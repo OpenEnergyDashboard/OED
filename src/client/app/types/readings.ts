@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from './redux/graph';
-
 export interface CompareReading {
 	curr_use: number;
 	prev_use: number;
@@ -13,18 +11,14 @@ export interface CompareReadings {
 	[id: number]: CompareReading;
 }
 
-export interface ExportDataSet {
-	label: string;
-	id: number;
-	currentChart: ChartTypes;
-	exportVals: Array<{ x: number, y: number, z: number }>;
-}
-
 export interface RawReadings {
-	label: string,
-	reading: number,
-	startTimestamp: string,
-	endTimestamp: string
+	// Note that the identifiers are not the usual ones so the route
+	// sends less data since they are one letter long. Testing indicated
+	// up to a 25% reduction in the network traffic. It is done for raw
+	// since the export can send lots of data (unlike graphing).
+	r: number,
+	s: string,
+	e: string
 }
 
 export interface LineReading {

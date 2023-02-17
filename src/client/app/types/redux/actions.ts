@@ -52,6 +52,7 @@ export enum ActionType {
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
 	UpdateLineGraphRate = 'UPDATE_LINE_GRAPH_RATE',
+	ConfirmGraphRenderOnce = 'CONFIRM_GRAPH_RENDER_ONCE',
 
 	RequestGroupsDetails = 'REQUEST_GROUPS_DETAILS',
 	ReceiveGroupsDetails = 'RECEIVE_GROUPS_DETAILS',
