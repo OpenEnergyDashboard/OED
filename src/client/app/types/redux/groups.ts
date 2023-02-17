@@ -17,6 +17,7 @@ export type GroupsAction =
 	| ChangeSelectedChildGroupsPerGroupAction
 	| ChangeSelectedChildMetersPerGroupAction
 	| ConfirmEditedGroupAction
+	| ConfirmGroupsFetchedOnceAction;
 	;
 
 export interface RequestGroupsDetailsAction {
@@ -59,6 +60,10 @@ export interface ChangeSelectedChildMetersPerGroupAction {
 	type: ActionType.ChangeSelectedChildMetersPerGroup;
 	parentID: number;
 	meterIDs: number[];
+}
+
+export interface ConfirmGroupsFetchedOnceAction {
+	type: ActionType.ConfirmGroupsFetchedOnce;
 }
 
 export interface GroupMetadata {
@@ -109,6 +114,7 @@ export interface StatefulEditable {
 }
 
 export interface GroupsState {
+	hasBeenFetchedOnce: boolean;
 	isFetching: boolean;
 	outdated: boolean;
 	byGroupID: {

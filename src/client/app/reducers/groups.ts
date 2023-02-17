@@ -7,6 +7,7 @@ import { GroupsAction, GroupsState, DisplayMode } from '../types/redux/groups';
 import { ActionType } from '../types/redux/actions';
 
 const defaultState: GroupsState = {
+	hasBeenFetchedOnce: false,
 	isFetching: false,
 	outdated: true,
 	byGroupID: {},
@@ -20,6 +21,13 @@ const defaultState: GroupsState = {
 
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {
+		// Records if group details have been fetched at least once
+		case ActionType.ConfirmGroupsFetchedOnce: {
+			return {
+				...state,
+				hasBeenFetchedOnce: true
+			};
+		}
 		// The following are reducers related to viewing and fetching groups data
 		case ActionType.RequestGroupsDetails:
 			return {

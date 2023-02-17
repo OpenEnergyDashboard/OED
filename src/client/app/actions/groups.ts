@@ -33,16 +33,26 @@ export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGrou
 }
 
 export function fetchGroupsDetails(): Thunk {
-	return async (dispatch: Dispatch) => {
+	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestGroupsDetails());
 		// Returns the names and IDs of all groups in the groups table.
 		const groupsDetails = await groupsApi.details();
-		return dispatch(receiveGroupsDetails(groupsDetails));
+		dispatch(receiveGroupsDetails(groupsDetails));
+		// If this is the first fetch, inform the store that the first fetch has been made
+		if (!getState().groups.hasBeenFetchedOnce) {
+			dispatch(confirmGroupsFetchedOnce());
+		}
 	};
 }
 
+export function confirmGroupsFetchedOnce(): t.ConfirmGroupsFetchedOnceAction {
+	return { type: ActionType.ConfirmGroupsFetchedOnce };
+}
+
 function shouldFetchGroupsDetails(state: State): boolean {
-	return !state.groups.isFetching && state.groups.outdated;
+	// TODO the first part is from the older code before modals and it isn't clear if
+	// outdated is needed.
+	return (!state.groups.isFetching && state.groups.outdated) || !state.groups.hasBeenFetchedOnce;
 }
 
 export function fetchGroupsDetailsIfNeeded(): Thunk {

@@ -56,7 +56,7 @@ export default function MetersDetailComponent() {
 	// Units state loaded status
 	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 
-	// Possible Meter Units
+	// Possible Meter Units to use
 	let possibleMeterUnits = new Set<UnitData>();
 	// The meter unit can be any unit of type meter.
 	Object.values(units).forEach(unit => {
@@ -68,6 +68,8 @@ export default function MetersDetailComponent() {
 	possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	possibleMeterUnits.add(noUnit);
+
+	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(units);
 
 	const titleStyle: React.CSSProperties = {

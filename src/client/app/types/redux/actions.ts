@@ -61,6 +61,7 @@ export enum ActionType {
 	ChangeSelectedChildMetersPerGroup = 'CHANGE_SELECTED_CHILD_METERS_PER_GROUP',
 	ChangeDisplayedGroups = 'CHANGE_DISPLAYED_GROUPS',
 	ConfirmEditedGroup = 'CONFIRM_EDITED_GROUP',
+	ConfirmGroupsFetchedOnce = 'CONFIRM_GROUPS_FETCHED_ONCE',
 
 	UpdateImportMeter = 'UPDATE_IMPORT_METER',
 	UpdateDisplayTitle = 'UPDATE_DISPLAY_TITLE',
