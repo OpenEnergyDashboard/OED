@@ -18,7 +18,7 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import '../../styles/modal.css';
 import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
+import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
@@ -57,7 +57,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		note: originalGroupState.note,
 		area: originalGroupState.area,
 		defaultGraphicUnit: originalGroupState.defaultGraphicUnit,
-		id: originalGroupState.id,
+		id: originalGroupState.id
 	}
 
 	// The information on the children of this group
@@ -73,7 +73,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// The identifiers of all meter children (deep meters) that are visible to this user.
 		deepMetersIdentifier: [] as string[],
 		// The original number of direct meter children
-		deepMetersTrueSize: 0,
+		deepMetersTrueSize: 0
 	}
 
 	const dropdownsStateDefaults = {
@@ -189,7 +189,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (inputOk) {
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
-				const submitState = { ...state, gps: gps, };
+				const submitState = { ...state, gps: gps };
 				dispatch(submitGroupEdits(submitState));
 				dispatch(removeUnsavedChanges());
 			} else {
@@ -288,7 +288,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			...dropdownsState,
 			// The new set helps avoid repaints.
 			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
 		});
 		// TODO for now just do every time but need to put in actual dependencies
 		// If either unit or the status of pik changes then this needs to be done.
@@ -315,7 +315,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		<>
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
-					<Modal.Title> <FormattedMessage id={loggedInAsAdmin ? "edit.group" : "group.details"} />
+					<Modal.Title> <FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
 						<TooltipHelpContainer page='groups' />
 						<div style={tooltipStyle}>
 							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipEditGroupView} />

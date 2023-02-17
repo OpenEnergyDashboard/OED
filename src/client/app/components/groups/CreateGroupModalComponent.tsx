@@ -45,7 +45,7 @@ export default function CreateGroupModalComponent() {
 	// Unlike EditGroupsModalComponent, there are no props so we don't pass show and close via props.
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
-	
+
 	const handleClose = () => {
 		setShowModal(false);
 		resetState();

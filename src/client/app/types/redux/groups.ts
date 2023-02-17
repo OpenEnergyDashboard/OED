@@ -17,8 +17,8 @@ export type GroupsAction =
 	| ChangeSelectedChildGroupsPerGroupAction
 	| ChangeSelectedChildMetersPerGroupAction
 	| ConfirmEditedGroupAction
-	| ConfirmGroupsFetchedOnceAction;
-	;
+	| ConfirmGroupsFetchedOnceAction
+;
 
 export interface RequestGroupsDetailsAction {
 	type: ActionType.RequestGroupsDetails;

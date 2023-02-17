@@ -85,8 +85,9 @@ export default function GroupsDetailComponent() {
 							{Object.values(groupsState)
 								.sort((groupA: GroupDefinition, groupB: GroupDefinition) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
 									((groupB.name.toLowerCase() > groupA.name.toLowerCase()) ? -1 : 0))
-								.map(groupData => (<GroupViewComponent group={groupData as
-									GroupDefinition} key={(groupData as GroupDefinition).id}
+								.map(groupData => (<GroupViewComponent
+									group={groupData as GroupDefinition}
+									key={(groupData as GroupDefinition).id}
 									currentUser={currentUserState}
 									// These two props are used in the edit component (child of view component)
 									possibleGraphicUnits={possibleGraphicUnits}
