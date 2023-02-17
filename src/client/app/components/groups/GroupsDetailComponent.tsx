@@ -14,6 +14,7 @@ import { State } from '../../types/redux/state';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+import { potentialGraphicUnits } from '../../utils/input';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
@@ -40,6 +41,13 @@ export default function GroupsDetailComponent() {
 	// Check for admin status
 	const currentUser = currentUserState.profile;
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	// Units state
+	const units = useSelector((state: State) => state.units.units);
+	// Units state loaded status
+	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
+
+	// Possible graphic units to use
+	const possibleGraphicUnits = potentialGraphicUnits(units);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -71,7 +79,7 @@ export default function GroupsDetailComponent() {
 							< CreateGroupModalComponent />
 						</div>
 					}
-					{groupsStateLoaded &&
+					{groupsStateLoaded && unitsStateLoaded &&
 						<div className="card-container">
 							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 							{Object.values(groupsState)
@@ -80,6 +88,8 @@ export default function GroupsDetailComponent() {
 								.map(groupData => (<GroupViewComponent group={groupData as
 									GroupDefinition} key={(groupData as GroupDefinition).id}
 									currentUser={currentUserState}
+									// These two props are used in the edit component (child of view component)
+									possibleGraphicUnits={possibleGraphicUnits}
 								/>))}
 						</div>
 					}

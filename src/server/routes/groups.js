@@ -312,14 +312,14 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
-				// TODO: pass arguments for units
 				const newGroup = new Group(
 					req.body.id,
 					req.body.name,
 					req.body.displayable,
 					newGPS,
 					req.body.note,
-					req.body.area
+					req.body.area,
+					req.body.defaultGraphicUnit
 				);
 
 				await newGroup.update(t);

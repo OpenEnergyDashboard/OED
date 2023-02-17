@@ -5,7 +5,7 @@
 import * as React from 'react';
 // TODO import store from '../../index';
 // Realize that * is already imported from react
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
 import { Modal, Button } from 'react-bootstrap';
@@ -21,12 +21,14 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups'; // TODO verify correct action, remove export for action if not used.
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
 
 interface EditGroupModalComponentProps {
 	show: boolean;
 	groupId: number;
+	possibleGraphicUnits: Set<UnitData>;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -74,6 +76,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		deepMetersTrueSize: 0,
 	}
 
+	const dropdownsStateDefaults = {
+		possibleGraphicUnits: props.possibleGraphicUnits,
+		compatibleGraphicUnits: props.possibleGraphicUnits,
+		incompatibleGraphicUnits: new Set<UnitData>()
+	}
+
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
@@ -91,6 +99,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
+
+	// Dropdowns
+	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
 	/* End State */
 
 	// Reset the state to default values
@@ -188,7 +199,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	};
 
 	// Determine the names of the child meters/groups.
-	React.useEffect(() => {
+	useEffect(() => {
 		// Get the children of this meter. This will happen twice on the first load.
 		// TODO Since this is done for each card, it would be better to load them all at once
 		// rather per meter. This means moving this into the GroupsDetailComponent or before.
@@ -262,6 +273,29 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		})
 	}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups, groupsState[state.id].deepMeters]);
 
+	// Update compatible units and graphic units set.
+	useEffect(() => {
+		// Graphic units compatible with currently selected unit
+		const compatibleGraphicUnits = new Set<UnitData>();
+		// Graphic units incompatible with currently selected unit
+		const incompatibleGraphicUnits = new Set<UnitData>();
+		dropdownsState.possibleGraphicUnits.forEach(unit => {
+			// TODO As starting point, just allow all and don't filter
+			compatibleGraphicUnits.add(unit);
+		});
+		// Update the state
+		setDropdownsState({
+			...dropdownsState,
+			// The new set helps avoid repaints.
+			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits),
+		});
+		// TODO for now just do every time but need to put in actual dependencies
+		// If either unit or the status of pik changes then this needs to be done.
+		// pik is needed since the compatible units is not correct until pik is available.
+		// }, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
+	}, []);
+
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
@@ -319,19 +353,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												type='select'
 												value={state.defaultGraphicUnit}
 												onChange={e => handleNumberChange(e)}>
-												{<option
-													value={-999}
-													key={-999}
-													hidden={state.defaultGraphicUnit !== -999}
-													disabled>
-													{translate('select.unit')}
-												</option>}
-												{/* TODO {Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
+												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
 												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})} */}
+												})}
 											</Input>
 										</div>
 										:

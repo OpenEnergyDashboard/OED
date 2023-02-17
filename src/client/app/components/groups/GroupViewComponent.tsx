@@ -15,6 +15,7 @@ import { GroupDefinition } from 'types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { CurrentUserState } from 'types/redux/currentUser';
 import translate from '../../utils/translate';
+import { UnitData } from '../../types/redux/units';
 
 // TODO
 // Need to put child meters somewhere
@@ -27,6 +28,9 @@ import translate from '../../utils/translate';
 interface GroupViewComponentProps {
 	group: GroupDefinition;
 	currentUser: CurrentUserState;
+	// This isn't used in this component but are passed to the edit component
+	// This is done to avoid having to recalculate the possible units sets in each view component
+	possibleGraphicUnits: Set<UnitData>;
 }
 
 export default function GroupViewComponent(props: GroupViewComponentProps) {
@@ -85,7 +89,8 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 				<EditGroupModalComponent
 					show={showEditModal}
 					groupId={props.group.id}
-					handleClose={handleClose} />
+					handleClose={handleClose}
+					possibleGraphicUnits={props.possibleGraphicUnits} />
 			</div>
 		</div>
 	);
