@@ -22,6 +22,8 @@ import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/grou
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
+import { unitsCompatibleWithMeters, metersInGroup } from '../../utils/determineCompatibleUnits';
+import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
 
@@ -281,9 +283,19 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		const compatibleGraphicUnits = new Set<UnitData>();
 		// Graphic units incompatible with currently selected unit
 		const incompatibleGraphicUnits = new Set<UnitData>();
+		// Find all the meters in this group. Initially this will be the same as the deep meters but needs to be updated
+		// if edited on this page. Then find all the units that are compatible with these meters.
+		// TODO this isn't going to be correct if the meters or groups of this group is edited on this page
+		// because it does not change the group state until you save.
+		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(metersInGroup(state.id));
 		dropdownsState.possibleGraphicUnits.forEach(unit => {
-			// TODO As starting point, just allow all and don't filter
-			compatibleGraphicUnits.add(unit);
+				// If current graphic unit exists in the set of allowed graphic units
+				if (allowedDefaultGraphicUnit.has(unit.id)) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
 		});
 		// Update the state
 		setDropdownsState({
@@ -292,11 +304,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
 			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
 		});
-		// TODO for now just do every time but need to put in actual dependencies
-		// If either unit or the status of pik changes then this needs to be done.
+		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
-		// }, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
-	}, []);
+		// TODO need to add change in meters and groups of this group once settle how going to do above.
+	}, [ConversionArray.pikAvailable()]);
 
 	const tooltipStyle = {
 		display: 'inline-block',

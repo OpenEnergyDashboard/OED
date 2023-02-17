@@ -45,6 +45,8 @@ export default function GroupsDetailComponent() {
 	const units = useSelector((state: State) => state.units.units);
 	// Units state loaded status
 	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
+	// Units state loaded status
+	const metersStateLoaded = useSelector((state: State) => state.meters.hasBeenFetchedOnce);
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(units);
@@ -79,7 +81,7 @@ export default function GroupsDetailComponent() {
 							< CreateGroupModalComponent />
 						</div>
 					}
-					{groupsStateLoaded && unitsStateLoaded &&
+					{groupsStateLoaded && unitsStateLoaded && metersStateLoaded &&
 						<div className="card-container">
 							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 							{Object.values(groupsState)
