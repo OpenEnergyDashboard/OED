@@ -155,9 +155,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="conversion.edit.conversion" />
-						<TooltipHelpContainer page='conversions' />
+						<TooltipHelpContainer page='conversions-edit' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipEditConversionView} />
+							<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>

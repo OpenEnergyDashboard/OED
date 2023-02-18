@@ -151,9 +151,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.unit" />
-						<TooltipHelpContainer page='units' />
+						<TooltipHelpContainer page='units-edit' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipEditUnitView} />
+							<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>

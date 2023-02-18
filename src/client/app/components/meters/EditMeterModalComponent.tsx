@@ -360,9 +360,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.meter" />
-						<TooltipHelpContainer page='meters' />
+						<TooltipHelpContainer page='meters-edit' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipEditMeterView} />
+							<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>

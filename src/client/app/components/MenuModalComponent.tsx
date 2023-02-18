@@ -60,7 +60,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 							<p style={labelStyle}>
 								<FormattedMessage id='navigation' />:
 							</p>
-							<HeaderButtonsContainer  showCollapsedMenuButton={false} />
+							<HeaderButtonsContainer  showCollapsedMenuButton={false} isModal />
 						</div>
 						{ this.props.showOptions &&
 							<UIOptionsContainer />

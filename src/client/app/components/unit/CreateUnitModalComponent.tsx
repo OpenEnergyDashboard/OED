@@ -105,9 +105,9 @@ export default function CreateUnitModalComponent() {
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.unit" />
-						<TooltipHelpContainer page='units' />
+						<TooltipHelpContainer page='units-create' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipCreateUnitView} />
+							<TooltipMarkerComponent page='units-create' helpTextId={tooltipStyle.tooltipCreateUnitView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>

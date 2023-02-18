@@ -171,9 +171,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.conversion" />
-						<TooltipHelpContainer page='conversions' />
+						<TooltipHelpContainer page='conversions-create' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipCreateConversionView} />
+							<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
