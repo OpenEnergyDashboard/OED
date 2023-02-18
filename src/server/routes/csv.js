@@ -111,7 +111,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	try {
 		log.info(`The file ${uploadedFilepath} was created to upload meters csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		// Unzip uploaded file and save file to disk if the user 
+		// Unzip uploaded file and save file to disk if the user
 		// has indicated that the file is (g)zipped.
 		if (isGzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
@@ -159,7 +159,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	try {
 		log.info(`The uploaded file ${uploadedFilepath} was created to upload readings csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
-		// Unzip uploaded file and save file to disk if the user 
+		// Unzip uploaded file and save file to disk if the user
 		// has indicated that the file is (g)zipped.
 		if (isGzip) {
 			fileBuffer = zlib.gunzipSync(fileBuffer);

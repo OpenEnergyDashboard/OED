@@ -12,6 +12,7 @@ const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
+const { translate } = require('../../translate')
 
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
@@ -31,7 +32,7 @@ const E0 = moment(0).utc()
  *   are actually date/time where you cannot have the day of month first in date. This is what moment can deal with.
  *   No start time if isEndOnly true.
  * @param {number} meterID meter id being input
- * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file 
+ * @param {string} timeSort the canonical order sorted by date/time in which the data appears in the data file
  *   'increasing' or 'decreasing'), default 'increasing'
  * @param {number} readingRepetition value is 1 if reading is not duplicated. 2 if repeated twice and so on (such as E-mon D-mon meters)
  * @param {boolean} isCumulative true if the data is cumulative and false otherwise
@@ -128,8 +129,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// might be true with regular time sort.
 	if (cumulativeReset && !isCumulative) {
 		isAllReadingsOk = false;
-		msgTotal = '<h2>On meter ' + meterName + ' in pipeline: cumulative was false but cumulative reset was true.' +
-			' To avoid mistakes all reading are rejected.</h2>';
+		msgTotal = `<h2>${translate('csv.mismatched-cumulative-variables', { meter: meterName })}</h2>`;
 		// No readings yet so can return result
 		return { result, isAllReadingsOk, msgTotal };
 	}
@@ -147,7 +147,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	*  currentReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
 	*  prevReading = row[1] : {reading_value1, startTimestamp1, endTimestamp1}
 	*  currentReading = row[2] : {reading_value2, startTimestamp2, endTimestamp2}
-	*  
+	*
 	*  If the currentReading passes all checks then we add the currentReading to result and begin parsing and checking the next reading
 	*/
 	// This current reading should not be used until it is reset later with the desired reading.
@@ -190,8 +190,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			startTimestampTz = prevEndTimestampTz;
 			endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			if (!endTimestampTz.isValid() && relaxedParsing) {
-				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += `${translate('csv.failed-to-parse-end-datetime', { datetime: rows[index][1] }) }<br>`;
 				// If this fails it is caught below.
 				endTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
@@ -212,15 +211,14 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			if (!startTimestampTz.isValid() && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
-				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += `${translate('csv.failed-to-parse-start-datetime', { datetime: rows[index][1] }) }<br>`;
+
 				// If this fails it is caught below.
 				startTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
 			endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
 			if (!endTimestampTz.isValid() && relaxedParsing) {
-				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += `${translate('csv.failed-to-parse-end-datetime', { datetime: rows[index][2] }) }<br>`;
 				// If this fails it is caught below.
 				endTimestampTz = moment.parseZone(rows[index][2], undefined);
 			}
@@ -230,9 +228,12 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);;
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
-			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-				' The start (' + rows[index][1] + ') and/or end time (' + rows[index][2] +
-				') provided did not parse into a valid date/time so all reading are rejected.<br>';
+			errMsg += `${translate('csv.invalid-date', {
+				meter: meterName,
+				num: row(index, isAscending, rows.length),
+				start: rows[index][1],
+				end: rows[index][2],
+			})}<br>`;
 			log.error(errMsg);
 			// We use the current reading where provide 'unknown' for reading value since not yet set.
 			// Since only output this is okay.
@@ -251,9 +252,11 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
 			// Check the current reading is a number. The previous one should already be checked.
 			if (isNaN(meterReading2)) {
-				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-					' with cumulative data. The reading value provided of ' + meterReading2 +
-					' is not considered a number so all reading are rejected.<br>';
+				errMsg += `${translate('csv.invalid-date', {
+					meter: meterName,
+					num: row(index, isAscending, rows.length),
+					reading: meterReading2,
+				})}<br>`;
 				log.error(errMsg);
 				msgTotal += errMsg;
 				// This empties the result array. Should be fast and okay with const.
@@ -272,9 +275,11 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// The data is not cumulative use the raw reading value
 			meterReading = rows[index][0];
 			if (isNaN(meterReading)) {
-				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-					' The reading value provided of ' + meterReading +
-					' is not considered a number so all reading are rejected.<br>';
+				errMsg += `${translate('csv.invalid-date', {
+					meter: meterName,
+					num: row(index, isAscending, rows.length),
+					reading: meterReading,
+				})}<br>`;
 				log.error(errMsg);
 				msgTotal += errMsg;
 				// This empties the result array. Should be fast and okay with const.
@@ -760,7 +765,7 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 * have offsets. If not/in UTC then always returns zero.
 * @param {Moment} startTimestamp The start timestamp of the reading to use.
 * @param {Moment} endTimestamp The end timestamp of the reading to use.
-* @returns {number} the time shift between the first and second reading in minutes where it is 0 if none. 
+* @returns {number} the time shift between the first and second reading in minutes where it is 0 if none.
 */
 function dstShift(startTimestamp, endTimestamp) {
 	const startOffset = startTimestamp.utcOffset();
@@ -805,7 +810,7 @@ function getZoneUntil(meterZone, pastCrossingTimestamp) {
 		}
 	}
 	// We really don't expect to not find the date desired. If this happens then throw an error.
-	throw new Error('Could not find DST crossing date in pipeline so giving up.');
+	throw new Error(translate('csv.missing-dst-crossing-date'));
 }
 
 /**
@@ -837,7 +842,7 @@ function inZone(meterZone, timestamp) {
 		}
 	}
 	// We really don't expect to not find the date desired. If this happens then throw an error.
-	throw new Error('Could not find DST crossing date in pipeline so giving up.');
+	throw new Error(translate('csv.missing-dst-crossing-date'));
 }
 
 module.exports = processData;

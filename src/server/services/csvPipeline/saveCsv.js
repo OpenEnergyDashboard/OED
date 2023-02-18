@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const { CSVPipelineError } = require('./CustomErrors');
 const fs = require('fs').promises;
 const moment = require('moment');
+const { translate } = require('../../translate');
 
 async function saveCsv(buffer, filename, dir = __dirname) {
 	// save this buffer into a file
@@ -13,9 +14,8 @@ async function saveCsv(buffer, filename, dir = __dirname) {
 	const filepath = `${dir}/${randomFilename}.csv`;
 	await fs.writeFile(filepath, buffer)
 		.catch(err => {
-			const message = `Failed to write the file: ${filepath}`;
-			throw new CSVPipelineError(`Internal OED error: ${message}`, err.message, 500);
-		}); // separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process; 
+			throw new CSVPipelineError(translate('csv.failed-to-write-file', { filename }), err.message, 500);
+		}); // separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process;
 	return filepath;
 }
 
