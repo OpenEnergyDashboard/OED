@@ -101,7 +101,7 @@ function createTimeString(startDay, startTime, endDay, endTime) {
 
 /**
  * Get the unit id given name of unit.
- * @param {string} unitNamne
+ * @param {string} unitName
  * @returns {number} id of unitName
  */
 async function getUnitId(unitName) {
@@ -346,6 +346,32 @@ mocha.describe('readings API', () => {
 					const unitId = await getUnitId('MJ');
 					// Reuse same file as flow since value should be the same values.
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
+					const unitData = [
+						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
+						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
+						// Not present in design docs, but taken from the insertStandardUnits() function src/server/util/insertData.js
+						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+					];
+					const conversionData = [
+						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+					 	['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
+					 	['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+					];
+					const meterData = [['Electric_Utility BTU', 'Electric_Utility', 'BTU', true, undefined,
+						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('BTU');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
