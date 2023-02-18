@@ -11,7 +11,7 @@ const { log } = require('../../log');
  *
  * @param {express.Request} req The Express request object
  * @param {express.Response} res The Express response object
- * @param {Error || CSVPipelineError.class} error The reason for the failure.
+ * @param {Error | CSVPipelineError} error The reason for the failure.
  *
  */
 function failure(req, res, error) {
