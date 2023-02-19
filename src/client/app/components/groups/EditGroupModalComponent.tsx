@@ -2,10 +2,13 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as _ from 'lodash';
 import * as React from 'react';
 // TODO import store from '../../index';
 // Realize that * is already imported from react
 import { useState, useEffect } from 'react';
+import MultiSelectComponent from '../MultiSelectComponent';
+import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
 import { Modal, Button } from 'react-bootstrap';
@@ -25,7 +28,8 @@ import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithMeters, metersInGroup } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
+import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
+import { getSelectOptionsByItem } from '../ChartDataSelectComponent';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -46,6 +50,22 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// The current groups state. It should always be valid.
 	const originalGroupState = groupsState[props.groupId];
+	// Sort child meters by id because need that every time the user makes a meter selection
+	originalGroupState.childMeters.sort();
+
+	// The chosen meters are initially the meter children of this group.
+	// In format for the display component.
+	const selectedMetersUnsorted: SelectOption[] = [];
+	Object.values(originalGroupState.childMeters).forEach(meter => {
+		selectedMetersUnsorted.push({
+			value: meter,
+			label: metersState[meter].identifier,
+			isDisabled: false
+		} as SelectOption
+		);
+	});
+	// Want chosen in sorted order.
+	let selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -134,6 +154,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
+		const childMeterChanges = !metersSame(originalGroupState.childMeters, selectedMeters);
 		const groupHasChanges =
 			(
 				originalGroupState.name != state.name ||
@@ -141,13 +162,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				originalGroupState.gps != state.gps ||
 				originalGroupState.note != state.note ||
 				originalGroupState.area != state.area ||
-				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit
+				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
+				childMeterChanges
 				// TODO add children value when can edit and any others
 			);
-
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
-
 			//Check if area is positive
 			// TODO object is possibly undefined
 			// TODO For now allow zero so works with default value and DB. We should probably
@@ -193,7 +213,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (inputOk) {
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
-				const submitState = { ...state, gps: gps };
+				let submitState = { ...state, gps: gps };
+				let childMeters: number[] = [];
+				if (childMeterChanges) {
+					// Send child meters to update but need to create array of the ids.
+					childMeters = selectedMeters.map(meter => { return meter.value; });
+					submitState = { ...state, childMeters: childMeters }
+				}
 				dispatch(submitGroupEdits(submitState));
 				dispatch(removeUnsavedChanges());
 			} else {
@@ -201,6 +227,27 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		}
 	};
+
+	// TODO consider useSelect vs useEffect and implications for entire codebase
+	const dataProps = useSelector((state: State) => {
+		// Get meters that okay for this group in a format the component can display.
+		const sortedMeters = getMeterCompatibilityForDropdown(state);
+		// push a dummy item as a divider.
+		const firstDisabledMeter: number = sortedMeters.findIndex(item => item.isDisabled);
+		if (firstDisabledMeter != -1) {
+			sortedMeters.splice(firstDisabledMeter, 0, {
+				value: 0,
+				label: '----- Incompatible Meters -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
+
+		return {
+			// all meter, sorted alphabetically and by compatibility
+			sortedMeters
+		}
+	});
 
 	// Determine the names of the child meters/groups.
 	useEffect(() => {
@@ -289,13 +336,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// because it does not change the group state until you save.
 		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(metersInGroup(state.id));
 		dropdownsState.possibleGraphicUnits.forEach(unit => {
-				// If current graphic unit exists in the set of allowed graphic units
-				if (allowedDefaultGraphicUnit.has(unit.id)) {
-					compatibleGraphicUnits.add(unit);
-				}
-				else {
-					incompatibleGraphicUnits.add(unit);
-				}
+			// If current graphic unit exists in the set of allowed graphic units
+			if (allowedDefaultGraphicUnit.has(unit.id)) {
+				compatibleGraphicUnits.add(unit);
+			}
+			else {
+				incompatibleGraphicUnits.add(unit);
+			}
 		});
 		// Update the state
 		setDropdownsState({
@@ -378,7 +425,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<div className="item-container">
 											{/* Use meter translation id string since same one wanted. */}
 											{/* This is the default graphic unit associated with the group or no unit if none. */}
-											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {state.defaultGraphicUnit === -99 ? 'no unit' : unitState[state.defaultGraphicUnit].identifier}
+											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
+											{state.defaultGraphicUnit === -99 ? 'no unit' : unitState[state.defaultGraphicUnit].identifier}
 										</div>
 									}
 									{/* Displayable input */}
@@ -432,9 +480,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 									}
 									{/* The child meters in this group */}
-									<div>
+									<div style={formInputStyle}>
 										<b><FormattedMessage id='child.meters' /></b>:
-										<ListDisplayComponent trueSize={groupChildrenState.childMetersTrueSize} items={groupChildrenState.childMetersIdentifier} />
+										<MultiSelectComponent
+											options={dataProps.sortedMeters}
+											selectedOptions={selectedMeters}
+											placeholder={translate('select.meters')}
+											onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+												selectedMeters = newSelectedMeterOptions;
+											}}
+										/>
 									</div>
 									{/* The child groups in this group */}
 									<div>
@@ -473,4 +528,46 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			</Modal >
 		</>
 	);
+}
+
+// TODO maybe just pass the meter state?
+/**
+ * Determines the compatibility of meters in the redux state for display in dropdown
+ * @param {State} state - current redux state
+ * @returns {SelectOption[]} an array of SelectOption
+ */
+function getMeterCompatibilityForDropdown(state: State) {
+	// meters that can be selected for this group
+	const compatibleMeters = new Set<number>();
+	// meters that cannot be selected for this group
+	const incompatibleMeters = new Set<number>();
+	// TODO right now just allowing all meters
+	Object.values(state.meters.byMeterID).forEach(meter => {
+		compatibleMeters.add(meter.id);
+	});
+
+	// Retrieve select options from meter sets
+	const finalMeters = getSelectOptionsByItem(compatibleMeters, incompatibleMeters, state.meters);
+	return finalMeters;
+}
+
+/**
+ * Returns false if the two arrays have different meter ids and true otherwise. Assumes elements unique.
+ * SelectOption has meter id in value.
+ * @param {number[]} originalMeters[] first array of meter ids
+ * @param {SelectOption[]} selectedMeters[] second array of selection options
+ * @returns false if two arrays differ, otherwise true
+ */
+function metersSame(originalMeters: number[], selectedMeters: SelectOption[]) {
+	if (originalMeters.length == selectedMeters.length) {
+		// Sort since user selections can be in any order.
+		const sortedTwo = _.sortBy(selectedMeters, item => item.value, 'asc');
+		// Compare id of meters in each array by each element until find difference or all the same.
+		return originalMeters.every((element, index) => {
+			return element === sortedTwo[index].value;
+		});
+	} else {
+		// The lengths differ so cannot be the same since each element is unique.
+		return false;
+	}
 }
