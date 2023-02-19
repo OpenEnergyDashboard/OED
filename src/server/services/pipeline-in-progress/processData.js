@@ -655,9 +655,12 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, '<h2>Readings Dropped and should have previous messages</h2><ol>', msgTotalWarning));
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, `<h2>${translate('data.readings-dropped-previous-messages')}</h2><ol>`, msgTotalWarning));
 		readingsDropped.forEach(readingNum => {
-			let messageNew = '<li>Dropped Reading #' + readingNum + ' for meter ' + meterName + '</li>'; log.info(messageNew);
+			let messageNew = `<li>${translate('data.dropped-reading-for-meter', {
+				readingNum,
+				meter: meterName
+			})}</li>`; log.info(messageNew);
 			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning));
 		});
 		// Assume the <ol> was put in. If not, get minor HTML syntax issue.
@@ -752,8 +755,7 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 	if (msgTotal.length < MAX_SIZE) {
 		msgTotal += newMsg;
 	} else if (!msgTotalWarning) {
-		msgTotal = '<h1>WARNING - The total number of messages was stopped due to size.' +
-			' The log file has all the messages.</h1>' + message + '<h1>Message lost starting now.</h1>';
+		msgTotal = `<h1>${translate('data.warning-message-stopped')}</h1>${message}<h1>${translate('data.message-lost-starting-now')}</h1>`;
 		// Note that warned so goes from false to true.
 		msgTotalWarning = !msgTotalWarning;
 	}
