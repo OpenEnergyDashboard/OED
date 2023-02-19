@@ -34,5 +34,23 @@ exports.localeData = {
 		"csv.failed-to-parse-end-datetime": "(Need French) The end date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.invalid-date": "(Need French) For meter {meter}: Error parsing Reading #{num} The start ({start}) and/or end time ({end}) provided did not parse into a valid date/time so all reading are rejected.",
 		"csv.invalid-reading-number": "(Need French) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected."
+	},
+	"es": {
+		"status.success": "ÉXITO",
+		"status.failure": "FALLA",
+		"csv.failed-to-write-file": "Error interno de OED: Error al escribir el archivo: {filename}",
+		"csv.missing-dst-crossing-date": "No se pudo encontrar la fecha de cruce de DST en la canalización, por lo que se rindió.",
+		"csv.invalid-gps-input": "(Need Spanish) For meter {meter} the gps coordinates of {gps} are invalid",
+		"csv.invalid-unit-id": "(Need Spanish) For meter {meter} the unit of {unit} is invalid",
+		"csv.invalid-graphic-unit": "(Need Spanish) For meter {meter} the default graphic unit of {graphic_unit} is invalid",
+		"csv.require-single-meter": "(Need Spanish) Meter name provided (\"{meter}\") in request with update for meters but more than one meter in CSV so not processing",
+		"csv.non-existent-meter-name": "(Need Spanish) Meter name of \"{meter}\" does not seem to exist with update for meters and got DB error of: {errorMessage}",
+		"csv.duplicate-meter": "(Need Spanish) Meter name of \"{meter}\" got database error of: {errorMessage}",
+		"csv.failed-meter-upload": "(Need Spanish) Failed to upload meters due to internal OED Error: {errorMessage}",
+		"csv.mismatched-cumulative-variables": "(Need Spanish) On meter {meter} in pipeline: cumulative was false but cumulative reset was true. To avoid mistakes all reading are rejected.",
+		"csv.failed-to-parse-start-datetime": "(Need Spanish) The start date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
+		"csv.failed-to-parse-end-datetime": "(Need Spanish) The end date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
+		"csv.invalid-date": "(Need Spanish) For meter {meter}: Error parsing Reading #{num} The start ({start}) and/or end time ({end}) provided did not parse into a valid date/time so all reading are rejected.",
+		"csv.invalid-reading-number": "(Need Spanish) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected."
 	}
 }
