@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- const translate = require('../translate');
+const translate = require('../../translate');
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
