@@ -218,7 +218,12 @@ function validateMeterParams(params) {
 			reading: { type: 'number' },
 			startTimestamp: { type: 'string' },
 			endTimestamp: { type: 'string' },
-			previousEnd: { type: 'string' },
+			previousEnd: {
+                oneOf: [
+                    { type: 'string' },
+                    { type: 'null' }
+                ]
+            },
 			unitId: { type: 'integer' },
 			defaultGraphicUnit: { type: 'integer' }
 		}
@@ -260,7 +265,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.reading,
 				(req.body.startTimestamp.length === 0) ? undefined : req.body.startTimestamp,
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
-				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
+				(req.body.previousEnd === null || req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
 				req.body.defaultGraphicUnit
 			);

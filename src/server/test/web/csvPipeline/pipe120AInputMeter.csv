@@ -1,0 +1,2 @@
+name,url,enabled,displayable,type,timezone,gps,identifier,note,area,cumulative,reset,reset start,reset end,gap,variation,duplicates,timesort,end only,reading,start time,end time,previous end,unit,default graphic unit
+pipe120,,FALSE,TRUE,other,America/Chicago,,,,,,,,,,,,,,,,,,Electric_Utility,kWh
