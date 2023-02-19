@@ -15,9 +15,9 @@ import { groupsApi } from './api';
 
 /**
  * The intersect operation of two sets.
- * @param setA The first set.
- * @param setB The second set.
- * @returns The intersection of two sets.
+ * @param {Set<number>} setA The first set.
+ * @param {Set<number>} setB The second set.
+ * @returns {Set<number>} The intersection of two sets.
  */
 export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> {
 	return new Set(Array.from(setA).filter(i => setB.has(i)));
