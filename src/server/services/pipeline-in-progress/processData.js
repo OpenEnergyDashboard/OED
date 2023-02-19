@@ -12,7 +12,7 @@ const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings } = require('./validateReadings');
 const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
-const { translate } = require('../../translate')
+const { translate } = require('../../translate');
 
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
