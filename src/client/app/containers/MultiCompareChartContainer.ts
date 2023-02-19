@@ -42,10 +42,14 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 	const entities: CompareEntity[] = [];
 	for (const id of ids) {
 		let name: string;
-		let identifier: string = 'none';
+		let identifier: string;
 		let readingsData: CompareReadingsData | undefined;
 		if (isGroup) {
 			name = getGroupName(state, id);
+			// This is a bit of a kluge but the compare graphic uses the identifier. Since it does
+			// not easily know if it is group or meter, we set the identifier for the group to be
+			// the name to make it easier.
+			identifier = name;
 			readingsData = getGroupReadingsData(state, id, timeInterval, compareShift);
 		} else {
 			name = getMeterName(state, id);

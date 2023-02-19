@@ -55,14 +55,14 @@ router.get('/line/count/meters/:meter_ids', async (req, res) => {
 	}
 })
 
-router.get('/line/raw/meters/:meter_ids', async (req, res) => {
+router.get('/line/raw/meter/:meter_id', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
-		required: ['meter_ids'],
+		required: ['meter_id'],
 		properties: {
 			meter_ids: {
-				type: 'string'
+				type: 'integer'
 			}
 		}
 	};
@@ -80,28 +80,17 @@ router.get('/line/raw/meters/:meter_ids', async (req, res) => {
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
-		// We can't do .map(parseInt) here because map would give parseInt a radix value of the current array position.
-		// Again, this is why a lambda function is used so that .map(parseInt) can be recreated without problems.
-		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
+		// Get the routed meter id and time for the desired readings.
+		const meterID = req.params.meter_id;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try {
-			let toReturn = [];
-			for (let i = 0; i < meterIDs.length; i++) {
-				meterID = meterIDs[i];
-				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn)
-				const meterLabel = (await Meter.getByID(meterID, conn)).name;
-				rawReadings.map(ele => {
-					delete ele.meterID;
-					ele.label = meterLabel;
-					// The Reading function to get items from the databases returns the moment in UTC so this is okay without forcing it.
-					ele.startTimestamp = moment(ele.startTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-					ele.endTimestamp = moment(ele.endTimestamp).format('dddd LL LTS').replace(/,/g, ''); // use regex to omit pesky commas
-					toReturn.push(ele);
-				})
-			}
-			res.send(toReturn);
+			// Get the raw readings for this meter over time range desired.
+			// Note this returns unusual identifiers to save space and does not return the meter id.
+			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+			// They are ready to go back.
+			res.send(rawReadings);
 		} catch (err) {
-			log.error(`Error while performing GET raw readings for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
+			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
 		}
 	}

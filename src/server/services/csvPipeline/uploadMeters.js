@@ -29,86 +29,97 @@ async function uploadMeters(req, res, filepath, conn) {
 
 	// If there is a header row, we remove and ignore it for now.
 	const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
-	await Promise.all(meters.map(async meter => {
-		// First verify GPS is okay
-		// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
-		const gpsInput = meter[6];
-		// Skip if undefined.
-		if (gpsInput) {
-			// Verify GPS is okay values
-			if (!isValidGPSInput(gpsInput)) {
+	// The original code used a Promise.all to run through the meters. The issue is that the promises are run in parallel.
+	// If the meters are independent as expected then this works fine. However, in the error case where one CSV file has
+	// the same meter name listed twice, the order of the attempts to add to the database was arbitrary. This meant one of them
+	// failed due to the duplicate name but you did not know which one. If some of the information on the two meters differed then
+	// you did not know which one you would get in the database. The best result would be the first one in the CSV file would be stored
+	// as this makes the most logical sense (no update here) and it is consistent. To make this happen a for loop is used as it
+	// is sequential. A small negative is the database requests do not run in parallel in the usual case without an error.
+	// However, uploading meters is not common so slowing it down slightly seems a reasonable price to get this behavior.
+	try {
+		for (let i = 0; i < meters.length; i++) {
+			let meter = meters[i];
+			// First verify GPS is okay
+			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
+			const gpsInput = meter[6];
+			// Skip if undefined.
+			if (gpsInput) {
+				// Verify GPS is okay values
+				if (!isValidGPSInput(gpsInput)) {
+					throw new CSVPipelineError(translate(
+						'csv.invalid-gps-input',
+						{ meter: meter[0], gps: gpsInput }
+					), undefined, 500);
+				}
+				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
+				// DB is longitude, latitude.
+				meter[6] = switchGPS(gpsInput);
+			}
+
+			// Process unit.
+			const unitName = meter[23];
+			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
+			if (!unitId) {
 				throw new CSVPipelineError(translate(
-					'csv.invalid-gps-input',
-					{ meter: meter[0], gps: gpsInput }
+					'csv.invalid-unit-id',
+					{ meter: meter[0], unit: unitName }
 				), undefined, 500);
 			}
-			// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
-			// DB is longitude, latitude.
-			meter[6] = switchGPS(gpsInput);
-		}
+			// Replace the unit's name by its id.
+			meter[23] = unitId;
 
-		// Process unit.
-		const unitName = meter[23];
-		const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
-		if (!unitId) {
-			throw new CSVPipelineError(
-				translate('csv.invalid-unit-id', { meter: meter[0], unit: unitName }),
-			undefined, 500);
-		}
-		// Replace the unit's name by its id.
-		meter[23] = unitId;
-
-		// Process default graphic unit.
-		const defaultGraphicUnitName = meter[24];
-		const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
-		if (!defaultGraphicUnitId) {
-			throw new CSVPipelineError(translate(
-				'csv.invalid-graphic-unit',
-				{ meter: meter[0], graphic_unit: defaultGraphicUnitName }
-			), undefined, 500);
-		}
-		// Replace the default grahic unit's name by its id.
-		meter[24] = defaultGraphicUnitId;
-
-		if (req.body.update === 'true') {
-			// Updating the new meters.
-			// First get its id.
-			let nameOfMeter = req.body.meterName;
-			if (!nameOfMeter) {
-				// Seems no name provided so use one in CSV file.
-				nameOfMeter = meter[0];
-			} else if (meters.length !== 1) {
-				// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
+			// Process default graphic unit.
+			const defaultGraphicUnitName = meter[24];
+			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
+			if (!defaultGraphicUnitId) {
 				throw new CSVPipelineError(translate(
-					'csv.require-single-meter', { meter: nameOfMeter }
+					'csv.invalid-graphic-unit',
+					{ meter: meter[0], graphic_unit: defaultGraphicUnitName }
 				), undefined, 500);
 			}
-			let currentMeter;
-			currentMeter = await Meter.getByName(nameOfMeter, conn)
-				.catch(error => {
-					// Did not find the meter.
+			// Replace the default graphic unit's name by its id.
+			meter[24] = defaultGraphicUnitId;
+
+			if (req.body.update === 'true') {
+				// Updating the new meters.
+				// First get its id.
+				let nameOfMeter = req.body.meterName;
+				if (!nameOfMeter) {
+					// Seems no name provided so use one in CSV file.
+					nameOfMeter = meter[0];
+				} else if (meters.length !== 1) {
+					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
 					throw new CSVPipelineError(translate(
-						'csv.non-existent-meter-name', { meter: nameOfMeter , errorMessage: error.message }
+						'csv.require-single-meter', { meter: nameOfMeter }
 					), undefined, 500);
-				});
-			currentMeter.merge(...meter);
-			await currentMeter.update(conn);
-		} else {
-			// Inserting the new meters.
-			await new Meter(undefined, ...meter).insert(conn)
-				.catch(error => {
-					// Probably duplicate meter.
-					throw new CSVPipelineError(translate(
-						'csv.duplicate-meter', { meter: meter[0], errorMessage: error.message }
-					), undefined, 500);
-				});
+				}
+				let currentMeter;
+				currentMeter = await Meter.getByName(nameOfMeter, conn)
+					.catch(error => {
+						// Did not find the meter.
+						throw new CSVPipelineError(translate(
+							'csv.non-existent-meter-name', { meter: nameOfMeter , errorMessage: error.message }
+						), undefined, 500);
+					});
+				currentMeter.merge(...meter);
+				await currentMeter.update(conn);
+			} else {
+				// Inserting the new meters.
+				await new Meter(undefined, ...meter).insert(conn)
+					.catch(error => {
+						// Probably duplicate meter.
+						throw new CSVPipelineError(translate(
+							'csv.duplicate-meter', { meter: meter[0], errorMessage: error.message }
+						), undefined, 500);
+					});
+			}
 		}
-	}))
-		.catch(error => {
-			throw new CSVPipelineError(translate(
-				'csv.failed-meter-upload', { errorMessage: error.message }
-			), undefined, 500);
-		});
+	} catch (error) {
+		throw new CSVPipelineError(translate(
+			'csv.failed-meter-upload', { errorMessage: error.message }
+		), undefined, 500);
+	}
 }
 
 /**
