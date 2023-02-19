@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+ const translate = require('../translate');
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
@@ -32,7 +33,7 @@ async function uploadReadings(req, res, filepath, conn) {
 			if (createMeter !== 'true') {
 				// If createMeter is not set to true, we do not know what to do with the readings so we error out.
 				throw new CSVPipelineError(
-					`User Error: Meter with name '${meterName}' not found. createMeter needs to be set true in order to automatically create meter.`,
+					translate('csv.create-meter-false', { name:meterName }),
 					err.message
 				);
 			} else {
