@@ -423,7 +423,7 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have raW points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
+				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
 					const unitData = [
 						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
 						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
