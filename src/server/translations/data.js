@@ -15,7 +15,14 @@ exports.localeData = {
 		"csv.failed-to-parse-start-datetime": "The start date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.failed-to-parse-end-datetime": "The end date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.invalid-date": "For meter {meter}: Error parsing Reading #{num} The start ({start}) and/or end time ({end}) provided did not parse into a valid date/time so all reading are rejected.",
-		"csv.invalid-reading-number": "For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected."
+		"csv.invalid-reading-number": "For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected.",
+		"csv.error-uploading":  "A csv file must be submitted via the csvfile parameter.",
+		"csv.verified-user":"Invalid credentials",
+		"csv.insert-readings-success":"It looks like the insert of the readings was a success.",
+		"csv.warning-during-readings-process":"However, note that the processing of the readings returned these warning(s): ",
+		"csv.insert-readings-failed":"It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s): ",
+		"csv.invalid-token":"Invalid token (either unauthorized or logged out)",
+
 	},
 	"fr": {
 		"status.success": "SUCCÈS",
@@ -33,7 +40,14 @@ exports.localeData = {
 		"csv.failed-to-parse-start-datetime": "(Need French) The start date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.failed-to-parse-end-datetime": "(Need French) The end date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.invalid-date": "(Need French) For meter {meter}: Error parsing Reading #{num} The start ({start}) and/or end time ({end}) provided did not parse into a valid date/time so all reading are rejected.",
-		"csv.invalid-reading-number": "(Need French) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected."
+		"csv.invalid-reading-number": "(Need French) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected.",
+		"csv.verified-user":"(Need french)Invalid credentials",
+		"csv.insert-readings-success":"(Need french)It looks like the insert of the readings was a success.",
+		"csv.warning-during-readings-process":"(need french)However, note that the processing of the readings returned these warning(s): ",
+		"csv.insert-readings-failed":'(Need French)It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s): ',
+		"csv.error-uploading":"Aucun fichier CSV n\'a été téléchargé. Un fichier CSV doit être soumis via le paramètre csvfile.",
+		"csv.invalid-token":"(Need French) Invalid token (either unauthorized or logged out"
+
 	},
 	"es": {
 		"status.success": "ÉXITO",
@@ -51,6 +65,13 @@ exports.localeData = {
 		"csv.failed-to-parse-start-datetime": "(Need Spanish) The start date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.failed-to-parse-end-datetime": "(Need Spanish) The end date/time of {datetime} did not parse to a date/time using the normal format so a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.",
 		"csv.invalid-date": "(Need Spanish) For meter {meter}: Error parsing Reading #{num} The start ({start}) and/or end time ({end}) provided did not parse into a valid date/time so all reading are rejected.",
-		"csv.invalid-reading-number": "(Need Spanish) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected."
+		"csv.invalid-reading-number": "(Need Spanish) For meter {meterName}: Error parsing Reading #{num} with cumulative data. The reading value provided of {reading} is not considered a number so all reading are rejected.",
+		"csv.error-uploading":  "Se debe enviar un archivo csv a través del parámetro csvfile.",
+		"csv.verified-user": "Credenciales no Válidas",
+		"csv.insert-readings-success":"Parece que la inserción de las lecturas fue un éxito.",
+		"csv.warning-during-readings-process":"Sin embargo, tenga en cuenta que el procesamiento de las lecturas devolvió estas advertencias: ",
+		"csv.insert-readings-failed":'Parece que la inserción de las lecturas tuvo problemas con algunas o todas las lecturas donde el procesamiento de las lecturas devolvió estas advertencias/errores: ',
+		"csv.invalid-token":"(Need Spanish) Invalid token (either unauthorized or logged out)",
+		
 	}
 }
