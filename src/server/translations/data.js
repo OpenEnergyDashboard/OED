@@ -2,6 +2,9 @@ exports.localeData = {
 	"en": {
 		"status.success": "SUCCESS",
 		"status.failure": "FAILURE",
+		"csv.readings-input-error-p1": "Attempting to insert the readings into the database failed with error: \"{",
+		"csv.readings-input-error-p2": "\n  and the pipeline returned these messages: ",
+		"csv.readings-input-update-error-p1": "Attempting to insert the readings into the database with updates failed with error: \"",
 		"csv.failed-to-write-file": "Internal OED error: Failed to write the file: {filename}",
 		"csv.missing-dst-crossing-date": "Could not find DST crossing date in pipeline so giving up.",
 		"csv.invalid-gps-input": "For meter {meter} the gps coordinates of {gps} are invalid",
@@ -32,6 +35,9 @@ exports.localeData = {
 	"fr": {
 		"status.success": "SUCCÈS",
 		"status.failure": "ÉCHEC",
+		"csv.readings.input.error.p1": "La tentative d'insertion des lectures dans la base de données a échoué avec une erreur: \"",
+		"csv.readings.input.error.p2": "\n et le pipeline a renvoyé ces messages: ",
+		"csv.readings.input.update.error.p1": "La tentative d'insertion des lectures dans la base de données avec les mises à jour a échoué avec une erreur: \"",
 		"csv.failed-to-write-file": "Erreur interne OED: Impossible d'écrire le fichier: {filename}",
 		"csv.missing-dst-crossing-date": "Impossible de trouver la date de passage à l'heure d'été dans le pipeline, donc abandonner.",
 		"csv.invalid-gps-input": "(Need French) For meter {meter} the gps coordinates of {gps} are invalid",
@@ -61,6 +67,9 @@ exports.localeData = {
 	"es": {
 		"status.success": "ÉXITO",
 		"status.failure": "FALLA",
+		"csv.readings.input.error.p1": "Error al intentar insertar las lecturas en la base de datos: \"",
+		"csv.readings.input.error.p2": "\n y la canalización devolvió estos mensajes: ",
+		"csv.readings.input.update.error.p1": "Error al intentar insertar las lecturas en la base de datos con actualizaciones: \"",
 		"csv.failed-to-write-file": "Error interno de OED: Error al escribir el archivo: {filename}",
 		"csv.missing-dst-crossing-date": "No se pudo encontrar la fecha de cruce de DST en la canalización, por lo que se rindió.",
 		"csv.invalid-gps-input": "(Need Spanish) For meter {meter} the gps coordinates of {gps} are invalid",
