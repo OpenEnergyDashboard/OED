@@ -151,6 +151,32 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
+router.get('/parents/:group_id', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			group_id: {
+				type: 'string',
+				pattern: '^\\d+$'
+			}
+		}
+	};
+	if (!validate(req.params, validParams).valid) {
+		res.sendStatus(400);
+	} else {
+		const conn = getConnection();
+		try {
+			const parentGroups = await Group.getParentsByGroupID(req.params.group_id, conn);
+			res.json(parentGroups);
+		} catch (err) {
+			log.error(`Error while preforming GET on all parents of specific group: ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
+});
+
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',

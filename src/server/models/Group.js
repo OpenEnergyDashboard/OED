@@ -239,6 +239,17 @@ class Group {
 	}
 
 	/**
+	 * Returns a promise to retrieve an array of the group IDs of the parent groups of a group.
+	 * @param groupID the group's id that we need to find its parents.
+	 * @param conn the connection to be used.
+	 * @return {Promise<IArrayExt<any>>}
+	 */
+	static async getParentsByGroupID(groupID, conn) {
+		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: groupID });
+		return rows.map(row => row.parent_id);
+	}
+
+	/**
 	 * Returns a promise to delete a group and purge all trace of it form the memories of its parents and children
 	 * @param groupID The ID of the group to be deleted
 	 * @param conn the connection to be used.

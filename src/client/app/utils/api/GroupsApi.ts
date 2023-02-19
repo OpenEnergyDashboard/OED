@@ -38,6 +38,10 @@ export default class GroupsApi {
 		return await this.backend.doPostRequest('api/groups/delete', { id: groupID });
 	}
 
+	public async getParentIDs(groupID: number): Promise<number[]> {
+		return await this.backend.doGetRequest<number[]>(`api/groups/parents/${groupID}`);
+	}
+
 	/**
 	 * Gets compare readings for groups for the given current time range and a shift for previous time range
 	 * @param groupIDs The group IDs to get readings for
