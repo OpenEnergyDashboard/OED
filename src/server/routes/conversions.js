@@ -6,6 +6,7 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
+const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
 
 const router = express.Router();
@@ -68,7 +69,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
-		res.status(400);
+        failure(res, 400, "Got request to edit conversions with invalid conversion data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -77,9 +78,9 @@ router.post('/edit', async (req, res) => {
 			await updatedConversion.update(conn);
 		} catch (err) {
 			log.error('Failed to edit conversion', err);
-			res.status(500).json({ message: 'Unable to edit conversions.', err });
+			failure(res, 500, "Unable to edit conversions due to " + err.toString());
 		}
-		res.status(200).json({ message: `Successfully edited conversions ${req.body.sourceId}` });
+		success(res);
 	}
 });
 
@@ -120,8 +121,8 @@ router.post('/addConversion', async (req, res) => {
 	};
 	const validationResult = validate(req.body, validConversion);
 	if (!validationResult.valid) {
-		log.error(`Invalid input for ConversionsAPI. ${validationResult.error}`);
-		res.sendStatus(400);
+		log.error(`Invalid input for conversion. ${validationResult.error}`);
+        failure(res, 400, 'Invalid input for conversion: ' + validationResult.error.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -139,7 +140,7 @@ router.post('/addConversion', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new conversion ${err}`, err);
-			res.sendStatus(500);
+            failure(res, 500, 'Error while inserting new conversion: ' + err.toString());
 		}
 	}
 });
