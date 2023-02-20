@@ -105,9 +105,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-			failure(res, 500, 'Unable to edit units ' + req.body.identifier);
+            failure(res, 500, 'Unable to edit units ' + err.toString());
 		}
-		success(res, `Successfully edited units ${req.body.id}`);
+		success(res, `Successfully edited units ${req.body.identifier}`);
 	}
 });
 
