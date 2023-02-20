@@ -80,7 +80,7 @@ router.post('/edit', async (req, res) => {
 			log.error('Failed to edit conversion', err);
 			failure(res, 500, "Unable to edit conversions due to " + err.toString());
 		}
-		success(res, `Successfully edited conversions ${req.body.sourceId}`);
+		success(res);
 	}
 });
 
