@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const express = require('express') /* needed to resolve types in JSDoc comments */
 const { CSVPipelineError } = require('./CustomErrors');
 const escapeHtml = require('core-js/fn/string/escape-html');
 const { log } = require('../../log');
@@ -11,7 +12,7 @@ const { log } = require('../../log');
  *
  * @param {express.Request} req The Express request object
  * @param {express.Response} res The Express response object
- * @param {Error || CSVPipelineError.class} error The reason for the failure.
+ * @param {Error | CSVPipelineError} error The reason for the failure.
  *
  */
 function failure(req, res, error) {
