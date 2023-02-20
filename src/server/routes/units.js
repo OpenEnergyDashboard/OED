@@ -10,7 +10,6 @@ const { removeAdditionalConversionsAndUnits } = require('../services/graph/handl
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
 
-
 const router = express.Router();
 
 function formatUnitForResponse(item) {
