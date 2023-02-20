@@ -84,7 +84,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-		failure(res, 400, 'Validation failed with ' + validatorResult.errors.toString());
+        failure(res, 400, `Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -165,8 +165,8 @@ router.post('/addUnit', async (req, res) => {
 	};
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
-		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
-		failure(res, 400, 'Validation failed with  ' + validationResult.error.toString());
+        log.error(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
+        failure(res, 400, `Got request to add units with invalid unit data, errors:${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
