@@ -4,15 +4,15 @@
 
 const reqPromise = require('request-promise-native');
 const readCsv = require('./readCsv');
-const promisify = require('es6-promisify');
 const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
+const util = require('util');
 const _ = require('lodash');
 const stopDB = require('../models/database').stopDB;
 const { log } = require('../log');
 const moment = require('moment');
 
-const parseXMLPromisified = promisify(parseString);
+const parseXMLPromisified = util.promisify(parseString);
 
 async function parseCSV(filename) {
 	// returns a list of lists representing the lines of the file
