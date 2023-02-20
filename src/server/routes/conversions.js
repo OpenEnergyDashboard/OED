@@ -69,7 +69,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
-		failure(res, 400, "Error(s): " + validatorResult.errors.toString());
+        failure(res, 400, "Got request to edit conversions with invalid conversion data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
