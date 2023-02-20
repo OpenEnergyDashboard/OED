@@ -189,7 +189,7 @@ router.post('/addUnit', async (req, res) => {
 			success(res);
 		} catch (err) {
 			log.error(`Error while inserting new unit ${err}`, err);
-			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
+            failure(res, 500, `Error while inserting new unit ${err}`);
 		}
 	}
 });
