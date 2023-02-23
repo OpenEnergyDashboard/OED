@@ -15,6 +15,7 @@ import { hasPermissions } from '../utils/hasPermissions';
 import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
 
 interface HeaderButtonsProps {
+	isModal: boolean;
 	showCollapsedMenuButton: boolean;
 	loggedInAsAdmin: boolean;
 	role: UserRole | null;
@@ -47,6 +48,7 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
 		const shouldUnitsButtonDisabled = getPage() === 'units';
 		const shouldConversionsButtonDisabled = getPage() === 'conversions';
+		const dataFor = this.props.isModal ? 'all-modal' : 'all';
 
 		const linkStyle: React.CSSProperties = {
 			display: 'inline',
@@ -80,8 +82,8 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 					}
 				</div>
 				<div className={this.props.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-					<TooltipHelpContainer page='all' />
-					<TooltipMarkerComponent page='all' helpTextId='help.home.header' />
+					<TooltipHelpContainer page={dataFor} />
+					<TooltipMarkerComponent page={dataFor} helpTextId='help.home.header' />
 					<Link
 						style={adminViewableLinkStyle}
 						to='/admin'>

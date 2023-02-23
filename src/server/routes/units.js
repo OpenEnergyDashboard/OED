@@ -8,6 +8,7 @@ const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -83,7 +84,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-		res.status(400);
+        failure(res, 400, `Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -104,9 +105,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-			res.status(500).json({ message: 'Unable to edit units.', err });
+            failure(res, 500, 'Unable to edit units ' + err.toString());
 		}
-		res.status(200).json({ message: `Successfully edited units ${req.body.id}` });
+		success(res, `Successfully edited units ${req.body.identifier}`);
 	}
 });
 
@@ -164,8 +165,8 @@ router.post('/addUnit', async (req, res) => {
 	};
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
-		log.error(`Invalid input for unitsAPI. ${validationResult.error}`);
-		res.sendStatus(400);
+        log.error(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
+        failure(res, 400, `Got request to add units with invalid unit data, errors:${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -185,10 +186,10 @@ router.post('/addUnit', async (req, res) => {
 				);
 				await newUnit.insert(t);
 			});
-			res.sendStatus(200);
+			success(res);
 		} catch (err) {
 			log.error(`Error while inserting new unit ${err}`, err);
-			res.sendStatus(500);
+            failure(res, 500, `Error while inserting new unit ${err}`);
 		}
 	}
 });

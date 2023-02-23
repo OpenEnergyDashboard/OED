@@ -9,12 +9,12 @@ const Point = require('../../models/Point');
 const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions, insertUnits, insertConversions } = require('../../util/insertData')
 const { redoCik } = require('../../services/graph/redoCik');
+const util = require('util');
 const fs = require('fs');
 const csv = require('csv');
-const promisify = require('es6-promisify');
 const moment = require('moment');
 
-const parseCsv = promisify(csv.parse);
+const parseCsv = util.promisify(csv.parse);
 
 const UPLOAD_METERS_ROUTE = '/api/csv/meters';
 const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
@@ -27,9 +27,9 @@ const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').fi
 // but all other keys are arrays of length number of uploads in test.
 // Note the use of double quotes for strings because some have single quotes within.
 
-/** 
+/**
  * description, what the tests aims to test
- * chaiRequest, makes a string of the parameters 
+ * chaiRequest, makes a string of the parameters
  * fileName, the input files used for the test
  * responseCode, the expected response code from the request
  * responseString, the expected response string from the request

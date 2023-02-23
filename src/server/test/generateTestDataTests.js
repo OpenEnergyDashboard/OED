@@ -7,15 +7,15 @@
  * library chai.
  */
 
+const util = require('util');
 const _ = require('lodash');
 const chai = require('chai');
 const mocha = require('mocha');
 const expect = chai.expect;
 const fs = require('fs').promises;
 const moment = require('moment');
-const promisify = require('es6-promisify');
 const csv = require('csv');
-const parseCsv = promisify(csv.parse);
+const parseCsv = util.promisify(csv.parse);
 const path = require('path');
 
 const generateData = require('../data/generateTestingData'); // To get this file compile ../data/generateTestingData.ts

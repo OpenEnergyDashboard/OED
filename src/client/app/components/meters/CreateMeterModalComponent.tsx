@@ -336,9 +336,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="meter.create" />
-						<TooltipHelpContainer page='meters' />
+						<TooltipHelpContainer page='meters-create' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipCreateMeterView} />
+							<TooltipMarkerComponent page='meters-create' helpTextId={tooltipStyle.tooltipCreateMeterView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
