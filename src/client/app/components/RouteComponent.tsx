@@ -15,7 +15,7 @@ import AdminComponent from './admin/AdminComponent';
 import { LinkOptions } from 'actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
@@ -42,9 +42,11 @@ interface RouteProps {
 	defaultLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
 	role: UserRole;
+	renderOnce: boolean;
 	areaNormalization: boolean;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 	clearCurrentUser(): any;
+	changeRenderOnce(): any;
 }
 
 export default class RouteComponent extends React.Component<RouteProps> {
@@ -151,83 +153,106 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @param search The string of queries in the path
 	 */
 	public linkToGraph(component: JSX.Element, search: string) {
-		const queries: any = queryString.parse(search);
-		if (!_.isEmpty(queries)) {
-			try {
-				const options: LinkOptions = {};
-				for (const [key, infoObj] of _.entries(queries)) {
-					// TODO The upgrade of TypeScript lead to it giving an error for the type of infoObj
-					// which it thinks is unknown. I'm not sure why and this is code from the history
-					// package (see modules/@types/history/index.d.ts). What follows is a hack where
-					// the type is cast to any. This removes the problem and also allowed the removal
-					// of the ! to avoid calling toString when it is a bad value. I think this is okay
-					// because the toString documentation indicates it works fine with any type including
-					// null and unknown. If it does convert then the default case will catch it as an error.
-					// I want to get rid of this issue so Travis testing is not stopped by this. However,
-					// we should look into this typing issue more to see what might be a better fix.
-					const fixTypeIssue: any = infoObj as any;
-					const info: string = fixTypeIssue.toString();
-					switch (key) {
-						case 'meterIDs':
-							options.meterIDs = info.split(',').map(s => parseInt(s));
-							break;
-						case 'groupIDs':
-							options.groupIDs = info.split(',').map(s => parseInt(s));
-							break;
-						case 'chartType':
-							options.chartType = info as ChartTypes;
-							break;
-						case 'barDuration':
-							options.barDuration = moment.duration(parseInt(info), 'days');
-							break;
-						case 'areaNormalization':
-							if (this.props.areaNormalization.toString() !== info) {
-								options.toggleAreaNormalization = true;
-							}
-							break;
-						case 'barStacking':
-							if (this.props.barStacking.toString() !== info) {
-								options.toggleBarStacking = true;
-							}
-							break;
-						case 'comparePeriod':
-							options.comparePeriod = validateComparePeriod(info);
-							break;
-						case 'compareSortingOrder':
-							options.compareSortingOrder = validateSortingOrder(info);
-							break;
-						case 'optionsVisibility':
-							options.optionsVisibility = (info === 'true');
-							break;
-						case 'mapID':
-							options.mapID = (parseInt(info));
-							break;
-						case 'serverRange':
-							options.serverRange = TimeInterval.fromString(info);
-							/**
-							 * commented out since days from present feature is not currently used
-							 */
-							// const index = info.indexOf('dfp');
-							// if (index === -1) {
-							// 	options.serverRange = TimeInterval.fromString(info);
-							// } else {
-							// 	const message = info.substring(0, index);
-							// 	const stringField = this.getNewIntervalFromMessage(message);
-							// 	options.serverRange = TimeInterval.fromString(stringField);
-							// }
-							break;
-						case 'sliderRange':
-							options.sliderRange = TimeInterval.fromString(info);
-							break;
-						default:
-							throw new Error('Unknown query parameter');
+		/*
+		 * This stops the chart links from processing more than once. Initially renderOnce is false
+		 * so the code executes but then it is set to true near the end so it will not do it again.
+		 * This is somewhat more efficient but, more importantly, it fixed a bug. The URL did not clear
+		 * until a different page was loaded. While most selections did not route /graph, some do
+		 * so this function is called. The bug was that when the user clicked on bar stacking, that
+		 * action caused the action to happen but then it happened again here. This caused the boolean
+		 * to flip twice so it was unchanged in the end. It is possible that other issues could exist
+		 * but should be gone now.
+		*/
+		if (!this.props.renderOnce) {
+			const queries: any = queryString.parse(search);
+			if (!_.isEmpty(queries)) {
+				try {
+					const options: LinkOptions = {};
+					for (const [key, infoObj] of _.entries(queries)) {
+						// TODO The upgrade of TypeScript lead to it giving an error for the type of infoObj
+						// which it thinks is unknown. I'm not sure why and this is code from the history
+						// package (see modules/@types/history/index.d.ts). What follows is a hack where
+						// the type is cast to any. This removes the problem and also allowed the removal
+						// of the ! to avoid calling toString when it is a bad value. I think this is okay
+						// because the toString documentation indicates it works fine with any type including
+						// null and unknown. If it does convert then the default case will catch it as an error.
+						// I want to get rid of this issue so Travis testing is not stopped by this. However,
+						// we should look into this typing issue more to see what might be a better fix.
+						const fixTypeIssue: any = infoObj as any;
+						const info: string = fixTypeIssue.toString();
+						// ESLint does not want const params in the one case it is used so put here.
+						let params;
+						switch (key) {
+							case 'meterIDs':
+								options.meterIDs = info.split(',').map(s => parseInt(s));
+								break;
+							case 'groupIDs':
+								options.groupIDs = info.split(',').map(s => parseInt(s));
+								break;
+							case 'chartType':
+								options.chartType = info as ChartTypes;
+								break;
+							case 'unitID':
+								options.unitID = parseInt(info);
+								break;
+							case 'rate':
+								params = info.split(',');
+								options.rate = { label: params[0], rate: parseFloat(params[1]) } as LineGraphRate;
+								break;
+							case 'barDuration':
+								options.barDuration = moment.duration(parseInt(info), 'days');
+								break;
+							case 'barStacking':
+								if (this.props.barStacking.toString() !== info) {
+									options.toggleBarStacking = true;
+								}
+								break;
+							case 'areaNormalization':
+								if (this.props.areaNormalization.toString() !== info) {
+									options.toggleAreaNormalization = true;
+								}
+								break;
+							case 'comparePeriod':
+								options.comparePeriod = validateComparePeriod(info);
+								break;
+							case 'compareSortingOrder':
+								options.compareSortingOrder = validateSortingOrder(info);
+								break;
+							case 'optionsVisibility':
+								options.optionsVisibility = (info === 'true');
+								break;
+							case 'mapID':
+								options.mapID = (parseInt(info));
+								break;
+							case 'serverRange':
+								options.serverRange = TimeInterval.fromString(info);
+								/**
+								 * commented out since days from present feature is not currently used
+								 */
+								// const index = info.indexOf('dfp');
+								// if (index === -1) {
+								// 	options.serverRange = TimeInterval.fromString(info);
+								// } else {
+								// 	const message = info.substring(0, index);
+								// 	const stringField = this.getNewIntervalFromMessage(message);
+								// 	options.serverRange = TimeInterval.fromString(stringField);
+								// }
+								break;
+							case 'sliderRange':
+								options.sliderRange = TimeInterval.fromString(info);
+								break;
+							default:
+								throw new Error('Unknown query parameter');
+						}
 					}
+					// The chartlink was processed so note so will not be done again.
+					this.props.changeRenderOnce();
+					if (Object.keys(options).length > 0) {
+						this.props.changeOptionsFromLink(options);
+					}
+				} catch (err) {
+					showErrorNotification(translate('failed.to.link.graph'));
 				}
-				if (Object.keys(options).length > 0) {
-					this.props.changeOptionsFromLink(options);
-				}
-			} catch (err) {
-				showErrorNotification(translate('failed.to.link.graph'));
 			}
 		}
 		return component;

@@ -10,8 +10,7 @@ import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
-import { UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { lineUnitLabel } from '../utils/graphics';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -21,7 +20,7 @@ function mapStateToProps(state: State) {
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
 	const currentSelectedRate = state.graph.lineGraphRate;
-	let unitLabel: string = '';
+	let unitLabel = '';
 	let needsRateScaling = false;
 	// variables to determine the slider min and max
 	let minTimestamp: number | undefined;
@@ -31,30 +30,10 @@ function mapStateToProps(state: State) {
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
-			// Quantity and flow units have different unit labels.
-			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
-			// Bar graphics are always quantities.
-			if (selectUnitState.identifier === 'kWh' || selectUnitState.identifier === 'kW') {
-				// This is a special case. kWh has a general meaning and the flow equivalent is kW.
-				// A kW is a Joule/sec. While it is possible to convert to another rate, OED is not
-				// going to allow that. If you want that then the site should add Joule as a unit.
-				// Note the rate is per second which is unusual and not the normal OED of per hour.
-				// Thus, OED will show kW and not allow other rates. To make it consistent, kWh cannot
-				// be shown in another rate. Thus, there is no need to scale.
-				// TODO This isn't a general solution. For example, Wh or W would not be fixed.
-				// The y-axis label is the kW.
-				unitLabel = 'kW';
-			} else if (selectUnitState.unitRepresent == UnitRepresentType.raw) {
-				// A raw unit just uses the identifier.
-				// The y-axis label is the same as the identifier.
-				unitLabel = selectUnitState.identifier;
-			} else if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
-				// If it is a quantity or flow unit then it is a rate so indicate by dividing by the time interval
-				// which is always one hour for OED.
-				unitLabel = selectUnitState.identifier + ' / ' + translate(currentSelectedRate.label);
-				// Rate scaling is needed
-				needsRateScaling = true;
-			}
+			// Determine the y-axis label and if the rate needs to be scaled.
+			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate);
+			unitLabel = returned.unitLabel
+			needsRateScaling = returned.needsRateScaling;
 			if(state.graph.areaNormalization) {
 				const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
 				if (selectAreaUnitState !== undefined) {
