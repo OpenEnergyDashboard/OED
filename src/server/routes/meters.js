@@ -195,15 +195,7 @@ function validateMeterParams(params) {
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{
-						type: 'number',
-						minimum: 0,
-					},
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			cumulative: { type: 'bool' },
 			cumulativeReset: { type: 'bool' },
 			cumulativeResetStart: { type: 'string' },

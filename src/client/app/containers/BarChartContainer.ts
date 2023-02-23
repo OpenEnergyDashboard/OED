@@ -32,6 +32,7 @@ function mapStateToProps(state: State) {
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label.
 			unitLabel  = barUnitLabel(selectUnitState);
+			// TODO move this into the above function for compatibility with export
 			if(state.graph.areaNormalization) {
 				const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
 				if (selectAreaUnitState !== undefined) {

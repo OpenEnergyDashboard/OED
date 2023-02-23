@@ -79,7 +79,7 @@ export function areaUnitsCompatibleWithMeters(meters: Set<number>): Set<number> 
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
 		// the final result must be empty set but don't check specially since don't expect.
-		if (meter.areaUnitId != -99) {
+		if (meter.areaUnitId != undefined && meter.areaUnitId != -99) {
 			// Set of compatible units with this meter.
 			meterAreaUnits = unitsCompatibleWithUnit(meter.areaUnitId);
 		}

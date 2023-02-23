@@ -17,8 +17,9 @@ class Group {
 	 * @param note Note about the group
 	 * @param area Area of the group, default null
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
+	 * @param areaUnitId The area unit
 	 */
-	constructor(id, name, displayable, gps, note, area, defaultGraphicUnit) {
+	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnitId = -99) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -26,6 +27,7 @@ class Group {
 		this.note = note;
 		this.area = area;
 		this.defaultGraphicUnit = defaultGraphicUnit;
+		this.areaUnitId = areaUnitId;
 	}
 
 	/**
@@ -52,6 +54,7 @@ class Group {
 		if (group.defaultGraphicUnit === -99) {
 			group.defaultGraphicUnit = null;
 		}
+		group.areaUnitId = Meter.convertUnitValue(group.areaUnitId);
 		const resp = await conn.one(sqlFile('group/insert_new_group.sql'), group);
 		// resp = { id: 42 }, hence this line
 		this.id = resp.id;
@@ -68,7 +71,8 @@ class Group {
 		if (defaultGraphicUnit === null) {
 			defaultGraphicUnit = -99;
 		}
-		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit);
+		var areaUnitId = Meter.convertUnitValue(row.areaUnitId);
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit, areaUnitId);
 	}
 
 	/**

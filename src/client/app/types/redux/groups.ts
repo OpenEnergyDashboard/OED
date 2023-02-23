@@ -158,8 +158,9 @@ export interface GroupData {
 	gps?: GPSPoint;
 	displayable: boolean;
 	note?: string;
-	area?: number;
+	area: number;
 	defaultGraphicUnit: number;
+	areaUnitId: number;
 }
 
 export interface GroupID {

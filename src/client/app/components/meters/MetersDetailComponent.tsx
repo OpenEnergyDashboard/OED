@@ -152,7 +152,7 @@ export default function MetersDetailComponent() {
 								meter={MeterData as MeterData}
 								key={(MeterData as MeterData).id}
 								currentUser={currentUserState}
-								// These two props are used in the edit component (child of view component)
+								// These three props are used in the edit component (child of view component)
 								possibleMeterUnits={possibleMeterUnits}
 								possibleGraphicUnits={possibleGraphicUnits}
 								possibleMeterAreaUnits={possibleMeterAreaUnits} />))}

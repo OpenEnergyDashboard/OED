@@ -41,7 +41,9 @@ async function insertStandardUnits(conn) {
 		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
 		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
 		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+		['ft²', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.AREA, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+		['m²', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.AREA, '', Unit.displayableType.ALL, false, 'OED created standard unit']
 	];
 
 	await insertUnits(standardUnits, conn);
@@ -76,7 +78,8 @@ async function insertStandardConversions(conn) {
 		['MJ', 'm³ gas', true, 2.6e-2, 0, 'MJ → m^3 gas'],
 		['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
 		['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton'],
-		['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit']
+		['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit'],
+		['ft²', 'm²', true, 0.3048, 0, 'ft² → m²']
 	];
 
 	// await Conversion.insertMany(standardConversions, conn);
@@ -124,7 +127,6 @@ async function insertMeters(metersToInsert, conn) {
 			meterUnit = (await Unit.getByName(meterData[1], conn)).id;
 			meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
 		}
-		const meterAreaUnit = -99;
 		const meter = new Meter(
 			undefined, // id
 			meterName, // name
@@ -136,7 +138,7 @@ async function insertMeters(metersToInsert, conn) {
 			meterData[4], // gps
 			undefined, // identifier
 			meterData[5], // note
-			null, //area
+			undefined, //area
 			undefined, // cumulative
 			undefined, //cumulativeReset
 			undefined, // cumulativeResetStart
@@ -152,7 +154,7 @@ async function insertMeters(metersToInsert, conn) {
 			undefined, // previousEnd
 			meterUnit, // unit
 			meterGraphicUnit, // default graphic unit
-			meterAreaUnit // area unit
+			undefined // area unit
 		);
 		const filename = `src/server/${meterData[6]}`;
 		if (await meter.existsByName(conn)) {
@@ -219,16 +221,15 @@ async function insertGroups(groupsToInsert, conn) {
 		} else {
 			groupDefaultGraphicUnit = (await Unit.getByName(groupData[1], conn)).id;
 		}
-		const groupAreaUnit = -99;
 		const group = new Group(
 			undefined, // id
 			groupName, // name
 			groupData[2], //displayable
 			groupData[3], // gps
 			groupData[4], // note
-			null, //area
+			undefined, //area
 			groupDefaultGraphicUnit, // default graphic unit
-			groupAreaUnit
+			undefined // area unit
 		);
 		if (await group.existsByName(conn)) {
 			console.log(`        Warning: group '${group.name}' existed so not changed.`);

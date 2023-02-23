@@ -41,7 +41,7 @@ class Meter {
 	*/
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
-	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
+	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area = 0,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),

@@ -182,12 +182,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{ type: 'number' },
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
@@ -201,7 +196,8 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				items: {
 					type: 'integer'
 				}
-			}
+			},
+			areaUnitId: { type: 'integer' }
 		}
 	};
 
@@ -272,12 +268,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{ type: 'number' },
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
@@ -291,7 +282,8 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 				items: {
 					type: 'integer'
 				}
-			}
+			},
+			areaUnitId: { type: 'integer' }
 		}
 	};
 
