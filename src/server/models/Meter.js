@@ -126,7 +126,7 @@ class Meter {
 		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
 			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
 			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
-			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.meter_area_id);
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.area_unit_id);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		meter.areaUnitId = Meter.convertUnitValue(meter.areaUnitId);

@@ -143,22 +143,26 @@ function getAreaUnitCompatibilityForDropdown(state: State) {
 	// Holds all units that are not compatible with selected meters/groups
 	const incompatibleAreaUnits = new Set<number>();
 
-	// Holds all selected meters, including those retrieved from groups
-	const allSelectedMeters = new Set<number>();
+	// Holds all selected meters with an area unit, including those retrieved from groups
+	const allCompatibleSelectedMeters = new Set<number>();
 
 	// Get for all meters
 	state.graph.selectedMeters.forEach(meter => {
-		allSelectedMeters.add(meter);
+		if(state.meters.byMeterID[meter].areaUnitId != -99) {
+			allCompatibleSelectedMeters.add(meter);
+		}
 	});
 	// Get for all groups
 	state.graph.selectedGroups.forEach(group => {
 		// Get for all deep meters in group
 		metersInGroup(group).forEach(meter => {
-			allSelectedMeters.add(meter);
+			if(state.meters.byMeterID[meter].areaUnitId != -99) {
+				allCompatibleSelectedMeters.add(meter);
+			}
 		});
 	});
 
-	if (allSelectedMeters.size == 0) {
+	if (allCompatibleSelectedMeters.size == 0) {
 		// No meters/groups are selected. This includes the case where the selectedUnit is -99.
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Filter the units to be displayed by user status and displayable type
@@ -168,7 +172,7 @@ function getAreaUnitCompatibilityForDropdown(state: State) {
 	} else {
 		// Some meter or group is selected
 		// Retrieve set of units compatible with list of selected meters and/or groups
-		const areaUnits = areaUnitsCompatibleWithMeters(allSelectedMeters);
+		const areaUnits = areaUnitsCompatibleWithMeters(allCompatibleSelectedMeters);
 
 		// Loop over all units (they must be of type area - case 1)
 		getVisibleAreaUnit(state).forEach(o => {

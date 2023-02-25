@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GroupsState } from 'types/redux/groups';
 import { MetersState } from 'types/redux/meters';
 import {
-	changeSelectedAreaUnit,
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedAreaUnit, updateSelectedGroups,
 	updateSelectedMeters, updateSelectedUnit
 } from '../actions/graph';
@@ -172,13 +171,6 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
-				// if (state.graph.selectedAreaUnit == -99) {
-				// 	// if no area unit is selected, then this must be the first meter selected
-				// 	if(state.meters.byMeterID[meterID].area != 0) {
-				// 		// dispatch(changeSelectedAreaUnit(state.meters.byMeterID[meterID].areaUnitId));
-				// 		dispatch(updateSelectedAreaUnit(state.meters.byMeterID[meterID].areaUnitId));
-				// 	}
-				// }
 				compatibleSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',

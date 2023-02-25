@@ -13,7 +13,8 @@ import {
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit,
-	toggleDefaultAreaNormalization
+	toggleDefaultAreaNormalization,
+	updateDefaultAreaUnit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -30,7 +31,8 @@ function mapStateToProps(state: State) {
 		disableSubmitPreferences: state.admin.submitted,
 		defaultWarningFileSize: state.admin.defaultWarningFileSize,
 		defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
-		defaultAreaNormalization: state.admin.defaultAreaNormalization
+		defaultAreaNormalization: state.admin.defaultAreaNormalization,
+		defaultAreaUnit: state.admin.defaultAreaUnit
 	};
 }
 
@@ -44,7 +46,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
-		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization())
+		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
+		updateDefaultAreaUnit: (defaultAreaUnit: number) => dispatch(updateDefaultAreaUnit(defaultAreaUnit))
 	};
 }
 

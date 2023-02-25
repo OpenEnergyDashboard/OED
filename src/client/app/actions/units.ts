@@ -113,3 +113,15 @@ export function addUnit(unit: t.UnitData): Thunk {
 		}
 	}
 }
+
+export function fetchConvertedAreas(): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		const state = getState();
+		const promises: Array<Promise<any>> = [];
+		// when the unit gets changed, we need to get all of the new converted areas
+		// promises.push(dispatch(fetchMeterConvertedAreas(state.graph.selectedMeters)));
+		// 	promises.push(dispatch(fetchGroupLineReadings(state.graph.selectedGroups)));
+
+		return Promise.all(promises);
+	}
+}

@@ -13,7 +13,8 @@ import {
 	UpdateDefaultTimeZone,
 	UpdateDisplayTitleAction,
 	UpdateDefaultWarningFileSize,
-	UpdateDefaultFileSizeLimit
+	UpdateDefaultFileSizeLimit,
+	UpdateDefaultAreaUnitAction
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
@@ -32,6 +33,7 @@ interface PreferencesProps {
 	disableSubmitPreferences: boolean;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
+	defaultAreaUnit: number;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -41,6 +43,7 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
+	updateDefaultAreaUnit(defaultAreaUnit: number): UpdateDefaultAreaUnitAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -57,6 +60,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultWarningFileSizeChange = this.handleDefaultWarningFileSizeChange.bind(this);
 		this.handleDefaultFileSizeLimitChange = this.handleDefaultFileSizeLimitChange.bind(this);
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
+		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
 	}
 
 	public render() {
@@ -293,6 +297,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultAreaNormalizationChange() {
 		this.props.toggleDefaultAreaNormalization();
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultAreaUnitChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultAreaUnit(parseInt(e.target.value));
 		this.updateUnsavedChanges();
 	}
 

@@ -19,7 +19,8 @@ const defaultState: AdminState = {
 	defaultWarningFileSize: 5,
 	defaultFileSizeLimit: 25,
 	isUpdatingCikAndDBViews: false,
-	defaultAreaNormalization: false
+	defaultAreaNormalization: false,
+	defaultAreaUnit: -99
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -51,6 +52,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultAreaNormalization: !state.defaultAreaNormalization,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultAreaUnit:
+			return {
+				...state,
+				defaultAreaUnit: action.defaultAreaUnit,
 				submitted: false
 			}
 		case ActionType.UpdateDefaultTimeZone:

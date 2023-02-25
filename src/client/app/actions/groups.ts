@@ -330,7 +330,9 @@ export function submitGroupInEditingIfNeeded() {
 				displayable: rawGroup.displayable,
 				note: rawGroup.note,
 				area: rawGroup.area,
-				defaultGraphicUnit: rawGroup.defaultGraphicUnit
+				defaultGraphicUnit: rawGroup.defaultGraphicUnit,
+				areaUnitId: rawGroup.areaUnitId,
+				convertedArea: rawGroup.convertedArea
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));

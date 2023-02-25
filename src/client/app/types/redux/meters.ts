@@ -74,7 +74,6 @@ export interface MeterData {
 	timeZone: string;
 	gps: GPSPoint | null;
 	unitId: number;
-	areaUnitId: number;
 	defaultGraphicUnit: number;
 	note: string;
 	cumulative: boolean;
@@ -90,6 +89,8 @@ export interface MeterData {
 	startTimestamp: string;
 	endTimestamp: string;
 	previousEnd: string;
+	areaUnitId: number;
+	convertedArea: number;
 }
 
 export interface MeterEditData {
@@ -120,6 +121,7 @@ export interface MeterEditData {
 	startTimestamp: string | undefined;
 	endTimestamp: string | undefined;
 	previousEnd: string | undefined;
+	convertedArea: number;
 }
 
 export interface MeterDataByID {

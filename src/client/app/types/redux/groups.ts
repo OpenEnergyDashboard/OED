@@ -161,6 +161,7 @@ export interface GroupData {
 	area: number;
 	defaultGraphicUnit: number;
 	areaUnitId: number;
+	convertedArea: number;
 }
 
 export interface GroupID {

@@ -16,7 +16,7 @@ import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
-import { fetchUnitsDetailsIfNeeded } from './units';
+import { fetchUnitsDetailsIfNeeded, fetchConvertedAreas } from './units';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -154,14 +154,9 @@ export function changeSelectedUnit(unitID: number): Thunk {
 
 // TODO: make sure this works right
 export function changeSelectedAreaUnit(unitID: number): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
+	return (dispatch: Dispatch) => {
 		dispatch(updateSelectedAreaUnit(unitID));
-		// dispatch((dispatch2: Dispatch) => {
-		// 	dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
-		// 	dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
-		// 	dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
-		// 	dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
-		// });
+		dispatch(fetchConvertedAreas());
 		return Promise.resolve();
 	}
 }

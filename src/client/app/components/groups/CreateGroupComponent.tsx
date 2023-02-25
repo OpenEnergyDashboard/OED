@@ -221,11 +221,14 @@ class CreateGroupComponent extends React.Component<CreateGroupPropsWithIntl, Cre
 			const gpsProxy = this.state.gpsInput.replace('(','').replace(')','').replace(' ', '');
 			const pattern2 = /^\d+(\.\d+)?$/;
 			// need to check gps and area
-			// gps and area are still optional so check if blank
-			if (this.state.groupArea.match(pattern2) || this.state.groupArea === '') {
-				if (this.state.groupArea !== '') {
-					this.props.editGroupArea(parseFloat(this.state.groupArea));
-				}
+			if (this.state.groupArea !== '') {
+				this.props.editGroupArea(parseFloat(this.state.groupArea));
+			} else {
+				this.props.editGroupArea(0);
+			}
+			// gps is optional so check if blank
+			if (this.state.groupArea.match(pattern2)) {
+				// TODO: one of these if statements is redundant
 				if (this.state.gpsInput === '' || isValidGPSInput(gpsProxy)) {
 					if (this.state.gpsInput !== '') {
 						// if it satisfies if condition, and defined, then set GPSPoint

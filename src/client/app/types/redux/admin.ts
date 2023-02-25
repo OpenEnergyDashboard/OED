@@ -21,7 +21,8 @@ export type AdminAction =
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
-	| UpdateCikAndDBViews;
+	| UpdateCikAndDBViews
+	| UpdateDefaultAreaUnitAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -44,6 +45,11 @@ export interface ToggleDefaultBarStackingAction {
 
 export interface ToggleDefaultAreaNormalizationAction {
 	type: ActionType.ToggleDefaultAreaNormalization;
+}
+
+export interface UpdateDefaultAreaUnitAction {
+	type: ActionType.UpdateDefaultAreaUnit;
+	defaultAreaUnit: number;
 }
 
 export interface UpdateDefaultTimeZone {
@@ -100,4 +106,5 @@ export interface AdminState {
 	defaultFileSizeLimit: number;
 	isUpdatingCikAndDBViews: boolean;
 	defaultAreaNormalization: boolean;
+	defaultAreaUnit: number;
 }

@@ -11,4 +11,5 @@ SET
 	default_timezone = ${defaultTimezone},
 	default_warning_file_size = ${defaultWarningFileSize},
 	default_file_size_limit = ${defaultFileSizeLimit},
-	default_area_normalization = ${defaultAreaNormalization};
+	default_area_normalization = ${defaultAreaNormalization},
+	default_area_unit = ${defaultAreaUnit};

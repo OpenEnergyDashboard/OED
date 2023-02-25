@@ -4,7 +4,8 @@
 
 DO $$ BEGIN
     ALTER TABLE preferences
-        ADD COLUMN default_area_normalization BOOLEAN NOT NULL DEFAULT FALSE;
+        ADD COLUMN default_area_normalization BOOLEAN NOT NULL DEFAULT FALSE,
+        ADD COLUMN default_area_unit INTEGER NOT NULL DEFAULT -99;
 EXCEPTION
     WHEN duplicate_column THEN NULL;
 END $$;

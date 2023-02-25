@@ -106,7 +106,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
-		areaUnitId: props.meter.areaUnitId
+		areaUnitId: props.meter.areaUnitId,
+		convertedArea: props.meter.convertedArea
 	}
 
 	const dropdownsStateDefaults = {

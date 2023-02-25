@@ -75,7 +75,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		reading: 0.0,
 		startTimestamp: '',
 		endTimestamp: '',
-		previousEnd: ''
+		previousEnd: '',
+		convertedArea: 0
 	}
 
 	const dropdownsStateDefaults = {

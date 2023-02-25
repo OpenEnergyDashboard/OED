@@ -8,5 +8,6 @@ UPDATE groups
 		gps = ${gps},
 		note = ${note},
 		area = ${area},
-		default_graphic_unit = ${defaultGraphicUnit}
+		default_graphic_unit = ${defaultGraphicUnit},
+		area_unit_id = ${areaUnitId}
 	WHERE id = ${id};

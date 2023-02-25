@@ -47,7 +47,7 @@ function mapStateToProps(state: State) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined &&
 			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			const meterArea = state.meters.byMeterID[meterID].area;
+			const meterArea = state.meters.byMeterID[meterID].convertedArea;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
 			if (!state.graph.areaNormalization || meterArea > 0) {
 				const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
@@ -101,11 +101,7 @@ function mapStateToProps(state: State) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined &&
 			byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			let groupArea = state.groups.byGroupID[groupID].area;
-			// TODO Consider changing group area to always be defined
-			if(groupArea === undefined) {
-				groupArea = 0;
-			}
+			const groupArea = state.groups.byGroupID[groupID].convertedArea;
 			if (!state.graph.areaNormalization || groupArea > 0) {
 				const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
@@ -127,10 +123,6 @@ function mapStateToProps(state: State) {
 						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 						let readingValue = barReading.reading;
 						if(state.graph.areaNormalization) {
-							// TODO: Consider changing group area to always be defined
-							if(groupArea === undefined) {
-								groupArea = 0;
-							}
 							readingValue /= groupArea;
 						}
 						yData.push(readingValue);

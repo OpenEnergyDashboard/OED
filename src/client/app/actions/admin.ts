@@ -39,6 +39,10 @@ export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizati
 	return { type: ActionType.ToggleDefaultAreaNormalization };
 }
 
+export function updateDefaultAreaUnit(defaultAreaUnit: number): t.UpdateDefaultAreaUnitAction {
+	return { type: ActionType.UpdateDefaultAreaUnit, defaultAreaUnit };
+}
+
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
 	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
