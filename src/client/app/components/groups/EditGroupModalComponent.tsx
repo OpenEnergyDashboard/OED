@@ -25,11 +25,10 @@ import { submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithMeters, metersInGroup } from '../../utils/determineCompatibleUnits';
+import { unitsCompatibleWithMeters, metersInGroup, getMeterMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
-import { getSelectOptionsByItem } from '../ChartDataSelectComponent';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -64,7 +63,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		} as SelectOption
 		);
 	});
-	// Want chosen in sorted order.
+	// Want chosen in sorted order. Note any changes by user can unsort them.
 	let selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
 
 	// Check for admin status
@@ -87,9 +86,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// The information on the children of this group
 	const groupChildrenDefaults = {
 		// The identifiers of all direct meter children that are visible to this user.
-		childMetersIdentifier: [] as string[],
+		// childMetersIdentifier: [] as string[],
 		// The original number of direct meter children
-		childMetersTrueSize: 0,
+		// childMetersTrueSize: 0,
 		// The names of all direct meter children that are visible to this user.
 		childGroupsName: [] as string[],
 		// The original number of direct group children
@@ -229,19 +228,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	};
 
 	// TODO consider useSelect vs useEffect and implications for entire codebase
-	const dataProps = useSelector((state: State) => {
+	// TODO this state name is obscuring the state variable declared above.
+	const meterSelectOptions = useSelector((stateX: State) => {
 		// Get meters that okay for this group in a format the component can display.
-		const sortedMeters = getMeterCompatibilityForDropdown(state);
-		// push a dummy item as a divider.
-		const firstDisabledMeter: number = sortedMeters.findIndex(item => item.isDisabled);
-		if (firstDisabledMeter != -1) {
-			sortedMeters.splice(firstDisabledMeter, 0, {
-				value: 0,
-				label: '----- Incompatible Meters -----',
-				isDisabled: true
-			} as SelectOption
-			);
-		}
+		// TODO pass current deep meters instead
+		const sortedMeters = getMeterMenuOptionsForGroup(state.id);
 
 		return {
 			// all meter, sorted alphabetically and by compatibility
@@ -252,24 +243,26 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Determine the names of the child meters/groups.
 	useEffect(() => {
 		// State for current group
+		// TODO ??????????? Why can't this be done once and how relate to one above?
 		const currentGroup = groupsState[state.id];
 
-		// Information to display the direct children meters.
-		// Holds the names of all direct meter children of this group when visible to this user.
-		const childMetersIdentifier: string[] = [];
-		let trueMeterSize = 0;
-		// Make sure state exists as the dispatch above may not be done.
-		if (currentGroup.childMeters) {
-			currentGroup.childMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-					childMetersIdentifier.push(metersState[meterID].identifier.trim());
-				}
-			});
-			childMetersIdentifier.sort();
-			// Record the total number so later can compare the number in array to see if any missing.
-			trueMeterSize = currentGroup.childMeters.length;
-		}
+		// // Information to display the direct children meters.
+		// // Holds the names of all direct meter children of this group when visible to this user.
+		// const childMetersIdentifier: string[] = [];
+		// let trueMeterSize = 0;
+		// // Make sure state exists as the dispatch above may not be done.
+		// if (currentGroup.childMeters) {
+		// 	currentGroup.childMeters.forEach((meterID: number) => {
+		// 		// TODO shouldn't the meter state always exist?
+		// 		// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+		// 		if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+		// 			childMetersIdentifier.push(metersState[meterID].identifier.trim());
+		// 		}
+		// 	});
+		// 	childMetersIdentifier.sort();
+		// 	// Record the total number so later can compare the number in array to see if any missing.
+		// 	trueMeterSize = currentGroup.childMeters.length;
+		// }
 
 		// Information to display the direct children groups.
 		// Holds the names of all direct group children of this group when visible to this user.
@@ -308,8 +301,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Update the state
 		setGroupChildrenState({
 			...groupChildrenState,
-			childMetersIdentifier: childMetersIdentifier,
-			childMetersTrueSize: trueMeterSize,
+			// childMetersIdentifier: childMetersIdentifier,
+			// childMetersTrueSize: trueMeterSize,
 			childGroupsName: childGroupsName,
 			childGroupsTrueSize: trueGroupSize,
 			deepMetersIdentifier: deepMetersIdentifier,
@@ -476,7 +469,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<div style={formInputStyle}>
 										<b><FormattedMessage id='child.meters' /></b>:
 										<MultiSelectComponent
-											options={dataProps.sortedMeters}
+											options={meterSelectOptions.sortedMeters}
 											selectedOptions={selectedMeters}
 											placeholder={translate('select.meters')}
 											onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
@@ -521,27 +514,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			</Modal >
 		</>
 	);
-}
-
-// TODO maybe just pass the meter state?
-/**
- * Determines the compatibility of meters in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
- */
-function getMeterCompatibilityForDropdown(state: State) {
-	// meters that can be selected for this group
-	const compatibleMeters = new Set<number>();
-	// meters that cannot be selected for this group
-	const incompatibleMeters = new Set<number>();
-	// TODO right now just allowing all meters
-	Object.values(state.meters.byMeterID).forEach(meter => {
-		compatibleMeters.add(meter.id);
-	});
-
-	// Retrieve select options from meter sets
-	const finalMeters = getSelectOptionsByItem(compatibleMeters, incompatibleMeters, state.meters);
-	return finalMeters;
 }
 
 /**

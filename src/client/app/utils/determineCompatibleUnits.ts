@@ -158,6 +158,7 @@ export function metersInGroup(groupId: number): Set<number> {
 export function getMeterMenuOptionsForGroup(gid: number): SelectOption[] {
 	const state = store.getState() as State;
 	// Get the currentGroup's compatible units.
+	// TODO need to make this the current deep meters????????
 	const currentUnits = unitsCompatibleWithMeters(metersInGroup(gid));
 	// Current group's default graphic unit (via Redux).
 	const defaultGraphicUnit = state.groups.byGroupID[gid].defaultGraphicUnit;
@@ -185,7 +186,8 @@ export function getMeterMenuOptionsForGroup(gid: number): SelectOption[] {
 		options.push(option);
 	});
 
-	return options;
+	// We want the options sorted by meter identifier.
+	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
 }
 
 /**
