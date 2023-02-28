@@ -7,7 +7,7 @@ import * as React from 'react';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import { changeSelectedAreaUnit, updateSelectedAreaUnit, updateSelectedGroups, updateSelectedMeters, updateSelectedUnit } from '../actions/graph';
-import { areaUnitsCompatibleWithMeters, metersInGroup } from '../utils/determineCompatibleUnits';
+import { metersInGroup } from '../utils/determineCompatibleUnits';
 import { SelectOption } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
@@ -110,11 +110,11 @@ export default function AreaUnitSelectComponent() {
 }
 
 /**
- * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
+ * Filters all units that are not of type area or displayable type none from the redux state, as well as admin only units if the user is not an admin.
  * @param {State} state - current redux state
  * @returns {UnitData[]} an array of UnitData
  */
-function getVisibleAreaUnit(state: State) {
+function getVisibleAreaUnits(state: State) {
 	let visibleAreaUnits;
 	if (state.currentUser.profile?.role === 'admin') {
 		// User is an admin, allow all units to be seen
@@ -162,30 +162,11 @@ function getAreaUnitCompatibilityForDropdown(state: State) {
 		});
 	});
 
-	if (allCompatibleSelectedMeters.size == 0) {
-		// No meters/groups are selected. This includes the case where the selectedUnit is -99.
-		// Every unit is okay/compatible in this case so skip the work needed below.
-		// Filter the units to be displayed by user status and displayable type
-		getVisibleAreaUnit(state).forEach(unit => {
-			compatibleAreaUnits.add(unit.id);
-		});
-	} else {
-		// Some meter or group is selected
-		// Retrieve set of units compatible with list of selected meters and/or groups
-		const areaUnits = areaUnitsCompatibleWithMeters(allCompatibleSelectedMeters);
+	// for now, we assume all area units are compatible with all other area units
+	getVisibleAreaUnits(state).forEach(unit => {
+		compatibleAreaUnits.add(unit.id);
+	});
 
-		// Loop over all units (they must be of type area - case 1)
-		getVisibleAreaUnit(state).forEach(o => {
-			// Control displayable ones (case 2)
-			if (areaUnits.has(o.id)) {
-				// Should show as compatible (case 3)
-				compatibleAreaUnits.add(o.id);
-			} else {
-				// Should show as incompatible (case 4)
-				incompatibleAreaUnits.add(o.id);
-			}
-		});
-	}
 	// Ready to display unit. Put selectable ones before non-selectable ones.
 	const finalUnits = getSelectOptionsByItem(compatibleAreaUnits, incompatibleAreaUnits, state.units);
 	return finalUnits;

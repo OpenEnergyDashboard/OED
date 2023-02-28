@@ -252,7 +252,7 @@ class Meter {
 		this.previousEnd = previousEnd;
 		this.unitId = unitId;
 		this.defaultGraphicUnit = defaultGraphicUnit;
-		this.areaUnitId = this.areaUnitId;
+		this.areaUnitId = areaUnitId;
 	}
 
 	/**

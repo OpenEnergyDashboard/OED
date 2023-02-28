@@ -7,5 +7,8 @@
 	toVersion: '1.1.0',
 	up: async db => {
 		await db.none(sqlFile('../migrations/1.1.0-1.1.0/sql/preferences/add_preferences_default_area_normalization.sql'));
+		await db.none(sqlFile('../migrations/1.1.0-1.1.0/sql/unit/add_unit_type.sql'));
+		await db.none(sqlFile('../migrations/1.1.0-1.1.0/sql/group/add_area_unit_id.sql'));
+		await db.none(sqlFile('../migrations/1.1.0-1.1.0/sql/meter/add_area_unit_id.sql'));
 	}
 };
