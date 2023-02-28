@@ -21,6 +21,11 @@ interface UserDisplayComponentProps {
 	submitUserEdits: () => Promise<void>;
 }
 
+/**
+ * Component which shows user details
+ * @param {UserDisplayComponentProps} props defined above
+ * @returns {Element} User Detail element
+ */
 export default function UserDetailComponent(props: UserDisplayComponentProps) {
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'

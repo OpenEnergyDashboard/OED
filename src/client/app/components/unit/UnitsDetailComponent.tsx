@@ -16,6 +16,10 @@ import CreateUnitModalComponent from './CreateUnitModalComponent';
 import { UnitData } from 'types/redux/units';
 import SpinnerComponent from '../../components/SpinnerComponent';
 
+/**
+ * Component which defines units page
+ * @returns {Element} Units page element
+ */
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 

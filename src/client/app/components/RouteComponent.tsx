@@ -61,13 +61,13 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Their async blocks evaluate properly, but the returns inside of them are never honored. The end return statement is always what is evaluated.
 	 * Fixing this may require some major changes to how page redirects are done. This is detailed more in issue #817.
 	 * The errors can be obtained by putting breakpoints on all returns and then stepping through a page load in a debugger.
-	*/
+	 */
 
 	/**
 	 * Generates middleware that requires proper role and authentication for a page route
-	 * @param requiredRole The role that is necessary to access a page route
-	 * @param component The component of the page redirecting
-	 * @returns The page route to continue to (component or home)
+	 * @param {UserRole} requiredRole The role that is necessary to access a page route
+	 * @param {Element} component The component of the page redirecting
+	 * @returns {Element} The page route to continue to (component or home)
 	 */
 	public requireRole(requiredRole: UserRole, component: JSX.Element) {
 		// Redirect route to login page if the auth token does not exist or if the user is not the required role
@@ -95,8 +95,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Middleware function that requires proper authentication for a page route
-	 * @param component The component of the page redirecting
-	 * @returns The page route to continue to (component or home)
+	 * @param {Element} component The component of the page redirecting
+	 * @returns {Element} The page route to continue to (component or home)
 	 */
 	public requireAuth(component: JSX.Element) {
 		// Redirect route to home page if the auth token does not exist or if the user is not an admin
@@ -123,8 +123,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Middleware function that checks proper authentication for a page route
-	 * @param component The component of the page redirecting
-	 * @returns component
+	 * @param {Element} component The component of the page redirecting
+	 * @returns {Element} component
 	 */
 	public checkAuth(component: JSX.Element) {
 		// Only check the token if the auth token exists
@@ -148,8 +148,9 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Middleware function that allows hotlinking to a graph with options
-	 * @param component The component of the page redirecting
-	 * @param search The string of queries in the path
+	 * @param {Element} component The component of the page redirecting
+	 * @param {string} search The string of queries in the path
+	 * @returns {Element} component
 	 */
 	public linkToGraph(component: JSX.Element, search: string) {
 		/*
@@ -255,7 +256,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	/**
 	 * React component that controls the app's routes
 	 * Note that '/admin', '/editGroup', and '/createGroup' requires authentication
-	 * @returns JSX to create the RouteComponent
+	 * @returns {Element} JSX to create the RouteComponent
 	 */
 	public render() {
 		const lang = this.props.defaultLanguage;
@@ -292,11 +293,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Generates new time interval based on current time and user selected amount to trace back;
-	 * @param message: currently able to accept how many days to go back in time;
+	 * @param {string} message currently able to accept how many days to go back in time;
+	 * @returns {string} interval as a string
 	 */
 	// private getNewIntervalFromMessage(message: string) {
 	// 	const numDays = parseInt(message);
-	//
 	// If we ever use this code we might need to fix up moment for UTC as elsewhere in the code.
 	// 	const current = moment();
 	// 	const newMinTimeStamp = current.clone();

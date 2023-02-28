@@ -10,6 +10,11 @@ interface ListDisplayProps {
 	items: any[];
 }
 
+/**
+ * Defines a list wrapper used in OED
+ * @param {ListDisplayProps} props defined above
+ * @returns {Element} List Display JSX Element
+ */
 export default function ListDisplayComponent(props: ListDisplayProps) {
 	const defaultHeightItems = 8;
 	const itemHeightPx = 18;

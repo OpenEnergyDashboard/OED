@@ -11,6 +11,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
+/**
+ * Component used to select the desired map
+ * @returns {Element} Map Chart element
+ */
 export default function MapChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
 		paddingBottom: '15px'

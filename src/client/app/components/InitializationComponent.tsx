@@ -18,6 +18,10 @@ import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 
+/**
+ * Initializes OED redux with needed details
+ * @returns {Element} Initialization JSX element
+ */
 export default function InitializationComponent() {
 
 	const dispatch = useDispatch();

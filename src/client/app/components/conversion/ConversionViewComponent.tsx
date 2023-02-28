@@ -18,6 +18,11 @@ interface ConversionViewComponentProps {
 	units: UnitDataById;
 }
 
+/**
+ * Shows conversion details as a bubble
+ * @param {ConversionViewComponentProps} props defined above
+ * @returns {Element} Single conversion element
+ */
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
 
