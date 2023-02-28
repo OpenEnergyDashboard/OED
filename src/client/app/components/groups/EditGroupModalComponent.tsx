@@ -21,7 +21,7 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import '../../styles/modal.css';
 import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitGroupEdits, fetchGroupChildrenIfNeeded } from '../../actions/groups';
+import { submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
@@ -251,13 +251,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Determine the names of the child meters/groups.
 	useEffect(() => {
-		// Get the children of this meter. This will happen twice on the first load.
-		// TODO Since this is done for each card, it would be better to load them all at once
-		// rather per meter. This means moving this into the GroupsDetailComponent or before.
-		// TODO I think this function will fetch as long as another is not fetching so it could be made better
-		// to avoid redoing when not needed.
-		// TODO Look into outdated on group state to see how used and if needed with new group pages.
-		dispatch(fetchGroupChildrenIfNeeded(state.id));
 		// State for current group
 		const currentGroup = groupsState[state.id];
 

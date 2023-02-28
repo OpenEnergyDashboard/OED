@@ -11,7 +11,7 @@ import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { State } from '../../types/redux/state';
-import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
+import { fetchAllGroupChildrenIfNeeded, fetchGroupsDetailsIfNeeded } from '../../actions/groups';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { potentialGraphicUnits } from '../../utils/input';
@@ -26,6 +26,9 @@ export default function GroupsDetailComponent() {
 
 	useEffect(() => {
 		// Note each modal is created for each group when the details are created so get all state now for all groups.
+		// Get all groups' meter and group immediate children into state. Since all modals done for all groups
+		// we get them all here.
+		dispatch(fetchAllGroupChildrenIfNeeded());
 		// Makes async call to groups API for groups details if one has not already been made somewhere else, stores group ids in state
 		dispatch(fetchGroupsDetailsIfNeeded());
 		// Get meter details if needed
@@ -34,8 +37,10 @@ export default function GroupsDetailComponent() {
 
 	// Groups state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
-	// Meters state loaded status
+	// Groups state loaded status
 	const groupsStateLoaded = useSelector((state: State) => state.groups.hasBeenFetchedOnce);
+	// The immediate children of groups is loaded separately.
+	const groupsAllChildrenLoaded = useSelector((state: State) => state.groups.hasChildrenBeenFetchedOnce);
 	// current user state
 	const currentUserState = useSelector((state: State) => state.currentUser);
 	// Check for admin status
@@ -81,7 +86,7 @@ export default function GroupsDetailComponent() {
 							< CreateGroupModalComponent />
 						</div>
 					}
-					{groupsStateLoaded && unitsStateLoaded && metersStateLoaded &&
+					{groupsAllChildrenLoaded && groupsStateLoaded && unitsStateLoaded && metersStateLoaded &&
 						<div className="card-container">
 							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 							{Object.values(groupsState)

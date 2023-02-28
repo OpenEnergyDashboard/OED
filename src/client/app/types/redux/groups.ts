@@ -13,12 +13,15 @@ export type GroupsAction =
 	| ReceiveGroupsDetailsAction
 	| RequestGroupChildrenAction
 	| ReceiveGroupChildrenAction
+	| RequestAllGroupsChildrenAction
+	| ReceiveAllGroupsChildrenAction
 	| ChangeDisplayedGroupsAction
 	| ChangeSelectedChildGroupsPerGroupAction
 	| ChangeSelectedChildMetersPerGroupAction
 	| ConfirmEditedGroupAction
 	| ConfirmGroupsFetchedOnceAction
-;
+	| ConfirmAllGroupsChildrenFetchedOnceAction
+	;
 
 export interface RequestGroupsDetailsAction {
 	type: ActionType.RequestGroupsDetails;
@@ -38,6 +41,15 @@ export interface ReceiveGroupChildrenAction {
 	type: ActionType.ReceiveGroupChildren;
 	groupID: number;
 	data: { meters: number[], groups: number[], deepMeters: number[] };
+}
+
+export interface RequestAllGroupsChildrenAction {
+	type: ActionType.RequestAllGroupsChildren;
+}
+
+export interface ReceiveAllGroupsChildrenAction {
+	type: ActionType.ReceiveAllGroupsChildren;
+	data: GroupChildren[];
 }
 
 export interface ConfirmEditedGroupAction {
@@ -64,6 +76,10 @@ export interface ChangeSelectedChildMetersPerGroupAction {
 
 export interface ConfirmGroupsFetchedOnceAction {
 	type: ActionType.ConfirmGroupsFetchedOnce;
+}
+
+export interface ConfirmAllGroupsChildrenFetchedOnceAction {
+	type: ActionType.ConfirmAllGroupsChildrenFetchedOnce
 }
 
 export interface GroupMetadata {
@@ -106,6 +122,16 @@ export interface GroupDeepMeters {
 	deepMeters: number[];
 }
 
+// TODO this duplicates two fields in ones above so decide if should somehow merge.
+export interface GroupChildren {
+	// Which group id this applies to
+	groupId: number;
+	// All the immediate children of this group.
+	childMeters: number[];
+	// All the immediate groups of this group.
+	childGroups: number[];
+}
+
 export type GroupDefinition = GroupData & GroupMetadata & GroupID & GroupDeepMeters;
 
 export interface StatefulEditable {
@@ -115,7 +141,11 @@ export interface StatefulEditable {
 
 export interface GroupsState {
 	hasBeenFetchedOnce: boolean;
+	// If all groups child meters/groups are in state.
+	hasChildrenBeenFetchedOnce: boolean;
 	isFetching: boolean;
+	// If fetching all groups child meters/groups.
+	isFetchingAllChildren: boolean;
 	outdated: boolean;
 	byGroupID: {
 		[groupID: number]: GroupDefinition;

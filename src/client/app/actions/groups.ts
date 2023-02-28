@@ -28,6 +28,14 @@ function receiveGroupChildren(groupID: number, data: { meters: number[], groups:
 	return { type: ActionType.ReceiveGroupChildren, groupID, data };
 }
 
+function requestAllGroupsChildren(): t.RequestAllGroupsChildrenAction {
+	return { type: ActionType.RequestAllGroupsChildren };
+}
+
+function receiveAllGroupsChildren(data: t.GroupChildren[]): t.ReceiveAllGroupsChildrenAction {
+	return { type: ActionType.ReceiveAllGroupsChildren, data };
+}
+
 export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGroupsAction {
 	return { type: ActionType.ChangeDisplayedGroups, groupIDs };
 }
@@ -64,6 +72,11 @@ export function fetchGroupsDetailsIfNeeded(): Thunk {
 	};
 }
 
+// The following 3 functions do a single groups at a time. They were used
+// before the group modals. They are being left in case we want them in
+// the future, esp. if modals do not load all at start as they now do.
+// Note outdated is not used in the new code.
+
 function shouldFetchGroupChildren(state: State, groupID: number) {
 	const group = state.groups.byGroupID[groupID];
 	// Check that the group is outdated AND that it is not being fetched.
@@ -87,6 +100,39 @@ export function fetchGroupChildrenIfNeeded(groupID: number) {
 	};
 }
 
+// The following functions get the immediate children meters and groups of all groups.
+
+function fetchAllGroupChildren(): Thunk {
+	return async (dispatch: Dispatch, getState: GetState) => {
+		// ensure a fetch is not currently happening
+		if (!getState().groups.isFetchingAllChildren) {
+			// set isFetching to true
+			dispatch(requestAllGroupsChildren());
+			// Retrieve all groups children from database
+			const groupsChildren = await groupsApi.getAllGroupsChildren();
+			// update the state with all groups children
+			dispatch(receiveAllGroupsChildren(groupsChildren));
+			// If this is the first fetch, inform the store that the first fetch has been made
+			if (!getState().groups.hasChildrenBeenFetchedOnce) {
+				dispatch(confirmAllGroupsChildrenFetchedOnce());
+			}
+		}
+	}
+}
+
+export function confirmAllGroupsChildrenFetchedOnce(): t.ConfirmAllGroupsChildrenFetchedOnceAction {
+	return { type: ActionType.ConfirmAllGroupsChildrenFetchedOnce };
+}
+
+export function fetchAllGroupChildrenIfNeeded(): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		// If groups have not been fetched once (or that reset) then try to fetch.
+		if (!getState().groups.hasChildrenBeenFetchedOnce) {
+			return dispatch(fetchAllGroupChildren());
+		}
+		return Promise.resolve();
+	};
+}
 /**
  * Change the selected child groups of a group.
  * This is tracked on a per-group basis. (I.e., each group has its own list of selected child groups.)

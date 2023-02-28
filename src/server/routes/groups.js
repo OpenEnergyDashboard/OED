@@ -77,7 +77,6 @@ router.get('/idname', async (req, res) => {
 	}
 });
 
-
 /**
  * GET meters and groups that are immediate children of a given group
  * This will only return IDs because it queries groups_immediate_children and groups_immediate_meters, which store
@@ -96,6 +95,23 @@ router.get('/children/:group_id', async (req, res) => {
 		res.json({ meters, groups, deepMeters });
 	} catch (err) {
 		log.error(`Error while preforming GET on all immediate children (meters and groups) of specific group: ${err}`, err);
+	}
+});
+
+/**
+ * GET meters and groups that are immediate children of all groups
+ * This will only return IDs because it queries groups_immediate_children and groups_immediate_meters, which store
+ * only the IDs of the children.
+ * @return {[int, [int], [int]]}  array where each entry has the group id, array of child meter IDs and array of child group IDs
+ */
+router.get('/allChildren/', async (req, res) => {
+	// There are not parameters so nothing to verify.
+	const conn = getConnection();
+	try {
+		const allChildren = await Group.getImmediateChildren(conn);
+		res.json(allChildren);
+	} catch (err) {
+		log.error(`Error while preforming GET on all immediate children (meters and groups) of all groups: ${err}`, err);
 	}
 });
 

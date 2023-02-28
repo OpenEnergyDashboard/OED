@@ -8,7 +8,11 @@ import { ActionType } from '../types/redux/actions';
 
 const defaultState: GroupsState = {
 	hasBeenFetchedOnce: false,
+	// Has the child meters and groups of all groups already been put into state.
+	hasChildrenBeenFetchedOnce: false,
 	isFetching: false,
+	// Are we currently getting the child meters/groups for all groups.
+	isFetchingAllChildren: false,
 	outdated: true,
 	byGroupID: {},
 	selectedGroups: [],
@@ -26,6 +30,14 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			return {
 				...state,
 				hasBeenFetchedOnce: true
+			};
+		}
+		// Records if all group meter/group children have been fetched at least once.
+		// Normally just once but can reset to get it to fetch again.
+		case ActionType.ConfirmAllGroupsChildrenFetchedOnce: {
+			return {
+				...state,
+				hasChildrenBeenFetchedOnce: true
 			};
 		}
 		// The following are reducers related to viewing and fetching groups data
@@ -95,6 +107,38 @@ export default function groups(state = defaultState, action: GroupsAction) {
 					}
 				}
 			};
+		}
+
+		// When start fetching all groups meters/groups children.
+		case ActionType.RequestAllGroupsChildren: {
+			// Note that fetching
+			return {
+				...state,
+				isFetchingAllChildren: true
+			}
+		}
+
+		// When receive all groups meters/groups children.
+		case ActionType.ReceiveAllGroupsChildren: {
+			// Set up temporary state so only change/return once.
+			const newState: GroupsState = {
+				...state,
+				byGroupID: {
+					...state.byGroupID
+				}
+			}
+			// For each group that received data, set the children meters and groups.
+			for (const groupInfo of action.data) {
+				// Group id of the current item
+				const groupId = groupInfo.groupId;
+				// Reset the newState for this group to have child meters/groups.
+				newState.byGroupID[groupId].childMeters = groupInfo.childMeters;
+				newState.byGroupID[groupId].childGroups = groupInfo.childGroups;
+			}
+			// Note that not fetching children
+			newState.isFetchingAllChildren = false
+			// The updated state.
+			return newState;
 		}
 
 		case ActionType.ChangeDisplayedGroups: {

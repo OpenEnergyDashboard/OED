@@ -9,7 +9,7 @@ import * as moment from 'moment';
 import { CompareReadings } from '../../types/readings';
 import { NamedIDItem } from '../../types/items';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { GroupData, GroupID } from '../../types/redux/groups';
+import { GroupChildren, GroupData, GroupID } from '../../types/redux/groups';
 
 export default class GroupsApi {
 	private readonly backend: ApiBackend;
@@ -24,6 +24,11 @@ export default class GroupsApi {
 
 	public async children(groupID: number): Promise<{ meters: number[], groups: number[], deepMeters: number[] }> {
 		return await this.backend.doGetRequest<{ meters: number[], groups: number[], deepMeters: number[] }>(`api/groups/children/${groupID}`);
+	}
+
+	public async getAllGroupsChildren(): Promise<GroupChildren[]> {
+		// Sends route to server to get all groups child meters/groups.
+		return await this.backend.doGetRequest<GroupChildren[]>('api/groups/allChildren');
 	}
 
 	public async create(groupData: GroupData): Promise<void> {
