@@ -52,23 +52,44 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Sort child meters by id because need that every time the user makes a meter selection
 	originalGroupState.childMeters.sort();
 
-	// The chosen meters are initially the meter children of this group.
-	// In format for the display component.
-	const selectedMetersUnsorted: SelectOption[] = [];
-	Object.values(originalGroupState.childMeters).forEach(meter => {
-		selectedMetersUnsorted.push({
-			value: meter,
-			label: metersState[meter].identifier,
-			isDisabled: false
-		} as SelectOption
-		);
-	});
-	// Want chosen in sorted order. Note any changes by user can unsort them.
-	let selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
-
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
+	// The chosen meters are initially the meter children of this group.
+	// If an admin then will display as a selectable meter list and if 
+	// other user than it is a list of the meter identifiers.
+	let selectedMeters: SelectOption[] = [], listedMeters: string[] = [];
+	if (loggedInAsAdmin) {
+		// In format for the display component.
+		const selectedMetersUnsorted: SelectOption[] = [];
+		Object.values(originalGroupState.childMeters).forEach(meter => {
+			selectedMetersUnsorted.push({
+				value: meter,
+				label: metersState[meter].identifier,
+				isDisabled: false
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order. Note any changes by user can unsort them.
+		selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+	} else {
+		let hasHidden = false;
+		// The childMeters were sorted above so they should be sorted as select.
+		Object.values(originalGroupState.childMeters).forEach(meter => {
+			let meterIdentifier = metersState[meter].identifier;
+			// The identifier is null if the meter is not visible to this user so not hidden meters.
+			if (meterIdentifier === null) {
+				hasHidden = true;
+			} else {
+				listedMeters.push(meterIdentifier);
+			}
+			if (hasHidden) {
+				// There are hidden meters so note at bottom of list.
+				listedMeters.push('At least one meter is not visible to you');
+			}
+		});
+	}
 
 	// Set existing group values
 	const values = {
@@ -138,107 +159,112 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	const handleClose = () => {
 		props.handleClose();
-		resetState();
+		if (loggedInAsAdmin) {
+			// State cannot change if you are not an admin.
+			resetState();
+		}
 	}
 
-	// Save changes
-	// Currently using the old functionality which is to compare inherited prop values to state values
-	// If there is a difference between props and state, then a change was made
-	// Side note, we could probably just set a boolean when any input
-	const handleSaveChanges = () => {
-		// Close the modal first to avoid repeat clicks
-		props.handleClose();
+	let handleSaveChanges, meterSelectOptions: SelectOption[] = [];
+	if (loggedInAsAdmin) {
+		// Save changes
+		// Currently using the old functionality which is to compare inherited prop values to state values
+		// If there is a difference between props and state, then a change was made
+		// Side note, we could probably just set a boolean when any input
+		handleSaveChanges = () => {
+			// Close the modal first to avoid repeat clicks
+			props.handleClose();
 
-		// true if inputted values are okay. Then can submit.
-		let inputOk = true;
+			// true if inputted values are okay. Then can submit.
+			let inputOk = true;
 
-		// Check for changes by comparing state to props
-		const childMeterChanges = !metersSame(originalGroupState.childMeters, selectedMeters);
-		const groupHasChanges =
-			(
-				originalGroupState.name != state.name ||
-				originalGroupState.displayable != state.displayable ||
-				originalGroupState.gps != state.gps ||
-				originalGroupState.note != state.note ||
-				originalGroupState.area != state.area ||
-				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
-				childMeterChanges
-				// TODO add children value when can edit and any others
-			);
-		// Only validate and store if any changes.
-		if (groupHasChanges) {
-			//Check if area is positive
-			// TODO object is possibly undefined
-			// TODO For now allow zero so works with default value and DB. We should probably
-			// make this better default than 0 (DB set to not null now).
-			if (state.area < 0) {
-				notifyUser(translate('area.invalid') + state.area + '.');
-				inputOk = false;
-			}
-
-			// TODO - not done on meters; may not need once set value properly
-			//Check default graphic unit
-			if (state.defaultGraphicUnit === -999) {
-				notifyUser(translate('group.graphic.invalid'));
-				inputOk = false;
-			}
-
-			//Check GPS
-			const gpsInput = state.gps;
-			let gps: GPSPoint | null = null;
-			const latitudeIndex = 0;
-			const longitudeIndex = 1;
-			//if the user input a value then gpsInput should be a string
-			// null came from DB and it is okay to just leave it - Not a String.
-			if (typeof gpsInput === 'string') {
-				if (isValidGPSInput(gpsInput)) {
-					//Clearly gpsInput is a string but TS complains about the split so cast.
-					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-					//It is valid and needs to be in this format for routing
-					gps = {
-						longitude: gpsValues[longitudeIndex],
-						latitude: gpsValues[latitudeIndex]
-					};
-				} else if ((gpsInput as string).length !== 0) {
-					// GPS not okay.
-					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-					// so leaving code commented out.
-					// notifyUser(translate('input.gps.range') + state.gps + '.');
-					notifyUser(translate('input.gps.range') + state.gps + '.');
+			// Check for changes by comparing state to props
+			const childMeterChanges = !metersSame(originalGroupState.childMeters, selectedMeters);
+			const groupHasChanges =
+				(
+					originalGroupState.name != state.name ||
+					originalGroupState.displayable != state.displayable ||
+					originalGroupState.gps != state.gps ||
+					originalGroupState.note != state.note ||
+					originalGroupState.area != state.area ||
+					originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
+					childMeterChanges
+					// TODO add children value when can edit and any others
+				);
+			// Only validate and store if any changes.
+			if (groupHasChanges) {
+				//Check if area is positive
+				// TODO object is possibly undefined
+				// TODO For now allow zero so works with default value and DB. We should probably
+				// make this better default than 0 (DB set to not null now).
+				if (state.area < 0) {
+					notifyUser(translate('area.invalid') + state.area + '.');
 					inputOk = false;
 				}
-			}
 
-			if (inputOk) {
-				// The input passed validation.
-				// GPS may have been updated so create updated state to submit.
-				let submitState = { ...state, gps: gps };
-				let childMeters: number[] = [];
-				if (childMeterChanges) {
-					// Send child meters to update but need to create array of the ids.
-					childMeters = selectedMeters.map(meter => { return meter.value; });
-					submitState = { ...state, childMeters: childMeters }
+				// TODO - not done on meters; may not need once set value properly
+				//Check default graphic unit
+				if (state.defaultGraphicUnit === -999) {
+					notifyUser(translate('group.graphic.invalid'));
+					inputOk = false;
 				}
-				dispatch(submitGroupEdits(submitState));
-				dispatch(removeUnsavedChanges());
-			} else {
-				notifyUser(translate('group.input.error'));
+
+				//Check GPS
+				const gpsInput = state.gps;
+				let gps: GPSPoint | null = null;
+				const latitudeIndex = 0;
+				const longitudeIndex = 1;
+				//if the user input a value then gpsInput should be a string
+				// null came from DB and it is okay to just leave it - Not a String.
+				if (typeof gpsInput === 'string') {
+					if (isValidGPSInput(gpsInput)) {
+						//Clearly gpsInput is a string but TS complains about the split so cast.
+						const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+						//It is valid and needs to be in this format for routing
+						gps = {
+							longitude: gpsValues[longitudeIndex],
+							latitude: gpsValues[latitudeIndex]
+						};
+					} else if ((gpsInput as string).length !== 0) {
+						// GPS not okay.
+						// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+						// so leaving code commented out.
+						// notifyUser(translate('input.gps.range') + state.gps + '.');
+						notifyUser(translate('input.gps.range') + state.gps + '.');
+						inputOk = false;
+					}
+				}
+
+				if (inputOk) {
+					// The input passed validation.
+					// GPS may have been updated so create updated state to submit.
+					let submitState = { ...state, gps: gps };
+					let childMeters: number[] = [];
+					if (childMeterChanges) {
+						// Send child meters to update but need to create array of the ids.
+						childMeters = selectedMeters.map(meter => { return meter.value; });
+						submitState = { ...state, childMeters: childMeters }
+					}
+					dispatch(submitGroupEdits(submitState));
+					dispatch(removeUnsavedChanges());
+				} else {
+					notifyUser(translate('group.input.error'));
+				}
 			}
-		}
-	};
+		};
+		// TODO consider useSelect vs useEffect and implications for entire codebase
+		// TODO this state name is obscuring the state variable declared above.
+		meterSelectOptions = useSelector((stateX: State) => {
+			// Get meters that okay for this group in a format the component can display.
+			// TODO pass current deep meters instead
+			return getMeterMenuOptionsForGroup(state.id);
 
-	// TODO consider useSelect vs useEffect and implications for entire codebase
-	// TODO this state name is obscuring the state variable declared above.
-	const meterSelectOptions = useSelector((stateX: State) => {
-		// Get meters that okay for this group in a format the component can display.
-		// TODO pass current deep meters instead
-		const sortedMeters = getMeterMenuOptionsForGroup(state.id);
-
-		return {
-			// all meter, sorted alphabetically and by compatibility
-			sortedMeters
-		}
-	});
+			// return {
+			// 	// all meter, sorted alphabetically and by compatibility
+			// 	sortedMeters
+			// }
+		});
+	}
 
 	// Determine the names of the child meters/groups.
 	useEffect(() => {
@@ -412,7 +438,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											{/* Use meter translation id string since same one wanted. */}
 											{/* This is the default graphic unit associated with the group or no unit if none. */}
 											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
-											{state.defaultGraphicUnit === -99 ? 'no unit' : unitState[state.defaultGraphicUnit].identifier}
+											{/* Not exactly sure why but must force a starting space after the label */}
+											{state.defaultGraphicUnit === -99 ? ' no unit' : ' ' + unitState[state.defaultGraphicUnit].identifier}
 										</div>
 									}
 									{/* Displayable input */}
@@ -466,17 +493,24 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 									}
 									{/* The child meters in this group */}
-									<div style={formInputStyle}>
-										<b><FormattedMessage id='child.meters' /></b>:
-										<MultiSelectComponent
-											options={meterSelectOptions.sortedMeters}
-											selectedOptions={selectedMeters}
-											placeholder={translate('select.meters')}
-											onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
-												selectedMeters = newSelectedMeterOptions;
-											}}
-										/>
-									</div>
+									{loggedInAsAdmin ?
+										<div style={formInputStyle}>
+											<b><FormattedMessage id='child.meters' /></b>:
+											<MultiSelectComponent
+												options={meterSelectOptions}
+												selectedOptions={selectedMeters}
+												placeholder={translate('select.meters')}
+												onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+													selectedMeters = newSelectedMeterOptions;
+												}}
+											/>
+										</div>
+										:
+										<div>
+											<b><FormattedMessage id='child.meters' /></b>:
+											<ListDisplayComponent trueSize={listedMeters.length} items={listedMeters} />
+										</div>
+									}
 									{/* The child groups in this group */}
 									<div>
 										<b><FormattedMessage id='child.groups' /></b>:
