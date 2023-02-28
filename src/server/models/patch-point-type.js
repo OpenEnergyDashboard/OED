@@ -16,7 +16,7 @@ function patchPointType(pgp) {
 		/**
 		 * parse the string representation of a 'postgres point type' into a {Point}
 		 * @param val a string in the form "(floatA,floatB)"
-		 * @return {Point}
+		 * @returns {Point}
 		 */
 		function (val) {
 			const coordinates = val.slice(1, val.length - 1).split(',');

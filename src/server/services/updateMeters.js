@@ -13,7 +13,7 @@ const { log } = require('../log');
  * @param dataReader {function} A function to fetch readings from each meter
  * @param metersToUpdate [Meter] An array of meters to be updated
  * @param conn the database connection to use
- * @return {Promise.<void>}
+ * @returns {Promise.<void>}
  */
 async function updateAllMeters(dataReader, metersToUpdate, conn) {
 	log.info(`Getting meter data`);

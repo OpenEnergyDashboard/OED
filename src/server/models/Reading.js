@@ -26,7 +26,7 @@ class Reading {
 	/**
 	 * Returns a promise to create the readings table.
 	 * @param conn the database connection to use
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('reading/create_readings_table.sql'));
@@ -36,7 +36,7 @@ class Reading {
 	 * Returns a promise to create the function and materialized views that aggregate
 	 * readings by various time intervals.
 	 * @param conn the database connection to use
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static createReadingsMaterializedViews(conn) {
 		return conn.none(sqlFile('reading/create_reading_views.sql'));
@@ -54,7 +54,7 @@ class Reading {
 	 * Refreshes the daily readings view.
 	 * Should be called at least once a day, preferably in the middle of the night.
 	 * @param conn The connection to use
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static refreshDailyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
@@ -69,7 +69,7 @@ class Reading {
 	 * server response time. If only called once a day, then probably best to do so in the middle
 	 * of the night as suggested for daily refresh.
 	 * @param conn The connection to use
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static refreshHourlyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
@@ -225,7 +225,7 @@ class Reading {
 	 * @param fromTimestamp An optional start point for the time range of readings returned
 	 * @param toTimestamp An optional end point for the time range of readings returned
 	 * @param conn the connection to use.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getMeterLineReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
@@ -252,7 +252,7 @@ class Reading {
 	 * @param fromTimestamp An optional start point for the time range of readings returned
 	 * @param toTimestamp An optional end point for the time range of readings returned
 	 * @param conn the connection to use.
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getGroupLineReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
 		const [minHourPoints, minDayPoints] = determineMinPoints();
@@ -280,7 +280,7 @@ class Reading {
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
-	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 * @returns {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getMeterBarReadings(meterIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
 		const allBarReadings = await conn.func('meter_bar_readings_unit', [meterIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
@@ -301,7 +301,7 @@ class Reading {
 	 * @param toTimestamp the end of the barchart interval
 	 * @param barWidthDays the width of each bar in days
 	 * @param conn the connection to use.
-	 * @return {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
+	 * @returns {Promise<object<int, array<{reading: number, start_timestamp: Moment, end_timestamp: Moment}>>>}
 	 */
 	static async getGroupBarReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, barWidthDays, conn) {
 		const allBarReadings = await conn.func('group_bar_readings_unit', [groupIDs, graphicUnitId, barWidthDays, fromTimestamp, toTimestamp]);
@@ -322,7 +322,7 @@ class Reading {
 	 * @param {Moment} currEndTimestamp end of current/this compare period
 	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
 	 * @param conn the connection to use.
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static async getMeterCompareReadings(meterIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
@@ -346,7 +346,7 @@ class Reading {
 	 * @param {Moment} currEndTimestamp end of current/this compare period
 	 * @param {Duration} compareShift how far to shift back in time from current period to previous period
 	 * @param conn the connection to use.
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	 static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(

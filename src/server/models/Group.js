@@ -40,7 +40,7 @@ class Group {
 	/**
 	 * Returns a promise to insert this group into the db
 	 * @param conn a function returning the connection to be used, defaults to the default database connection.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async insert(conn) {
 		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
@@ -149,7 +149,7 @@ class Group {
 	 * Returns a promise to associate this group with a child group
 	 * @param childID ID of the meter to be the child
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async adoptGroup(childID, conn) {
 		// Confirm that such a group exists
@@ -161,7 +161,7 @@ class Group {
 	 * Returns a promise to make the meter with the given ID an immediate child of this group.
 	 * @param childID
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async adoptMeter(childID, conn) {
 		const meter = await Meter.getByID(childID, conn);
@@ -172,7 +172,7 @@ class Group {
 	 *  Returns a promise to retrieve all the IDs of the deep child groups of the group with the given ID.
 	 * @param id
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	static async getDeepGroupsByGroupID(id, conn) {
 		const rows = await conn.any(sqlFile('group/get_deep_groups_by_group_id.sql'), { id });
@@ -183,7 +183,7 @@ class Group {
 	 * Returns a promise to retrieve all the IDs of deep child meters of the group with the given ID.
 	 * @param id
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	static async getDeepMetersByGroupID(id, conn) {
 		const rows = await conn.any(sqlFile('group/get_deep_meters_by_group_id.sql'), { id });
@@ -212,7 +212,7 @@ class Group {
 	 * Returns a promise to remove the group with childID from the children of this group.
 	 * @param childID The child group to be disowned
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async disownGroup(childID, conn) {
 		await conn.none(sqlFile('group/disown_child_group.sql'), { parent_id: this.id, child_id: childID });
@@ -222,7 +222,7 @@ class Group {
 	 * Returns a promise to remove the group with childID from the children of this group.
 	 * @param childID The child group to be disowned
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async disownMeter(meterID, conn) {
 		await conn.none(sqlFile('group/disown_child_meter.sql'), { parent_id: this.id, meter_id: meterID });
@@ -231,7 +231,7 @@ class Group {
 	/**
 	 * Returns a promise to retrieve an array of the group IDs of the parent groups of this group
 	 * @param conn the connection to be used.
-	 * @return {Promise<IArrayExt<any>>}
+	 * @returns {Promise<IArrayExt<any>>}
 	 */
 	async getParents(conn) {
 		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: this.id });
@@ -242,7 +242,7 @@ class Group {
 	 * Returns a promise to delete a group and purge all trace of it form the memories of its parents and children
 	 * @param groupID The ID of the group to be deleted
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	static async delete(groupID, conn) {
 		await conn.none(sqlFile('group/delete_group.sql'), { id: groupID });

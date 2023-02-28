@@ -50,7 +50,7 @@ class Map {
 	/**
 	 * Returns a promise to insert this map into the db
 	 * @param conn a function returning the connection to be used, defaults to the default database connection.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async insert(conn) {
 		const map = this;
@@ -136,7 +136,7 @@ class Map {
 	 * Change the name of this map
 	 * @param newName New name for the map
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	async rename(newName, conn) {
 		await conn.none(sqlFile('map/rename_map.sql'), { new_name: newName, id: this.id });
@@ -146,7 +146,7 @@ class Map {
 	 * Returns a promise to delete a map
 	 * @param mapID The ID of the map to be deleted
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	static async delete(mapID, conn) {
 		await conn.none(sqlFile('map/delete_map.sql'), { id: mapID });

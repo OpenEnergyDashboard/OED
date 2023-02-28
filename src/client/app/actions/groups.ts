@@ -82,7 +82,7 @@ export function fetchGroupChildrenIfNeeded(groupID: number) {
  * This is tracked on a per-group basis. (I.e., each group has its own list of selected child groups.)
  * @param {number} parentID The ID of the group whose subgroups are being selected
  * @param {number[]} groupIDs The IDs of the new set of selected subgroups
- * @returns {{type: string, groupIDs: [number]}}
+ * @returns {{type: string, parentID: number, groupIDs: [number]}}
  */
 export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: number[]): t.ChangeSelectedChildGroupsPerGroupAction {
 	return { type: ActionType.ChangeSelectedChildGroupsPerGroup, parentID, groupIDs };

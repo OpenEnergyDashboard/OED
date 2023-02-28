@@ -45,7 +45,7 @@ class TimeInterval {
 	 * Test if this time interval is contains another.
 	 * Intervals are considered to contain equal intervals.
 	 * @param other
-	 * @return {boolean}
+	 * @returns {boolean}
 	 */
 	contains(other) {
 		if (!(other instanceof TimeInterval)) {
@@ -67,7 +67,7 @@ class TimeInterval {
 	/**
 	 * Returns TimeInterval.toString() so that using a time interval as an object key will
 	 * have reasonable behaviour.
-	 * @return {*}
+	 * @returns {*}
 	 */
 	valueOf() {
 		return this.toString();
@@ -83,7 +83,7 @@ class TimeInterval {
 
 	/**
 	 * Creates a new unbounded time interval
-	 * @return {TimeInterval}
+	 * @returns {TimeInterval}
 	 */
 	static unbounded() {
 		return new TimeInterval(null, null);
@@ -92,7 +92,7 @@ class TimeInterval {
 	/**
 	 * Creates a new TimeInterval from its string representation
 	 * @param {string} stringified the string representation
-	 * @return {TimeInterval}
+	 * @returns {TimeInterval}
 	 */
 	static fromString(stringified) {
 		if (stringified === 'all') {

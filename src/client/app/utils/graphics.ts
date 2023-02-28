@@ -10,9 +10,10 @@ import translate from '../utils/translate';
 
 /**
  * Returns the y-axis label for a line graph and whether the rate needs scaling
+ *
  * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
  * @param {LineGraphRate} currentSelectedRate The current selected rate
- * @returns y-axis label and boolean of whether rate needs to be scaled (true if does)
+ * @returns {{unitLabel: string, needsRateScaling: boolean}} y-axis label and boolean of whether rate needs to be scaled (true if does)
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate): { unitLabel: string, needsRateScaling: boolean } {
 	let unitLabel: string = '';
@@ -45,10 +46,11 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
 }
 
 /**
-* Returns the y-axis label for a bar graph
-* @param {UnitData} selectUnitState The unit state for the selected unit for graphing
-* @return y-axis label
-*/
+ * Returns the y-axis label for a bar graph
+ *
+ * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
+ * @returns {string} y-axis label
+ */
 export function barUnitLabel(selectUnitState: UnitData): string {
 	let unitLabel: string = '';
 	// Quantity and flow units have different unit labels.

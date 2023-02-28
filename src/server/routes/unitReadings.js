@@ -64,7 +64,7 @@ function formatReadingRow(readingRow) {
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
 async function meterLineReadings(meterIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
@@ -93,7 +93,7 @@ function validateGroupLineReadingsParams(params) {
  * @param groupIDs The group IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
 async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
@@ -154,7 +154,7 @@ function formatBarReadingRow(readingRow) {
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param barWidthDays The width of the bar in days
  * @param timeInterval The range of time to get readings for
- * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+ * @returns {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
  */
 async function meterBarReadings(meterIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
@@ -185,7 +185,7 @@ function validateGroupBarReadingsParams(params) {
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param barWidthDays The width of the bar in days
  * @param timeInterval The range of time to get readings for
- * @return {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
+ * @returns {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
  */
  async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
