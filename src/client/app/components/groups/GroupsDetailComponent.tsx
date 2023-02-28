@@ -24,17 +24,6 @@ export default function GroupsDetailComponent() {
 
 	const dispatch = useDispatch();
 
-	useEffect(() => {
-		// Note each modal is created for each group when the details are created so get all state now for all groups.
-		// Get all groups' meter and group immediate children into state. Since all modals done for all groups
-		// we get them all here.
-		dispatch(fetchAllGroupChildrenIfNeeded());
-		// Makes async call to groups API for groups details if one has not already been made somewhere else, stores group ids in state
-		dispatch(fetchGroupsDetailsIfNeeded());
-		// Get meter details if needed
-		dispatch(fetchMetersDetailsIfNeeded())
-	}, []);
-
 	// Groups state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Groups state loaded status
@@ -52,6 +41,22 @@ export default function GroupsDetailComponent() {
 	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 	// Units state loaded status
 	const metersStateLoaded = useSelector((state: State) => state.meters.hasBeenFetchedOnce);
+
+	useEffect(() => {
+		// Note each modal is created for each group when the details are created so get all state now for all groups.
+		// Get meter details if needed
+		dispatch(fetchMetersDetailsIfNeeded())
+		// Makes async call to groups API for groups details if one has not already been made somewhere else, stores group ids in state
+		dispatch(fetchGroupsDetailsIfNeeded());
+		// TODO Is there a good way to integrate this into the actions so it must work correctly?
+		// You need the basic group state loaded since going to modify.
+		if (groupsStateLoaded) {
+			// Get all groups' meter and group immediate children into state. Since all modals done for all groups
+			// we get them all here.
+			dispatch(fetchAllGroupChildrenIfNeeded());
+		}
+		// In case the group state was not yet loaded you need to do this again.
+	}, [groupsStateLoaded]);
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(units);
