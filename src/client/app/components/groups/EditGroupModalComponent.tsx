@@ -25,7 +25,7 @@ import { submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithMeters, metersInGroup, getMeterMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
+import { unitsCompatibleWithMeters, getMeterMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, updateDeepMetersOnMeter } from '../../utils/input';
@@ -309,15 +309,15 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 		// Update compatible units and graphic units set.
 		useEffect(() => {
-			// Graphic units compatible with currently selected unit
+			// Graphic units compatible with currently selected meters/groups.
 			const compatibleGraphicUnits = new Set<UnitData>();
-			// Graphic units incompatible with currently selected unit
+			// Graphic units incompatible with currently selected meters/groups.
 			const incompatibleGraphicUnits = new Set<UnitData>();
-			// Find all the meters in this group. Initially this will be the same as the deep meters but needs to be updated
-			// if edited on this page. Then find all the units that are compatible with these meters.
-			// TODO this isn't going to be correct if the meters or groups of this group is edited on this page
-			// because it does not change the group state until you save.
-			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(metersInGroup(state.id));
+			// First must get a set from the array of deep meter numbers which is all meters currently in this group.
+			const deepMetersSet = new Set(state.deepMeters);
+			// Get the units that are compatible with this set of meters.
+			// TODO This does not allow no unit which we currently planned to allow for groups. Need to decide what to do in this case.
+			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
 			dropdownsState.possibleGraphicUnits.forEach(unit => {
 				// If current graphic unit exists in the set of allowed graphic units
 				if (allowedDefaultGraphicUnit.has(unit.id)) {
@@ -331,13 +331,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			setDropdownsState({
 				...dropdownsState,
 				// The new set helps avoid repaints.
-				compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-				incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
+				compatibleGraphicUnits: compatibleGraphicUnits,
+				incompatibleGraphicUnits: incompatibleGraphicUnits
 			});
 			// If any of these change then it needs to be updated.
 			// pik is needed since the compatible units is not correct until pik is available.
 			// TODO need to add change in meters and groups of this group once settle how going to do above.
-		}, [ConversionArray.pikAvailable()]);
+		}, [ConversionArray.pikAvailable(), state.deepMeters]);
 	}
 	const tooltipStyle = {
 		display: 'inline-block',
