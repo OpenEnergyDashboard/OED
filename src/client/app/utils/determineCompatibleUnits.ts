@@ -154,20 +154,24 @@ export function metersInGroup(groupId: number): Set<number> {
 /**
  * Get options for the meter menu on the group page.
  * @param gid The group's id.
+ * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
+ * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @return The current meter options for this group. 
  */
-export function getMeterMenuOptionsForGroup(gid: number): SelectOption[] {
+export function getMeterMenuOptionsForGroup(gid: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
-	// Get the currentGroup's compatible units.
-	// TODO need to make this the current deep meters????????
-	const currentUnits = unitsCompatibleWithMeters(metersInGroup(gid));
-	// Current group's default graphic unit (via Redux).
-	const defaultGraphicUnit = state.groups.byGroupID[gid].defaultGraphicUnit;
-	// Get all meters.
+	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
+	// First must get a set from the array of meter numbers.
+	const deepMetersSet = new Set(deepMeters);
+	// Get the units that are compatible with this set of meters.
+	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
+	// Get all meters' state.
 	const meters = Object.values(state.meters.byMeterID) as MeterData[];
 
 	// Options for the meter menu.
 	const options: SelectOption[] = [];
-
+	// For each meter, decide its compatibility for the menu
 	meters.forEach((meter: MeterData) => {
 		const option = {
 			label: meter.identifier,
@@ -178,11 +182,12 @@ export function getMeterMenuOptionsForGroup(gid: number): SelectOption[] {
 
 		const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, meter.id, DataType.Meter, defaultGraphicUnit);
 		if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
+			// This meter was not compatible with the ones in the group so disable it as a choice.
 			option.isDisabled = true;
 		} else {
+			// This meter is compatible but need to decide what impact choosing it will have on the group.
 			option.style = getMenuOptionFont(compatibilityChangeCase);
 		}
-
 		options.push(option);
 	});
 
@@ -197,7 +202,7 @@ export function getMeterMenuOptionsForGroup(gid: number): SelectOption[] {
 export function getGroupMenuOptionsForGroup(gid: number): SelectOption[] {
 	const state = store.getState() as State;
 	// Get the currentGroup's compatible units.
-	const currentUnits = unitsCompatibleWithMeters(metersInGroup(gid))
+	const currentUnits = unitsCompatibleWithMeters(metersInGroup(gid));
 	// Current group's default graphic unit (via Redux).
 	const defaultGraphicUnit = state.groups.byGroupID[gid].defaultGraphicUnit;
 	// Get all groups.

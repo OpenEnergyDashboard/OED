@@ -106,6 +106,8 @@ export interface GroupEditData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
+	// This is optional since it is in Redux state and used during group editing but not sent in route.
+	deepMeters?: number[];
 	gps: GPSPoint | null;
 	displayable: boolean;
 	note?: string;

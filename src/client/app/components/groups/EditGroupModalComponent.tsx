@@ -28,7 +28,8 @@ import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithMeters, metersInGroup, getMeterMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
+import { notifyUser, getGPSString, nullToEmptyString, updateDeepMetersOnMeter } from '../../utils/input';
+import { GroupEditData } from 'types/redux/groups';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -92,22 +93,25 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	// Set existing group values
-	const values = {
+	const values: GroupEditData = {
+		id: originalGroupState.id,
 		name: originalGroupState.name,
 		childMeters: originalGroupState.childMeters,
 		childGroups: originalGroupState.childGroups,
-		displayable: originalGroupState.displayable,
+		deepMeters: originalGroupState.deepMeters,
 		gps: originalGroupState.gps,
+		displayable: originalGroupState.displayable,
 		note: originalGroupState.note,
 		area: originalGroupState.area,
-		defaultGraphicUnit: originalGroupState.defaultGraphicUnit,
-		id: originalGroupState.id
+		defaultGraphicUnit: originalGroupState.defaultGraphicUnit
 	}
 
 	// The information on the children of this group
 	const groupChildrenDefaults = {
 		// The meter selections in format for selection dropdown.
 		meterSelectOptions: [] as SelectOption[],
+		// Meters that have been selected for this group. Not used if non-admin.
+		meterSelectedSelectOptions: loggedInAsAdmin ? selectedMeters : [] as SelectOption[],
 		// The names of all direct meter children that are visible to this user.
 		childGroupsName: [] as string[],
 		// The original number of direct group children
@@ -177,7 +181,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			let inputOk = true;
 
 			// Check for changes by comparing state to props
-			const childMeterChanges = !metersSame(originalGroupState.childMeters, selectedMeters);
+			const childMeterChanges = !metersSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
 			const groupHasChanges =
 				(
 					originalGroupState.name != state.name ||
@@ -237,11 +241,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					// The input passed validation.
 					// GPS may have been updated so create updated state to submit.
 					let submitState = { ...state, gps: gps };
+					// deepMeters is part of the group state but it is not sent on edit so remove.
+					delete submitState.deepMeters;
 					let childMeters: number[] = [];
 					if (childMeterChanges) {
 						// Send child meters to update but need to create array of the ids.
-						childMeters = selectedMeters.map(meter => { return meter.value; });
-						submitState = { ...state, childMeters: childMeters }
+						childMeters = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.value; });
+						submitState = { ...submitState, childMeters: childMeters }
 					}
 					dispatch(submitGroupEdits(submitState));
 					dispatch(removeUnsavedChanges());
@@ -253,22 +259,17 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 		// Determine child meters/groups.
 		useEffect(() => {
-
 			// Get meters that okay for this group in a format the component can display.
-			// TODO pass current deep meters instead
-			const possibleMeters = getMeterMenuOptionsForGroup(state.id);
-
-			// State for current group
-			// TODO ??????????? Why can't this be done once and how relate to one above?
-			const currentGroup = groupsState[state.id];
+			// Must pass the current state info since can be changed while editing.
+			const possibleMeters = getMeterMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
 
 			// Information to display the direct children groups.
 			// Holds the names of all direct group children of this group when visible to this user.
 			const childGroupsName: string[] = [];
 			let trueGroupSize = 0;
 			// Make sure state exists as the dispatch above may not be done.
-			if (currentGroup.childGroups) {
-				currentGroup.childGroups.forEach((groupID: number) => {
+			if (state.childGroups) {
+				state.childGroups.forEach((groupID: number) => {
 					// Make sure group state exists. Also, the name is missing if not visible (non-admin).
 					if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
 						childGroupsName.push(groupsState[groupID].name.trim());
@@ -276,7 +277,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				});
 				childGroupsName.sort();
 				// Record the total number so later can compare the number in array to see if any missing.
-				trueGroupSize = currentGroup.childGroups.length;
+				trueGroupSize = state.childGroups.length;
 			}
 
 			// Information to display all (deep) children meters.
@@ -284,8 +285,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			const deepMetersIdentifier: string[] = [];
 			let trueDeepMeterSize = 0;
 			// Make sure state exists as the dispatch above may not be done.
-			if (currentGroup.deepMeters) {
-				currentGroup.deepMeters.forEach((meterID: number) => {
+			if (state.deepMeters) {
+				state.deepMeters.forEach((meterID: number) => {
 					// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
 					if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
 						deepMetersIdentifier.push(metersState[meterID].identifier.trim());
@@ -293,7 +294,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				});
 				deepMetersIdentifier.sort();
 				// Record the total number so later can compare the number in array to see if any missing.
-				trueDeepMeterSize = currentGroup.deepMeters.length;
+				trueDeepMeterSize = state.deepMeters.length;
 			}
 			// Update the state
 			setGroupChildrenState({
@@ -304,7 +305,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				deepMetersTrueSize: trueDeepMeterSize,
 				meterSelectOptions: possibleMeters
 			});
-		}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups, groupsState[state.id].deepMeters]);
+		}, [metersState, state.childMeters, state.childGroups, state.deepMeters]);
 
 		// Update compatible units and graphic units set.
 		useEffect(() => {
@@ -468,10 +469,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											<b><FormattedMessage id='child.meters' /></b>:
 											<MultiSelectComponent
 												options={groupChildrenState.meterSelectOptions}
-												selectedOptions={selectedMeters}
+												selectedOptions={groupChildrenState.meterSelectedSelectOptions}
 												placeholder={translate('select.meters')}
 												onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
-													selectedMeters = newSelectedMeterOptions;
+													// The meters changed so update the current list of deep meters
+													const newDeepMeters = updateDeepMetersOnMeter(state.deepMeters, groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
+													// Update the deep meter state based on the changes
+													setState({ ...state, deepMeters: newDeepMeters });
+													// Set the selected meters in state to the ones chosen.
+													setGroupChildrenState({
+														...groupChildrenState,
+														meterSelectedSelectOptions: newSelectedMeterOptions
+													});
 												}}
 											/>
 										</div>
