@@ -91,6 +91,10 @@ export interface UpdateLineGraphRate {
 	lineGraphRate: LineGraphRate;
 }
 
+export interface ConfirmGraphRenderOnce {
+	type: ActionType.ConfirmGraphRenderOnce;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -105,7 +109,8 @@ export type GraphAction =
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
 	| SetOptionsVisibility
-	| UpdateLineGraphRate;
+	| UpdateLineGraphRate
+	| ConfirmGraphRenderOnce;
 
 export interface LineGraphRate {
 	label: string,
@@ -127,4 +132,5 @@ export interface GraphState {
 	hotlinked: boolean;
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
+	renderOnce: boolean;
 }
