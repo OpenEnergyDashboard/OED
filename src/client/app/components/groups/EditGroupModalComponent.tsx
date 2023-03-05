@@ -106,10 +106,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// The information on the children of this group
 	const groupChildrenDefaults = {
-		// The identifiers of all direct meter children that are visible to this user.
-		// childMetersIdentifier: [] as string[],
-		// The original number of direct meter children
-		// childMetersTrueSize: 0,
+		// The meter selections in format for selection dropdown.
+		meterSelectOptions: [] as SelectOption[],
 		// The names of all direct meter children that are visible to this user.
 		childGroupsName: [] as string[],
 		// The original number of direct group children
@@ -165,7 +163,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	}
 
-	let handleSaveChanges, meterSelectOptions: SelectOption[] = [];
+	let handleSaveChanges;
 	if (loggedInAsAdmin) {
 		// Save changes
 		// Currently using the old functionality which is to compare inherited prop values to state values
@@ -252,122 +250,94 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				}
 			}
 		};
-		// TODO consider useSelect vs useEffect and implications for entire codebase
-		// TODO this state name is obscuring the state variable declared above.
-		meterSelectOptions = useSelector((stateX: State) => {
+
+		// Determine child meters/groups.
+		useEffect(() => {
+
 			// Get meters that okay for this group in a format the component can display.
 			// TODO pass current deep meters instead
-			return getMeterMenuOptionsForGroup(state.id);
+			const possibleMeters = getMeterMenuOptionsForGroup(state.id);
 
-			// return {
-			// 	// all meter, sorted alphabetically and by compatibility
-			// 	sortedMeters
-			// }
-		});
+			// State for current group
+			// TODO ??????????? Why can't this be done once and how relate to one above?
+			const currentGroup = groupsState[state.id];
+
+			// Information to display the direct children groups.
+			// Holds the names of all direct group children of this group when visible to this user.
+			const childGroupsName: string[] = [];
+			let trueGroupSize = 0;
+			// Make sure state exists as the dispatch above may not be done.
+			if (currentGroup.childGroups) {
+				currentGroup.childGroups.forEach((groupID: number) => {
+					// Make sure group state exists. Also, the name is missing if not visible (non-admin).
+					if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
+						childGroupsName.push(groupsState[groupID].name.trim());
+					}
+				});
+				childGroupsName.sort();
+				// Record the total number so later can compare the number in array to see if any missing.
+				trueGroupSize = currentGroup.childGroups.length;
+			}
+
+			// Information to display all (deep) children meters.
+			// Holds the names of all (deep) meter children of this group when visible to this user.
+			const deepMetersIdentifier: string[] = [];
+			let trueDeepMeterSize = 0;
+			// Make sure state exists as the dispatch above may not be done.
+			if (currentGroup.deepMeters) {
+				currentGroup.deepMeters.forEach((meterID: number) => {
+					// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+					if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+						deepMetersIdentifier.push(metersState[meterID].identifier.trim());
+					}
+				});
+				deepMetersIdentifier.sort();
+				// Record the total number so later can compare the number in array to see if any missing.
+				trueDeepMeterSize = currentGroup.deepMeters.length;
+			}
+			// Update the state
+			setGroupChildrenState({
+				...groupChildrenState,
+				childGroupsName: childGroupsName,
+				childGroupsTrueSize: trueGroupSize,
+				deepMetersIdentifier: deepMetersIdentifier,
+				deepMetersTrueSize: trueDeepMeterSize,
+				meterSelectOptions: possibleMeters
+			});
+		}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups, groupsState[state.id].deepMeters]);
+
+		// Update compatible units and graphic units set.
+		useEffect(() => {
+			// Graphic units compatible with currently selected unit
+			const compatibleGraphicUnits = new Set<UnitData>();
+			// Graphic units incompatible with currently selected unit
+			const incompatibleGraphicUnits = new Set<UnitData>();
+			// Find all the meters in this group. Initially this will be the same as the deep meters but needs to be updated
+			// if edited on this page. Then find all the units that are compatible with these meters.
+			// TODO this isn't going to be correct if the meters or groups of this group is edited on this page
+			// because it does not change the group state until you save.
+			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(metersInGroup(state.id));
+			dropdownsState.possibleGraphicUnits.forEach(unit => {
+				// If current graphic unit exists in the set of allowed graphic units
+				if (allowedDefaultGraphicUnit.has(unit.id)) {
+					compatibleGraphicUnits.add(unit);
+				}
+				else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
+			// Update the state
+			setDropdownsState({
+				...dropdownsState,
+				// The new set helps avoid repaints.
+				compatibleGraphicUnits: new Set(compatibleGraphicUnits),
+				incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
+			});
+			// If any of these change then it needs to be updated.
+			// pik is needed since the compatible units is not correct until pik is available.
+			// TODO need to add change in meters and groups of this group once settle how going to do above.
+		}, [ConversionArray.pikAvailable()]);
 	}
-
-	// Determine the names of the child meters/groups.
-	useEffect(() => {
-		// State for current group
-		// TODO ??????????? Why can't this be done once and how relate to one above?
-		const currentGroup = groupsState[state.id];
-
-		// // Information to display the direct children meters.
-		// // Holds the names of all direct meter children of this group when visible to this user.
-		// const childMetersIdentifier: string[] = [];
-		// let trueMeterSize = 0;
-		// // Make sure state exists as the dispatch above may not be done.
-		// if (currentGroup.childMeters) {
-		// 	currentGroup.childMeters.forEach((meterID: number) => {
-		// 		// TODO shouldn't the meter state always exist?
-		// 		// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-		// 		if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-		// 			childMetersIdentifier.push(metersState[meterID].identifier.trim());
-		// 		}
-		// 	});
-		// 	childMetersIdentifier.sort();
-		// 	// Record the total number so later can compare the number in array to see if any missing.
-		// 	trueMeterSize = currentGroup.childMeters.length;
-		// }
-
-		// Information to display the direct children groups.
-		// Holds the names of all direct group children of this group when visible to this user.
-		const childGroupsName: string[] = [];
-		let trueGroupSize = 0;
-		// Make sure state exists as the dispatch above may not be done.
-		if (currentGroup.childGroups) {
-			currentGroup.childGroups.forEach((groupID: number) => {
-				// Make sure group state exists. Also, the name is missing if not visible (non-admin).
-				if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
-					childGroupsName.push(groupsState[groupID].name.trim());
-				}
-			});
-			childGroupsName.sort();
-			// Record the total number so later can compare the number in array to see if any missing.
-			trueGroupSize = currentGroup.childGroups.length;
-		}
-
-		// Information to display all (deep) children meters.
-		// Holds the names of all (deep) meter children of this group when visible to this user.
-		const deepMetersIdentifier: string[] = [];
-		let trueDeepMeterSize = 0;
-		// Make sure state exists as the dispatch above may not be done.
-		if (currentGroup.deepMeters) {
-			currentGroup.deepMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-					deepMetersIdentifier.push(metersState[meterID].identifier.trim());
-				}
-			});
-			deepMetersIdentifier.sort();
-			// Record the total number so later can compare the number in array to see if any missing.
-			trueDeepMeterSize = currentGroup.deepMeters.length;
-		}
-
-		// Update the state
-		setGroupChildrenState({
-			...groupChildrenState,
-			// childMetersIdentifier: childMetersIdentifier,
-			// childMetersTrueSize: trueMeterSize,
-			childGroupsName: childGroupsName,
-			childGroupsTrueSize: trueGroupSize,
-			deepMetersIdentifier: deepMetersIdentifier,
-			deepMetersTrueSize: trueDeepMeterSize
-		})
-	}, [metersState, groupsState[state.id].childMeters, groupsState[state.id].childGroups, groupsState[state.id].deepMeters]);
-
-	// Update compatible units and graphic units set.
-	useEffect(() => {
-		// Graphic units compatible with currently selected unit
-		const compatibleGraphicUnits = new Set<UnitData>();
-		// Graphic units incompatible with currently selected unit
-		const incompatibleGraphicUnits = new Set<UnitData>();
-		// Find all the meters in this group. Initially this will be the same as the deep meters but needs to be updated
-		// if edited on this page. Then find all the units that are compatible with these meters.
-		// TODO this isn't going to be correct if the meters or groups of this group is edited on this page
-		// because it does not change the group state until you save.
-		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(metersInGroup(state.id));
-		dropdownsState.possibleGraphicUnits.forEach(unit => {
-			// If current graphic unit exists in the set of allowed graphic units
-			if (allowedDefaultGraphicUnit.has(unit.id)) {
-				compatibleGraphicUnits.add(unit);
-			}
-			else {
-				incompatibleGraphicUnits.add(unit);
-			}
-		});
-		// Update the state
-		setDropdownsState({
-			...dropdownsState,
-			// The new set helps avoid repaints.
-			compatibleGraphicUnits: new Set(compatibleGraphicUnits),
-			incompatibleGraphicUnits: new Set(incompatibleGraphicUnits)
-		});
-		// If any of these change then it needs to be updated.
-		// pik is needed since the compatible units is not correct until pik is available.
-		// TODO need to add change in meters and groups of this group once settle how going to do above.
-	}, [ConversionArray.pikAvailable()]);
-
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
@@ -497,7 +467,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<div style={formInputStyle}>
 											<b><FormattedMessage id='child.meters' /></b>:
 											<MultiSelectComponent
-												options={meterSelectOptions}
+												options={groupChildrenState.meterSelectOptions}
 												selectedOptions={selectedMeters}
 												placeholder={translate('select.meters')}
 												onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
