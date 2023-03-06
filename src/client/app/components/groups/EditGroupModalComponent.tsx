@@ -157,6 +157,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
+		setGroupChildrenState(groupChildrenDefaults);
+		setDropdownsState(dropdownsStateDefaults);
 	}
 
 	const handleClose = () => {
@@ -282,17 +284,17 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
-			const deepMetersIdentifier: string[] = [];
+			let identifierDeepMeters: string[] = [];
 			let trueDeepMeterSize = 0;
 			// Make sure state exists as the dispatch above may not be done.
 			if (state.deepMeters) {
 				state.deepMeters.forEach((meterID: number) => {
 					// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
 					if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-						deepMetersIdentifier.push(metersState[meterID].identifier.trim());
+						identifierDeepMeters.push(metersState[meterID].identifier.trim());
 					}
 				});
-				deepMetersIdentifier.sort();
+				identifierDeepMeters.sort();
 				// Record the total number so later can compare the number in array to see if any missing.
 				trueDeepMeterSize = state.deepMeters.length;
 			}
@@ -301,7 +303,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				...groupChildrenState,
 				childGroupsName: childGroupsName,
 				childGroupsTrueSize: trueGroupSize,
-				deepMetersIdentifier: deepMetersIdentifier,
+				deepMetersIdentifier: identifierDeepMeters,
 				deepMetersTrueSize: trueDeepMeterSize,
 				meterSelectOptions: possibleMeters
 			});
