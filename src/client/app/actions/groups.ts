@@ -189,8 +189,8 @@ export function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
 			await groupsApi.edit(group);
 			// Update the store with our new edits
 			dispatch(confirmGroupEdits(group));
-				// Success!
-				showSuccessNotification(translate('group.successfully.edited.group'));
+			// Success!
+			showSuccessNotification(translate('group.successfully.edited.group'));
 		} catch (e) {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));

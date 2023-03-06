@@ -94,12 +94,12 @@ export function updateDeepMetersOnMeter(deepMeters: number[] = [], selectedMeter
 	// Find the meters that were added.
 	const addedMeters = _.difference(newSelectedMeterOptions, selectedMeters);
 	// Remove those meters from localDeepMeters
-	removedMeters.forEach((item) => {
-		localDeepMeters.splice(deepMeters.indexOf(item.value), 1); 
+	removedMeters.forEach(item => {
+		localDeepMeters.splice(deepMeters.indexOf(item.value), 1);
 	});
 	// Add new meter to localDeepMeters
-	addedMeters.forEach((item) => {
-		localDeepMeters.push(item.value); 
+	addedMeters.forEach(item => {
+		localDeepMeters.push(item.value);
 	});
 	return localDeepMeters;
 }

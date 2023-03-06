@@ -58,9 +58,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// The chosen meters are initially the meter children of this group.
-	// If an admin then will display as a selectable meter list and if 
+	// If an admin then will display as a selectable meter list and if
 	// other user than it is a list of the meter identifiers.
-	let selectedMeters: SelectOption[] = [], listedMeters: string[] = [], listedDeepMeters: string[] = [];
+	let selectedMeters: SelectOption[] = []
+	const listedMeters: string[] = [], listedDeepMeters: string[] = [];
 	if (loggedInAsAdmin) {
 		// In format for the display component.
 		const selectedMetersUnsorted: SelectOption[] = [];
@@ -79,7 +80,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// These do the immediate child meters.
 		let hasHidden = false;
 		Object.values(originalGroupState.childMeters).forEach(meter => {
-			let meterIdentifier = metersState[meter].identifier;
+			const meterIdentifier = metersState[meter].identifier;
 			// The identifier is null if the meter is not visible to this user so not hidden meters.
 			if (meterIdentifier === null) {
 				hasHidden = true;
@@ -96,7 +97,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// These do the deep child meters.
 		hasHidden = false;
 		Object.values(originalGroupState.deepMeters).forEach(meter => {
-			let meterIdentifier = metersState[meter].identifier;
+			const meterIdentifier = metersState[meter].identifier;
 			// The identifier is null if the meter is not visible to this user so not hidden meters.
 			if (meterIdentifier === null) {
 				hasHidden = true;
@@ -189,12 +190,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	}
 
-	let handleSaveChanges;
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
 	// Side note, we could probably just set a boolean when any input
-	handleSaveChanges = () => {
+	const handleSaveChanges = () => {
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
@@ -304,7 +304,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
-			let identifierDeepMeters: string[] = [];
+			const identifierDeepMeters: string[] = [];
 			let trueDeepMeterSize = 0;
 			// Because deepMeters is optional in state, TS is worried it may not exist. It should always be set
 			// at this point but if stops the error.
