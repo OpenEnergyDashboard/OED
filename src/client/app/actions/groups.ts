@@ -99,6 +99,7 @@ export function fetchGroupChildrenIfNeeded(groupID: number) {
 }
 
 // The following functions get the immediate children meters and groups of all groups.
+// They are not currently used but left for now.
 
 function fetchAllGroupChildren(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {

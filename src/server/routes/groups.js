@@ -53,7 +53,6 @@ router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		// TODO??? currently have a separate route to get all children that should be removed or modified including uses.
 		deepChildren = [];
 		promises = await rows.map(async (row) => {
 			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
