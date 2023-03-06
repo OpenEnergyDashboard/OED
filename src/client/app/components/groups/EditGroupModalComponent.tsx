@@ -4,7 +4,6 @@
 
 import * as _ from 'lodash';
 import * as React from 'react';
-// TODO import store from '../../index';
 // Realize that * is already imported from react
 import { useState, useEffect } from 'react';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -212,23 +211,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				originalGroupState.area != state.area ||
 				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
 				childMeterChanges
-				// TODO add children value when can edit and any others
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
 			//Check if area is positive
-			// TODO object is possibly undefined
 			// TODO For now allow zero so works with default value and DB. We should probably
 			// make this better default than 0 (DB set to not null now).
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
-				inputOk = false;
-			}
-
-			// TODO - not done on meters; may not need once set value properly
-			//Check default graphic unit
-			if (state.defaultGraphicUnit === -999) {
-				notifyUser(translate('group.graphic.invalid'));
 				inputOk = false;
 			}
 
@@ -362,7 +352,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
-		// TODO need to add change in meters and groups of this group once settle how going to do above.
 	}, [ConversionArray.pikAvailable(), state.deepMeters]);
 	// }
 	const tooltipStyle = {
