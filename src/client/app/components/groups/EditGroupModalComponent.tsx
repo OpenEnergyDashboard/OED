@@ -105,7 +105,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display.
-		listedDeepMeters.sort(); 
+		listedDeepMeters.sort();
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			listedDeepMeters.push('At least one meter is not visible to you');
@@ -190,97 +190,97 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	let handleSaveChanges;
-	if (loggedInAsAdmin) {
-		// Save changes
-		// Currently using the old functionality which is to compare inherited prop values to state values
-		// If there is a difference between props and state, then a change was made
-		// Side note, we could probably just set a boolean when any input
-		handleSaveChanges = () => {
-			// Close the modal first to avoid repeat clicks
-			props.handleClose();
+	// Save changes
+	// Currently using the old functionality which is to compare inherited prop values to state values
+	// If there is a difference between props and state, then a change was made
+	// Side note, we could probably just set a boolean when any input
+	handleSaveChanges = () => {
+		// Close the modal first to avoid repeat clicks
+		props.handleClose();
 
-			// true if inputted values are okay. Then can submit.
-			let inputOk = true;
+		// true if inputted values are okay. Then can submit.
+		let inputOk = true;
 
-			// Check for changes by comparing state to props
-			const childMeterChanges = !metersSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
-			const groupHasChanges =
-				(
-					originalGroupState.name != state.name ||
-					originalGroupState.displayable != state.displayable ||
-					originalGroupState.gps != state.gps ||
-					originalGroupState.note != state.note ||
-					originalGroupState.area != state.area ||
-					originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
-					childMeterChanges
-					// TODO add children value when can edit and any others
-				);
-			// Only validate and store if any changes.
-			if (groupHasChanges) {
-				//Check if area is positive
-				// TODO object is possibly undefined
-				// TODO For now allow zero so works with default value and DB. We should probably
-				// make this better default than 0 (DB set to not null now).
-				if (state.area < 0) {
-					notifyUser(translate('area.invalid') + state.area + '.');
+		// Check for changes by comparing state to props
+		const childMeterChanges = !metersSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
+		const groupHasChanges =
+			(
+				originalGroupState.name != state.name ||
+				originalGroupState.displayable != state.displayable ||
+				originalGroupState.gps != state.gps ||
+				originalGroupState.note != state.note ||
+				originalGroupState.area != state.area ||
+				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
+				childMeterChanges
+				// TODO add children value when can edit and any others
+			);
+		// Only validate and store if any changes.
+		if (groupHasChanges) {
+			//Check if area is positive
+			// TODO object is possibly undefined
+			// TODO For now allow zero so works with default value and DB. We should probably
+			// make this better default than 0 (DB set to not null now).
+			if (state.area < 0) {
+				notifyUser(translate('area.invalid') + state.area + '.');
+				inputOk = false;
+			}
+
+			// TODO - not done on meters; may not need once set value properly
+			//Check default graphic unit
+			if (state.defaultGraphicUnit === -999) {
+				notifyUser(translate('group.graphic.invalid'));
+				inputOk = false;
+			}
+
+			//Check GPS
+			const gpsInput = state.gps;
+			let gps: GPSPoint | null = null;
+			const latitudeIndex = 0;
+			const longitudeIndex = 1;
+			//if the user input a value then gpsInput should be a string
+			// null came from DB and it is okay to just leave it - Not a String.
+			if (typeof gpsInput === 'string') {
+				if (isValidGPSInput(gpsInput)) {
+					//Clearly gpsInput is a string but TS complains about the split so cast.
+					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+					//It is valid and needs to be in this format for routing
+					gps = {
+						longitude: gpsValues[longitudeIndex],
+						latitude: gpsValues[latitudeIndex]
+					};
+				} else if ((gpsInput as string).length !== 0) {
+					// GPS not okay.
+					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+					// so leaving code commented out.
+					// notifyUser(translate('input.gps.range') + state.gps + '.');
+					notifyUser(translate('input.gps.range') + state.gps + '.');
 					inputOk = false;
-				}
-
-				// TODO - not done on meters; may not need once set value properly
-				//Check default graphic unit
-				if (state.defaultGraphicUnit === -999) {
-					notifyUser(translate('group.graphic.invalid'));
-					inputOk = false;
-				}
-
-				//Check GPS
-				const gpsInput = state.gps;
-				let gps: GPSPoint | null = null;
-				const latitudeIndex = 0;
-				const longitudeIndex = 1;
-				//if the user input a value then gpsInput should be a string
-				// null came from DB and it is okay to just leave it - Not a String.
-				if (typeof gpsInput === 'string') {
-					if (isValidGPSInput(gpsInput)) {
-						//Clearly gpsInput is a string but TS complains about the split so cast.
-						const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-						//It is valid and needs to be in this format for routing
-						gps = {
-							longitude: gpsValues[longitudeIndex],
-							latitude: gpsValues[latitudeIndex]
-						};
-					} else if ((gpsInput as string).length !== 0) {
-						// GPS not okay.
-						// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-						// so leaving code commented out.
-						// notifyUser(translate('input.gps.range') + state.gps + '.');
-						notifyUser(translate('input.gps.range') + state.gps + '.');
-						inputOk = false;
-					}
-				}
-
-				if (inputOk) {
-					// The input passed validation.
-					// GPS may have been updated so create updated state to submit.
-					let submitState = { ...state, gps: gps };
-					// deepMeters is part of the group state but it is not sent on edit so remove.
-					delete submitState.deepMeters;
-					let childMeters: number[] = [];
-					if (childMeterChanges) {
-						// Send child meters to update but need to create array of the ids.
-						childMeters = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.value; });
-						submitState = { ...submitState, childMeters: childMeters }
-					}
-					dispatch(submitGroupEdits(submitState));
-					dispatch(removeUnsavedChanges());
-				} else {
-					notifyUser(translate('group.input.error'));
 				}
 			}
-		};
 
-		// Determine child meters/groups.
-		useEffect(() => {
+			if (inputOk) {
+				// The input passed validation.
+				// GPS may have been updated so create updated state to submit.
+				let submitState = { ...state, gps: gps };
+				// deepMeters is part of the group state but it is not sent on edit so remove.
+				delete submitState.deepMeters;
+				let childMeters: number[] = [];
+				if (childMeterChanges) {
+					// Send child meters to update but need to create array of the ids.
+					childMeters = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.value; });
+					submitState = { ...submitState, childMeters: childMeters }
+				}
+				dispatch(submitGroupEdits(submitState));
+				dispatch(removeUnsavedChanges());
+			} else {
+				notifyUser(translate('group.input.error'));
+			}
+		}
+	};
+
+	// Determine child meters/groups.
+	useEffect(() => {
+		if (loggedInAsAdmin) {
 			// Get meters that okay for this group in a format the component can display.
 			// Must pass the current state info since can be changed while editing.
 			const possibleMeters = getMeterMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
@@ -328,10 +328,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				deepMetersTrueSize: trueDeepMeterSize,
 				meterSelectOptions: possibleMeters
 			});
-		}, [metersState, state.childMeters, state.childGroups, state.deepMeters]);
+		}
+	}, [metersState, state.childMeters, state.childGroups, state.deepMeters]);
 
-		// Update compatible units and graphic units set.
-		useEffect(() => {
+	// Update compatible units and graphic units set.
+	useEffect(() => {
+		if (loggedInAsAdmin) {
 			// Graphic units compatible with currently selected meters/groups.
 			const compatibleGraphicUnits = new Set<UnitData>();
 			// Graphic units incompatible with currently selected meters/groups.
@@ -357,11 +359,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				compatibleGraphicUnits: compatibleGraphicUnits,
 				incompatibleGraphicUnits: incompatibleGraphicUnits
 			});
-			// If any of these change then it needs to be updated.
-			// pik is needed since the compatible units is not correct until pik is available.
-			// TODO need to add change in meters and groups of this group once settle how going to do above.
-		}, [ConversionArray.pikAvailable(), state.deepMeters]);
-	}
+		}
+		// If any of these change then it needs to be updated.
+		// pik is needed since the compatible units is not correct until pik is available.
+		// TODO need to add change in meters and groups of this group once settle how going to do above.
+	}, [ConversionArray.pikAvailable(), state.deepMeters]);
+	// }
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
