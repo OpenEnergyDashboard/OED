@@ -9,7 +9,7 @@ import * as moment from 'moment';
 import { CompareReadings } from '../../types/readings';
 import { NamedIDItem } from '../../types/items';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { GroupChildren, GroupData, GroupID } from '../../types/redux/groups';
+import { GroupChildren, GroupData, GroupEditData } from '../../types/redux/groups';
 
 export default class GroupsApi {
 	private readonly backend: ApiBackend;
@@ -35,7 +35,7 @@ export default class GroupsApi {
 		return await this.backend.doPostRequest<void>('api/groups/create', groupData);
 	}
 
-	public async edit(group: GroupData & GroupID): Promise<void> {
+	public async edit(group: GroupEditData): Promise<void> {
 		return await this.backend.doPutRequest<void>('api/groups/edit', group);
 	}
 

@@ -252,8 +252,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				let submitState = { ...state, gps: gps };
-				// deepMeters is part of the group state but it is not sent on edit so remove.
-				delete submitState.deepMeters;
 				let childMeters: number[] = [];
 				if (childMeterChanges) {
 					// Send child meters to update but need to create array of the ids.

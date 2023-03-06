@@ -177,6 +177,8 @@ export default function groups(state = defaultState, action: GroupsAction) {
 				byGroupID: {
 					...state.byGroupID,
 					[action.editedGroup.id]: {
+						// There is state that is in each group that is not part of the edit information state.
+						...state.byGroupID[action.editedGroup.id],
 						...action.editedGroup
 					}
 				}
