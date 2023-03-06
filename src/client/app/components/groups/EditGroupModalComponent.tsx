@@ -60,7 +60,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// The chosen meters are initially the meter children of this group.
 	// If an admin then will display as a selectable meter list and if 
 	// other user than it is a list of the meter identifiers.
-	let selectedMeters: SelectOption[] = [], listedMeters: string[] = [];
+	let selectedMeters: SelectOption[] = [], listedMeters: string[] = [], listedDeepMeters: string[] = [];
 	if (loggedInAsAdmin) {
 		// In format for the display component.
 		const selectedMetersUnsorted: SelectOption[] = [];
@@ -75,8 +75,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Want chosen in sorted order. Note any changes by user can unsort them.
 		selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
 	} else {
+		// What to display if not an admin.
+		// These do the immediate child meters.
 		let hasHidden = false;
-		// The childMeters were sorted above so they should be sorted as select.
 		Object.values(originalGroupState.childMeters).forEach(meter => {
 			let meterIdentifier = metersState[meter].identifier;
 			// The identifier is null if the meter is not visible to this user so not hidden meters.
@@ -85,11 +86,30 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			} else {
 				listedMeters.push(meterIdentifier);
 			}
-			if (hasHidden) {
-				// There are hidden meters so note at bottom of list.
-				listedMeters.push('At least one meter is not visible to you');
+		});
+		// Sort for display. Before were sorted by id so not okay here.
+		listedMeters.sort();
+		if (hasHidden) {
+			// There are hidden meters so note at bottom of list.
+			listedMeters.push('At least one meter is not visible to you');
+		}
+		// These do the deep child meters.
+		hasHidden = false;
+		Object.values(originalGroupState.deepMeters).forEach(meter => {
+			let meterIdentifier = metersState[meter].identifier;
+			// The identifier is null if the meter is not visible to this user so not hidden meters.
+			if (meterIdentifier === null) {
+				hasHidden = true;
+			} else {
+				listedDeepMeters.push(meterIdentifier);
 			}
 		});
+		// Sort for display.
+		listedDeepMeters.sort(); 
+		if (hasHidden) {
+			// There are hidden meters so note at bottom of list.
+			listedDeepMeters.push('At least one meter is not visible to you');
+		}
 	}
 
 	// Set existing group values
@@ -286,7 +306,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Holds the names of all (deep) meter children of this group when visible to this user.
 			let identifierDeepMeters: string[] = [];
 			let trueDeepMeterSize = 0;
-			// Make sure state exists as the dispatch above may not be done.
+			// Because deepMeters is optional in state, TS is worried it may not exist. It should always be set
+			// at this point but if stops the error.
 			if (state.deepMeters) {
 				state.deepMeters.forEach((meterID: number) => {
 					// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
@@ -498,10 +519,17 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<ListDisplayComponent trueSize={groupChildrenState.childGroupsTrueSize} items={groupChildrenState.childGroupsName} />
 									</div>
 									{/* All (deep) meters in this group */}
-									<div>
-										<b><FormattedMessage id='group.all.meters' /></b>:
-										<ListDisplayComponent trueSize={groupChildrenState.deepMetersTrueSize} items={groupChildrenState.deepMetersIdentifier} />
-									</div>
+									{loggedInAsAdmin ?
+										<div>
+											<b><FormattedMessage id='group.all.meters' /></b>:
+											<ListDisplayComponent trueSize={groupChildrenState.deepMetersTrueSize} items={groupChildrenState.deepMetersIdentifier} />
+										</div>
+										:
+										<div>
+											<b><FormattedMessage id='group.all.meters' /></b>:
+											<ListDisplayComponent trueSize={listedDeepMeters.length} items={listedDeepMeters} />
+										</div>
+									}
 								</div>
 							</div>
 						</div>
