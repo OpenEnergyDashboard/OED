@@ -13,7 +13,6 @@ const defaultState: GroupsState = {
 	isFetching: false,
 	// Are we currently getting the child meters/groups for all groups.
 	isFetchingAllChildren: false,
-	outdated: true,
 	byGroupID: {},
 	selectedGroups: [],
 	// TODO groupInEditing: {
@@ -58,7 +57,6 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
-				outdated: true,
 				childGroups: [],
 				childMeters: [],
 				selectedGroups: [],
@@ -71,7 +69,6 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			return {
 				...state,
 				isFetching: false,
-				outdated: false,
 				byGroupID: newGroupsByID
 			};
 		}
@@ -100,7 +97,6 @@ export default function groups(state = defaultState, action: GroupsAction) {
 					[action.groupID]: {
 						...state.byGroupID[action.groupID],
 						isFetching: false,
-						outdated: false,
 						childGroups: action.data.groups,
 						childMeters: action.data.meters,
 						deepMeters: action.data.deepMeters

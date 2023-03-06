@@ -84,7 +84,6 @@ export interface ConfirmAllGroupsChildrenFetchedOnceAction {
 
 export interface GroupMetadata {
 	isFetching: boolean;
-	outdated: boolean;
 	selectedGroups: number[];
 	selectedMeters: number[];
 }
@@ -148,7 +147,6 @@ export interface GroupsState {
 	isFetching: boolean;
 	// If fetching all groups child meters/groups.
 	isFetchingAllChildren: boolean;
-	outdated: boolean;
 	byGroupID: {
 		[groupID: number]: GroupDefinition;
 	};

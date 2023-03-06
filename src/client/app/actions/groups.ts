@@ -58,9 +58,8 @@ export function confirmGroupsFetchedOnce(): t.ConfirmGroupsFetchedOnceAction {
 }
 
 function shouldFetchGroupsDetails(state: State): boolean {
-	// TODO the first part is from the older code before modals and it isn't clear if
-	// outdated is needed.
-	return (!state.groups.isFetching && state.groups.outdated) || !state.groups.hasBeenFetchedOnce;
+	// If isFetching then don't do this. If already fetched then don't do this.
+	return !state.groups.isFetching && !state.groups.hasBeenFetchedOnce;
 }
 
 export function fetchGroupsDetailsIfNeeded(): Thunk {
@@ -75,12 +74,11 @@ export function fetchGroupsDetailsIfNeeded(): Thunk {
 // The following 3 functions do a single groups at a time. They were used
 // before the group modals. They are being left in case we want them in
 // the future, esp. if modals do not load all at start as they now do.
-// Note outdated is not used in the new code.
-
+// They used to have outdated but removed since not used by new code.
 function shouldFetchGroupChildren(state: State, groupID: number) {
 	const group = state.groups.byGroupID[groupID];
-	// Check that the group is outdated AND that it is not being fetched.
-	return group.outdated && !group.isFetching;
+	// Check that it is not being fetched.
+	return !group.isFetching;
 }
 
 function fetchGroupChildren(groupID: number) {
