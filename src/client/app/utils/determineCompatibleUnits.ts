@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import { MeterData } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
-import { GroupData, GroupDefinition, GroupID } from '../types/redux/groups';
+import { GroupData, GroupDefinition, GroupEditData, GroupID } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
@@ -137,7 +137,8 @@ export function unitFromPColumn(column: number): number {
 }
 
 /**
- * Returns the set of meters's ids associated with the groupId used.
+ * Returns the set of meters's ids associated with the groupId used where Redux
+ * state is accurate for all groups.
  *
  * @param {number} groupId The groupId.
  * @returns {Set<number>} The set of deep children of this group.
@@ -149,6 +150,29 @@ export function metersInGroup(groupId: number): Set<number> {
 	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
 	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
+}
+
+/**
+ * Returns array of deep meter ids of the changed group.
+ * @param {GroupEditData} changedGroupState The state for the changed group
+ * @returns {number[]} returns array of deep meter ids of the changed group considering possible changes
+ */
+export function metersInChangedGroup(changedGroupState: GroupEditData): number[] {
+	const state = store.getState();
+	// deep meters starts with all the direct child meters of the group being changed.
+	const deepMeters = new Set(changedGroupState.childMeters);
+	// These groups cannot contain the group being edited so the redux state is okay.
+	changedGroupState.childGroups.forEach((group: number) => {
+		// The group state for the current child group.
+		const groupState = _.get(state.groups.byGroupID, group) as GroupDefinition;
+		// The deep meters of every group contained in the changed group are in that group.
+		// The set does not allow duplicates so no issue there.
+		groupState.deepMeters.forEach((meter: number) => {
+			deepMeters.add(meter);
+		});
+	});
+	// Convert set to array.
+	return Array.from(deepMeters);
 }
 
 /**

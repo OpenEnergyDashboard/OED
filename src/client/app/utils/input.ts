@@ -4,7 +4,6 @@
 
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
-import { SelectOption } from '../types/items';
 import * as _ from 'lodash';
 
 // Notifies user of msg.
@@ -76,32 +75,6 @@ export function potentialGraphicUnits(units: UnitDataById) {
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	possibleGraphicUnits.add(noUnit);
 	return possibleGraphicUnits;
-}
-
-/**
- * updates deepMeters to only have the ones after changes in meter selection between selectedMeters and newSelectedMeterOptions
- * as a new returned array
- * @param {number[]} deepMeters array of ids of all the current deep meters of the group
- * @param {SelectOption[]} selectedMeters array of the meters that were previously selected
- * @param {SelectOption[]} newSelectedMeterOptions array of currently selected meters
- * @returns new array with the updated deep meters
- */
-export function updateDeepMetersOnMeter(deepMeters: number[] = [], selectedMeters: SelectOption[], newSelectedMeterOptions: SelectOption[]) {
-	// Clone the state since will update in component.
-	const localDeepMeters = [...deepMeters]
-	// Find the meters that were removed
-	const removedMeters = _.difference(selectedMeters, newSelectedMeterOptions);
-	// Find the meters that were added.
-	const addedMeters = _.difference(newSelectedMeterOptions, selectedMeters);
-	// Remove those meters from localDeepMeters
-	removedMeters.forEach(item => {
-		localDeepMeters.splice(deepMeters.indexOf(item.value), 1);
-	});
-	// Add new meter to localDeepMeters
-	addedMeters.forEach(item => {
-		localDeepMeters.push(item.value);
-	});
-	return localDeepMeters;
 }
 
 // A non-unit

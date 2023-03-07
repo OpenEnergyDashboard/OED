@@ -182,12 +182,12 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
 	return { type: ActionType.ConfirmEditedGroup, editedGroup };
 }
 
-	export function submitGroupEdits(group: t.GroupEditData): Thunk {
-		return async (dispatch: Dispatch) => {
+export function submitGroupEdits(group: t.GroupEditData): Thunk {
+	return async (dispatch: Dispatch) => {
 		try {
 			// deepMeters is part of the group state but it is not sent on edit route so remove.
 			// Need deep copy so changes don't impact original.
-			let groupNoDeep = {...group};
+			const groupNoDeep = { ...group };
 			delete groupNoDeep.deepMeters;
 			await groupsApi.edit(groupNoDeep);
 			// Update the store with our new edits where need deep meters included.

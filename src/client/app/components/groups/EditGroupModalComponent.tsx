@@ -24,10 +24,12 @@ import { submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
+import {
+	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup
+} from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString, nullToEmptyString, updateDeepMetersOnMeter } from '../../utils/input';
+import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
 import { GroupEditData } from 'types/redux/groups';
 
 interface EditGroupModalComponentProps {
@@ -284,18 +286,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (inputOk) {
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
-				let submitState = { ...state, gps: gps };
-				let childMeters: number[] = [], childGroups: number[] = [];
-				if (childMeterChanges) {
-					// Send child meters to update but need to create array of the ids.
-					childMeters = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.value; });
-					submitState = { ...submitState, childMeters: childMeters }
-				}
-				if (childGroupChanges) {
-					// Send child groups to update but need to create array of the ids.
-					childGroups = groupChildrenState.groupSelectedSelectOptions.map(group => { return group.value; });
-					submitState = { ...submitState, childGroups: childGroups }
-				}
+				const submitState = { ...state, gps: gps };
 				dispatch(submitGroupEdits(submitState));
 				dispatch(removeUnsavedChanges());
 			} else {
@@ -307,11 +298,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Determine child meters/groups.
 	useEffect(() => {
 		if (loggedInAsAdmin) {
+			// This is the current deep meters of this group including any changes.
+			const groupDeepMeter = metersInChangedGroup(state);
 			// Get meters that okay for this group in a format the component can display.
-			// Must pass the current state info since can be changed while editing.
-			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, state.deepMeters);
+			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
 			// Get groups okay for this group. Similar to meters.
-			const possibleGroups = getGroupMenuOptionsForGroup(state.defaultGraphicUnit, state.deepMeters);
+			const possibleGroups = getGroupMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
@@ -508,9 +500,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												placeholder={translate('select.meters')}
 												onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
 													// The meters changed so update the current list of deep meters
-													const newDeepMeters = updateDeepMetersOnMeter(state.deepMeters, groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
-													// Update the deep meter state based on the changes
-													setState({ ...state, deepMeters: newDeepMeters });
+													// Get the currently included/selected meters as an array of the ids.
+													const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
+													const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters });
+													// // Update the deep meter and child meter state based on the changes.
+													// Note could update child meters above to avoid updating state value for metersInChangedGroup but want
+													// to avoid too many state updates.
+													setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters });
 													// Set the selected meters in state to the ones chosen.
 													setGroupChildrenState({
 														...groupChildrenState,
@@ -535,10 +531,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												placeholder={translate('select.groups')}
 												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
 													// The groups changed so update the current list of deep meters
-													// TODO ???
-													// const newDeepMeters = updateDeepMetersOnMeter(state.deepMeters, groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
-													// // Update the deep meter state based on the changes
-													// setState({ ...state, deepMeters: newDeepMeters });
+													// Get the currently included/selected meters as an array of the ids.
+													const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
+													const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups });
+													// Update the deep meter and child group state based on the changes.
+													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
+													// to avoid too many state updates.
+													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups});
 													// // Set the selected groups in state to the ones chosen.
 													setGroupChildrenState({
 														...groupChildrenState,
