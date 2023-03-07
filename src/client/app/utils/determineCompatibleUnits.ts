@@ -153,12 +153,11 @@ export function metersInGroup(groupId: number): Set<number> {
 
 /**
  * Get options for the meter menu on the group page.
- * @param gid The group's id.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
  * @return The current meter options for this group.
  */
-export function getMeterMenuOptionsForGroup(gid: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
@@ -197,12 +196,11 @@ export function getMeterMenuOptionsForGroup(gid: number, defaultGraphicUnit: num
 
 /**
  * Get options for the group menu on the group page.
- * @param gid The group's id.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
   * @return The current group options for this group.
 */
-export function getGroupMenuOptionsForGroup(gid: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+export function getGroupMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.

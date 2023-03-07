@@ -309,9 +309,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		if (loggedInAsAdmin) {
 			// Get meters that okay for this group in a format the component can display.
 			// Must pass the current state info since can be changed while editing.
-			const possibleMeters = getMeterMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
+			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, state.deepMeters);
 			// Get groups okay for this group. Similar to meters.
-			const possibleGroups = getGroupMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
+			const possibleGroups = getGroupMenuOptionsForGroup(state.defaultGraphicUnit, state.deepMeters);
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
