@@ -260,7 +260,8 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 		}
 	});
 
-	return options;
+	// We want the options sorted by group name.
+	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
 }
 
 /**
