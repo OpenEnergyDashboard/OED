@@ -339,7 +339,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, state.childMeters, state.childGroups, state.deepMeters]);
+	}, [metersState, state.defaultGraphicUnit, state.deepMeters]);
 
 	// Update compatible units and graphic units set.
 	useEffect(() => {
