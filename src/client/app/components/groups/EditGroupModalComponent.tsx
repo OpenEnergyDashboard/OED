@@ -51,9 +51,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// The current groups state. It should always be valid.
 	const originalGroupState = groupsState[props.groupId];
-	// Sort child meters & groups by id because need that every time the user makes a meter selection
-	originalGroupState.childMeters.sort();
-	originalGroupState.childGroups.sort();
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -604,7 +601,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
  */
 function listsSame(original: number[], selected: SelectOption[]) {
 	if (original.length == selected.length) {
-		// Sort since user selections can be in any order.
+		// Sort each list so comparison is easier.
+		// Sorting the array of numbers in place is fine as the order should not matter.
+		original.sort();
 		const sortedTwo = _.sortBy(selected, item => item.value, 'asc');
 		// Compare id in each array by each element until find difference or all the same.
 		return original.every((element, index) => {
