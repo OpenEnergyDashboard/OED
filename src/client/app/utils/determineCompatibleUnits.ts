@@ -220,11 +220,12 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 
 /**
  * Get options for the group menu on the group page.
+ * @param groupId The id of the group being worked on.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
-  * @return The current group options for this group.
+ * @return The current group options for this group.
 */
-export function getGroupMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
@@ -239,21 +240,24 @@ export function getGroupMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 	const options: SelectOption[] = [];
 
 	groups.forEach((group: GroupDefinition) => {
-		const option = {
-			label: group.name,
-			value: group.id,
-			isDisabled: false,
-			style: {}
-		} as SelectOption;
+		// You cannot have yourself in the group so not an option.
+		if (group.id !== groupId) {
+			const option = {
+				label: group.name,
+				value: group.id,
+				isDisabled: false,
+				style: {}
+			} as SelectOption;
 
-		const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit);
-		if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
-			option.isDisabled = true;
-		} else {
-			option.style = getMenuOptionFont(compatibilityChangeCase);
+			const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit);
+			if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
+				option.isDisabled = true;
+			} else {
+				option.style = getMenuOptionFont(compatibilityChangeCase);
+			}
+
+			options.push(option);
 		}
-
-		options.push(option);
 	});
 
 	return options;
