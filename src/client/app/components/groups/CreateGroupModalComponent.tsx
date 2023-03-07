@@ -164,9 +164,9 @@ export default function CreateGroupModalComponent() {
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.group" />
-						<TooltipHelpContainer page='groups' />
+						<TooltipHelpContainer page='groups-create' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipCreateGroupView} />
+							<TooltipMarkerComponent page='groups-create' helpTextId={tooltipStyle.tooltipCreateGroupView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
