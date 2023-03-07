@@ -345,6 +345,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Get the units that are compatible with this set of meters.
 			// TODO This does not allow no unit which we currently planned to allow for groups. Need to decide what to do in this case.
 			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
+			// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
+			allowedDefaultGraphicUnit.add(-99);
 			dropdownsState.possibleGraphicUnits.forEach(unit => {
 				// If current graphic unit exists in the set of allowed graphic units
 				if (allowedDefaultGraphicUnit.has(unit.id)) {
@@ -537,7 +539,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 													// Update the deep meter and child group state based on the changes.
 													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
 													// to avoid too many state updates.
-													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups});
+													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups });
 													// // Set the selected groups in state to the ones chosen.
 													setGroupChildrenState({
 														...groupChildrenState,
