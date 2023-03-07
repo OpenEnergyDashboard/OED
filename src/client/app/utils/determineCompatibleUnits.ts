@@ -198,14 +198,19 @@ export function getMeterMenuOptionsForGroup(gid: number, defaultGraphicUnit: num
 /**
  * Get options for the group menu on the group page.
  * @param gid The group's id.
- */
-export function getGroupMenuOptionsForGroup(gid: number): SelectOption[] {
+ * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
+ * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+  * @return The current group options for this group.
+*/
+export function getGroupMenuOptionsForGroup(gid: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
+	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
+	// First must get a set from the array of meter numbers.
+	const deepMetersSet = new Set(deepMeters);
 	// Get the currentGroup's compatible units.
-	const currentUnits = unitsCompatibleWithMeters(metersInGroup(gid));
-	// Current group's default graphic unit (via Redux).
-	const defaultGraphicUnit = state.groups.byGroupID[gid].defaultGraphicUnit;
-	// Get all groups.
+	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
+	// Get all groups' state.
 	const groups = Object.values(state.groups.byGroupID) as GroupDefinition[];
 
 	// Options for the group menu.

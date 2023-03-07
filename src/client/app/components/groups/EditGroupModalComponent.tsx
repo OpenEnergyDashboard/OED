@@ -24,7 +24,7 @@ import { submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithMeters, getMeterMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
+import { unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, updateDeepMetersOnMeter } from '../../utils/input';
@@ -49,8 +49,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// The current groups state. It should always be valid.
 	const originalGroupState = groupsState[props.groupId];
-	// Sort child meters by id because need that every time the user makes a meter selection
+	// Sort child meters & groups by id because need that every time the user makes a meter selection
 	originalGroupState.childMeters.sort();
+	originalGroupState.childGroups.sort();
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -59,10 +60,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// The chosen meters are initially the meter children of this group.
 	// If an admin then will display as a selectable meter list and if
 	// other user than it is a list of the meter identifiers.
-	let selectedMeters: SelectOption[] = []
-	const listedMeters: string[] = [], listedDeepMeters: string[] = [];
+	// Groups are done similarly.
+	let selectedMeters: SelectOption[] = [], selectedGroups: SelectOption[] = [];
+	const listedMeters: string[] = [], listedGroups: string[] = [], listedDeepMeters: string[] = [];
 	if (loggedInAsAdmin) {
-		// In format for the display component.
+		// In format for the display component for meters.
 		const selectedMetersUnsorted: SelectOption[] = [];
 		Object.values(originalGroupState.childMeters).forEach(meter => {
 			selectedMetersUnsorted.push({
@@ -74,6 +76,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		});
 		// Want chosen in sorted order. Note any changes by user can unsort them.
 		selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		// Similar but for groups.
+		const selectedGroupsUnsorted: SelectOption[] = [];
+		Object.values(originalGroupState.childGroups).forEach(group => {
+			selectedGroupsUnsorted.push({
+				value: group,
+				label: groupsState[group].name,
+				isDisabled: false
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order. Note any changes by user can unsort them.
+		selectedGroups = _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
 	} else {
 		// What to display if not an admin.
 		// These do the immediate child meters.
@@ -92,6 +106,23 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			listedMeters.push('At least one meter is not visible to you');
+		}
+		// Similar but for the groups.
+		hasHidden = false;
+		Object.values(originalGroupState.childGroups).forEach(group => {
+			const groupName = groupsState[group].name;
+			// The name is null if the group is not visible to this user so not hidden groups.
+			if (groupName === null) {
+				hasHidden = true;
+			} else {
+				listedGroups.push(groupName);
+			}
+		});
+		// Sort for display. Before were sorted by id so not okay here.
+		listedGroups.sort();
+		if (hasHidden) {
+			// There are hidden groups so note at bottom of list.
+			listedGroups.push('At least one group is not visible to you');
 		}
 		// These do the deep child meters.
 		hasHidden = false;
@@ -132,10 +163,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		meterSelectOptions: [] as SelectOption[],
 		// Meters that have been selected for this group. Not used if non-admin.
 		meterSelectedSelectOptions: loggedInAsAdmin ? selectedMeters : [] as SelectOption[],
-		// The names of all direct meter children that are visible to this user.
-		childGroupsName: [] as string[],
-		// The original number of direct group children
-		childGroupsTrueSize: 0,
+		// The group selections in format for selection dropdown.
+		groupSelectOptions: [] as SelectOption[],
+		// Groups that have been selected for this group. Not used if non-admin.
+		groupSelectedSelectOptions: loggedInAsAdmin ? selectedGroups : [] as SelectOption[],
 		// The identifiers of all meter children (deep meters) that are visible to this user.
 		deepMetersIdentifier: [] as string[],
 		// The original number of direct meter children
@@ -201,7 +232,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
-		const childMeterChanges = !metersSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
+		const childMeterChanges = !listsSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
+		const childGroupChanges = !listsSame(originalGroupState.childGroups, groupChildrenState.groupSelectedSelectOptions);
 		const groupHasChanges =
 			(
 				originalGroupState.name != state.name ||
@@ -210,7 +242,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				originalGroupState.note != state.note ||
 				originalGroupState.area != state.area ||
 				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
-				childMeterChanges
+				childMeterChanges ||
+				childGroupChanges
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
@@ -252,11 +285,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				let submitState = { ...state, gps: gps };
-				let childMeters: number[] = [];
+				let childMeters: number[] = [], childGroups: number[] = [];
 				if (childMeterChanges) {
 					// Send child meters to update but need to create array of the ids.
 					childMeters = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.value; });
 					submitState = { ...submitState, childMeters: childMeters }
+				}
+				if (childGroupChanges) {
+					// Send child groups to update but need to create array of the ids.
+					childGroups = groupChildrenState.groupSelectedSelectOptions.map(group => { return group.value; });
+					submitState = { ...submitState, childGroups: childGroups }
 				}
 				dispatch(submitGroupEdits(submitState));
 				dispatch(removeUnsavedChanges());
@@ -272,23 +310,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Get meters that okay for this group in a format the component can display.
 			// Must pass the current state info since can be changed while editing.
 			const possibleMeters = getMeterMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
-
-			// Information to display the direct children groups.
-			// Holds the names of all direct group children of this group when visible to this user.
-			const childGroupsName: string[] = [];
-			let trueGroupSize = 0;
-			// Make sure state exists as the dispatch above may not be done.
-			if (state.childGroups) {
-				state.childGroups.forEach((groupID: number) => {
-					// Make sure group state exists. Also, the name is missing if not visible (non-admin).
-					if (groupsState[groupID] !== undefined && groupsState[groupID].name !== null) {
-						childGroupsName.push(groupsState[groupID].name.trim());
-					}
-				});
-				childGroupsName.sort();
-				// Record the total number so later can compare the number in array to see if any missing.
-				trueGroupSize = state.childGroups.length;
-			}
+			// Get groups okay for this group. Similar to meters.
+			const possibleGroups = getGroupMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
@@ -310,11 +333,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Update the state
 			setGroupChildrenState({
 				...groupChildrenState,
-				childGroupsName: childGroupsName,
-				childGroupsTrueSize: trueGroupSize,
 				deepMetersIdentifier: identifierDeepMeters,
 				deepMetersTrueSize: trueDeepMeterSize,
-				meterSelectOptions: possibleMeters
+				meterSelectOptions: possibleMeters,
+				groupSelectOptions: possibleGroups
 			});
 		}
 	}, [metersState, state.childMeters, state.childGroups, state.deepMeters]);
@@ -504,10 +526,33 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										</div>
 									}
 									{/* The child groups in this group */}
-									<div>
-										<b><FormattedMessage id='child.groups' /></b>:
-										<ListDisplayComponent trueSize={groupChildrenState.childGroupsTrueSize} items={groupChildrenState.childGroupsName} />
-									</div>
+									{loggedInAsAdmin ?
+										<div style={formInputStyle}>
+											<b><FormattedMessage id='child.groups' /></b>:
+											<MultiSelectComponent
+												options={groupChildrenState.groupSelectOptions}
+												selectedOptions={groupChildrenState.groupSelectedSelectOptions}
+												placeholder={translate('select.groups')}
+												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
+													// The groups changed so update the current list of deep meters
+													// TODO ???
+													// const newDeepMeters = updateDeepMetersOnMeter(state.deepMeters, groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
+													// // Update the deep meter state based on the changes
+													// setState({ ...state, deepMeters: newDeepMeters });
+													// // Set the selected groups in state to the ones chosen.
+													setGroupChildrenState({
+														...groupChildrenState,
+														groupSelectedSelectOptions: newSelectedGroupOptions
+													});
+												}}
+											/>
+										</div>
+										:
+										<div>
+											<b><FormattedMessage id='child.groups' /></b>:
+											<ListDisplayComponent trueSize={listedGroups.length} items={listedGroups} />
+										</div>
+									}
 									{/* All (deep) meters in this group */}
 									{loggedInAsAdmin ?
 										<div>
@@ -550,18 +595,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 }
 
 /**
- * Returns false if the two arrays have different meter ids and true otherwise. Assumes elements unique.
- * SelectOption has meter id in value.
- * @param {number[]} originalMeters[] first array of meter ids
- * @param {SelectOption[]} selectedMeters[] second array of selection options
+ * Returns false if the two arrays have different ids and true otherwise. Assumes elements unique.
+ * SelectOption has id in value.
+ * @param {number[]} original[] first array of ids
+ * @param {SelectOption[]} selected[] second array of selection options
  * @returns false if two arrays differ, otherwise true
  */
-function metersSame(originalMeters: number[], selectedMeters: SelectOption[]) {
-	if (originalMeters.length == selectedMeters.length) {
+function listsSame(original: number[], selected: SelectOption[]) {
+	if (original.length == selected.length) {
 		// Sort since user selections can be in any order.
-		const sortedTwo = _.sortBy(selectedMeters, item => item.value, 'asc');
-		// Compare id of meters in each array by each element until find difference or all the same.
-		return originalMeters.every((element, index) => {
+		const sortedTwo = _.sortBy(selected, item => item.value, 'asc');
+		// Compare id in each array by each element until find difference or all the same.
+		return original.every((element, index) => {
 			return element === sortedTwo[index].value;
 		});
 	} else {
