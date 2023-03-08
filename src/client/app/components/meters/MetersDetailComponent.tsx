@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { potentialGraphicUnits, noUnit } from '../../utils/input';
+import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
@@ -67,7 +67,7 @@ export default function MetersDetailComponent() {
 	// Put in alphabetical order.
 	possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	possibleMeterUnits.add(noUnit);
+	possibleMeterUnits.add(noUnitTranslated());
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(units);

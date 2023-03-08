@@ -16,6 +16,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { CurrentUserState } from 'types/redux/currentUser';
 import translate from '../../utils/translate';
 import { UnitData } from '../../types/redux/units';
+import { noUnitTranslated } from '../../utils/input';
 
 interface GroupViewComponentProps {
 	group: GroupDefinition;
@@ -47,9 +48,6 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state
 	const unitState = useSelector((state: State) => state.units.units);
-	// This is the default graphic unit associated with the group or no unit if none.
-	const graphicName = props.group.defaultGraphicUnit === -99 ?
-		'no unit' : unitState[props.group.defaultGraphicUnit].identifier;
 
 	return (
 		<div className="card">
@@ -59,7 +57,9 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			</div>
 			<div className="item-container">
 				{/* Use meter translation id string since same one wanted. */}
-				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {graphicName}
+				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
+				{/* This is the default graphic unit associated with the group or no unit if none. */}
+				{props.group.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[props.group.defaultGraphicUnit].identifier}
 			</div>
 			{loggedInAsAdmin &&
 				<div className={props.group.displayable.toString()}>

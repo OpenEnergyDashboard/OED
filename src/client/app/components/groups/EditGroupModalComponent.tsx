@@ -29,7 +29,7 @@ import {
 } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
+import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { GroupEditData } from 'types/redux/groups';
 
 interface EditGroupModalComponentProps {
@@ -60,7 +60,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// If an admin then will display as a selectable meter list and if
 	// other user than it is a list of the meter identifiers.
 	// Groups are done similarly.
+	// For admins
 	let selectedMeters: SelectOption[] = [], selectedGroups: SelectOption[] = [];
+	// For non-admins.
 	const listedMeters: string[] = [], listedGroups: string[] = [], listedDeepMeters: string[] = [];
 	if (loggedInAsAdmin) {
 		// In format for the display component for meters.
@@ -68,8 +70,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		Object.values(originalGroupState.childMeters).forEach(meter => {
 			selectedMetersUnsorted.push({
 				value: meter,
-				label: metersState[meter].identifier,
-				isDisabled: false
+				label: metersState[meter].identifier
+				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
 		});
@@ -80,20 +82,23 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		Object.values(originalGroupState.childGroups).forEach(group => {
 			selectedGroupsUnsorted.push({
 				value: group,
-				label: groupsState[group].name,
-				isDisabled: false
+				label: groupsState[group].name
+				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
 		});
 		// Want chosen in sorted order. Note any changes by user can unsort them.
 		selectedGroups = _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
 	} else {
-		// What to display if not an admin.
+		// What to display if not an admin. Also do deep meters since they never change.
+		// The logic has overlaps to admin but separated since different enough.
 		// These do the immediate child meters.
+		// Tells if any meter is not visible to user.
 		let hasHidden = false;
 		Object.values(originalGroupState.childMeters).forEach(meter => {
 			const meterIdentifier = metersState[meter].identifier;
-			// The identifier is null if the meter is not visible to this user so not hidden meters.
+			// The identifier is null if the meter is not visible to this user. If hidden then do
+			// not list and otherwise label.
 			if (meterIdentifier === null) {
 				hasHidden = true;
 			} else {
@@ -104,13 +109,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		listedMeters.sort();
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
-			listedMeters.push('At least one meter is not visible to you');
+			listedMeters.push(translate('meter.hidden'));
 		}
 		// Similar but for the groups.
 		hasHidden = false;
 		Object.values(originalGroupState.childGroups).forEach(group => {
 			const groupName = groupsState[group].name;
-			// The name is null if the group is not visible to this user so not hidden groups.
+			// The name is null if the group is not visible to this user.
 			if (groupName === null) {
 				hasHidden = true;
 			} else {
@@ -121,7 +126,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		listedGroups.sort();
 		if (hasHidden) {
 			// There are hidden groups so note at bottom of list.
-			listedGroups.push('At least one group is not visible to you');
+			listedGroups.push(translate('group.hidden'));
 		}
 		// These do the deep child meters.
 		hasHidden = false;
@@ -142,7 +147,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	}
 
-	// Set existing group values
+	// Set existing group values for the state.
 	const values: GroupEditData = {
 		id: originalGroupState.id,
 		name: originalGroupState.name,
@@ -156,7 +161,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		defaultGraphicUnit: originalGroupState.defaultGraphicUnit
 	}
 
-	// The information on the children of this group
+	// The information on the children of this group for state. Except for selected, the
+	// values are set by the useEffect functions.
 	const groupChildrenDefaults = {
 		// The meter selections in format for selection dropdown.
 		meterSelectOptions: [] as SelectOption[],
@@ -167,12 +173,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Groups that have been selected for this group. Not used if non-admin.
 		groupSelectedSelectOptions: loggedInAsAdmin ? selectedGroups : [] as SelectOption[],
 		// The identifiers of all meter children (deep meters) that are visible to this user.
-		deepMetersIdentifier: [] as string[],
-		// The original number of direct meter children
-		deepMetersTrueSize: 0
+		deepMetersIdentifier: [] as string[]
 	}
 
-	const dropdownsStateDefaults = {
+	const graphicUnitsStateDefaults = {
 		possibleGraphicUnits: props.possibleGraphicUnits,
 		compatibleGraphicUnits: props.possibleGraphicUnits,
 		incompatibleGraphicUnits: new Set<UnitData>()
@@ -197,7 +201,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
 
 	// Dropdowns
-	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
+	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
 
 	// Reset the state to default values
@@ -208,9 +212,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const resetState = () => {
 		setState(values);
 		setGroupChildrenState(groupChildrenDefaults);
-		setDropdownsState(dropdownsStateDefaults);
+		setGraphicUnitsState(graphicUnitsStateDefaults);
 	}
 
+	// Note this differs from the props.handleClose(). This is only called when the user
+	// clicks to discard or close the modal.
 	const handleClose = () => {
 		props.handleClose();
 		if (loggedInAsAdmin) {
@@ -220,9 +226,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	// Save changes
-	// Currently using the old functionality which is to compare inherited prop values to state values
-	// If there is a difference between props and state, then a change was made
-	// Side note, we could probably just set a boolean when any input
 	const handleSaveChanges = () => {
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
@@ -231,6 +234,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
+		// Check children separately since lists.
 		const childMeterChanges = !listsSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
 		const childGroupChanges = !listsSame(originalGroupState.childGroups, groupChildrenState.groupSelectedSelectOptions);
 		const groupHasChanges =
@@ -254,7 +258,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				inputOk = false;
 			}
 
-			//Check GPS
+			//Check GPS is okay.
 			const gpsInput = state.gps;
 			let gps: GPSPoint | null = null;
 			const latitudeIndex = 0;
@@ -272,7 +276,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					};
 				} else if ((gpsInput as string).length !== 0) {
 					// GPS not okay.
-					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
+					// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 					// so leaving code commented out.
 					// notifyUser(translate('input.gps.range') + state.gps + '.');
 					notifyUser(translate('input.gps.range') + state.gps + '.');
@@ -292,8 +296,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	};
 
-	// Determine child meters/groups.
+	// Determine child meters/groups and deep meters.
 	useEffect(() => {
+		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
 			// This is the current deep meters of this group including any changes.
 			const groupDeepMeter = metersInChangedGroup(state);
@@ -305,7 +310,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
 			const identifierDeepMeters: string[] = [];
-			let trueDeepMeterSize = 0;
 			// Because deepMeters is optional in state, TS is worried it may not exist. It should always be set
 			// at this point but if stops the error.
 			if (state.deepMeters) {
@@ -315,20 +319,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						identifierDeepMeters.push(metersState[meterID].identifier.trim());
 					}
 				});
+				// We want to display in alphabetical order.
 				identifierDeepMeters.sort();
-				// Record the total number so later can compare the number in array to see if any missing.
-				trueDeepMeterSize = state.deepMeters.length;
 			}
 			// Update the state
 			setGroupChildrenState({
 				...groupChildrenState,
 				deepMetersIdentifier: identifierDeepMeters,
-				deepMetersTrueSize: trueDeepMeterSize,
 				meterSelectOptions: possibleMeters,
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, state.defaultGraphicUnit, state.deepMeters]);
+	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
 
 	// Update compatible units and graphic units set.
 	useEffect(() => {
@@ -340,12 +342,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// First must get a set from the array of deep meter numbers which is all meters currently in this group.
 			const deepMetersSet = new Set(state.deepMeters);
 			// Get the units that are compatible with this set of meters.
-			// TODO This does not allow no unit which we currently planned to allow for groups. Need to decide what to do in this case.
 			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
 			// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
 			allowedDefaultGraphicUnit.add(-99);
-			dropdownsState.possibleGraphicUnits.forEach(unit => {
-				// If current graphic unit exists in the set of allowed graphic units
+			graphicUnitsState.possibleGraphicUnits.forEach(unit => {
+				// If current graphic unit exists in the set of allowed graphic units then compatible and not otherwise.
 				if (allowedDefaultGraphicUnit.has(unit.id)) {
 					compatibleGraphicUnits.add(unit);
 				}
@@ -354,9 +355,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				}
 			});
 			// Update the state
-			setDropdownsState({
-				...dropdownsState,
-				// The new set helps avoid repaints.
+			setGraphicUnitsState({
+				...graphicUnitsState,
 				compatibleGraphicUnits: compatibleGraphicUnits,
 				incompatibleGraphicUnits: incompatibleGraphicUnits
 			});
@@ -364,7 +364,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [ConversionArray.pikAvailable(), state.deepMeters]);
-	// }
+
 	const tooltipStyle = {
 		display: 'inline-block',
 		fontSize: '60%',
@@ -391,7 +391,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</div>
 					</Modal.Title>
 				</Modal.Header>
-				{/* when any of the group are changed call one of the functions (if admin). */}
 				<Modal.Body className="show-grid">
 					<div id="container">
 						<div id="modalChild">
@@ -413,7 +412,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											<b><FormattedMessage id="group.name" /></b> {state.name}
 										</div>
 									}
-									{/* default graphic unit input */}
+									{/* default graphic unit input or display */}
 									{loggedInAsAdmin ?
 										< div style={formInputStyle}>
 											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
@@ -422,10 +421,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												type='select'
 												value={state.defaultGraphicUnit}
 												onChange={e => handleNumberChange(e)}>
-												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
+												{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
-												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
+												{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 												})}
 											</Input>
@@ -434,9 +433,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<div className="item-container">
 											{/* Use meter translation id string since same one wanted. */}
 											{/* This is the default graphic unit associated with the group or no unit if none. */}
-											<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
+											<b><FormattedMessage id='meter.defaultGraphicUnit' /></b>
 											{/* Not exactly sure why but must force a starting space after the label */}
-											{state.defaultGraphicUnit === -99 ? ' no unit' : ' ' + unitState[state.defaultGraphicUnit].identifier}
+											{state.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[state.defaultGraphicUnit].identifier}
 										</div>
 									}
 									{/* Displayable input */}
@@ -517,7 +516,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										:
 										<div>
 											<b><FormattedMessage id='child.meters' /></b>:
-											<ListDisplayComponent trueSize={listedMeters.length} items={listedMeters} />
+											<ListDisplayComponent items={listedMeters} />
 										</div>
 									}
 									{/* The child groups in this group */}
@@ -548,21 +547,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										:
 										<div>
 											<b><FormattedMessage id='child.groups' /></b>:
-											<ListDisplayComponent trueSize={listedGroups.length} items={listedGroups} />
+											<ListDisplayComponent items={listedGroups} />
 										</div>
 									}
 									{/* All (deep) meters in this group */}
-									{loggedInAsAdmin ?
-										<div>
-											<b><FormattedMessage id='group.all.meters' /></b>:
-											<ListDisplayComponent trueSize={groupChildrenState.deepMetersTrueSize} items={groupChildrenState.deepMetersIdentifier} />
-										</div>
-										:
-										<div>
-											<b><FormattedMessage id='group.all.meters' /></b>:
-											<ListDisplayComponent trueSize={listedDeepMeters.length} items={listedDeepMeters} />
-										</div>
-									}
+									<div>
+										<b><FormattedMessage id='group.all.meters' /></b>:
+										<ListDisplayComponent items={loggedInAsAdmin ? groupChildrenState.deepMetersIdentifier : listedDeepMeters} />
+									</div>
 								</div>
 							</div>
 						</div>

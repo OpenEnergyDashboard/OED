@@ -4,6 +4,7 @@
 
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
+import translate from './translate';
 import * as _ from 'lodash';
 
 // Notifies user of msg.
@@ -73,12 +74,12 @@ export function potentialGraphicUnits(units: UnitDataById) {
 	// Put in alphabetical order.
 	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	possibleGraphicUnits.add(noUnit);
+	possibleGraphicUnits.add(noUnitTranslated());
 	return possibleGraphicUnits;
 }
 
 // A non-unit
-export const noUnit: UnitData = {
+export const NoUnit: UnitData = {
 	// Only needs the id and identifier, others are dummy values.
 	id: -99,
 	name: '',
@@ -91,4 +92,16 @@ export const noUnit: UnitData = {
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
 	note: ''
+}
+
+/**
+ * The enum is fine if don't want translation but this is dynamic so translation works.
+ * @returns a unit to represent no unit with translated identifier
+ */
+export function noUnitTranslated(): UnitData {
+	// Untranslated no unit.
+	const unit = NoUnit;
+	// Make the identifier be translated.
+	unit.identifier = translate('unit.none');
+	return unit;
 }

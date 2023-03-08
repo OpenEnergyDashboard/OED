@@ -23,7 +23,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input'
+import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -278,7 +278,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// Also add the 'no unit' unit
 				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
 					// add the current meter unit to the list of compatible units
-					compatibleUnits.add(unit);
+					compatibleUnits.add(noUnitTranslated());
 				}
 				else {
 					// add the current meter unit to the list of incompatible units
