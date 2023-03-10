@@ -88,7 +88,9 @@ export default function GroupsDetailComponent() {
 					{loggedInAsAdmin && groupsStateLoaded &&
 						<div className="edit-btn">
 							{/* The actual button for create is inside this component. */}
-							< CreateGroupModalComponent />
+							< CreateGroupModalComponent
+								possibleGraphicUnits={possibleGraphicUnits}
+							/>
 						</div>
 					}
 					{groupsAllChildrenLoaded && groupsStateLoaded && unitsStateLoaded && metersStateLoaded &&

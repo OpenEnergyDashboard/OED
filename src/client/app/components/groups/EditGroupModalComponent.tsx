@@ -279,7 +279,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 					// so leaving code commented out.
 					// notifyUser(translate('input.gps.range') + state.gps + '.');
-					notifyUser(translate('input.gps.range') + state.gps + '.');
 					inputOk = false;
 				}
 			}
