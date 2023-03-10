@@ -101,11 +101,11 @@ export function submitPreferences() {
 			await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
+				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
 				defaultTimezone: state.admin.defaultTimeZone,
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
-				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
 				defaultAreaUnit: state.admin.defaultAreaUnit
 			});

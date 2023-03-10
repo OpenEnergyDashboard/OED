@@ -96,7 +96,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 						meter={props.meter}
 						handleClose={handleClose}
 						possibleMeterUnits={props.possibleMeterUnits}
-						possibleGraphicUnits={props.possibleGraphicUnits} />
+						possibleGraphicUnits={props.possibleGraphicUnits}/>
 				</div>
 			}
 		</div>

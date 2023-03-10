@@ -18,11 +18,6 @@ export interface ChangeDisplayedUnitsAction {
 	selectedUnits: number[];
 }
 
-export interface ChangeDisplayedAreaUnitsAction {
-	type: ActionType.ChangeDisplayedAreaUnits;
-	selectedAreaUnits: number[];
-}
-
 export interface ConfirmEditedUnitAction {
 	type: ActionType.ConfirmEditedUnit;
 	editedUnit: UnitData;
@@ -45,7 +40,6 @@ export interface ConfirmUnitsFetchedOnceAction {
 export type UnitsAction = RequestUnitsDetailsAction
 | ReceiveUnitsDetailsAction
 | ChangeDisplayedUnitsAction
-| ChangeDisplayedAreaUnitsAction
 | ConfirmEditedUnitAction
 | DeleteSubmittedUnitAction
 | SubmitEditedUnitAction
@@ -106,7 +100,6 @@ export interface UnitsState {
 	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;
 	selectedUnits: number[];
-	selectedAreaUnits: number[];
 	submitting: number[];
 	units: UnitDataById;
 }

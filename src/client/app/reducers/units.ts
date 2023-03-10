@@ -2,14 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as _ from 'lodash';
-import { UnitsAction, UnitsState } from '../types/redux/units';
 import { ActionType } from '../types/redux/actions';
+import { UnitsAction, UnitsState } from '../types/redux/units';
 
 const defaultState: UnitsState = {
 	hasBeenFetchedOnce: false,
 	isFetching: false,
 	selectedUnits: [],
-	selectedAreaUnits: [],
 	submitting: [],
 	units: {}
 };
@@ -39,12 +38,6 @@ export default function units(state = defaultState, action: UnitsAction) {
 			return {
 				...state,
 				selectedUnits: action.selectedUnits
-			};
-		}
-		case ActionType.ChangeDisplayedAreaUnits: {
-			return {
-				...state,
-				selectedUnits: action.selectedAreaUnits
 			};
 		}
 		case ActionType.SubmitEditedUnit: {
