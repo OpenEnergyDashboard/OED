@@ -3,20 +3,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import { fetchMetersDetailsIfNeeded } from './meters';
-import { fetchGroupsDetailsIfNeeded } from './groups';
-import { fetchNeededLineReadings } from './lineReadings';
-import { fetchNeededBarReadings } from './barReadings';
-import { fetchNeededCompareReadings } from './compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
-import { State } from '../types/redux/state';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
+import { State } from '../types/redux/state';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import { fetchNeededMapReadings } from './mapReadings';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { fetchNeededBarReadings } from './barReadings';
+import { fetchNeededCompareReadings } from './compareReadings';
+import { fetchGroupsDetailsIfNeeded } from './groups';
+import { fetchNeededLineReadings } from './lineReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
-import { fetchUnitsDetailsIfNeeded, fetchConvertedAreas } from './units';
+import { fetchNeededMapReadings } from './mapReadings';
+import { fetchMetersDetailsIfNeeded } from './meters';
+import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -46,8 +47,8 @@ export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
 	return { type: ActionType.UpdateSelectedUnit, unitID };
 }
 
-export function updateSelectedAreaUnit(unitID: number): t.UpdateSelectedAreaUnitAction {
-	return { type: ActionType.UpdateSelectedAreaUnit, unitID };
+export function updateSelectedAreaUnit(areaUnit: AreaUnitType): t.UpdateSelectedAreaUnitAction {
+	return { type: ActionType.UpdateSelectedAreaUnit, areaUnit };
 }
 
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
@@ -148,15 +149,6 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
 		});
-		return Promise.resolve();
-	}
-}
-
-// TODO: make sure this works right
-export function changeSelectedAreaUnit(unitID: number): Thunk {
-	return (dispatch: Dispatch) => {
-		dispatch(updateSelectedAreaUnit(unitID));
-		dispatch(fetchConvertedAreas());
 		return Promise.resolve();
 	}
 }

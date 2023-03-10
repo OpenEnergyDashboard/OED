@@ -4,13 +4,15 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { connect } from 'react-redux';
-import getGraphColor from '../utils/getGraphColor';
-import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
-import Locales from '../types/locales';
+import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';
+import Locales from '../types/locales';
+import { State } from '../types/redux/state';
+import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
+import translate from '../utils/translate';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access
@@ -34,10 +36,7 @@ function mapStateToProps(state: State) {
 			unitLabel  = barUnitLabel(selectUnitState);
 			// TODO move this into the above function for compatibility with export
 			if(state.graph.areaNormalization) {
-				const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
-				if (selectAreaUnitState !== undefined) {
-					unitLabel += ' / ' + selectAreaUnitState.identifier;
-				}
+				unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
 			}
 		}
 	}
@@ -47,9 +46,17 @@ function mapStateToProps(state: State) {
 		const byMeterID = state.readings.bar.byMeterID[meterID];
 		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined &&
 			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			const meterArea = state.meters.byMeterID[meterID].convertedArea;
+			let meterArea = state.meters.byMeterID[meterID].area;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
-			if (!state.graph.areaNormalization || meterArea > 0) {
+			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
+				if(state.graph.areaNormalization) {
+					// convert the meter area into the proper unit, if needed
+					const graphAreaUnit = state.graph.selectedAreaUnit;
+					const meterAreaUnit = state.meters.byMeterID[meterID].areaUnit;
+					if(graphAreaUnit != meterAreaUnit) {
+						meterArea *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
+					}
+				}
 				const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.meters.byMeterID[meterID].identifier;
@@ -101,8 +108,16 @@ function mapStateToProps(state: State) {
 		const byGroupID = state.readings.bar.byGroupID[groupID];
 		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined &&
 			byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-			const groupArea = state.groups.byGroupID[groupID].convertedArea;
-			if (!state.graph.areaNormalization || groupArea > 0) {
+			let groupArea = state.groups.byGroupID[groupID].area;
+			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
+				if(state.graph.areaNormalization) {
+					// convert the meter area into the proper unit, if needed
+					const graphAreaUnit = state.graph.selectedAreaUnit;
+					const groupAreaUnit = state.groups.byGroupID[groupID].areaUnit;
+					if(graphAreaUnit != groupAreaUnit) {
+						groupArea *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
+					}
+				}
 				const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.groups.byGroupID[groupID].name;

@@ -87,6 +87,7 @@ async function createSchema(conn) {
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
+	await Unit.createAreaUnitTypesEnum(conn);
 	await Unit.createDisplayableTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);

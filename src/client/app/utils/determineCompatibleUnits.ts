@@ -2,12 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import store from '../index';
 import * as _ from 'lodash';
-import { MeterData } from '../types/redux/meters';
-import { ConversionArray } from '../types/conversionArray';
-import { UnitData, UnitType } from '../types/redux/units';
 import { GroupDefinition } from 'types/redux/groups';
+import store from '../index';
+import { ConversionArray } from '../types/conversionArray';
+import { MeterData } from '../types/redux/meters';
+import { UnitData, UnitType } from '../types/redux/units';
 
 /**
  * The intersect operation of two sets.
@@ -56,45 +56,6 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	});
 	// Now have final compatible units for the provided set of meter
 	return compatibleUnits;
-}
-
-/**
- * Takes a set of meter ids and returns the set of compatible area unit ids.
- * TODO This is nearly identical code to the function above, perhaps they could be merged
- *
- * @param {Set<number>} meters The set of meter ids.
- * @returns {Set<number>} Set of compatible unit ids.
- */
-export function areaUnitsCompatibleWithMeters(meters: Set<number>): Set<number> {
-	const state = store.getState();
-	// The first meter processed is different since intersection with empty set is empty.
-	let first = true;
-	// Holds current set of compatible units.
-	let compatibleAreaUnits = new Set<number>();
-	// Loops over all meters.
-	meters.forEach(function (meterId: number) {
-		// Gets the meter associated with the meterId.
-		const meter = _.get(state.meters.byMeterID, meterId) as MeterData;
-		let meterAreaUnits = new Set<number>();
-		// If meter had no unit then nothing compatible with it.
-		// This probably won't happen but be safe. Note once you have one of these then
-		// the final result must be empty set but don't check specially since don't expect.
-		if (meter.areaUnitId != undefined && meter.areaUnitId != -99) {
-			// Set of compatible units with this meter.
-			meterAreaUnits = unitsCompatibleWithUnit(meter.areaUnitId);
-		}
-		// meterUnits now has all compatible units.
-		if (first) {
-			// First meter so all its units are acceptable at this point.
-			compatibleAreaUnits = meterAreaUnits;
-			first = false;
-		} else {
-			// Do intersection of compatible units so far with ones for this meters.
-			compatibleAreaUnits = setIntersect(compatibleAreaUnits, meterAreaUnits);
-		}
-	});
-	// Now have final compatible units for the provided set of meter
-	return compatibleAreaUnits;
 }
 
 /**

@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
-import { AdminState, AdminAction } from '../types/redux/admin';
+import { AdminAction, AdminState } from '../types/redux/admin';
+import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -20,7 +21,7 @@ const defaultState: AdminState = {
 	defaultFileSizeLimit: 25,
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
-	defaultAreaUnit: -99
+	defaultAreaUnit: AreaUnitType.none
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -88,7 +89,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultTimeZone: action.data.defaultTimezone,
 				defaultWarningFileSize: action.data.defaultWarningFileSize,
 				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
-				defaultAreaNormalization: action.data.defaultAreaNormalization
+				defaultAreaNormalization: action.data.defaultAreaNormalization,
+				defaultAreaUnit: action.data.defaultAreaUnit
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {

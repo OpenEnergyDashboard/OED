@@ -3,26 +3,27 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { Input } from 'reactstrap';
 import { State } from 'types/redux/state';
-import '../../styles/modal.css';
-import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { TrueFalseType } from '../../types/items';
-import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import '../../styles/modal.css';
 import { ConversionArray } from '../../types/conversionArray';
+import { TrueFalseType } from '../../types/items';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { UnitData } from '../../types/redux/units';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -66,7 +67,6 @@ interface EditMeterModalComponentProps {
 	meter: MeterData;
 	possibleMeterUnits: Set<UnitData>;
 	possibleGraphicUnits: Set<UnitData>;
-	possibleMeterAreaUnits: Set<UnitData>;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -106,14 +106,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
-		areaUnitId: props.meter.areaUnitId,
-		convertedArea: props.meter.convertedArea
+		areaUnit: props.meter.areaUnit
 	}
 
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
-		possibleMeterAreaUnits: props.possibleMeterAreaUnits,
 		compatibleUnits: props.possibleMeterUnits,
 		incompatibleUnits: new Set<UnitData>(),
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -197,7 +195,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.startTimestamp != state.startTimestamp ||
 				props.meter.endTimestamp != state.endTimestamp ||
 				props.meter.previousEnd != state.previousEnd ||
-				props.meter.areaUnitId != state.areaUnitId
+				props.meter.areaUnit != state.areaUnit
 			);
 
 		// Only validate and store if any changes.
@@ -498,14 +496,14 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* meter area unit input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.areaUnitName" /></label><br />
+											<label><FormattedMessage id="units.area" /></label><br />
 											<Input
-												name="areaUnitId"
+												name='areaUnit'
 												type='select'
-												value={state.areaUnitId}
-												onChange={e => handleNumberChange(e)}>
-												{Array.from(dropdownsState.possibleMeterAreaUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>

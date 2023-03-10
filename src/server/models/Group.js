@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const Meter = require('./Meter');
+const Unit = require('./Unit');
 
 const sqlFile = database.sqlFile;
 
@@ -17,9 +18,9 @@ class Group {
 	 * @param note Note about the group
 	 * @param area Area of the group, default null
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
-	 * @param areaUnitId The area unit
+	 * @param areaUnit The area unit
 	 */
-	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnitId = -99) {
+	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnit = Unit.areaUnitType.NONE) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -27,7 +28,7 @@ class Group {
 		this.note = note;
 		this.area = area;
 		this.defaultGraphicUnit = defaultGraphicUnit;
-		this.areaUnitId = areaUnitId;
+		this.areaUnit = areaUnit;
 	}
 
 	/**
@@ -54,7 +55,6 @@ class Group {
 		if (group.defaultGraphicUnit === -99) {
 			group.defaultGraphicUnit = null;
 		}
-		group.areaUnitId = Meter.convertUnitValue(group.areaUnitId);
 		const resp = await conn.one(sqlFile('group/insert_new_group.sql'), group);
 		// resp = { id: 42 }, hence this line
 		this.id = resp.id;
@@ -71,8 +71,7 @@ class Group {
 		if (defaultGraphicUnit === null) {
 			defaultGraphicUnit = -99;
 		}
-		var areaUnitId = Meter.convertUnitValue(row.areaUnitId);
-		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit, areaUnitId);
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit, row.area_unit);
 	}
 
 	/**

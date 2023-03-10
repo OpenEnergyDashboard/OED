@@ -9,5 +9,5 @@ UPDATE groups
 		note = ${note},
 		area = ${area},
 		default_graphic_unit = ${defaultGraphicUnit},
-		area_unit_id = ${areaUnitId}
+		area_unit = ${areaUnit}
 	WHERE id = ${id};

@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 import { PreferenceRequestItem } from '../items';
+import { ActionType } from './actions';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
-import { ActionType } from './actions';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -49,7 +50,7 @@ export interface ToggleDefaultAreaNormalizationAction {
 
 export interface UpdateDefaultAreaUnitAction {
 	type: ActionType.UpdateDefaultAreaUnit;
-	defaultAreaUnit: number;
+	defaultAreaUnit: AreaUnitType;
 }
 
 export interface UpdateDefaultTimeZone {
@@ -106,5 +107,5 @@ export interface AdminState {
 	defaultFileSizeLimit: number;
 	isUpdatingCikAndDBViews: boolean;
 	defaultAreaNormalization: boolean;
-	defaultAreaUnit: number;
+	defaultAreaUnit: AreaUnitType;
 }

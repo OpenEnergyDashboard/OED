@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_warning_file_size FLOAT NOT NULL,
 	default_file_size_limit FLOAT NOT NULL,
 	default_area_normalization BOOLEAN NOT NULL,
-	default_area_unit INTEGER NOT NULL DEFAULT -99
+	default_area_unit area_unit_type NOT NULL
 );

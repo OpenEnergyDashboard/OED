@@ -9,8 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { GroupsState } from 'types/redux/groups';
 import { MetersState } from 'types/redux/meters';
 import {
-	changeSelectedAreaUnit,
-	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedAreaUnit, updateSelectedGroups,
+	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedGroups,
 	updateSelectedMeters, updateSelectedUnit
 } from '../actions/graph';
 import { DataType } from '../types/Datasources';
@@ -24,6 +23,7 @@ import {
 	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
 } from '../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import MultiSelectComponent from './MultiSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -64,14 +64,14 @@ export default function ChartDataSelectComponent() {
 		if(state.graph.areaNormalization) {
 			sortedMeters.forEach(meter => {
 				// do not allow meter to be selected if it does not have area
-				if(allMeters[meter.value].area === 0 || allMeters[meter.value].area === null) {
+				if(allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit == AreaUnitType.none) {
 					meter.isDisabled = true;
 					nonAreaMeters.push(meter.value);
 				}
 			});
 			sortedGroups.forEach(group => {
 				// do not allow group to be selected if it does not have area
-				if(allGroups[group.value].area === 0 || allGroups[group.value].area === null) {
+				if(allGroups[group.value].area === 0 || allGroups[group.value].areaUnit == AreaUnitType.none) {
 					group.isDisabled = true;
 					nonAreaGroups.push(group.value);
 				}
@@ -172,10 +172,6 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
-				// update area unit in a similar fashion
-				// if(state.graph.areaNormalization && state.graph.selectedAreaUnit == -99) {
-				// 	dispatch(changeSelectedAreaUnit(state.meters.byMeterID[meterID].areaUnitId));
-				// }
 				compatibleSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
@@ -266,6 +262,10 @@ export default function ChartDataSelectComponent() {
 				isDisabled: true
 			} as SelectOption
 			);
+		}
+
+		if(state.graph.selectedAreaUnit == AreaUnitType.none) {
+			state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
 		}
 
 		return {
@@ -359,7 +359,6 @@ export default function ChartDataSelectComponent() {
 							dispatch(updateSelectedGroups([]));
 							dispatch(updateSelectedMeters([]));
 							dispatch(updateSelectedUnit(-99));
-							dispatch(updateSelectedAreaUnit(-99));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
 						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }

@@ -18,7 +18,7 @@ class Preferences {
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -27,6 +27,7 @@ class Preferences {
 		this.defaultWarningFileSize = defaultWarningFileSize;
 		this.defaultFileSizeLimit = defaultFileSizeLimit;
 		this.defaultAreaNormalization = defaultAreaNormalization;
+		this.defaultAreaUnit = defaultAreaUnit;
 	}
 
 	/**
@@ -56,7 +57,8 @@ class Preferences {
 			row.default_timezone, 
 			row.default_warning_file_size, 
 			row.default_file_size_limit,
-			row.default_area_normalization
+			row.default_area_normalization,
+			row.default_area_unit
 		);
 	}
 
@@ -86,7 +88,8 @@ class Preferences {
 				defaultTimezone: preferences.defaultTimezone,
 				defaultWarningFileSize: preferences.defaultWarningFileSize,
 				defaultFileSizeLimit: preferences.defaultFileSizeLimit,
-				defaultAreaNormalization: preferences.defaultAreaNormalization
+				defaultAreaNormalization: preferences.defaultAreaNormalization,
+				defaultAreaUnit: preferences.defaultAreaUnit
 			});
 	}
 }

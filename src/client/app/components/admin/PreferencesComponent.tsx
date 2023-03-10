@@ -3,25 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Input, Button } from 'reactstrap';
-import { ChartTypes } from '../../types/redux/graph';
-import {
-	ToggleDefaultBarStackingAction,
-	ToggleDefaultAreaNormalizationAction,
-	UpdateDefaultChartToRenderAction,
-	UpdateDefaultLanguageAction,
-	UpdateDefaultTimeZone,
-	UpdateDisplayTitleAction,
-	UpdateDefaultWarningFileSize,
-	UpdateDefaultFileSizeLimit,
-	UpdateDefaultAreaUnitAction
-} from '../../types/redux/admin';
-import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { LanguageTypes } from '../../types/redux/i18n';
-import TimeZoneSelect from '../TimeZoneSelect';
-import store from '../../index';
+import { Button, Input } from 'reactstrap';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
+import store from '../../index';
+import {
+	ToggleDefaultAreaNormalizationAction, ToggleDefaultBarStackingAction, UpdateDefaultAreaUnitAction,
+	UpdateDefaultChartToRenderAction, UpdateDefaultFileSizeLimit, UpdateDefaultLanguageAction,
+	UpdateDefaultTimeZone, UpdateDefaultWarningFileSize, UpdateDisplayTitleAction
+} from '../../types/redux/admin';
+import { ChartTypes } from '../../types/redux/graph';
+import { LanguageTypes } from '../../types/redux/i18n';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import TimeZoneSelect from '../TimeZoneSelect';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -33,7 +28,7 @@ interface PreferencesProps {
 	disableSubmitPreferences: boolean;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
-	defaultAreaUnit: number;
+	defaultAreaUnit: AreaUnitType;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -43,7 +38,7 @@ interface PreferencesProps {
 	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
-	updateDefaultAreaUnit(defaultAreaUnit: number): UpdateDefaultAreaUnitAction;
+	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -179,6 +174,63 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 				</div>
 				<div>
 					<p style={labelStyle}>
+						<FormattedMessage id='default.area.unit' />:
+					</p>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='areaUnitType'
+								style={{ marginRight: '10px' }}
+								value={AreaUnitType.feet}
+								onChange={this.handleDefaultAreaUnitChange}
+								checked={this.props.defaultAreaUnit === AreaUnitType.feet}
+							/>
+							<FormattedMessage id='AreaUnitType.feet' />
+						</label>
+					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='areaUnitType'
+								style={{ marginRight: '10px' }}
+								value={AreaUnitType.meters}
+								onChange={this.handleDefaultAreaUnitChange}
+								checked={this.props.defaultAreaUnit === AreaUnitType.meters}
+							/>
+							<FormattedMessage id='AreaUnitType.meters' />
+						</label>
+					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='areaUnitType'
+								style={{ marginRight: '10px' }}
+								value={AreaUnitType.miles}
+								onChange={this.handleDefaultAreaUnitChange}
+								checked={this.props.defaultAreaUnit === AreaUnitType.miles}
+							/>
+							<FormattedMessage id='AreaUnitType.miles' />
+						</label>
+					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='areaUnitType'
+								style={{ marginRight: '10px' }}
+								value={AreaUnitType.kilometers}
+								onChange={this.handleDefaultAreaUnitChange}
+								checked={this.props.defaultAreaUnit === AreaUnitType.kilometers}
+							/>
+							<FormattedMessage id='AreaUnitType.kilometers' />
+						</label>
+					</div>
+				</div>
+				<div>
+					<p style={labelStyle}>
 						<FormattedMessage id='default.language' />:
 					</p>
 					<div className='radio'>
@@ -301,7 +353,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 	}
 
 	private handleDefaultAreaUnitChange(e: { target: HTMLInputElement; }) {
-		this.props.updateDefaultAreaUnit(parseInt(e.target.value));
+		this.props.updateDefaultAreaUnit(e.target.value as AreaUnitType);
 		this.updateUnsavedChanges();
 	}
 

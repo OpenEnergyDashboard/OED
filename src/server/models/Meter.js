@@ -37,7 +37,7 @@ class Meter {
 	 * @param previousEnd  The last okay reading before crossed out of DST or moment(0) if not, default'1970-01-01 00:00:00'
 	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
-	 * @param areaUnitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
+	 * @param areaUnit The foreign key to the unit table. Default is 'none'
 	*/
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
@@ -45,7 +45,7 @@ class Meter {
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
-		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnitId = -99) {
+		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE ) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -74,7 +74,7 @@ class Meter {
 		this.previousEnd = previousEnd;
 		this.unitId = unitId;
 		this.defaultGraphicUnit = defaultGraphicUnit;
-		this.areaUnitId = areaUnitId;
+		this.areaUnit = areaUnit;
 	}
 
 	/**
@@ -126,10 +126,9 @@ class Meter {
 		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
 			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
 			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
-			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.area_unit_id);
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.area_unit);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
-		meter.areaUnitId = Meter.convertUnitValue(meter.areaUnitId);
 		return meter;
 	}
 
@@ -211,7 +210,6 @@ class Meter {
 		}
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
-		meter.areaUnitId = Meter.convertUnitValue(meter.areaUnitId);
 		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
 		this.id = resp.id;
 	}
@@ -226,7 +224,7 @@ class Meter {
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
-		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit, areaUnitId = this.areaUnitId) {
+		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit, areaUnit = this.area_unit) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -252,7 +250,7 @@ class Meter {
 		this.previousEnd = previousEnd;
 		this.unitId = unitId;
 		this.defaultGraphicUnit = defaultGraphicUnit;
-		this.areaUnitId = areaUnitId;
+		this.areaUnit = areaUnit;
 	}
 
 	/**
@@ -268,7 +266,6 @@ class Meter {
 		}
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
-		meter.areaUnitId = Meter.convertUnitValue(meter.areaUnitId);
 		await conn.none(sqlFile('meter/update_meter.sql'), meter);
 	}
 
@@ -298,10 +295,10 @@ class Meter {
 			}
 		}
 		// if there is area but no area unit, set displayable to false
-		if(meter.area !== 0 && meter.areaUnitId === -99) {
+		if(meter.area !== 0 && meter.areaUnit == Unit.areaUnitType.NONE) {
 			if(meter.displayable === true) {
 				meter.displayable = false;
-				log.warn(`displayable of the meter "${meter.name}" has been switched to false since area is nonzero but there is no areaUnitId.`);
+				log.warn(`displayable of the meter "${meter.name}" has been switched to false since area is nonzero but there is no area unit.`);
 			}
 		}
 	}

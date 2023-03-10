@@ -2,25 +2,26 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { Input } from 'reactstrap';
 import { State } from 'types/redux/state';
-import '../../styles/modal.css';
-import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { addMeter } from '../../actions/meters';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { TrueFalseType } from '../../types/items';
-import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import '../../styles/modal.css';
 import { ConversionArray } from '../../types/conversionArray';
+import { TrueFalseType } from '../../types/items';
+import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { UnitData } from '../../types/redux/units';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
@@ -35,7 +36,6 @@ function notifyUser(msg: string) {
 interface CreateMeterModalComponentProps {
 	possibleMeterUnits: Set<UnitData>;
 	possibleGraphicUnits: Set<UnitData>;
-	possibleMeterAreaUnits: Set<UnitData>;
 }
 
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
@@ -60,7 +60,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// Defaults of -999 (not to be confused with -99 which is no unit)
 		// Purely for allowing the default select to be "select a ..."
 		unitId: -999,
-		areaUnitId: -99,
 		defaultGraphicUnit: -999,
 		note: '',
 		cumulative: false,
@@ -76,13 +75,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		startTimestamp: '',
 		endTimestamp: '',
 		previousEnd: '',
-		convertedArea: 0
+		areaUnit: AreaUnitType.none
 	}
 
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
-		possibleMeterAreaUnits: props.possibleMeterAreaUnits,
 		compatibleUnits: props.possibleMeterUnits,
 		incompatibleUnits: new Set<UnitData>(),
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -174,7 +172,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		}
 
 		// A meter area unit must be selected if meter has area
-		if (state.area !== 0 && state.areaUnitId === -99) {
+		if (state.area !== 0 && state.areaUnit === AreaUnitType.none) {
 			notifyUser(translate('meter.unit.invalid'));
 			inputOk = false;
 		}
@@ -485,14 +483,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 										</div>
 										{/* meter area unit input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.areaUnitName" /></label><br />
+											<label><FormattedMessage id="units.area" /></label><br />
 											<Input
-												name="areaUnitId"
+												name='areaUnit'
 												type='select'
-												value={state.areaUnitId}
-												onChange={e => handleNumberChange(e)}>
-												{Array.from(dropdownsState.possibleMeterAreaUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
 												})}
 											</Input>
 										</div>

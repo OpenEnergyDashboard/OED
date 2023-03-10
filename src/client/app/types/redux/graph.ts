@@ -4,8 +4,9 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { ActionType } from './actions';
 
 export enum ChartTypes {
 	line = 'line',
@@ -39,7 +40,7 @@ export interface UpdateSelectedUnitAction {
 
 export interface UpdateSelectedAreaUnitAction {
 	type: ActionType.UpdateSelectedAreaUnit;
-	unitID: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface UpdateBarDurationAction {
@@ -133,7 +134,7 @@ export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;
-	selectedAreaUnit: number;
+	selectedAreaUnit: AreaUnitType;
 	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;

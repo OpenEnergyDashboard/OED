@@ -3,23 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import {
-	updateDisplayTitle,
-	updateDefaultChartToRender,
-	toggleDefaultBarStacking,
-	updateTimeZone,
-	updateDefaultLanguage,
-	submitPreferencesIfNeeded,
-	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit,
-	toggleDefaultAreaNormalization,
-	updateDefaultAreaUnit
+	submitPreferencesIfNeeded, toggleDefaultAreaNormalization, toggleDefaultBarStacking,
+	updateDefaultAreaUnit, updateDefaultChartToRender, updateDefaultFileSizeLimit, updateDefaultLanguage,
+	updateDefaultWarningFileSize, updateDisplayTitle, updateTimeZone
 } from '../../actions/admin';
-import { State } from '../../types/redux/state';
+import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
+import { State } from '../../types/redux/state';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
 	return {
@@ -47,7 +41,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
 		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
-		updateDefaultAreaUnit: (defaultAreaUnit: number) => dispatch(updateDefaultAreaUnit(defaultAreaUnit))
+		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit))
 	};
 }
 

@@ -39,7 +39,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 		});
 
@@ -130,7 +130,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -178,7 +178,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -245,7 +245,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -314,7 +314,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -433,9 +433,9 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter1 = await Meter.getByName('Meter1', conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
@@ -524,10 +524,10 @@ mocha.describe('Line & bar Readings', () => {
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;

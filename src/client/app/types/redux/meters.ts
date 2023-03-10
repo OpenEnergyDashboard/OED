@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { GPSPoint } from 'utils/calibration';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 import { ActionType } from './actions';
 
 export interface RequestMetersDetailsAction {
@@ -89,8 +90,7 @@ export interface MeterData {
 	startTimestamp: string;
 	endTimestamp: string;
 	previousEnd: string;
-	areaUnitId: number;
-	convertedArea: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface MeterEditData {
@@ -105,7 +105,6 @@ export interface MeterEditData {
 	timeZone: string | null;
 	gps: GPSPoint | null;
 	unitId: number;
-	areaUnitId: number;
 	defaultGraphicUnit: number;
 	note: string;
 	cumulative: boolean;
@@ -121,7 +120,7 @@ export interface MeterEditData {
 	startTimestamp: string | undefined;
 	endTimestamp: string | undefined;
 	previousEnd: string | undefined;
-	convertedArea: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface MeterDataByID {

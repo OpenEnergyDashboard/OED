@@ -54,8 +54,7 @@ export type UnitsAction = RequestUnitsDetailsAction
 export enum UnitType {
 	unit = 'unit',
 	meter = 'meter',
-	suffix = 'suffix',
-	area = 'area'
+	suffix = 'suffix'
 }
 
 export enum DisplayableType {

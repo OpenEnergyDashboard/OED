@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from './actions';
-import { NamedIDItem } from '../items';
 import { GPSPoint } from 'utils/calibration';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
+import { NamedIDItem } from '../items';
+import { ActionType } from './actions';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
 
@@ -160,8 +161,7 @@ export interface GroupData {
 	note?: string;
 	area: number;
 	defaultGraphicUnit: number;
-	areaUnitId: number;
-	convertedArea: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface GroupID {

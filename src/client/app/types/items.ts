@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from '../types/redux/graph';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { LanguageTypes } from './redux/i18n';
 
 /**
@@ -11,6 +12,16 @@ import { LanguageTypes } from './redux/i18n';
 export interface SelectOption {
 	label: string;
 	value: number;
+	isDisabled?: boolean;
+	labelIdForTranslate?: string;
+}
+
+/**
+ * SelectOption but holds strings
+ */
+export interface StringSelectOption {
+	label: string;
+	value: string;
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
 }
@@ -35,6 +46,7 @@ export interface PreferenceRequestItem {
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 	defaultAreaNormalization: boolean;
+	defaultAreaUnit: AreaUnitType;
 }
 
 /**

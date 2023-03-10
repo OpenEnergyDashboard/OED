@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
-import { State } from '../types/redux/state';
 import { NamedIDItem } from '../types/items';
-import { showErrorNotification } from '../utils/notifications';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/groups';
+import { State } from '../types/redux/state';
 import { groupsApi } from '../utils/api';
+import { GPSPoint } from '../utils/calibration';
 import { browserHistory } from '../utils/history';
+import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import { GPSPoint } from 'utils/calibration';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -331,8 +331,7 @@ export function submitGroupInEditingIfNeeded() {
 				note: rawGroup.note,
 				area: rawGroup.area,
 				defaultGraphicUnit: rawGroup.defaultGraphicUnit,
-				areaUnitId: rawGroup.areaUnitId,
-				convertedArea: rawGroup.convertedArea
+				areaUnit: rawGroup.areaUnit
 			};
 			if (creatingNewGroup(getState())) {
 				return dispatch(submitNewGroup(group));

@@ -13,6 +13,7 @@ const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const { log } = require('../log');
 const Point = require('../models/Point');
+const Unit = require('../models/Unit');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -197,7 +198,11 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 					type: 'integer'
 				}
 			},
-			areaUnitId: { type: 'integer' }
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.AreaUnitType)
+			}
 		}
 	};
 
@@ -283,7 +288,11 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 					type: 'integer'
 				}
 			},
-			areaUnitId: { type: 'integer' }
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
+			}
 		}
 	};
 

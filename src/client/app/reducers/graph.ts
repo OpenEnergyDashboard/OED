@@ -4,15 +4,16 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
+import { ChartTypes, GraphAction, GraphState } from '../types/redux/graph';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	selectedUnit: -99,
-	selectedAreaUnit: -99,
+	selectedAreaUnit: AreaUnitType.none,
 	timeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
@@ -27,6 +28,7 @@ const defaultState: GraphState = {
 	lineGraphRate: {label: 'hour', rate: 1},
 	renderOnce: false
 };
+
 
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
@@ -54,7 +56,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.UpdateSelectedAreaUnit:
 			return {
 				...state,
-				selectedAreaUnit: action.unitID
+				selectedAreaUnit: action.areaUnit
 			}
 		case ActionType.UpdateBarDuration:
 			return {

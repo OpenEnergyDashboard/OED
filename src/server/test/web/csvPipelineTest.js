@@ -580,7 +580,8 @@ const testMeters = {
 				undefined, // endTimestamp
 				undefined, // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				undefined // area unit
 			),
 			new Meter(
 				undefined, // id
@@ -609,7 +610,8 @@ const testMeters = {
 				'1777-08-09 05:07:11', // endTimestamp
 				'1888-09-10 11:12:13+00:00', // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				Unit.areaUnitType.METERS // area unit
 			)
 		]
 	},
@@ -646,7 +648,8 @@ const testMeters = {
 				undefined, // endTimestamp
 				undefined, // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				undefined // area unit
 			)
 		]
 	},

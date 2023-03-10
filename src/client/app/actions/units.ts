@@ -2,11 +2,11 @@
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
 export function requestUnitsDetails(): t.RequestUnitsDetailsAction {
@@ -111,17 +111,5 @@ export function addUnit(unit: t.UnitData): Thunk {
 		} catch (err) {
 			showErrorNotification(translate('unit.failed.to.create.unit'));
 		}
-	}
-}
-
-export function fetchConvertedAreas(): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		const state = getState();
-		const promises: Array<Promise<any>> = [];
-		// when the unit gets changed, we need to get all of the new converted areas
-		// promises.push(dispatch(fetchMeterConvertedAreas(state.graph.selectedMeters)));
-		// 	promises.push(dispatch(fetchGroupLineReadings(state.graph.selectedGroups)));
-
-		return Promise.all(promises);
 	}
 }

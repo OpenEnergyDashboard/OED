@@ -2,17 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { changeAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
-import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
+import * as moment from 'moment';
 import { PreferenceRequestItem } from '../types/items';
-import * as t from '../types/redux/admin';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import * as t from '../types/redux/admin';
+import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/redux/i18n';
 import { State } from '../types/redux/state';
 import { conversionArrayApi, preferencesApi } from '../utils/api';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import { LanguageTypes } from '../types/redux/i18n';
-import * as moment from 'moment';
+import { changeAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -39,7 +40,7 @@ export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizati
 	return { type: ActionType.ToggleDefaultAreaNormalization };
 }
 
-export function updateDefaultAreaUnit(defaultAreaUnit: number): t.UpdateDefaultAreaUnitAction {
+export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDefaultAreaUnitAction {
 	return { type: ActionType.UpdateDefaultAreaUnit, defaultAreaUnit };
 }
 
@@ -105,7 +106,8 @@ export function submitPreferences() {
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 				defaultBarStacking: state.admin.defaultBarStacking,
-				defaultAreaNormalization: state.admin.defaultAreaNormalization
+				defaultAreaNormalization: state.admin.defaultAreaNormalization,
+				defaultAreaUnit: state.admin.defaultAreaUnit
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

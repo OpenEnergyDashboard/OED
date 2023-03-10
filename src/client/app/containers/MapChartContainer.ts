@@ -2,19 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import { connect } from 'react-redux';
-import Plot from 'react-plotly.js';
-import { State } from '../types/redux/state';
-import {
-	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
-	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
-} from '../utils/calibration';
 import * as _ from 'lodash';
-import getGraphColor from '../utils/getGraphColor';
-import Locales from '../types/locales';
+import * as moment from 'moment';
+import Plot from 'react-plotly.js';
+import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';
+import Locales from '../types/locales';
+import { State } from '../types/redux/state';
 import { UnitRepresentType } from '../types/redux/units';
+import {
+	calculateScaleFromEndpoints, CartesianPoint, Dimensions, gpsToUserGrid,
+	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
+} from '../utils/calibration';
+import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import getGraphColor from '../utils/getGraphColor';
+import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;
@@ -91,10 +93,7 @@ function mapStateToProps(state: State) {
 						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
 					}
 					if(state.graph.areaNormalization) {
-						const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
-						if (selectAreaUnitState !== undefined) {
-							unitLabel += ' / ' + selectAreaUnitState.identifier;
-						}
+						unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
 					}
 				}
 			}
@@ -106,9 +105,17 @@ function mapStateToProps(state: State) {
 				const gps = state.meters.byMeterID[meterID].gps;
 				// filter meters with actual gps coordinates.
 				if (gps !== undefined && gps !== null && byMeterID !== undefined) {
-					const meterArea = state.meters.byMeterID[meterID].area;
+					let meterArea = state.meters.byMeterID[meterID].area;
 					// we either don't care about area, or we do in which case there needs to be a nonzero area
-					if (!state.graph.areaNormalization || meterArea > 0) {
+					if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
+						if(state.graph.areaNormalization) {
+							// convert the meter area into the proper unit, if needed
+							const graphAreaUnit = state.graph.selectedAreaUnit;
+							const meterAreaUnit = state.meters.byMeterID[meterID].areaUnit;
+							if(graphAreaUnit != meterAreaUnit) {
+								meterArea *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
+							}
+						}
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.
@@ -185,7 +192,15 @@ function mapStateToProps(state: State) {
 					if(groupArea === undefined) {
 						groupArea = 0;
 					}
-					if (!state.graph.areaNormalization || groupArea > 0) {
+					if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
+						if(state.graph.areaNormalization) {
+							// convert the meter area into the proper unit, if needed
+							const graphAreaUnit = state.graph.selectedAreaUnit;
+							const groupAreaUnit = state.groups.byGroupID[groupID].areaUnit;
+							if(graphAreaUnit != groupAreaUnit) {
+								groupArea *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
+							}
+						}
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.

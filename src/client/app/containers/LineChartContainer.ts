@@ -4,13 +4,15 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { connect } from 'react-redux';
-import getGraphColor from '../utils/getGraphColor';
-import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
-import Locales from '../types/locales';
+import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';
+import Locales from '../types/locales';
+import { State } from '../types/redux/state';
+import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
+import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -35,10 +37,7 @@ function mapStateToProps(state: State) {
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 			if(state.graph.areaNormalization) {
-				const selectAreaUnitState = state.units.units[state.graph.selectedAreaUnit];
-				if (selectAreaUnitState !== undefined) {
-					unitLabel += ' / ' + selectAreaUnitState.identifier;
-				}
+				unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
 			}
 		}
 		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
@@ -49,9 +48,17 @@ function mapStateToProps(state: State) {
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
 		if (byMeterID !== undefined) {
-			const meterArea = state.meters.byMeterID[meterID].area;
+			let meterArea = state.meters.byMeterID[meterID].area;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
-			if (!state.graph.areaNormalization || meterArea > 0) {
+			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
+				if(state.graph.areaNormalization) {
+					// convert the meter area into the proper unit, if needed
+					const graphAreaUnit = state.graph.selectedAreaUnit;
+					const meterAreaUnit = state.meters.byMeterID[meterID].areaUnit;
+					if(graphAreaUnit != meterAreaUnit) {
+						meterArea *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
+					}
+				}
 				const readingsData = byMeterID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.meters.byMeterID[meterID].identifier;
@@ -138,11 +145,15 @@ function mapStateToProps(state: State) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
 		if (byGroupID !== undefined) {
 			let groupArea = state.groups.byGroupID[groupID].area;
-			// TODO Consider changing group area to always be defined
-			if(groupArea === undefined) {
-				groupArea = 0;
-			}
-			if (!state.graph.areaNormalization || groupArea > 0) {
+			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
+				if(state.graph.areaNormalization) {
+					// convert the meter area into the proper unit, if needed
+					const graphAreaUnit = state.graph.selectedAreaUnit;
+					const groupAreaUnit = state.groups.byGroupID[groupID].areaUnit;
+					if(graphAreaUnit != groupAreaUnit) {
+						groupArea *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
+					}
+				}
 				const readingsData = byGroupID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.groups.byGroupID[groupID].name;
@@ -181,10 +192,6 @@ function mapStateToProps(state: State) {
 							xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
 							if(state.graph.areaNormalization) {
-								// TODO: Consider changing group area to always be defined
-								if(groupArea === undefined) {
-									groupArea = 0;
-								}
 								readingValue /= groupArea;
 							}
 							yData.push(readingValue);

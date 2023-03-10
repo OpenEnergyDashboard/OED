@@ -67,7 +67,8 @@ async function processConfigFile(configFile) {
 			undefined, // endTimestamp
 			undefined, // previousEnd
 			unitId, // unit
-			unitId // default graphic unit
+			unitId, // default graphic unit
+			undefined // area unit
 			)
 		);
 	}

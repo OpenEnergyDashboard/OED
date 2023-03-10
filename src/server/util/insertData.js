@@ -41,9 +41,7 @@ async function insertStandardUnits(conn) {
 		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
 		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
 		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['ft²', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.AREA, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['m²', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.AREA, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
 	];
 
 	await insertUnits(standardUnits, conn);
@@ -78,8 +76,7 @@ async function insertStandardConversions(conn) {
 		['MJ', 'm³ gas', true, 2.6e-2, 0, 'MJ → m^3 gas'],
 		['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
 		['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton'],
-		['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit'],
-		['ft²', 'm²', true, 0.3048, 0, 'ft² → m²']
+		['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit']
 	];
 
 	// await Conversion.insertMany(standardConversions, conn);
