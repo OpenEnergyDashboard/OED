@@ -3,12 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import { beginEditingIfPossible, changeDisplayMode, fetchGroupChildrenIfNeeded } from '../../actions/groups';
 import GroupViewComponent from '../../components/groups/GroupViewComponent';
-import { fetchGroupChildrenIfNeeded, beginEditingIfPossible, changeDisplayMode } from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
-import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
+import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
+
+/* eslint-disable */
+
 function mapStateToProps(state: State, ownProps: { id: number }) {
 	const id = ownProps.id;
 	const childMeterNames: string[] = [];

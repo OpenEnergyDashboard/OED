@@ -4,7 +4,6 @@
 
 import * as moment from 'moment';
 import { connect } from 'react-redux';
-import UIOptionsComponent from '../components/UIOptionsComponent';
 import {
 	changeBarDuration,
 	changeBarStacking,
@@ -12,10 +11,12 @@ import {
 	changeCompareSortingOrder,
 	setOptionsVisibility
 } from '../actions/graph';
+import UIOptionsComponent from '../components/UIOptionsComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	return {

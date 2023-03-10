@@ -3,21 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import {
-	updateDisplayTitle,
-	updateDefaultChartToRender,
-	toggleDefaultBarStacking,
-	updateTimeZone,
-	updateDefaultLanguage,
-	submitPreferencesIfNeeded,
-	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit
+	submitPreferencesIfNeeded, toggleDefaultBarStacking, updateDefaultChartToRender, updateDefaultFileSizeLimit,
+	updateDefaultLanguage, updateDefaultWarningFileSize, updateDisplayTitle, updateTimeZone
 } from '../../actions/admin';
-import { State } from '../../types/redux/state';
+import PreferencesComponent from '../../components/admin/PreferencesComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
+import { State } from '../../types/redux/state';
+
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	return {

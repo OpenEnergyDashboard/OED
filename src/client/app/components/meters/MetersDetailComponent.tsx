@@ -1,24 +1,28 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
-import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { State } from '../../types/redux/state';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import MeterViewComponent from './MeterViewComponent';
-import CreateMeterModalComponent from './CreateMeterModalComponent';
-import { MeterData } from 'types/redux/meters';
-import '../../styles/card-page.css';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
+import * as React from 'react';
+import { useEffect } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { useDispatch, useSelector } from 'react-redux';
+import { MeterData } from 'types/redux/meters';
+import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
+import FooterContainer from '../../containers/FooterContainer';
+import HeaderContainer from '../../containers/HeaderContainer';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import '../../styles/card-page.css';
+import { State } from '../../types/redux/state';
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import CreateMeterModalComponent from './CreateMeterModalComponent';
+import MeterViewComponent from './MeterViewComponent';
 
+/**
+ * Creates the page to view current meters
+ * @returns {Element} Meters page element
+ */
 export default function MetersDetailComponent() {
 
 	const dispatch = useDispatch();

@@ -3,16 +3,17 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectOption } from '../types/items';
 import Select from 'react-select';
-import translate from '../utils/translate';
-import { updateLineGraphRate } from '../actions/graph'
+import { updateLineGraphRate } from '../actions/graph';
+import { SelectOption } from '../types/items';
 import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import translate from '../utils/translate';
 
 /**
  * React component that controls the line graph rate menu
+ * @returns {Element} Rate selection element
  */
 export default function GraphicRateMenuComponent() {
 	const dispatch = useDispatch();

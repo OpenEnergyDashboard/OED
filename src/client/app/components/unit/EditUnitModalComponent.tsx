@@ -5,18 +5,18 @@ import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { useDispatch } from 'react-redux';
+import { Input } from 'reactstrap';
+import { submitEditedUnit } from '../../actions/units';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitEditedUnit } from '../../actions/units';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import translate from '../../utils/translate';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -25,6 +25,11 @@ interface EditUnitModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * Creates menu for editing meters
+ * @param {object} props props for component
+ * @returns {Element} Meter edit menu element
+ */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const dispatch = useDispatch();
 

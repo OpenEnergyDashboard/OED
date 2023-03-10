@@ -2,15 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { connect } from 'react-redux';
-import Plot from 'react-plotly.js';
-import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
-import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
+import Plot from 'react-plotly.js';
+import { connect } from 'react-redux';
 import { updateCurrentCartesian } from '../../actions/map';
 import store from '../../index';
+import Locales from '../../types/locales';
 import { CalibrationSettings } from '../../types/redux/map';
-import Locales from '../../types/locales'
+import { State } from '../../types/redux/state';
+import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
+
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -99,10 +101,12 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
+/* eslint-enable */
 /**
  * use a transparent heatmap to capture which point the user clicked on the map
- * @param imageDimensions {Dimensions} Normalized dimensions of the image
- * @param settings {CalibrationSettings} Settings for calibration displays
+ * @param {Dimensions} imageDimensions Normalized dimensions of the image
+ * @param {CalibrationSettings} settings Settings for calibration displays
+ * @returns {object} point and data
  */
 function createBackgroundTrace(imageDimensions: Dimensions, settings: CalibrationSettings) {
 	// define the grid of heatmap
@@ -138,6 +142,8 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	};
 	return trace;
 }
+
+/* eslint-disable */
 
 function handlePointClick(event: plotly.PlotMouseEvent) {
 	event.event.preventDefault();

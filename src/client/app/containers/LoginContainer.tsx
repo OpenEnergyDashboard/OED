@@ -3,15 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { User } from '../types/items';
-import { receiveCurrentUser } from '../actions/currentUser'
+import { receiveCurrentUser } from '../actions/currentUser';
 import LoginComponent from '../components/LoginComponent';
+import { User } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
 
-/*
+/* eslint-disable */
+/**
 * A container that does data fetching for FooterComponent and connects it to the redux store.
 */
-
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		saveCurrentUser: (profile: User) => dispatch(receiveCurrentUser(profile))

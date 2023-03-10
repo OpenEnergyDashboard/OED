@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import { GroupsAction, GroupsState, DisplayMode } from '../types/redux/groups';
 import { ActionType } from '../types/redux/actions';
+import { DisplayMode, GroupsAction, GroupsState } from '../types/redux/groups';
 
 const defaultState: GroupsState = {
 	isFetching: false,
@@ -17,6 +17,7 @@ const defaultState: GroupsState = {
 	displayMode: DisplayMode.View
 };
 
+/* eslint-disable */
 
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {

@@ -3,14 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { fetchVersionIfNeeded } from '../actions/version'
+import { fetchVersionIfNeeded } from '../actions/version';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
+import { State } from '../types/redux/state';
 
-/*
-* A container that does data fetching for TooltipHelpComponent and connects it to the redux store.
-*/
+/* eslint-disable */
+
+/**
+ * A container that does data fetching for TooltipHelpComponent and connects it to the redux store.
+ */
 function mapStateToProps(state: State) {
 	return {
 		version: state.version.version

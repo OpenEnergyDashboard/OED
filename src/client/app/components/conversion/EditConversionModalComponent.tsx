@@ -4,20 +4,20 @@
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { useDispatch } from 'react-redux';
+import { Input } from 'reactstrap';
+import { UnitDataById } from 'types/redux/units';
+import { deleteConversion, submitEditedConversion } from '../../actions/conversions';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
-import { UnitDataById } from 'types/redux/units';
-import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
+import translate from '../../utils/translate';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -30,6 +30,11 @@ interface EditConversionModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * Creates the menu to edit a conversion
+ * @param {object} props Props for the component
+ * @returns {Element} The edit menu
+ */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const dispatch = useDispatch();
 

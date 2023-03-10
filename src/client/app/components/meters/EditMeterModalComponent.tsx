@@ -3,36 +3,43 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { Input } from 'reactstrap';
 import { State } from 'types/redux/state';
-import '../../styles/modal.css';
-import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { TrueFalseType } from '../../types/items';
-import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import '../../styles/modal.css';
 import { ConversionArray } from '../../types/conversionArray';
+import { TrueFalseType } from '../../types/items';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { UnitData } from '../../types/redux/units';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
+/**
+ * Notifies user of msg.
+ * TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
+ * Note this causes the modal to close but the state is not reset.
+ * Use a function so can easily change how it works.
+ * @param {string} msg message to send
+ */
 function notifyUser(msg: string) {
 	window.alert(msg);
 }
 
-// get string value from GPSPoint or null.
+/**
+ * Get string value from GPSPoint or null.
+ * @param {GPSPoint | null} gps value to evaluate
+ * @returns {string} passed value converted to string
+ */
 function getGPSString(gps: GPSPoint | null) {
 	if (gps === null) {
 		//  if gps is null return empty string value
@@ -50,9 +57,13 @@ function getGPSString(gps: GPSPoint | null) {
 	}
 }
 
-// Checks if the input is null and returns empty string if that is the case. Otherwise return input.
-// This is needed because React does not want values to be of type null for display and null is the
-// state for some of the meter values. This only should change what is displayed and not the state or props.
+/**
+ * Checks if the input is null and returns empty string if that is the case. Otherwise return input.
+ * This is needed because React does not want values to be of type null for display and null is the
+ * state for some of the meter values. This only should change what is displayed and not the state or props.
+ * @param {any} item to check if null
+ * @returns {string | any} empty string if null, else whatever was passed in
+ */
 function nullToEmptyString(item: any) {
 	if (item === null) {
 		return '';
@@ -69,7 +80,11 @@ interface EditMeterModalComponentProps {
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
-
+/**
+ * Creates the meter edit menu
+ * @param {object} props for the edit component
+ * @returns {Element} Edit meter menu
+ */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const dispatch = useDispatch();
 

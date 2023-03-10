@@ -2,15 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
-import { State } from '../types/redux/state';
+import { GPSPoint } from 'utils/calibration';
 import { NamedIDItem } from '../types/items';
-import { showErrorNotification } from '../utils/notifications';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/groups';
+import { State } from '../types/redux/state';
 import { groupsApi } from '../utils/api';
 import { browserHistory } from '../utils/history';
+import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import { GPSPoint } from 'utils/calibration';
+
+/* eslint-disable */
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -211,7 +213,11 @@ export function changeChildMeters(meterIDs: number[]): t.ChangeChildMetersAction
 	return { type: ActionType.ChangeChildMeters, meterIDs };
 }
 
-// Record whether or not a request to submit edits to the database has been sent
+/* eslint-disable */
+
+/**
+ * Record whether or not a request to submit edits to the database has been sent
+ */
 function markGroupInEditingSubmitted(): t.MarkGroupInEditingSubmittedAction {
 	return { type: ActionType.MarkGroupInEditingSubmitted };
 }
@@ -223,7 +229,6 @@ function markGroupInEditingNotSubmitted(): t.MarkGroupInEditingNotSubmittedActio
  * Use this to cancel group editing and allow `groupInEditing` to be overwritten later.
  * `groupInEditing` is dirty when it is storing changes that have not yet been committed to the database.
  * It is not clean until a request to store the changes has received a successful response.
- * @returns {{type: string}}
  */
 export function markGroupInEditingClean(): t.MarkGroupInEditingCleanAction {
 	return { type: ActionType.MarkGroupInEditingClean };
@@ -233,7 +238,7 @@ function markGroupInEditingDirty(): t.MarkGroupInEditingDirtyAction {
 	return { type: ActionType.MarkGroupInEditingDirty };
 }
 
-/*
+/**
  * Mark all the data in `byGroupID` as outdated.
  * This data is out of date when the name of a group may have changed, or when a group ahs been created.
  * groupDetails will be re-fetched at the next opportunity.

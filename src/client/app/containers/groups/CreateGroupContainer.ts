@@ -4,15 +4,17 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
-import { createNewBlankGroup, editGroupName, editGroupGPS,
-	editGroupDisplayable, editGroupNote, editGroupArea, submitGroupInEditingIfNeeded,
-	changeDisplayMode } from '../../actions/groups';
-import { Dispatch } from '../../types/redux/actions';
-import { State } from '../../types/redux/state';
-import { NamedIDItem } from '../../types/items';
-import { DisplayMode } from '../../types/redux/groups';
 import { GPSPoint } from 'utils/calibration';
+import {
+	changeDisplayMode, createNewBlankGroup, editGroupArea, editGroupDisplayable, editGroupGPS, editGroupName, editGroupNote, submitGroupInEditingIfNeeded
+} from '../../actions/groups';
+import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
+import { NamedIDItem } from '../../types/items';
+import { Dispatch } from '../../types/redux/actions';
+import { DisplayMode } from '../../types/redux/groups';
+import { State } from '../../types/redux/state';
+
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	const sortedMeters: NamedIDItem[] = _.sortBy(_.values(state.meters.byMeterID).map(

@@ -4,19 +4,22 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { connect } from 'react-redux';
-import getGraphColor from '../utils/getGraphColor';
-import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
-import Locales from '../types/locales';
+import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';
+import Locales from '../types/locales';
+import { State } from '../types/redux/state';
+import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
 
-/* Passes the current redux state of the barchart, and turns it into props for the React
-*  component, which is what will be visible on the page. Makes it possible to access
-*  your reducer state objects from within your React components.
-*
-*  Returns the props object. */
+/* eslint-disable */
+/** 
+ * Passes the current redux state of the barchart, and turns it into props for the React
+ * component, which is what will be visible on the page. Makes it possible to access
+ * your reducer state objects from within your React components.
+ *
+ * Returns the props object.
+ */
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const barDuration = state.graph.barDuration;

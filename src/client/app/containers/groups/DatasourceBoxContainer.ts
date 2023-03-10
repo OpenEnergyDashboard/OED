@@ -4,8 +4,8 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
+import { changeChildGroups, changeChildMeters, changeSelectedChildGroupsOfGroup, changeSelectedChildMetersOfGroup } from '../../actions/groups';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
-import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
 import { NamedIDItem } from '../../types/items';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
@@ -25,6 +25,7 @@ interface DatasourceBoxContainerProps {
 	selectDatasource?: (meterIDs: number[]) => void;
 }
 
+/* eslint-disable */
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
 // if ownProps.selection is 'custom', ownProps must have both a 'datasource' and 'selectDatasource' prop (and optional selectedOptions prop)

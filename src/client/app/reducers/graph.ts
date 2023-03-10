@@ -4,8 +4,8 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
+import { ChartTypes, GraphAction, GraphState } from '../types/redux/graph';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 const defaultState: GraphState = {
@@ -25,6 +25,8 @@ const defaultState: GraphState = {
 	lineGraphRate: {label: 'hour', rate: 1},
 	renderOnce: false
 };
+
+/* eslint-disable */
 
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {

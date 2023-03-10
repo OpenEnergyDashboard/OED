@@ -3,17 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import LanguageSelectorComponent from '../components/LanguageSelectorComponent';
-import { State } from '../types/redux/state';
-import { Dispatch } from '../types/redux/actions';
 import { updateDefaultLanguage } from '../actions/admin';
+import LanguageSelectorComponent from '../components/LanguageSelectorComponent';
+import { Dispatch } from '../types/redux/actions';
 import { LanguageTypes } from '../types/redux/i18n';
+import { State } from '../types/redux/state';
 
-
-/*
-*  Passes the current redux state of the language selection, and turns it into props for the React
-*  component, which is what will be visible on the page. Makes it possible to access
-*  your reducer state objects from within your React components.
+/* eslint-disable */
+/**
+* Passes the current redux state of the language selection, and turns it into props for the React
+* component, which is what will be visible on the page. Makes it possible to access
+* your reducer state objects from within your React components.
 */
 function mapStateToProps(state: State) {
 	return {

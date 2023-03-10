@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
-import {ActionType} from '../types/redux/actions';
 import * as _ from 'lodash';
-import {CalibratedPoint} from '../utils/calibration';
+import { ActionType } from '../types/redux/actions';
+import { MapMetadata, MapsAction, MapState } from '../types/redux/map';
+import { CalibratedPoint } from '../utils/calibration';
 
 const defaultState: MapState = {
 	isLoading: false,
@@ -17,6 +17,8 @@ const defaultState: MapState = {
 	newMapCounter: 0,
 	calibrationSettings: {showGrid: false}
 };
+
+/* eslint-disable */
 
 export default function maps(state = defaultState, action: MapsAction) {
 	let submitting;

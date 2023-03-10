@@ -2,26 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
-import { Button } from 'reactstrap';
 import * as _ from 'lodash';
-import graphExport, { downloadRawCSV } from '../utils/exportData';
+import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { metersApi } from '../utils/api'
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
-import { hasToken } from '../utils/token';
-import { usersApi } from '../utils/api'
+import { Button } from 'reactstrap';
 import { UserRole } from '../types/items';
-import translate from '../utils/translate';
-import { ChartTypes } from '../types/redux/graph';
-import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
 import { ConversionData } from '../types/redux/conversions';
+import { ChartTypes } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import { metersApi, usersApi } from '../utils/api';
+import graphExport, { downloadRawCSV } from '../utils/exportData';
+import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
+import { hasToken } from '../utils/token';
+import translate from '../utils/translate';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
- * @returns HTML for export buttons
+ * @returns {Element} HTML for export buttons
  */
 export default function ExportComponent() {
 	// Meters state

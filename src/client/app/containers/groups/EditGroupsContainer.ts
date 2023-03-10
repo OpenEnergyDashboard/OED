@@ -4,20 +4,19 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
-import {
-	submitGroupInEditingIfNeeded,
-	editGroupName, editGroupGPS, editGroupDisplayable, editGroupNote, editGroupArea,
-	changeChildMeters,
-	changeChildGroups,
-	changeDisplayMode,
-	deleteGroup
-} from '../../actions/groups';
-import { GroupDefinition, DisplayMode } from '../../types/redux/groups';
-import { Dispatch } from '../../types/redux/actions';
-import { State } from '../../types/redux/state';
-import {  browserHistory } from '../../utils/history';
 import { GPSPoint } from 'utils/calibration';
+import {
+	changeChildGroups, changeChildMeters, changeDisplayMode,
+	deleteGroup, editGroupArea, editGroupDisplayable, editGroupGPS, editGroupName,
+	editGroupNote, submitGroupInEditingIfNeeded
+} from '../../actions/groups';
+import EditGroupsComponent from '../../components/groups/EditGroupsComponent';
+import { Dispatch } from '../../types/redux/actions';
+import { DisplayMode, GroupDefinition } from '../../types/redux/groups';
+import { State } from '../../types/redux/state';
+import { browserHistory } from '../../utils/history';
+
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');

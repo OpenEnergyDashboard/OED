@@ -2,27 +2,31 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as _ from 'lodash';
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
-import { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
+import { useDispatch } from 'react-redux';
+import { Input } from 'reactstrap';
+import { ConversionData } from 'types/redux/conversions';
+import { UnitDataById } from 'types/redux/units';
+import { addConversion } from '../../actions/conversions';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
+import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { addConversion } from '../../actions/conversions';
-import { UnitDataById } from 'types/redux/units';
-import { ConversionData } from 'types/redux/conversions';
-import * as _ from 'lodash';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
 	unitsState: UnitDataById;
 }
-
+/**
+ * Creates the conversion creation menu
+ * @param {object} props Props for the component
+ * @returns {Element} Conversion element
+ */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
 	const dispatch = useDispatch();

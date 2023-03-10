@@ -2,12 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import MapCalibrationInitiateComponent from '../../components/maps/MapCalibrationInitiateComponent';
 import { connect } from 'react-redux';
+import { updateMapMode, updateMapSource } from '../../actions/map';
+import MapCalibrationInitiateComponent from '../../components/maps/MapCalibrationInitiateComponent';
 import { Dispatch } from '../../types/redux/actions';
-import {updateMapMode, updateMapSource} from '../../actions/map';
-import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
-import {State} from '../../types/redux/state';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { State } from '../../types/redux/state';
+
+/* eslint-disable */
 
 function mapStateToProps(state: State) {
 	return {

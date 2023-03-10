@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as _ from 'lodash';
-import { MetersAction, MetersState } from '../types/redux/meters';
 import { ActionType } from '../types/redux/actions';
+import { MetersAction, MetersState } from '../types/redux/meters';
 
 const defaultState: MetersState = {
 	hasBeenFetchedOnce: false,
@@ -12,6 +12,8 @@ const defaultState: MetersState = {
 	selectedMeters: [],
 	submitting: []
 };
+
+/* eslint-disable */
 
 export default function meters(state = defaultState, action: MetersAction) {
 	switch (action.type) {

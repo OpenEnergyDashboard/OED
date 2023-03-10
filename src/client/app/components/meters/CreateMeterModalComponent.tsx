@@ -2,30 +2,33 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState, useEffect } from 'react';
+import { Input } from 'reactstrap';
 import { State } from 'types/redux/state';
-import '../../styles/modal.css';
-import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { addMeter } from '../../actions/meters';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { TrueFalseType } from '../../types/items';
-import TimeZoneSelect from '../TimeZoneSelect';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import { UnitData } from '../../types/redux/units';
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import '../../styles/modal.css';
 import { ConversionArray } from '../../types/conversionArray';
+import { TrueFalseType } from '../../types/items';
+import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { UnitData } from '../../types/redux/units';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
+/**
+ * Notifies user of msg.
+ * TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
+ * Note this causes the modal to close but the state is not reset.
+ * Use a function so can easily change how it works.
+ * @param {string} msg message to send
+ */
 function notifyUser(msg: string) {
 	window.alert(msg);
 }
@@ -37,6 +40,11 @@ interface CreateMeterModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Component to create the meter creation menu
+ * @param {object} props Component props
+ * @returns {Element} JSX of the create meter page
+ */
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 
 	const dispatch = useDispatch();

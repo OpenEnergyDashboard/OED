@@ -3,15 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { browserHistory } from '../utils/history';
-import { injectIntl, defineMessages, FormattedMessage, WrappedComponentProps } from 'react-intl';
-import { Input, Button, InputGroup, Form } from 'reactstrap';
-import HeaderContainer from '../containers/HeaderContainer';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import { Button, Form, Input, InputGroup } from 'reactstrap';
 import FooterContainer from '../containers/FooterContainer';
-import { showErrorNotification } from '../utils/notifications';
-import { verificationApi } from '../utils/api';
-import translate from '../utils/translate';
+import HeaderContainer from '../containers/HeaderContainer';
 import { User } from '../types/items';
+import { verificationApi } from '../utils/api';
+import { browserHistory } from '../utils/history';
+import { showErrorNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 
 interface LoginState {
 	email: string;
@@ -37,7 +37,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	}
 
 	/**
-	 * @returns JSX to create the login panel
+	 * @returns {Element} JSX to create the login panel
 	 */
 	public render() {
 		const formStyle = {
@@ -89,6 +89,8 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 			</div>
 		);
 	}
+
+	/* eslint-disable jsdoc/require-param-type */
 
 	/**
 	 * Sets the email state whenever the user changes the email input field

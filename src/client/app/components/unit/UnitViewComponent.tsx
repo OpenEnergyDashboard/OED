@@ -5,16 +5,18 @@
 import * as React from 'react';
 //Realize that * is already imported from react
 import { useState } from 'react';
-import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import EditUnitModalComponent from './EditUnitModalComponent';
-import '../../styles/card-page.css';
+import { Button } from 'reactstrap';
 import { UnitData } from 'types/redux/units';
+import '../../styles/card-page.css';
 import translate from '../../utils/translate';
+import EditUnitModalComponent from './EditUnitModalComponent';
 
 interface UnitViewComponentProps {
 	unit: UnitData;
 }
+
+/* eslint-disable */
 
 export default function UnitViewComponent(props: UnitViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.

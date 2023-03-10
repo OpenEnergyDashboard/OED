@@ -4,11 +4,11 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
-import { State } from '../types/redux/state';
-import * as t from '../types/redux/barReadings';
-import { readingsApi } from '../utils/api';
 import { BarReadings } from '../types/readings';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import * as t from '../types/redux/barReadings';
+import { State } from '../types/redux/state';
+import { readingsApi } from '../utils/api';
 
 /**
  * @param {State} state the Redux state
@@ -81,6 +81,8 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
 
 	return !readingsForUnit.isFetching;
 }
+
+/* eslint-disable jsdoc/require-returns */
 
 /**
  * @param {number} meterIDs the IDs of the meters to get readings

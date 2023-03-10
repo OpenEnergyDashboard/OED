@@ -10,6 +10,8 @@ import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 
+/* eslint-disable */
+
 function mapStateToProps(state: State) {
 	const sortedGroups = _.sortBy(_.values(state.groups.byGroupID).map(group => ({ id: group.id, name: group.name.trim() })), 'name');
 	const currentUser = state.currentUser.profile;

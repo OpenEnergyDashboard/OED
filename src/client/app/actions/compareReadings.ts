@@ -4,12 +4,12 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
-import { State } from '../types/redux/state';
 import { CompareReadings } from '../types/readings';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/compareReadings';
-import { metersApi, groupsApi } from '../utils/api';
-import { ComparePeriod, calculateCompareShift } from '../utils/calculateCompare';
+import { State } from '../types/redux/state';
+import { groupsApi, metersApi } from '../utils/api';
+import { calculateCompareShift, ComparePeriod } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state
@@ -72,6 +72,8 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
 
 	return !readingsForUnit.isFetching;
 }
+
+/* eslint-disable jsdoc/require-returns */
 
 /**
  * @param {number} meterIDs the IDs of the meters to get readings

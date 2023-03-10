@@ -2,12 +2,14 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 import { updateCikAndDBViewsIfNeeded } from './admin';
+
+/* eslint-disable */
 
 export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
 	return { type: ActionType.RequestConversionsDetails };
@@ -39,7 +41,9 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 	return { type: ActionType.ChangeDisplayedConversions, selectedConversions: conversions };
 }
 
-// Pushes ConversionData onto submitting conversions state array
+/**
+ * Pushes ConversionData onto submitting conversions state array
+ */
 export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
 	return { type: ActionType.SubmitEditedConversion, conversionData};
 }
@@ -48,7 +52,9 @@ export function confirmConversionEdits(editedConversion: t.ConversionData): t.Co
 	return { type: ActionType.ConfirmEditedConversion, editedConversion };
 }
 
-// Removes ConversionData from submitting state array
+/**
+ * Removes ConversionData from submitting state array
+ */
 export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
 	return {type: ActionType.DeleteSubmittedConversion, conversionData}
 }
@@ -57,12 +63,16 @@ export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnce
 	return { type: ActionType.ConfirmConversionsFetchedOnce };
 }
 
-// Removes the passed ConversionData from the store
+/**
+ * Removes the passed ConversionData from the store
+ */
 export function confirmDeletedConversion(conversionData: t.ConversionData): t.DeleteConversionAction {
 	return { type: ActionType.DeleteConversion, conversionData }
 }
 
-// Fetch the conversions details from the database if they have not already been fetched once
+/**
+ * Fetch the conversions details from the database if they have not already been fetched once
+ */
 export function fetchConversionsDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		// If conversions have not been fetched once, return the fetchConversionDetails function

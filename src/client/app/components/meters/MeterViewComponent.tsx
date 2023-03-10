@@ -2,18 +2,18 @@
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Button } from 'reactstrap';
-import { State } from 'types/redux/state';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import EditMeterModalComponent from './EditMeterModalComponent';
-import { MeterData } from 'types/redux/meters';
-import translate from '../../utils/translate';
 import { FormattedMessage } from 'react-intl';
-import { isRoleAdmin } from '../../utils/hasPermissions';
+import { useSelector } from 'react-redux';
+import { Button } from 'reactstrap';
 import { CurrentUserState } from 'types/redux/currentUser';
+import { MeterData } from 'types/redux/meters';
+import { State } from 'types/redux/state';
 import '../../styles/card-page.css';
-import { UnitData} from '../../types/redux/units';
+import { UnitData } from '../../types/redux/units';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import EditMeterModalComponent from './EditMeterModalComponent';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -24,6 +24,11 @@ interface MeterViewComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Creates the meter info bubble shown on meters page
+ * @param {object} props component props
+ * @returns {Element} Meter info card
+ */
 export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);

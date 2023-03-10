@@ -2,13 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
 import { connect } from 'react-redux';
+import { TimeInterval } from '../../../common/TimeInterval';
 import MultiCompareChartComponent from '../components/MultiCompareChartComponent';
+import { CompareReadingsData } from '../types/redux/compareReadings';
 import { State } from '../types/redux/state';
 import { calculateCompareShift, SortingOrder } from '../utils/calculateCompare';
-import { CompareReadingsData } from '../types/redux/compareReadings';
-import { TimeInterval } from '../../../common/TimeInterval';
-import * as moment from 'moment';
+
+/* eslint-disable */
 
 export interface CompareEntity {
 	id: number;

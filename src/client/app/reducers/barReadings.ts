@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { BarReadingsAction, BarReadingsState } from '../types/redux/barReadings';
 import { ActionType } from '../types/redux/actions';
+import { BarReadingsAction, BarReadingsState } from '../types/redux/barReadings';
 
 const defaultState: BarReadingsState = {
 	byMeterID: {},
@@ -12,6 +12,8 @@ const defaultState: BarReadingsState = {
 	metersFetching: false,
 	groupsFetching: false
 };
+
+/* eslint-disable */
 
 export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {

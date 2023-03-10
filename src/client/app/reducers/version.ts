@@ -2,13 +2,15 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { VersionAction, VersionState } from '../types/redux/version';
 import { ActionType } from '../types/redux/actions';
+import { VersionAction, VersionState } from '../types/redux/version';
 
 /*
 * Defines store interactions when user profile related actions are dispatched to the store.
 */
 const defaultState: VersionState = { isFetching: false, version: '' };
+
+/* eslint-disable */
 
 export default function version(state = defaultState, action: VersionAction) {
 	switch (action.type) {

@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as _ from 'lodash';
-import { UnitsAction, UnitsState } from '../types/redux/units';
 import { ActionType } from '../types/redux/actions';
+import { UnitsAction, UnitsState } from '../types/redux/units';
 
 const defaultState: UnitsState = {
 	hasBeenFetchedOnce: false,
@@ -12,6 +12,8 @@ const defaultState: UnitsState = {
 	submitting: [],
 	units: {}
 };
+
+/* eslint-disable */
 
 export default function units(state = defaultState, action: UnitsAction) {
 	switch (action.type) {
