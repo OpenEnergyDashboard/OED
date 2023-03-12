@@ -18,6 +18,7 @@ import { potentialGraphicUnits } from '../../utils/input';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
+import * as _ from 'lodash';
 
 export default function GroupsDetailComponent() {
 	// TODO The route stops you from getting to this page if not an admin.
@@ -35,6 +36,18 @@ export default function GroupsDetailComponent() {
 	// Check for admin status
 	const currentUser = currentUserState.profile;
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
+	// We only want displayable groups if non-admins because they still have
+	// non-displayable in state.
+	let visibleGroups;
+	if (loggedInAsAdmin) {
+		visibleGroups = groupsState;
+	} else {
+		visibleGroups = _.filter(groupsState, (group: GroupDefinition) => {
+			return group.displayable === true
+		});
+	}
+
 	// Units state
 	const units = useSelector((state: State) => state.units.units);
 	// Units state loaded status
@@ -96,7 +109,7 @@ export default function GroupsDetailComponent() {
 					{groupsAllChildrenLoaded && groupsStateLoaded && unitsStateLoaded && metersStateLoaded &&
 						<div className="card-container">
 							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
-							{Object.values(groupsState)
+							{Object.values(visibleGroups)
 								.sort((groupA: GroupDefinition, groupB: GroupDefinition) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
 									((groupB.name.toLowerCase() > groupA.name.toLowerCase()) ? -1 : 0))
 								.map(groupData => (<GroupViewComponent

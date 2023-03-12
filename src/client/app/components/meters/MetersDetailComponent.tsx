@@ -42,7 +42,7 @@ export default function MetersDetailComponent() {
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	let visibleMeters
+	let visibleMeters;
 	if (loggedInAsAdmin) {
 		visibleMeters = MetersState;
 	} else {
