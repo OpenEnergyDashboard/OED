@@ -117,12 +117,17 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Similar but for the groups.
 		hasHidden = false;
 		Object.values(originalGroupState.childGroups).forEach(group => {
-			const groupName = groupsState[group].name;
 			// The name is null if the group is not visible to this user.
-			if (groupName === null) {
-				hasHidden = true;
+			// TODO The following line should work but does not (it does for meters).
+			// The Redux state has the name of hidden groups but it should not. A quick
+			// attempt to fix did not work as login/out did not clear as expected when
+			// control what is returned. This needs to be addressed.
+			// if (groupName !== null) {
+			// For now, check if the group is displayable.
+			if (groupsState[group].displayable) {
+				listedGroups.push(groupsState[group].name);
 			} else {
-				listedGroups.push(groupName);
+				hasHidden = true;
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
