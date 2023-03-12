@@ -334,12 +334,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	useEffect(() => {
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
-			// This is the current deep meters of this group including any changes.
-			const groupDeepMeter = metersInChangedGroup(state);
 			// Get meters that okay for this group in a format the component can display.
-			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
+			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, state.deepMeters);
 			// Get groups okay for this group. Similar to meters.
-			const possibleGroups = getGroupMenuOptionsForGroup(state.id, state.defaultGraphicUnit, groupDeepMeter);
+			const possibleGroups = getGroupMenuOptionsForGroup(state.id, state.defaultGraphicUnit, state.deepMeters);
 
 			// Information to display all (deep) children meters.
 			// Holds the names of all (deep) meter children of this group when visible to this user.
