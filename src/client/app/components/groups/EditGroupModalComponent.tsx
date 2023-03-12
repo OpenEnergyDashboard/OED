@@ -318,6 +318,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				}
 			}
 
+			// Do not allow groups without any child meters and groups. From a practical standpoint, this
+			// means there are no deep children.
+			if (state.deepMeters?.length === 0) {
+				notifyUser(translate('group.children.error'));
+				inputOk = false;
+			}
+
 			if (inputOk) {
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
@@ -344,16 +351,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			const identifierDeepMeters: string[] = [];
 			// Because deepMeters is optional in state, TS is worried it may not exist. It should always be set
 			// at this point but if stops the error.
-			if (state.deepMeters) {
-				state.deepMeters.forEach((meterID: number) => {
-					// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-					if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-						identifierDeepMeters.push(metersState[meterID].identifier.trim());
-					}
-				});
-				// We want to display in alphabetical order.
-				identifierDeepMeters.sort();
-			}
+			state.deepMeters?.forEach((meterID: number) => {
+				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
+				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
+					identifierDeepMeters.push(metersState[meterID].identifier.trim());
+				}
+			});
+			// We want to display in alphabetical order.
+			identifierDeepMeters.sort();
 			// Update the state
 			setGroupChildrenState({
 				...groupChildrenState,
