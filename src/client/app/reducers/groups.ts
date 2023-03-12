@@ -57,8 +57,11 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
-				childGroups: [],
-				childMeters: [],
+				// Sometimes OED fetches both the details and the child meters/groups as separate actions. Since the order they will happen is
+				// uncertain, we need to preserve the child meters/groups if they exist. If not, put empty so no issues when accessing in other
+				// places. Note this may be the wrong values but they should refresh quickly once all actions are done.
+				childGroups: (state.byGroupID[group.id] && state.byGroupID[group.id].childGroups) ? state.byGroupID[group.id].childGroups : [],
+				childMeters: (state.byGroupID[group.id] && state.byGroupID[group.id].childMeters) ? state.byGroupID[group.id].childMeters : [],
 				selectedGroups: [],
 				selectedMeters: []
 			}));

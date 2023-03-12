@@ -4,7 +4,6 @@
 
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { NamedIDItem } from '../types/items';
 import { showErrorNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
@@ -16,7 +15,7 @@ function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
 }
 
-function receiveGroupsDetails(data: NamedIDItem[]): t.ReceiveGroupsDetailsAction {
+function receiveGroupsDetails(data: t.GroupDetailsData[]): t.ReceiveGroupsDetailsAction {
 	return { type: ActionType.ReceiveGroupsDetails, data };
 }
 
@@ -43,7 +42,7 @@ export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGrou
 export function fetchGroupsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestGroupsDetails());
-		// Returns the names and IDs of all groups in the groups table.
+		// Returns the names, IDs and most info of all groups in the groups table.
 		const groupsDetails = await groupsApi.details();
 		dispatch(receiveGroupsDetails(groupsDetails));
 		// If this is the first fetch, inform the store that the first fetch has been made
@@ -190,10 +189,17 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 			const groupNoDeep = { ...group };
 			delete groupNoDeep.deepMeters;
 			await groupsApi.edit(groupNoDeep);
-			// Update the store with our new edits where need deep meters included.
-			dispatch(confirmGroupEdits(group));
+			// See deleteGroup action for full description but we reload the window
+			// to avoid issues with change from one group impacting another.
+			// Update the store for all groups.
+			// TODO We should limit this to the times it is needed and not all group edits.
+			window.location.reload();
+			// If we did not reload then we need to refresh the edited group's state with:
+			// dispatch(confirmGroupEdits(group));
+			// An then we need to fix up any other groups impacted.
+			// This is removed since you won't see it.
 			// Success!
-			showSuccessNotification(translate('group.successfully.edited.group'));
+			// showSuccessNotification(translate('group.successfully.edited.group'));
 		} catch (e) {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
@@ -204,21 +210,21 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 	};
 }
 
-// TODO see if can remove this since not yet used but still need to be able to delete a group.
-// export function deleteGroup(): Thunk {
-// 	return async (dispatch: Dispatch, getState: GetState) => {
-// 		const groupInEditing = getState().groups.groupInEditing as t.GroupDefinition;
-// 		if (groupInEditing === undefined) {
-// 			throw new Error('Unacceptable condition: state.groups.groupInEditing has no data.');
-// 		}
-// 		try {
-// 			await groupsApi.delete(groupInEditing.id);
-// 			dispatch(changeDisplayedGroups([]));
-// 			dispatch((dispatch2: Dispatch) => {
-// 				browserHistory.push('/groups');
-// 			});
-// 		} catch (e) {
-// 			showErrorNotification(translate('failed.to.delete.group'));
-// 		}
-// 	};
-// }
+export function deleteGroup(group: t.GroupEditData): Thunk {
+	return async (dispatch: Dispatch) => {
+		try {
+			await groupsApi.delete(group.id);
+			// We need to remove this group from Redux state. Also, other groups
+			// can be changed if they included this group. It should only impact
+			// the immediate group children and the deep meters. If any of these
+			// groups are being graphed then their readings, etc. need to be updated.
+			// Given this isn't done very often and only by an admin, the code 
+			// reloads the browser so the state is fixed and any graphing is removed.
+			// We could just fix the state but that is more complex and the code was
+			// having issues redoing the useEffect for edit in this case.
+			window.location.reload();
+		} catch (e) {
+			showErrorNotification(translate('failed.to.delete.group'));
+		}
+	};
+}

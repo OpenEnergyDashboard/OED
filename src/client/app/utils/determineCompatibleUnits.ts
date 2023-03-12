@@ -165,11 +165,15 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
 	changedGroupState.childGroups.forEach((group: number) => {
 		// The group state for the current child group.
 		const groupState = _.get(state.groups.byGroupID, group) as GroupDefinition;
-		// The deep meters of every group contained in the changed group are in that group.
-		// The set does not allow duplicates so no issue there.
-		groupState.deepMeters.forEach((meter: number) => {
-			deepMeters.add(meter);
-		});
+		// The group state might not be defined, e.g., a group delete happened and the state is refreshing.
+		// In this case the deepMeters returned will be off but they should quickly refresh.
+		if (groupState) {
+			// The deep meters of every group contained in the changed group are in that group.
+			// The set does not allow duplicates so no issue there.
+			groupState.deepMeters.forEach((meter: number) => {
+				deepMeters.add(meter);
+			});
+		}
 	});
 	// Convert set to array.
 	return Array.from(deepMeters);

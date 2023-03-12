@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType } from './actions';
-import { NamedIDItem } from '../items';
 import { GPSPoint } from 'utils/calibration';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
@@ -29,7 +28,7 @@ export interface RequestGroupsDetailsAction {
 
 export interface ReceiveGroupsDetailsAction {
 	type: ActionType.ReceiveGroupsDetails;
-	data: NamedIDItem[];
+	data: GroupDetailsData[];
 }
 
 export interface RequestGroupChildrenAction {
@@ -105,6 +104,21 @@ export interface GroupEditData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
+	// This is optional since it is in Redux state and used during group editing but not sent in route.
+	deepMeters?: number[];
+	gps: GPSPoint | null;
+	displayable: boolean;
+	note?: string;
+	// TODO with area? you get a TS error but without it lets null through (see web console).
+	area: number;
+	defaultGraphicUnit: number;
+}
+
+// TODO This is similar to GroupEditData but without the children. Should be able to
+// fuse and clean up.
+export interface GroupDetailsData {
+	id: number,
+	name: string;
 	// This is optional since it is in Redux state and used during group editing but not sent in route.
 	deepMeters?: number[];
 	gps: GPSPoint | null;

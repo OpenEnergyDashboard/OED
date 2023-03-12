@@ -63,7 +63,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		meterSelectedSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown and initially empty.
 		groupSelectOptions: [] as SelectOption[],
-		// Groups that have been selected for this group and intiially empty.
+		// Groups that have been selected for this group and initially empty.
 		groupSelectedSelectOptions: [] as SelectOption[],
 		// The identifiers of all meter children (deep meters) that are visible to this user.
 		deepMetersIdentifier: [] as string[]
@@ -108,9 +108,11 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	};
 	const handleShow = () => setShowModal(true);
 
-	// Reset the state to default values
+	// Reset the state to default value so each time starts from scratch.
 	const resetState = () => {
 		setState(defaultValues);
+		setGroupChildrenState(groupChildrenDefaults);
+		setGraphicUnitsState(graphicUnitsStateDefaults);
 	}
 
 	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is

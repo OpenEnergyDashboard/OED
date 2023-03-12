@@ -20,7 +20,7 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import '../../styles/modal.css';
 import '../../styles/card-page.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitGroupEdits } from '../../actions/groups';
+import { deleteGroup, submitGroupEdits } from '../../actions/groups';
 import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
@@ -31,11 +31,14 @@ import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { GroupEditData } from 'types/redux/groups';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 
 interface EditGroupModalComponentProps {
 	show: boolean;
 	groupId: number;
 	possibleGraphicUnits: Set<UnitData>;
+	// passed in to handle opening the modal
+	handleShow: () => void;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -204,6 +207,34 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
 
+	/* Confirm Delete Modal */
+	// Separate from state comment to keep everything related to the warning confirmation modal together
+	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+	const deleteConfirmationMessage = translate('group.delete.group') + ' \"' + originalGroupState.name + '\"?';
+	const deleteConfirmText = translate('group.delete.group');
+	const deleteRejectText = translate('cancel');
+	// The first two handle functions below are required because only one Modal can be open at a time (properly)
+	const handleDeleteConfirmationModalClose = () => {
+		// Hide the warning modal
+		setShowDeleteConfirmationModal(false);
+		// Show the edit modal
+		handleShow();
+	}
+	const handleDeleteConfirmationModalOpen = () => {
+		// Hide the edit modal
+		handleClose();
+		// Show the warning modal
+		setShowDeleteConfirmationModal(true);
+	}
+	const handleDeleteGroup = () => {
+		// Closes the warning modal
+		// Do not call the handler function because we do not want to open the parent modal
+		setShowDeleteConfirmationModal(false);
+		// Delete the group using the state object where only really need id.
+		dispatch(deleteGroup(state as GroupEditData));
+	}
+	/* End Confirm Delete Modal */
+
 	// Reset the state to default values
 	// To be used for the discard changes button
 	// Different use case from CreateGroupModalComponent's resetState
@@ -213,6 +244,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		setState(values);
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
+	}
+
+	const handleShow = () => {
+		props.handleShow();
 	}
 
 	// Note this differs from the props.handleClose(). This is only called when the user
@@ -381,6 +416,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	return (
 		<>
+			<ConfirmActionModalComponent
+				show={showDeleteConfirmationModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleDeleteConfirmationModalClose}
+				actionFunction={handleDeleteGroup}
+				actionConfirmText={deleteConfirmText}
+				actionRejectText={deleteRejectText} />
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
@@ -562,8 +604,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				<Modal.Footer>
 					{/* Discard & save buttons if admin and close button if not. */}
 					{loggedInAsAdmin ?
-						// Hides the modal
 						<div>
+							{/* TODO this should warn admin if group in another group */}
+							<Button variant="danger" onClick={handleDeleteConfirmationModalOpen}>
+								<FormattedMessage id="group.delete.group" />
+							</Button>
+							{/* Hides the modal */}
 							<Button variant="secondary" onClick={handleClose}>
 								<FormattedMessage id="discard.changes" />
 							</Button>

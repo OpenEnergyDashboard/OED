@@ -7,9 +7,8 @@
 import ApiBackend from './ApiBackend';
 import * as moment from 'moment';
 import { CompareReadings } from '../../types/readings';
-import { NamedIDItem } from '../../types/items';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { GroupChildren, GroupData, GroupEditData } from '../../types/redux/groups';
+import { GroupChildren, GroupData, GroupDetailsData, GroupEditData } from '../../types/redux/groups';
 
 export default class GroupsApi {
 	private readonly backend: ApiBackend;
@@ -18,8 +17,8 @@ export default class GroupsApi {
 		this.backend = backend;
 	}
 
-	public async details(): Promise<NamedIDItem[]> {
-		return await this.backend.doGetRequest<NamedIDItem[]>('/api/groups');
+	public async details(): Promise<GroupDetailsData[]> {
+		return await this.backend.doGetRequest<GroupDetailsData[]>('/api/groups');
 	}
 
 	public async children(groupID: number): Promise<{ meters: number[], groups: number[], deepMeters: number[] }> {
