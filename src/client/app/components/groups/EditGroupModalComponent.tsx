@@ -215,7 +215,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('group.delete.group') + ' \"' + originalGroupState.name + '\"?';
+	const deleteConfirmationMessage = translate('group.delete.group') + ' "' + originalGroupState.name + '"?';
 	const deleteConfirmText = translate('group.delete.group');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)

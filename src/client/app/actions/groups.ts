@@ -182,7 +182,11 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
 }
 
 export function submitGroupEdits(group: t.GroupEditData): Thunk {
+	// TODO This no longer does a dispatch so it may need to be reworked.
+	// For now, get to ignore eslint issue.
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	return async (dispatch: Dispatch) => {
+		/* eslint-enable @typescript-eslint/no-unused-vars */
 		try {
 			// deepMeters is part of the group state but it is not sent on edit route so remove.
 			// Need deep copy so changes don't impact original.
@@ -211,14 +215,18 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 }
 
 export function deleteGroup(group: t.GroupEditData): Thunk {
+	// TODO This no longer does a dispatch so it may need to be reworked.
+	// For now, get to ignore eslint issue.
+	/* eslint-disable @typescript-eslint/no-unused-vars */
 	return async (dispatch: Dispatch) => {
+		/* eslint-enable @typescript-eslint/no-unused-vars */
 		try {
 			await groupsApi.delete(group.id);
 			// We need to remove this group from Redux state. Also, other groups
 			// can be changed if they included this group. It should only impact
 			// the immediate group children and the deep meters. If any of these
 			// groups are being graphed then their readings, etc. need to be updated.
-			// Given this isn't done very often and only by an admin, the code 
+			// Given this isn't done very often and only by an admin, the code
 			// reloads the browser so the state is fixed and any graphing is removed.
 			// We could just fix the state but that is more complex and the code was
 			// having issues redoing the useEffect for edit in this case.
