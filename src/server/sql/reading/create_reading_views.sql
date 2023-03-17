@@ -127,7 +127,8 @@ daily_readings_unit
 									greatest(r.start_timestamp, gen.interval_start)
 					)
 			))
-		END AS reading_rate,
+		END AS reading_rate, 
+		
 		tsrange(gen.interval_start, gen.interval_start + '1 day'::INTERVAL, '()') AS time_interval
 		FROM ((readings r
 		-- This sequence of joins takes the meter id to its unit and in the final join
@@ -494,4 +495,6 @@ BEGIN
 		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
 END;
 $$ LANGUAGE 'plpgsql';
+
+
 
