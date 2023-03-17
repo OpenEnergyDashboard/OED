@@ -6,7 +6,6 @@
  * This file contains a series of functions used to generate (at some point automated - hopefully) test data.
  */
 
-const promisify = require('es6-promisify');
 const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
@@ -168,7 +167,7 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
  * The next five functions -- generateFourDayTestingData(), generateFourHourTestingData(), generateTwentyThreeMinuteTestingData(),
  * generateFifteenMinuteTestingData(), and generateOneMinuteTestingData() -- have no parameters as they generate one year of data at
  * pre-specified intervals. All have wave periods of 45 days for easy visual display.
- * 
+ *
  * Please see the documentation for 'generateSine()' under 'generateTestingData.js' for more details.
  */
 

@@ -50,7 +50,7 @@ class HeaderComponent extends React.Component<HeaderProps> {
 					</div>
 					<div className='col-4 justify-content-end' style={divRightStyle}>
 						{ this.props.optionsVisibility ?
-							<HeaderButtonsContainer showCollapsedMenuButton />
+							<HeaderButtonsContainer showCollapsedMenuButton isModal={false}/>
 							: <MenuModalComponent
 								showOptions={getPage() === ''}
 								showCollapsedMenuButton={false}
