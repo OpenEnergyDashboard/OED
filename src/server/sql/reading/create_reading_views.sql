@@ -237,7 +237,7 @@ BEGIN
 	-- Make sure the time range is withing the reading values.
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
 	requested_interval := upper(requested_range) - lower(requested_range);
-	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
+	-- holds the column index into the cik table. This is the unit that was requested for graphing.
 	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
@@ -310,7 +310,6 @@ BEGIN
 	 END IF;
 END;
 $$ LANGUAGE 'plpgsql';
-
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw readings from it.
@@ -495,3 +494,4 @@ BEGIN
 		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp;
 END;
 $$ LANGUAGE 'plpgsql';
+
