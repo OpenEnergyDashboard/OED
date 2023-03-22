@@ -99,7 +99,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 				showSuccessNotification(translate('conversion.successfully.edited.conversion'));
 			} catch (err) {
 				// Failure! ):
-				showErrorNotification(translate('conversion.failed.to.edit.conversion'));
+				showErrorNotification(translate('conversion.failed.to.edit.conversion') + '"' + err + '"');
 			}
 			// Clear conversionData object from submitting state array
 			dispatch(deleteSubmittedConversion(editedConversion));
@@ -121,7 +121,7 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 			dispatch(fetchConversionsDetails());
 			showSuccessNotification(translate('conversion.successfully.create.conversion'));
 		} catch (err) {
-			showErrorNotification(translate('conversion.failed.to.create.conversion'));
+			showErrorNotification(translate('conversion.failed.to.create.conversion') + '"' + err + '"');
 		}
 	}
 }
@@ -150,7 +150,7 @@ export function deleteConversion(conversion: t.ConversionData): Thunk {
 				dispatch(confirmDeletedConversion(conversion));
 				showSuccessNotification(translate('conversion.successfully.delete.conversion'));
 			} catch (err) {
-				showErrorNotification(translate('conversion.failed.to.delete.conversion'));
+				showErrorNotification(translate('conversion.failed.to.delete.conversion') + '"' + err + '"');
 			}
 			// Inform the store we are done working with the conversion
 			dispatch(deleteSubmittedConversion(conversion));
