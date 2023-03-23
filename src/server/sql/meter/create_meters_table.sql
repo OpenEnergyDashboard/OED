@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS meters (
     gps POINT DEFAULT NULL,
     identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
     note TEXT,
-    area REAL DEFAULT 0 NOT NULL CHECK (area >= 0),
+    area REAL NOT NULL DEFAULT 0 CHECK (area >= 0),
     cumulative BOOLEAN DEFAULT false,
     cumulative_reset BOOLEAN DEFAULT false,
     cumulative_reset_start TIME DEFAULT '00:00:00',
