@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN 
-	CREATE TYPE area_unit_type AS ENUM('feet', 'meters', 'kilometers', 'miles', 'none');
+	-- CREATE TYPE area_unit_type AS ENUM('feet', 'meters', 'kilometers', 'miles', 'none');
+	CREATE TYPE area_unit_type AS ENUM('feet', 'meters', 'none');
 EXCEPTION
 	WHEN duplicate_object THEN null;
 END $$;

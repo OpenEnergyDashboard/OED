@@ -145,11 +145,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 
 		// Check area is positive.
-		// TODO For now allow zero so works with default value and DB. We should probably
-		// make this better default than 0 (DB set to not null now).
-		// if (state.area <= 0) {
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
+			inputOk = false;
+		// If the meter has an assigned area, it must have a unit
+		} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+			notifyUser(translate('area.but.no.unit'));
 			inputOk = false;
 		}
 

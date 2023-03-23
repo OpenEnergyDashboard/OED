@@ -12,7 +12,6 @@ import { State } from '../types/redux/state';
 import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -33,12 +32,9 @@ function mapStateToProps(state: State) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate);
+			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
-			if(state.graph.areaNormalization) {
-				unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
-			}
 		}
 		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
 		needsRateScaling = needsRateScaling && (currentSelectedRate.rate != 1);

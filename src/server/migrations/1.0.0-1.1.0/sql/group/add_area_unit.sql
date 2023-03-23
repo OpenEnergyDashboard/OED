@@ -4,4 +4,5 @@
 
 -- Add default_graphic_unit to the groups table.
 ALTER TABLE groups
-    ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL;
+    ALTER COLUMN area REAL DEFAULT 0 NOT NULL CHECK (area >= 0),
+    ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL DEFAULT 'none';

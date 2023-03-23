@@ -4,4 +4,4 @@
 
 -- Add default_graphic_unit to the groups table.
 ALTER TABLE meters
-    ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL;
+    ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL DEFAULT 'none';

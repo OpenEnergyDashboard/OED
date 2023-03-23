@@ -5,7 +5,7 @@
 DO $$ BEGIN
     ALTER TABLE preferences
         ADD COLUMN default_area_normalization BOOLEAN NOT NULL DEFAULT FALSE,
-        ADD COLUMN default_area_unit area_unit_type NOT NULL;
+        ADD COLUMN default_area_unit area_unit_type NOT NULL DEFAULT 'meters';
 EXCEPTION
     WHEN duplicate_column THEN NULL;
 END $$;

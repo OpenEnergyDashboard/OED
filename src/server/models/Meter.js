@@ -294,13 +294,6 @@ class Meter {
 				log.warn(`displayable of the meter "${meter.name}" has been switched to false since there is no unitId.`);
 			}
 		}
-		// if there is area but no area unit, set displayable to false
-		if(meter.area !== 0 && meter.areaUnit == Unit.areaUnitType.NONE) {
-			if(meter.displayable === true) {
-				meter.displayable = false;
-				log.warn(`displayable of the meter "${meter.name}" has been switched to false since area is nonzero but there is no area unit.`);
-			}
-		}
 	}
 
 	/**

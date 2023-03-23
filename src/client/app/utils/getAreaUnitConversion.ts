@@ -2,23 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+//  Adding more area units is possible under the current system. Code for kilometers and miles exists as an example.
 export enum AreaUnitType {
 	feet = 'feet',
 	meters = 'meters',
-	kilometers = 'kilometers',
-	miles = 'miles',
+	// kilometers = 'kilometers',
+	// miles = 'miles',
 	none = 'none'
 }
 
 const areaUnitConversions: {[key: string]: number} = {
-	// TODO possibly make this list automatically generated
-	// from unit to unit
-	'metersfeet': 10.7639,
-	'kilometersmeters': 1000000,
-	'milesmeters': 2590000,
-	'milesfeet': 27880000,
-	'kilometersfeet': 10760000,
-	'mileskilometers': 2.58999
+	'metersfeet': 10.7639
+	// 'kilometersmeters': 1000000,
+	// 'milesmeters': 2590000,
+	// 'milesfeet': 27880000,
+	// 'kilometersfeet': 10760000,
+	// 'mileskilometers': 2.58999
 };
 
 /**

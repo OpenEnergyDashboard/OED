@@ -267,8 +267,8 @@ Unit.unitRepresentType = Object.freeze({
 Unit.areaUnitType = Object.freeze({
 	FEET: 'feet',
 	METERS: 'meters',
-	KILOMETERS: 'kilometers',
-	MILES: 'miles',
+	// KILOMETERS: 'kilometers',
+	// MILES: 'miles',
 	NONE: 'none'
 
 });

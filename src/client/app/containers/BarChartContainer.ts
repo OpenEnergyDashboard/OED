@@ -12,7 +12,6 @@ import { State } from '../types/redux/state';
 import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access
@@ -33,11 +32,7 @@ function mapStateToProps(state: State) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label.
-			unitLabel  = barUnitLabel(selectUnitState);
-			// TODO move this into the above function for compatibility with export
-			if(state.graph.areaNormalization) {
-				unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
-			}
+			unitLabel  = barUnitLabel(selectUnitState, state.graph.areaNormalization, state.graph.selectedAreaUnit);
 		}
 	}
 

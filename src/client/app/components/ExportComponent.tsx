@@ -18,6 +18,7 @@ import translate from '../utils/translate';
 import { ChartTypes } from '../types/redux/graph';
 import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
 import { ConversionData } from '../types/redux/conversions';
+import getAreaUnitConversion from '../utils/getAreaUnitConversion';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -52,16 +53,24 @@ export default function ExportComponent() {
 		if (chartName === ChartTypes.line) {
 			// Exporting a line chart
 			// Get the full y-axis unit label for a line
-			const returned = lineUnitLabel(unitsState[unitId], graphState.lineGraphRate);
+			const returned = lineUnitLabel(unitsState[unitId], graphState.lineGraphRate, graphState.areaNormalization, graphState.selectedAreaUnit);
 			const unitLabel = returned.unitLabel
-			// The selected rate for scaling
-			const scaling = graphState.lineGraphRate.rate;
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// Line readings data for this meter.
 				const byMeterID = readingsState.line.byMeterID[meterId];
 				// Make sure it exists in case state is not there yet.
 				if (byMeterID !== undefined) {
+					// The selected rate for scaling
+					let scaling = graphState.lineGraphRate.rate;
+					if(graphState.areaNormalization) {
+						// convert the meter area into the proper unit, if needed
+						const graphAreaUnit = graphState.selectedAreaUnit;
+						const meterAreaUnit = metersState[meterId].areaUnit;
+						if(graphAreaUnit != meterAreaUnit) {
+							scaling *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
+						}
+					}
 					// Get the readings for the time range and unit graphed
 					const byTimeInterval = byMeterID[timeInterval.toString()];
 					if (byTimeInterval !== undefined) {
@@ -88,6 +97,16 @@ export default function ExportComponent() {
 				const byGroupID = readingsState.line.byGroupID[groupId];
 				// Make sure it exists in case state is not there yet.
 				if (byGroupID !== undefined) {
+					// The selected rate for scaling
+					let scaling = graphState.lineGraphRate.rate;
+					if(graphState.areaNormalization) {
+						// convert the meter area into the proper unit, if needed
+						const graphAreaUnit = graphState.selectedAreaUnit;
+						const groupAreaUnit = groupsState[groupId].areaUnit;
+						if(graphAreaUnit != groupAreaUnit) {
+							scaling *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
+						}
+					}
 					// Get the readings for the time range and unit graphed
 					const byTimeInterval = byGroupID[timeInterval.toString()];
 					if (byTimeInterval !== undefined) {
@@ -111,17 +130,25 @@ export default function ExportComponent() {
 		} else if (chartName === ChartTypes.bar) {
 			// Exporting a bar chart
 			// Get the full y-axis unit label for a bar
-			const unitLabel = barUnitLabel(unitsState[unitId]);
+			const unitLabel = barUnitLabel(unitsState[unitId], graphState.areaNormalization, graphState.selectedAreaUnit);
 			// Time width of the bars
 			const barDuration = graphState.barDuration;
-			// There is no scaling for bars so make it 1
-			const scaling = 1;
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// Bar readings data for this meter.
 				const byMeterID = readingsState.bar.byMeterID[meterId];
 				// Make sure it exists in case state is not there yet.
 				if (byMeterID !== undefined) {
+					// No scaling if areaNormalization is not enabled
+					let scaling = 1;
+					if(graphState.areaNormalization) {
+						// convert the meter area into the proper unit, if needed
+						const graphAreaUnit = graphState.selectedAreaUnit;
+						const meterAreaUnit = metersState[meterId].areaUnit;
+						if(graphAreaUnit != meterAreaUnit) {
+							scaling *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
+						}
+					}
 					const byTimeInterval = byMeterID[timeInterval.toString()];
 					if (byTimeInterval !== undefined) {
 						const byBarDuration = byTimeInterval[barDuration.toISOString()];
@@ -151,6 +178,16 @@ export default function ExportComponent() {
 				const byGroupID = readingsState.bar.byGroupID[groupId];
 				// Make sure it exists in case state is not there yet.
 				if (byGroupID !== undefined) {
+					// No scaling if areaNormalization is not enabled
+					let scaling = 1;
+					if(graphState.areaNormalization) {
+						// convert the meter area into the proper unit, if needed
+						const graphAreaUnit = graphState.selectedAreaUnit;
+						const groupAreaUnit = groupsState[groupId].areaUnit;
+						if(graphAreaUnit != groupAreaUnit) {
+							scaling *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
+						}
+					}
 					const byTimeInterval = byGroupID[timeInterval.toString()];
 					if (byTimeInterval !== undefined) {
 						const byBarDuration = byTimeInterval[barDuration.toISOString()];

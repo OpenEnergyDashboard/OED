@@ -144,10 +144,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						</label>
 					</div>
 				</div>
+				<p style={labelStyle}>
+					<FormattedMessage id='default.graph.settings' />:
+				</p>
 				<div className='checkbox'>
-					<p style={labelStyle}>
-						<FormattedMessage id='default.bar.stacking' />:
-					</p>
 					<label>
 						<input
 							type='checkbox'
@@ -155,13 +155,10 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							onChange={this.handleDefaultBarStackingChange}
 							checked={this.props.defaultBarStacking}
 						/>
-						<FormattedMessage id='bar.stacking' />
+						<FormattedMessage id='default.bar.stacking' />
 					</label>
 				</div>
 				<div className='checkbox'>
-					<p style={labelStyle}>
-						<FormattedMessage id='default.area.normalize' />:
-					</p>
 					<label>
 						<input
 							type='checkbox'
@@ -169,7 +166,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							onChange={this.handleDefaultAreaNormalizationChange}
 							checked={this.props.defaultAreaNormalization}
 						/>
-						<FormattedMessage id='area.normalize' />
+						<FormattedMessage id='default.area.normalize' />
 					</label>
 				</div>
 				<div>
@@ -202,7 +199,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							<FormattedMessage id='AreaUnitType.meters' />
 						</label>
 					</div>
-					<div className='radio'>
+					{/* <div className='radio'>
 						<label>
 							<input
 								type='radio'
@@ -227,7 +224,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							/>
 							<FormattedMessage id='AreaUnitType.kilometers' />
 						</label>
-					</div>
+					</div> */}
 				</div>
 				<div>
 					<p style={labelStyle}>
