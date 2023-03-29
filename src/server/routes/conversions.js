@@ -122,7 +122,7 @@ router.post('/addConversion', async (req, res) => {
 	const validationResult = validate(req.body, validConversion);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for conversion. ${validationResult.error}`);
-        failure(res, 400, 'Invalid input for conversion: ' + validationResult.error.toString());
+        failure(res, 400, 'Invalid input for conversion: ' + validationResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
