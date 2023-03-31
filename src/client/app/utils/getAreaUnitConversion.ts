@@ -27,6 +27,9 @@ const areaUnitConversions: {[key: string]: number} = {
  * @returns {number} conversion multiplier
  */
 export default function getAreaUnitConversion(fromUnit: AreaUnitType, toUnit: AreaUnitType): number {
+	if(fromUnit == toUnit) {
+		return 1;
+	}
 	let conversion = areaUnitConversions[fromUnit + toUnit];
 	if(conversion == null) {
 		// if it's null, try the other way
@@ -34,7 +37,7 @@ export default function getAreaUnitConversion(fromUnit: AreaUnitType, toUnit: Ar
 	}
 	if(conversion == null) {
 		// if it's still null, then the conversion doesn't exist.
-		// this should never happen
+		// this should never happen, because the function should never be called this way
 		return 0;
 	}
 	return conversion;

@@ -32,7 +32,8 @@ export type GroupsAction =
 	| MarkGroupInEditingCleanAction
 	| MarkGroupInEditingDirtyAction
 	| MarkGroupsOutdatedAction
-	| MarkOneGroupOutdatedAction;
+	| MarkOneGroupOutdatedAction
+	| EditGroupAreaUnitAction;
 
 export interface RequestGroupsDetailsAction {
 	type: ActionType.RequestGroupsDetails;
@@ -108,6 +109,11 @@ export interface EditGroupNoteAction {
 export interface EditGroupAreaAction {
 	type: ActionType.EditGroupArea;
 	newArea: number;
+}
+
+export interface EditGroupAreaUnitAction {
+	type: ActionType.EditGroupAreaUnit;
+	newAreaUnit: AreaUnitType;
 }
 
 export interface ChangeChildGroupsAction {

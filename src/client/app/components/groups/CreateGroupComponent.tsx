@@ -9,7 +9,7 @@ import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { NamedIDItem } from '../../types/items';
 import { CreateNewBlankGroupAction, EditGroupNameAction,
 	EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction,
-	EditGroupAreaAction, ChangeDisplayModeAction, GroupDefinition, StatefulEditable } from '../../types/redux/groups';
+	EditGroupAreaAction, ChangeDisplayModeAction, GroupDefinition, StatefulEditable, EditGroupAreaUnitAction } from '../../types/redux/groups';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import { browserHistory } from '../../utils/history';
@@ -20,6 +20,7 @@ import store from '../../index';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import translate from '../../utils/translate';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 interface CreateGroupProps {
 	meters: NamedIDItem[];
@@ -33,6 +34,7 @@ interface CreateGroupProps {
 	editGroupArea(area: number): EditGroupAreaAction;
 	submitGroupInEditingIfNeeded(): Promise<any>;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
+	editGroupAreaUnit(areaUnit: AreaUnitType): EditGroupAreaUnitAction;
 }
 
 interface CreateGroupState {

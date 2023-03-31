@@ -10,7 +10,7 @@ import DatasourceBoxContainer from '../../containers/groups/DatasourceBoxContain
 import { NamedIDItem } from '../../types/items';
 import { SelectionType } from '../../containers/groups/DatasourceBoxContainer';
 import { EditGroupNameAction, EditGroupGPSAction, EditGroupDisplayableAction, EditGroupNoteAction, EditGroupAreaAction,
-	ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction, GroupDefinition } from '../../types/redux/groups';
+	ChangeChildMetersAction, ChangeChildGroupsAction, ChangeDisplayModeAction, GroupDefinition, EditGroupAreaUnitAction } from '../../types/redux/groups';
 import FooterContainer from '../../containers/FooterContainer';
 import HeaderContainer from '../../containers/HeaderContainer';
 import {  browserHistory } from '../../utils/history';
@@ -21,6 +21,10 @@ import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsave
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { fetchGroupsDetails } from '../../actions/groups';
 import translate from '../../utils/translate';
+import { useSelector } from 'react-redux';
+import { State } from '../../types/redux/state';
+import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { showErrorNotification } from '../../utils/notifications';
 
 interface EditGroupsProps {
 	currentGroup: GroupDefinition;
@@ -38,6 +42,7 @@ interface EditGroupsProps {
 	changeChildMeters(selected: number[]): ChangeChildMetersAction;
 	changeChildGroups(selected: number[]): ChangeChildGroupsAction;
 	changeDisplayModeToView(): ChangeDisplayModeAction;
+	editGroupAreaUnit(areaUnit: AreaUnitType): EditGroupAreaUnitAction;
 }
 
 type EditGroupsPropsWithIntl = EditGroupsProps & WrappedComponentProps;
@@ -56,6 +61,7 @@ interface EditGroupsState {
 	defaultSelectedGroups: NamedIDItem[];
 	unusedGroups: number[];
 	defaultUnusedGroups: NamedIDItem[];
+	groupAreaUnit: AreaUnitType;
 }
 
 class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditGroupsState> {
@@ -75,7 +81,9 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 			selectedGroups: [],
 			defaultSelectedGroups: [],
 			unusedGroups: [],
-			defaultUnusedGroups: []
+			defaultUnusedGroups: [],
+			groupAreaUnit: (this.props.currentGroup.areaUnit == AreaUnitType.feet || this.props.currentGroup.areaUnit == AreaUnitType.meters)
+				? this.props.currentGroup.areaUnit : AreaUnitType.none
 		};
 		// edit displayable to false if previously group had null displayable (past version of group)
 		if (this.props.currentGroup.displayable === null) {
@@ -102,6 +110,8 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.handleDeleteGroup = this.handleDeleteGroup.bind(this);
 		this.handleReturnToView = this.handleReturnToView.bind(this);
 		this.removeUnsavedChangesFunction = this.removeUnsavedChangesFunction.bind(this);
+		this.handleAutoCalculateGroupArea = this.handleAutoCalculateGroupArea.bind(this);
+		this.handleAreaUnitChange = this.handleAreaUnitChange.bind(this);
 	}
 
 	public render() {
@@ -189,6 +199,25 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 								<FormattedMessage id='area' />:
 							</p>
 							<Input type='text' value={this.state.groupArea} onChange={this.handleAreaChange}/>
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<p style={boldStyle}>
+								<FormattedMessage id='area' />:
+							</p>
+							<Button outline onClick={this.handleAutoCalculateGroupArea} style={leftRightButtonStyle}>
+								<i className='fa fa-chevron-right' />
+							</Button>
+						</div>
+						<div style={divBottomStyle} className='col-4'>
+							<Input
+								name='areaUnit'
+								type='select'
+								value={this.props.currentGroup.areaUnit}
+								onChange={e => this.handleAreaUnitChange(e)}>
+								{Object.keys(AreaUnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+								})}
+							</Input>
 						</div>
 					</div>
 					<div className='col-6'>
@@ -328,6 +357,31 @@ class EditGroupsComponent extends React.Component<EditGroupsPropsWithIntl, EditG
 		this.setState({ groupArea: e.target.value });
 		this.updateUnsavedChanges();
 		// still need to set state to parse check before submitting
+	}
+
+	private handleAreaUnitChange(e: React.ChangeEvent<HTMLInputElement>) {
+		this.props.editGroupAreaUnit(e.target.value as AreaUnitType);
+		this.setState({ groupAreaUnit: e.target.value as AreaUnitType});
+		this.updateUnsavedChanges();
+	}
+
+	private handleAutoCalculateGroupArea() {
+		let areaSum = 0;
+		if(this.props.currentGroup.areaUnit == AreaUnitType.none) {
+			// error, can't calculate for a null unit
+			showErrorNotification(translate('invalid.token.login'));
+		} else {
+			const metersState = useSelector((state: State) => state.meters.byMeterID);
+			for (const meterID of this.props.currentGroup.deepMeters) {
+				const meter = metersState[meterID];
+				if(meter.areaUnit != AreaUnitType.none && meter.area > 0) {
+					areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, this.props.currentGroup.areaUnit);
+				}
+			}
+			this.setState({ groupArea: areaSum.toString() });
+			this.updateUnsavedChanges();
+		}
+
 	}
 
 	private handleUpdatedSelectedMeters(selectedMeters: number[]) {

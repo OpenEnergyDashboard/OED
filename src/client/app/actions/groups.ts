@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 import { NamedIDItem } from '../types/items';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/groups';
@@ -192,6 +193,10 @@ export function editGroupNote(newNote: string): t.EditGroupNoteAction {
  */
 export function editGroupArea(newArea: number): t.EditGroupAreaAction {
 	return { type: ActionType.EditGroupArea, newArea };
+}
+
+export function editGroupAreaUnit(newAreaUnit: AreaUnitType): t.EditGroupAreaUnitAction {
+	return { type: ActionType.EditGroupAreaUnit, newAreaUnit};
 }
 
 /**

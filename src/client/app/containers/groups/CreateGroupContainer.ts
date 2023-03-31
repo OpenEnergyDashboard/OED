@@ -7,12 +7,14 @@ import { connect } from 'react-redux';
 import CreateGroupComponent from '../../components/groups/CreateGroupComponent';
 import { createNewBlankGroup, editGroupName, editGroupGPS,
 	editGroupDisplayable, editGroupNote, editGroupArea, submitGroupInEditingIfNeeded,
-	changeDisplayMode } from '../../actions/groups';
+	changeDisplayMode,
+	editGroupAreaUnit} from '../../actions/groups';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import { NamedIDItem } from '../../types/items';
 import { DisplayMode } from '../../types/redux/groups';
 import { GPSPoint } from 'utils/calibration';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
 	const sortedMeters: NamedIDItem[] = _.sortBy(_.values(state.meters.byMeterID).map(
@@ -35,7 +37,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		editGroupDisplayable: (display: boolean) => dispatch(editGroupDisplayable(display)),
 		editGroupNote: (note: string) => dispatch(editGroupNote(note)),
 		editGroupArea: (area: number) => dispatch(editGroupArea(area)),
-		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View))
+		changeDisplayModeToView: () => dispatch(changeDisplayMode(DisplayMode.View)),
+		editGroupAreaUnit: (areaUnit: AreaUnitType) => dispatch(editGroupAreaUnit(areaUnit))
 	};
 }
 
