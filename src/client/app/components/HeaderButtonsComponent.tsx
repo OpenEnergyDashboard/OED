@@ -20,11 +20,11 @@ import { State } from 'types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { isRoleAdmin } from 'utils/hasPermissions';
 
-export default function HeaderButtonsComponent(state: State, showCollapsedMenuButton: boolean, isModal: boolean){
+export default function HeaderButtonsComponent(state: State, showCollapsedMenuButton: boolean, isModal: boolean) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;
 	let role: UserRole | null = null;
-	if (currentUser !== null){
+	if (currentUser !== null) {
 		loggedInAsAdmin = isRoleAdmin(currentUser.role);
 		role = currentUser.role;
 	}
@@ -142,7 +142,7 @@ export default function HeaderButtonsComponent(state: State, showCollapsedMenuBu
 				<Link
 					style={logoutLinkStyle}
 					to='/'>
-					<Button outline onClick={handleLogOut}><FormattedMessage id='log.out' />
+					<Button outline onClick={handleLogOut()}><FormattedMessage id='log.out' />
 					</Button>
 				</Link>
 			</div>
@@ -150,14 +150,8 @@ export default function HeaderButtonsComponent(state: State, showCollapsedMenuBu
 	);
 }
 
-function handleLogOut(state: State, dispatch: Dispatch){
-	if (this.props.hasUnsavedChanges) {
-			this.props.flipLogOutState();
-		} else {
-			// Normally log out if there are no unsaved changes
-			this.props.handleLogOut();
-			this.forceUpdate();
-		}
+function handleLogOut() {
+	
 }
 
 /*
