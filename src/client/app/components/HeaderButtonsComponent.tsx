@@ -13,7 +13,154 @@ import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import { UserRole } from '../types/items';
 import { hasPermissions } from '../utils/hasPermissions';
 import { FlipLogOutStateAction } from '../types/redux/unsavedWarning';
+import { flipLogOutState } from '../actions/unsavedWarning';
+import { deleteToken } from '../utils/token';
+import { clearCurrentUser } from '../actions/currentUser';
+import { State } from 'types/redux/state';
+import { Dispatch } from '../types/redux/actions';
+import { isRoleAdmin } from 'utils/hasPermissions';
 
+export default function HeaderButtonsComponent(state: State, showCollapsedMenuButton: boolean, isModal: boolean){
+	const currentUser = state.currentUser.profile;
+	let loggedInAsAdmin = false;
+	let role: UserRole | null = null;
+	if (currentUser !== null){
+		loggedInAsAdmin = isRoleAdmin(currentUser.role);
+		role = currentUser.role;
+	}
+	const showOptions = getPage() === '';
+	const renderLoginButton = role === null;
+	const renderLogoutButton = role !== null;
+	const shouldHomeButtonDisabled = getPage() === '';
+	const shouldAdminButtonDisabled = getPage() === 'admin';
+	const shouldGroupsButtonDisabled = getPage() === 'groups';
+	const shouldMetersButtonDisabled = getPage() === 'meters';
+	const shouldMapsButtonDisabled = getPage() === 'maps';
+	const shouldCSVButtonDisabled = getPage() === 'csv';
+	const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
+	const shouldUnitsButtonDisabled = getPage() === 'units';
+	const shouldConversionsButtonDisabled = getPage() === 'conversions';
+	const dataFor = isModal ? 'all-modal' : 'all';
+
+	const linkStyle: React.CSSProperties = {
+		display: 'inline',
+		paddingLeft: '5px'
+	};
+	const loginLinkStyle: React.CSSProperties = {
+		display: renderLoginButton ? 'inline' : 'none',
+		paddingLeft: '5px'
+	};
+	const logoutLinkStyle: React.CSSProperties = {
+		display: renderLogoutButton ? 'inline' : 'none',
+		paddingLeft: '5px'
+	};
+	const adminViewableLinkStyle: React.CSSProperties = {
+		display: loggedInAsAdmin ? 'inline' : 'none',
+		paddingLeft: '5px'
+	};
+	const csvLinkStyle: React.CSSProperties = {
+		display: renderCSVButton ? 'inline' : 'none',
+		paddingLeft: '5px'
+	};
+
+
+	return (
+		<div>
+			<div className='d-lg-none'>
+				{(showCollapsedMenuButton) ?
+					<MenuModalComponent
+						showOptions={showOptions}
+						showCollapsedMenuButton={false}
+					/> : null
+				}
+			</div>
+			<div className={showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
+				<TooltipHelpContainer page={dataFor} />
+				<TooltipMarkerComponent page={dataFor} helpTextId='help.home.header' />
+				<Link
+					style={adminViewableLinkStyle}
+					to='/admin'>
+					<Button disabled={shouldAdminButtonDisabled}
+						outline><FormattedMessage id='admin.panel' />
+					</Button>
+				</Link>
+				<Link
+					style={adminViewableLinkStyle}
+					to='/conversions'>
+					<Button disabled={shouldConversionsButtonDisabled}
+						outline><FormattedMessage id='conversions' />
+					</Button>
+				</Link>
+				<Link
+					style={csvLinkStyle}
+					to='/csv'>
+					<Button disabled={shouldCSVButtonDisabled}
+						outline><FormattedMessage id='csv' />
+					</Button>
+				</Link>
+				<Link
+					style={linkStyle}
+					to='/groups'>
+					<Button disabled={shouldGroupsButtonDisabled}
+						outline><FormattedMessage id='groups' />
+					</Button>
+				</Link>
+				<Link
+					style={linkStyle}
+					to='/'>
+					<Button disabled={shouldHomeButtonDisabled}
+						outline><FormattedMessage id='home' />
+					</Button>
+				</Link>
+				<Link
+					style={adminViewableLinkStyle}
+					to='/maps'>
+					<Button disabled={shouldMapsButtonDisabled}
+						outline><FormattedMessage id='maps' />
+					</Button>
+				</Link>
+				<Link
+					style={linkStyle}
+					to='/meters'>
+					<Button disabled={shouldMetersButtonDisabled}
+						outline><FormattedMessage id='meters' />
+					</Button>
+				</Link>
+				<Link
+					style={adminViewableLinkStyle}
+					to='/units'>
+					<Button disabled={shouldUnitsButtonDisabled}
+						outline><FormattedMessage id='units' />
+					</Button>
+				</Link>
+				<Link
+					style={loginLinkStyle}
+					to='/login'>
+					<Button outline><FormattedMessage id='log.in' />
+					</Button>
+				</Link>
+				<Link
+					style={logoutLinkStyle}
+					to='/'>
+					<Button outline onClick={handleLogOut}><FormattedMessage id='log.out' />
+					</Button>
+				</Link>
+			</div>
+		</div>
+	);
+}
+
+function handleLogOut(state: State, dispatch: Dispatch){
+	if (this.props.hasUnsavedChanges) {
+			this.props.flipLogOutState();
+		} else {
+			// Normally log out if there are no unsaved changes
+			this.props.handleLogOut();
+			this.forceUpdate();
+		}
+}
+
+/*
 interface HeaderButtonsProps {
 	isModal: boolean;
 	showCollapsedMenuButton: boolean;
@@ -23,10 +170,12 @@ interface HeaderButtonsProps {
 	handleLogOut: () => any;
 	flipLogOutState(): FlipLogOutStateAction;
 }
+*/
 
 /**
  * React component that controls the buttons in the Header
  */
+/*
 export default class HeaderButtonsComponent extends React.Component<HeaderButtonsProps> {
 	constructor(props: HeaderButtonsProps) {
 		super(props);
@@ -167,3 +316,4 @@ export default class HeaderButtonsComponent extends React.Component<HeaderButton
 		}
 	}
 }
+*/
