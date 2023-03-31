@@ -27,7 +27,7 @@ function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: bool
 		hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges
 	};
 }
-
+// pay attention to menu modal components in line 63
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		handleLogOut: () => {
