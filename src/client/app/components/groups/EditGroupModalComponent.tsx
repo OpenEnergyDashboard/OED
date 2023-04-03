@@ -25,13 +25,14 @@ import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import {
-	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup
+	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup, assignChildToGroup, calculateMetersInGroup
 } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { GroupEditData } from 'types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
+import { DataType } from '../../types/Datasources';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -54,6 +55,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// The current groups state. It should always be valid.
 	const originalGroupState = groupsState[props.groupId];
+
+	// TODO DEBUG
+	// TODO this is a hack - how to properly pass the state?
+	// TODO The creates a copy of the group state which is needed but need to make it state that can be updated and used.
+	// maybe need expanded values type state for all groups.
+	const allGroupStateCopy = JSON.parse(JSON.stringify(groupsState));
+	console.log('group: ', originalGroupState.name, ' has calculateMetersInGroup: ', calculateMetersInGroup(originalGroupState.id, allGroupStateCopy), ' deepMeters: ', originalGroupState.deepMeters);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -549,6 +557,25 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 													// The meters changed so update the current list of deep meters
 													// Get the currently included/selected meters as an array of the ids.
 													const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
+													// The length of of selected meters should only vary by 1 since each change is handled separately.
+													if (newSelectedMeterOptions.length === groupChildrenState.meterSelectedSelectOptions.length + 1) {
+														// TODO start DEBUG.
+														// Get original selected meter names.
+														// const originalSelected = groupChildrenState.meterSelectedSelectOptions.map(meter => { return meter.label; });
+														// const newSelected = newSelectedMeterOptions.map(meter => { return meter.label; });
+														// console.log('There were more than 1 changed meter for this group with old being (' +  originalSelected + ') and the new is (' + newSelected + ')');
+														// TODO end DEBUG
+														// A meter was selected so it is consider for adding.
+														// The newly selected item is always the last one.
+														console.log('adding child: ', newSelectedMeterOptions[newSelectedMeterOptions.length - 1].label);
+														assignChildToGroup(state.id, newSelectedMeterOptions[newSelectedMeterOptions.length - 1].value, DataType.Meter);
+													} else {
+														// TODO
+														// Could have removed any item so figure out which one it is.
+														const removedMeter = _.difference(groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
+														console.log('removing # ', removedMeter.length, ' with first child: ', removedMeter[0].label);
+													}
+													// TODO reconsider following ???????
 													const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters });
 													// // Update the deep meter and child meter state based on the changes.
 													// Note could update child meters above to avoid updating state value for metersInChangedGroup but want

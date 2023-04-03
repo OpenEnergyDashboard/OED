@@ -180,6 +180,39 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
 }
 
 /**
+ * Returns the set of meters's ids associated with the groupId. Does full calculation where
+ * only uses the direct meter and group children. It uses a store passed to it so it can
+ * be changed without changing the Redux group store. Thus, it directly and recursively gets
+ * the deep meters of a group.
+ *
+ * @param {number} groupId The groupId.
+ * @param {GroupDefinition[]} groupState The group state to use in the calculation.
+ * @returns {number[]} Array of deep children ids of this group.
+ */
+// TODO how to properly pass the state?
+// export function calculateMetersInGroup(groupId: number, groupState: GroupDefinition[]): number[] {
+// export function calculateMetersInGroup(groupId: number, groupState: {[] as GroupDefinition}): number[] {
+// export function calculateMetersInGroup(groupId: number, groupState: State.group.byGroupID): number[] {
+export function calculateMetersInGroup(groupId: number, groupState: any): number[] {
+	// Use a set to avoid duplicates. 
+	// Gets the group associated with groupId.
+	// const groupToCheck = _.get(groupState, groupId) as GroupDefinition;
+	const groupToCheck = groupState[groupId] as GroupDefinition;
+	// The deep meters are the direct child meters of this group plus the direct child meters
+	// of all included meters, recursively. Since groups are acyclic, this must terminate.
+	// This should reproduce some DB functionality but using local state.
+	const deepMeters = new Set(groupToCheck.childMeters);
+	groupToCheck.childGroups.forEach(group => {
+		// Get the deep meters of this group.
+		const meters = calculateMetersInGroup(group, groupState);
+		// Add to set of deep meters for the group checking.
+		meters.forEach(meter => { deepMeters.add(meter); })
+	});
+	// Create a set of the deep meters of this group and return it.
+	return Array.from(deepMeters);
+}
+
+/**
  * Get options for the meter menu on the group page.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
@@ -278,7 +311,7 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 export async function assignChildToGroup(gid: number, childId: number, childType: DataType): Promise<void> {
 	const state = store.getState() as State;
 	// Get the group to add the child.
-	// Note that this is not a deep copy. Changes make to this object will change the redux state.
+	// Note that this is not a deep copy. Changes made to this object will change the redux state.
 	const group = state.groups.byGroupID[gid];
 	// Create a deep copy of the group before adding the child.
 	// At the end, if the check fails or if admin doesn't want to apply the change, we set the redux state to this copy.
@@ -314,7 +347,7 @@ export async function assignChildToGroup(gid: number, childId: number, childType
 		// Update the group. Now, the changes actually happen.
 		await applyChangesToGroup(group);
 	} else {
-		// Reset the redux state for this gorup.
+		// Reset the redux state for this group.
 		state.groups.byGroupID[gid] = oldGroup;
 	}
 }
@@ -338,6 +371,7 @@ async function validateGroupPostAddChild(gid: number, parentGroupIDs: number[]):
 		// Get compatibility change case when add this group to its parent.
 		const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group, parentGroup.defaultGraphicUnit);
 		switch (compatibilityChangeCase) {
+			// TODO internationalize strings for rest of function
 			case GroupCase.NoCompatibleUnits:
 				msg += `Group ${parentGroup.name} would have no compatible units by the edit to this group so the edit is cancelled\n`;
 				cancel = true;
@@ -388,6 +422,7 @@ async function applyChangesToGroup(group: GroupDefinition): Promise<void> {
 	// Update Redux state.
 	state.groups.byGroupID[group.id] = group;
 	// Update database.
+	// TODO ??? should we update here each time or wait until save. Issue that also done to parents so need to fix all if want to change.
 	await groupsApi.edit(groupData);
 }
 
