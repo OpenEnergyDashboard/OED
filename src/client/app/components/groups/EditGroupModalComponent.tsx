@@ -380,7 +380,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
+	}, [metersState, groupsState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
 
 	// Update compatible units and graphic units set.
 	useEffect(() => {
