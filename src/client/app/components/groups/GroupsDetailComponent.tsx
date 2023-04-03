@@ -69,7 +69,7 @@ export default function GroupsDetailComponent() {
 			dispatch(fetchAllGroupChildrenIfNeeded());
 		}
 		// In case the group state was not yet loaded you need to do this again.
-	}, [groupsStateLoaded]);
+	}, [groupsStateLoaded, groupsAllChildrenLoaded]);
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(units);

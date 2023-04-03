@@ -164,8 +164,10 @@ export function submitNewGroup(group: t.GroupData): Thunk {
 			await groupsApi.create(group);
 			// Update the groups state from the database on a successful call
 			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
-			// However, since the database currently assigns the id to the GroupData
-			dispatch(fetchGroupsDetails());
+			// However, since the database currently assigns the id to the GroupData and it is not returned we do the get.
+			// We also need to get the child meters/groups of the new group. We can just fetch this one group but instead get all the groups since easier and this
+			// is not a common operation. We must wait for the new group state so its substate for children can be set.
+			dispatch(fetchGroupsDetails()).then(() => dispatch(fetchAllGroupChildren()));
 			showSuccessNotification(translate('group.successfully.create.group'));
 		} catch (err) {
 			// Failure! ):

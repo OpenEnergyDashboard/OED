@@ -113,7 +113,11 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			// Note that fetching
 			return {
 				...state,
-				isFetchingAllChildren: true
+				isFetchingAllChildren: true,
+				// When the group children are forced to be re-fetched on creating a new group, we need to indicate
+				// here that the children are not yet gotten. This causes the group detail page to redraw when this
+				// is finished so the new group has the latest info.
+				hasChildrenBeenFetchedOnce: false
 			}
 		}
 
