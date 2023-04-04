@@ -19,48 +19,8 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
-import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import translate from '../../utils/translate';
-import TimeZoneSelect from '../TimeZoneSelect';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-function notifyUser(msg: string) {
-	window.alert(msg);
-}
-
-// get string value from GPSPoint or null.
-function getGPSString(gps: GPSPoint | null) {
-	if (gps === null) {
-		//  if gps is null return empty string value
-		return '';
-	}
-	else if (typeof gps === 'object') {
-		// if gps is an object parse GPSPoint and return string value
-		const json = JSON.stringify({ gps });
-		const obj = JSON.parse(json);
-		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
-	}
-	else {
-		// Assume it is a string that was input.
-		return gps
-	}
-}
-
-// Checks if the input is null and returns empty string if that is the case. Otherwise return input.
-// This is needed because React does not want values to be of type null for display and null is the
-// state for some of the meter values. This only should change what is displayed and not the state or props.
-function nullToEmptyString(item: any) {
-	if (item === null) {
-		return '';
-	} else {
-		return item;
-	}
-}
+import { ConversionArray } from '../../types/conversionArray';
+import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -250,7 +210,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 
 			if (inputOk) {
-				// The input passed validation but only store if there are changes.
+				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				const submitState = { ...state, gps: gps };
 				// Submit new meter if checks where ok.
@@ -318,7 +278,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// Also add the 'no unit' unit
 				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
 					// add the current meter unit to the list of compatible units
-					compatibleUnits.add(unit);
+					compatibleUnits.add(noUnitTranslated());
 				}
 				else {
 					// add the current meter unit to the list of incompatible units

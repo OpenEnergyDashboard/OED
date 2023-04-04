@@ -14,6 +14,7 @@ export interface SelectOption {
 	value: number;
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
+	style?: React.CSSProperties;
 }
 
 /**

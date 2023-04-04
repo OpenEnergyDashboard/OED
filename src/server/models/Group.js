@@ -149,6 +149,38 @@ class Group {
 	}
 
 	/**
+	 * Returns a promise to retrieve the group ID and IDs of all the immediate child meters and groups of all groups.
+	 * @param id the id of the group whose children are to be retrieved
+	 * @param conn the connection to be used.
+	 * @returns {Promise.<*>}
+	 */
+	static async getImmediateChildren(conn) {
+		const rows = await conn.any(sqlFile('group/get_all_children.sql'));
+		// Rename the keys from the database ones to the JS ones.
+		const newRows = [];
+		for (const row of rows) {
+			// The database query returns a single item in the array as null if no child exists so remove that
+			// to make it an empty array.
+			this.purgeNull(row.child_meters);
+			this.purgeNull(row.child_groups);
+			// Now rename the keys.
+			newRows.push({ groupId: row.group_id, childMeters: row.child_meters, childGroups: row.child_groups });
+		}
+		return newRows;
+	}
+
+	/**
+	 * Removes first array entry if only one and null
+	 * @param {[]} array array to remove null
+	 */
+	static purgeNull(array) {
+		if (array.length === 1 && array[0] === null) {
+			// Length 1 and only item null so remove from array.
+			array.pop();
+		}
+	}
+
+	/**
 	 * Returns a promise to associate this group with a child group
 	 * @param childID ID of the meter to be the child
 	 * @param conn the connection to be used.
@@ -238,6 +270,17 @@ class Group {
 	 */
 	async getParents(conn) {
 		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: this.id });
+		return rows.map(row => row.parent_id);
+	}
+
+	/**
+	 * Returns a promise to retrieve an array of the group IDs of the parent groups of a group.
+	 * @param groupID the group's id that we need to find its parents.
+	 * @param conn the connection to be used.
+	 * @return {Promise<IArrayExt<any>>}
+	 */
+	static async getParentsByGroupID(groupID, conn) {
+		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: groupID });
 		return rows.map(row => row.parent_id);
 	}
 

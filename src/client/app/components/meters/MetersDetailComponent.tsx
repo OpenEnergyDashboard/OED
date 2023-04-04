@@ -15,9 +15,13 @@ import '../../styles/card-page.css';
 import { State } from '../../types/redux/state';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateMeterModalComponent from './CreateMeterModalComponent';
+import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 import MeterViewComponent from './MeterViewComponent';
+import CreateMeterModalComponent from './CreateMeterModalComponent';
+import { MeterData } from 'types/redux/meters';
+import '../../styles/card-page.css';
+import { UnitData, UnitType } from '../../types/redux/units';
+import * as _ from 'lodash';
 
 export default function MetersDetailComponent() {
 
@@ -36,12 +40,12 @@ export default function MetersDetailComponent() {
 	const currentUserState = useSelector((state: State) => state.currentUser);
 
 	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const currentUser = currentUserState.profile;
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	let visibleMeters
+	let visibleMeters;
 	if (loggedInAsAdmin) {
 		visibleMeters = MetersState;
 	} else {
@@ -55,25 +59,8 @@ export default function MetersDetailComponent() {
 	// Units state loaded status
 	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 
-	// A non-unit
-	const noUnit: UnitData = {
-		// Only needs the id and identifier, others are dummy values.
-		id: -99,
-		name: '',
-		identifier: 'no unit',
-		unitRepresent: UnitRepresentType.unused,
-		secInRate: 99,
-		typeOfUnit: UnitType.unit,
-		unitIndex: -99,
-		suffix: '',
-		displayable: DisplayableType.none,
-		preferredDisplay: false,
-		note: ''
-	}
-	// Possible Meter Units
+	// Possible Meter Units to use
 	let possibleMeterUnits = new Set<UnitData>();
-	let possibleGraphicUnits = new Set<UnitData>();
-
 	// The meter unit can be any unit of type meter.
 	Object.values(units).forEach(unit => {
 		if (unit.typeOfUnit == UnitType.meter) {
@@ -83,19 +70,10 @@ export default function MetersDetailComponent() {
 	// Put in alphabetical order.
 	possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	possibleMeterUnits.add(noUnit);
+	possibleMeterUnits.add(noUnitTranslated());
 
-	// Possible Graphic Units
-	// The default graphic unit can be any unit of type unit or suffix.
-	Object.values(units).forEach(unit => {
-		if (unit.typeOfUnit == UnitType.unit || unit.typeOfUnit == UnitType.suffix) {
-			possibleGraphicUnits.add(unit);
-		}
-	});
-	// Put in alphabetical order.
-	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
-	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
-	possibleGraphicUnits.add(noUnit);
+	// Possible graphic units to use
+	const possibleGraphicUnits = potentialGraphicUnits(units);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'

@@ -1,98 +1,90 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+//Realize that * is already imported from react
+import { State } from 'types/redux/state';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
-import ListDisplayComponent from '../ListDisplayComponent';
-import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
-import { ChangeDisplayModeAction } from '../../types/redux/groups';
+import EditGroupModalComponent from './EditGroupModalComponent';
+import '../../styles/card-page.css';
+import { GroupDefinition } from 'types/redux/groups';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { CurrentUserState } from 'types/redux/currentUser';
+import translate from '../../utils/translate';
+import { UnitData } from '../../types/redux/units';
+import { noUnitTranslated } from '../../utils/input';
 
-interface GroupViewProps {
-	name: string;
-	id: number;
-	childMeterNames: string[];
-	trueMeterSize: number;
-	childGroupNames: string[];
-	trueGroupSize: number;
-	deepMeterNames: string[];
-	loggedInAsAdmin: boolean;
-	fetchGroupChildren(id: number): Promise<any>;
-	beginEditingIfPossible(id: number): Promise<any>;
-	changeDisplayModeToEdit(): ChangeDisplayModeAction;
+interface GroupViewComponentProps {
+	group: GroupDefinition;
+	currentUser: CurrentUserState;
+	// This isn't used in this component but are passed to the edit component
+	// This is done to avoid having to recalculate the possible units sets in each view component
+	possibleGraphicUnits: Set<UnitData>;
 }
 
-export default class GroupViewComponent extends React.Component<GroupViewProps> {
-	constructor(props: GroupViewProps) {
-		super(props);
-		this.handleEditGroup = this.handleEditGroup.bind(this);
+export default function GroupViewComponent(props: GroupViewComponentProps) {
+	// Don't check if admin since only an admin is allow to route to this page.
+
+	// Edit Modal Show
+	const [showEditModal, setShowEditModal] = useState(false);
+
+	const handleShow = () => {
+		setShowEditModal(true);
 	}
 
-	public componentDidMount() {
-		this.props.fetchGroupChildren(this.props.id);
+	const handleClose = () => {
+		setShowEditModal(false);
 	}
 
-	public render() {
-		const renderEditGroupButton = this.props.loggedInAsAdmin;
-		const nameStyle: React.CSSProperties = {
-			textAlign: 'center'
-		};
-		const buttonPadding: React.CSSProperties = {
-			marginTop: '10px'
-		};
-		const boldStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-		const editGroupStyle: React.CSSProperties = {
-			display: renderEditGroupButton ? 'inline' : 'none',
-			paddingLeft: '5px'
-		};
-		const groupAllMeters: React.CSSProperties = {
-			fontWeight: 'bold',
-			marginBottom: 0
-		};
-		return (
-			<div>
-				<h2 style={nameStyle}>{this.props.name}</h2>
-				<div className='row'>
-					<div className='col-6'>
-						<p style={boldStyle}>
-							<FormattedMessage id='child.meters' />:
-						</p>
-						<ListDisplayComponent trueSize={this.props.trueMeterSize} items={this.props.childMeterNames} />
-					</div>
-					<div className='col-6'>
-						<p style={boldStyle}>
-							<FormattedMessage id='child.groups' />:
-						</p>
-						<ListDisplayComponent trueSize={this.props.trueGroupSize} items={this.props.childGroupNames} />
-					</div>
-				</div>
-				<Link style={editGroupStyle} to='/editGroup'>
-					<Button style={buttonPadding} outline onClick={this.handleEditGroup}>
-						<FormattedMessage id='edit.a.group' />
-					</Button>
-				</Link>
-				<div>
-					<p style={groupAllMeters}>
-						<FormattedMessage id='group.all.meters' />:
-					</p>
-					{this.props.deepMeterNames.map((item, index) => (
-						<span key={`d_${index}`}>{(index ? ', ': '') + item}</span>
-					))}
-					{
-						this.props.childMeterNames.length !== this.props.trueMeterSize ||
-						this.props.childGroupNames.length !== this.props.trueGroupSize ?
-							<div><i>This group contains non-displayable meters/groups denoted as hidden.</i></div> : <></>
-					}
-				</div>
+	// current user state
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	// Check for admin status
+	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+
+	// Set up to display the units associated with the group as the unit identifier.
+	// unit state
+	const unitState = useSelector((state: State) => state.units.units);
+
+	return (
+		<div className="card">
+			{/* Use identifier-container since similar and groups only have name */}
+			<div className="identifier-container">
+				{props.group.name}
 			</div>
-		);
-	}
-
-	private handleEditGroup() {
-		this.props.beginEditingIfPossible(this.props.id);
-	}
+			<div className="item-container">
+				{/* Use meter translation id string since same one wanted. */}
+				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
+				{/* This is the default graphic unit associated with the group or no unit if none. */}
+				{props.group.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[props.group.defaultGraphicUnit].identifier}
+			</div>
+			{loggedInAsAdmin &&
+				<div className={props.group.displayable.toString()}>
+					<b><FormattedMessage id="group.displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
+				</div>
+			}
+			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
+			{loggedInAsAdmin &&
+				<div className="item-container">
+					<b><FormattedMessage id="group.note" /></b> {props.group.note?.slice(0, 29)}
+				</div>
+			}
+			<div className="edit-btn">
+				<Button variant="Secondary" onClick={handleShow}>
+					{/* admins can edit a group but others can only view the details */}
+					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
+				</Button>
+				{/* Creates a child GroupModalEditComponent */}
+				<EditGroupModalComponent
+					show={showEditModal}
+					groupId={props.group.id}
+					possibleGraphicUnits={props.possibleGraphicUnits}
+					handleShow={handleShow}
+					handleClose={handleClose} />
+			</div>
+		</div>
+	);
 }
