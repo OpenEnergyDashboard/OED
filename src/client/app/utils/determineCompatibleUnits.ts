@@ -7,11 +7,14 @@ import * as _ from 'lodash';
 import { MeterData } from '../types/redux/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
-import { GroupDefinition } from 'types/redux/groups';
+import { GroupData, GroupDefinition, GroupEditData, GroupID } from '../types/redux/groups';
+import { DataType } from '../types/Datasources';
+import { State } from '../types/redux/state';
+import { SelectOption } from '../types/items';
+import { groupsApi } from './api';
 
 /**
  * The intersect operation of two sets.
- *
  * @param {Set<number>} setA The first set.
  * @param {Set<number>} setB The second set.
  * @returns {Set<number>} The intersection of two sets.
@@ -134,7 +137,8 @@ export function unitFromPColumn(column: number): number {
 }
 
 /**
- * Returns the set of meters's ids associated with the groupId used.
+ * Returns the set of meters's ids associated with the groupId used where Redux
+ * state is accurate for all groups.
  *
  * @param {number} groupId The groupId.
  * @returns {Set<number>} The set of deep children of this group.
@@ -146,4 +150,366 @@ export function metersInGroup(groupId: number): Set<number> {
 	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
 	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
+}
+
+/**
+ * Returns array of deep meter ids of the changed group.
+ * @param {GroupEditData} changedGroupState The state for the changed group
+ * @returns {number[]} returns array of deep meter ids of the changed group considering possible changes
+ */
+export function metersInChangedGroup(changedGroupState: GroupEditData): number[] {
+	const state = store.getState();
+	// deep meters starts with all the direct child meters of the group being changed.
+	const deepMeters = new Set(changedGroupState.childMeters);
+	// These groups cannot contain the group being edited so the redux state is okay.
+	changedGroupState.childGroups.forEach((group: number) => {
+		// The group state for the current child group.
+		const groupState = _.get(state.groups.byGroupID, group) as GroupDefinition;
+		// The group state might not be defined, e.g., a group delete happened and the state is refreshing.
+		// In this case the deepMeters returned will be off but they should quickly refresh.
+		if (groupState) {
+			// The deep meters of every group contained in the changed group are in that group.
+			// The set does not allow duplicates so no issue there.
+			groupState.deepMeters.forEach((meter: number) => {
+				deepMeters.add(meter);
+			});
+		}
+	});
+	// Convert set to array.
+	return Array.from(deepMeters);
+}
+
+/**
+ * Returns the set of meters's ids associated with the groupId. Does full calculation where
+ * only uses the direct meter and group children. It uses a store passed to it so it can
+ * be changed without changing the Redux group store. Thus, it directly and recursively gets
+ * the deep meters of a group.
+ *
+ * @param {number} groupId The groupId.
+ * @param {GroupDefinition[]} groupState The group state to use in the calculation.
+ * @returns {number[]} Array of deep children ids of this group.
+ */
+// TODO how to properly pass the state?
+// export function calculateMetersInGroup(groupId: number, groupState: GroupDefinition[]): number[] {
+// export function calculateMetersInGroup(groupId: number, groupState: {[] as GroupDefinition}): number[] {
+// export function calculateMetersInGroup(groupId: number, groupState: State.group.byGroupID): number[] {
+export function calculateMetersInGroup(groupId: number, groupState: any): number[] {
+	// Use a set to avoid duplicates. 
+	// Gets the group associated with groupId.
+	// const groupToCheck = _.get(groupState, groupId) as GroupDefinition;
+	const groupToCheck = groupState[groupId] as GroupDefinition;
+	// The deep meters are the direct child meters of this group plus the direct child meters
+	// of all included meters, recursively. Since groups are acyclic, this must terminate.
+	// This should reproduce some DB functionality but using local state.
+	const deepMeters = new Set(groupToCheck.childMeters);
+	groupToCheck.childGroups.forEach(group => {
+		// Get the deep meters of this group.
+		const meters = calculateMetersInGroup(group, groupState);
+		// Add to set of deep meters for the group checking.
+		meters.forEach(meter => { deepMeters.add(meter); })
+	});
+	// Create a set of the deep meters of this group and return it.
+	return Array.from(deepMeters);
+}
+
+/**
+ * Get options for the meter menu on the group page.
+ * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
+ * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @return The current meter options for this group.
+ */
+export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
+	const state = store.getState() as State;
+	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
+	// First must get a set from the array of meter numbers.
+	const deepMetersSet = new Set(deepMeters);
+	// Get the units that are compatible with this set of meters.
+	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
+	// Get all meters' state.
+	const meters = Object.values(state.meters.byMeterID) as MeterData[];
+
+	// Options for the meter menu.
+	const options: SelectOption[] = [];
+	// For each meter, decide its compatibility for the menu
+	meters.forEach((meter: MeterData) => {
+		const option = {
+			label: meter.identifier,
+			value: meter.id,
+			isDisabled: false,
+			style: {}
+		} as SelectOption;
+
+		const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, meter.id, DataType.Meter, defaultGraphicUnit);
+		if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
+			// This meter was not compatible with the ones in the group so disable it as a choice.
+			option.isDisabled = true;
+		} else {
+			// This meter is compatible but need to decide what impact choosing it will have on the group.
+			option.style = getMenuOptionFont(compatibilityChangeCase);
+		}
+		options.push(option);
+	});
+
+	// We want the options sorted by meter identifier.
+	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
+}
+
+/**
+ * Get options for the group menu on the group page.
+ * @param groupId The id of the group being worked on.
+ * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
+ * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @return The current group options for this group.
+*/
+export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
+	const state = store.getState() as State;
+	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
+	// First must get a set from the array of meter numbers.
+	const deepMetersSet = new Set(deepMeters);
+	// Get the currentGroup's compatible units.
+	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
+	// Get all groups' state.
+	const groups = Object.values(state.groups.byGroupID) as GroupDefinition[];
+
+	// Options for the group menu.
+	const options: SelectOption[] = [];
+
+	groups.forEach((group: GroupDefinition) => {
+		// You cannot have yourself in the group so not an option.
+		if (group.id !== groupId) {
+			const option = {
+				label: group.name,
+				value: group.id,
+				isDisabled: false,
+				style: {}
+			} as SelectOption;
+
+			const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit);
+			if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
+				option.isDisabled = true;
+			} else {
+				option.style = getMenuOptionFont(compatibilityChangeCase);
+			}
+
+			options.push(option);
+		}
+	});
+
+	// We want the options sorted by group name.
+	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
+}
+
+/**
+ * Validates and warns user when adding a child group/meter to a specific group.
+ * If the check pass, update the edited group and related groups.
+ * @param gid The id of the group to assign the child.
+ * @param childId The group/meter's id to add to the parent group.
+ * @param childType Can be group or meter.
+ */
+export async function assignChildToGroup(gid: number, childId: number, childType: DataType): Promise<void> {
+	const state = store.getState() as State;
+	// Get the group to add the child.
+	// Note that this is not a deep copy. Changes made to this object will change the redux state.
+	const group = state.groups.byGroupID[gid];
+	// Create a deep copy of the group before adding the child.
+	// At the end, if the check fails or if admin doesn't want to apply the change, we set the redux state to this copy.
+	const oldGroup = JSON.parse(JSON.stringify(group));
+	// Add the child to this group.
+	if (childType === DataType.Meter) {
+		group.childMeters.push(childId);
+		group.deepMeters.push(childId);
+	} else {
+		group.childGroups.push(childId);
+		// Uses set here so the deep meters are not duplicated.
+		const deepMeters = new Set(group.deepMeters.concat(state.groups.byGroupID[childId].deepMeters));
+		group.deepMeters = Array.from(deepMeters);
+	}
+	// Get all parent groups of this group.
+	const parentGroupIDs = await groupsApi.getParentIDs(gid);
+	const shouldUpdate = await validateGroupPostAddChild(gid, parentGroupIDs);
+	// If the admin wants to apply changes.
+	if (shouldUpdate) {
+		// Update related groups.
+		for (const parentID of parentGroupIDs) {
+			const parentGroup = state.groups.byGroupID[parentID] as GroupDefinition;
+			// Get parent's compatible units
+			const parentCompatibleUnits = unitsCompatibleWithMeters(metersInGroup(parentID));
+			// Get compatibility change case when add this group to its parent.
+			const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group, parentGroup.defaultGraphicUnit);
+			if (compatibilityChangeCase === GroupCase.LostDefaultGraphicUnit) {
+				// For parent groups, only default graphic units are affected.
+				parentGroup.defaultGraphicUnit = -99;
+				await applyChangesToGroup(parentGroup);
+			}
+		}
+		// Update the group. Now, the changes actually happen.
+		await applyChangesToGroup(group);
+	} else {
+		// Reset the redux state for this group.
+		state.groups.byGroupID[gid] = oldGroup;
+	}
+}
+
+/**
+ * Determines if the change in compatible units of one group are okay with another group.
+ * Warns admin of changes and returns true if the changes should happen.
+ * @param gid The group that has a change in compatible units.
+ * @param parentGroupIDs The parent groups' ids of that group.
+ */
+async function validateGroupPostAddChild(gid: number, parentGroupIDs: number[]): Promise<boolean> {
+	const state = store.getState() as State;
+	// This will hold the overall message for the admin alert.
+	let msg = '';
+	// Tells if the change should be cancelled.
+	let cancel = false;
+	for (const parentID of parentGroupIDs) {
+		const parentGroup = state.groups.byGroupID[parentID] as GroupDefinition;
+		// Get parent's compatible units
+		const parentCompatibleUnits = unitsCompatibleWithMeters(metersInGroup(parentID));
+		// Get compatibility change case when add this group to its parent.
+		const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group, parentGroup.defaultGraphicUnit);
+		switch (compatibilityChangeCase) {
+			// TODO internationalize strings for rest of function
+			case GroupCase.NoCompatibleUnits:
+				msg += `Group ${parentGroup.name} would have no compatible units by the edit to this group so the edit is cancelled\n`;
+				cancel = true;
+				break;
+
+			case GroupCase.LostDefaultGraphicUnit:
+				msg += `Group ${parentGroup.name} will have its compatible units changed and its default graphic unit set to no unit by the edit to this group\n`;
+				break;
+
+			case GroupCase.LostCompatibleUnits:
+				msg += `Group ${parentGroup.name} will have its compatible units changed by the edit to this group\n`;
+				break;
+
+			// Case NoChange requires no message.
+		}
+	}
+	if (msg !== '') {
+		if (cancel) {
+			msg += '\nTHE CHANGE TO THE GROUP IS CANCELLED';
+			// If cancel is true, doesn't allow the admin to apply changes.
+			window.alert(msg);
+		} else {
+			msg += '\nGiven the messages, do you want to cancel this change or continue?';
+			// If msg is not empty, warns the admin and asks if they want to apply changes.
+			cancel = !window.confirm(msg);
+		}
+	}
+	return !cancel;
+}
+
+/**
+ * Calls the api to update a group.
+ * @param group The group to update.
+ */
+async function applyChangesToGroup(group: GroupDefinition): Promise<void> {
+	const groupData = {
+		id: group.id,
+		name: group.name,
+		displayable: group.displayable,
+		gps: group.gps,
+		note: group.note,
+		area: group.area,
+		childGroups: group.childGroups,
+		childMeters: group.childMeters,
+		defaultGraphicUnit: group.defaultGraphicUnit
+	} as GroupData & GroupID;
+	const state = store.getState() as State;
+	// Update Redux state.
+	state.groups.byGroupID[group.id] = group;
+	// Update database.
+	// TODO ??? should we update here each time or wait until save. Issue that also done to parents so need to fix all if want to change.
+	await groupsApi.edit(groupData);
+}
+
+/**
+ * The four cases that could happen when adding a group/meter to a group:
+ * 	- NoChange: Adding this meter/group will not change the compatible units for the group.
+ *  - LostCompatibleUnits: The meter/group is compatible with the default graphic unit although some compatible units are lost.
+ *  - LostDefaultGraphicUnits: The meter/group is not compatible with the default graphic unit but there exists some compatible untis.
+ *  - NoCompatibleUnits: The meter/group will cause the compatible units for the group to be empty.
+ */
+export const enum GroupCase {
+	NoChange = 'NO_CHANGE',
+	LostCompatibleUnits = 'LOST_COMPATIBLE_UNITS',
+	LostDefaultGraphicUnit = 'LOST_DEFAULT_GRAPHIC_UNIT',
+	NoCompatibleUnits = 'NO_COMPATIBLE_UNITS'
+}
+
+/**
+ * Return the case associated if we add the given meter/group to a group.
+ * @param currentUnits The current compatible units of the group.
+ * @param idToAdd The meter/group's id to add to the group.
+ * @param type Can be METER or GROUP.
+ * @param currentDefaultGraphicUnit The default graphic unit.
+ */
+function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType, currentDefaultGraphicUnit: number): GroupCase {
+	// Determine the compatible units for meter or group represented by the id.
+	const newUnits = getCompatibleUnits(idToAdd, type);
+	// Returns the associated case.
+	return groupCase(currentUnits, newUnits, currentDefaultGraphicUnit);
+}
+
+/**
+ * Given a meter or group's id, returns its compatible units.
+ * @param id The meter or group's id.
+ * @param type Can be Meter or Group.
+ */
+function getCompatibleUnits(id: number, type: DataType): Set<number> {
+	if (type == DataType.Meter) {
+		const state = store.getState();
+		// Get the unit id of meter.
+		const unitId = state.meters.byMeterID[id].unitId;
+		// Returns all compatible units with this unit id.
+		return unitsCompatibleWithUnit(unitId);
+	} else {
+		// Returns all compatible units with this group.
+		return unitsCompatibleWithMeters(metersInGroup(id));
+	}
+}
+
+/**
+ * Returns the group case given current units and new units. See the enum GroupCase for the list of possible cases.
+ * @param currentUnits The current compatible units set.
+ * @param newUnits The new compatible units set.
+ * @param defaultGraphicUnit The default graphic unit.
+ */
+function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGraphicUnit: number): GroupCase {
+	// The compatible units of a set of meters or groups is the intersection of the compatible units for each
+	// Thus, we can get the units that will go away with (- is set subtraction/difference):
+	// lostUnit = currentUnit - ( currentUnit n newUnits)
+	const intersection = setIntersect(currentUnits, newUnits);
+	const lostUnits = new Set(Array.from(currentUnits).filter(x => !intersection.has(x)));
+
+	if (lostUnits.size == 0) {
+		return GroupCase.NoChange;
+	} else if (lostUnits.size == currentUnits.size) {
+		return GroupCase.NoCompatibleUnits;
+	} else if (defaultGraphicUnit != -99 && lostUnits.has(defaultGraphicUnit)) {
+		return GroupCase.LostDefaultGraphicUnit;
+	} else {
+		// if the default graphic unit is no unit then you can add any meter/group
+		return GroupCase.LostCompatibleUnits;
+	}
+}
+
+function getMenuOptionFont(compatibilityChangeCase: GroupCase): React.CSSProperties {
+	switch (compatibilityChangeCase) {
+		case GroupCase.NoChange:
+			return { color: 'black' };
+
+		case GroupCase.LostCompatibleUnits:
+			return { color: 'yellow' };
+
+		case GroupCase.LostDefaultGraphicUnit:
+			return { color: 'red' };
+
+		default:
+			// Should never reach here.
+			return {}
+	}
 }
