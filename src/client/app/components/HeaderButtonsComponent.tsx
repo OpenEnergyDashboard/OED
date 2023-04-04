@@ -19,7 +19,7 @@ import { clearCurrentUser } from "../actions/currentUser";
 import { State } from "../types/redux/state";
 import { useSelector } from "react-redux";
 
-export default function HeaderButtonsComponent(showCollapsedMenuButton: boolean, isModal: boolean) {
+export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: boolean, isModal: boolean}) {
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	let loggedInAsAdmin = false;
 	let role: UserRole | null = null;
@@ -39,7 +39,7 @@ export default function HeaderButtonsComponent(showCollapsedMenuButton: boolean,
 	const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
 	const shouldUnitsButtonDisabled = getPage() === "units";
 	const shouldConversionsButtonDisabled = getPage() === "conversions";
-	const dataFor = isModal ? "all-modal" : "all";
+	const dataFor = args.isModal ? "all-modal" : "all";
 
 	const linkStyle: React.CSSProperties = {
 		display: "inline",
@@ -74,14 +74,14 @@ export default function HeaderButtonsComponent(showCollapsedMenuButton: boolean,
 	return (
 		<div>
 			<div className="d-lg-none">
-				{showCollapsedMenuButton ? (
+				{args['showCollapsedMenuButton'] ? (
 					<MenuModalComponent
 						showOptions={showOptions}
 						showCollapsedMenuButton={false}
 					/>
 				) : null}
 			</div>
-			<div className={showCollapsedMenuButton ? "d-none d-lg-block" : ""}>
+			<div className={args.showCollapsedMenuButton ? "d-none d-lg-block" : ""}>
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 				<Link style={adminViewableLinkStyle} to="/admin">
