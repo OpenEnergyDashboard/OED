@@ -33,7 +33,7 @@ export default function getAreaUnitConversion(fromUnit: AreaUnitType, toUnit: Ar
 	let conversion = areaUnitConversions[fromUnit + toUnit];
 	if(conversion == null) {
 		// if it's null, try the other way
-		conversion = 1 / areaUnitConversions[fromUnit + toUnit];
+		conversion = 1 / areaUnitConversions[toUnit + fromUnit];
 	}
 	if(conversion == null) {
 		// if it's still null, then the conversion doesn't exist.

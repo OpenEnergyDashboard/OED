@@ -25,14 +25,15 @@ import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import {
-	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup, assignChildToGroup, calculateMetersInGroup
+	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup, assignChildToGroup
 } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
-import { GroupEditData } from 'types/redux/groups';
+import { GroupEditData } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
+import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -60,8 +61,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// TODO this is a hack - how to properly pass the state?
 	// TODO The creates a copy of the group state which is needed but need to make it state that can be updated and used.
 	// maybe need expanded values type state for all groups.
-	const allGroupStateCopy = JSON.parse(JSON.stringify(groupsState));
-	console.log('group: ', originalGroupState.name, ' has calculateMetersInGroup: ', calculateMetersInGroup(originalGroupState.id, allGroupStateCopy), ' deepMeters: ', originalGroupState.deepMeters);
+	// const allGroupStateCopy = JSON.parse(JSON.stringify(groupsState));
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -174,7 +174,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		displayable: originalGroupState.displayable,
 		note: originalGroupState.note,
 		area: originalGroupState.area,
-		defaultGraphicUnit: originalGroupState.defaultGraphicUnit
+		defaultGraphicUnit: originalGroupState.defaultGraphicUnit,
+		areaUnit: originalGroupState.areaUnit
 	}
 
 	// The information on the children of this group for state. Except for selected, the
@@ -246,6 +247,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Delete the group using the state object where only really need id.
 		dispatch(deleteGroup(state as GroupEditData));
 	}
+	const handleAutoCalculateArea = () => {
+		if(state.deepMeters != undefined && state.areaUnit != AreaUnitType.none) {
+			let areaSum = 0;
+			state.deepMeters.forEach(meterID => {
+				const meter = metersState[meterID];
+				if(meter.area > 0 && meter.areaUnit != AreaUnitType.none) {
+					areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
+				}
+			});
+			setState({...state, ['area']: areaSum});
+		}
+	}
 	/* End Confirm Delete Modal */
 
 	// Reset the state to default values
@@ -294,7 +307,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				originalGroupState.area != state.area ||
 				originalGroupState.defaultGraphicUnit != state.defaultGraphicUnit ||
 				childMeterChanges ||
-				childGroupChanges
+				childGroupChanges ||
+				originalGroupState.areaUnit != state.areaUnit
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
@@ -304,8 +318,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
 				inputOk = false;
+			// If the group has an assigned area, it must have a unit
+			} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+				notifyUser(translate('area.but.no.unit'));
+				inputOk = false;
 			}
-
 			//Check GPS is okay.
 			const gpsInput = state.gps;
 			let gps: GPSPoint | null = null;
@@ -521,6 +538,28 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												min="0"
 												value={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+									}
+									{/* meter area unit input */}
+									{loggedInAsAdmin &&
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="units.area" /></label><br />
+											<Input
+												name='areaUnit'
+												type='select'
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+									}
+									{loggedInAsAdmin &&
+										<div style={formInputStyle}>
+											<Button variant="danger" onClick={handleAutoCalculateArea}>
+												<FormattedMessage id="units.area" />
+											</Button>
 										</div>
 									}
 									{/* GPS input */}

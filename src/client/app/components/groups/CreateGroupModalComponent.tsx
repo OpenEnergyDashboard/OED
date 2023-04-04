@@ -25,6 +25,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -51,7 +52,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		note: '',
 		area: 0,
 		// default is no unit or -99.
-		defaultGraphicUnit: -99
+		defaultGraphicUnit: -99,
+		areaUnit: AreaUnitType.none
 	}
 
 	// The information on the children of this group for state. Except for selected, the
@@ -132,6 +134,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// if (state.area <= 0) {
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
+			inputOk = false;
+		// If the group has an assigned area, it must have a unit
+		} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+			notifyUser(translate('area.but.no.unit'));
 			inputOk = false;
 		}
 

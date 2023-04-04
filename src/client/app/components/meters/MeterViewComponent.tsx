@@ -12,6 +12,9 @@ import { State } from 'types/redux/state';
 import '../../styles/card-page.css';
 import { UnitData } from '../../types/redux/units';
 import { noUnitTranslated } from '../../utils/input';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import translate from '../../utils/translate';
+import EditMeterModalComponent from './EditMeterModalComponent';
 
 interface MeterViewComponentProps {
 	meter: MeterData;

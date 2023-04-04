@@ -2,15 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { AreaUnitType } from 'utils/getAreaUnitConversion';
-import { NamedIDItem } from '../types/items';
 import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/groups';
 import { State } from '../types/redux/state';
 import { groupsApi } from '../utils/api';
-import { GPSPoint } from '../utils/calibration';
-import { browserHistory } from '../utils/history';
-import { showErrorNotification } from '../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
@@ -212,7 +208,7 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification(translate('group.failed.to.edit.group'));
+				showErrorNotification(translate('group.failed.to.edit.group') + e.response.data.message as string);
 			}
 		}
 	};

@@ -17,8 +17,12 @@ import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
-import { ConversionArray } from '../../types/conversionArray';
 import { notifyUser } from '../../utils/input'
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import TimeZoneSelect from '../../components/TimeZoneSelect';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import translate from '../../utils/translate';
 
 // TODO Moved the possible meters/graphic units calculations up to the details component
 // This was to prevent the calculations from being done on every load, but now requires them to be passed as props

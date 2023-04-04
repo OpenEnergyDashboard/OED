@@ -5,8 +5,7 @@
 const express = require('express');
 const _ = require('lodash');
 const validate = require('jsonschema').validate;
-const User = require('../models/User');
-const { isTokenAuthorized } = require('../util/userRoles');
+const Unit = require('../models/Unit');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
@@ -32,7 +31,7 @@ function formatGroupForResponse(item) {
 	return {
 		id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
 		note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit,
-		deepMeters: item.children
+		deepMeters: item.children, areaUnit: item.areaUnit
 	};
 }
 
@@ -240,7 +239,12 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 					type: 'integer'
 				}
 			},
-			defaultGraphicUnit: { type: 'integer' }
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
+			}
 		}
 	};
 
@@ -260,7 +264,8 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 					newGPS,
 					req.body.note,
 					req.body.area,
-					req.body.defaultGraphicUnit
+					req.body.defaultGraphicUnit,
+					req.body.areaUnit
 				);
 
 				await newGroup.insert(t);
@@ -328,7 +333,12 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 					type: 'integer'
 				}
 			},
-			defaultGraphicUnit: { type: 'integer' }
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
+			}
 		}
 	};
 
@@ -350,7 +360,8 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 					newGPS,
 					req.body.note,
 					req.body.area,
-					req.body.defaultGraphicUnit
+					req.body.defaultGraphicUnit,
+					req.body.areaUnit
 				);
 
 				await newGroup.update(t);

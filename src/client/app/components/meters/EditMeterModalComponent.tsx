@@ -13,7 +13,6 @@ import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
-import { ConversionArray } from '../../types/conversionArray';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { UnitData } from '../../types/redux/units';
@@ -21,6 +20,11 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
+import TimeZoneSelect from '../../components/TimeZoneSelect';
+import translate from '../../utils/translate';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 
 interface EditMeterModalComponentProps {
 	show: boolean;

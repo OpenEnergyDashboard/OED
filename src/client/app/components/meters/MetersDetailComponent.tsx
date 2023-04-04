@@ -13,15 +13,13 @@ import HeaderContainer from '../../containers/HeaderContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/card-page.css';
 import { State } from '../../types/redux/state';
-import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
-import { MeterData } from 'types/redux/meters';
 import '../../styles/card-page.css';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 import { UnitData, UnitType } from '../../types/redux/units';
-import * as _ from 'lodash';
 
 export default function MetersDetailComponent() {
 

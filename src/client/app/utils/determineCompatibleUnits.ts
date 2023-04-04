@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import { GroupDefinition } from 'types/redux/groups';
 import store from '../index';
 import { ConversionArray } from '../types/conversionArray';
 import { MeterData } from '../types/redux/meters';
@@ -195,7 +194,7 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
 // export function calculateMetersInGroup(groupId: number, groupState: {[] as GroupDefinition}): number[] {
 // export function calculateMetersInGroup(groupId: number, groupState: State.group.byGroupID): number[] {
 export function calculateMetersInGroup(groupId: number, groupState: any): number[] {
-	// Use a set to avoid duplicates. 
+	// Use a set to avoid duplicates.
 	// Gets the group associated with groupId.
 	// const groupToCheck = _.get(groupState, groupId) as GroupDefinition;
 	const groupToCheck = groupState[groupId] as GroupDefinition;
