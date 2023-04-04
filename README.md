@@ -47,6 +47,10 @@ improve what it does. We commit to a timely response to input that clearly artic
 be taken and why. Whatever our decision, you will be informed. We want everyone to know that we take having a welcoming community seriously and will work for and
 respond appropriately to any concern or ideas for improvement.
 
+## Security Concerns ##
+
+If you think there is a security concern in the OED software, the please visit our [security reporting page](SECURITY.md) for information on reporting it to the OED project.
+
 ## Contact ##
 
 To contact us, see our [contact web page](https://openenergydashboard.github.io/contact.html), send an email to info@OpenEnergyDashboard.org or open an issue on GitHub.
