@@ -12,6 +12,7 @@ import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
 import { groupsApi } from './api';
+import translate from './translate';
 
 /**
  * The intersect operation of two sets.
@@ -373,16 +374,16 @@ async function validateGroupPostAddChild(gid: number, parentGroupIDs: number[]):
 		switch (compatibilityChangeCase) {
 			// TODO internationalize strings for rest of function
 			case GroupCase.NoCompatibleUnits:
-				msg += `Group ${parentGroup.name} would have no compatible units by the edit to this group so the edit is cancelled\n`;
+				msg += `${translate('group')} ${parentGroup.name} ${translate('group.edit.nocompatible')}\n`;
 				cancel = true;
 				break;
 
 			case GroupCase.LostDefaultGraphicUnit:
-				msg += `Group ${parentGroup.name} will have its compatible units changed and its default graphic unit set to no unit by the edit to this group\n`;
+				msg += `${translate('group')} ${parentGroup.name} ${translate('group.edit.nounit')}\n`;
 				break;
 
 			case GroupCase.LostCompatibleUnits:
-				msg += `Group ${parentGroup.name} will have its compatible units changed by the edit to this group\n`;
+				msg += `${translate('group')} ${parentGroup.name} ${translate('group.edit.changed')}\n`;
 				break;
 
 			// Case NoChange requires no message.
@@ -390,11 +391,11 @@ async function validateGroupPostAddChild(gid: number, parentGroupIDs: number[]):
 	}
 	if (msg !== '') {
 		if (cancel) {
-			msg += '\nTHE CHANGE TO THE GROUP IS CANCELLED';
+			msg += `\n${translate('group.edit.cancelled')}`;
 			// If cancel is true, doesn't allow the admin to apply changes.
 			window.alert(msg);
 		} else {
-			msg += '\nGiven the messages, do you want to cancel this change or continue?';
+			msg += `\n${translate('group.edit.verify')}`;
 			// If msg is not empty, warns the admin and asks if they want to apply changes.
 			cancel = !window.confirm(msg);
 		}
