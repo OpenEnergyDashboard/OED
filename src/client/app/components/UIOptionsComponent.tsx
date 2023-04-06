@@ -2,27 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
-import 'rc-slider/assets/index.css';
 import * as React from 'react';
-import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import ReactTooltip from 'react-tooltip';
-import { Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
+import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
+import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
+import * as moment from 'moment';
+import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportComponent from '../components/ExportComponent';
-import ChartLinkContainer from '../containers/ChartLinkContainer';
-import LanguageSelectorContainer from '../containers/LanguageSelectorContainer';
-import {
-	ChangeAreaNormalizationAction, ChangeBarStackingAction, ChangeCompareSortingOrderAction,
-	ChartTypes, SetOptionsVisibility
-} from '../types/redux/graph';
-import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import AreaUnitSelectComponent from './AreaUnitSelectComponent';
-import ChartDataSelectComponent from './ChartDataSelectComponent';
 import ChartSelectComponent from './ChartSelectComponent';
-import GraphicRateMenuComponent from './GraphicRateMenuComponent';
-import MapChartSelectComponent from './MapChartSelectComponent';
+import ChartDataSelectComponent from './ChartDataSelectComponent';
+import { ChangeAreaNormalizationAction, ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
+import ChartLinkContainer from '../containers/ChartLinkContainer';
+import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
+import { ChartTypes } from '../types/redux/graph';
+import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import 'rc-slider/assets/index.css';
+import MapChartSelectComponent from './MapChartSelectComponent';
+import ReactTooltip from 'react-tooltip';
+import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 

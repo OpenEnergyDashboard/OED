@@ -4,28 +4,29 @@
 
 import * as _ from 'lodash';
 import * as React from 'react';
-import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import { GroupsState } from 'types/redux/groups';
-import { MetersState } from 'types/redux/meters';
-import {
-	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedGroups,
-	updateSelectedMeters, updateSelectedUnit
-} from '../actions/graph';
-import { DataType } from '../types/Datasources';
-import { SelectOption } from '../types/items';
-import { Dispatch } from '../types/redux/actions';
-import { ChartTypes } from '../types/redux/graph';
-import { State } from '../types/redux/state';
-import { DisplayableType, UnitData, UnitsState, UnitType } from '../types/redux/units';
-import {
-	calculateScaleFromEndpoints, CartesianPoint, Dimensions, gpsToUserGrid,
-	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
-} from '../utils/calibration';
-import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import MultiSelectComponent from './MultiSelectComponent';
+import { SelectOption } from '../types/items';
+import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { useSelector, useDispatch } from 'react-redux';
+import { State } from '../types/redux/state';
+import { ChartTypes } from '../types/redux/graph';
+import { DataType } from '../types/Datasources';
+import {
+	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
+	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid
+} from '../utils/calibration';
+import {
+	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
+	updateSelectedGroups, updateSelectedUnit
+} from '../actions/graph';
+import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
+import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
+import { Dispatch } from '../types/redux/actions';
+import { UnitsState } from '../types/redux/units';
+import { MetersState } from 'types/redux/meters';
+import { GroupsState } from 'types/redux/groups';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.

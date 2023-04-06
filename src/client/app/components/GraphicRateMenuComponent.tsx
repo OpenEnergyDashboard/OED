@@ -4,13 +4,13 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
-import Select from 'react-select';
-import { updateLineGraphRate } from '../actions/graph';
-import { SelectOption } from '../types/items';
-import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { State } from '../types/redux/state';
+import { useDispatch, useSelector } from 'react-redux';
+import { SelectOption } from '../types/items';
+import Select from 'react-select';
 import translate from '../utils/translate';
+import { updateLineGraphRate } from '../actions/graph'
+import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 
 /**
  * React component that controls the line graph rate menu

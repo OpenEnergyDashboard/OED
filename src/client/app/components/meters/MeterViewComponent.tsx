@@ -2,19 +2,19 @@
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
-import { CurrentUserState } from 'types/redux/currentUser';
-import { MeterData } from 'types/redux/meters';
 import { State } from 'types/redux/state';
-import '../../styles/card-page.css';
-import { UnitData } from '../../types/redux/units';
-import { noUnitTranslated } from '../../utils/input';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import translate from '../../utils/translate';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import EditMeterModalComponent from './EditMeterModalComponent';
+import { MeterData } from 'types/redux/meters';
+import translate from '../../utils/translate';
+import { FormattedMessage } from 'react-intl';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { CurrentUserState } from 'types/redux/currentUser';
+import '../../styles/card-page.css';
+import { UnitData} from '../../types/redux/units';
+import { noUnitTranslated } from '../../utils/input';
 
 interface MeterViewComponentProps {
 	meter: MeterData;

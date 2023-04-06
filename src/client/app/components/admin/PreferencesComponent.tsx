@@ -3,20 +3,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { Button, Input } from 'reactstrap';
-import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
-import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index';
-import {
-	ToggleDefaultAreaNormalizationAction, ToggleDefaultBarStackingAction, UpdateDefaultAreaUnitAction,
-	UpdateDefaultChartToRenderAction, UpdateDefaultFileSizeLimit, UpdateDefaultLanguageAction,
-	UpdateDefaultTimeZone, UpdateDefaultWarningFileSize, UpdateDisplayTitleAction
-} from '../../types/redux/admin';
+import { Input, Button } from 'reactstrap';
 import { ChartTypes } from '../../types/redux/graph';
+import {
+	ToggleDefaultBarStackingAction,
+	UpdateDefaultChartToRenderAction,
+	UpdateDefaultLanguageAction,
+	UpdateDefaultTimeZone,
+	UpdateDisplayTitleAction,
+	UpdateDefaultWarningFileSize,
+	UpdateDefaultFileSizeLimit,
+	ToggleDefaultAreaNormalizationAction,
+	UpdateDefaultAreaUnitAction
+} from '../../types/redux/admin';
+import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
+import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
-import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import TimeZoneSelect from '../TimeZoneSelect';
+import store from '../../index';
+import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface PreferencesProps {
 	displayTitle: string;

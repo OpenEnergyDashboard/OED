@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import store from '../index';
-import { ConversionArray } from '../types/conversionArray';
+import * as _ from 'lodash';
 import { MeterData } from '../types/redux/meters';
+import { ConversionArray } from '../types/conversionArray';
 import { UnitData, UnitType } from '../types/redux/units';
 import { GroupData, GroupDefinition, GroupEditData, GroupID } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';

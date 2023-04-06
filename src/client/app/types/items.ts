@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from '../types/redux/graph';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { LanguageTypes } from './redux/i18n';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * The type of options displayed in Select components.

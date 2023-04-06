@@ -4,14 +4,14 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import Plot from 'react-plotly.js';
 import { connect } from 'react-redux';
-import { DataType } from '../types/Datasources';
-import Locales from '../types/locales';
-import { State } from '../types/redux/state';
-import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
+import { State } from '../types/redux/state';
+import Plot from 'react-plotly.js';
+import Locales from '../types/locales';
+import { DataType } from '../types/Datasources';
 import { barUnitLabel } from '../utils/graphics';
+import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access

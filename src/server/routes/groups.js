@@ -288,7 +288,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 9,
+		maxProperties: 10,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },

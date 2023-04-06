@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/groups';
+import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { groupsApi } from '../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
+import * as t from '../types/redux/groups';
+import { groupsApi } from '../utils/api';
 import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {

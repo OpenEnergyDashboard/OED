@@ -3,28 +3,29 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
+import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
+import translate from '../../utils/translate';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
+import '../../styles/modal.css';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
-import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
-import { UnitData } from '../../types/redux/units';
+import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
-import TimeZoneSelect from '../../components/TimeZoneSelect';
-import translate from '../../utils/translate';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
+import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
+
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -295,7 +296,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// All units are compatible
 			compatibleUnits = new Set(dropdownsState.possibleMeterUnits);
 		}
-
 		// Update the state
 		setDropdownsState({
 			...dropdownsState,

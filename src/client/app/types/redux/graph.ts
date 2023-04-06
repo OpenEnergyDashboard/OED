@@ -4,9 +4,9 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
+import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { ActionType } from './actions';
 
 export enum ChartTypes {
 	line = 'line',
