@@ -4,7 +4,7 @@
 
 import * as React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "reactstrap";
+import { Button, Dropdown } from "reactstrap";
 import { FormattedMessage } from "react-intl";
 import MenuModalComponent from "./MenuModalComponent";
 import getPage from "../utils/getPage";
@@ -61,6 +61,14 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 		display: renderCSVButton ? "inline" : "none",
 		paddingLeft: "5px",
 	};
+	const dropdownContainer: React.CSSProperties = {
+		position: "relative",
+		display: "inline-block"
+	};
+	const dropdownContent: React.CSSProperties = {
+		position: "absolute",
+		display: "none"
+	};
 
 	const handleLogOut = () => {
 		if (useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges))
@@ -74,7 +82,7 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 	return (
 		<div>
 			<div className="d-lg-none">
-				{args['showCollapsedMenuButton'] ? (
+				{args.showCollapsedMenuButton ? (
 					<MenuModalComponent
 						showOptions={showOptions}
 						showCollapsedMenuButton={false}
@@ -84,6 +92,16 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 			<div className={args.showCollapsedMenuButton ? "d-none d-lg-block" : ""}>
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
+				<Dropdown style={linkStyle}>
+					<Button style={linkStyle}>Menu</Button>
+					<div>
+						<Link style={linkStyle} to="/meters">
+							<Button disabled={shouldMetersButtonDisabled} outline>
+								<FormattedMessage id="meters" />
+							</Button>
+						</Link>
+					</div>
+				</Dropdown>
 				<Link style={adminViewableLinkStyle} to="/admin">
 					<Button disabled={shouldAdminButtonDisabled} outline>
 						<FormattedMessage id="admin.panel" />
@@ -138,3 +156,10 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 		</div>
 	);
 }
+
+
+// hooks are easier since everything gets put into a single file
+// makes maintaining the code easier
+// don't have to mess around with props, so you couldn't access state and you would have to access the state from a container
+// OED is converting everything to react hooks, since OED is older than react hooks
+// /home/nicolax/Desktop/OED/src/client/app/components/ChartSelectComponent.tsx
