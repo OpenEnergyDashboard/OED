@@ -18,7 +18,8 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-returns */
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -214,7 +215,6 @@ export interface LinkOptions {
 /**
  * Update graph options from a link
  * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
- * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];

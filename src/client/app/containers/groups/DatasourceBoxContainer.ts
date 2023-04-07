@@ -25,7 +25,7 @@ interface DatasourceBoxContainerProps {
 	selectDatasource?: (meterIDs: number[]) => void;
 }
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 // ownProps.selection may be 'children', 'all', or 'custom'
 // if ownProps.selection is 'children', ownProps must have a 'parentID' property
 // if ownProps.selection is 'custom', ownProps must have both a 'datasource' and 'selectDatasource' prop (and optional selectedOptions prop)

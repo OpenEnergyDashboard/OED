@@ -21,7 +21,8 @@ import * as moment from 'moment';
 import {browserHistory} from '../utils/history';
 import {logToServer} from './logs';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-returns */
 
 function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };

@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function AdminComponent() {
 

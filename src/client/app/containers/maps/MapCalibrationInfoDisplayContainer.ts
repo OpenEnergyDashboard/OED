@@ -11,7 +11,7 @@ import {GPSPoint} from '../../utils/calibration';
 import {logToServer} from '../../actions/logs';
 import translate from '../../utils/translate';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;

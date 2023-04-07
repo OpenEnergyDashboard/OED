@@ -13,7 +13,7 @@ const defaultState: ConversionsState = {
 	conversions: []
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function conversions(state = defaultState, action: ConversionsAction) {
 	switch (action.type) {

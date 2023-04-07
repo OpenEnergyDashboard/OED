@@ -8,7 +8,7 @@ import {Dispatch} from '../../types/redux/actions';
 import {fetchMapsDetails, setNewMap, submitEditedMaps} from '../../actions/map';
 import MapsDetailComponent from '../../components/maps/MapsDetailComponent';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	return {

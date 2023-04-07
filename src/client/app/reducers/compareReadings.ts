@@ -13,7 +13,7 @@ const defaultState: CompareReadingsState = {
 	groupsFetching: false
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function readings(state = defaultState, action: CompareReadingsAction) {
 	switch (action.type) {

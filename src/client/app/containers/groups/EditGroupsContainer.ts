@@ -19,7 +19,7 @@ import { State } from '../../types/redux/state';
 import {  browserHistory } from '../../utils/history';
 import { GPSPoint } from 'utils/calibration';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const allMeters = _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name');

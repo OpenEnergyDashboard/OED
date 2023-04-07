@@ -16,7 +16,7 @@ interface UnitViewComponentProps {
 	unit: UnitData;
 }
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function UnitViewComponent(props: UnitViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.

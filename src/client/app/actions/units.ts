@@ -9,7 +9,7 @@ import * as t from '../types/redux/units';
 import { unitsApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function requestUnitsDetails(): t.RequestUnitsDetailsAction {
 	return { type: ActionType.RequestUnitsDetails };

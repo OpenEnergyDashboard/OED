@@ -10,7 +10,7 @@ import { State } from '../../types/redux/state';
 import { DisplayMode } from '../../types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State, ownProps: { id: number }) {
 	const id = ownProps.id;

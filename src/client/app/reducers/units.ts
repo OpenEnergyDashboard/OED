@@ -13,7 +13,7 @@ const defaultState: UnitsState = {
 	units: {}
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function units(state = defaultState, action: UnitsAction) {
 	switch (action.type) {

@@ -10,7 +10,7 @@ import { ActionType } from '../types/redux/actions';
 */
 const defaultState: CurrentUserState = { isFetching: false, profile: null  };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function profile(state = defaultState, action: CurrentUserAction): CurrentUserState {
 	switch (action.type) {

@@ -19,7 +19,7 @@ import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	return {

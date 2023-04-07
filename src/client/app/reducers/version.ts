@@ -10,7 +10,7 @@ import { ActionType } from '../types/redux/actions';
 */
 const defaultState: VersionState = { isFetching: false, version: '' };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function version(state = defaultState, action: VersionAction) {
 	switch (action.type) {

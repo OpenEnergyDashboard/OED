@@ -16,7 +16,7 @@ import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;

@@ -14,7 +14,7 @@ import { NamedIDItem } from '../../types/items';
 import { DisplayMode } from '../../types/redux/groups';
 import { GPSPoint } from 'utils/calibration';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const sortedMeters: NamedIDItem[] = _.sortBy(_.values(state.meters.byMeterID).map(

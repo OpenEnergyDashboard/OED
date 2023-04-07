@@ -12,7 +12,7 @@ import store from '../../index';
 import { CalibrationSettings } from '../../types/redux/map';
 import Locales from '../../types/locales'
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -143,7 +143,7 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	return trace;
 }
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function handlePointClick(event: plotly.PlotMouseEvent) {
 	event.event.preventDefault();

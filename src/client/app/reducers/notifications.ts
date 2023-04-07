@@ -9,7 +9,7 @@ const defaultState: NotificationsState = {
 	notification: {}
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function topLevel(state = defaultState, action: NotificationAction) {
 	switch (action.type) {

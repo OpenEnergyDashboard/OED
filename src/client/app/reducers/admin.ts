@@ -21,7 +21,7 @@ const defaultState: AdminState = {
 	isUpdatingCikAndDBViews: false
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function admin(state = defaultState, action: AdminAction) {
 	switch (action.type) {

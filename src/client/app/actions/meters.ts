@@ -8,7 +8,7 @@ import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
 	return { type: ActionType.RequestMetersDetails };

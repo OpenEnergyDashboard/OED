@@ -12,7 +12,9 @@ import { browserHistory } from '../utils/history';
 import translate from '../utils/translate';
 import { GPSPoint } from 'utils/calibration';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-returns */
+/* eslint-disable jsdoc/require-returns-description */
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
@@ -103,7 +105,7 @@ export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: num
 
 /**
  * Change the display mode of the groups page
- * @param newMode Either 'view', 'edit', or 'create'
+ * @param {t.DisplayMode} newMode Either 'view', 'edit', or 'create'
  * @returns {{type: string, newMode: string}}
  */
 export function changeDisplayMode(newMode: t.DisplayMode): t.ChangeDisplayModeAction {
@@ -139,7 +141,6 @@ function canBeginEditing(state: State): boolean {
 /**
  * Copy the group with the given ID into `groupInEditing` if allowed.
  * @param {number} groupID The ID of the group to be edited
- * @returns {function(*, *)}
  */
 export function beginEditingIfPossible(groupID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
@@ -213,7 +214,6 @@ export function changeChildMeters(meterIDs: number[]): t.ChangeChildMetersAction
 	return { type: ActionType.ChangeChildMeters, meterIDs };
 }
 
-/* eslint-disable */
 
 /**
  * Record whether or not a request to submit edits to the database has been sent
@@ -318,7 +318,6 @@ function submitGroupEdits(group: t.GroupData & t.GroupID): Thunk {
  * If this is the case, decides whether it is a new group
  * being created, or an old group being edited, and calls the
  * appropriate helper function to handle the request.
- * @returns {function(*, *)}
  */
 export function submitGroupInEditingIfNeeded() {
 	return (dispatch: Dispatch, getState: GetState) => {

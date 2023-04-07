@@ -9,7 +9,7 @@ import MeterDropdownComponent from '../components/MeterDropDownComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	return {

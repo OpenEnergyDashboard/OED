@@ -12,7 +12,7 @@ import { clearCurrentUser } from '../actions/currentUser';
 import { UserRole } from '../types/items';
 import { flipLogOutState } from '../actions/unsavedWarning';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State, ownProps: { showCollapsedMenuButton: boolean, isModal: boolean}) {
 	const currentUser = state.currentUser.profile;

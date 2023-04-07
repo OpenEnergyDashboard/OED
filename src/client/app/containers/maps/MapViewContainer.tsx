@@ -9,7 +9,7 @@ import { State } from '../../types/redux/state';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {editMapDetails, removeMap, setCalibration} from '../../actions/map';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	let map = state.maps.byMapID[ownProps.id];

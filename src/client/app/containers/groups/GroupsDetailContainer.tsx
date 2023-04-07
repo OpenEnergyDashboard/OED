@@ -10,7 +10,7 @@ import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { Dispatch } from '../../types/redux/actions';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const selectGroups = state.groups.selectedGroups;

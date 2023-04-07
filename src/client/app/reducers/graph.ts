@@ -26,7 +26,7 @@ const defaultState: GraphState = {
 	renderOnce: false
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {

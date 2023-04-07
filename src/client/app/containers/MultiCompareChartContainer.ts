@@ -10,7 +10,7 @@ import { CompareReadingsData } from '../types/redux/compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export interface CompareEntity {
 	id: number;

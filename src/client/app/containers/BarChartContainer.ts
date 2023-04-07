@@ -12,8 +12,10 @@ import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { barUnitLabel } from '../utils/graphics';
 
-/* eslint-disable */
-/** 
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
+/**
  * Passes the current redux state of the barchart, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access
  * your reducer state objects from within your React components.

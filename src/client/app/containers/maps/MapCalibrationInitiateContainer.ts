@@ -9,7 +9,7 @@ import {updateMapMode, updateMapSource} from '../../actions/map';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {State} from '../../types/redux/state';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	return {

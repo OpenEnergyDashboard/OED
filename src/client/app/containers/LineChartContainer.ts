@@ -12,7 +12,7 @@ import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;

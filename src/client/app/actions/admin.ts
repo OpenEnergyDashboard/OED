@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -130,7 +130,7 @@ function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
 }
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function fetchPreferencesIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {

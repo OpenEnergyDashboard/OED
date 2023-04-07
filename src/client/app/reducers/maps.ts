@@ -18,7 +18,7 @@ const defaultState: MapState = {
 	calibrationSettings: {showGrid: false}
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function maps(state = defaultState, action: MapsAction) {
 	let submitting;

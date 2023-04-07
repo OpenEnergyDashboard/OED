@@ -9,7 +9,9 @@ import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
 
 export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
 	return { type: ActionType.RequestConversionsDetails };

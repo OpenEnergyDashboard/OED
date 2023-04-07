@@ -13,7 +13,7 @@ const defaultState: LineReadingsState = {
 	groupsFetching: false
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function readings(state = defaultState, action: LineReadingsAction) {
 	switch (action.type) {

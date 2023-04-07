@@ -13,7 +13,7 @@ const defaultState: UnsavedWarningState = {
 	submitFunction: () => any
 };
 
-/* eslint-disable */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function unsavedWarning(state = defaultState, action: UnsavedWarningAction) {
 	switch (action.type) {
