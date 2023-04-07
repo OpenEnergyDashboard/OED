@@ -53,6 +53,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.admin.unitview': { link: `${BASE_URL}/adminUnitViewing.html` },
 			'help.admin.user': { link: `${BASE_URL}/adminUser.html` },
 			'help.csv.header': { link: `${BASE_URL}/adminDataAcquisition.html` },
+			'help.home.area.normalize': { link: `${BASE_URL}/areaNormalization.html` },
 			'help.home.bar.custom.slider.tip': { link: `${BASE_URL}/barGraphic.html#usage` },
 			'help.home.bar.interval.tip': { link: `${BASE_URL}/barGraphic.html#usage` },
 			'help.home.bar.stacking.tip': { link: `${BASE_URL}/barGraphic.html#barStacking` },

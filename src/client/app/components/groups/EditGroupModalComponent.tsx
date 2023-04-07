@@ -247,19 +247,39 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Delete the group using the state object where only really need id.
 		dispatch(deleteGroup(state as GroupEditData));
 	}
+	/* End Confirm Delete Modal */
+
+	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
+	// or if any other errors are encountered.
 	const handleAutoCalculateArea = () => {
-		if(state.deepMeters != undefined && state.areaUnit != AreaUnitType.none) {
-			let areaSum = 0;
-			state.deepMeters.forEach(meterID => {
-				const meter = metersState[meterID];
-				if(meter.area > 0 && meter.areaUnit != AreaUnitType.none) {
-					areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
+		if(state.deepMeters != undefined && state.deepMeters.length > 0) {
+			if(state.areaUnit != AreaUnitType.none) {
+				let areaSum = 0;
+				let notifyMsg = '';
+				state.deepMeters.forEach(meterID => {
+					const meter = metersState[meterID];
+					if(meter.area > 0) {
+						if(meter.areaUnit != AreaUnitType.none) {
+							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
+						} else {
+							notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.unit');
+						}
+					} else {
+						notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.zero');
+					}
+				});
+				if(notifyMsg != '') {
+					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
 				}
-			});
-			setState({...state, ['area']: areaSum});
+				// the + here converts back into a number. this method also removes trailing zeroes.
+				setState({...state, ['area']: +areaSum.toFixed(2)});
+			} else {
+				notifyUser(translate('group.area.calculate.error.group.unit'));
+			}
+		} else {
+			notifyUser(translate('group.area.calculate.error.no.meters'));
 		}
 	}
-	/* End Confirm Delete Modal */
 
 	// Reset the state to default values
 	// To be used for the discard changes button
@@ -555,11 +575,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											</Input>
 										</div>
 									}
+									{/* Calculate sum of meter areas */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<Button variant="danger" onClick={handleAutoCalculateArea}>
-												<FormattedMessage id="units.area" />
+											<Button variant="secondary" onClick={handleAutoCalculateArea}>
+												<FormattedMessage id="group.area.calculate" />
 											</Button>
+											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										</div>
 									}
 									{/* GPS input */}

@@ -58,33 +58,29 @@ export default function ChartDataSelectComponent() {
 		let sortedGroups = getGroupCompatibilityForDropdown(state);
 		const sortedUnits = getUnitCompatibilityForDropdown(state);
 
-		const nonAreaMeters: number[] = [];
-		const nonAreaGroups: number[] = [];
+		// store meters which are found to be incompatible.
+		const incompatibleMeters = new Set<number>();
+		const incompatibleGroups = new Set<number>();
 
 		// only run this check if area normalization is on
 		if(state.graph.areaNormalization) {
 			sortedMeters.forEach(meter => {
-				// do not allow meter to be selected if it does not have area
-				if(allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit == AreaUnitType.none) {
+				// do not allow meter to be selected if it has zero area or no area unit
+				if(allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit === AreaUnitType.none) {
 					meter.isDisabled = true;
-					nonAreaMeters.push(meter.value);
+					incompatibleMeters.add(meter.value);
 				}
 			});
 			sortedGroups.forEach(group => {
-				// do not allow group to be selected if it does not have area
-				if(allGroups[group.value].area === 0 || allGroups[group.value].areaUnit == AreaUnitType.none) {
+				// do not allow group to be selected if it has zero area or no area unit
+				if(allGroups[group.value].area === 0 || allGroups[group.value].areaUnit === AreaUnitType.none) {
 					group.isDisabled = true;
-					nonAreaGroups.push(group.value);
+					incompatibleGroups.add(group.value);
 				}
 			});
 		}
 
-		//Map information about the currently selected meters into a format the component can display.
-		// do extra check for display if using mapChart.
-		const nonGpsMeters: number[] = [];
-		const nonGpsGroups: number[] = [];
-
-		// Don't do this if there is no selected map.
+		// ony run this check if we are displaying a map chart
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
@@ -126,12 +122,12 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(meter.value, DataType.Meter, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 						meter.isDisabled = true;
-						nonGpsMeters.push(meter.value);
+						incompatibleMeters.add(meter.value);
 					}
 				} else {
 					// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
 					meter.isDisabled = true;
-					nonGpsMeters.push(meter.value);
+					incompatibleMeters.add(meter.value);
 				}
 			});
 			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
@@ -143,15 +139,16 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(group.value, DataType.Group, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 						group.isDisabled = true;
-						nonGpsGroups.push(group.value);
+						incompatibleGroups.add(group.value);
 					}
 				} else {
 					group.isDisabled = true;
-					nonGpsGroups.push(group.value);
+					incompatibleGroups.add(group.value);
 				}
 			});
 		}
 
+		//Map information about the currently selected meters into a format the component can display.
 		const compatibleSelectedMeters: SelectOption[] = [];
 		const allSelectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
@@ -162,7 +159,7 @@ export default function ChartDataSelectComponent() {
 				isDisabled: false
 			} as SelectOption)
 			// don't include meters that can't be graphed with current settings
-			if (!(nonGpsMeters.includes(meterID)) && !(nonAreaMeters.includes(meterID))) {
+			if (!incompatibleMeters.has(meterID)) {
 				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 				// meter that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -182,7 +179,7 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
-		// re-sort by disabled because that status may have changed (mainly for maps)
+		// re-sort by disabled because that status may have changed
 		sortedMeters = _.sortBy(sortedMeters, item => item.isDisabled, 'asc');
 		// push a dummy item as a divider.
 		const firstDisabledMeter: number = sortedMeters.findIndex(item => item.isDisabled);
@@ -205,7 +202,7 @@ export default function ChartDataSelectComponent() {
 				isDisabled: false
 			} as SelectOption);
 			// don't include groups that can't be graphed with current settings
-			if (!(nonGpsGroups.includes(groupID)) && !(nonAreaGroups.includes(groupID))) {
+			if (!incompatibleGroups.has(groupID)) {
 				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 				// group that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -225,7 +222,7 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
-		// re-sort by disabled because that status may have changed (mainly for maps)
+		// re-sort by disabled because that status may have changed
 		sortedGroups = _.sortBy(sortedGroups, item => item.isDisabled, 'asc');
 		// dummy item as a divider
 		const firstDisabledGroup: number = sortedGroups.findIndex(item => item.isDisabled);
@@ -346,6 +343,7 @@ export default function ChartDataSelectComponent() {
 				<FormattedMessage id='units' />:
 			</p>
 			<div style={divBottomPadding}>
+				{/* TODO this could be converted to a regular Select component */}
 				<MultiSelectComponent
 					options={dataProps.sortedUnits}
 					selectedOptions={dataProps.selectedUnit}

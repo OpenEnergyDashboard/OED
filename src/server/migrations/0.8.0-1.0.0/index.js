@@ -14,14 +14,16 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_unit_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/create_units_table.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/conversion/create_conversions_table.sql'));
+		await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/unit/add_area_unit_types.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default.sql'));
 		// Insert default units and conversions into the database. 
 		// This file should be called before these values are used for meters and groups.
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_default_units_and_conversions.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_unit_id_default_graphic_unit.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_unit_id_default_graphic_unit_area_unit.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/alter_meter_time_holders.sql'));
 		// Note that default units and conversions must be inserted before calling this file.
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/update_unit_id_default_graphic_unit.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/group/add_default_graphic_unit.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/group/add_default_graphic_unit_area_unit.sql'));
 		// Note that default units and conversions must be inserted before calling this file.
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/group/update_default_graphic_unit.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/cik/create_cik_table.sql'));

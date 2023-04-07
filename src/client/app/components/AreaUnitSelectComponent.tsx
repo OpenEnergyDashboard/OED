@@ -21,7 +21,7 @@ export default function AreaUnitSelectComponent() {
 
 	const graphState = useSelector((state: State) => state.graph);
 
-	// Array of select options created from the rates
+	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
 
 	Object.keys(AreaUnitType).forEach(unitKey => {
@@ -56,7 +56,6 @@ export default function AreaUnitSelectComponent() {
 							}
 						}}
 					/>
-					{/* <TooltipMarkerComponent page='home' helpTextId='help.home.select.units' /> */}
 				</div>
 			}
 		</div>

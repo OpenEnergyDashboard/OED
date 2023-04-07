@@ -25,7 +25,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
-import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -103,6 +103,38 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	// Dropdowns
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
+
+	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
+	// or if any other errors are encountered.
+	const handleAutoCalculateArea = () => {
+		if(state.deepMeters != undefined && state.deepMeters.length > 0) {
+			if(state.areaUnit != AreaUnitType.none) {
+				let areaSum = 0;
+				let notifyMsg = '';
+				state.deepMeters.forEach(meterID => {
+					const meter = metersState[meterID];
+					if(meter.area > 0) {
+						if(meter.areaUnit != AreaUnitType.none) {
+							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
+						} else {
+							notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.unit');
+						}
+					} else {
+						notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.zero');
+					}
+				});
+				if(notifyMsg != '') {
+					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
+				}
+				// the + here converts back into a number
+				setState({...state, ['area']: +areaSum.toFixed(2)});
+			} else {
+				notifyUser(translate('group.area.calculate.error.group.unit'));
+			}
+		} else {
+			notifyUser(translate('group.area.calculate.error.no.meters'));
+		}
+	}
 
 	const handleClose = () => {
 		setShowModal(false);
@@ -342,6 +374,26 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												min="0"
 												value={state.area}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* meter area unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="units.area" /></label><br />
+											<Input
+												name='areaUnit'
+												type='select'
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Calculate sum of meter areas */}
+										<div style={formInputStyle}>
+											<Button variant="secondary" onClick={handleAutoCalculateArea}>
+												<FormattedMessage id="group.area.calculate" />
+											</Button>
+											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
