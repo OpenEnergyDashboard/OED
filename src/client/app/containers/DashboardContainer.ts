@@ -5,6 +5,9 @@
 import { connect } from 'react-redux';
 import DashboardComponent from '../components/DashboardComponent';
 import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { changeGraphZoomIfNeeded } from '../actions/graph';
 
 /* eslint-disable */
 /**
