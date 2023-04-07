@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { receiveCurrentUser } from '../actions/currentUser';
-import LoginComponent from '../components/LoginComponent';
 import { User } from '../types/items';
+import { receiveCurrentUser } from '../actions/currentUser'
+import LoginComponent from '../components/LoginComponent';
 import { Dispatch } from '../types/redux/actions';
 
 /* eslint-disable */

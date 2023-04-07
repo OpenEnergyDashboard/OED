@@ -4,20 +4,20 @@
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
+import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
-import { UnitDataById } from 'types/redux/units';
-import { deleteConversion, submitEditedConversion } from '../../actions/conversions';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import { FormattedMessage } from 'react-intl';
+import translate from '../../utils/translate';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
-import translate from '../../utils/translate';
-import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { UnitDataById } from 'types/redux/units';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 
 interface EditConversionModalComponentProps {
 	show: boolean;

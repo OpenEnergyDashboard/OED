@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from '../types/redux/actions';
 import { LineReadingsAction, LineReadingsState } from '../types/redux/lineReadings';
+import { ActionType } from '../types/redux/actions';
 
 const defaultState: LineReadingsState = {
 	byMeterID: {},

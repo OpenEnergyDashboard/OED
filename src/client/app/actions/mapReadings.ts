@@ -2,10 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import {Dispatch, GetState, Thunk} from '../types/redux/actions';
+import {TimeInterval} from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, GetState, Thunk } from '../types/redux/actions';
-import { readingsApi } from '../utils/api';
 import {
 	receiveGroupBarReadings,
 	receiveMeterBarReadings,
@@ -14,6 +13,7 @@ import {
 	shouldFetchGroupBarReadings,
 	shouldFetchMeterBarReadings
 } from './barReadings';
+import {readingsApi} from '../utils/api';
 
 /* eslint-disable jsdoc/require-returns */
 

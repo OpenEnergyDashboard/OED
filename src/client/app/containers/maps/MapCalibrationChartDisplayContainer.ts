@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as plotly from 'plotly.js';
-import Plot from 'react-plotly.js';
 import { connect } from 'react-redux';
+import Plot from 'react-plotly.js';
+import { State } from '../../types/redux/state';
+import * as plotly from 'plotly.js';
+import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
 import { updateCurrentCartesian } from '../../actions/map';
 import store from '../../index';
-import Locales from '../../types/locales';
 import { CalibrationSettings } from '../../types/redux/map';
-import { State } from '../../types/redux/state';
-import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
+import Locales from '../../types/locales'
 
 /* eslint-disable */
 

@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { updateDefaultLanguage } from '../actions/admin';
 import LanguageSelectorComponent from '../components/LanguageSelectorComponent';
-import { Dispatch } from '../types/redux/actions';
-import { LanguageTypes } from '../types/redux/i18n';
 import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
+import { updateDefaultLanguage } from '../actions/admin';
+import { LanguageTypes } from '../types/redux/i18n';
 
 /* eslint-disable */
 /**

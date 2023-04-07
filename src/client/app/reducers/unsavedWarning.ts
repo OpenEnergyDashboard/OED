@@ -2,9 +2,9 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { any } from 'prop-types';
-import { ActionType } from '../types/redux/actions';
 import { UnsavedWarningAction, UnsavedWarningState } from '../types/redux/unsavedWarning';
+import { ActionType } from '../types/redux/actions';
+import { any } from 'prop-types';
 
 const defaultState: UnsavedWarningState = {
 	hasUnsavedChanges: false,

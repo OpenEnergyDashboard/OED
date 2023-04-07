@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { User } from '../types/items';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/currentUser';
-import { State } from '../types/redux/state';
 import { usersApi, verificationApi } from '../utils/api';
+import { Thunk, ActionType, Dispatch, GetState } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/currentUser';
+import { User } from '../types/items';
 import { deleteToken, hasToken } from '../utils/token';
 
 /* eslint-disable */

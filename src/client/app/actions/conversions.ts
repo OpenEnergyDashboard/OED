@@ -2,11 +2,11 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
+import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
-import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import translate from '../utils/translate';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
 /* eslint-disable */

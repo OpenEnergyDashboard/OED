@@ -5,18 +5,18 @@ import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
+import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
-import { submitEditedUnit } from '../../actions/units';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/modal.css';
-import { TrueFalseType } from '../../types/items';
-import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import '../../styles/modal.css';
+import { removeUnsavedChanges } from '../../actions/unsavedWarning';
+import { submitEditedUnit } from '../../actions/units';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { TrueFalseType } from '../../types/items';
 
 interface EditUnitModalComponentProps {
 	show: boolean;

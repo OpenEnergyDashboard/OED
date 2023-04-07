@@ -2,18 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import * as moment from 'moment';
-import Plot from 'react-plotly.js';
 import { connect } from 'react-redux';
-import { DataType } from '../types/Datasources';
-import Locales from '../types/locales';
+import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
-import { UnitRepresentType } from '../types/redux/units';
 import {
-	calculateScaleFromEndpoints, CartesianPoint, Dimensions, gpsToUserGrid, itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
+	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
+	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
+import * as _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
+import Locales from '../types/locales';
+import { DataType } from '../types/Datasources';
+import { UnitRepresentType } from '../types/redux/units';
 
 /* eslint-disable */
 

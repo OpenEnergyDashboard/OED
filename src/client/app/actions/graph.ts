@@ -3,19 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/graph';
-import * as m from '../types/redux/map';
-import { State } from '../types/redux/state';
-import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import { fetchNeededBarReadings } from './barReadings';
-import { fetchNeededCompareReadings } from './compareReadings';
+import { fetchMetersDetailsIfNeeded } from './meters';
 import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
-import { changeSelectedMap, fetchMapsDetails } from './map';
+import { fetchNeededBarReadings } from './barReadings';
+import { fetchNeededCompareReadings } from './compareReadings';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
+import { State } from '../types/redux/state';
+import * as t from '../types/redux/graph';
+import * as m from '../types/redux/map';
+import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
-import { fetchMetersDetailsIfNeeded } from './meters';
+import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 
 /* eslint-disable */

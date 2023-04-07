@@ -5,12 +5,12 @@
 import * as React from 'react';
 //Realize that * is already imported from react
 import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import { UnitData } from 'types/redux/units';
-import '../../styles/card-page.css';
-import translate from '../../utils/translate';
+import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
+import '../../styles/card-page.css';
+import { UnitData } from 'types/redux/units';
+import translate from '../../utils/translate';
 
 interface UnitViewComponentProps {
 	unit: UnitData;

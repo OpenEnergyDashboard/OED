@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { editMapDetails, removeMap, setCalibration } from '../../actions/map';
 import MapViewComponent from '../../components/maps/MapViewComponent';
 import { Dispatch } from '../../types/redux/actions';
-import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { State } from '../../types/redux/state';
+import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
+import {editMapDetails, removeMap, setCalibration} from '../../actions/map';
 
 /* eslint-disable */
 

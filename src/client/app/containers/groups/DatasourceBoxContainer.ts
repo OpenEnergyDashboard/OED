@@ -4,8 +4,8 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import { changeChildGroups, changeChildMeters, changeSelectedChildGroupsOfGroup, changeSelectedChildMetersOfGroup } from '../../actions/groups';
 import DatasourceBoxComponent from '../../components/groups/DatasourceBoxComponent';
+import { changeSelectedChildMetersOfGroup, changeSelectedChildGroupsOfGroup, changeChildMeters, changeChildGroups } from '../../actions/groups';
 import { NamedIDItem } from '../../types/items';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';

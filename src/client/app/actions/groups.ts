@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { GPSPoint } from 'utils/calibration';
-import { NamedIDItem } from '../types/items';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/groups';
+import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { NamedIDItem } from '../types/items';
+import { showErrorNotification } from '../utils/notifications';
+import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import { browserHistory } from '../utils/history';
-import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
+import { GPSPoint } from 'utils/calibration';
 
 /* eslint-disable */
 

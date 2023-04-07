@@ -3,15 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { Button, Form, Input, InputGroup } from 'reactstrap';
-import FooterContainer from '../containers/FooterContainer';
-import HeaderContainer from '../containers/HeaderContainer';
-import { User } from '../types/items';
-import { verificationApi } from '../utils/api';
 import { browserHistory } from '../utils/history';
+import { injectIntl, defineMessages, FormattedMessage, WrappedComponentProps } from 'react-intl';
+import { Input, Button, InputGroup, Form } from 'reactstrap';
+import HeaderContainer from '../containers/HeaderContainer';
+import FooterContainer from '../containers/FooterContainer';
 import { showErrorNotification } from '../utils/notifications';
+import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
+import { User } from '../types/items';
 
 interface LoginState {
 	email: string;

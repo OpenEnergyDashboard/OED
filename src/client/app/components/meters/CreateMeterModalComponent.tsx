@@ -1,26 +1,27 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
+import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
-import { State } from 'types/redux/state';
-import { addMeter } from '../../actions/meters';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/modal.css';
-import { ConversionArray } from '../../types/conversionArray';
-import { TrueFalseType } from '../../types/items';
-import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
-import { UnitData } from '../../types/redux/units';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
-import { isRoleAdmin } from '../../utils/hasPermissions';
+import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import TimeZoneSelect from '../TimeZoneSelect';
+import { useDispatch, useSelector } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { State } from 'types/redux/state';
+import '../../styles/modal.css';
+import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { addMeter } from '../../actions/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { TrueFalseType } from '../../types/items';
+import TimeZoneSelect from '../TimeZoneSelect';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { isRoleAdmin } from '../../utils/hasPermissions';
+import { UnitData } from '../../types/redux/units';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { ConversionArray } from '../../types/conversionArray';
 
 /**
  * Notifies user of msg.

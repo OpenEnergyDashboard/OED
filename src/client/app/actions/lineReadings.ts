@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../common/TimeInterval';
-import { LineReadings } from '../types/readings';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/lineReadings';
+import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import * as t from '../types/redux/lineReadings';
 import { readingsApi } from '../utils/api';
+import { LineReadings } from '../types/readings';
 
 /**
  * @param {State} state the Redux state

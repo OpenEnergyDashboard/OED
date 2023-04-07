@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { clearCurrentUser } from '../actions/currentUser';
-import { flipLogOutState } from '../actions/unsavedWarning';
 import HeaderButtonsComponent from '../components/HeaderButtonsComponent';
-import { UserRole } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { isRoleAdmin } from '../utils/hasPermissions';
 import { deleteToken } from '../utils/token';
+import { isRoleAdmin } from '../utils/hasPermissions';
+import { clearCurrentUser } from '../actions/currentUser';
+import { UserRole } from '../types/items';
+import { flipLogOutState } from '../actions/unsavedWarning';
 
 /* eslint-disable */
 

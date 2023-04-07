@@ -4,8 +4,8 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
-import { ChartTypes, GraphAction, GraphState } from '../types/redux/graph';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 
 const defaultState: GraphState = {

@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
+import GroupsDetailComponent from '../../components/groups/GroupsDetailComponent';
+import { State } from '../../types/redux/state';
 import { fetchGroupsDetailsIfNeeded } from '../../actions/groups';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import GroupsDetailComponent from '../../components/groups/GroupsDetailComponent';
 import { Dispatch } from '../../types/redux/actions';
-import { State } from '../../types/redux/state';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 
 /* eslint-disable */

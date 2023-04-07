@@ -6,8 +6,8 @@ import * as _ from 'lodash';
 import { connect } from 'react-redux';
 import { updateSelectedMeter } from '../actions/admin';
 import MeterDropdownComponent from '../components/MeterDropDownComponent';
-import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
 
 /* eslint-disable */
 

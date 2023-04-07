@@ -4,11 +4,11 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { BarReadings } from '../types/readings';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/barReadings';
+import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import * as t from '../types/redux/barReadings';
 import { readingsApi } from '../utils/api';
+import { BarReadings } from '../types/readings';
 
 /**
  * @param {State} state the Redux state

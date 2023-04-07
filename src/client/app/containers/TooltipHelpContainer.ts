@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { fetchVersionIfNeeded } from '../actions/version';
+import { fetchVersionIfNeeded } from '../actions/version'
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
 
 /* eslint-disable */
 

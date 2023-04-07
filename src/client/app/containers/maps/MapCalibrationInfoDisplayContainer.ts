@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { connect } from 'react-redux';
-import { logToServer } from '../../actions/logs';
-import { changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap } from '../../actions/map';
-import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibrationInfoDisplayComponent';
-import { Dispatch } from '../../types/redux/actions';
+import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
-import { GPSPoint } from '../../utils/calibration';
+import { Dispatch } from '../../types/redux/actions';
+import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibrationInfoDisplayComponent';
+import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../actions/map';
+import {GPSPoint} from '../../utils/calibration';
+import {logToServer} from '../../actions/logs';
 import translate from '../../utils/translate';
 
 /* eslint-disable */

@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { removeUnsavedChanges, flipLogOutState } from '../actions/unsavedWarning';
 import { connect } from 'react-redux';
-import { flipLogOutState, removeUnsavedChanges } from '../actions/unsavedWarning';
 import UnsavedWarningComponent from '../components/UnsavedWarningComponent';
-import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { Dispatch } from '../types/redux/actions';
 
 /* eslint-disable */
 

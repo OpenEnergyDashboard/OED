@@ -4,12 +4,12 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { CompareReadings } from '../types/readings';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/compareReadings';
+import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { groupsApi, metersApi } from '../utils/api';
-import { calculateCompareShift, ComparePeriod } from '../utils/calculateCompare';
+import { CompareReadings } from '../types/readings';
+import * as t from '../types/redux/compareReadings';
+import { metersApi, groupsApi } from '../utils/api';
+import { ComparePeriod, calculateCompareShift } from '../utils/calculateCompare';
 
 /**
  * @param {State} state the Redux state

@@ -2,17 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import { PreferenceRequestItem } from '../types/items';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
-import * as t from '../types/redux/admin';
+import { changeBarStacking, changeChartToRender } from './graph';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/redux/i18n';
+import { PreferenceRequestItem } from '../types/items';
+import * as t from '../types/redux/admin';
+import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { conversionArrayApi, preferencesApi } from '../utils/api';
-import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import { changeBarStacking, changeChartToRender } from './graph';
+import { LanguageTypes } from '../types/redux/i18n';
+import * as moment from 'moment';
 
 /* eslint-disable */
 

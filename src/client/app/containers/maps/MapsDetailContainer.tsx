@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { fetchMapsDetails, setNewMap, submitEditedMaps } from '../../actions/map';
-import MapsDetailComponent from '../../components/maps/MapsDetailComponent';
-import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
+import {Dispatch} from '../../types/redux/actions';
+import {fetchMapsDetails, setNewMap, submitEditedMaps} from '../../actions/map';
+import MapsDetailComponent from '../../components/maps/MapsDetailComponent';
 
 /* eslint-disable */
 

@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from '../types/redux/actions';
-import { AdminAction, AdminState } from '../types/redux/admin';
 import { ChartTypes } from '../types/redux/graph';
+import { ActionType } from '../types/redux/actions';
+import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 
 const defaultState: AdminState = {

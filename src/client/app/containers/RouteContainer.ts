@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { clearCurrentUser } from '../actions/currentUser';
-import { changeOptionsFromLink, changeRenderOnce, LinkOptions } from '../actions/graph';
 import RouteComponent from '../components/RouteComponent';
-import { UserRole } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
+import { changeOptionsFromLink, LinkOptions, changeRenderOnce } from '../actions/graph';
+import { clearCurrentUser } from '../actions/currentUser';
 import { isRoleAdmin } from '../utils/hasPermissions';
+import { UserRole } from '../types/items';
 
 /* eslint-disable */
 

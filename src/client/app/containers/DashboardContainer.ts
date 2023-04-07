@@ -3,10 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { connect } from 'react-redux';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { changeGraphZoomIfNeeded } from '../actions/graph';
 import DashboardComponent from '../components/DashboardComponent';
-import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 
 /* eslint-disable */
