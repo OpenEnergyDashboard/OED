@@ -342,7 +342,9 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 		}
 	};
 
-	if (!validate(req.body, validGroup).valid) {
+	const validationResult = validate(req.body, validGroup);
+	if (!validationResult.valid) {
+		log.error(`Invalid input for groupAPI. ${validationResult.errors}`);
 		res.sendStatus(400);
 	} else {
 		try {
