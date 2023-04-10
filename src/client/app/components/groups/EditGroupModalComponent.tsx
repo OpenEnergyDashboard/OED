@@ -65,115 +65,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
-	// The chosen meters are initially the meter children of this group.
-	// If an admin then will display as a selectable meter list and if
-	// other user than it is a list of the meter identifiers.
-	// Groups are done similarly.
-	// For admins
-	let selectedMeters: SelectOption[] = [], selectedGroups: SelectOption[] = [];
-	// For non-admins.
-	const listedMeters: string[] = [], listedGroups: string[] = [], listedDeepMeters: string[] = [];
-	if (loggedInAsAdmin) {
-		// In format for the display component for meters.
-		const selectedMetersUnsorted: SelectOption[] = [];
-		Object.values(groupState.childMeters).forEach(meter => {
-			selectedMetersUnsorted.push({
-				value: meter,
-				label: metersState[meter].identifier
-				// isDisabled not needed since only used for selected and not display.
-			} as SelectOption
-			);
-		});
-		// Want chosen in sorted order. Note any changes by user can unsort them.
-		selectedMeters = _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
-		// Similar but for groups.
-		const selectedGroupsUnsorted: SelectOption[] = [];
-		Object.values(groupState.childGroups).forEach(group => {
-			selectedGroupsUnsorted.push({
-				value: group,
-				label: editGroupsState[group].name
-				// isDisabled not needed since only used for selected and not display.
-			} as SelectOption
-			);
-		});
-		// Want chosen in sorted order. Note any changes by user can unsort them.
-		selectedGroups = _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
-	} else {
-		// What to display if not an admin. Also do deep meters since they never change.
-		// The logic has overlaps to admin but separated since different enough.
-		// These do the immediate child meters.
-		// Tells if any meter is not visible to user.
-		let hasHidden = false;
-		Object.values(groupState.childMeters).forEach(meter => {
-			const meterIdentifier = metersState[meter].identifier;
-			// The identifier is null if the meter is not visible to this user. If hidden then do
-			// not list and otherwise label.
-			if (meterIdentifier === null) {
-				hasHidden = true;
-			} else {
-				listedMeters.push(meterIdentifier);
-			}
-		});
-		// Sort for display. Before were sorted by id so not okay here.
-		listedMeters.sort();
-		if (hasHidden) {
-			// There are hidden meters so note at bottom of list.
-			listedMeters.push(translate('meter.hidden'));
-		}
-		// Similar but for the groups.
-		hasHidden = false;
-		Object.values(groupState.childGroups).forEach(group => {
-			// The name is null if the group is not visible to this user.
-			// TODO The following line should work but does not (it does for meters).
-			// The Redux state has the name of hidden groups but it should not. A quick
-			// attempt to fix did not work as login/out did not clear as expected when
-			// control what is returned. This needs to be addressed.
-			// if (groupName !== null) {
-			// For now, check if the group is displayable.
-			if (editGroupsState[group].displayable) {
-				listedGroups.push(editGroupsState[group].name);
-			} else {
-				hasHidden = true;
-			}
-		});
-		// Sort for display. Before were sorted by id so not okay here.
-		listedGroups.sort();
-		if (hasHidden) {
-			// There are hidden groups so note at bottom of list.
-			listedGroups.push(translate('group.hidden'));
-		}
-		// These do the deep child meters.
-		hasHidden = false;
-		Object.values(groupState.deepMeters).forEach(meter => {
-			const meterIdentifier = metersState[meter].identifier;
-			// The identifier is null if the meter is not visible to this user so not hidden meters.
-			if (meterIdentifier === null) {
-				hasHidden = true;
-			} else {
-				listedDeepMeters.push(meterIdentifier);
-			}
-		});
-		// Sort for display.
-		listedDeepMeters.sort();
-		if (hasHidden) {
-			// There are hidden meters so note at bottom of list.
-			listedDeepMeters.push('At least one meter is not visible to you');
-		}
-	}
-
 	// The information on the children of this group for state. Except for selected, the
 	// values are set by the useEffect functions.
 	const groupChildrenDefaults = {
 		// The meter selections in format for selection dropdown.
 		meterSelectOptions: [] as SelectOption[],
-		// Meters that have been selected for this group. Not used if non-admin.
-		meterSelectedSelectOptions: loggedInAsAdmin ? selectedMeters : [] as SelectOption[],
 		// The group selections in format for selection dropdown.
 		groupSelectOptions: [] as SelectOption[],
-		// Groups that have been selected for this group. Not used if non-admin.
-		groupSelectedSelectOptions: loggedInAsAdmin ? selectedGroups : [] as SelectOption[],
-		// The identifiers of all meter children (deep meters) that are visible to this user.
-		deepMetersIdentifier: [] as string[]
 	}
 
 	const graphicUnitsStateDefaults = {
@@ -290,8 +188,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This is the unedited state of the group being edited to compare to for changes.
 		const originalGroupState = globalGroupsState[props.groupId];
 		// Check children separately since lists.
-		const childMeterChanges = !listsSame(originalGroupState.childMeters, groupChildrenState.meterSelectedSelectOptions);
-		const childGroupChanges = !listsSame(originalGroupState.childGroups, groupChildrenState.groupSelectedSelectOptions);
+		const childMeterChanges = _.isEqual(originalGroupState.childMeters, groupState.childMeters);
+		const childGroupChanges = _.isEqual(originalGroupState.childGroups, groupState.childGroups);
 		const groupHasChanges =
 			(
 				originalGroupState.name != groupState.name ||
@@ -378,7 +276,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 	};
 
-	// Determine child meters/groups and deep meters.
+	// Determine allowed child meters/groups .
 	useEffect(() => {
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
@@ -386,32 +284,18 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			const possibleMeters = getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters);
 			// Get groups okay for this group. Similar to meters.
 			const possibleGroups = getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters);
-
-			// Information to display all (deep) children meters.
-			// Holds the names of all (deep) meter children of this group when visible to this user.
-			const identifierDeepMeters: string[] = [];
-			groupState.deepMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-					identifierDeepMeters.push(metersState[meterID].identifier.trim());
-				}
-			});
-			// We want to display in alphabetical order.
-			identifierDeepMeters.sort();
 			// Update the state
 			setGroupChildrenState({
 				...groupChildrenState,
-				deepMetersIdentifier: identifierDeepMeters,
 				meterSelectOptions: possibleMeters,
 				groupSelectOptions: possibleGroups,
-				// TODO This is a hack but the set should be done better.******************
-				meterSelectedSelectOptions: selectedMeters
 			});
 		}
 	}, [metersState, editGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters, groupState.childGroups, groupState.childMeters]);
 
-	// Update compatible units and graphic units set.
+	// Update default graphic units set.
 	useEffect(() => {
+		// Only shown to an admin.
 		if (loggedInAsAdmin) {
 			// Graphic units compatible with currently selected meters/groups.
 			const compatibleGraphicUnits = new Set<UnitData>();
@@ -581,12 +465,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											<b><FormattedMessage id='child.meters' /></b>:
 											<MultiSelectComponent
 												options={groupChildrenState.meterSelectOptions}
-												selectedOptions={groupChildrenState.meterSelectedSelectOptions}
+												selectedOptions={metersToSelectOptions()}
 												placeholder={translate('select.meters')}
 												onValuesChange={async (newSelectedMeterOptions: SelectOption[]) => {
 													// The meters changed so verify update is okay and deal with appropriately.
 													// The length of of selected meters should only vary by 1 since each change is handled separately.
-													if (newSelectedMeterOptions.length === groupChildrenState.meterSelectedSelectOptions.length + 1) {
+													// Compare the new length to the original length that is the same as
+													// the number of child meters of group being edited.
+													if (newSelectedMeterOptions.length === groupState.childMeters.length + 1) {
 														// A meter was selected so it is considered for adding.
 														// The newly selected item is always the last one.
 														// Now attempt to add the child to see if okay.
@@ -598,22 +484,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 													} else {
 														// TODO
 														// Could have removed any item so figure out which one it is.
-														const removedMeter = _.difference(groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
-														console.log('removing # ', removedMeter.length, ' with first child: ', removedMeter[0].label);
+														// const removedMeter = _.difference(groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
+														// console.log('removing # ', removedMeter.length, ' with first child: ', removedMeter[0].label);
 													}
-													// Set the selected meters in state to the ones chosen. Do even if removed user choice so correct
-													// when rerender.
-													setGroupChildrenState({
-														...groupChildrenState,
-														meterSelectedSelectOptions: newSelectedMeterOptions
-													});
 												}}
 											/>
 										</div>
 										:
 										<div>
 											<b><FormattedMessage id='child.meters' /></b>:
-											<ListDisplayComponent items={listedMeters} />
+											<ListDisplayComponent items={metersToList()} />
 										</div>
 									}
 									{/* The child groups in this group */}
@@ -622,7 +502,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											<b><FormattedMessage id='child.groups' /></b>:
 											<MultiSelectComponent
 												options={groupChildrenState.groupSelectOptions}
-												selectedOptions={groupChildrenState.groupSelectedSelectOptions}
+												selectedOptions={groupsToSelectOptions()}
 												placeholder={translate('select.groups')}
 												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
 													// The groups changed so update the current list of deep meters
@@ -641,24 +521,19 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 															childGroups: updatedChildGroups
 														}
 													});
-													// // Set the selected groups in state to the ones chosen.
-													setGroupChildrenState({
-														...groupChildrenState,
-														groupSelectedSelectOptions: newSelectedGroupOptions
-													});
 												}}
 											/>
 										</div>
 										:
 										<div>
 											<b><FormattedMessage id='child.groups' /></b>:
-											<ListDisplayComponent items={listedGroups} />
+											<ListDisplayComponent items={groupsToList()} />
 										</div>
 									}
 									{/* All (deep) meters in this group */}
 									<div>
 										<b><FormattedMessage id='group.all.meters' /></b>:
-										<ListDisplayComponent items={loggedInAsAdmin ? groupChildrenState.deepMetersIdentifier : listedDeepMeters} />
+										<ListDisplayComponent items={deepMetersToList()} />
 									</div>
 								</div>
 							</div>
@@ -805,6 +680,134 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		return !cancel;
 	}
+
+	/**
+	 * Converts the child meters of this group to options for menu sorted by identifier
+	 * @returns sorted SelectOption for child meters of group editing.
+	 */
+	function metersToSelectOptions() {
+		// In format for the display component for menu.
+		const selectedMetersUnsorted: SelectOption[] = [];
+		groupState.childMeters.forEach(groupId => {
+			selectedMetersUnsorted.push({
+				value: groupId,
+				label: metersState[groupId].identifier
+				// isDisabled not needed since only used for selected and not display.
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order. Note any changes by user can unsort them.
+		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+	}
+
+	/**
+	 * Converts the child groups of this group to options for menu sorted by name
+	 * @returns sorted SelectOption for child groups of group editing.
+	 */
+	function groupsToSelectOptions() {
+		// In format for the display component for menu.
+		const selectedGroupsUnsorted: SelectOption[] = [];
+		groupState.childGroups.forEach(groupId => {
+			selectedGroupsUnsorted.push({
+				value: groupId,
+				label: editGroupsState[groupId].name
+				// isDisabled not needed since only used for selected and not display.
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order. Note any changes by user can unsort them.
+		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+	}
+
+	/**
+	 * Converts the child meters of this group to list options sorted by name.
+	 * This is needed for non-admins. Hidden items are not shown but noted in list.
+	 * @returns names of all child meters in sorted order.
+	 */
+	function metersToList() {
+		// Hold the list for display.
+		const listedMeters: string[] = [];
+		// Tells if any meter is not visible to user.
+		let hasHidden = false;
+		groupState.childMeters.forEach(meterId => {
+			const meterIdentifier = metersState[meterId].identifier;
+			// The identifier is null if the meter is not visible to this user. If hidden then do
+			// not list and otherwise label.
+			if (meterIdentifier === null) {
+				hasHidden = true;
+			} else {
+				listedMeters.push(meterIdentifier);
+			}
+		});
+		// Sort for display. Before were sorted by id so not okay here.
+		listedMeters.sort();
+		if (hasHidden) {
+			// There are hidden meters so note at bottom of list.
+			listedMeters.push(translate('meter.hidden'));
+		}
+		return listedMeters;
+	}
+
+	/**
+	 * Converts the child meters of this group to list options sorted by name.
+	 * This is needed for non-admins. Hidden items are not shown but noted in list.
+	 * @returns names of all child meters in sorted order.
+	 */
+	function groupsToList() {
+		const listedGroups: string[] = [];
+		let hasHidden = false;
+		groupState.childGroups.forEach(groupId => {
+				// The name is null if the group is not visible to this user.
+			// TODO The following line should work but does not (it does for meters).
+			// The Redux state has the name of hidden groups but it should not. A quick
+			// attempt to fix did not work as login/out did not clear as expected when
+			// control what is returned. This needs to be addressed.
+			// if (groupName !== null) {
+			// For now, check if the group is displayable.
+			if (editGroupsState[groupId].displayable) {
+				listedGroups.push(editGroupsState[groupId].name);
+			} else {
+				hasHidden = true;
+			}
+		});
+		// Sort for display. Before were sorted by id so not okay here.
+		listedGroups.sort();
+		if (hasHidden) {
+			// There are hidden groups so note at bottom of list.
+			listedGroups.push(translate('group.hidden'));
+		}
+		return listedGroups;
+	}
+
+
+	/**
+	 * Converts the deep meters of this group to list options sorted by identifier.
+	 * This is needed for non-admins. Hidden items are not shown but noted in list.
+	 * @returns names of all child meters in sorted order.
+	 */
+	function deepMetersToList() {
+		// Unlike child meter/group, these are lists for all users.
+		const listedDeepMeters: string[] = [];
+		let hasHidden = false;
+		groupState.deepMeters.forEach((meterId) => {
+			const meterIdentifier = metersState[meterId].identifier;
+			if (meterIdentifier === null) {
+				// The identifier is null if the meter is not visible to this user.
+				hasHidden = true;
+			} else {
+				// If not null then either non-admin can see or you are an admin.
+				listedDeepMeters.push(meterIdentifier);
+			}
+		});
+		// Sort for display.
+		listedDeepMeters.sort();
+		if (hasHidden) {
+			// There are hidden meters so note at bottom of list.
+			// This should never happen to an admin.
+			listedDeepMeters.push('At least one meter is not visible to you');
+		}
+		return listedDeepMeters;
+	}
 }
 
 /**
@@ -832,27 +835,4 @@ function calculateMetersInGroup(groupId: number, groupState: any): number[] {
 	});
 	// Create an array of the deep meters of this group and return it.
 	return Array.from(deepMeters);
-}
-
-/**
- * Returns false if the two arrays have different ids and true otherwise. Assumes elements unique.
- * SelectOption has id in value.
- * @param {number[]} original[] first array of ids
- * @param {SelectOption[]} selected[] second array of selection options
- * @returns false if two arrays differ, otherwise true
- */
-function listsSame(original: number[], selected: SelectOption[]) {
-	if (original.length == selected.length) {
-		// Sort each list so comparison is easier.
-		// Sorting the array of numbers in place is fine as the order should not matter.
-		original.sort();
-		const sortedTwo = _.sortBy(selected, item => item.value, 'asc');
-		// Compare id in each array by each element until find difference or all the same.
-		return original.every((element, index) => {
-			return element === sortedTwo[index].value;
-		});
-	} else {
-		// The lengths differ so cannot be the same since each element is unique.
-		return false;
-	}
 }
