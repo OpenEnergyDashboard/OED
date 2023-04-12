@@ -21,8 +21,6 @@ import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 
 export default function GroupsDetailComponent() {
-	// TODO The route stops you from getting to this page if not an admin.
-
 	const dispatch = useDispatch();
 
 	// Groups state

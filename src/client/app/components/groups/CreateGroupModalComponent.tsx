@@ -127,9 +127,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		let inputOk = true;
 
 		// Check area is positive.
-		// TODO For now allow zero so works with default value and DB. We should probably
-		// make this better default than 0 (DB set to not null now).
-		// if (state.area <= 0) {
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;

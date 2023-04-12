@@ -642,7 +642,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Update the group. Now, the changes actually happen.
 			// Done by setting the edit state to the temp state so does not impact other groups
 			// and what is seen until the admin saves.
-			// TODO Could limit to only ones changed but just do since local state and easy.
+			// Could limit to only ones changed but just do since local state and easy.
 			setEditGroupsState(tempGroupsState);
 		}
 
@@ -764,7 +764,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Update the group. Now, the changes actually happen.
 			// Done by setting the edit state to the temp state so does not impact other groups
 			// and what is seen until the admin saves.
-			// TODO Could limit to only ones changed but just do since local state and easy.
+			// Could limit to only ones changed but just do since local state and easy.
 			setEditGroupsState(tempGroupsState);
 		}
 		// Tells if the edit was accepted.
