@@ -145,8 +145,8 @@ daily_readings_unit
 					)
 			)) )
 		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-			(max(( -- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
-					(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+			(max(( 
+					(r.reading * 3600 / u.sec_in_rate)
 					*
 					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
 									least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
@@ -254,7 +254,7 @@ hourly_readings_unit
 			))
 		END AS reading_rate,
 		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	(max(( --Extract the maximum rate over each day
+    	(max(( -- Extract the maximum rate over each day
 					(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
 					*
 					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
