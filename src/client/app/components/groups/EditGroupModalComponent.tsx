@@ -24,7 +24,7 @@ import { TrueFalseType } from '../../types/items';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import {
-	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup,
+	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup,
 	getCompatibilityChangeCase, GroupCase
 } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
@@ -71,7 +71,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// The meter selections in format for selection dropdown.
 		meterSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown.
-		groupSelectOptions: [] as SelectOption[],
+		groupSelectOptions: [] as SelectOption[]
 	}
 
 	const graphicUnitsStateDefaults = {
@@ -188,8 +188,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This is the unedited state of the group being edited to compare to for changes.
 		const originalGroupState = globalGroupsState[props.groupId];
 		// Check children separately since lists.
-		const childMeterChanges = _.isEqual(originalGroupState.childMeters, groupState.childMeters);
-		const childGroupChanges = _.isEqual(originalGroupState.childGroups, groupState.childGroups);
+		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
+		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
 		const groupHasChanges =
 			(
 				originalGroupState.name != groupState.name ||
@@ -260,8 +260,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					// There are extra properties in the state so only include the desired ones for edit submit.
 					// GPS is one above since may differ from the state.
 					const submitState = {
-						id: thisGroupState.id, name: thisGroupState.name, childMeters: thisGroupState.childMeters, childGroups: thisGroupState.childGroups,
-						gps: gps, displayable: thisGroupState.displayable, note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit
+						id: thisGroupState.id, name: thisGroupState.name, childMeters: thisGroupState.childMeters,
+						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
+						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit
 					}
 					// This saves group to the DB and then refreshes the window if the last group being updated.
 					dispatch(submitGroupEdits(submitState, i === groupChanged.length ? true : false));
@@ -288,7 +289,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			setGroupChildrenState({
 				...groupChildrenState,
 				meterSelectOptions: possibleMeters,
-				groupSelectOptions: possibleGroups,
+				groupSelectOptions: possibleGroups
 			});
 		}
 	}, [metersState, editGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters, groupState.childGroups, groupState.childMeters]);
@@ -482,10 +483,21 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 															newSelectedMeterOptions.pop();
 														}
 													} else {
-														// TODO
-														// Could have removed any item so figure out which one it is.
-														// const removedMeter = _.difference(groupChildrenState.meterSelectedSelectOptions, newSelectedMeterOptions);
-														// console.log('removing # ', removedMeter.length, ' with first child: ', removedMeter[0].label);
+														// Could have removed any item so figure out which one it is. Need to convert options to ids.
+														const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
+														// There should only be one removed item.
+														const removedMeterId = removedMeter[0];
+														const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter)
+														if (!childRemoved) {
+															// The new child meter removal was rejected so put it back. It is the last one which should be the only one.
+															// Should only be one item so no need to sort.
+															newSelectedMeterOptions.push({
+																value: removedMeterId,
+																label: metersState[removedMeterId].identifier
+																// isDisabled not needed since only used for selected and not display.
+															} as SelectOption
+															);
+														}
 													}
 												}}
 											/>
@@ -504,23 +516,38 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												options={groupChildrenState.groupSelectOptions}
 												selectedOptions={groupsToSelectOptions()}
 												placeholder={translate('select.groups')}
-												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
-													// The groups changed so update the current list of deep meters
-													// Get the currently included/selected meters as an array of the ids.
-													const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
-													const newDeepMeters = metersInChangedGroup({ ...groupState, childGroups: updatedChildGroups });
-													// Update the deep meter and child group state based on the changes.
-													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
-													// to avoid too many state updates.
-													setEditGroupsState({
-														...editGroupsState,
-														[props.groupId]: {
-															// There is state that is in each group that is not part of the edit information state.
-															...editGroupsState[props.groupId],
-															deepMeters: newDeepMeters,
-															childGroups: updatedChildGroups
+												onValuesChange={async (newSelectedGroupOptions: SelectOption[]) => {
+													// The groups changed so verify update is okay and deal with appropriately.
+													// The length of of selected groups should only vary by 1 since each change is handled separately.
+													// Compare the new length to the original length that is the same as
+													// the number of child groups of group being edited.
+													if (newSelectedGroupOptions.length === groupState.childGroups.length + 1) {
+														// A group was selected so it is considered for adding.
+														// The newly selected item is always the last one.
+														// Now attempt to add the child to see if okay.
+														const childAdded = await assignChildToGroup(newSelectedGroupOptions[newSelectedGroupOptions.length - 1].value, DataType.Group);
+														if (!childAdded) {
+															// The new child meter was rejected so remove it. It is the last one.
+															newSelectedGroupOptions.pop();
 														}
-													});
+													} else {
+														// Could have removed any item so figure out which one it is. Need to convert options to ids.
+														const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
+														// There should only be one removed item.
+														const removedGroupId = removedGroup[0];
+														const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group)
+														if (!childRemoved) {
+															// The new child group removal was rejected so put it back. It is the last one which should be the only one.
+															// Should only be one item so no need to sort.
+															newSelectedGroupOptions.push({
+																value: removedGroupId,
+																// The name should not have changed since cannot be group editing but use the edit state to be consistent.
+																label: editGroupsState[removedGroupId].name
+																// isDisabled not needed since only used for selected and not display.
+															} as SelectOption
+															);
+														}
+													}
 												}}
 											/>
 										</div>
@@ -583,46 +610,53 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// put back into the edit state.
 		const tempGroupsState = _.cloneDeep(editGroupsState);
 
-		// Add the child to the group being edited.
+		// Add the child to the group being edited in temp so can decide if want change.
+		// This assumes there are no duplicates which is not allowed by menus
 		if (childType === DataType.Meter) {
-			// This assume there are no duplicates which is not allowed by menus
-			// TODO Seems could just push since copy.
-			// const newChildMeters = tempGroupsState[props.groupId].childMeters.concat(childId);
-			// tempGroupsState[props.groupId].childMeters = newChildMeters;
 			tempGroupsState[props.groupId].childMeters.push(childId);
 		} else {
-			// TODO once meters works edit this similarly but must check for a circular group
-			groupState.childGroups.push(childId);
-			// Uses set here so the deep meters are not duplicated.
-			// const deepMeters = new Set(group.deepMeters.concat(state.groups.byGroupID[childId].deepMeters));
-			const deepMeters = new Set(groupState.deepMeters.concat(editGroupsState[childId].deepMeters));
-			groupState.deepMeters = Array.from(deepMeters);
+			tempGroupsState[props.groupId].childGroups.push(childId);
 		}
-
 		// The deep meters of any group can change for any group containing the group that just had a meter/group added.
 		// Since groups can be indirectly included in another group it is hard to know which ones where impacted so
 		// just redo them all for now. Also do this group since it likely changed.
-		Object.values(tempGroupsState).forEach(group => {
-			tempGroupsState[group.id].deepMeters = calculateMetersInGroup(group.id, tempGroupsState);;
-		})
+		// Returned value tells if update should happen.
+		let shouldUpdate = !Object.values(tempGroupsState).some(group => {
+			const deepMeters = calculateMetersInGroup(group.id, tempGroupsState);
+			if (deepMeters.length === 0) {
+				// There is a circular dependency so this change is not allowed.
+				// Cannot be case of no children since adding child.
+				// Let the user know.
+				window.alert(`${translate('group.edit.circular')}`);
+				// Stops processing and will return this result (negated).
+				return true;
+			} else {
+				// Group okay so update deep meters for it.
+				tempGroupsState[group.id].deepMeters = deepMeters;
+				// Go to next group/keep processing.
+				return false;
+			}
+		});
 
-		// Get all parent groups of this group.
-		// TODO resolve to use groupState.id or props.groupId
-		const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
-		const shouldUpdate = await validateGroupPostAddChild(groupState.id, parentGroupIDs, tempGroupsState);
-		// If the admin wants to apply changes.
+		// Only do next step if update is still possible.
+		if (shouldUpdate) {
+			// Get all parent groups of this group.
+			// TODO resolve to use groupState.id or props.groupId
+			const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
+			// Check for group changes and have admin agree or not.
+			shouldUpdate = await validateGroupPostAddChild(groupState.id, parentGroupIDs, tempGroupsState);
+		}
+		// If the admin wants to apply changes and allowed.
 		if (shouldUpdate) {
 			// Update the group. Now, the changes actually happen.
 			// Done by setting the edit state to the temp state so does not impact other groups
 			// and what is seen until the admin saves.
 			// TODO Could limit to only ones changed but just do since local state and easy.
 			setEditGroupsState(tempGroupsState);
-			return true;
-		} else {
-			// Not updating so throw away the temp store.
-			// The menu needs to be updated to remove this selection so return false.
-			return false;
 		}
+
+		// Tell if applied update.
+		return shouldUpdate;
 	}
 
 	/**
@@ -631,8 +665,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * @param gid The group that has a change in compatible units.
 	 * @param parentGroupIds The parent groups' ids of that group.
 	 * @param groupsState The local group state to use.
+	 * @returns true if change fine or if admin agreed. false if admin does not or the change is an issue.
 	 */
-	async function validateGroupPostAddChild(gid: number, parentGroupIds: number[], groupsState: any): Promise<boolean> {
+	function validateGroupPostAddChild(gid: number, parentGroupIds: number[], groupsState: any): boolean {
 		// This will hold the overall message for the admin alert.
 		let msg = '';
 		// Tells if the change should be cancelled.
@@ -644,7 +679,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Get parent's compatible units
 			const parentCompatibleUnits = unitsCompatibleWithMeters(new Set(parentGroup.deepMeters));
 			// Get compatibility change case when add this group to its parent.
-			const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group, parentGroup.defaultGraphicUnit, groupsState[groupId].deepMeters);
+			const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group,
+				parentGroup.defaultGraphicUnit, groupsState[groupId].deepMeters);
 			switch (compatibilityChangeCase) {
 				case GroupCase.NoCompatibleUnits:
 					// The group has no compatible units so cannot do this.
@@ -682,10 +718,73 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 
 	/**
+	 * Handles removing child from a group.
+	 * @param childId The group/meter's id to add to the parent group.
+	 * @param childType Can be group or meter.
+	 * @returns true if change fine or if admin agreed. false if admin does not or the change is an issue.
+	 */
+	function removeChildFromGroup(childId: number, childType: DataType): boolean {
+		// Unlike adding, you do not change the default graphic unit by removing. Thus, you only need to recalculate the
+		// deep meters and remove this child from the group being edited.
+
+		// Create a deep copy of the edit state before adding the child. We only need some of the state but this is easier.
+		// This copy is directly changed without using the Redux hooks since it is not used by React.
+		// This means that changes to the group do not happen put back into the edit state.
+		// For the record, it was tried to not create the copy and update the edit state for each change. This had
+		// two issues. First, the next step in this function does not see the change because Redux does not update
+		// until the next render. Second, and more importantly, the updated state was not showing during the render.
+		// Why that is the case was unclear because the set value were correct. Given all of this and to make the
+		// code more similar to add, it is done with a copy.
+		const tempGroupsState = _.cloneDeep(editGroupsState);
+
+		// Add the child to the group being edited.
+		if (childType === DataType.Meter) {
+			// All the children without one being removed.
+			const newChildren = _.filter(tempGroupsState[props.groupId].childMeters, value => value != childId);
+			tempGroupsState[props.groupId].childMeters = newChildren;
+		} else {
+			// All the children without one being removed.
+			const newChildren = _.filter(tempGroupsState[props.groupId].childGroups, value => value != childId);
+			tempGroupsState[props.groupId].childGroups = newChildren;
+		}
+
+		// The deep meters of any group can change for any group containing the group that just had a meter/group added.
+		// Since groups can be indirectly included in another group it is hard to know which ones where impacted so
+		// just redo them all for now. Also do this group since it likely changed.
+		const groupOk = !Object.values(tempGroupsState).some(group => {
+			const newDeepMeters = calculateMetersInGroup(group.id, tempGroupsState);
+			// If the array is empty then there are no child meters nor groups and this is not allowed.
+			// The change is rejected.
+			// This should only happen for the group being edited but check for all since easier.
+			if (newDeepMeters.length === 0) {
+				// Let the user know.
+				window.alert(`${translate('group.edit.empty')}`);
+				// Indicate issue and stop processing.
+				return true;
+			} else {
+				// Update the temp deep meters and continue.
+				tempGroupsState[group.id].deepMeters = newDeepMeters;
+				return false;
+			}
+		});
+
+		// Only update if the group is okay.
+		if (groupOk) {
+			// Update the group. Now, the changes actually happen.
+			// Done by setting the edit state to the temp state so does not impact other groups
+			// and what is seen until the admin saves.
+			// TODO Could limit to only ones changed but just do since local state and easy.
+			setEditGroupsState(tempGroupsState);
+		}
+		// Tells if the edit was accepted.
+		return groupOk;
+	}
+
+	/**
 	 * Converts the child meters of this group to options for menu sorted by identifier
 	 * @returns sorted SelectOption for child meters of group editing.
 	 */
-	function metersToSelectOptions() {
+	function metersToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
 		const selectedMetersUnsorted: SelectOption[] = [];
 		groupState.childMeters.forEach(groupId => {
@@ -704,7 +803,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * Converts the child groups of this group to options for menu sorted by name
 	 * @returns sorted SelectOption for child groups of group editing.
 	 */
-	function groupsToSelectOptions() {
+	function groupsToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
 		const selectedGroupsUnsorted: SelectOption[] = [];
 		groupState.childGroups.forEach(groupId => {
@@ -724,7 +823,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * This is needed for non-admins. Hidden items are not shown but noted in list.
 	 * @returns names of all child meters in sorted order.
 	 */
-	function metersToList() {
+	function metersToList(): string[] {
 		// Hold the list for display.
 		const listedMeters: string[] = [];
 		// Tells if any meter is not visible to user.
@@ -753,11 +852,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * This is needed for non-admins. Hidden items are not shown but noted in list.
 	 * @returns names of all child meters in sorted order.
 	 */
-	function groupsToList() {
+	function groupsToList(): string[] {
 		const listedGroups: string[] = [];
 		let hasHidden = false;
 		groupState.childGroups.forEach(groupId => {
-				// The name is null if the group is not visible to this user.
+			// The name is null if the group is not visible to this user.
 			// TODO The following line should work but does not (it does for meters).
 			// The Redux state has the name of hidden groups but it should not. A quick
 			// attempt to fix did not work as login/out did not clear as expected when
@@ -789,7 +888,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Unlike child meter/group, these are lists for all users.
 		const listedDeepMeters: string[] = [];
 		let hasHidden = false;
-		groupState.deepMeters.forEach((meterId) => {
+		groupState.deepMeters.forEach(meterId => {
 			const meterIdentifier = metersState[meterId].identifier;
 			if (meterIdentifier === null) {
 				// The identifier is null if the meter is not visible to this user.
@@ -818,21 +917,39 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
  *
  * @param {number} groupId The groupId.
  * @param {GroupDefinition[]} groupState The group state to use in the calculation.
- * @returns {number[]} Array of deep children ids of this group.
+ * @param {number} times The number of times the function has been recursively called. Not passed on first call and only used internally.
+ * @returns {number[]} Array of deep children ids of this group or empty array if none/circular dependency.
  */
-function calculateMetersInGroup(groupId: number, groupState: any): number[] {
-	// Use a set to avoid duplicates. 
+function calculateMetersInGroup(groupId: number, groupState: any, times: number = 0): number[] {
+	// The number of times should be set to zero on the first call. Each time add one and assume
+	// if depth of calls is greater than value then there is a circular dependency and stop to report issue.
+	// This assumes no site will ever have a group chain of this length which seems safe.
+	if (++times > 50) {
+		return [];
+	}
+	// Use a set to avoid duplicates.
 	const groupToCheck = groupState[groupId] as GroupDefinition;
 	// The deep meters are the direct child meters of this group plus the direct child meters
-	// of all included meters, recursively. Since groups are acyclic, this must terminate.
+	// of all included meters, recursively.
 	// This should reproduce some DB functionality but using local state.
 	const deepMeters = new Set(groupToCheck.childMeters);
-	groupToCheck.childGroups.forEach(group => {
+	groupToCheck.childGroups.some(group => {
 		// Get the deep meters of this group.
-		const meters = calculateMetersInGroup(group, groupState);
-		// Add to set of deep meters for the group checking.
-		meters.forEach(meter => { deepMeters.add(meter); })
+		const meters = calculateMetersInGroup(group, groupState, times);
+		if (meters.length === 0) {
+			// Issue found so stop loop and return empty set. There must be meters if all is okay.
+			// Clear deep meters so calling function knows there is an issue.
+			deepMeters.clear();
+			// Stops the processing.
+			return true;
+		} else {
+			// Add to set of deep meters for the group checking.
+			meters.forEach(meter => { deepMeters.add(meter); });
+			// Continue loop to process more.
+			return false;
+		}
 	});
 	// Create an array of the deep meters of this group and return it.
+	// It will be empty if there are none.
 	return Array.from(deepMeters);
 }

@@ -289,7 +289,8 @@ export const enum GroupCase {
  * @param currentDefaultGraphicUnit The default graphic unit.
  * @param deepMeters The deep meters for the group, ignored if meter
  */
-export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType, currentDefaultGraphicUnit: number, deepMeters: number[]): GroupCase {
+export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType,
+	currentDefaultGraphicUnit: number, deepMeters: number[]): GroupCase {
 	// Determine the compatible units for meter or group represented by the id.
 	const newUnits = getCompatibleUnits(idToAdd, type, deepMeters);
 	// Returns the associated case.
