@@ -197,7 +197,7 @@ export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true)
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification(translate('group.failed.to.edit.group'));
+				showErrorNotification(translate('group.failed.to.edit.group')+ ' "' + e.response.data as string + '"');
 			}
 		}
 	};

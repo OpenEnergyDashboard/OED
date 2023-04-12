@@ -126,8 +126,10 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group deep group children with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group deep group children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -152,8 +154,10 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group deep meter children with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group deep meter children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -178,8 +182,10 @@ router.get('/parents/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group parents with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group parents with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -249,10 +255,10 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 		}
 	};
 
-	const validationResult = validate(req.body, validGroup);
-	if (!validationResult.valid) {
-		log.error(`Invalid input for groupAPI. ${validationResult.errors}`);
-		res.sendStatus(400);
+	const validatorResult = validate(req.body, validGroup);
+	if (!validatorResult.valid) {
+		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -342,10 +348,10 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 		}
 	};
 
-	const validationResult = validate(req.body, validGroup);
-	if (!validationResult.valid) {
-		log.error(`Invalid input for groupAPI. ${validationResult.errors}`);
-		res.sendStatus(400);
+	const validatorResult = validate(req.body, validGroup);
+	if (!validatorResult.valid) {
+		log.error(`Got request to edit group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		try {
 			const conn = getConnection();
@@ -403,8 +409,11 @@ router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => 
 			id: { type: 'integer' }
 		}
 	};
-	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request to delete group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to delete group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
