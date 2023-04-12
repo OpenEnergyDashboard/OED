@@ -152,7 +152,8 @@ export function metersInGroup(groupId: number): Set<number> {
 }
 
 /**
- * Returns array of deep meter ids of the changed group.
+ * Returns array of deep meter ids of the changed group. This only works if all other groups in state
+ * do not include this group.
  * @param {GroupEditData} changedGroupState The state for the changed group
  * @returns {number[]} returns array of deep meter ids of the changed group considering possible changes
  */
@@ -160,7 +161,7 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
 	const state = store.getState();
 	// deep meters starts with all the direct child meters of the group being changed.
 	const deepMeters = new Set(changedGroupState.childMeters);
-	// These groups cannot contain the group being edited so the redux state is okay.
+	// These groups cannot contain the group being changed so the redux state is okay.
 	changedGroupState.childGroups.forEach((group: number) => {
 		// The group state for the current child group.
 		const groupState = _.get(state.groups.byGroupID, group) as GroupDefinition;
@@ -288,6 +289,7 @@ export const enum GroupCase {
  * @param type Can be METER or GROUP.
  * @param currentDefaultGraphicUnit The default graphic unit.
  * @param deepMeters The deep meters for the group, ignored if meter
+ * @returns GroupCase the type of change this involves.
  */
 export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType,
 	currentDefaultGraphicUnit: number, deepMeters: number[]): GroupCase {
@@ -301,6 +303,8 @@ export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: n
  * Given a meter or group's id, returns its compatible units.
  * @param id The meter or group's id.
  * @param type Can be Meter or Group.
+ * @param deepMeters The deep meter of the id if it is a group, ignored if meter.
+ * @returns Set of ids of compatible units.
  */
 function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): Set<number> {
 	if (type == DataType.Meter) {
@@ -320,9 +324,10 @@ function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): S
  * @param currentUnits The current compatible units set.
  * @param newUnits The new compatible units set.
  * @param defaultGraphicUnit The default graphic unit.
+ * @returns GroupCase of impact on units from current to new unit sets.
  */
 function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGraphicUnit: number): GroupCase {
-	// The compatible units of a set of meters or groups is the intersection of the compatible units for each
+	// The compatible units of a set of meters or groups is the intersection of the compatible units for each.
 	// Thus, we can get the units that will go away with (- is set subtraction/difference):
 	// lostUnit = currentUnit - ( currentUnit n newUnits)
 	const intersection = setIntersect(currentUnits, newUnits);
@@ -333,6 +338,7 @@ function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGrap
 	} else if (lostUnits.size == currentUnits.size) {
 		return GroupCase.NoCompatibleUnits;
 	} else if (defaultGraphicUnit != -99 && lostUnits.has(defaultGraphicUnit)) {
+		// The current default graphic unit is not no unit and it is still in the new ones.
 		return GroupCase.LostDefaultGraphicUnit;
 	} else {
 		// if the default graphic unit is no unit then you can add any meter/group
@@ -340,6 +346,11 @@ function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGrap
 	}
 }
 
+/**
+ * Returns the styling for the menu for the type of change in in GroupCase
+ * @param compatibilityChangeCase Which GroupCase is involved.
+ * @returns the desired color for styling.
+ */
 function getMenuOptionFont(compatibilityChangeCase: GroupCase): React.CSSProperties {
 	switch (compatibilityChangeCase) {
 		case GroupCase.NoChange:

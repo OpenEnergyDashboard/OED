@@ -69,6 +69,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		deepMetersIdentifier: [] as string[]
 	}
 
+	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
 		possibleGraphicUnits: props.possibleGraphicUnits,
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -76,9 +77,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	}
 
 	/* State */
+	// State for the created group.
+	const [state, setState] = useState(defaultValues);
 
 	// Handlers for each type of input change
-	const [state, setState] = useState(defaultValues);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -96,9 +98,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 
+	// Dropdowns state
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
-
-	// Dropdowns
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
 
@@ -106,7 +107,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		setShowModal(false);
 		resetState();
 	};
-	const handleShow = () => setShowModal(true);
+	const handleShow = () => { setShowModal(true); }
 
 	// Reset the state to default value so each time starts from scratch.
 	const resetState = () => {
@@ -126,14 +127,13 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
-		// Check area is positive.
+		// Check if area is non-negative
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;
 		}
 
 		// Check GPS entered.
-		// Validate GPS is okay and take from string to GPSPoint to submit.
 		const gpsInput = state.gps;
 		let gps: GPSPoint | null = null;
 		const latitudeIndex = 0;
@@ -168,7 +168,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 		if (inputOk) {
 			// The input passed validation.
-			// Submit new group if checks where ok.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
 			dispatch(submitNewGroup(submitState));
@@ -302,6 +301,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												type='select'
 												value={state.defaultGraphicUnit}
 												onChange={e => handleNumberChange(e)}>
+												{/* First list the selectable ones and then the rest as disabled. */}
 												{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
