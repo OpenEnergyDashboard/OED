@@ -86,9 +86,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEditGroupsState({
 			...editGroupsState,
-			[props.groupId]: {
+			[groupState.id]: {
 				// There is state that is in each group that is not part of the edit information state.
-				...editGroupsState[props.groupId],
+				...editGroupsState[groupState.id],
 				[e.target.name]: e.target.value
 			}
 		})
@@ -97,9 +97,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEditGroupsState({
 			...editGroupsState,
-			[props.groupId]: {
+			[groupState.id]: {
 				// There is state that is in each group that is not part of the edit information state.
-				...editGroupsState[props.groupId],
+				...editGroupsState[groupState.id],
 				[e.target.name]: JSON.parse(e.target.value)
 			}
 		})
@@ -108,9 +108,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEditGroupsState({
 			...editGroupsState,
-			[props.groupId]: {
+			[groupState.id]: {
 				// There is state that is in each group that is not part of the edit information state.
-				...editGroupsState[props.groupId],
+				...editGroupsState[groupState.id],
 				[e.target.name]: Number(e.target.value)
 			}
 		})
@@ -186,7 +186,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 		// Check for changes by comparing the original, global state to edited state.
 		// This is the unedited state of the group being edited to compare to for changes.
-		const originalGroupState = globalGroupsState[props.groupId];
+		const originalGroupState = globalGroupsState[groupState.id];
 		// Check children separately since lists.
 		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
 		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
@@ -234,19 +234,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				}
 			}
 
-			// Do not allow groups without any child meters and groups. From a practical standpoint, this
-			// means there are no deep children.
-			if (groupState.deepMeters.length === 0) {
-				notifyUser(translate('group.children.error'));
-				inputOk = false;
-			}
-
 			if (inputOk) {
 				// The input passed validation so okay to save.
 
 				// A change in this group may have changed other group's default graphic unit. Thus, create a list of
 				// all groups needing to be saved starting with the group being edited.
-				const groupChanged = [props.groupId];
+				const groupChanged = [groupState.id];
 				Object.values(editGroupsState).forEach(group => {
 					if (group.defaultGraphicUnit !== globalGroupsState[group.id].defaultGraphicUnit) {
 						groupChanged.push(group.id);
@@ -271,7 +264,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// The next line is unneeded since do refresh.
 				// dispatch(removeUnsavedChanges());
 			} else {
-				// TODO We probably should reset the state since it failed - other pages similar.
 				notifyUser(translate('group.input.error'));
 			}
 		}
@@ -571,7 +563,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					{/* Discard & save buttons if admin and close button if not. */}
 					{loggedInAsAdmin ?
 						<div>
-							{/* TODO this should warn admin if group in another group */}
+							{/* delete group */}
 							<Button variant="danger" onClick={validateDelete}>
 								<FormattedMessage id="group.delete.group" />
 							</Button>
@@ -613,9 +605,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Add the child to the group being edited in temp so can decide if want change.
 		// This assumes there are no duplicates which is not allowed by menus
 		if (childType === DataType.Meter) {
-			tempGroupsState[props.groupId].childMeters.push(childId);
+			tempGroupsState[groupState.id].childMeters.push(childId);
 		} else {
-			tempGroupsState[props.groupId].childGroups.push(childId);
+			tempGroupsState[groupState.id].childGroups.push(childId);
 		}
 		// The deep meters of any group can change for any group containing the group that just had a meter/group added.
 		// Since groups can be indirectly included in another group it is hard to know which ones where impacted so
@@ -641,7 +633,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Only do next step if update is still possible.
 		if (shouldUpdate) {
 			// Get all parent groups of this group.
-			// TODO resolve to use groupState.id or props.groupId
 			const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
 			// Check for group changes and have admin agree or not.
 			shouldUpdate = await validateGroupPostAddChild(groupState.id, parentGroupIDs, tempGroupsState);
@@ -740,12 +731,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Add the child to the group being edited.
 		if (childType === DataType.Meter) {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[props.groupId].childMeters, value => value != childId);
-			tempGroupsState[props.groupId].childMeters = newChildren;
+			const newChildren = _.filter(tempGroupsState[groupState.id].childMeters, value => value != childId);
+			tempGroupsState[groupState.id].childMeters = newChildren;
 		} else {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[props.groupId].childGroups, value => value != childId);
-			tempGroupsState[props.groupId].childGroups = newChildren;
+			const newChildren = _.filter(tempGroupsState[groupState.id].childGroups, value => value != childId);
+			tempGroupsState[groupState.id].childGroups = newChildren;
 		}
 
 		// The deep meters of any group can change for any group containing the group that just had a meter/group added.
@@ -786,7 +777,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 */
 	async function validateDelete() {
 		// Get all parent groups of this group.
-		// TODO resolve to use groupState.id or props.groupId
 		const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
 		// If there are parents then you cannot delete this group. Notify admin.
 		if (parentGroupIDs.length !== 0) {
