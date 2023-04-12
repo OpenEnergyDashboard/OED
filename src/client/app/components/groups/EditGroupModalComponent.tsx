@@ -619,7 +619,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// There is a circular dependency so this change is not allowed.
 				// Cannot be case of no children since adding child.
 				// Let the user know.
-				window.alert(`${translate('group.edit.circular')}`);
+				window.alert(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
 				// Stops processing and will return this result (negated).
 				return true;
 			} else {
@@ -749,7 +749,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// This should only happen for the group being edited but check for all since easier.
 			if (newDeepMeters.length === 0) {
 				// Let the user know.
-				window.alert(`${translate('group.edit.empty')}`);
+				window.alert(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
 				// Indicate issue and stop processing.
 				return true;
 			} else {
