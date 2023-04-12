@@ -572,7 +572,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					{loggedInAsAdmin ?
 						<div>
 							{/* TODO this should warn admin if group in another group */}
-							<Button variant="danger" onClick={handleDeleteConfirmationModalOpen}>
+							<Button variant="danger" onClick={validateDelete}>
 								<FormattedMessage id="group.delete.group" />
 							</Button>
 							{/* Hides the modal */}
@@ -778,6 +778,29 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		// Tells if the edit was accepted.
 		return groupOk;
+	}
+
+	/**
+	 * Checks if this group is contained in another group. If so, no delete.
+	 * If not, then continue delete process.
+	 */
+	async function validateDelete() {
+		// Get all parent groups of this group.
+		// TODO resolve to use groupState.id or props.groupId
+		const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
+		// If there are parents then you cannot delete this group. Notify admin.
+		if (parentGroupIDs.length !== 0) {
+			// This will hold the overall message for the admin alert.
+			let msg = `${translate('group')} "${groupState.name}" ${translate('group.delete.issue')}:\n`;
+			parentGroupIDs.forEach(groupId => {
+				msg += `${editGroupsState[groupId].name}\n`;
+			})
+			msg += `\n${translate('group.edit.cancelled')}`;
+			window.alert(msg);
+		} else {
+			// The group can be deleted.
+			handleDeleteConfirmationModalOpen();
+		}
 	}
 
 	/**
