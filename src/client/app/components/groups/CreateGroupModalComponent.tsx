@@ -63,7 +63,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// The meter selections in format for selection dropdown and initially empty.
 		meterSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown and initially empty.
-		groupSelectOptions: [] as SelectOption[],
+		groupSelectOptions: [] as SelectOption[]
 	}
 
 	// Information on the default graphic unit values.
@@ -175,7 +175,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 	};
 
-	// Determine child meters/groups and deep meters.
+	// Determine allowed child meters/groups for menu.
 	useEffect(() => {
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
@@ -197,7 +197,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
 
-	// Update compatible units and graphic units set.
+	// Update compatible default graphic units set.
 	useEffect(() => {
 		if (loggedInAsAdmin) {
 			// Graphic units compatible with currently selected meters/groups.

@@ -225,8 +225,8 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 /**
  * Get options for the group menu on the group page.
  * @param groupId The id of the group being worked on.
- * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
- * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @param defaultGraphicUnit The group's current default graphic unit which may have been updated from what is in Redux state.
+ * @param deepMeters The group's current deep meters (all recursively) which may have been updated from what is in Redux state.
  * @return The current group options for this group.
 */
 export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
@@ -253,7 +253,7 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 				style: {}
 			} as SelectOption;
 
-			const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit, deepMeters);
+			const compatibilityChangeCase = getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit, group.deepMeters);
 			if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
 				option.isDisabled = true;
 			} else {
@@ -272,7 +272,7 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
  * The four cases that could happen when adding a group/meter to a group:
  * 	- NoChange: Adding this meter/group will not change the compatible units for the group.
  *  - LostCompatibleUnits: The meter/group is compatible with the default graphic unit although some compatible units are lost.
- *  - LostDefaultGraphicUnits: The meter/group is not compatible with the default graphic unit but there exists some compatible untis.
+ *  - LostDefaultGraphicUnits: The meter/group is not compatible with the default graphic unit but there exists some compatible units.
  *  - NoCompatibleUnits: The meter/group will cause the compatible units for the group to be empty.
  */
 export const enum GroupCase {
@@ -287,7 +287,7 @@ export const enum GroupCase {
  * @param currentUnits The current compatible units of the group.
  * @param idToAdd The meter/group's id to add to the group.
  * @param type Can be METER or GROUP.
- * @param currentDefaultGraphicUnit The default graphic unit.
+ * @param currentDefaultGraphicUnit The default graphic unit for group changing
  * @param deepMeters The deep meters for the group, ignored if meter
  * @returns GroupCase the type of change this involves.
  */
