@@ -129,27 +129,6 @@ export function fetchAllGroupChildrenIfNeeded(): Thunk {
 		return Promise.resolve();
 	};
 }
-/**
- * Change the selected child groups of a group.
- * This is tracked on a per-group basis. (I.e., each group has its own list of selected child groups.)
- * @param {number} parentID The ID of the group whose subgroups are being selected
- * @param {number[]} groupIDs The IDs of the new set of selected subgroups
- * @returns {{type: string, groupIDs: [number]}}
- */
-export function changeSelectedChildGroupsOfGroup(parentID: number, groupIDs: number[]): t.ChangeSelectedChildGroupsPerGroupAction {
-	return { type: ActionType.ChangeSelectedChildGroupsPerGroup, parentID, groupIDs };
-}
-
-/**
- * Change which child meters of a group are selected.
- * This is tracked on a per-group basis.
- * @param {number} parentID The ID of the group whose subgroups are being selected
- * @param {number[]} meterIDs The IDs of the new set of selected child meters
- * @returns {{type: string, parentID: number, meterIDs: [number]}}
- */
-export function changeSelectedChildMetersOfGroup(parentID: number, meterIDs: number[]): t.ChangeSelectedChildMetersPerGroupAction {
-	return { type: ActionType.ChangeSelectedChildMetersPerGroup, parentID, meterIDs };
-}
 
 /*
  * The `submitNewGroup` and `submitGroupEdits` functions are called by
@@ -181,7 +160,13 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
 	return { type: ActionType.ConfirmEditedGroup, editedGroup };
 }
 
-export function submitGroupEdits(group: t.GroupEditData): Thunk {
+/**
+ * Pushes group changes out to DB.
+ * @param group The group to update
+ * @param reload If true, the window is reloaded to reset everything on change
+ * @returns Function to do this for an action
+ */
+export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true): Thunk {
 	// TODO This no longer does a dispatch so it may need to be reworked.
 	// For now, get to ignore eslint issue.
 	/* eslint-disable @typescript-eslint/no-unused-vars */
@@ -189,7 +174,7 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 		/* eslint-enable @typescript-eslint/no-unused-vars */
 		try {
 			// deepMeters is part of the group state but it is not sent on edit route so remove.
-			// Need deep copy so changes don't impact original.
+			// Need deep copy so changes don't impact original but not really important if reload.
 			const groupNoDeep = { ...group };
 			delete groupNoDeep.deepMeters;
 			await groupsApi.edit(groupNoDeep);
@@ -197,7 +182,9 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 			// to avoid issues with change from one group impacting another.
 			// Update the store for all groups.
 			// TODO We should limit this to the times it is needed and not all group edits.
-			window.location.reload();
+			if (reload) {
+				window.location.reload();
+			}
 			// If we did not reload then we need to refresh the edited group's state with:
 			// dispatch(confirmGroupEdits(group));
 			// An then we need to fix up any other groups impacted.
@@ -208,7 +195,7 @@ export function submitGroupEdits(group: t.GroupEditData): Thunk {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification(translate('group.failed.to.edit.group') + e.response.data.message as string);
+				showErrorNotification(translate('group.failed.to.edit.group')+ ' "' + e.response.data as string + '"');
 			}
 		}
 	};

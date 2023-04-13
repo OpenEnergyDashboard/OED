@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import * as _ from 'lodash';
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -36,6 +37,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	// Group state
+	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -61,16 +64,11 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	const groupChildrenDefaults = {
 		// The meter selections in format for selection dropdown and initially empty.
 		meterSelectOptions: [] as SelectOption[],
-		// Meters that have been selected for this group and initially empty.
-		meterSelectedSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown and initially empty.
-		groupSelectOptions: [] as SelectOption[],
-		// Groups that have been selected for this group and initially empty.
-		groupSelectedSelectOptions: [] as SelectOption[],
-		// The identifiers of all meter children (deep meters) that are visible to this user.
-		deepMetersIdentifier: [] as string[]
+		groupSelectOptions: [] as SelectOption[]
 	}
 
+	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
 		possibleGraphicUnits: props.possibleGraphicUnits,
 		compatibleGraphicUnits: props.possibleGraphicUnits,
@@ -78,9 +76,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	}
 
 	/* State */
+	// State for the created group.
+	const [state, setState] = useState(defaultValues);
 
 	// Handlers for each type of input change
-	const [state, setState] = useState(defaultValues);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -98,9 +97,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 
+	// Dropdowns state
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
-
-	// Dropdowns
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
 
@@ -140,7 +138,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		setShowModal(false);
 		resetState();
 	};
-	const handleShow = () => setShowModal(true);
+	const handleShow = () => { setShowModal(true); }
 
 	// Reset the state to default value so each time starts from scratch.
 	const resetState = () => {
@@ -160,10 +158,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
-		// Check area is positive.
-		// TODO For now allow zero so works with default value and DB. We should probably
-		// make this better default than 0 (DB set to not null now).
-		// if (state.area <= 0) {
+		// Check if area is non-negative
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;
@@ -174,7 +169,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 
 		// Check GPS entered.
-		// Validate GPS is okay and take from string to GPSPoint to submit.
 		const gpsInput = state.gps;
 		let gps: GPSPoint | null = null;
 		const latitudeIndex = 0;
@@ -209,7 +203,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 		if (inputOk) {
 			// The input passed validation.
-			// Submit new group if checks where ok.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
 			dispatch(submitNewGroup(submitState));
@@ -220,7 +213,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 	};
 
-	// Determine child meters/groups and deep meters.
+	// Determine allowed child meters/groups for menu.
 	useEffect(() => {
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
@@ -233,29 +226,16 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
 			// in this case so set to -1 so it never matches in this function.
 			const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
-
-			// Information to display all (deep) children meters.
-			// Holds the names of all (deep) meter children of this group when visible to this user.
-			const identifierDeepMeters: string[] = [];
-			state.deepMeters.forEach((meterID: number) => {
-				// Make sure meter state exists. Also, the identifier is missing if not visible (non-admin).
-				if (metersState[meterID] !== undefined && metersState[meterID].identifier !== null) {
-					identifierDeepMeters.push(metersState[meterID].identifier.trim());
-				}
-			});
-			// We want to display in alphabetical order.
-			identifierDeepMeters.sort();
 			// Update the state
 			setGroupChildrenState({
 				...groupChildrenState,
-				deepMetersIdentifier: identifierDeepMeters,
 				meterSelectOptions: possibleMeters,
 				groupSelectOptions: possibleGroups
 			});
 		}
 	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
 
-	// Update compatible units and graphic units set.
+	// Update compatible default graphic units set.
 	useEffect(() => {
 		if (loggedInAsAdmin) {
 			// Graphic units compatible with currently selected meters/groups.
@@ -343,6 +323,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												type='select'
 												value={state.defaultGraphicUnit}
 												onChange={e => handleNumberChange(e)}>
+												{/* First list the selectable ones and then the rest as disabled. */}
 												{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
 												})}
@@ -419,7 +400,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												<b><FormattedMessage id='child.meters' /></b>:
 												<MultiSelectComponent
 													options={groupChildrenState.meterSelectOptions}
-													selectedOptions={groupChildrenState.meterSelectedSelectOptions}
+													selectedOptions={metersToSelectOptions()}
 													placeholder={translate('select.meters')}
 													onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
 														// The meters changed so update the current list of deep meters
@@ -431,11 +412,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 														// Note could update child meters above to avoid updating state value for metersInChangedGroup but want
 														// to avoid too many state updates.
 														setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters });
-														// Set the selected meters in state to the ones chosen.
-														setGroupChildrenState({
-															...groupChildrenState,
-															meterSelectedSelectOptions: newSelectedMeterOptions
-														});
 													}}
 												/>
 											</div>
@@ -445,7 +421,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 											<b><FormattedMessage id='child.groups' /></b>:
 											<MultiSelectComponent
 												options={groupChildrenState.groupSelectOptions}
-												selectedOptions={groupChildrenState.groupSelectedSelectOptions}
+												selectedOptions={groupsToSelectOptions()}
 												placeholder={translate('select.groups')}
 												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
 													// The groups changed so update the current list of deep meters
@@ -457,11 +433,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
 													// to avoid too many state updates.
 													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups });
-													// // Set the selected groups in state to the ones chosen.
-													setGroupChildrenState({
-														...groupChildrenState,
-														groupSelectedSelectOptions: newSelectedGroupOptions
-													});
 												}}
 											/>
 										</div>
@@ -469,7 +440,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										{/* All (deep) meters in this group */}
 										<div>
 											<b><FormattedMessage id='group.all.meters' /></b>:
-											<ListDisplayComponent items={groupChildrenState.deepMetersIdentifier} />
+											<ListDisplayComponent items={deepMetersToList()} />
 										</div>
 									</div>
 								</div>
@@ -489,4 +460,56 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			</Modal>
 		</>
 	);
+
+	/**
+	 * Converts the child meters of this group to options for menu sorted by identifier
+	 * @returns sorted SelectOption for child meters of group creating.
+	 */
+	function metersToSelectOptions(): SelectOption[] {
+		// In format for the display component for menu.
+		const selectedMetersUnsorted: SelectOption[] = [];
+		state.childMeters.forEach(groupId => {
+			selectedMetersUnsorted.push({
+				value: groupId,
+				label: metersState[groupId].identifier
+				// isDisabled not needed since only used for selected and not display.
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order.
+		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+	}
+
+	/**
+	 * Converts the child groups of this group to options for menu sorted by name
+	 * @returns sorted SelectOption for child groups of group editing.
+	 */
+	function groupsToSelectOptions(): SelectOption[] {
+		// In format for the display component for menu.
+		const selectedGroupsUnsorted: SelectOption[] = [];
+		state.childGroups.forEach(groupId => {
+			selectedGroupsUnsorted.push({
+				value: groupId,
+				label: groupsState[groupId].name
+				// isDisabled not needed since only used for selected and not display.
+			} as SelectOption
+			);
+		});
+		// Want chosen in sorted order.
+		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+	}
+
+	/**
+	 * Converts the deep meters of this group to list options sorted by identifier.
+	 * @returns names of all child meters in sorted order.
+	 */
+	function deepMetersToList() {
+		// Create list of meter identifiers.
+		const listedDeepMeters: string[] = [];
+		state.deepMeters.forEach(meterId => {
+			listedDeepMeters.push(metersState[meterId].identifier);
+		});
+		// Sort for display.
+		return listedDeepMeters.sort();
+	}
 }

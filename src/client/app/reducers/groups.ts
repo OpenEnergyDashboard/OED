@@ -151,32 +151,6 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			};
 		}
 
-		case ActionType.ChangeSelectedChildGroupsPerGroup: {
-			return {
-				...state,
-				byGroupID: {
-					...state.byGroupID,
-					[action.parentID]: {
-						...state.byGroupID[action.parentID],
-						selectedGroups: action.groupIDs
-					}
-				}
-			};
-		}
-
-		case ActionType.ChangeSelectedChildMetersPerGroup: {
-			return {
-				...state,
-				byGroupID: {
-					...state.byGroupID,
-					[action.parentID]: {
-						...state.byGroupID[action.parentID],
-						selectedMeters: action.meterIDs
-					}
-				}
-			};
-		}
-
 		case ActionType.ConfirmEditedGroup: {
 			// Return new state object with updated edited group info.
 			return {

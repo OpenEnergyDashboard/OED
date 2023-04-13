@@ -16,8 +16,6 @@ export type GroupsAction =
 	| RequestAllGroupsChildrenAction
 	| ReceiveAllGroupsChildrenAction
 	| ChangeDisplayedGroupsAction
-	| ChangeSelectedChildGroupsPerGroupAction
-	| ChangeSelectedChildMetersPerGroupAction
 	| ConfirmEditedGroupAction
 	| ConfirmGroupsFetchedOnceAction
 	| ConfirmAllGroupsChildrenFetchedOnceAction
@@ -60,18 +58,6 @@ export interface ConfirmEditedGroupAction {
 export interface ChangeDisplayedGroupsAction {
 	type: ActionType.ChangeDisplayedGroups;
 	groupIDs: number[];
-}
-
-export interface ChangeSelectedChildGroupsPerGroupAction {
-	type: ActionType.ChangeSelectedChildGroupsPerGroup;
-	parentID: number;
-	groupIDs: number[];
-}
-
-export interface ChangeSelectedChildMetersPerGroupAction {
-	type: ActionType.ChangeSelectedChildMetersPerGroup;
-	parentID: number;
-	meterIDs: number[];
 }
 
 export interface ConfirmGroupsFetchedOnceAction {

@@ -22,8 +22,6 @@ import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 
 export default function GroupsDetailComponent() {
-	// TODO The route stops you from getting to this page if not an admin.
-
 	const dispatch = useDispatch();
 
 	// Groups state
@@ -32,10 +30,8 @@ export default function GroupsDetailComponent() {
 	const groupsStateLoaded = useSelector((state: State) => state.groups.hasBeenFetchedOnce);
 	// The immediate children of groups is loaded separately.
 	const groupsAllChildrenLoaded = useSelector((state: State) => state.groups.hasChildrenBeenFetchedOnce);
-	// current user state
-	const currentUserState = useSelector((state: State) => state.currentUser);
 	// Check for admin status
-	const currentUser = currentUserState.profile;
+	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
 	// We only want displayable groups if non-admins because they still have
@@ -116,8 +112,7 @@ export default function GroupsDetailComponent() {
 								.map(groupData => (<GroupViewComponent
 									group={groupData as GroupDefinition}
 									key={(groupData as GroupDefinition).id}
-									currentUser={currentUserState}
-									// These two props are used in the edit component (child of view component)
+									// This prop is used in the edit component (child of view component)
 									possibleGraphicUnits={possibleGraphicUnits}
 								/>))}
 						</div>

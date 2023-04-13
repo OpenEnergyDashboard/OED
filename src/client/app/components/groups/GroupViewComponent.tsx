@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-//Realize that * is already imported from react
+// Realize that * is already imported from react
 import { State } from 'types/redux/state';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -13,21 +13,19 @@ import EditGroupModalComponent from './EditGroupModalComponent';
 import '../../styles/card-page.css';
 import { GroupDefinition } from 'types/redux/groups';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { CurrentUserState } from 'types/redux/currentUser';
 import translate from '../../utils/translate';
 import { UnitData } from '../../types/redux/units';
 import { noUnitTranslated } from '../../utils/input';
 
 interface GroupViewComponentProps {
 	group: GroupDefinition;
-	currentUser: CurrentUserState;
 	// This isn't used in this component but are passed to the edit component
 	// This is done to avoid having to recalculate the possible units sets in each view component
 	possibleGraphicUnits: Set<UnitData>;
 }
 
 export default function GroupViewComponent(props: GroupViewComponentProps) {
-	// Don't check if admin since only an admin is allow to route to this page.
+	// Don't check if admin since only an admin is allowed to route to this page.
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);

@@ -62,8 +62,6 @@ export enum ActionType {
 	ReceiveGroupChildren = 'RECEIVE_GROUP_CHILDREN',
 	RequestAllGroupsChildren = 'REQUEST_ALL_GROUPS_CHILDREN',
 	ReceiveAllGroupsChildren = 'RECEIVE_ALL_GROUPS_CHILDREN',
-	ChangeSelectedChildGroupsPerGroup = 'CHANGE_SELECTED_CHILD_GROUPS_PER_GROUP',
-	ChangeSelectedChildMetersPerGroup = 'CHANGE_SELECTED_CHILD_METERS_PER_GROUP',
 	ChangeDisplayedGroups = 'CHANGE_DISPLAYED_GROUPS',
 	ConfirmEditedGroup = 'CONFIRM_EDITED_GROUP',
 	ConfirmGroupsFetchedOnce = 'CONFIRM_GROUPS_FETCHED_ONCE',
