@@ -898,7 +898,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		return listedGroups;
 	}
 
-
 	/**
 	 * Converts the deep meters of this group to list options sorted by identifier.
 	 * Hidden items are not shown but noted in list; admins should never see that.
