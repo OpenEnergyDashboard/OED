@@ -2,23 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from "react";
-import Dropdown from 'react-bootstrap/Dropdown';
-import { Link } from "react-router-dom";
-import { Button } from "reactstrap";
-import { FormattedMessage } from "react-intl";
-import MenuModalComponent from "./MenuModalComponent";
-import getPage from "../utils/getPage";
-import TooltipMarkerComponent from "./TooltipMarkerComponent";
-import TooltipHelpContainer from "../containers/TooltipHelpContainer";
-import { UserRole } from "../types/items";
-import { isRoleAdmin } from "../utils/hasPermissions";
-import { hasPermissions } from "../utils/hasPermissions";
-import { flipLogOutState } from "../actions/unsavedWarning";
-import { deleteToken } from "../utils/token";
-import { clearCurrentUser } from "../actions/currentUser";
-import { State } from "../types/redux/state";
-import { useSelector } from "react-redux";
+ import * as React from "react";
+ import { useEffect } from 'react';
+ import Dropdown from 'react-bootstrap/Dropdown';
+ import { Link } from "react-router-dom";
+ import { Button } from "reactstrap";
+ import { FormattedMessage } from "react-intl";
+ import MenuModalComponent from "./MenuModalComponent";
+ import getPage from "../utils/getPage";
+ import TooltipMarkerComponent from "./TooltipMarkerComponent";
+ import TooltipHelpContainer from "../containers/TooltipHelpContainer";
+ import { UserRole } from "../types/items";
+ import { isRoleAdmin } from "../utils/hasPermissions";
+ import { hasPermissions } from "../utils/hasPermissions";
+ import { flipLogOutState } from "../actions/unsavedWarning";
+ import { deleteToken } from "../utils/token";
+ import { clearCurrentUser } from "../actions/currentUser";
+ import { State } from "../types/redux/state";
+ import { useDispatch, useSelector } from 'react-redux';
 
 export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: boolean, isModal: boolean}) {
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -42,6 +43,9 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 	const shouldConversionsButtonDisabled = getPage() === "conversions";
 	const dataFor = args.isModal ? "all-modal" : "all";
 
+	useEffect(() => {
+        // Empty because just want to rerender.
+    }, [currentUser]);
 
 	const linkStyle: React.CSSProperties = {
 		display: "inline",
@@ -55,22 +59,26 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 		display: renderLogoutButton ? "inline" : "none",
 		paddingLeft: "5px",
 	};
-	/*const adminViewableLinkStyle: React.CSSProperties = {
+	const adminViewableLinkStyle: React.CSSProperties = {
 		display: loggedInAsAdmin ? "block" : "none",
 	};
 	const csvLinkStyle: React.CSSProperties = {
 		display: renderCSVButton ? "block" : "none",
-	};*/
-
-
-	const handleLogOut = () => {
-		if (useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges))
-			flipLogOutState();
-		else {
-			deleteToken();
-			clearCurrentUser();
-		}
 	};
+
+	const dispatch = useDispatch();
+	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
+	const handleLogOut = () => {
+        if (unsavedChangesState) {
+            dispatch(flipLogOutState());
+        } else {
+            deleteToken();
+            dispatch(clearCurrentUser());
+            // component.forceUpdate();
+        }
+    };
+
+	
 
 	return (
 		<div>
@@ -94,19 +102,19 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 							<FormattedMessage id="home" />
 						</Dropdown.Item>
 						<Dropdown.Item 
-							//style={adminViewableLinkStyle} 
+							style={adminViewableLinkStyle} 
 							disabled = {shouldAdminButtonDisabled}
 							onClick={() => {window.location.href = "/admin";}}>
 							<FormattedMessage id="admin.panel" />
 						</Dropdown.Item>
 						<Dropdown.Item
-							//style={adminViewableLinkStyle}
+							style={adminViewableLinkStyle}
 							disabled = {shouldConversionsButtonDisabled}
 							onClick={() => {window.location.href = "/conversions";}}>
 							<FormattedMessage id="conversions" />
 						</Dropdown.Item>
 						<Dropdown.Item
-							//style={csvLinkStyle}
+							style={csvLinkStyle}
 							disabled={shouldCSVButtonDisabled}
 							onClick={() => {window.location.href = "/csv";}}>
 							<FormattedMessage id="csv" />
@@ -117,7 +125,7 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 							<FormattedMessage id="groups" />
 						</Dropdown.Item>
 						<Dropdown.Item
-							//style={adminViewableLinkStyle}
+							style={adminViewableLinkStyle}
 							disabled={shouldMapsButtonDisabled}
 							onClick={() => {window.location.href = "/maps";}}>
 							<FormattedMessage id="maps" />
@@ -128,7 +136,7 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 							<FormattedMessage id="meters" />
 						</Dropdown.Item>
 						<Dropdown.Item
-							//style={adminViewableLinkStyle}
+							style={adminViewableLinkStyle}
 							disabled={shouldUnitsButtonDisabled}
 							onClick={() => {window.location.href = "/units";}}>
 							<FormattedMessage id="units" />
@@ -155,4 +163,4 @@ export default function HeaderButtonsComponent(args: {showCollapsedMenuButton: b
 // makes maintaining the code easier
 // don't have to mess around with props, so you couldn't access state and you would have to access the state from a container
 // OED is converting everything to react hooks, since OED is older than react hooks
-// /home/nicolax/Desktop/OED/src/client/app/components/ChartSelectComponent.tsx
+// 	home/nicolax/Desktop/OED/src/client/app/components/ChartSelectComponent.tsx
