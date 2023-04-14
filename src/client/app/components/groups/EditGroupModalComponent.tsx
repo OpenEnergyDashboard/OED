@@ -34,6 +34,7 @@ import { GroupDefinition } from 'types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
+import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -328,18 +329,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}, [ConversionArray.pikAvailable(), groupState.deepMeters, editGroupsState]);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
 		tooltipEditGroupView: loggedInAsAdmin ? 'help.admin.groupedit' : 'help.groups.groupdetails'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -371,12 +363,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Name where input if admin or shown if now */}
 									{loggedInAsAdmin ?
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.name" /></label><br />
+											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												value={groupState.name} />
+												required value={groupState.name} />
 										</div>
 										:
 										<div className="item-container">
@@ -386,7 +378,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* default graphic unit input or display */}
 									{loggedInAsAdmin ?
 										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -413,7 +405,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Displayable input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label>
 											<Input
 												name='displayable'
 												type='select'
@@ -428,20 +420,19 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Area input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label>
 											<Input
 												name="area"
 												type="number"
-												step="0.01"
 												min="0"
-												value={nullToEmptyString(groupState.area)}
+												defaultValue={nullToEmptyString(groupState.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 									}
 									{/* GPS input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label>
 											<Input
 												name='gps'
 												type='text'
@@ -452,7 +443,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Note input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label><br />
+											<label><FormattedMessage id="group.note" /></label>
 											<Input
 												name='note'
 												type='textarea'

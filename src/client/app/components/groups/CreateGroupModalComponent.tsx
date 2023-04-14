@@ -26,6 +26,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
+import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -231,17 +232,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	}, [ConversionArray.pikAvailable(), state.deepMeters]);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		tooltipCreateGroupView: 'help.admin.groupcreate'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -270,16 +262,16 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 									<div style={tableStyle}>
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.name" /></label><br />
+											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												value={state.name} />
+												required value={state.name} />
 										</div>
 										{/* default graphic unit input */}
 										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -296,7 +288,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Displayable input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label>
 											<Input
 												name='displayable'
 												type='select'
@@ -309,18 +301,17 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Area input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label>
 											<Input
 												name="area"
 												type="number"
-												step="0.01"
 												min="0"
-												value={state.area}
+												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label>
 											<Input
 												name='gps'
 												type='text'
@@ -329,7 +320,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label><br />
+											<label><FormattedMessage id="group.note" /></label>
 											<Input
 												name='note'
 												type='textarea'

@@ -14,6 +14,8 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 import { addUnit } from '../../actions/units';
+import { notifyUser } from '../../utils/input'
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();
@@ -72,27 +74,22 @@ export default function CreateUnitModalComponent() {
 
 	// Submit
 	const handleSubmit = () => {
-		// Close modal first to avoid repeat clicks
-		setShowModal(false);
-		// Set default identifier as name if left blank
-		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-		// Add the new unit and update the store
-		dispatch(addUnit(state));
-		resetState();
+		if (state.secInRate <= 0) {
+			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}. ${translate('unit.input.error')}`);
+		} else {
+			// Close modal first to avoid repeat clicks
+			setShowModal(false);
+			// Set default identifier as name if left blank
+			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
+			// Add the new unit and update the store
+			dispatch(addUnit(state));
+			resetState();
+		}
 	};
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		tooltipCreateUnitView: 'help.admin.unitcreate'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -120,7 +117,7 @@ export default function CreateUnitModalComponent() {
 								<div style={tableStyle}>
 									{/* Identifier input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.identifier" /></label><br />
+										<label><FormattedMessage id="unit.identifier" /></label>
 										<Input
 											name='identifier'
 											type='text'
@@ -129,7 +126,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Name input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.name" /></label><br />
+										<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
 										<Input
 											name='name'
 											type='text'
@@ -138,7 +135,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Type of unit input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.type.of.unit" /></label><br />
+										<label><FormattedMessage id="unit.type.of.unit" /></label>
 										<Input
 											name='typeOfUnit'
 											type='select'
@@ -151,7 +148,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Unit represent input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.represent" /></label><br />
+										<label><FormattedMessage id="unit.represent" /></label>
 										<Input
 											name='unitRepresent'
 											type='select'
@@ -164,7 +161,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Displayable type input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.dropdown.displayable" /></label><br />
+										<label><FormattedMessage id="unit.dropdown.displayable" /></label>
 										<Input
 											name='displayable'
 											type='select'
@@ -177,7 +174,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Preferred display input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.preferred.display" /></label><br />
+										<label><FormattedMessage id="unit.preferred.display" /></label>
 										<Input
 											name='preferredDisplay'
 											type='select'
@@ -189,7 +186,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Seconds in rate input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
+										<label><FormattedMessage id="unit.sec.in.rate" /></label>
 										<Input
 											name='secInRate'
 											type='number'
@@ -201,7 +198,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Suffix input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.suffix" /></label><br />
+										<label><FormattedMessage id="unit.suffix" /></label>
 										<Input
 											name='suffix'
 											type='text'
@@ -210,7 +207,7 @@ export default function CreateUnitModalComponent() {
 									</div>
 									{/* Note input */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.note.optional" /></label><br />
+										<label><FormattedMessage id="unit.note" /></label>
 										<Input
 											name='note'
 											type='textarea'
