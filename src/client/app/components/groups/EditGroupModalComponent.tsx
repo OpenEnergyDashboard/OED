@@ -620,7 +620,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// There is a circular dependency so this change is not allowed.
 				// Cannot be case of no children since adding child.
 				// Let the user know.
-				window.alert(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
+				notifyUser(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
 				// Stops processing and will return this result (negated).
 				return true;
 			} else {
@@ -700,7 +700,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (cancel) {
 				// If cancel is true, doesn't allow the admin to apply changes.
 				msg += `\n${translate('group.edit.cancelled')}`;
-				window.alert(msg);
+				notifyUser(msg);
 			} else {
 				// If msg is not empty, warns the admin and asks if they want to apply changes.
 				msg += `\n${translate('group.edit.verify')}`;
@@ -751,7 +751,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// This should only happen for the group being edited but check for all since easier.
 			if (newDeepMeters.length === 0) {
 				// Let the user know.
-				window.alert(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
+				notifyUser(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
 				// Indicate issue and stop processing.
 				return true;
 			} else {
@@ -788,7 +788,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				msg += `${editGroupsState[groupId].name}\n`;
 			})
 			msg += `\n${translate('group.edit.cancelled')}`;
-			window.alert(msg);
+			notifyUser(msg);
 		} else {
 			// The group can be deleted.
 			handleDeleteConfirmationModalOpen();

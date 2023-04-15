@@ -357,7 +357,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 														let dgu = state.defaultGraphicUnit;
 														if (!newAllowedDGU.has(dgu)) {
 															// The current default graphic unit is not compatible so set to no unit and warn admin.
-															window.alert(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+															notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
 															dgu = -99;
 														}
 														// Update the deep meter, child meter & default graphic unit state based on the changes.
@@ -393,7 +393,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 													let dgu = state.defaultGraphicUnit;
 													if (!newAllowedDGU.has(dgu)) {
 														// The current default graphic unit is not compatible so set to no unit and warn admin.
-														window.alert(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+														notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
 														dgu = -99;
 													}
 													// Update the deep meter, child meter & default graphic unit state based on the changes.
