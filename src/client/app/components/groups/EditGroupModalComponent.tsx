@@ -34,7 +34,7 @@ import { GroupDefinition } from 'types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
-import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -291,7 +291,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, editGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters, groupState.childGroups, groupState.childMeters]);
+		// pik is needed since the compatible units is not correct until pik is available.
+		// metersState normally does not change but can so include.
+	}, [ConversionArray.pikAvailable(), metersState, groupState.defaultGraphicUnit, groupState.deepMeters]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -324,9 +326,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
-		// Another card can update a group that changes the values. Only certain changes matter
-		// but for now just do for all.
-	}, [ConversionArray.pikAvailable(), groupState.deepMeters, editGroupsState]);
+		// metersState normally does not change but can so include.
+		// If another group that is included in this group is changed then it must be redone
+		// but we currently do a refresh so it is covered. It should still be okay if
+		// the deep meters of this group are properly updated.
+	}, [ConversionArray.pikAvailable(), metersState, groupState.deepMeters]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

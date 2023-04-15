@@ -198,7 +198,9 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
+		// pik is needed since the compatible units is not correct until pik is available.
+		// metersState normally does not change but can so include.
+	}, [ConversionArray.pikAvailable(), metersState, state.defaultGraphicUnit, state.deepMeters]);
 
 	// Update compatible default graphic units set.
 	useEffect(() => {
@@ -230,8 +232,9 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			});
 		}
 		// If any of these change then it needs to be updated.
+		// metersState normally does not change but can so include.
 		// pik is needed since the compatible units is not correct until pik is available.
-	}, [ConversionArray.pikAvailable(), state.deepMeters]);
+	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
