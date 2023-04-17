@@ -349,7 +349,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={state.area}
+												// cannot use defaultValue because it won't update when area is auto calculated
+												value={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* meter area unit input */}

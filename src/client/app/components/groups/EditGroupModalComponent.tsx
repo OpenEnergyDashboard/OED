@@ -474,7 +474,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={nullToEmptyString(groupState.area)}
+												// cannot use defaultValue because it won't update when area is auto calculated
+												value={groupState.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 									}

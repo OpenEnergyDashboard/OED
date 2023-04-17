@@ -459,7 +459,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={nullToEmptyString(state.area)}
+												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* meter area unit input */}

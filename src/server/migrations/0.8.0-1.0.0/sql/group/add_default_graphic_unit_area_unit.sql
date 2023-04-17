@@ -6,8 +6,8 @@
 -- Also updates the area column to match meter specifications
 UPDATE groups SET area = 0 WHERE area IS NULL;
 ALTER TABLE groups
-    ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id);
-    ALTER COLUMN area SET DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id),
     ALTER COLUMN area SET NOT NULL,
+    ALTER COLUMN area SET DEFAULT 0,
     ADD CONSTRAINT group_area_check CHECK (area >= 0),
     ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL DEFAULT 'none';
