@@ -279,8 +279,6 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								<Route path='/graph' render={({ location }) => this.linkToGraph(<HomeComponent />, location.search)} />
 								<Route path='/calibration' render={() => this.requireAuth(<MapCalibrationContainer />)} />
 								<Route path='/maps' render={() => this.requireAuth(<MapsDetailContainer />)} />
-								{/* <Route path='/createGroup' render={() => this.requireAuth(<CreateGroupContainer />)} /> */}
-								{/* <Route path='/editGroup' render={() => this.requireAuth(<EditGroupsContainer />)} /> */}
 								<Route path='/users/new' render={() => this.requireAuth(<CreateUserContainer />)} />
 								<Route path='/users' render={() => this.requireAuth(<UsersDetailContainer fetchUsers={() => []} />)} />
 								<Route path='/units' render={() => this.requireAuth(<UnitsDetailComponent />)} />

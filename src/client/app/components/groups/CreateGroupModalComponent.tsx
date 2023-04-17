@@ -26,6 +26,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
@@ -39,6 +40,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
 	// Group state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
+	// Unit state
+	const unitsState = useSelector((state: State) => state.units.units);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -233,7 +236,9 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, state.defaultGraphicUnit, state.deepMeters, state.childGroups, state.childMeters]);
+		// pik is needed since the compatible units is not correct until pik is available.
+		// metersState normally does not change but can so include.
+	}, [ConversionArray.pikAvailable(), metersState, state.defaultGraphicUnit, state.deepMeters]);
 
 	// Update compatible default graphic units set.
 	useEffect(() => {
@@ -265,21 +270,13 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			});
 		}
 		// If any of these change then it needs to be updated.
+		// metersState normally does not change but can so include.
 		// pik is needed since the compatible units is not correct until pik is available.
-	}, [ConversionArray.pikAvailable(), state.deepMeters]);
+	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		tooltipCreateGroupView: 'help.admin.groupcreate'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -308,16 +305,16 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 									<div style={tableStyle}>
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.name" /></label><br />
+											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												value={state.name} />
+												required value={state.name} />
 										</div>
 										{/* default graphic unit input */}
 										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -334,7 +331,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Displayable input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label>
 											<Input
 												name='displayable'
 												type='select'
@@ -347,13 +344,12 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Area input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label>
 											<Input
 												name="area"
 												type="number"
-												step="0.01"
 												min="0"
-												value={state.area}
+												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* meter area unit input */}
@@ -378,7 +374,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label>
 											<Input
 												name='gps'
 												type='text'
@@ -387,7 +383,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 										</div>
 										{/* Note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label><br />
+											<label><FormattedMessage id="group.note" /></label>
 											<Input
 												name='note'
 												type='textarea'
@@ -408,10 +404,25 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 														const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
 														// The id is not really needed so set to -1 since same function for edit.
 														const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 });
-														// // Update the deep meter and child meter state based on the changes.
+														// The choice may have invalidated the default graphic unit so it needs
+														// to be reset to no unit.
+														// The selection encodes this information in the color but recalculate
+														// to see if this is the case.
+														// Get the units compatible with the new set of deep meters in group.
+														const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+														// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
+														newAllowedDGU.add(-99);
+														let dgu = state.defaultGraphicUnit;
+														if (!newAllowedDGU.has(dgu)) {
+															// The current default graphic unit is not compatible so set to no unit and warn admin.
+															notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+															dgu = -99;
+														}
+														// Update the deep meter, child meter & default graphic unit state based on the changes.
 														// Note could update child meters above to avoid updating state value for metersInChangedGroup but want
 														// to avoid too many state updates.
-														setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters });
+														// It is possible the default graphic unit is unchanged but just do this.
+														setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters, defaultGraphicUnit: dgu });
 													}}
 												/>
 											</div>
@@ -429,10 +440,25 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 													const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
 													// The id is not really needed so set to -1 since same function for edit.
 													const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 });
-													// Update the deep meter and child group state based on the changes.
+													// The choice may have invalidated the default graphic unit so it needs
+													// to be reset to no unit.
+													// The selection encodes this information in the color but recalculate
+													// to see if this is the case.
+													// Get the units compatible with the new set of deep meters in group.
+													const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+													// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
+													newAllowedDGU.add(-99);
+													let dgu = state.defaultGraphicUnit;
+													if (!newAllowedDGU.has(dgu)) {
+														// The current default graphic unit is not compatible so set to no unit and warn admin.
+														notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+														dgu = -99;
+													}
+													// Update the deep meter, child meter & default graphic unit state based on the changes.
 													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
 													// to avoid too many state updates.
-													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups });
+													// It is possible the default graphic unit is unchanged but just do this.
+													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups, defaultGraphicUnit: dgu });
 												}}
 											/>
 										</div>

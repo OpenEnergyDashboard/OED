@@ -357,7 +357,7 @@ function getMenuOptionFont(compatibilityChangeCase: GroupCase): React.CSSPropert
 			return { color: 'black' };
 
 		case GroupCase.LostCompatibleUnits:
-			return { color: 'yellow' };
+			return { color: 'orange' };
 
 		case GroupCase.LostDefaultGraphicUnit:
 			return { color: 'red' };

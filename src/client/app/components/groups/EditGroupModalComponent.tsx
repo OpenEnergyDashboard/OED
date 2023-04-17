@@ -34,6 +34,7 @@ import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
@@ -335,7 +336,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				groupSelectOptions: possibleGroups
 			});
 		}
-	}, [metersState, editGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters, groupState.childGroups, groupState.childMeters]);
+		// pik is needed since the compatible units is not correct until pik is available.
+		// metersState normally does not change but can so include.
+	}, [ConversionArray.pikAvailable(), metersState, groupState.defaultGraphicUnit, groupState.deepMeters]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -368,23 +371,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
-		// Another card can update a group that changes the values. Only certain changes matter
-		// but for now just do for all.
-	}, [ConversionArray.pikAvailable(), groupState.deepMeters, editGroupsState]);
+		// metersState normally does not change but can so include.
+		// If another group that is included in this group is changed then it must be redone
+		// but we currently do a refresh so it is covered. It should still be okay if
+		// the deep meters of this group are properly updated.
+	}, [ConversionArray.pikAvailable(), metersState, groupState.deepMeters]);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
 		tooltipEditGroupView: loggedInAsAdmin ? 'help.admin.groupedit' : 'help.groups.groupdetails'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -416,12 +412,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Name where input if admin or shown if now */}
 									{loggedInAsAdmin ?
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.name" /></label><br />
+											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
 												onChange={e => handleStringChange(e)}
-												value={groupState.name} />
+												required value={groupState.name} />
 										</div>
 										:
 										<div className="item-container">
@@ -431,7 +427,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* default graphic unit input or display */}
 									{loggedInAsAdmin ?
 										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label><br />
+											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -458,7 +454,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Displayable input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label><br />
+											<label><FormattedMessage id="group.displayable" /></label>
 											<Input
 												name='displayable'
 												type='select'
@@ -473,13 +469,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Area input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label><br />
+											<label><FormattedMessage id="group.area" /></label>
 											<Input
 												name="area"
 												type="number"
-												step="0.01"
 												min="0"
-												value={nullToEmptyString(groupState.area)}
+												defaultValue={nullToEmptyString(groupState.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 									}
@@ -510,7 +505,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* GPS input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label><br />
+											<label><FormattedMessage id="group.gps" /></label>
 											<Input
 												name='gps'
 												type='text'
@@ -521,7 +516,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* Note input, only for admin. */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label><br />
+											<label><FormattedMessage id="group.note" /></label>
 											<Input
 												name='note'
 												type='textarea'
@@ -694,7 +689,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// There is a circular dependency so this change is not allowed.
 				// Cannot be case of no children since adding child.
 				// Let the user know.
-				window.alert(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
+				notifyUser(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
 				// Stops processing and will return this result (negated).
 				return true;
 			} else {
@@ -774,7 +769,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (cancel) {
 				// If cancel is true, doesn't allow the admin to apply changes.
 				msg += `\n${translate('group.edit.cancelled')}`;
-				window.alert(msg);
+				notifyUser(msg);
 			} else {
 				// If msg is not empty, warns the admin and asks if they want to apply changes.
 				msg += `\n${translate('group.edit.verify')}`;
@@ -825,7 +820,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// This should only happen for the group being edited but check for all since easier.
 			if (newDeepMeters.length === 0) {
 				// Let the user know.
-				window.alert(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
+				notifyUser(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
 				// Indicate issue and stop processing.
 				return true;
 			} else {
@@ -862,7 +857,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				msg += `${editGroupsState[groupId].name}\n`;
 			})
 			msg += `\n${translate('group.edit.cancelled')}`;
-			window.alert(msg);
+			notifyUser(msg);
 		} else {
 			// The group can be deleted.
 			handleDeleteConfirmationModalOpen();
