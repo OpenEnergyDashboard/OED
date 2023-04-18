@@ -565,7 +565,7 @@ const testMeters = {
 				undefined, // gps
 				undefined, // identifier
 				null, // note
-				null, //area
+				undefined, //area
 				undefined, // cumulative
 				undefined, //cumulativeReset
 				undefined, // cumulativeResetStart
@@ -633,7 +633,7 @@ const testMeters = {
 				undefined, // gps
 				undefined, // identifier
 				null, // note
-				null, //area
+				undefined, //area
 				undefined, // cumulative
 				undefined, //cumulativeReset
 				undefined, // cumulativeResetStart
@@ -769,4 +769,5 @@ function compareMeters(expectMeter, receivedMeter) {
 	expect(receivedMeter.previousEnd.isSame(moment.parseZone(expectMeter.previousEnd, true).tz('UTC', true))).to.equal(true);
 	expect(receivedMeter).to.have.property('unitId', expectMeter.unitId);
 	expect(receivedMeter).to.have.property('defaultGraphicUnit', expectMeter.defaultGraphicUnit);
+	expect(receivedMeter).to.have.property('areaUnit', expectMeter.areaUnit);
 }

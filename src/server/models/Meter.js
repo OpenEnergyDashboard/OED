@@ -224,7 +224,7 @@ class Meter {
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
-		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit, areaUnit = this.area_unit) {
+		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.defaultGraphicUnit, areaUnit = this.areaUnit) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
