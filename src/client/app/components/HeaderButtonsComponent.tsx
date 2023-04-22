@@ -2,29 +2,29 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from "react";
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { Link } from "react-router-dom";
-import { Button } from "reactstrap";
-import { FormattedMessage } from "react-intl";
-import MenuModalComponent from "./MenuModalComponent";
-import getPage from "../utils/getPage";
-import TooltipMarkerComponent from "./TooltipMarkerComponent";
-import TooltipHelpContainer from "../containers/TooltipHelpContainer";
-import { UserRole } from "../types/items";
-import { hasPermissions, isRoleAdmin } from "../utils/hasPermissions";
-import { flipLogOutState } from "../actions/unsavedWarning";
-import { deleteToken } from "../utils/token";
-import { clearCurrentUser } from "../actions/currentUser";
-import { State } from "../types/redux/state";
+import { Link } from 'react-router-dom';
+import { Button } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
+import MenuModalComponent from './MenuModalComponent';
+import getPage from '../utils/getPage';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import TooltipHelpContainer from '../containers/TooltipHelpContainer';
+import { UserRole } from '../types/items';
+import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
+import { flipLogOutState } from '../actions/unsavedWarning';
+import { deleteToken } from '../utils/token';
+import { clearCurrentUser } from '../actions/currentUser';
+import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: boolean, isModal: boolean }) {
 	const dispatch = useDispatch();
 
 	// Tracks modal or not so helps works as desired.
-	const dataFor = args.isModal ? "all-modal" : "all";
+	const dataFor = args.isModal ? 'all-modal' : 'all';
 	// Get the current page so know which one should not be shown in menu.
 	const currentPage = getPage();
 
@@ -34,16 +34,16 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		// set to what is desired.
 		// The styles control if an item is seen at all.
 		adminViewableLinkStyle: {
-			display: "none"
+			display: 'none'
 		} as React.CSSProperties,
 		csvViewableLinkStyle: {
-			display: "none"
+			display: 'none'
 		} as React.CSSProperties,
 		loginLinkStyle: {
-			display: "none"
+			display: 'none'
 		} as React.CSSProperties,
 		logoutLinkStyle: {
-			display: "none"
+			display: 'none'
 		} as React.CSSProperties,
 		// The should ones tell if see but not selectable.
 		shouldHomeButtonDisabled: true,
@@ -69,15 +69,15 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 	useEffect(() => {
 		setState(prevState => ({
 			...prevState,
-			shouldHomeButtonDisabled: currentPage === "",
-			shouldAdminButtonDisabled: currentPage === "admin",
-			shouldGroupsButtonDisabled: currentPage === "groups",
-			shouldMetersButtonDisabled: currentPage === "meters",
-			shouldMapsButtonDisabled: currentPage === "maps",
-			shouldCSVButtonDisabled: currentPage === "csv",
-			shouldUnitsButtonDisabled: currentPage === "units",
-			shouldConversionsButtonDisabled: currentPage === "conversions",
-			showOptions: currentPage === ""
+			shouldHomeButtonDisabled: currentPage === '',
+			shouldAdminButtonDisabled: currentPage === 'admin',
+			shouldGroupsButtonDisabled: currentPage === 'groups',
+			shouldMetersButtonDisabled: currentPage === 'meters',
+			shouldMapsButtonDisabled: currentPage === 'maps',
+			shouldCSVButtonDisabled: currentPage === 'csv',
+			shouldUnitsButtonDisabled: currentPage === 'units',
+			shouldConversionsButtonDisabled: currentPage === 'conversions',
+			showOptions: currentPage === ''
 		}));
 	}, [currentPage]);
 
@@ -103,20 +103,20 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		const renderLoginButton = role === null;
 		// If an admin then show these items, otherwise hide them.
 		const currentAdminViewableLinkStyle = {
-			display: loggedInAsAdmin ? "block" : "none",
+			display: loggedInAsAdmin ? 'block' : 'none'
 		};
 		// Similar but need to have CSV permissions.
 		const currentCsvViewableLinkStyle: React.CSSProperties = {
-			display: renderCSVButton ? "block" : "none",
+			display: renderCSVButton ? 'block' : 'none'
 		};
 		// Show login if not and logout if you are.
 		const currentLoginLinkStyle = {
-			display: renderLoginButton ? "inline" : "none",
-			paddingLeft: "5px",
+			display: renderLoginButton ? 'inline' : 'none',
+			paddingLeft: '5px'
 		};
 		const currentLogoutLinkStyle = {
-			display: !renderLoginButton ? "inline" : "none",
-			paddingLeft: "5px",
+			display: !renderLoginButton ? 'inline' : 'none',
+			paddingLeft: '5px'
 		};
 		setState(prevState => ({
 			...prevState,
@@ -129,8 +129,8 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 
 	// Style for drowdown.
 	const linkStyle: React.CSSProperties = {
-		display: "inline",
-		paddingLeft: "5px",
+		display: 'inline',
+		paddingLeft: '5px'
 	};
 
 	// Handle actions on logout.
@@ -157,7 +157,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 					/>
 				) : null}
 			</div>
-			<div className={args.showCollapsedMenuButton ? "d-none d-lg-block" : ""}>
+			<div className={args.showCollapsedMenuButton ? "d-none d-lg-block" : ''}>
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 				<Dropdown style={linkStyle}>
@@ -165,6 +165,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 					<Dropdown.Menu>
 						<Dropdown.Item
 							disabled={state.shouldHomeButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/'>
@@ -176,6 +177,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/admin'>
@@ -187,6 +189,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldConversionsButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/conversions'>
@@ -198,6 +201,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.csvViewableLinkStyle}
 							disabled={state.shouldCSVButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/csv'>
@@ -208,6 +212,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldGroupsButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/groups'>
@@ -219,6 +224,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldMapsButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/maps'>
@@ -229,6 +235,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldMetersButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/meters'>
@@ -249,6 +256,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldUnitsButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
 							onClick={() => { }}>
 							<Link
 								to='/units'>
