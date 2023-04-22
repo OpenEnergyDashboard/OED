@@ -13,6 +13,7 @@ export interface SelectOption {
 	value: number;
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
+	style?: React.CSSProperties;
 }
 
 /**
@@ -68,5 +69,5 @@ export enum UserRole {
 export enum TrueFalseType {
 	// Normally the values here are not used but the ones in data.js so translated.
 	true = 'yes',
-	false = 'no',
+	false = 'no'
 }

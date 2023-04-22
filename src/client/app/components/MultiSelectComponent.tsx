@@ -37,6 +37,12 @@ export default class MultiSelectComponent<I> extends React.Component<MultiSelect
 	public render() {
 		return (
 			<Select
+				styles={{
+					option: (baseStyles, { data }) => ({
+						...baseStyles,
+						...data.style
+					})
+				}}
 				isMulti
 				options={this.props.options}
 				value={this.state.selectedOptions}
