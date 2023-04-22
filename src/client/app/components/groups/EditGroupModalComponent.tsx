@@ -482,7 +482,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									{/* meter area unit input */}
 									{loggedInAsAdmin &&
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="units.area" /></label><br />
+											<label><FormattedMessage id="group.area.unit" /></label>
 											<Input
 												name='areaUnit'
 												type='select'
