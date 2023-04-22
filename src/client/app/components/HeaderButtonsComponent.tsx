@@ -157,7 +157,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 					/>
 				) : null}
 			</div>
-			<div className={args.showCollapsedMenuButton ? "d-none d-lg-block" : ''}>
+			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 				<Dropdown style={linkStyle}>
@@ -269,18 +269,30 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 								<FormattedMessage id='units' />
 							</Link> */}
 						</Dropdown.Item>
+						<Dropdown.Item
+							style={state.loginLinkStyle}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
+							onClick={() => { }}>
+							<Link
+								to="/login">
+								<Button outline>
+									<FormattedMessage id="log.in"/>
+								</Button>
+							</Link>
+						</Dropdown.Item>
+						<Dropdown.Item
+							style={state.logoutLinkStyle}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
+							onClick={() => { }}>
+							<Link
+								to="/">
+								<Button outline onClick={handleLogOut}>
+									<FormattedMessage id="log.out"/>
+								</Button>
+							</Link>
+						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
-				<Link style={state.loginLinkStyle} to="/login">
-					<Button outline>
-						<FormattedMessage id="log.in" />
-					</Button>
-				</Link>
-				<Link style={state.logoutLinkStyle} to="/">
-					<Button outline onClick={handleLogOut}>
-						<FormattedMessage id="log.out" />
-					</Button>
-				</Link>
 			</div>
 		</div>
 	);
