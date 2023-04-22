@@ -293,7 +293,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					}
 				});
 				// Make sure the group being edited is on the list.
-				if (groupsChanged.findIndex(value => { value === groupState.id }) === -1) {
+				if (!groupsChanged.includes(groupState.id)) {
 					// Add the edited one to the list.
 					groupsChanged.push(groupState.id);
 				}
@@ -309,8 +309,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
 						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
 					}
-					// This saves group to the DB and then refreshes the window if the last group being updated.
-					dispatch(submitGroupEdits(submitState, i === groupsChanged.length ? true : false));
+					// This saves group to the DB and then refreshes the window if the last group being updated and
+					// changes were made to the children. This avoid a reload on name change, etc.
+					dispatch(submitGroupEdits(submitState, (i === groupsChanged.length ? true : false) && (childMeterChanges || childGroupChanges)));
 					i++;
 				});
 				// The next line is unneeded since do refresh.
@@ -338,7 +339,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		}
 		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
-	}, [ConversionArray.pikAvailable(), metersState, groupState.defaultGraphicUnit, groupState.deepMeters]);
+		// globalGroupsState can change if another group is created/edited and this can change ones displayed in menus.
+	}, [ConversionArray.pikAvailable(), metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -894,7 +896,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		groupState.childGroups.forEach(groupId => {
 			selectedGroupsUnsorted.push({
 				value: groupId,
-				label: editGroupsState[groupId].name
+				// Use globalGroupsState so see edits in other groups. You would miss an update
+				// in this group but it cannot be on the menu so that is okay.
+				label: globalGroupsState[groupId].name
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);

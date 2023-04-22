@@ -167,11 +167,7 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
  * @returns Function to do this for an action
  */
 export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true): Thunk {
-	// TODO This no longer does a dispatch so it may need to be reworked.
-	// For now, get to ignore eslint issue.
-	/* eslint-disable @typescript-eslint/no-unused-vars */
 	return async (dispatch: Dispatch) => {
-		/* eslint-enable @typescript-eslint/no-unused-vars */
 		try {
 			// deepMeters is part of the group state but it is not sent on edit route so remove.
 			// Need deep copy so changes don't impact original but not really important if reload.
@@ -184,18 +180,19 @@ export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true)
 			// TODO We should limit this to the times it is needed and not all group edits.
 			if (reload) {
 				window.location.reload();
+			} else {
+				// If we did not reload then we need to refresh the edited group's state with:
+				dispatch(confirmGroupEdits(group));
+				// An then we need to fix up any other groups impacted.
+				// This is removed since you won't see it.
+				// Success!
+				showSuccessNotification(translate('group.successfully.edited.group'));
 			}
-			// If we did not reload then we need to refresh the edited group's state with:
-			// dispatch(confirmGroupEdits(group));
-			// An then we need to fix up any other groups impacted.
-			// This is removed since you won't see it.
-			// Success!
-			// showSuccessNotification(translate('group.successfully.edited.group'));
 		} catch (e) {
 			if (e.response.data.message && e.response.data.message === 'Cyclic group detected') {
 				showErrorNotification(translate('you.cannot.create.a.cyclic.group'));
 			} else {
-				showErrorNotification(translate('group.failed.to.edit.group')+ ' "' + e.response.data as string + '"');
+				showErrorNotification(translate('group.failed.to.edit.group') + ' "' + e.response.data as string + '"');
 			}
 		}
 	};

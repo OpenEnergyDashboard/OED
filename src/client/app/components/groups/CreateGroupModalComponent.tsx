@@ -238,7 +238,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
-	}, [ConversionArray.pikAvailable(), metersState, state.defaultGraphicUnit, state.deepMeters]);
+		// groupState can change if another group is created/edited and this can change ones displayed in menus.
+	}, [ConversionArray.pikAvailable(), metersState, groupsState, state.defaultGraphicUnit, state.deepMeters]);
 
 	// Update compatible default graphic units set.
 	useEffect(() => {
