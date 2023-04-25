@@ -164,22 +164,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 					<Dropdown.Toggle variant="outline-dark">Menu</Dropdown.Toggle>
 					<Dropdown.Menu style={dropAlign} align='end'>
 						<Dropdown.Item
-							disabled={state.shouldHomeButtonDisabled}
-							as={Link} to='/'>
-							<FormattedMessage id='home' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldGroupsButtonDisabled}
-							as={Link} to='/groups'>
-							<FormattedMessage id='groups' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldMetersButtonDisabled}
-							as={Link} to='meters'>
-							<FormattedMessage id='meters' />
-						</Dropdown.Item>
-						<Dropdown.Divider style={state.adminViewableLinkStyle}/>
-						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
 							as={Link} to='/admin'>
@@ -198,11 +182,26 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 							<FormattedMessage id='csv' />
 						</Dropdown.Item>
 						<Dropdown.Item
+							disabled={state.shouldGroupsButtonDisabled}
+							as={Link} to='/groups'>
+							<FormattedMessage id='groups' />
+						</Dropdown.Item>
+						<Dropdown.Item
+							disabled={state.shouldHomeButtonDisabled}
+							as={Link} to='/'>
+							<FormattedMessage id='home' />
+						</Dropdown.Item>
+						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldMapsButtonDisabled}
 							as={Link} to='/maps'>
 							<FormattedMessage id='maps' />
-						</Dropdown.Item>
+						</Dropdown.Item>	
+						<Dropdown.Item
+							disabled={state.shouldMetersButtonDisabled}
+							as={Link} to='meters'>
+							<FormattedMessage id='meters' />
+						</Dropdown.Item>					
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldUnitsButtonDisabled}
