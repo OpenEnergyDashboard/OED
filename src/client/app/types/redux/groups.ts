@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ActionType } from './actions';
-import { NamedIDItem } from '../items';
 import { GPSPoint } from 'utils/calibration';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
@@ -13,25 +12,13 @@ export type GroupsAction =
 	| ReceiveGroupsDetailsAction
 	| RequestGroupChildrenAction
 	| ReceiveGroupChildrenAction
+	| RequestAllGroupsChildrenAction
+	| ReceiveAllGroupsChildrenAction
 	| ChangeDisplayedGroupsAction
-	| ChangeSelectedChildGroupsPerGroupAction
-	| ChangeSelectedChildMetersPerGroupAction
-	| ChangeDisplayModeAction
-	| CreateNewBlankGroupAction
-	| BeginEditingGroupAction
-	| EditGroupNameAction
-	| EditGroupGPSAction
-	| EditGroupDisplayableAction
-	| EditGroupNoteAction
-	| EditGroupAreaAction
-	| ChangeChildGroupsAction
-	| ChangeChildMetersAction
-	| MarkGroupInEditingSubmittedAction
-	| MarkGroupInEditingNotSubmittedAction
-	| MarkGroupInEditingCleanAction
-	| MarkGroupInEditingDirtyAction
-	| MarkGroupsOutdatedAction
-	| MarkOneGroupOutdatedAction;
+	| ConfirmEditedGroupAction
+	| ConfirmGroupsFetchedOnceAction
+	| ConfirmAllGroupsChildrenFetchedOnceAction
+	;
 
 export interface RequestGroupsDetailsAction {
 	type: ActionType.RequestGroupsDetails;
@@ -39,7 +26,7 @@ export interface RequestGroupsDetailsAction {
 
 export interface ReceiveGroupsDetailsAction {
 	type: ActionType.ReceiveGroupsDetails;
-	data: NamedIDItem[];
+	data: GroupDetailsData[];
 }
 
 export interface RequestGroupChildrenAction {
@@ -50,7 +37,21 @@ export interface RequestGroupChildrenAction {
 export interface ReceiveGroupChildrenAction {
 	type: ActionType.ReceiveGroupChildren;
 	groupID: number;
-	data: {meters: number[], groups: number[], deepMeters: number[]};
+	data: { meters: number[], groups: number[], deepMeters: number[] };
+}
+
+export interface RequestAllGroupsChildrenAction {
+	type: ActionType.RequestAllGroupsChildren;
+}
+
+export interface ReceiveAllGroupsChildrenAction {
+	type: ActionType.ReceiveAllGroupsChildren;
+	data: GroupChildren[];
+}
+
+export interface ConfirmEditedGroupAction {
+	type: ActionType.ConfirmEditedGroup;
+	editedGroup: GroupEditData;
 }
 
 export interface ChangeDisplayedGroupsAction {
@@ -58,95 +59,16 @@ export interface ChangeDisplayedGroupsAction {
 	groupIDs: number[];
 }
 
-export interface ChangeSelectedChildGroupsPerGroupAction {
-	type: ActionType.ChangeSelectedChildGroupsPerGroup;
-	parentID: number;
-	groupIDs: number[];
+export interface ConfirmGroupsFetchedOnceAction {
+	type: ActionType.ConfirmGroupsFetchedOnce;
 }
 
-export interface ChangeSelectedChildMetersPerGroupAction {
-	type: ActionType.ChangeSelectedChildMetersPerGroup;
-	parentID: number;
-	meterIDs: number[];
-}
-
-export interface ChangeDisplayModeAction {
-	type: ActionType.ChangeGroupsUIDisplayMode;
-	newMode: DisplayMode;
-}
-
-export interface CreateNewBlankGroupAction {
-	type: ActionType.CreateNewBlankGroup;
-}
-
-export interface BeginEditingGroupAction {
-	type: ActionType.BeginEditingGroup;
-	groupID: number;
-}
-
-export interface EditGroupNameAction {
-	type: ActionType.EditGroupName;
-	newName: string;
-}
-
-export interface EditGroupGPSAction {
-	type: ActionType.EditGroupGPS;
-	newGPS: GPSPoint;
-}
-
-export interface EditGroupDisplayableAction {
-	type: ActionType.EditGroupDisplayable;
-	newDisplay: boolean;
-}
-
-export interface EditGroupNoteAction {
-	type: ActionType.EditGroupNote;
-	newNote: string;
-}
-
-export interface EditGroupAreaAction {
-	type: ActionType.EditGroupArea;
-	newArea: number;
-}
-
-export interface ChangeChildGroupsAction {
-	type: ActionType.ChangeChildGroups;
-	groupIDs: number[];
-}
-
-export interface ChangeChildMetersAction {
-	type: ActionType.ChangeChildMeters;
-	meterIDs: number[];
-}
-
-export interface MarkGroupInEditingSubmittedAction {
-	type: ActionType.MarkGroupInEditingSubmitted;
-}
-
-export interface MarkGroupInEditingNotSubmittedAction {
-	type: ActionType.MarkGroupInEditingNotSubmitted;
-}
-
-export interface MarkGroupInEditingCleanAction {
-	type: ActionType.MarkGroupInEditingClean;
-}
-
-export interface MarkGroupInEditingDirtyAction {
-	type: ActionType.MarkGroupInEditingDirty;
-}
-
-export interface MarkGroupsOutdatedAction {
-	type: ActionType.MarkGroupsByIDOutdated;
-}
-
-export interface MarkOneGroupOutdatedAction {
-	type: ActionType.MarkOneGroupOutdated;
-	groupID: number;
+export interface ConfirmAllGroupsChildrenFetchedOnceAction {
+	type: ActionType.ConfirmAllGroupsChildrenFetchedOnce
 }
 
 export interface GroupMetadata {
 	isFetching: boolean;
-	outdated: boolean;
 	selectedGroups: number[];
 	selectedMeters: number[];
 }
@@ -155,10 +77,41 @@ export interface GroupData {
 	name: string;
 	childMeters: number[];
 	childGroups: number[];
-	gps?: GPSPoint;
+	gps: GPSPoint | null;
 	displayable: boolean;
 	note?: string;
-	area?: number;
+	// TODO with area? you get a TS error but without it lets null through (see web console).
+	area: number;
+	defaultGraphicUnit: number;
+}
+
+export interface GroupEditData {
+	id: number,
+	name: string;
+	childMeters: number[];
+	childGroups: number[];
+	// This is optional since it is in Redux state and used during group editing but not sent in route.
+	deepMeters?: number[];
+	gps: GPSPoint | null;
+	displayable: boolean;
+	note?: string;
+	// TODO with area? you get a TS error but without it lets null through (see web console).
+	area: number;
+	defaultGraphicUnit: number;
+}
+
+// TODO This is similar to GroupEditData but without the children. Should be able to
+// fuse and clean up.
+export interface GroupDetailsData {
+	id: number,
+	name: string;
+	// This is optional since it is in Redux state and used during group editing but not sent in route.
+	deepMeters?: number[];
+	gps: GPSPoint | null;
+	displayable: boolean;
+	note?: string;
+	// TODO with area? you get a TS error but without it lets null through (see web console).
+	area: number;
 	defaultGraphicUnit: number;
 }
 
@@ -170,6 +123,16 @@ export interface GroupDeepMeters {
 	deepMeters: number[];
 }
 
+// TODO this duplicates two fields in ones above so decide if should somehow merge.
+export interface GroupChildren {
+	// Which group id this applies to
+	groupId: number;
+	// All the immediate children of this group.
+	childMeters: number[];
+	// All the immediate groups of this group.
+	childGroups: number[];
+}
+
 export type GroupDefinition = GroupData & GroupMetadata & GroupID & GroupDeepMeters;
 
 export interface StatefulEditable {
@@ -178,12 +141,16 @@ export interface StatefulEditable {
 }
 
 export interface GroupsState {
+	hasBeenFetchedOnce: boolean;
+	// If all groups child meters/groups are in state.
+	hasChildrenBeenFetchedOnce: boolean;
 	isFetching: boolean;
-	outdated: boolean;
+	// If fetching all groups child meters/groups.
+	isFetchingAllChildren: boolean;
 	byGroupID: {
 		[groupID: number]: GroupDefinition;
 	};
 	selectedGroups: number[];
-	groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
+	// TODO groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
 	displayMode: DisplayMode;
 }
