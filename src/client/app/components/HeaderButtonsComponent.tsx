@@ -126,7 +126,8 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 
 	// Style for dropdown
 	const dropAlign: React.CSSProperties = {
-		right: 0
+		right: 0,
+		margin: 0
 	};
 
 	// Handle actions on logout.
