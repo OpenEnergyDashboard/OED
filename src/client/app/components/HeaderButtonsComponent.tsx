@@ -166,59 +166,59 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							disabled={state.shouldHomeButtonDisabled}
 							as={Link} to='/'>
-								<FormattedMessage id='home' />
+							<FormattedMessage id='home' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldGroupsButtonDisabled}
 							as={Link} to='/groups'>
-								<FormattedMessage id='groups' />
+							<FormattedMessage id='groups' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldMetersButtonDisabled}
 							as={Link} to='meters'>
-								<FormattedMessage id='meters' />
+							<FormattedMessage id='meters' />
 						</Dropdown.Item>
 						<Dropdown.Divider style={state.adminViewableLinkStyle}/>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
 							as={Link} to='/admin'>
-								<FormattedMessage id='admin.panel' />
+							<FormattedMessage id='admin.panel' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldConversionsButtonDisabled}
 							as={Link} to='/conversions'>
-								<FormattedMessage id='conversions' />
+							<FormattedMessage id='conversions' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.csvViewableLinkStyle}
 							disabled={state.shouldCSVButtonDisabled}
 							as={Link} to='/csv'>
-								<FormattedMessage id='csv' />
+							<FormattedMessage id='csv' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldMapsButtonDisabled}
 							as={Link} to='/maps'>
-								<FormattedMessage id='maps' />
+							<FormattedMessage id='maps' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldUnitsButtonDisabled}
 							as={Link} to='/units'>
-								<FormattedMessage id='units' />
+							<FormattedMessage id='units' />
 						</Dropdown.Item>
 						<Dropdown.Divider/>
 						<Dropdown.Item
 							style={state.loginLinkStyle}
 							as={Link} to='/login'>
-								<FormattedMessage id='log.in'/>
+							<FormattedMessage id='log.in'/>
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.logoutLinkStyle}
 							onClick={handleLogOut}>
-								<FormattedMessage id='log.out'/>
+							<FormattedMessage id='log.out'/>
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
