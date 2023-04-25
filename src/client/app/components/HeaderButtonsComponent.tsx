@@ -6,7 +6,6 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
-import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
 import getPage from '../utils/getPage';
@@ -111,12 +110,10 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		};
 		// Show login if not and logout if you are.
 		const currentLoginLinkStyle = {
-			display: renderLoginButton ? 'inline' : 'none',
-			paddingLeft: '5px'
+			display: renderLoginButton ? 'block' : 'none'
 		};
 		const currentLogoutLinkStyle = {
-			display: !renderLoginButton ? 'inline' : 'none',
-			paddingLeft: '5px'
+			display: !renderLoginButton ? 'block' : 'none'
 		};
 		setState(prevState => ({
 			...prevState,
@@ -127,10 +124,9 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		}));
 	}, [currentUser]);
 
-	// Style for drowdown.
-	const linkStyle: React.CSSProperties = {
-		display: 'inline',
-		paddingLeft: '5px'
+	// Style for dropdown
+	const dropAlign: React.CSSProperties = {
+		right: 0
 	};
 
 	// Handle actions on logout.
@@ -146,7 +142,9 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		}
 	};
 
-	// TODO See the last item for ways tried and issues with the current way.
+	// TODO: There is an issue where the modal is appearing above the dropdown menu since using the 
+	// css property, display:, will cause an error that prevents the menu from displaying properly. 
+	// This issue could be related to the warning that pops up whenever the dropdown menu is clicked.
 	return (
 		<div>
 			<div className="d-lg-none">
@@ -160,136 +158,83 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
-				<Dropdown style={linkStyle}>
+				<Dropdown style={dropAlign} align='end'>
 					<Dropdown.Toggle variant="outline-dark">Menu</Dropdown.Toggle>
-					<Dropdown.Menu>
+					<Dropdown.Menu style={dropAlign} align='end'>
 						<Dropdown.Item
 							disabled={state.shouldHomeButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/'>
-								<Button outline>
-									<FormattedMessage id='home' />
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/'>
+								<FormattedMessage id='home' />
 						</Dropdown.Item>
+						<Dropdown.Item
+							disabled={state.shouldGroupsButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
+							onClick={() => { }}
+							as={Link} to='/groups'>
+								<FormattedMessage id='groups' />
+						</Dropdown.Item>
+						<Dropdown.Item
+							disabled={state.shouldMetersButtonDisabled}
+							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
+							onClick={() => { }}
+							as={Link} to='meters'>
+								<FormattedMessage id='meters' />
+						</Dropdown.Item>
+						<Dropdown.Divider style={state.adminViewableLinkStyle}/>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/admin'>
-								<Button outline>
-									<FormattedMessage id='admin.panel' />
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/admin'>
+								<FormattedMessage id='admin.panel' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldConversionsButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/conversions'>
-								<Button outline>
-									<FormattedMessage id='conversions' />
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/conversions'>
+								<FormattedMessage id='conversions' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.csvViewableLinkStyle}
 							disabled={state.shouldCSVButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/csv'>
-								<Button outline>
-									<FormattedMessage id='csv' />
-								</Button>
-							</Link>
-						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldGroupsButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/groups'>
-								<Button outline>
-									<FormattedMessage id='groups' />
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/csv'>
+								<FormattedMessage id='csv' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldMapsButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/maps'>
-								<Button outline>
-									<FormattedMessage id='maps' />
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/maps'>
+								<FormattedMessage id='maps' />
 						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldMetersButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/meters'>
-								<Button outline>
-									<FormattedMessage id='meters' />
-								</Button>
-							</Link>
-						</Dropdown.Item>
-						{/* TODO This is not perfect. Using the link or button causes a console error about nesting <a>.
-						Thankfully it only shows up the first time you touch the menu.
-						There also seems to be a need to have an empty onClick since it is required by the component.
-						However, these do work. Of the two, I prefer the button rather than a link due to the look but
-						the link is cleaner.
-						Note I also tried a Navbar but I could not get the Nav.Link to work for to be recognized reasons.
-						I view this as a hack to get this to work as the original way of making the onClick() to a
-						window.location.href did not work due to issue #817. If that is resolved then we may be able to
-						simply do the href way. */}
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldUnitsButtonDisabled}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to='/units'>
-								<Button outline>
-									<FormattedMessage id='units' />
-								</Button>
-							</Link>
-							{/* <Link
-								to='/units'>
+							onClick={() => { }}
+							as={Link} to='/units'>
 								<FormattedMessage id='units' />
-							</Link> */}
 						</Dropdown.Item>
+						<Dropdown.Divider/>
 						<Dropdown.Item
 							style={state.loginLinkStyle}
 							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to="/login">
-								<Button outline>
-									<FormattedMessage id="log.in"/>
-								</Button>
-							</Link>
+							onClick={() => { }}
+							as={Link} to='/login'>
+								<FormattedMessage id='log.in'/>
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.logoutLinkStyle}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}>
-							<Link
-								to="/">
-								<Button outline onClick={handleLogOut}>
-									<FormattedMessage id="log.out"/>
-								</Button>
-							</Link>
+							onClick={handleLogOut}>
+								<FormattedMessage id='log.out'/>
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
@@ -297,10 +242,3 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		</div>
 	);
 }
-
-
-// hooks are easier since everything gets put into a single file
-// makes maintaining the code easier
-// don't have to mess around with props, so you couldn't access state and you would have to access the state from a container
-// OED is converting everything to react hooks, since OED is older than react hooks
-// 	home/nicolax/Desktop/OED/src/client/app/components/ChartSelectComponent.tsx
