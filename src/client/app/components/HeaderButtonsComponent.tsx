@@ -142,9 +142,11 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		}
 	};
 
-	// TODO: There is an issue where the modal is appearing above the dropdown menu since using the 
-	// css property, display:, will cause an error that prevents the menu from displaying properly. 
-	// This issue could be related to the warning that pops up whenever the dropdown menu is clicked.
+	/*
+	TODO: There is an issue where the modal is appearing above the dropdown menu since using the
+	css property, display:, will cause an error that prevents the menu from displaying properly.
+	This issue could be related to the warning that pops up whenever the dropdown menu is clicked.
+	*/
 	return (
 		<div>
 			<div className="d-lg-none">
@@ -163,22 +165,16 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 					<Dropdown.Menu style={dropAlign} align='end'>
 						<Dropdown.Item
 							disabled={state.shouldHomeButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/'>
 								<FormattedMessage id='home' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldGroupsButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/groups'>
 								<FormattedMessage id='groups' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							disabled={state.shouldMetersButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='meters'>
 								<FormattedMessage id='meters' />
 						</Dropdown.Item>
@@ -186,48 +182,36 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/admin'>
 								<FormattedMessage id='admin.panel' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldConversionsButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/conversions'>
 								<FormattedMessage id='conversions' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.csvViewableLinkStyle}
 							disabled={state.shouldCSVButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/csv'>
 								<FormattedMessage id='csv' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldMapsButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/maps'>
 								<FormattedMessage id='maps' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldUnitsButtonDisabled}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/units'>
 								<FormattedMessage id='units' />
 						</Dropdown.Item>
 						<Dropdown.Divider/>
 						<Dropdown.Item
 							style={state.loginLinkStyle}
-							/* eslint-disable-next-line @typescript-eslint/no-empty-function */
-							onClick={() => { }}
 							as={Link} to='/login'>
 								<FormattedMessage id='log.in'/>
 						</Dropdown.Item>
