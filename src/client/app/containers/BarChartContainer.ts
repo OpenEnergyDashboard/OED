@@ -10,7 +10,7 @@ import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
-import { UnitRepresentType } from '../types/redux/units';
+import { barUnitLabel } from '../utils/graphics';
 
 /* Passes the current redux state of the barchart, and turns it into props for the React
 *  component, which is what will be visible on the page. Makes it possible to access
@@ -30,22 +30,8 @@ function mapStateToProps(state: State) {
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
-			// Quantity and flow units have different unit labels.
-			// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
-			// Bar graphics are always quantities.
-			if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
-				// If it is a quantity unit then that is the unit you are graphing.
-				unitLabel  = selectUnitState.identifier;
-			} else if (selectUnitState.unitRepresent === UnitRepresentType.flow) {
-				// If it is a flow meter then you need to multiply by time to get the quantity unit.
-				// The quantity/time for flow has varying time so label by multiplying by time.
-				// To make sure it is clear, also indicate it is a quantity.
-				// Note this should not be used for raw data.
-				// It might not be usual to take a flow and make it into a quantity so this label is a little different to
-				// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
-				// of graphics as we are doing for rate.
-				unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
-			}
+			// Determine the y-axis label.
+			unitLabel  = barUnitLabel(selectUnitState);
 		}
 	}
 
@@ -56,7 +42,7 @@ function mapStateToProps(state: State) {
 			byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.meters.byMeterID[meterID].name;
+				const label = state.meters.byMeterID[meterID].identifier;
 				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
@@ -66,7 +52,7 @@ function mapStateToProps(state: State) {
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
+				const readings = _.values(readingsData.readings);
 				readings.forEach(barReading => {
 					const st = moment.utc(barReading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\
@@ -112,7 +98,7 @@ function mapStateToProps(state: State) {
 				const xData: string[] = [];
 				const yData: number[] = [];
 				const hoverText: string[] = [];
-				const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['asc']);
+				const readings = _.values(readingsData.readings);
 				readings.forEach(barReading => {
 					const st = moment.utc(barReading.startTimestamp);
 					// Time reading is in the middle of the start and end timestamp (may change this depending on how it looks on the bar graph)\

@@ -6,6 +6,7 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
+const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
 
 const router = express.Router();
@@ -25,7 +26,7 @@ router.get('/', async (req, res) => {
 		const rows = await Conversion.getAll(conn);
 		res.json(rows.map(formatConversionForResponse));
 	} catch (err) {
-		log.error(`Error while performing GET conversions details query: ${err}`, err);
+		log.error(`Error while performing GET conversions details query: ${err}`);
 	}
 });
 
@@ -67,8 +68,8 @@ router.post('/edit', async (req, res) => {
 
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit conversions with invalid conversion data, errors:${validatorResult.errors}`);
-		res.status(400);
+		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+        failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -76,10 +77,10 @@ router.post('/edit', async (req, res) => {
 				req.body.slope, req.body.intercept, req.body.note);
 			await updatedConversion.update(conn);
 		} catch (err) {
-			log.error('Failed to edit conversion', err);
-			res.status(500).json({ message: 'Unable to edit conversions.', err });
+			log.error(`Error while editing conversion with error(s): ${err}`);
+			failure(res, 500, `Error while editing conversion with error(s): ${err}`);
 		}
-		res.status(200).json({ message: `Successfully edited conversions ${req.body.sourceId}` });
+		success(res);
 	}
 });
 
@@ -118,10 +119,10 @@ router.post('/addConversion', async (req, res) => {
 			}
 		}
 	};
-	const validationResult = validate(req.body, validConversion);
-	if (!validationResult.valid) {
-		log.error(`Invalid input for ConversionsAPI. ${validationResult.error}`);
-		res.sendStatus(400);
+	const validatorResult = validate(req.body, validConversion);
+	if (!validatorResult.valid) {
+		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
+        failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -138,8 +139,8 @@ router.post('/addConversion', async (req, res) => {
 			});
 			res.sendStatus(200);
 		} catch (err) {
-			log.error(`Error while inserting new conversion ${err}`, err);
-			res.sendStatus(500);
+			log.error(`Error while inserting new conversion with error(s): ${err}`);
+            failure(res, 500, `Error while inserting new conversion with errors(s): ${err}`);
 		}
 	}
 });
@@ -169,8 +170,8 @@ router.post('/delete', async (req, res) => {
 	// Ensure conversion object is valid
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to delete conversions with invalid conversion data, errors:${validatorResult.errors}`);
-		res.status(400);
+		log.warn(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+        failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -178,10 +179,10 @@ router.post('/delete', async (req, res) => {
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
 			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
 		} catch (err) {
-			log.error('Failed to delete conversion', err);
-			res.status(500).json({ message: 'Unable to delete conversions.', err });
+			log.error(`Error while deleting conversion with error(s): ${err}`);
+            failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
 		}
-		res.status(200).json({ message: `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}` });
+		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
 	}
 });
 

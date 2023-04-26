@@ -78,6 +78,16 @@ class Reading {
 	}
 
 	/**
+	 * Because moment allows modification of its values, this creates a new Reading where all the timestamps
+	 * are cloned so they cannot change unless you modify this new one.
+	 * 
+	 * @returns a duplicate of the reading where the moment timestamps are cloned so cannot change.
+	 */
+	clone() {
+		return new Reading(this.meterID, this.reading, this.startTimestamp.clone(), this.endTimestamp.clone());
+	}
+
+	/**
 	 * Change a row from the readings table into a Reading object.
 	 * @param row The row from the table to be changed.
 	 * @returns Reading object from row
@@ -161,7 +171,7 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to get all of the readings for this meter within (inclusive) a specified date range from the
+	 * Returns a promise to get all of the readings (so raw) for this meter within (inclusive) a specified date range from the
 	 * database. If no startDate is specified, all readings from the beginning of time to the endDate are returned.
 	 * If no endDate is specified, all readings after and including the startDate are returned.
 	 * @param meterID
@@ -176,7 +186,9 @@ class Reading {
 			startDate: startDate,
 			endDate: endDate
 		});
-		return rows.map(Reading.mapRow);
+		// This does not do the usual row mapping because the identifiers are not the usual ones and there
+		// is no meter id. All this is to make the data smaller.
+		return rows;
 	}
 
 	/**

@@ -30,9 +30,12 @@ const { getConnection } = require('../../db');
 
 	const conn = getConnection();
 	try {
-		await User.getByEmail(email, conn);
+		const user = await User.getByEmail(email, conn);
+		if (user === null) {
+			terminateReadline('No user with that email exists');
+		}
 	} catch (err) {
-		terminateReadline('No user with that email exists');
+		terminateReadline('User email lookup failed with err: ', err);
 	}
 
 	try {
@@ -40,6 +43,6 @@ const { getConnection } = require('../../db');
 		await User.updateUserPassword(email, passwordHash, conn);
 		terminateReadline('User\'s password updated');
 	} catch (err) {
-		terminateReadline('Failed to update user\'s password');
+		terminateReadline('Failed to update user\'s password with error: ', err);
 	}
 })();

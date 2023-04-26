@@ -23,43 +23,8 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-function notifyUser(msg: string) {
-	window.alert(msg);
-}
-
-// get string value from GPSPoint or null.
-function getGPSString(gps: GPSPoint | null) {
-	if (gps === null) {
-		//  if gps is null return empty string value
-		return '';
-	}
-	else if (typeof gps === 'object') {
-		// if gps is an object parse GPSPoint and return string value
-		const json = JSON.stringify({ gps });
-		const obj = JSON.parse(json);
-		return `${obj.gps.latitude}, ${obj.gps.longitude}`;
-	}
-	else {
-		// Assume it is a string that was input.
-		return gps
-	}
-}
-
-// Checks if the input is null and returns empty string if that is the case. Otherwise return input.
-// This is needed because React does not want values to be of type null for display and null is the
-// state for some of the meter values. This only should change what is displayed and not the state or props.
-function nullToEmptyString(item: any) {
-	if (item === null) {
-		return '';
-	} else {
-		return item;
-	}
-}
+import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -102,6 +67,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		reading: props.meter.reading,
 		startTimestamp: props.meter.startTimestamp,
 		endTimestamp: props.meter.endTimestamp,
+		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit
 	}
@@ -190,7 +156,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.readingDuplication != state.readingDuplication ||
 				props.meter.timeSort != state.timeSort ||
 				props.meter.startTimestamp != state.startTimestamp ||
-				props.meter.endTimestamp != state.endTimestamp
+				props.meter.endTimestamp != state.endTimestamp ||
+				props.meter.previousEnd != state.previousEnd
 			);
 
 		// Only validate and store if any changes.
@@ -207,6 +174,18 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// if (state.area <= 0) {
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
+				inputOk = false;
+			}
+
+			// Check reading gap is at least zero.
+			if (state.readingGap < 0) {
+				notifyUser(translate('reading.gap.invalid') + state.readingGap + '.');
+				inputOk = false;
+			}
+
+			// Check reading variation is at least zero.
+			if (state.readingVariation < 0) {
+				notifyUser(translate('reading.variation.invalid') + state.readingVariation + '.');
 				inputOk = false;
 			}
 
@@ -244,7 +223,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 
 			if (inputOk) {
-				// The input passed validation but only store if there are changes.
+				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				const submitState = { ...state, gps: gps };
 				// Submit new meter if checks where ok.
@@ -312,7 +291,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// Also add the 'no unit' unit
 				if (compatibleGraphicUnits.has(state.defaultGraphicUnit) || unit.id == -99) {
 					// add the current meter unit to the list of compatible units
-					compatibleUnits.add(unit);
+					compatibleUnits.add(noUnitTranslated());
 				}
 				else {
 					// add the current meter unit to the list of incompatible units
@@ -339,18 +318,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	}, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		// Only and admin can edit a meter.
 		tooltipEditMeterView: 'help.admin.meteredit'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -358,9 +328,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.meter" />
-						<TooltipHelpContainer page='meters' />
+						<TooltipHelpContainer page='meters-edit' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipEditMeterView} />
+							<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
@@ -374,7 +344,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									<div style={tableStyle}>
 										{/* Identifier input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.identifier" /></label><br />
+											<label><FormattedMessage id="meter.identifier" /></label>
 											<Input
 												name="identifier"
 												type="text"
@@ -383,7 +353,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.name" /></label><br />
+											<label>{translate('meter.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
@@ -392,7 +362,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* meter unit input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.unitName" /></label><br />
+											<label> {translate('meter.unitName')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name="unitId"
 												type='select'
@@ -408,7 +378,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* default graphic unit input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.defaultGraphicUnit" /></label><br />
+											<label>{translate('meter.defaultGraphicUnit')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='defaultGraphicUnit'
 												type='select'
@@ -424,7 +394,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Enabled input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.enabled" /></label><br />
+											<label><FormattedMessage id="meter.enabled" /></label>
 											<Input
 												name='enabled'
 												type='select'
@@ -443,7 +413,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Displayable input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.displayable" /></label><br />
+											<label><FormattedMessage id="meter.displayable" /></label>
 											<Input
 												name='displayable'
 												type='select'
@@ -456,7 +426,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Meter type input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.type" /></label><br />
+											<label>{translate('meter.type')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='meterType'
 												type='select'
@@ -470,7 +440,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* URL input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.url" /></label><br />
+											<label><FormattedMessage id="meter.url" /></label>
 											<Input
 												name='url'
 												type='text'
@@ -479,18 +449,17 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Area input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area" /></label><br />
+											<label><FormattedMessage id="meter.area" /></label>
 											<Input
 												name="area"
 												type="number"
-												step="0.01"
 												min="0"
-												value={nullToEmptyString(state.area)}
+												defaultValue={nullToEmptyString(state.area)}
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.gps" /></label><br />
+											<label><FormattedMessage id="meter.gps" /></label>
 											<Input
 												name='gps'
 												type='text'
@@ -499,7 +468,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.note" /></label><br />
+											<label><FormattedMessage id="meter.note" /></label>
 											<Input
 												name='note'
 												type='textarea'
@@ -509,7 +478,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* cumulative input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulative" /></label><br />
+											<label><FormattedMessage id="meter.cumulative" /></label>
 											<Input
 												name='cumulative'
 												type='select'
@@ -522,7 +491,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* cumulativeReset input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeReset" /></label><br />
+											<label><FormattedMessage id="meter.cumulativeReset" /></label>
 											<Input
 												name='cumulativeReset'
 												type='select'
@@ -535,7 +504,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* cumulativeResetStart input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeResetStart" /></label><br />
+											<label><FormattedMessage id="meter.cumulativeResetStart" /></label>
 											<Input
 												name='cumulativeResetStart'
 												type='text'
@@ -545,7 +514,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* cumulativeResetEnd input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label><br />
+											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label>
 											<Input
 												name='cumulativeResetEnd'
 												type='text'
@@ -555,7 +524,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* endOnlyTime input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endOnlyTime" /></label><br />
+											<label><FormattedMessage id="meter.endOnlyTime" /></label>
 											<Input
 												name='endOnlyTime'
 												type='select'
@@ -568,29 +537,27 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* readingGap input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingGap" /></label><br />
+											<label><FormattedMessage id="meter.readingGap" /></label>
 											<Input
 												name='readingGap'
 												type='number'
 												onChange={e => handleNumberChange(e)}
-												step="0.01"
 												min="0"
 												value={state?.readingGap} />
 										</div>
 										{/* readingVariation input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingVariation" /></label><br />
+											<label><FormattedMessage id="meter.readingVariation" /></label>
 											<Input
 												name="readingVariation"
 												type="number"
 												onChange={e => handleNumberChange(e)}
-												step="0.01"
 												min="0"
-												value={state?.readingVariation} />
+												defaultValue={state?.readingVariation} />
 										</div>
 										{/* readingDuplication input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingDuplication" /></label><br />
+											<label>{translate('meter.readingDuplication')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name="readingDuplication"
 												type="number"
@@ -598,11 +565,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												step="1"
 												min="1"
 												max="9"
-												value={state?.readingDuplication} />
+												defaultValue={state?.readingDuplication} />
 										</div>
 										{/* timeSort input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.timeSort" /></label><br />
+											<label><FormattedMessage id="meter.timeSort" /></label>
 											<Input
 												name='timeSort'
 												type='select'
@@ -617,22 +584,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* Timezone input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.time.zone" /></label><br />
+											<label><FormattedMessage id="meter.time.zone" /></label>
 											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
 										</div>
 										{/* reading input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.reading" /></label><br />
+											<label><FormattedMessage id="meter.reading" /></label>
 											<Input
 												name="reading"
 												type="number"
 												onChange={e => handleNumberChange(e)}
-												step="0.01"
-												value={state?.reading} />
+												defaultValue={state?.reading} />
 										</div>
 										{/* startTimestamp input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.startTimeStamp" /></label><br />
+											<label><FormattedMessage id="meter.startTimeStamp" /></label>
 											<Input
 												name='startTimestamp'
 												type='text'
@@ -642,13 +608,23 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 										</div>
 										{/* endTimestamp input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endTimeStamp" /></label><br />
+											<label><FormattedMessage id="meter.endTimeStamp" /></label>
 											<Input
 												name='endTimestamp'
 												type='text'
 												onChange={e => handleStringChange(e)}
 												placeholder="YYYY-MM-DD HH:MM:SS"
 												value={state?.endTimestamp} />
+										</div>
+										{/* previousEnd input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.previousEnd" /></label>
+											<Input
+												name='previousEnd'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												placeholder="YYYY-MM-DD HH:MM:SS"
+												value={state?.previousEnd} />
 										</div>
 									</div>
 								</div>

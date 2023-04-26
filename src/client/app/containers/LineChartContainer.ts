@@ -8,11 +8,9 @@ import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import Plot from 'react-plotly.js';
-import { TimeInterval } from '../../../common/TimeInterval';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
-import { UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { lineUnitLabel } from '../utils/graphics';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -22,37 +20,20 @@ function mapStateToProps(state: State) {
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
 	const currentSelectedRate = state.graph.lineGraphRate;
-	let unitLabel: string = '';
+	let unitLabel = '';
 	let needsRateScaling = false;
+	// variables to determine the slider min and max
+	let minTimestamp: number | undefined;
+	let maxTimestamp: number | undefined;
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
-			// Quantity and flow units have different unit labels.
-			// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
-			// Bar graphics are always quantities.
-			if (selectUnitState.identifier === 'kWh' || selectUnitState.identifier === 'kW') {
-				// This is a special case. kWh has a general meaning and the flow equivalent is kW.
-				// A kW is a Joule/sec. While it is possible to convert to another rate, OED is not
-				// going to allow that. If you want that then the site should add Joule as a unit.
-				// Note the rate is per second which is unusual and not the normal OED of per hour.
-				// Thus, OED will show kW and not allow other rates. To make it consistent, kWh cannot
-				// be shown in another rate. Thus, there is no need to scale.
-				// TODO This isn't a general solution. For example, Wh or W would not be fixed.
-				// The y-axis label is the kW.
-				unitLabel = 'kW';
-			} else if (selectUnitState.unitRepresent == UnitRepresentType.raw) {
-				// A raw unit just uses the identifier.
-				// The y-axis label is the same as the identifier.
-				unitLabel = selectUnitState.identifier;
-			} else if (selectUnitState.unitRepresent === UnitRepresentType.quantity || selectUnitState.unitRepresent === UnitRepresentType.flow) {
-				// If it is a quantity or flow unit then it is a rate so indicate by dividing by the time interval
-				// which is always one hour for OED.
-				unitLabel = selectUnitState.identifier + ' / ' + translate(currentSelectedRate.label);
-				// Rate scaling is needed
-				needsRateScaling = true;
-			}
+			// Determine the y-axis label and if the rate needs to be scaled.
+			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate);
+			unitLabel = returned.unitLabel
+			needsRateScaling = returned.needsRateScaling;
 		}
 		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
 		needsRateScaling = needsRateScaling && (currentSelectedRate.rate != 1);
@@ -64,7 +45,7 @@ function mapStateToProps(state: State) {
 		if (byMeterID !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
-				const label = state.meters.byMeterID[meterID].name;
+				const label = state.meters.byMeterID[meterID].identifier;
 				const colorID = meterID;
 				if (readingsData.readings === undefined) {
 					throw new Error('Unacceptable condition: readingsData.readings is undefined.');
@@ -103,18 +84,19 @@ function mapStateToProps(state: State) {
 					});
 				}
 
-				// Save the timestamp range of the plot
-				let minTimestamp: string = '';
-				let maxTimestamp: string = '';
+				/*
+				get the min and max timestamp of the meter, and compare it to the global values
+				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
+				*/
 				if (readings.length > 0) {
-					/* tslint:disable:no-string-literal */
-					minTimestamp = readings[0]['startTimestamp'].toString();
-					maxTimestamp = readings[readings.length - 1]['startTimestamp'].toString();
-					/* tslint:enable:no-string-literal */
+					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+						minTimestamp = readings[0]['startTimestamp'];
+					}
+					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+					}
 				}
-				const root: any = document.getElementById('root');
-				root.setAttribute('min-timestamp', minTimestamp);
-				root.setAttribute('max-timestamp', maxTimestamp);
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
@@ -182,6 +164,17 @@ function mapStateToProps(state: State) {
 					});
 				}
 
+				// get the min and max timestamp of the meter, and compare it to the global values
+				if (readings.length > 0) {
+					if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
+						minTimestamp = readings[0]['startTimestamp'];
+					}
+					if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
+						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
+						maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
+					}
+				}
+
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 				datasets.push({
 					name: label,
@@ -201,11 +194,20 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-	// Calculate slider interval if rangeSliderInterval is specified;
-	const sliderInterval = state.graph.rangeSliderInterval.equals(TimeInterval.unbounded()) ? timeInterval : state.graph.rangeSliderInterval;
+	// set the bounds for the slider
+	if (minTimestamp == undefined) {
+		minTimestamp = 0;
+		maxTimestamp = 0;
+	}
+	const root: any = document.getElementById('root');
+	root.setAttribute('min-timestamp', minTimestamp);
+	root.setAttribute('max-timestamp', maxTimestamp);
+
+	// Use the min/max time found for the readings (and shifted as desired) as the
+	// x-axis range for the graph.
 	// Avoid pesky shifting timezones with utc.
-	const start = moment.utc(sliderInterval.getStartTimestamp()).toISOString();
-	const end = moment.utc(sliderInterval.getEndTimestamp()).toISOString();
+	const start = moment.utc(minTimestamp).toISOString();
+	const end = moment.utc(maxTimestamp).toISOString();
 
 	// Customize the layout of the plot
 	const layout: any = {
@@ -223,7 +225,7 @@ function mapStateToProps(state: State) {
 		},
 
 		xaxis: {
-			range: [start, end], // Specifies the start and end points of visible part of graph(unshaded region on slider);
+			range: [start, end], // Specifies the start and end points of visible part of graph
 			rangeslider: {
 				thickness: 0.1
 			},

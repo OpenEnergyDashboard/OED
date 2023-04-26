@@ -66,8 +66,8 @@ export function setNewMap(): Thunk {
 
 /**
  * start a new calibration session
- * @param mode {CalibrationModeTypes} calibration modes
- * @param mapID {number} id of map being calibrated
+ * @param {CalibrationModeTypes} mode {CalibrationModeTypes} calibration modes
+ * @param {number} mapID {number} id of map being calibrated
  */
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -164,7 +164,7 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
 
 /**
  * use a default number as the threshold in determining if it's safe to call the calibration function
- * @param state
+ * @param {State} state The redux state
  */
 function isReadyForCalculation(state: State): boolean {
 	const calibrationThreshold = 3;
@@ -176,6 +176,7 @@ function isReadyForCalculation(state: State): boolean {
 
 /**
  *  prepare data to required formats to pass it to function calculating mapScales
+ * @param {State} state The redux state
  */
 function prepareDataToCalculation(state: State): CalibrationResult {
 	const mapID = state.maps.calibratingMap;
@@ -256,7 +257,7 @@ export function submitNewMap(): Thunk {
 
 /**
  * submit changes of an existing map to database at the end of a calibration session
- * @param mapID the edited map being updated at database
+ * @param {number} mapID the edited map being updated at database
  */
 export function submitEditedMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
@@ -299,7 +300,6 @@ export function submitEditedMap(mapID: number): Thunk {
  * permanently remove a map
  * @param mapID map to be removed
  */
-
 export function removeMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
 		try {

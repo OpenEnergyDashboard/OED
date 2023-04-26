@@ -21,7 +21,7 @@ log.level = LogLevel.SILENT;
 log.emailLevel = LogLevel.SILENT;
 
 const User = require('../models/User');
-const { getDB, currentDB, createSchema, stopDB } = require('../models/database');
+const { getDB, createSchema, stopDB } = require('../models/database');
 const { swapConnection, dropConnection } = require('../db');
 const app = require('../app');
 

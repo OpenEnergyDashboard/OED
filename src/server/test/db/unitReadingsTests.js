@@ -12,7 +12,8 @@ const Group = require('../../models/Group');
 const { generateSineData } = require('../../data/generateTestingData');
 const Unit = require('../../models/Unit');
 const Conversion = require('../../models/Conversion');
-const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData.js');
+const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
+const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
 
 // TODO add tests that check flow readings.
@@ -36,9 +37,9 @@ mocha.describe('Line & bar Readings', () => {
 			// Insert the special units. Really only need 1-2 but this is easy.
 			await insertSpecialUnits(conn);
 			// Make the meter be a kWh meter.
-			const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 		});
 
@@ -121,15 +122,15 @@ mocha.describe('Line & bar Readings', () => {
 		mocha.beforeEach(async function () {
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -169,15 +170,15 @@ mocha.describe('Line & bar Readings', () => {
 			this.timeout(20000);
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -236,15 +237,15 @@ mocha.describe('Line & bar Readings', () => {
 			this.timeout(20000);
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			const meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -305,15 +306,15 @@ mocha.describe('Line & bar Readings', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -424,17 +425,17 @@ mocha.describe('Line & bar Readings', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter1 = await Meter.getByName('Meter1', conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 
@@ -515,18 +516,18 @@ mocha.describe('Line & bar Readings', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-			await Unit.insertStandardUnits(conn);
-			await Conversion.insertStandardConversions(conn);
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
-			meterUnitId = (await Unit.getByName('Electric_utility', conn)).id;
+			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			await new Meter(undefined, 'Meter2', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
 			meter2 = await Meter.getByName('Meter2', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;

@@ -45,11 +45,11 @@ class User {
 	 * This exposes the user's password_hash and should only be used for authentication purposes.
 	 * @param email the email to look up
 	 * @param conn the connection to use.
-	 * @returns {Promise.<User>}
+	 * @returns {Promise.<User>} either the user object with info or null if does not exist.
 	 */
 	static async getByEmail(email, conn) {
-		const row = await conn.one(sqlFile('user/get_user_by_email.sql'), { email: email });
-		return new User(row.id, row.email, row.password_hash, row.role);
+		const row = await conn.oneOrNone(sqlFile('user/get_user_by_email.sql'), { email: email });
+		return row === null ? null : new User(row.id, row.email, row.password_hash, row.role);
 	}
 
 	/**
