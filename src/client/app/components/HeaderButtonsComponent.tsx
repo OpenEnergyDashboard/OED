@@ -145,7 +145,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 
 	// TODO: There is an issue where the modal is appearing above the dropdown menu since using the
 	// css property, display:, will cause an error that prevents the menu from displaying properly.
-	
+
 	// TODO: There is an issue where the question modal will only appear once after clicking on it.
 
 	return (
@@ -209,16 +209,16 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 							as={Link} to='/units'>
 							<FormattedMessage id='units' />
 						</Dropdown.Item>
-						<Dropdown.Divider/>
+						<Dropdown.Divider />
 						<Dropdown.Item
 							style={state.loginLinkStyle}
 							as={Link} to='/login'>
-							<FormattedMessage id='log.in'/>
+							<FormattedMessage id='log.in' />
 						</Dropdown.Item>
 						<Dropdown.Item
 							style={state.logoutLinkStyle}
 							onClick={handleLogOut}>
-							<FormattedMessage id='log.out'/>
+							<FormattedMessage id='log.out' />
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
