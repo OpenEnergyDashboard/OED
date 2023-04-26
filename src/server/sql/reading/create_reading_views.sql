@@ -235,7 +235,7 @@ DECLARE
 	requested_range TSRANGE;
 	unit_column INTEGER;
 	frequency INTERVAL;
-	add INTEGER := 1;
+	current_meter_id INTEGER := 1;
 	BEGIN
 	-- Make sure the time range is withing the reading values.
 	requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'));
@@ -246,9 +246,9 @@ DECLARE
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
 	-- Start with the raw, then hourly and then daily if others will not work.
 	-- Loop over all meters.
-	while add <= cardinality(meter_ids) loop
+	while current_meter_id <= cardinality(meter_ids) loop
 		- Get the frequency that this meter reads at.
-		select meter_reading_frequency into frequency from meters where id = meter_ids[add];
+		select meter_reading_frequency into frequency from meters where id = meter_ids[current_meter_id];
 		-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
 		-- Divide the time being graphed in minutes by the frequency of reading for this meter in minutes.
 		-- This should give the number of raw readings. If this is less than or equal to 1440 then use raw readings.
@@ -270,11 +270,10 @@ DECLARE
 				r.start_timestamp,
 				r.end_timestamp
 				FROM (((readings r
-				--INNER JOIN unnest(current_id) meters(id) ON r.meter_id = meters.id)
-				INNER JOIN meters m ON m.id = meter_ids[add])
+				INNER JOIN meters m ON m.id = meter_ids[current_meter_id])
 				INNER JOIN units u ON m.unit_id = u.id)
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[add];
+				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[current_meter_id];
 				-- This ensures the data is sorted
 				ORDER BY r.start_timestamp ASC;
 		-- If hours in the interval is less than or equal to 1440 and frequency of readings is an hour or less then use hourly readings.
@@ -289,10 +288,10 @@ DECLARE
 					lower(hourly.time_interval) AS start_timestamp,
 					upper(hourly.time_interval) AS end_timestamp
 				FROM (((hourly_readings_unit hourly
-				INNER JOIN meters m ON m.id = meters_ids[add])
+				INNER JOIN meters m ON m.id = meters_ids[current_meter_id])
 				INNER JOIN units u ON m.unit_id = u.id)
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[add];
+				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[current_meter_id];
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
 		ELSE 
@@ -311,16 +310,16 @@ DECLARE
 				-- Get all the meter_ids in the passed array of meters.
 				-- This sequence of joins takes the meter id to its unit and in the final join
 				-- it then uses the unit_index for this unit.
-				INNER JOIN meters m ON m.id = meter_ids[add])
+				INNER JOIN meters m ON m.id = meter_ids[current_meter_id])
 				INNER JOIN units u ON m.unit_id = u.id)
 				-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
 				-- The slope and intercept are used above the transform the reading to the desired unit.
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE requested_range @> time_interval AND daily.meter_id = meter_ids[add];
+				WHERE requested_range @> time_interval AND daily.meter_id = meter_ids[current_meter_id];
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
 		END IF;
-		add := add + 1;
+		current_meter_id := current_meter_id + 1;
 	end loop;
 END;
 $$ LANGUAGE 'plpgsql';
