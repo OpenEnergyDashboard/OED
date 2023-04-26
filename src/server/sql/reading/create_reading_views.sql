@@ -210,7 +210,7 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	min_hour_points INTEGER
 )
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
-AS $$ 
+AS $$
 DECLARE
 	requested_interval INTERVAL;
 	requested_range TSRANGE;
@@ -225,11 +225,16 @@ DECLARE
 	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 
 	-- For each frequency of points, verify that you will get the minimum graphing points to use.
-	-- Start with the raw, then hourly and then daily if others will not work
-
+	-- Start with the raw, then hourly and then daily if others will not work.
+	-- Loop over all meters.
 	while add <= cardinality(meter_ids) loop
+		- Get the frequency that this meter reads at.
 		select meter_reading_frequency into frequency from meters where id = meter_ids[add];
+		-- Divide the time being graphed in minutes by the frequency of reading for this meter in minutes.
+		-- This should give the number of raw readings. If this is less than or equal to 1440 then use raw readings.
 		IF (((EXTRACT (DAY FROM requested_interval) * 1440) / (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency))) <= 1440) 
+		-- Also, if the frequency is at least 1 day (1440 minutes) then use raw readings since even daily would
+		-- interpolate points. This can lead to too many points but do this for now since that is unlikely.
 		OR (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN
 			RETURN QUERY
 				SELECT r.meter_id as meter_id,
@@ -250,7 +255,9 @@ DECLARE
 				INNER JOIN units u ON m.unit_id = u.id)
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
 				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[add];
-		ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) >= 1440) THEN 
+		-- If hours in the interval is less than or equal to 1440 and frequency of readings is an hour or less then use hourly readings.
+		-- This means the number of hourly points is not too large and  
+		ELSIF (((EXTRACT (DAY FROM requested_interval) * 1440) / 60) <= 1440) AND (EXTRACT (HOUR FROM frequency) * 60 + EXTRACT (MINUTE FROM frequency) <= 60) THEN 
 			-- Get hourly points to graph. See daily for more comments.
 			RETURN QUERY
 				SELECT hourly.meter_id AS meter_id,
@@ -265,7 +272,9 @@ DECLARE
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
 				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[add];
 		ELSE 
-			-- Get daily points to graph
+			-- Get daily points to graph. This should be an okay number but can be too many
+			-- if there are a lot of days of readings.
+			-- TODO Someday consider averaging days if too many.
 			RETURN QUERY
 				SELECT
 					daily.meter_id AS meter_id,
@@ -290,6 +299,7 @@ DECLARE
 	end loop;
 END;
 $$ LANGUAGE 'plpgsql';
+
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw readings from it.
