@@ -11,6 +11,7 @@ import MenuModalComponent from './MenuModalComponent';
 import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
+import translate from '../utils/translate';
 import { UserRole } from '../types/items';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import { flipLogOutState } from '../actions/unsavedWarning';
@@ -54,7 +55,9 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
 		// Controls if the options are shown on the right side for some pages.
-		showOptions: false
+		showOptions: false,
+		// Translated menu title that depend on whether logged in.
+		menuTitle: ''
 	};
 
 	// Local state for rendering.
@@ -87,14 +90,19 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		// What role you have or null if not logged in.
 		// We can get the admin state from the role but separate the two.
 		let role: UserRole | null;
+		let currentMenuTitle: string;
 		if (currentUser !== null) {
 			// There is a current user so gets its information
 			loggedInAsAdmin = isRoleAdmin(currentUser.role);
 			role = currentUser.role;
+			// The menu title has logout.
+			currentMenuTitle = translate('page.choice.logout');
 		} else {
 			// You are not logged in.
 			loggedInAsAdmin = false;
 			role = null;
+			// The menu title has login.
+			currentMenuTitle = translate('page.choice.login');
 		}
 		// If you have a role then check if it is CSV.
 		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
@@ -120,7 +128,8 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 			adminViewableLinkStyle: currentAdminViewableLinkStyle,
 			csvViewableLinkStyle: currentCsvViewableLinkStyle,
 			loginLinkStyle: currentLoginLinkStyle,
-			logoutLinkStyle: currentLogoutLinkStyle
+			logoutLinkStyle: currentLogoutLinkStyle,
+			menuTitle: currentMenuTitle
 		}));
 	}, [currentUser]);
 
@@ -143,11 +152,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		}
 	};
 
-	// TODO: There is an issue where the modal is appearing above the dropdown menu since using the
-	// css property, display:, will cause an error that prevents the menu from displaying properly.
-	// TODO: There is an issue where the question modal will only appear once after clicking on it.
-	// It also cuts off part of the help text box.
-
 	return (
 		<div>
 			<div className="d-lg-none">
@@ -159,13 +163,15 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 				) : null}
 			</div>
 			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-				{/* TODO I have tried to move this below the Dropdown, put it in a div, etc.
-				This can get it so you can click it many times but it places the popup help
-				so parts get cut off. So far I have not figured this out. */}
-				<TooltipHelpContainer page={dataFor} />
-				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 				<Dropdown style={dropAlign} align='end'>
-					<Dropdown.Toggle variant="outline-dark">Menu</Dropdown.Toggle>
+					{/* There is an issue where the help popup goes off the page. When this
+					happens, you lose help text and you generally don't see the help text
+					if you click the help icon a second time. Why this is the case and how to
+					get the placement correct is unclear. However, if the menuTitle is long enough
+					to shift the help icon to the left then there is enough space for the help
+					text box and this does not happen. The current possibilities for menuTitle
+					do this so the issue is not seen by the user. */}
+					<Dropdown.Toggle variant="outline-dark">{state.menuTitle}</Dropdown.Toggle>
 					<Dropdown.Menu style={dropAlign} align='end'>
 						<Dropdown.Item
 							style={state.adminViewableLinkStyle}
@@ -225,6 +231,8 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						</Dropdown.Item>
 					</Dropdown.Menu>
 				</Dropdown>
+				<TooltipHelpContainer page={dataFor} />
+				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 			</div>
 		</div>
 	);
