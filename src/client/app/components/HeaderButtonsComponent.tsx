@@ -145,7 +145,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 
 	// TODO: There is an issue where the modal is appearing above the dropdown menu since using the
 	// css property, display:, will cause an error that prevents the menu from displaying properly.
-
 	// TODO: There is an issue where the question modal will only appear once after clicking on it.
 	// It also cuts off part of the help text box.
 
