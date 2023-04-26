@@ -147,6 +147,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 	// css property, display:, will cause an error that prevents the menu from displaying properly.
 
 	// TODO: There is an issue where the question modal will only appear once after clicking on it.
+	// It also cuts off part of the help text box.
 
 	return (
 		<div>
@@ -159,6 +160,9 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 				) : null}
 			</div>
 			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
+				{/* TODO I have tried to move this below the Dropdown, put it in a div, etc.
+				This can get it so you can click it many times but it places the popup help
+				so parts get cut off. So far I have not figured this out. */}
 				<TooltipHelpContainer page={dataFor} />
 				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 				<Dropdown style={dropAlign} align='end'>
