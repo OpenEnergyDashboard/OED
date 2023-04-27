@@ -247,7 +247,7 @@ DECLARE
 	-- Start with the raw, then hourly and then daily if others will not work.
 	-- Loop over all meters.
 	while current_meter_id <= cardinality(meter_ids) loop
-		- Get the frequency that this meter reads at.
+		-- Get the frequency that this meter reads at.
 		select meter_reading_frequency into frequency from meters where id = meter_ids[current_meter_id];
 		-- There's no quick way to get the number of hours in an interval. extract(HOURS FROM '1 day, 3 hours') gives 3.
 		-- Divide the time being graphed in minutes by the frequency of reading for this meter in minutes.
@@ -273,7 +273,7 @@ DECLARE
 				INNER JOIN meters m ON m.id = meter_ids[current_meter_id])
 				INNER JOIN units u ON m.unit_id = u.id)
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[current_meter_id];
+				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = meter_ids[current_meter_id]
 				-- This ensures the data is sorted
 				ORDER BY r.start_timestamp ASC;
 		-- If hours in the interval is less than or equal to 1440 and frequency of readings is an hour or less then use hourly readings.
@@ -291,7 +291,7 @@ DECLARE
 				INNER JOIN meters m ON m.id = meters_ids[current_meter_id])
 				INNER JOIN units u ON m.unit_id = u.id)
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[current_meter_id];
+				WHERE requested_range @> time_interval AND hourly.meter_id = meter_ids[current_meter_id]
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
 		ELSE 
@@ -315,7 +315,7 @@ DECLARE
 				-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
 				-- The slope and intercept are used above the transform the reading to the desired unit.
 				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
-				WHERE requested_range @> time_interval AND daily.meter_id = meter_ids[current_meter_id];
+				WHERE requested_range @> time_interval AND daily.meter_id = meter_ids[current_meter_id]
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
 		END IF;
