@@ -247,7 +247,7 @@ DECLARE
 	-- For each frequency of points, verify that you will get the minimum graphing points to use for each meter.
 	-- Start with the raw, then hourly and then daily if others will not work.
 	-- Loop over all meters.
-	while current_meter_index <= cardinality(meter_ids) loop
+	WHILE current_meter_index <= cardinality(meter_ids) LOOP
 		current_meter_id := meter_ids[current_meter_index];
 		-- Make sure the time range is within the reading values for this meter.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), current_meter_id);
@@ -255,11 +255,11 @@ DECLARE
 		requested_interval := upper(requested_range) - lower(requested_range);
 		-- Get the seconds in the interval.
 		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-		requested_interval_seconds := (SELECT * from EXTRACT(EPOCH FROM requested_interval));
+		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
 		-- Get the frequency that this meter reads at.
-		select meter_reading_frequency into frequency from meters where id = current_meter_id;
+		select meter_reading_frequency into frequency FROM meters where id = current_meter_id;
 		-- Get the seconds in the frequency.
-		frequency_seconds := (SELECT * from EXTRACT(EPOCH FROM frequency));
+		frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
 		-- The first part is making sure that there are no more than 1440 readings to graph if use raw readings.
 		-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
 		-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
@@ -334,7 +334,7 @@ DECLARE
 				ORDER BY start_timestamp ASC;
 		END IF;
 		current_meter_index := current_meter_index + 1;
-	end loop;
+	END LOOP;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -378,7 +378,7 @@ BEGIN
 			readings.end_timestamp
 		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, min_day_points, min_hour_points) readings
 		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
-		INNER JOIN unnest(group_ids) gids(id) on gdm.group_id = gids.id
+		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id
 		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp
 		-- This ensures the data is sorted
 		ORDER BY readings.start_timestamp ASC;
@@ -440,10 +440,10 @@ BEGIN
 	real_end_stamp := upper(real_tsrange);
 	-- This gives the number of whole bars that will fit within the real start/end times. For example, if the number of days
 	-- between start and end is 14 days and the bar width is 3 days then you get 4.
-	num_bars := floor(extract(EPOCH from real_end_stamp - real_start_stamp) / extract(EPOCH from bar_width));
+	num_bars := floor(extract(EPOCH FROM real_end_stamp - real_start_stamp) / extract(EPOCH FROM bar_width));
 	-- This makes the full bars go from the end time to as far back in time as possible.
 	-- This means that if some time was dropped to get full bars it is at the start of the interval.
-	-- It was felt that the most recend readings are the most important so drop older ones.
+	-- It was felt that the most recent readings are the most important so drop older ones.
 	-- It also helps with maps since they use the latest bar for their value.
 	real_start_stamp := real_end_stamp - (num_bars *  bar_width);
 	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
