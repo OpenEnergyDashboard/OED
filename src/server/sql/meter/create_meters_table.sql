@@ -62,5 +62,5 @@ CREATE TABLE IF NOT EXISTS meters (
     previous_end TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     unit_id INTEGER REFERENCES units(id),
     default_graphic_unit INTEGER REFERENCES units(id),
-    area_unit area_unit_type NOT NULL
+    area_unit area_unit_type NOT NULL DEFAULT 'none'
 );

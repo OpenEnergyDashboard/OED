@@ -21,7 +21,7 @@ class Meter {
 	 * @param gps location in format of GIS coordinates
 	 * @param identifier Another way to identify a meter
 	 * @param note Note about the meter
-	 * @param area Area of the meter default null
+	 * @param area Area of the meter default 0
 	 * @param cumulative Identifies if meter readings that are stored are the sum of usage or the particular reading, default false
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
@@ -37,7 +37,7 @@ class Meter {
 	 * @param previousEnd  The last okay reading before crossed out of DST or moment(0) if not, default'1970-01-01 00:00:00'
 	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
-	 * @param areaUnit The foreign key to the unit table. Default is 'none'
+	 * @param areaUnit The meter's area unit, default 'none'
 	*/
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.

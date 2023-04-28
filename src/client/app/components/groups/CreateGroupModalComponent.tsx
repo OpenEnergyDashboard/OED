@@ -27,7 +27,7 @@ import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
-import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -118,6 +118,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						if(meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
 						} else {
+							// This shouldn't happen because of the other checks in place when editing/creating a meter.
+							// However, there could still be edge cases (i.e meters from before area units were added) that could violate this.
 							notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.unit');
 						}
 					} else {
@@ -128,7 +130,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
 				}
 				// the + here converts back into a number
-				setState({...state, ['area']: +areaSum.toFixed(2)});
+				setState({...state, ['area']: +areaSum.toPrecision(6)});
 			} else {
 				notifyUser(translate('group.area.calculate.error.group.unit'));
 			}

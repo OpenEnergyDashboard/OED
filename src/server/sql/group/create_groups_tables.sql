@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS groups (
 	note TEXT,
 	area REAL NOT NULL DEFAULT 0 CHECK (area >= 0),
 	default_graphic_unit INTEGER REFERENCES units(id),
-	area_unit area_unit_type NOT NULL
+	area_unit area_unit_type NOT NULL DEFAULT 'none'
 );
 
 /*

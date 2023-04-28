@@ -18,7 +18,7 @@ import translate from '../utils/translate';
 import { ChartTypes } from '../types/redux/graph';
 import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
 import { ConversionData } from '../types/redux/conversions';
-import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -67,11 +67,7 @@ export default function ExportComponent() {
 						let scaling = graphState.lineGraphRate.rate;
 						if(graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = graphState.selectedAreaUnit;
-							const meterAreaUnit = metersState[meterId].areaUnit;
-							if(graphAreaUnit != meterAreaUnit) {
-								scaling *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
-							}
+							scaling *= getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit);
 						}
 						// Get the readings for the time range and unit graphed
 						const byTimeInterval = byMeterID[timeInterval.toString()];
@@ -106,11 +102,7 @@ export default function ExportComponent() {
 						let scaling = graphState.lineGraphRate.rate;
 						if(graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = graphState.selectedAreaUnit;
-							const groupAreaUnit = groupsState[groupId].areaUnit;
-							if(graphAreaUnit != groupAreaUnit) {
-								scaling *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
-							}
+							scaling *= getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit);
 						}
 						// Get the readings for the time range and unit graphed
 						const byTimeInterval = byGroupID[timeInterval.toString()];
@@ -151,11 +143,7 @@ export default function ExportComponent() {
 						let scaling = 1;
 						if(graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = graphState.selectedAreaUnit;
-							const meterAreaUnit = metersState[meterId].areaUnit;
-							if(graphAreaUnit != meterAreaUnit) {
-								scaling *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
-							}
+							scaling *= getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit);
 						}
 						const byTimeInterval = byMeterID[timeInterval.toString()];
 						if (byTimeInterval !== undefined) {
@@ -193,11 +181,7 @@ export default function ExportComponent() {
 						let scaling = 1;
 						if(graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = graphState.selectedAreaUnit;
-							const groupAreaUnit = groupsState[groupId].areaUnit;
-							if(graphAreaUnit != groupAreaUnit) {
-								scaling *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
-							}
+							scaling *= getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit);
 						}
 						const byTimeInterval = byGroupID[timeInterval.toString()];
 						if (byTimeInterval !== undefined) {

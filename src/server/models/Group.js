@@ -16,9 +16,9 @@ class Group {
 	 * @param displayable The group is available for display
 	 * @param gps Location in format of GIS coordinates, default null
 	 * @param note Note about the group
-	 * @param area Area of the group, default null
+	 * @param area Area of the group, default 0
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
-	 * @param areaUnit The area unit
+	 * @param areaUnit The area unit, default 'none'
 	 */
 	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnit = Unit.areaUnitType.NONE) {
 		this.id = id;

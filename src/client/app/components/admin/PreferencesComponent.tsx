@@ -205,32 +205,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 							<FormattedMessage id='AreaUnitType.meters' />
 						</label>
 					</div>
-					{/* <div className='radio'>
-						<label>
-							<input
-								type='radio'
-								name='areaUnitType'
-								style={{ marginRight: '10px' }}
-								value={AreaUnitType.miles}
-								onChange={this.handleDefaultAreaUnitChange}
-								checked={this.props.defaultAreaUnit === AreaUnitType.miles}
-							/>
-							<FormattedMessage id='AreaUnitType.miles' />
-						</label>
-					</div>
-					<div className='radio'>
-						<label>
-							<input
-								type='radio'
-								name='areaUnitType'
-								style={{ marginRight: '10px' }}
-								value={AreaUnitType.kilometers}
-								onChange={this.handleDefaultAreaUnitChange}
-								checked={this.props.defaultAreaUnit === AreaUnitType.kilometers}
-							/>
-							<FormattedMessage id='AreaUnitType.kilometers' />
-						</label>
-					</div> */}
 				</div>
 				<div>
 					<p style={labelStyle}>

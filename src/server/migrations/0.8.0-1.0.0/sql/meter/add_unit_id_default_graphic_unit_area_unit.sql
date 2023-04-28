@@ -9,4 +9,5 @@ ALTER TABLE meters
     ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id),
     ADD COLUMN IF NOT EXISTS area_unit area_unit_type NOT NULL DEFAULT 'none',
     ALTER COLUMN area SET NOT NULL,
-    ALTER COLUMN area SET DEFAULT 0;
+    ALTER COLUMN area SET DEFAULT 0,
+    ADD CONSTRAINT meter_area_check CHECK (area >= 0);

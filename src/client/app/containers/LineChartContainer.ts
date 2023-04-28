@@ -11,7 +11,7 @@ import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
-import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
@@ -49,11 +49,7 @@ function mapStateToProps(state: State) {
 			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
 				if(state.graph.areaNormalization) {
 					// convert the meter area into the proper unit, if needed
-					const graphAreaUnit = state.graph.selectedAreaUnit;
-					const meterAreaUnit = state.meters.byMeterID[meterID].areaUnit;
-					if(graphAreaUnit != meterAreaUnit) {
-						meterArea *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
-					}
+					meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
 				}
 				const readingsData = byMeterID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
@@ -144,11 +140,7 @@ function mapStateToProps(state: State) {
 			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
 				if(state.graph.areaNormalization) {
 					// convert the meter area into the proper unit, if needed
-					const graphAreaUnit = state.graph.selectedAreaUnit;
-					const groupAreaUnit = state.groups.byGroupID[groupID].areaUnit;
-					if(graphAreaUnit != groupAreaUnit) {
-						groupArea *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
-					}
+					groupArea *= getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit);
 				}
 				const readingsData = byGroupID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {

@@ -13,6 +13,8 @@ import { AreaUnitType } from './getAreaUnitConversion';
  * Returns the y-axis label for a line graph and whether the rate needs scaling
  * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
  * @param {LineGraphRate} currentSelectedRate The current selected rate
+ * @param {boolean} areaNormalization Whether area normalization is enabled
+ * @param {AreaUnitType} selectedAreaUnit The currently selected area unit to normalize to
  * @returns y-axis label and boolean of whether rate needs to be scaled (true if does)
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,

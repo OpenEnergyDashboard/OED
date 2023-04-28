@@ -83,7 +83,7 @@ mocha.describe('Meters', () => {
 		const conn = testDB.getConnection();
 		const meterPreInsert = new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, 'UTC',
 			gps, 'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, -99, Unit.areaUnitType.METERS);
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, -99, Unit.areaUnitType.FEET);
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);

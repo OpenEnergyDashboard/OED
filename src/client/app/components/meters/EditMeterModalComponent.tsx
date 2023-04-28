@@ -172,7 +172,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 
-			// Check area is positive.
+			// Check if area is non-negative
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
 				inputOk = false;

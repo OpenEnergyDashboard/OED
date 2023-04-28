@@ -17,6 +17,7 @@ class Preferences {
 	 * @param {Number} defaultWarningFileSize - Option to set the default warning file size
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
+	 * @param {String} defaultAreaUnit - The default area unit to normalize by
 	 */
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit) {
 		this.displayTitle = displayTitle;

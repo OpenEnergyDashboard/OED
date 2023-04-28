@@ -13,8 +13,8 @@ import {
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit,
-	updateDefaultAreaUnit,
-	toggleDefaultAreaNormalization
+	toggleDefaultAreaNormalization,
+	updateDefaultAreaUnit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';

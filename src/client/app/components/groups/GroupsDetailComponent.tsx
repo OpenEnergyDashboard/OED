@@ -8,7 +8,6 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { State } from '../../types/redux/state';

@@ -35,7 +35,7 @@ import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
-import getAreaUnitConversion, { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -163,6 +163,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						if(meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, groupState.areaUnit);
 						} else {
+							// This shouldn't happen because of the other checks in place when editing/creating a meter.
+							// However, there could still be edge cases (i.e meters from before area units were added) that could violate this.
 							notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.unit');
 						}
 					} else {
@@ -177,7 +179,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					...editGroupsState,
 					[groupState.id]: {
 						...editGroupsState[groupState.id],
-						['area']: +areaSum.toFixed(2)
+						['area']: +areaSum.toPrecision(6)
 					}
 				});
 			} else {
@@ -244,9 +246,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
-			//Check if area is positive
-			// TODO For now allow zero so works with default value and DB. We should probably
-			// make this better default than 0 (DB set to not null now).
+			// Check if area is non-negative
 			if (groupState.area < 0) {
 				notifyUser(translate('area.invalid') + groupState.area + '.');
 				inputOk = false;

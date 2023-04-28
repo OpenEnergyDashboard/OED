@@ -139,7 +139,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// Set default identifier as name if left blank
 		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 
-		// Check area is positive.
+		// Check if area is non-negative
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;
@@ -176,12 +176,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		// A meter default graphic unit must be selected.
 		if (state.defaultGraphicUnit === -999) {
 			notifyUser(translate('meter.graphic.invalid'));
-			inputOk = false;
-		}
-
-		// A meter area unit must be selected if meter has area
-		if (state.area !== 0 && state.areaUnit === AreaUnitType.none) {
-			notifyUser(translate('meter.unit.invalid'));
 			inputOk = false;
 		}
 

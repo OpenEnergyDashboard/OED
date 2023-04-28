@@ -262,6 +262,7 @@ export default function ChartDataSelectComponent() {
 			);
 		}
 
+		// if no area unit selected, set the default area as selected.
 		if(state.graph.selectedAreaUnit == AreaUnitType.none) {
 			state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
 		}

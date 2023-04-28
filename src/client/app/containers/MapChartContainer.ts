@@ -15,7 +15,7 @@ import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
-import getAreaUnitConversion, { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
@@ -110,11 +110,7 @@ function mapStateToProps(state: State) {
 					if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
 						if(state.graph.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = state.graph.selectedAreaUnit;
-							const meterAreaUnit = state.meters.byMeterID[meterID].areaUnit;
-							if(graphAreaUnit != meterAreaUnit) {
-								meterArea *= getAreaUnitConversion(graphAreaUnit, meterAreaUnit)
-							}
+							meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
 						}
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
@@ -188,18 +184,10 @@ function mapStateToProps(state: State) {
 				// Filter groups with actual gps coordinates.
 				if (gps !== undefined && gps !== null && byGroupID !== undefined) {
 					let groupArea = state.groups.byGroupID[groupID].area;
-					// TODO Consider changing group area to always be defined
-					if(groupArea === undefined) {
-						groupArea = 0;
-					}
 					if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
 						if(state.graph.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
-							const graphAreaUnit = state.graph.selectedAreaUnit;
-							const groupAreaUnit = state.groups.byGroupID[groupID].areaUnit;
-							if(graphAreaUnit != groupAreaUnit) {
-								groupArea *= getAreaUnitConversion(graphAreaUnit, groupAreaUnit)
-							}
+							groupArea *= getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit);
 						}
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
