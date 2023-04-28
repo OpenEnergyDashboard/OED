@@ -225,6 +225,7 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	graphic_unit_id INTEGER,
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP,
+	point_accuracy reading_line_accuracy,
 	min_day_points INTEGER,
 	min_hour_points INTEGER
 )
@@ -241,6 +242,8 @@ DECLARE
 	current_meter_index INTEGER := 1;
 	-- The id of the meter index working on
 	current_meter_id INTEGER;
+	-- Holds accuracy for current meter.
+	current_point_accuracy reading_line_accuracy;
 	BEGIN
 	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
 	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
@@ -248,25 +251,50 @@ DECLARE
 	-- Start with the raw, then hourly and then daily if others will not work.
 	-- Loop over all meters.
 	WHILE current_meter_index <= cardinality(meter_ids) LOOP
+		-- Reset the point accuracy for each meter so it does what is desired.
+		current_point_accuracy := point_accuracy;
 		current_meter_id := meter_ids[current_meter_index];
 		-- Make sure the time range is within the reading values for this meter.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), current_meter_id);
-		-- The interval of time.
-		requested_interval := upper(requested_range) - lower(requested_range);
-		-- Get the seconds in the interval.
-		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-		-- Get the frequency that this meter reads at.
-		select reading_frequency into frequency FROM meters where id = current_meter_id;
-		-- Get the seconds in the frequency.
-		frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
-		-- The first part is making sure that there are no more than 1440 readings to graph if use raw readings.
-		-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
-		-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
-		-- because even daily would
-		-- interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
-		-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
-		IF ((requested_interval_seconds / frequency_seconds <= 1440) OR (frequency_seconds >= 86400)) THEN
+		if (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
+			-- The request wants automatic calculation of the points returned.
+
+			-- The interval of time for the requested_range.
+			requested_interval := upper(requested_range) - lower(requested_range);
+			-- Get the seconds in the interval.
+			-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
+			requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
+			-- Get the frequency that this meter reads at.
+			select reading_frequency into frequency FROM meters where id = current_meter_id;
+			-- Get the seconds in the frequency.
+			frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
+
+			-- The first part is making sure that there are no more than 1440 readings to graph if use raw readings.
+			-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
+			-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
+			-- because even daily would
+			-- interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
+			-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
+			IF ((requested_interval_seconds / frequency_seconds <= 1440) OR (frequency_seconds >= 86400)) THEN
+				-- Return raw meter data.
+				current_point_accuracy := 'raw'::reading_line_accuracy;
+			-- The first part is making sure that the number of hour points is 1440 or less.
+			-- Thus, check if no more than 1440 hours * 60 minutes/hour * 60 seconds/hour = 5184000 seconds.
+			-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
+			-- so you don't interpolate points by using the hourly data.
+			-- TODO Not sure the second part is needed since if the raw readings are more than once an hour then you should have done raw above.
+			ELSIF ((requested_interval_seconds <= 5184000) AND (frequency_seconds <= 3600)) THEN
+				-- Return hourly reading data.
+				current_point_accuracy := 'hourly'::reading_line_accuracy;
+			ELSE
+				-- Return daily reading data.
+				current_point_accuracy := 'daily'::reading_line_accuracy;
+			END IF;
+		END IF;
+		-- At this point current_point_accuracy should never be 'auto'.
+
+		IF (current_point_accuracy = 'raw'::reading_line_accuracy) THEN
+			-- Gets raw meter data to graph.
 			RETURN QUERY
 				SELECT r.meter_id as meter_id,
 				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
@@ -292,7 +320,7 @@ DECLARE
 		-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
 		-- so you don't interpolate points by using the hourly data.
 		-- TODO Not sure the second part is needed since if the raw readings are more than once an hour then you should have done raw above.
-		ELSIF ((requested_interval_seconds <= 5184000) AND (frequency_seconds <= 3600)) THEN
+		ELSIF (current_point_accuracy = 'hourly'::reading_line_accuracy) THEN
 			-- Get hourly points to graph. See daily for more comments.
 			RETURN QUERY
 				SELECT hourly.meter_id AS meter_id,
@@ -308,7 +336,7 @@ DECLARE
 				WHERE requested_range @> time_interval AND hourly.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
-		ELSE 
+		ELSE
 			-- Get daily points to graph. This should be an okay number but can be too many
 			-- if there are a lot of days of readings.
 			-- TODO Someday consider averaging days if too many.

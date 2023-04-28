@@ -51,6 +51,16 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to create the reading_line_accuracy type.
+	 * This needs to be run before Reading.createTable().
+	 * @param conn the connection to use
+	 * @return {Promise<void>}
+	 */
+	static createReadingLineAccuracyEnum(conn) {
+		return conn.none(sqlFile('meter/create_reading_line_accuracy_enum.sql'));
+	}
+
+	/**
 	 * Refreshes the daily readings view.
 	 * Should be called at least once a day, preferably in the middle of the night.
 	 * @param conn The connection to use
