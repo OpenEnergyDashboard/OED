@@ -244,8 +244,9 @@ mocha.describe('Line & bar Readings', () => {
 			await redoCik(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
+			// The default frequency of reading is 15-min so set to 23 for this meter.
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId).insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, '00:23:00').insert(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
@@ -281,11 +282,7 @@ mocha.describe('Line & bar Readings', () => {
 			const end = moment.utc(startDate).clone();
 			const numDays = 22;
 			end.add(numDays, 'days');
-			// The crossover point for when to go to raw depends on the reading rate. Thus, it is reset to
-			// 23 minutes before getting the data and then set back to the original value.
-			process.env.OED_SITE_READING_RATE = "00:23:00";
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, start, end, conn);
-			process.env.OED_SITE_READING_RATE = process.env.OED_TEST_SITE_READING_RATE;
 			// Min hourly points is 1440 * reading frequency in hours so 1440 * 23/60 = 552 hours or 23 days.
 			// 22 days so expect 22 days * 24 hours/day * 60 min/hour / 23 min/reading = 1377.39 readings
 			// rounded down to 1377.

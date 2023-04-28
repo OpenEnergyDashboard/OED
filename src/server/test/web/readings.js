@@ -223,7 +223,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 
-				mocha.it('15 days barely gives hourly points & middle readings', async () => {
+				mocha.it('should barely have hourly points for middle readings of 15 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
@@ -234,7 +234,7 @@ mocha.describe('readings API', () => {
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:00:00'), graphicUnitId: unitId });
+						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:15:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 14 days barely gives raw points & middle readings
