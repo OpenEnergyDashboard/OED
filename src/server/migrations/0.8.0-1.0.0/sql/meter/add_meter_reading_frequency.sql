@@ -4,4 +4,4 @@
 
 -- Add meter reading frequency to the meters table.
 ALTER TABLE meters
-    ADD COLUMN IF NOT EXISTS meter_reading_frequency INTERVAL DEFAULT '00:15:00';
+    ADD COLUMN IF NOT EXISTS reading_frequency INTERVAL DEFAULT '00:15:00';

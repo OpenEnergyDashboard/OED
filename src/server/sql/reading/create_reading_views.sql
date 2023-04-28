@@ -257,7 +257,7 @@ DECLARE
 		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
 		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
 		-- Get the frequency that this meter reads at.
-		select meter_reading_frequency into frequency FROM meters where id = current_meter_id;
+		select reading_frequency into frequency FROM meters where id = current_meter_id;
 		-- Get the seconds in the frequency.
 		frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
 		-- The first part is making sure that there are no more than 1440 readings to graph if use raw readings.
