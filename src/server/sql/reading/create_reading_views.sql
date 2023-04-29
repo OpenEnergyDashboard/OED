@@ -217,8 +217,8 @@ graphic_unit_id: The unit id of the unit to use for the graphic.
 start_timestamp: The start timestamp of the data to return.
 end_timestamp: The end timestamp of the data to return.
 point_accuracy: Tells how decisions should be made on which types of points to return. 'auto' if automatic.
-min_data_points: The minimum number of data points to return if using the day view.
-min_hour_points: The minimum number of data points to return if using the hour view.
+max_raw_points: The maximum number of data points to return if using the raw points for a meter. Only used if 'auto' for point_accuracy.
+max_hour_points: The maximum number of data points to return if using the hour view. Only used if 'auto' for point_accuracy.
 Details on how this function works can be found in the devDocs in the resource generalization document.
  */
 CREATE OR REPLACE FUNCTION meter_line_readings_unit (
@@ -227,8 +227,8 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP,
 	point_accuracy reading_line_accuracy,
-	min_day_points INTEGER,
-	min_hour_points INTEGER
+	max_raw_points INTEGER,
+	max_hour_points INTEGER
 )
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
@@ -271,21 +271,20 @@ DECLARE
 			-- Get the seconds in the frequency.
 			frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
 
-			-- The first part is making sure that there are no more than 1440 readings to graph if use raw readings.
+			-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
 			-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
 			-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
-			-- because even daily would
-			-- interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
+			-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
 			-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
-			IF ((requested_interval_seconds / frequency_seconds <= 1440) OR (frequency_seconds >= 86400)) THEN
+			-- Note this overrides the max raw points if it applies.
+			IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
 				-- Return raw meter data.
 				current_point_accuracy := 'raw'::reading_line_accuracy;
-			-- The first part is making sure that the number of hour points is 1440 or less.
-			-- Thus, check if no more than 1440 hours * 60 minutes/hour * 60 seconds/hour = 5184000 seconds.
+			-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
+			-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
 			-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
 			-- so you don't interpolate points by using the hourly data.
-			-- TODO Not sure the second part is needed since if the raw readings are more than once an hour then you should have done raw above.
-			ELSIF ((requested_interval_seconds <= 5184000) AND (frequency_seconds <= 3600)) THEN
+			ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
 				-- Return hourly reading data.
 				current_point_accuracy := 'hourly'::reading_line_accuracy;
 			ELSE
@@ -321,7 +320,6 @@ DECLARE
 		-- Thus, check if no more than 1440 hours * 60 minutes/hour * 60 seconds/hour = 5184000 seconds.
 		-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
 		-- so you don't interpolate points by using the hourly data.
-		-- TODO Not sure the second part is needed since if the raw readings are more than once an hour then you should have done raw above.
 		ELSIF (current_point_accuracy = 'hourly'::reading_line_accuracy) THEN
 			-- Get hourly points to graph. See daily for more comments.
 			RETURN QUERY
@@ -378,8 +376,7 @@ graphic_unit_id: The unit id of the unit to use for the graph.
 start_timestamp: The start timestamp of the data to return.
 end_timestamp: The end timestamp of the data to return.
 point_accuracy: Tells how decisions should be made on which types of points to return. 'auto' if automatic.
-min_data_points: The minimum number of data points to return if using the day view.
-min_hour_points: The minimum number of data points to return if using the hour view.
+max_hour_points: The maximum number of data points to return if using the hour view. Only used if 'auto'/'raw' for point_accuracy.
 Details on how this function works can be found in the devDocs in the resource generalization document and above
 in the meter function that is equivalent.
  */
@@ -389,8 +386,7 @@ CREATE OR REPLACE FUNCTION group_line_readings_unit (
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP,
 	point_accuracy reading_line_accuracy,
-	min_day_points INTEGER,
-	min_hour_points INTEGER
+	max_hour_points INTEGER
 )
 	RETURNS TABLE(group_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
@@ -419,9 +415,9 @@ BEGIN
 		-- Get the seconds in the interval.
 		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
 		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-		-- Make sure that the number of hour points is 1440 or less.
-		-- Thus, check if no more than 1440 hours * 60 minutes/hour * 60 seconds/hour = 5184000 seconds.
-		IF ((requested_interval_seconds <= 5184000)) THEN
+		-- Make sure that the number of hour points is no more than maximum hourly readings.
+		-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
+		IF (requested_interval_seconds / 3600 <= max_hour_points) THEN
 			-- Return hourly reading data.
 			point_accuracy := 'hourly'::reading_line_accuracy;
 		ELSE
@@ -453,7 +449,8 @@ BEGIN
 			SUM(readings.reading_rate) AS reading_rate,
 			readings.start_timestamp,
 			readings.end_timestamp
-		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, point_accuracy, min_day_points, min_hour_points) readings
+		-- point_accuracy not 'auto' so last two parameters not used so send -1.
+		FROM meter_line_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, point_accuracy, -1, -1) readings
 		INNER JOIN groups_deep_meters gdm ON readings.meter_id = gdm.meter_id
 		INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id
 		GROUP BY gdm.group_id, readings.start_timestamp, readings.end_timestamp

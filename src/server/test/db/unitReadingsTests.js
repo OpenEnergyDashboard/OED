@@ -446,7 +446,7 @@ mocha.describe('Line & bar Readings', () => {
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
 		});
 
-		mocha.it('Raw readings with two meters in a group', async () => {
+		mocha.it('Hourly readings with two meters in a group', async () => {
 			const startOfDay = moment.utc('2018-01-01');
 
 			// Each meter gets a reading. Meter1 is at 100 kw, Meter2 is at 200.
@@ -454,6 +454,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter1.id, 100, startOfDay, startOfDay.clone().add(1, 'hour')),
 				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
 			], conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshHourlyReadings(conn);
 
 			// Associate both meters with a single group
 			await group1.adoptMeter(meter1.id, conn);
@@ -479,6 +481,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter1.id, 100, startOfDay, startOfDay.clone().add(1, 'hour')),
 				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
 			], conn);
+			// We need to refresh the hourly readings view because it is materialized.
+			await Reading.refreshHourlyReadings(conn);
 
 			// Associate both meters with a single group
 			await group1.adoptMeter(meter1.id, conn);

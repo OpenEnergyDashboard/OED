@@ -31,7 +31,7 @@ function mapStateToProps(state: State) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate);
+			const returned = lineUnitLabel(selectUnitState, currentSelectedRate);
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 		}
@@ -42,7 +42,10 @@ function mapStateToProps(state: State) {
 	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
-		if (byMeterID !== undefined) {
+		// Make sure have the meter data. If you already have the meter, unselect, change
+		// the timeInterval via another meter and then reselect then this new timeInterval
+		// may not yet be in state so verify with the second condition on the if.
+		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined) {
 			const readingsData = byMeterID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.meters.byMeterID[meterID].identifier;
@@ -122,7 +125,10 @@ function mapStateToProps(state: State) {
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
-		if (byGroupID !== undefined) {
+		// Make sure have the group data. If you already have the group, unselect, change
+		// the timeInterval via another meter and then reselect then this new timeInterval
+		// may not yet be in state so verify with the second condition on the if.
+		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined) {
 			const readingsData = byGroupID[timeInterval.toString()][unitID];
 			if (readingsData !== undefined && !readingsData.isFetching) {
 				const label = state.groups.byGroupID[groupID].name;
