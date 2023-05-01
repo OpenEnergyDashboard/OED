@@ -105,7 +105,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 
-	if(state.graph.areaNormalization) {
+	if (state.graph.areaNormalization) {
 		const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
 		const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
 		const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);

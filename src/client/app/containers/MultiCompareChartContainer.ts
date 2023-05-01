@@ -183,15 +183,15 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 }
 
 function areaNormalizationValid(state: State, id: number, isGroup: boolean): boolean {
-	if(!state.graph.areaNormalization) {
+	if (!state.graph.areaNormalization) {
 		return true;
 	}
-	if(isGroup) {
-		if(state.groups.byGroupID[id].area !== 0 && state.groups.byGroupID[id].areaUnit !== AreaUnitType.none) {
+	if (isGroup) {
+		if (state.groups.byGroupID[id].area !== 0 && state.groups.byGroupID[id].areaUnit !== AreaUnitType.none) {
 			return true;
 		}
 	}
-	if(state.meters.byMeterID[id].area !== 0 || state.meters.byMeterID[id].areaUnit !== AreaUnitType.none) {
+	if (state.meters.byMeterID[id].area !== 0 || state.meters.byMeterID[id].areaUnit !== AreaUnitType.none) {
 		return true;
 	}
 	return false;

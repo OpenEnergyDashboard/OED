@@ -16,13 +16,13 @@ export enum AreaUnitType {
  * @returns {number} conversion multiplier, or zero if conversion to none
  */
 export function getAreaUnitConversion(fromUnit: AreaUnitType, toUnit: AreaUnitType): number {
-	if(fromUnit === toUnit) {
+	if (fromUnit === toUnit) {
 		return 1;
 	}
-	if(fromUnit === AreaUnitType.feet && toUnit === AreaUnitType.meters ) {
+	if (fromUnit === AreaUnitType.feet && toUnit === AreaUnitType.meters) {
 		return 0.092903;
 	}
-	if(fromUnit === AreaUnitType.meters && toUnit === AreaUnitType.feet ) {
+	if (fromUnit === AreaUnitType.meters && toUnit === AreaUnitType.feet) {
 		return 10.7639;
 	}
 	return 0;

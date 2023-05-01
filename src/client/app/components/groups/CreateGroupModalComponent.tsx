@@ -108,29 +108,29 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
 	// or if any other errors are encountered.
 	const handleAutoCalculateArea = () => {
-		if(state.deepMeters != undefined && state.deepMeters.length > 0) {
-			if(state.areaUnit != AreaUnitType.none) {
+		if (state.deepMeters != undefined && state.deepMeters.length > 0) {
+			if (state.areaUnit != AreaUnitType.none) {
 				let areaSum = 0;
 				let notifyMsg = '';
 				state.deepMeters.forEach(meterID => {
 					const meter = metersState[meterID];
-					if(meter.area > 0) {
-						if(meter.areaUnit != AreaUnitType.none) {
+					if (meter.area > 0) {
+						if (meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
 						} else {
 							// This shouldn't happen because of the other checks in place when editing/creating a meter.
 							// However, there could still be edge cases (i.e meters from before area units were added) that could violate this.
-							notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.unit');
+							notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.unit');
 						}
 					} else {
-						notifyMsg += '\n' + meter.identifier + translate('group.area.calculate.error.zero');
+						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				if(notifyMsg != '') {
+				if (notifyMsg != '') {
 					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
 				}
 				// the + here converts back into a number
-				setState({...state, ['area']: +areaSum.toPrecision(6)});
+				setState({ ...state, ['area']: +areaSum.toPrecision(6) });
 			} else {
 				notifyUser(translate('group.area.calculate.error.group.unit'));
 			}
@@ -167,8 +167,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
 			inputOk = false;
-		// If the group has an assigned area, it must have a unit
 		} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+			// If the group has an assigned area, it must have a unit
 			notifyUser(translate('area.but.no.unit'));
 			inputOk = false;
 		}

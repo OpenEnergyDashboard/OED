@@ -63,17 +63,17 @@ export default function ChartDataSelectComponent() {
 		const incompatibleGroups = new Set<number>();
 
 		// only run this check if area normalization is on
-		if(state.graph.areaNormalization) {
+		if (state.graph.areaNormalization) {
 			sortedMeters.forEach(meter => {
 				// do not allow meter to be selected if it has zero area or no area unit
-				if(allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit === AreaUnitType.none) {
+				if (allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit === AreaUnitType.none) {
 					meter.isDisabled = true;
 					incompatibleMeters.add(meter.value);
 				}
 			});
 			sortedGroups.forEach(group => {
 				// do not allow group to be selected if it has zero area or no area unit
-				if(allGroups[group.value].area === 0 || allGroups[group.value].areaUnit === AreaUnitType.none) {
+				if (allGroups[group.value].area === 0 || allGroups[group.value].areaUnit === AreaUnitType.none) {
 					group.isDisabled = true;
 					incompatibleGroups.add(group.value);
 				}
@@ -263,7 +263,7 @@ export default function ChartDataSelectComponent() {
 		}
 
 		// if no area unit selected, set the default area as selected.
-		if(state.graph.selectedAreaUnit == AreaUnitType.none) {
+		if (state.graph.selectedAreaUnit == AreaUnitType.none) {
 			state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
 		}
 

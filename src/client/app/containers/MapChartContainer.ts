@@ -92,7 +92,7 @@ function mapStateToProps(state: State) {
 						// of graphics as we are doing for rate.
 						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
 					}
-					if(state.graph.areaNormalization) {
+					if (state.graph.areaNormalization) {
 						unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
 					}
 				}
@@ -108,7 +108,7 @@ function mapStateToProps(state: State) {
 					let meterArea = state.meters.byMeterID[meterID].area;
 					// we either don't care about area, or we do in which case there needs to be a nonzero area
 					if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
-						if(state.graph.areaNormalization) {
+						if (state.graph.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
 						}
@@ -154,14 +154,14 @@ function mapStateToProps(state: State) {
 										// only display a range of dates for the hover text if there is more than one day in the range
 										// Shift to UTC since want database time not local/browser time which is what moment does.
 										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-										if(barDuration.asDays() != 1) {
+										if (barDuration.asDays() != 1) {
 											// subtracting one extra day caused by day ending at midnight of the next day.
 											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 										}
 										// The value for the circle is the average daily usage.
 										averagedReading = mapReading.reading / barDuration.asDays();
-										if(state.graph.areaNormalization) {
+										if (state.graph.areaNormalization) {
 											averagedReading /= meterArea;
 										}
 										// The size is the reading value. It will be scaled later.
@@ -185,7 +185,7 @@ function mapStateToProps(state: State) {
 				if (gps !== undefined && gps !== null && byGroupID !== undefined) {
 					let groupArea = state.groups.byGroupID[groupID].area;
 					if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
-						if(state.graph.areaNormalization) {
+						if (state.graph.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							groupArea *= getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit);
 						}
@@ -230,14 +230,14 @@ function mapStateToProps(state: State) {
 									} else {
 										// only display a range of dates for the hover text if there is more than one day in the range
 										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-										if(barDuration.asDays() != 1) {
+										if (barDuration.asDays() != 1) {
 											// subtracting one extra day caused by day ending at midnight of the next day.
 											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 										}
 										// The value for the circle is the average daily usage.
 										averagedReading = mapReading.reading / barDuration.asDays();
-										if(state.graph.areaNormalization) {
+										if (state.graph.areaNormalization) {
 											averagedReading /= groupArea;
 										}
 										// The size is the reading value. It will be scaled later.

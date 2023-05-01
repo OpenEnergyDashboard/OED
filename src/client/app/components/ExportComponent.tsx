@@ -58,14 +58,14 @@ export default function ExportComponent() {
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// export if area normalization is off or the meter can be normalized
-				if(!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
 					// Line readings data for this meter.
 					const byMeterID = readingsState.line.byMeterID[meterId];
 					// Make sure it exists in case state is not there yet.
 					if (byMeterID !== undefined) {
 						// The selected rate for scaling
 						let scaling = graphState.lineGraphRate.rate;
-						if(graphState.areaNormalization) {
+						if (graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							scaling *= getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit);
 						}
@@ -93,14 +93,14 @@ export default function ExportComponent() {
 			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
 			for (const groupId of graphState.selectedGroups) {
 				// export if area normalization is off or the group can be normalized
-				if(!graphState.areaNormalization || (groupsState[groupId].area > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (groupsState[groupId].area > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
 					// Line readings data for this group.
 					const byGroupID = readingsState.line.byGroupID[groupId];
 					// Make sure it exists in case state is not there yet.
 					if (byGroupID !== undefined) {
 						// The selected rate for scaling
 						let scaling = graphState.lineGraphRate.rate;
-						if(graphState.areaNormalization) {
+						if (graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							scaling *= getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit);
 						}
@@ -134,14 +134,14 @@ export default function ExportComponent() {
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// export if area normalization is off or the meter can be normalized
-				if(!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
 					// Bar readings data for this meter.
 					const byMeterID = readingsState.bar.byMeterID[meterId];
 					// Make sure it exists in case state is not there yet.
 					if (byMeterID !== undefined) {
 						// No scaling if areaNormalization is not enabled
 						let scaling = 1;
-						if(graphState.areaNormalization) {
+						if (graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							scaling *= getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit);
 						}
@@ -172,14 +172,14 @@ export default function ExportComponent() {
 			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
 			for (const groupId of graphState.selectedGroups) {
 				// export if area normalization is off or the group can be normalized
-				if(!graphState.areaNormalization || (groupsState[groupId].area > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (groupsState[groupId].area > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
 					// Bar readings data for this group.
 					const byGroupID = readingsState.bar.byGroupID[groupId];
 					// Make sure it exists in case state is not there yet.
 					if (byGroupID !== undefined) {
 						// No scaling if areaNormalization is not enabled
 						let scaling = 1;
-						if(graphState.areaNormalization) {
+						if (graphState.areaNormalization) {
 							// convert the meter area into the proper unit, if needed
 							scaling *= getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit);
 						}
@@ -256,7 +256,7 @@ export default function ExportComponent() {
 			// Loop over each selected meter in graphic. Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
 				// export if area normalization is off or the meter can be normalized
-				if(!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
 					// Which selected meter being processed.
 					// const currentMeter = graphState.selectedMeters[i];
 					// Identifier for current meter.

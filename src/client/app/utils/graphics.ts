@@ -46,7 +46,7 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
 		// Rate scaling is needed
 		needsRateScaling = true;
 	}
-	if(areaNormalization) {
+	if (areaNormalization) {
 		unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);
 	}
 	return { unitLabel, needsRateScaling };
@@ -77,7 +77,7 @@ export function barUnitLabel(selectUnitState: UnitData, areaNormalization: boole
 		// of graphics as we are doing for rate.
 		unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
 	}
-	if(areaNormalization) {
+	if (areaNormalization) {
 		unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);
 	}
 	return unitLabel;

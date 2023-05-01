@@ -176,8 +176,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
 				inputOk = false;
-			// If the meter has an assigned area, it must have a unit
 			} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+				// If the meter has an assigned area, it must have a unit
 				notifyUser(translate('area.but.no.unit'));
 				inputOk = false;
 			}

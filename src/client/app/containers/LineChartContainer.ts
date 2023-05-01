@@ -32,7 +32,7 @@ function mapStateToProps(state: State) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned  = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
+			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 		}
@@ -47,7 +47,7 @@ function mapStateToProps(state: State) {
 			let meterArea = state.meters.byMeterID[meterID].area;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
 			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
-				if(state.graph.areaNormalization) {
+				if (state.graph.areaNormalization) {
 					// convert the meter area into the proper unit, if needed
 					meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
 				}
@@ -88,7 +88,7 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
-							if(state.graph.areaNormalization) {
+							if (state.graph.areaNormalization) {
 								readingValue /= meterArea;
 							}
 							yData.push(readingValue);
@@ -138,7 +138,7 @@ function mapStateToProps(state: State) {
 		if (byGroupID !== undefined) {
 			let groupArea = state.groups.byGroupID[groupID].area;
 			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
-				if(state.graph.areaNormalization) {
+				if (state.graph.areaNormalization) {
 					// convert the meter area into the proper unit, if needed
 					groupArea *= getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit);
 				}
@@ -179,7 +179,7 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
-							if(state.graph.areaNormalization) {
+							if (state.graph.areaNormalization) {
 								readingValue /= groupArea;
 							}
 							yData.push(readingValue);
