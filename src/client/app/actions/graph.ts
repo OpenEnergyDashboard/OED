@@ -27,8 +27,8 @@ export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRen
 	return { type: ActionType.ChangeChartToRender, chartType };
 }
 
-export function changeAreaNormalization(): t.ChangeAreaNormalizationAction {
-	return { type: ActionType.ChangeAreaNormalization };
+export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
+	return { type: ActionType.ToggleAreaNormalization };
 }
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
@@ -230,7 +230,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ChangeAreaNormalizationAction> = [];
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -261,7 +261,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
 	}
 	if (options.toggleAreaNormalization) {
-		dispatchSecond.push(changeAreaNormalization());
+		dispatchSecond.push(toggleAreaNormalization());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());

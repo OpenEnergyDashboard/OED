@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { changeAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
+import { toggleAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
@@ -87,7 +87,7 @@ function fetchPreferences(): Thunk {
 					dispatch2(changeBarStacking());
 				}
 				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
-					dispatch2(changeAreaNormalization());
+					dispatch2(toggleAreaNormalization());
 				}
 			});
 		}

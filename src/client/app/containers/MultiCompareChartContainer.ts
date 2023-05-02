@@ -186,12 +186,13 @@ function areaNormalizationValid(state: State, id: number, isGroup: boolean): boo
 	if (!state.graph.areaNormalization) {
 		return true;
 	}
+	// normalization is valid if the group/meter has a nonzero area and an area unit
 	if (isGroup) {
-		if (state.groups.byGroupID[id].area !== 0 && state.groups.byGroupID[id].areaUnit !== AreaUnitType.none) {
+		if (state.groups.byGroupID[id].area > 0 && state.groups.byGroupID[id].areaUnit !== AreaUnitType.none) {
 			return true;
 		}
 	}
-	if (state.meters.byMeterID[id].area !== 0 || state.meters.byMeterID[id].areaUnit !== AreaUnitType.none) {
+	if (state.meters.byMeterID[id].area > 0 && state.meters.byMeterID[id].areaUnit !== AreaUnitType.none) {
 		return true;
 	}
 	return false;

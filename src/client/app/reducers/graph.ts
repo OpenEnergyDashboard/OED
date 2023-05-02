@@ -89,7 +89,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				chartToRender: action.chartType
 			};
-		case ActionType.ChangeAreaNormalization:
+		case ActionType.ToggleAreaNormalization:
 			return {
 				...state,
 				areaNormalization: !state.areaNormalization

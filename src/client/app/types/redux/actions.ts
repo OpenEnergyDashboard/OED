@@ -45,7 +45,7 @@ export enum ActionType {
 	UpdateBarDuration = 'UPDATE_BAR_DURATION',
 	ChangeChartToRender = 'CHANGE_CHART_TO_RENDER',
 	ChangeBarStacking = 'CHANGE_BAR_STACKING',
-	ChangeAreaNormalization = 'CHANGE_AREA_NORMALIZATION',
+	ToggleAreaNormalization = 'TOGGLE_AREA_NORMALIZATION',
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	ChangeSliderRange = 'CHANGE_SLIDER_RANGE',
 	ResetRangeSliderStack = 'RESET_RANGE_SLIDER_STACK',

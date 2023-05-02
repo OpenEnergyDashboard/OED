@@ -53,8 +53,8 @@ export interface ChangeChartToRenderAction {
 	chartType: ChartTypes;
 }
 
-export interface ChangeAreaNormalizationAction {
-	type: ActionType.ChangeAreaNormalization;
+export interface ToggleAreaNormalizationAction {
+	type: ActionType.ToggleAreaNormalization;
 }
 
 export interface ChangeBarStackingAction {
@@ -110,7 +110,7 @@ export type GraphAction =
 	| ChangeSliderRangeAction
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
-	| ChangeAreaNormalizationAction
+	| ToggleAreaNormalizationAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction

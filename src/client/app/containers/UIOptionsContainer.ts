@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import {
 	changeBarDuration,
-	changeAreaNormalization,
 	changeBarStacking,
 	changeCompareGraph,
 	changeCompareSortingOrder,
@@ -33,7 +32,6 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		changeDuration: (barDuration: moment.Duration) => dispatch(changeBarDuration(barDuration)),
-		changeAreaNormalization: () => dispatch(changeAreaNormalization()),
 		changeBarStacking: () => dispatch(changeBarStacking()),
 		changeCompareGraph: (comparePeriod: ComparePeriod) => dispatch(changeCompareGraph(comparePeriod)),
 		changeCompareSortingOrder: (sortingOrder: SortingOrder) => dispatch(changeCompareSortingOrder(sortingOrder)),

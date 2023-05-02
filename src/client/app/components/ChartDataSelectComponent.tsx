@@ -20,7 +20,7 @@ import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
 	updateSelectedGroups, updateSelectedUnit
 } from '../actions/graph';
-import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { Dispatch } from '../types/redux/actions';
 import { UnitsState } from '../types/redux/units';
@@ -404,7 +404,11 @@ function getUnitCompatibilityForDropdown(state: State) {
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Filter the units to be displayed by user status and displayable type
 		getVisibleUnitOrSuffixState(state).forEach(unit => {
-			compatibleUnits.add(unit.id);
+			if(state.graph.areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
+				incompatibleUnits.add(unit.id);
+			} else {
+				compatibleUnits.add(unit.id);
+			}
 		});
 	} else {
 		// Some meter or group is selected
@@ -472,7 +476,12 @@ export function getMeterCompatibilityForDropdown(state: State) {
 			}
 			else {
 				//Default graphic unit is set
-				compatibleMeters.add(meterId);
+				if(state.graph.areaNormalization && state.units.units[state.meters.byMeterID[meterId].defaultGraphicUnit].unitRepresent === UnitRepresentType.raw) {
+					// area normalization is enabled and meter type is raw
+					incompatibleMeters.add(meterId);
+				} else {
+					compatibleMeters.add(meterId);
+				}
 			}
 		});
 	}
@@ -540,7 +549,12 @@ export function getGroupCompatibilityForDropdown(state: State) {
 			}
 			else {
 				//Default graphic unit is set
-				compatibleGroups.add(groupId);
+				if(state.graph.areaNormalization && state.units.units[state.groups.byGroupID[groupId].defaultGraphicUnit].unitRepresent === UnitRepresentType.raw) {
+					// area normalization is enabled and meter type is raw
+					incompatibleGroups.add(groupId);
+				} else {
+					compatibleGroups.add(groupId);
+				}
 			}
 		});
 	}

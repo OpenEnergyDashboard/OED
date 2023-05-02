@@ -6,11 +6,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { updateSelectedAreaUnit } from '../actions/graph';
+import { toggleAreaNormalization, updateSelectedAreaUnit } from '../actions/graph';
 import { StringSelectOption } from '../types/items';
 import { State } from '../types/redux/state';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
+import { UnitRepresentType } from '../types/redux/units';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React Component that creates the area unit selector dropdown
@@ -20,6 +22,7 @@ export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();
 
 	const graphState = useSelector((state: State) => state.graph);
+	const unitState = useSelector((state: State) => state.units.units);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
@@ -34,15 +37,36 @@ export default function AreaUnitSelectComponent() {
 		}
 	});
 
+	const handleToggleAreaNormalization = () => {
+		dispatch(toggleAreaNormalization());
+	}
+
 	const labelStyle: React.CSSProperties = {
 		fontWeight: 'bold',
 		margin: 0
 	};
 
+	if(graphState.selectedUnit != -99 && unitState[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
+		return null;
+	}
+
 	return (
 		<div>
-			{
-				graphState.areaNormalization &&
+			<div className='checkbox'>
+				<input
+					type='checkbox'
+					style={{ marginRight: '10px' }}
+					onChange={handleToggleAreaNormalization}
+					checked={graphState.areaNormalization}
+					id='areaNormalization'
+				/>
+				<label htmlFor='areaNormalization'>
+					<FormattedMessage id='area.normalize' />
+				</label>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize' />
+			</div>
+			{/* Will only show up if areaNormalization is enabled */}
+			{graphState.areaNormalization &&
 				<div>
 					<p style={labelStyle}>
 						<FormattedMessage id='units.area' />:
