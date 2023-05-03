@@ -38,15 +38,21 @@ class Meter {
 	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
 	 * @param areaUnit The meter's area unit, default 'none'
-	 * @param readingFrequency The time between readings for this meter, default is site environment value for OED_SITE_READING_RATE
+	 * @param readingFrequency The time between readings for this meter with default of '00:15:00' but should not depend on that.
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
+	// The software should stop a meter being created with no reading frequency
+	// but just in case this sets it to the default for the database.
+	// It would be better to use the admin preferences default but that
+	// would be async and not desired.
+	// Could also do in insert/update but then there is one floating around
+	// with a bad value that may cause issues.
 	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area = 0,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
-		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = process.env.OED_SITE_READING_RATE) {
+		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = '00:15:00') {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;

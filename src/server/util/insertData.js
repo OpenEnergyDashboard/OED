@@ -104,7 +104,7 @@ async function insertMeters(metersToInsert, conn) {
 
 	// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current
 	// loading of data for meters from CSV files requires a lot of memory. Running them in parallel often causes
-	// the JS VM to run out of heap memeory if you load lots of meters with large CSV file as is done at times.
+	// the JS VM to run out of heap memory if you load lots of meters with large CSV file as is done at times.
 	// Given this only slows down the process for developers and is not done too often, this seems okay.
 	// If we ever directly create the meter data instead of load via files then this should go away. 
 	// Second, the messages about changing the meter id do not align with the first meter message.
