@@ -21,7 +21,8 @@ const defaultState: AdminState = {
 	defaultFileSizeLimit: 25,
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
-	defaultAreaUnit: AreaUnitType.none
+	defaultAreaUnit: AreaUnitType.none,
+	defaultMeterReadingFrequency: '00:15:00'
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -90,7 +91,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultWarningFileSize: action.data.defaultWarningFileSize,
 				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
-				defaultAreaUnit: action.data.defaultAreaUnit
+				defaultAreaUnit: action.data.defaultAreaUnit,
+				defaultMeterReadingFrequency: action.data.defaultMeterReadingFrequency
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -119,6 +121,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				isUpdatingCikAndDBViews: true
 			}
+		case ActionType.UpdateDefaultMeterReadingFrequency:
+			return {
+				...state,
+				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
+				submitted: false
+			};
 		default:
 			return state;
 	}

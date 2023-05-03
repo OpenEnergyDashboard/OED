@@ -57,6 +57,10 @@ export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.Upda
 	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
 }
 
+export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): t.UpdateDefaultMeterReadingFrequencyAction {
+	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -107,7 +111,8 @@ export function submitPreferences() {
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
-				defaultAreaUnit: state.admin.defaultAreaUnit
+				defaultAreaUnit: state.admin.defaultAreaUnit,
+				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

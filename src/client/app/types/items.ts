@@ -46,6 +46,7 @@ export interface PreferenceRequestItem {
 	defaultFileSizeLimit: number;
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
+	defaultMeterReadingFrequency: string;
 }
 
 /**

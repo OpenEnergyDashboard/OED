@@ -63,6 +63,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultAreaNormalization: {
 					type: 'boolean'
+				},
+				defaultMeterReadingFrequency: {
+					type: 'string'
 				}
 			}
 		}

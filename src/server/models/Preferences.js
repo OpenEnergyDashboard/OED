@@ -18,8 +18,10 @@ class Preferences {
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 * @param {String} defaultAreaUnit - The default area unit to normalize by
+	 * @param {String} defaultMeterReadingFrequency - The default meter reading frequency if none is given
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
+		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -29,6 +31,7 @@ class Preferences {
 		this.defaultFileSizeLimit = defaultFileSizeLimit;
 		this.defaultAreaNormalization = defaultAreaNormalization;
 		this.defaultAreaUnit = defaultAreaUnit;
+		this.defaultMeterReadingFrequency = defaultMeterReadingFrequency;
 	}
 
 	/**
@@ -59,7 +62,8 @@ class Preferences {
 			row.default_warning_file_size,
 			row.default_file_size_limit,
 			row.default_area_normalization,
-			row.default_area_unit
+			row.default_area_unit,
+			row.default_meter_reading_frequency
 		);
 	}
 
@@ -90,7 +94,8 @@ class Preferences {
 				defaultWarningFileSize: preferences.defaultWarningFileSize,
 				defaultFileSizeLimit: preferences.defaultFileSizeLimit,
 				defaultAreaNormalization: preferences.defaultAreaNormalization,
-				defaultAreaUnit: preferences.defaultAreaUnit
+				defaultAreaUnit: preferences.defaultAreaUnit,
+				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency
 			});
 	}
 }

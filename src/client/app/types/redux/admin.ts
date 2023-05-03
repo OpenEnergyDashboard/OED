@@ -23,7 +23,8 @@ export type AdminAction =
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
 	| UpdateCikAndDBViews
-	| UpdateDefaultAreaUnitAction;
+	| UpdateDefaultAreaUnitAction
+	| UpdateDefaultMeterReadingFrequencyAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -94,6 +95,11 @@ export interface UpdateCikAndDBViews {
 	type: ActionType.UpdateCikAndDBViews;
 }
 
+export interface UpdateDefaultMeterReadingFrequencyAction {
+	type: ActionType.UpdateDefaultMeterReadingFrequency;
+	defaultMeterReadingFrequency: string;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -108,4 +114,5 @@ export interface AdminState {
 	isUpdatingCikAndDBViews: boolean;
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
+	defaultMeterReadingFrequency: string;
 }
