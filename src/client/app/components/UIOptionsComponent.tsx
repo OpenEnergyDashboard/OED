@@ -20,6 +20,7 @@ import 'rc-slider/assets/index.css';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -88,12 +89,13 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
+				<AreaUnitSelectComponent/>
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
+							<input type='checkbox' style={{ marginRight: '10px' }} onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
 							<label htmlFor='barStacking'>
 								<FormattedMessage id='bar.stacking' />
 							</label>

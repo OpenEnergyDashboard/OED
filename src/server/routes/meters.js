@@ -5,6 +5,7 @@
 const express = require('express');
 const Meter = require('../models/Meter');
 const User = require('../models/User');
+const Unit = require('../models/Unit');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
@@ -53,7 +54,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endTimestamp: null,
 		previousEnd: null,
 		unitId: meter.unitId,
-		defaultGraphicUnit: meter.defaultGraphicUnit
+		defaultGraphicUnit: meter.defaultGraphicUnit,
+		areaUnit: meter.areaUnit
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -145,7 +147,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 26,
+		maxProperties: 27,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -194,15 +196,7 @@ function validateMeterParams(params) {
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{
-						type: 'number',
-						minimum: 0,
-					},
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			cumulative: { type: 'bool' },
 			cumulativeReset: { type: 'bool' },
 			cumulativeResetStart: { type: 'string' },
@@ -225,7 +219,12 @@ function validateMeterParams(params) {
                 ]
             },
 			unitId: { type: 'integer' },
-			defaultGraphicUnit: { type: 'integer' }
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
+			}
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -267,7 +266,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd === null || req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnit
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
@@ -317,7 +317,8 @@ router.post('/addMeter', async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnit
 			);
 			await newMeter.insert(conn);
 			success(res);

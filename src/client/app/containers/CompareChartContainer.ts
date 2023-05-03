@@ -13,6 +13,7 @@ import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
+import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -101,21 +102,29 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 
 	const barColor = 'rgba(218, 165, 32, 1)';
 
-	const previousPeriod = entity.prevUsage;
-	const currentPeriod = entity.currUsage;
+	let previousPeriod = entity.prevUsage;
+	let currentPeriod = entity.currUsage;
+
+	if (state.graph.areaNormalization) {
+		const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
+		const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
+		const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
+		previousPeriod /= normalization;
+		currentPeriod /= normalization;
+	}
 
 	datasets.push(
 		{
 			x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
 			y: [previousPeriod, currentPeriod],
 			hovertext: [
-				`<b>${previousPeriod} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+				`<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
 			],
 			hoverinfo: 'text',
 			type: 'bar',
 			marker: { color: barColor },
-			text: [`<b>${previousPeriod} ${unitLabel}</b>`, `<b>${currentPeriod} ${unitLabel}</b>`],
+			text: [`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b>`, `<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b>`],
 			textposition: 'auto',
 			textfont: {
 				color: 'rgba(0,0,0,1)'

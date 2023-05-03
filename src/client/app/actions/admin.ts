@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { changeBarStacking, changeChartToRender } from './graph';
+import { toggleAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
@@ -13,6 +13,7 @@ import { conversionArrayApi, preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -33,6 +34,14 @@ export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.
 
 export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
+}
+
+export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizationAction {
+	return { type: ActionType.ToggleDefaultAreaNormalization };
+}
+
+export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDefaultAreaUnitAction {
+	return { type: ActionType.UpdateDefaultAreaUnit, defaultAreaUnit };
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
@@ -77,6 +86,9 @@ function fetchPreferences(): Thunk {
 				if (preferences.defaultBarStacking !== state.graph.barStacking) {
 					dispatch2(changeBarStacking());
 				}
+				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
+					dispatch2(toggleAreaNormalization());
+				}
 			});
 		}
 	};
@@ -93,7 +105,9 @@ export function submitPreferences() {
 				defaultLanguage: state.admin.defaultLanguage,
 				defaultTimezone: state.admin.defaultTimeZone,
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
-				defaultFileSizeLimit: state.admin.defaultFileSizeLimit
+				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
+				defaultAreaNormalization: state.admin.defaultAreaNormalization,
+				defaultAreaUnit: state.admin.defaultAreaUnit
 			});
 			dispatch(markPreferencesSubmitted());
 			showSuccessNotification(translate('updated.preferences'));

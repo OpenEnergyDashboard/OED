@@ -2,12 +2,12 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { FormattedMessage } from 'react-intl';
+import * as React from 'react';
 import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { State } from '../../types/redux/state';

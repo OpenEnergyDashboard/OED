@@ -23,7 +23,9 @@ mocha.describe('preferences API', () => {
 					defaultBarStacking: true,
 					defaultLanguage: 'en',
 					defaultWarningFileSize: 5,
-					defaultFileSizeLimit: 25
+					defaultFileSizeLimit: 25,
+					defaultAreaNormalization: true,
+					defaultAreaUnit: 'meters'
 				}
 				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
 				expect(res).to.have.status(200);

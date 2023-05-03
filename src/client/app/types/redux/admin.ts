@@ -6,6 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -13,6 +14,7 @@ export type AdminAction =
 	| UpdateDefaultChartToRenderAction
 	| UpdateDefaultLanguageAction
 	| ToggleDefaultBarStackingAction
+	| ToggleDefaultAreaNormalizationAction
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
@@ -20,7 +22,8 @@ export type AdminAction =
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
-	| UpdateCikAndDBViews;
+	| UpdateCikAndDBViews
+	| UpdateDefaultAreaUnitAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -39,6 +42,15 @@ export interface UpdateDefaultChartToRenderAction {
 
 export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
+}
+
+export interface ToggleDefaultAreaNormalizationAction {
+	type: ActionType.ToggleDefaultAreaNormalization;
+}
+
+export interface UpdateDefaultAreaUnitAction {
+	type: ActionType.UpdateDefaultAreaUnit;
+	defaultAreaUnit: AreaUnitType;
 }
 
 export interface UpdateDefaultTimeZone {
@@ -94,4 +106,6 @@ export interface AdminState {
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 	isUpdatingCikAndDBViews: boolean;
+	defaultAreaNormalization: boolean;
+	defaultAreaUnit: AreaUnitType;
 }

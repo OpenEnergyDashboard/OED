@@ -4,10 +4,9 @@
 
 import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { showErrorNotification } from '../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
-import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {

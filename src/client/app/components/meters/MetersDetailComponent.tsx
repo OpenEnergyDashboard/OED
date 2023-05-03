@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
 import { isRoleAdmin } from '../../utils/hasPermissions';
-import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 import MeterViewComponent from './MeterViewComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import '../../styles/card-page.css';
 import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
+import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 
 export default function MetersDetailComponent() {
 

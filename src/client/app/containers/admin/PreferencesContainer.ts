@@ -12,12 +12,15 @@ import {
 	updateDefaultLanguage,
 	submitPreferencesIfNeeded,
 	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit
+	updateDefaultFileSizeLimit,
+	toggleDefaultAreaNormalization,
+	updateDefaultAreaUnit
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
 	return {
@@ -28,7 +31,9 @@ function mapStateToProps(state: State) {
 		defaultLanguage: state.admin.defaultLanguage,
 		disableSubmitPreferences: state.admin.submitted,
 		defaultWarningFileSize: state.admin.defaultWarningFileSize,
-		defaultFileSizeLimit: state.admin.defaultFileSizeLimit
+		defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
+		defaultAreaNormalization: state.admin.defaultAreaNormalization,
+		defaultAreaUnit: state.admin.defaultAreaUnit
 	};
 }
 
@@ -41,7 +46,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
-		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit))
+		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
+		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
+		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit))
 	};
 }
 

@@ -11,5 +11,7 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_language language_type NOT NULL,
 	default_timezone TEXT DEFAULT NULL,
 	default_warning_file_size FLOAT NOT NULL,
-	default_file_size_limit FLOAT NOT NULL
+	default_file_size_limit FLOAT NOT NULL,
+	default_area_normalization BOOLEAN NOT NULL,
+	default_area_unit area_unit_type NOT NULL
 );

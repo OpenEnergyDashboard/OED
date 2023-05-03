@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const Meter = require('./Meter');
+const Unit = require('./Unit');
 
 const sqlFile = database.sqlFile;
 
@@ -15,10 +16,11 @@ class Group {
 	 * @param displayable The group is available for display
 	 * @param gps Location in format of GIS coordinates, default null
 	 * @param note Note about the group
-	 * @param area Area of the group, default null
+	 * @param area Area of the group, default 0
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
+	 * @param areaUnit The area unit, default 'none'
 	 */
-	constructor(id, name, displayable, gps, note, area, defaultGraphicUnit) {
+	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnit = Unit.areaUnitType.NONE) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -26,6 +28,7 @@ class Group {
 		this.note = note;
 		this.area = area;
 		this.defaultGraphicUnit = defaultGraphicUnit;
+		this.areaUnit = areaUnit;
 	}
 
 	/**
@@ -68,7 +71,7 @@ class Group {
 		if (defaultGraphicUnit === null) {
 			defaultGraphicUnit = -99;
 		}
-		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit);
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit, row.area_unit);
 	}
 
 	/**

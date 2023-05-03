@@ -135,7 +135,7 @@ async function insertMeters(metersToInsert, conn) {
 			meterData[4], // gps
 			undefined, // identifier
 			meterData[5], // note
-			null, //area
+			undefined, //area
 			undefined, // cumulative
 			undefined, //cumulativeReset
 			undefined, // cumulativeResetStart
@@ -150,7 +150,8 @@ async function insertMeters(metersToInsert, conn) {
 			undefined, // endTimestamp
 			undefined, // previousEnd
 			meterUnit, // unit
-			meterGraphicUnit // default graphic unit
+			meterGraphicUnit, // default graphic unit
+			undefined // area unit
 		);
 		const filename = `src/server/${meterData[6]}`;
 		if (await meter.existsByName(conn)) {
@@ -223,8 +224,9 @@ async function insertGroups(groupsToInsert, conn) {
 			groupData[2], //displayable
 			groupData[3], // gps
 			groupData[4], // note
-			null, //area
-			groupDefaultGraphicUnit // default graphic unit
+			undefined, //area
+			groupDefaultGraphicUnit, // default graphic unit
+			undefined // area unit
 		);
 		if (await group.existsByName(conn)) {
 			console.log(`        Warning: group '${group.name}' existed so not changed.`);
