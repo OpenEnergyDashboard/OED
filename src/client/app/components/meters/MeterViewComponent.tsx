@@ -13,7 +13,7 @@ import { FormattedMessage } from 'react-intl';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { CurrentUserState } from 'types/redux/currentUser';
 import '../../styles/card-page.css';
-import { UnitData } from '../../types/redux/units';
+import { UnitData} from '../../types/redux/units';
 import { noUnitTranslated } from '../../utils/input';
 
 interface MeterViewComponentProps {

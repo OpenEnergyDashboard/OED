@@ -30,11 +30,12 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
-import { GroupDefinition } from 'types/redux/groups';
+import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -149,6 +150,46 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	}
 	/* End Confirm Delete Modal */
 
+	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
+	// or if any other errors are encountered.
+	const handleAutoCalculateArea = () => {
+		if (groupState.deepMeters != undefined && groupState.deepMeters.length > 0) {
+			if (groupState.areaUnit != AreaUnitType.none) {
+				let areaSum = 0;
+				let notifyMsg = '';
+				groupState.deepMeters.forEach(meterID => {
+					const meter = metersState[meterID];
+					if (meter.area > 0) {
+						if (meter.areaUnit != AreaUnitType.none) {
+							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, groupState.areaUnit);
+						} else {
+							// This shouldn't happen because of the other checks in place when editing/creating a meter.
+							// However, there could still be edge cases (i.e meters from before area units were added) that could violate this.
+							notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.unit');
+						}
+					} else {
+						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
+					}
+				});
+				if (notifyMsg != '') {
+					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
+				}
+				// the + here converts back into a number. this method also removes trailing zeroes.
+				setEditGroupsState({
+					...editGroupsState,
+					[groupState.id]: {
+						...editGroupsState[groupState.id],
+						['area']: +areaSum.toPrecision(6)
+					}
+				});
+			} else {
+				notifyUser(translate('group.area.calculate.error.group.unit'));
+			}
+		} else {
+			notifyUser(translate('group.area.calculate.error.no.meters'));
+		}
+	}
+
 	// Reset the state to default values.
 	// To be used for the discard changes button
 	// Different use case from CreateGroupModalComponent's resetState
@@ -200,7 +241,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				originalGroupState.area != groupState.area ||
 				originalGroupState.defaultGraphicUnit != groupState.defaultGraphicUnit ||
 				childMeterChanges ||
-				childGroupChanges
+				childGroupChanges ||
+				originalGroupState.areaUnit != groupState.areaUnit
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
@@ -208,8 +250,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (groupState.area < 0) {
 				notifyUser(translate('area.invalid') + groupState.area + '.');
 				inputOk = false;
+			} else if (groupState.area > 0 && groupState.areaUnit == AreaUnitType.none) {
+				// If the group has an assigned area, it must have a unit
+				notifyUser(translate('area.but.no.unit'));
+				inputOk = false;
 			}
-
 			//Check GPS is okay.
 			const gpsInput = groupState.gps;
 			let gps: GPSPoint | null = null;
@@ -262,7 +307,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					const submitState = {
 						id: thisGroupState.id, name: thisGroupState.name, childMeters: thisGroupState.childMeters,
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
-						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit
+						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
 					}
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
@@ -431,8 +476,33 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={nullToEmptyString(groupState.area)}
+												// cannot use defaultValue because it won't update when area is auto calculated
+												value={groupState.area}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+									}
+									{/* meter area unit input */}
+									{loggedInAsAdmin &&
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="group.area.unit" /></label>
+											<Input
+												name='areaUnit'
+												type='select'
+												value={groupState.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+									}
+									{/* Calculate sum of meter areas */}
+									{loggedInAsAdmin &&
+										<div style={formInputStyle}>
+											<Button variant="secondary" onClick={handleAutoCalculateArea}>
+												<FormattedMessage id="group.area.calculate" />
+											</Button>
+											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										</div>
 									}
 									{/* GPS input, only for admin. */}

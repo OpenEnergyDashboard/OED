@@ -23,8 +23,10 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -69,7 +71,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		endTimestamp: props.meter.endTimestamp,
 		previousEnd: props.meter.previousEnd,
 		unitId: props.meter.unitId,
-		defaultGraphicUnit: props.meter.defaultGraphicUnit
+		defaultGraphicUnit: props.meter.defaultGraphicUnit,
+		areaUnit: props.meter.areaUnit
 	}
 
 	const dropdownsStateDefaults = {
@@ -157,7 +160,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.timeSort != state.timeSort ||
 				props.meter.startTimestamp != state.startTimestamp ||
 				props.meter.endTimestamp != state.endTimestamp ||
-				props.meter.previousEnd != state.previousEnd
+				props.meter.previousEnd != state.previousEnd ||
+				props.meter.areaUnit != state.areaUnit
 			);
 
 		// Only validate and store if any changes.
@@ -168,12 +172,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 
-			// Check area is positive.
-			// TODO For now allow zero so works with default value and DB. We should probably
-			// make this better default than 0 (DB set to not null now).
-			// if (state.area <= 0) {
+			// Check if area is non-negative
 			if (state.area < 0) {
 				notifyUser(translate('area.invalid') + state.area + '.');
+				inputOk = false;
+			} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+				// If the meter has an assigned area, it must have a unit
+				notifyUser(translate('area.but.no.unit'));
 				inputOk = false;
 			}
 
@@ -454,8 +459,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={nullToEmptyString(state.area)}
+												defaultValue={state.area}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* meter area unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.area.unit" /></label>
+											<Input
+												name='areaUnit'
+												type='select'
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+												})}
+											</Input>
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>

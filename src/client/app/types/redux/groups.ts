@@ -4,6 +4,7 @@
 
 import { ActionType } from './actions';
 import { GPSPoint } from 'utils/calibration';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
 
@@ -83,6 +84,7 @@ export interface GroupData {
 	// TODO with area? you get a TS error but without it lets null through (see web console).
 	area: number;
 	defaultGraphicUnit: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface GroupEditData {
@@ -98,6 +100,7 @@ export interface GroupEditData {
 	// TODO with area? you get a TS error but without it lets null through (see web console).
 	area: number;
 	defaultGraphicUnit: number;
+	areaUnit: AreaUnitType;
 }
 
 // TODO This is similar to GroupEditData but without the children. Should be able to
@@ -113,6 +116,7 @@ export interface GroupDetailsData {
 	// TODO with area? you get a TS error but without it lets null through (see web console).
 	area: number;
 	defaultGraphicUnit: number;
+	areaUnit: AreaUnitType;
 }
 
 export interface GroupID {

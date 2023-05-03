@@ -27,6 +27,7 @@ import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -57,7 +58,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		note: '',
 		area: 0,
 		// default is no unit or -99.
-		defaultGraphicUnit: -99
+		defaultGraphicUnit: -99,
+		areaUnit: AreaUnitType.none
 	}
 
 	// The information on the children of this group for state. Except for selected, the
@@ -103,6 +105,40 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 	/* End State */
 
+	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
+	// or if any other errors are encountered.
+	const handleAutoCalculateArea = () => {
+		if (state.deepMeters != undefined && state.deepMeters.length > 0) {
+			if (state.areaUnit != AreaUnitType.none) {
+				let areaSum = 0;
+				let notifyMsg = '';
+				state.deepMeters.forEach(meterID => {
+					const meter = metersState[meterID];
+					if (meter.area > 0) {
+						if (meter.areaUnit != AreaUnitType.none) {
+							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
+						} else {
+							// This shouldn't happen because of the other checks in place when editing/creating a meter.
+							// However, there could still be edge cases (i.e meters from before area units were added) that could violate this.
+							notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.unit');
+						}
+					} else {
+						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
+					}
+				});
+				if (notifyMsg != '') {
+					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
+				}
+				// the + here converts back into a number
+				setState({ ...state, ['area']: +areaSum.toPrecision(6) });
+			} else {
+				notifyUser(translate('group.area.calculate.error.group.unit'));
+			}
+		} else {
+			notifyUser(translate('group.area.calculate.error.no.meters'));
+		}
+	}
+
 	const handleClose = () => {
 		setShowModal(false);
 		resetState();
@@ -130,6 +166,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// Check if area is non-negative
 		if (state.area < 0) {
 			notifyUser(translate('area.invalid') + state.area + '.');
+			inputOk = false;
+		} else if (state.area > 0 && state.areaUnit == AreaUnitType.none) {
+			// If the group has an assigned area, it must have a unit
+			notifyUser(translate('area.but.no.unit'));
 			inputOk = false;
 		}
 
@@ -312,8 +352,29 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 												name="area"
 												type="number"
 												min="0"
-												defaultValue={state.area}
+												// cannot use defaultValue because it won't update when area is auto calculated
+												value={state.area}
 												onChange={e => handleNumberChange(e)} />
+										</div>
+										{/* meter area unit input */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="group.area.unit" /></label>
+											<Input
+												name='areaUnit'
+												type='select'
+												value={state.areaUnit}
+												onChange={e => handleStringChange(e)}>
+												{Object.keys(AreaUnitType).map(key => {
+													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+												})}
+											</Input>
+										</div>
+										{/* Calculate sum of meter areas */}
+										<div style={formInputStyle}>
+											<Button variant="secondary" onClick={handleAutoCalculateArea}>
+												<FormattedMessage id="group.area.calculate" />
+											</Button>
+											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										</div>
 										{/* GPS input */}
 										<div style={formInputStyle}>

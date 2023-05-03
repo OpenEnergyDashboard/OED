@@ -13,7 +13,7 @@ const migrations = [
 	require('./0.6.0-0.7.0'),
 	require('./0.7.0-0.8.0'),
 	require('./0.8.0-1.0.0')
-	/* eslint-disable global-require */
+	/* eslint-enable global-require */
 ];
 
 module.exports = migrations;

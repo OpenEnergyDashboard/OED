@@ -41,6 +41,7 @@ interface RouteProps {
 	loggedInAsAdmin: boolean;
 	role: UserRole;
 	renderOnce: boolean;
+	areaNormalization: boolean;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 	clearCurrentUser(): any;
 	changeRenderOnce(): any;
@@ -202,6 +203,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 							case 'barStacking':
 								if (this.props.barStacking.toString() !== info) {
 									options.toggleBarStacking = true;
+								}
+								break;
+							case 'areaNormalization':
+								if (this.props.areaNormalization.toString() !== info) {
+									options.toggleAreaNormalization = true;
 								}
 								break;
 							case 'comparePeriod':

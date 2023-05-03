@@ -20,6 +20,7 @@ import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
 function mapStateToProps(state: State) {
 	return {
 		chartToRender: state.graph.chartToRender,
+		areaNormalization: state.graph.areaNormalization,
 		barStacking: state.graph.barStacking,
 		barDuration: state.graph.barDuration,
 		comparePeriod: state.graph.comparePeriod,
