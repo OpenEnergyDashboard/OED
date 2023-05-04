@@ -79,6 +79,7 @@ export interface MarkPreferencesNotSubmittedAction {
 
 export interface MarkPreferencesSubmittedAction {
 	type: ActionType.MarkPreferencesSubmitted;
+	defaultMeterReadingFrequency: string;
 }
 
 export interface UpdateDefaultWarningFileSize {

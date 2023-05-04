@@ -7,6 +7,7 @@ import { ActionType } from '../types/redux/actions';
 import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { durationFormat } from '../utils/durationFormat';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -92,7 +93,7 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
 				defaultAreaUnit: action.data.defaultAreaUnit,
-				defaultMeterReadingFrequency: action.data.defaultMeterReadingFrequency
+				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency)
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -102,6 +103,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 		case ActionType.MarkPreferencesSubmitted:
 			return {
 				...state,
+				// Convert the duration returned from Postgres into more human format.
+				defaultMeterReadingFrequency: durationFormat(action.defaultMeterReadingFrequency),
 				submitted: true
 			};
 		case ActionType.UpdateDefaultWarningFileSize:

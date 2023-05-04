@@ -97,6 +97,11 @@ class Preferences {
 				defaultAreaUnit: preferences.defaultAreaUnit,
 				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency
 			});
+		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
+		// input so return the new preferences. Easier just to return them all and only
+		// use value needed.
+		const row = await conn.one(sqlFile('preferences/get_preferences.sql'));
+		return Preferences.mapRow(row);
 	}
 }
 

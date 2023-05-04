@@ -24,7 +24,6 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { durationFormat } from '../../utils/durationFormat';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -67,11 +66,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
 		this.handleDefaultMeterReadingFrequencyChange = this.handleDefaultMeterReadingFrequencyChange.bind(this);
-		// Convert the duration returned from Postgres into more human format.
-		// This is a bit of a hack so it only happens once so done in the constructor.
-		// The new OED way where items are not saved in state until saved should avoid this but
-		// this page is not yet in React Hooks.
-		this.props.updateDefaultMeterReadingFrequency(durationFormat(this.props.defaultMeterReadingFrequency));
 	}
 
 	public render() {
