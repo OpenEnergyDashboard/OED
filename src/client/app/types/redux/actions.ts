@@ -116,6 +116,7 @@ export enum ActionType {
 	EditMeterDetails = 'EDIT_METER_DETAILS',
 	SubmitEditedMeter = 'SUBMIT_EDITED_METER',
 	ConfirmEditedMeter = 'CONFIRM_EDITED_METER',
+	ConfirmAddMeter = 'CONFIRM_ADD_METER',
 	DeleteSubmittedMeter = 'DELETE_SUBMITTED_METER',
 	ConfirmMetersFetchedOnce = 'CONFIRM_METERS_FETCHED_ONCE',
 

@@ -11,4 +11,4 @@ VALUES (${name}, ${url}, ${enabled}, ${displayable}, ${type}, ${meterTimezone}, 
     ${readingGap}, ${readingVariation}, ${readingDuplication}, ${timeSort}, ${endOnlyTime},
     ${reading}, ${startTimestamp}, ${endTimestamp}, ${previousEnd}, ${unitId}, ${defaultGraphicUnit}, ${areaUnit},
     ${readingFrequency})
-RETURNING id;
+RETURNING id, reading_frequency;

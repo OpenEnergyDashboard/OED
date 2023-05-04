@@ -219,7 +219,10 @@ class Meter {
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
+		// The ID was set by the DB
 		this.id = resp.id;
+		// The reading frequency was interpreted by the DB when set so use its value now.
+		this.readingFrequency = resp.reading_frequency;
 	}
 
 	/**
@@ -276,7 +279,10 @@ class Meter {
 		}
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
-		await conn.none(sqlFile('meter/update_meter.sql'), meter);
+		// Postgres interprets the readingFrequency and it might not be what was
+		// input. Thus, the query returns that value.
+		const resp = await conn.one(sqlFile('meter/update_meter.sql'), meter);
+		return resp.reading_frequency;
 	}
 
 	/**
