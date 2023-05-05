@@ -83,6 +83,8 @@ async function insertStandardConversions(conn) {
 	await insertConversions(standardConversions, conn);
 }
 
+// TODO When this is updated it should allow for passing the area, area unit and reading frequency
+// or maybe just all values because want to use key/value pairs.
 /**
  * Inserts meters specified into the database and adds readings from CSV file.
  * @param [[]] metersToInsert array of arrays that specify the meter info for inserting meters where each row has
@@ -151,7 +153,8 @@ async function insertMeters(metersToInsert, conn) {
 			undefined, // previousEnd
 			meterUnit, // unit
 			meterGraphicUnit, // default graphic unit
-			undefined // area unit
+			undefined, // area unit
+			undefined // reading frequency
 		);
 		const filename = `src/server/${meterData[6]}`;
 		if (await meter.existsByName(conn)) {

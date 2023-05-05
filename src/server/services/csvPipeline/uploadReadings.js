@@ -37,10 +37,37 @@ async function uploadReadings(req, res, filepath, conn) {
 				);
 			} else {
 				// If createMeter is true, we will create the meter for the user.
-				// The meter type is unknown so set to other.
-				// This uses a lot of default values for meter parameters.
-				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.OTHER, undefined, undefined, meterName,
-					'created via reading upload on ' + moment().format());
+				// The meter type is unknown so set to other. Most parameters take on default values.
+				const tempMeter = new Meter(
+					undefined, // id
+					meterName, // name
+					undefined, // URL
+					false, // enabled
+					false, // displayable
+					Meter.type.OTHER, // type 
+					undefined, // timezone
+					undefined, // gps
+					meterName, // identifier
+					'created via reading upload on ' + moment().format(), // note
+					undefined, //area
+					undefined, // cumulative
+					undefined, // cumulativeReset
+					undefined, // cumulativeResetStart
+					undefined, // cumulativeResetEnd
+					undefined, // readingGap
+					undefined, // readingVariation
+					undefined, // readingDuplication
+					undefined, // timeSort
+					undefined, // endOnlyTime
+					undefined, // reading
+					undefined, // startTimestamp
+					undefined, // endTimestamp
+					undefined, // previousEnd
+					undefined, // unit
+					undefined, // default graphic unit
+					undefined, // area unit
+					undefined // reading frequency
+				)
 				await tempMeter.insert(conn);
 				meterCreated = true;
 				log.info('Creating meter ' + tempMeter.name);

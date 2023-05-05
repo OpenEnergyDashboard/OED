@@ -40,13 +40,16 @@ mocha.describe('groups API', () => {
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gpsPoint,
 			'Identified A', 'notes A', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId, Unit.areaUnitType.METERS);
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.OTHER, null, gpsPoint,
 			'Identified B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId, Unit.areaUnitType.METERS);
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gpsPoint,
 			'Identified C', 'notes C', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId, Unit.areaUnitType.METERS);
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
@@ -198,6 +201,7 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
+				// Several meter values not set but not needed so defaults fine.
 				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gpsPoint,
 					'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '0',
 					0, 1, 'increasing', false, 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');
