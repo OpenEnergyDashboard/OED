@@ -62,31 +62,232 @@ async function insertWebsiteData() {
 		//  47 to get the color. 10012 gives 0 so starts in first index of the color array. Note groups start at the other
 		//  end of the array so they use the same values.
 		// Dining Hall Electric
-		[compareMeters[0], 'Electric_Utility', 'kWh', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectric.csv', false, 10012],
+		{
+			name: compareMeters[0],
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: undefined,
+			file: 'data/webData/DiningHallElectric.csv',
+			deleteFile: false,
+			id: 10012
+		},
+
 		// For comparison meters you get a new name & id and also make the displayable to be false.
-		[compareName(compareMeters[0]), 'Electric_Utility', 'kWh', false, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectric.csv', false, compareId(10012)],
-		['Dining Hall Gas', 'Natural_Gas_BTU', 'BTU', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallGas.csv', false, 10013],
-		['Dining Hall Water', 'Water_Gallon', 'gallon', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallWater.csv', false, 10014],
-		['Dining Hall Electric Power', 'Electric_kW', 'kW', true, '-87.99913, 40.002', undefined, 'data/webData/DiningHallElectricPower.csv', false, 10015],
+		{
+			name: compareName(compareMeters[0]),
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99913, 40.002',
+			note: undefined,
+			file: 'data/webData/DiningHallElectric.csv',
+			deleteFile: false,
+			id: compareId(10012)
+		},
+		{
+			name: 'Dining Hall Gas',
+			unit: 'Natural_Gas_BTU',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: undefined,
+			file: 'data/webData/DiningHallGas.csv',
+			deleteFile: false,
+			id: 10013
+		},
+		{
+			name: 'Dining Hall Water',
+			unit: 'Water_Gallon',
+			defaultGraphicUnit: 'gallon',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: undefined,
+			file: 'data/webData/DiningHallWater.csv',
+			deleteFile: false,
+			id: 10014
+		},
+		{
+			name: 'Dining Hall Electric Power',
+			unit: 'Electric_kW',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: undefined,
+			file: 'data/webData/DiningHallElectricPower.csv',
+			deleteFile: false,
+			id: 10015
+		},
 		// Theater Electric
-		[compareMeters[1], 'Electric_Utility', 'kWh', true, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectric.csv', false, 10016],
-		[compareName(compareMeters[1]), 'Electric_Utility', 'kWh', false, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectric.csv', false, compareId(10016)],
-		['Theater Gas', 'Natural_Gas_M3', 'BTU', true, '-87.9975, 40.0027', undefined, 'data/webData/TheaterGas.csv', false, 10017],
-		['Theater Electric Power', 'Electric_kW', 'kW', false, '-87.9975, 40.0027', undefined, 'data/webData/TheaterElectricPower.csv', false, 10018],
-		['Theater Temperature', 'Temperature_Celsius', 'Fahrenheit', true, undefined, undefined, 'data/webData/TheaterTemperature.csv', false, 10019],
+		{
+			name: compareMeters[1],
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.9975, 40.0027',
+			note: undefined,
+			file: 'data/webData/TheaterElectric.csv',
+			deleteFile: false,
+			id: 10016
+		},
+		{
+			name: compareName(compareMeters[1]),
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.9975, 40.0027',
+			note: undefined,
+			file: 'data/webData/TheaterElectric.csv',
+			deleteFile: false,
+			id: compareId(10016)
+		},
+		{
+			name: 'Theater Gas',
+			unit: 'Natural_Gas_M3',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			gps: '-87.9975, 40.0027',
+			note: undefined,
+			file: 'data/webData/TheaterGas.csv',
+			deleteFile: false,
+			id: 10017
+		},
+		{
+			name: 'Theater Electric Power',
+			unit: 'Electric_kW',
+			defaultGraphicUnit: 'kW',
+			displayable: false,
+			gps: '-87.9975, 40.0027',
+			note: undefined,
+			file: 'data/webData/TheaterElectricPower.csv',
+			deleteFile: false,
+			id: 10018
+		},
+		{
+			name: 'Theater Temperature',
+			unit: 'Temperature_Celsius',
+			defaultGraphicUnit: 'Fahrenheit',
+			displayable: true,
+			gps: undefined,
+			note: undefined,
+			file: 'data/webData/TheaterTemperature.csv',
+			deleteFile: false,
+			id: 10019
+		},
 		// Library Electric
-		[compareMeters[2], 'Electric_Utility', 'kWh', true, '-87.99916, 40.00419', undefined, 'data/webData/LibraryElectric.csv', false, 10020],
-		[compareName(compareMeters[2]), 'Electric_Utility', 'kWh', false, '-87.99916, 40.00419', undefined, 'data/webData/LibraryElectric.csv', false, compareId(10020)],
-		['Library Temperature', 'Temperature_Fahrenheit', 'Fahrenheit', true, undefined, undefined, 'data/webData/LibraryTemperature.csv', false, 10021],
+		{
+			name: compareMeters[2],
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99916, 40.00419',
+			note: undefined,
+			file: 'data/webData/LibraryElectric.csv',
+			deleteFile: false,
+			id: 10020
+		},
+		{
+			name: compareName(compareMeters[2]),
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99916, 40.00419',
+			note: undefined,
+			file: 'data/webData/LibraryElectric.csv',
+			deleteFile: false,
+			id: compareId(10020)
+		},
+		{
+			name: 'Library Temperature',
+			unit: 'Temperature_Fahrenheit',
+			defaultGraphicUnit: 'Fahrenheit',
+			displayable: true,
+			gps: undefined,
+			note:  undefined,
+			file: 'data/webData/LibraryTemperature.csv',
+			deleteFile: false,
+			id: 10021
+		},
 		// Great Dorm 1st Floor Electric
-		[compareMeters[3], 'Electric_Solar', 'kWh', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, 10022],
-		[compareName(compareMeters[3]), 'Electric_Solar', 'kWh', false, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm1stFloorElectric.csv', false, compareId(10022)],
+		{
+			name: compareMeters[3],
+			unit: 'Electric_Solar',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDorm1stFloorElectric.csv',
+			deleteFile: false,
+			id: 10022
+		},
+		{
+			name: compareName(compareMeters[3]),
+			unit: 'Electric_Solar',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDorm1stFloorElectric.csv',
+			deleteFile: false,
+			id: compareId(10022)
+		},
 		// Great Dorm 2nd Floor Electric
-		[compareMeters[4], 'Electric_Solar', 'kWh', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, 10023],
-		[compareName(compareMeters[4]), 'Electric_Solar', 'kWh', false, '-87.99817, 40.00057', undefined, 'data/webData/GreatDorm2ndFloorElectric.csv', false, compareId(10023)],
-		['Great Dorm Gas', 'Natural_Gas_BTU', 'BTU', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDormGas.csv', false, 10024],
-		['Great Dorm Water', 'Water_Liter', 'gallon', true, '-87.99817, 40.00057', undefined, 'data/webData/GreatDormWater.csv', false, 10025],
-		['Campus Recycling', 'Recycling', 'pound', true, undefined, undefined, 'data/webData/CampusRecycling.csv', false, 10026],
+		{
+			name: compareMeters[4],
+			unit: 'Electric_Solar',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDorm2ndFloorElectric.csv',
+			deleteFile: false,
+			id: 10023
+		},
+		{
+			name: compareName(compareMeters[4]),
+			unit: 'Electric_Solar',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDorm2ndFloorElectric.csv',
+			deleteFile: false,
+			id: compareId(10023)
+		},
+		{
+			name: 'Great Dorm Gas',
+			unit: 'Natural_Gas_BTU',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDormGas.csv',
+			deleteFile: false,
+			id: 10024
+		},
+		{
+			name: 'Great Dorm Water',
+			unit: 'Water_Liter',
+			defaultGraphicUnit: 'gallon',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: undefined,
+			file: 'data/webData/GreatDormWater.csv',
+			deleteFile: false,
+			id: 10025
+		},
+		{
+			name: 'Campus Recycling',
+			unit: 'Recycling',
+			defaultGraphicUnit: 'pound',
+			displayable: true,
+			gps: undefined,
+			note:  undefined,
+			file: 'data/webData/CampusRecycling.csv',
+			deleteFile: false,
+			id: 10026
+		},
 	];
 
 	// The table contains groups' data.
@@ -199,7 +400,7 @@ async function insertWebsiteData() {
   */
 async function webShift(timezone) {
 	// Do all but the last meter without refreshing the readings.
-	for (let i = 0; i < compareMeters.length - 1; i++){
+	for (let i = 0; i < compareMeters.length - 1; i++) {
 		await shiftReadings(compareName(compareMeters[i]), timezone, false);
 	}
 	// Now do last meter where refresh readings.
