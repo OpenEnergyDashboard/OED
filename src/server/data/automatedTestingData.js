@@ -390,6 +390,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -400,6 +404,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity2-6.csv',
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'meters',
 			deleteFile: false
 		},
 		{
@@ -410,6 +417,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -420,6 +431,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -430,6 +445,8 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
 			deleteFile: false
 		},
 		{
@@ -440,6 +457,8 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
 			deleteFile: false
 		},
 		{
@@ -450,6 +469,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -460,6 +483,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -470,6 +497,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -480,6 +511,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -490,6 +525,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -500,6 +539,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -510,6 +553,8 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/temp0-212.csv',
+			// Many points less than 1 day but only 1 per day.
+			readingFrequency: '1 days',
 			deleteFile: false
 		},
 		{
@@ -520,6 +565,8 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/temp0-212.csv',
+			// Many points less than 1 day but only 1 per day.
+			readingFrequency: '1 days',
 			deleteFile: false
 		},
 		{
@@ -530,6 +577,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/rate1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -540,6 +591,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/rate2-6.csv',
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'meters',
 			deleteFile: false
 		},
 		{
@@ -550,6 +604,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'data/unit/rate1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: false
 		},
 		{
@@ -560,6 +618,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/fourDayFreqTestData.csv',
+			readingFrequency: '4 days',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -570,6 +631,10 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/fourHourFreqTestData.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '4 hours',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -580,6 +645,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv',
+			readingFrequency: '23 minutes',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -590,6 +658,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -600,6 +671,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/23FreqCosineTestData.csv',
+			readingFrequency: '23 minutes',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -610,6 +684,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -620,6 +697,9 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
 			deleteFile: true
 		},
 		{
@@ -630,6 +710,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -640,6 +721,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -650,6 +732,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -660,6 +743,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -670,6 +754,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -680,6 +765,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
@@ -690,6 +776,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			gps: undefined,
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
 			deleteFile: true
 		}
 	];

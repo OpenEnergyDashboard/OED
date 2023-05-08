@@ -148,6 +148,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -181,6 +182,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -211,6 +213,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -239,6 +242,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -265,6 +269,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -291,6 +296,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -317,6 +323,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -346,6 +353,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -376,6 +384,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -406,6 +415,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -440,6 +450,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -477,6 +488,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -511,6 +523,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -545,6 +558,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -579,6 +593,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -613,6 +628,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -645,6 +661,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -676,6 +693,7 @@ mocha.describe('readings API', () => {
 							note: 'invalid meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -703,6 +721,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						},
 						{
@@ -714,6 +733,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: (METER_ID + 1)
 						}
 					];
@@ -751,6 +771,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						}
 					];
@@ -784,6 +805,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: METER_ID
 						},
 						{
@@ -795,6 +817,7 @@ mocha.describe('readings API', () => {
 							note: 'special meter',
 							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
 							deleteFile: false,
+							readingFrequency: '15 minutes',
 							id: (METER_ID + 1)
 						}
 					];
