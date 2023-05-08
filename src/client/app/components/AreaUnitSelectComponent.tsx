@@ -29,7 +29,7 @@ export default function AreaUnitSelectComponent() {
 
 	Object.keys(AreaUnitType).forEach(unitKey => {
 		// don't allow normalization by no unit
-		if(unitKey != AreaUnitType.none) {
+		if (unitKey != AreaUnitType.none) {
 			unitOptions.push({
 				label: translate(`AreaUnitType.${unitKey}`),
 				value: unitKey
@@ -46,7 +46,7 @@ export default function AreaUnitSelectComponent() {
 		margin: 0
 	};
 
-	if(graphState.selectedUnit != -99 && unitState[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
+	if (graphState.selectedUnit != -99 && unitState[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
 		return null;
 	}
 

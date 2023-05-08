@@ -404,7 +404,7 @@ function getUnitCompatibilityForDropdown(state: State) {
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Filter the units to be displayed by user status and displayable type
 		getVisibleUnitOrSuffixState(state).forEach(unit => {
-			if(state.graph.areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
+			if (state.graph.areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
 				incompatibleUnits.add(unit.id);
 			} else {
 				compatibleUnits.add(unit.id);
@@ -470,13 +470,15 @@ export function getMeterCompatibilityForDropdown(state: State) {
 		// In this case, every meter is valid (provided it has a default graphic unit)
 		// If the meter has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleMeters.forEach(meterId => {
-			if (state.meters.byMeterID[meterId].defaultGraphicUnit === -99) {
+			const meterGraphingUnit = state.meters.byMeterID[meterId].defaultGraphicUnit;
+			if (meterGraphingUnit === -99) {
 				//Default graphic unit is not set
 				incompatibleMeters.add(meterId);
 			}
 			else {
 				//Default graphic unit is set
-				if(state.graph.areaNormalization && state.units.units[state.meters.byMeterID[meterId].defaultGraphicUnit].unitRepresent === UnitRepresentType.raw) {
+				if (state.graph.areaNormalization && state.units.units[meterGraphingUnit]
+					&& state.units.units[meterGraphingUnit].unitRepresent === UnitRepresentType.raw) {
 					// area normalization is enabled and meter type is raw
 					incompatibleMeters.add(meterId);
 				} else {
@@ -543,13 +545,15 @@ export function getGroupCompatibilityForDropdown(state: State) {
 		// In this case, every group is valid (provided it has a default graphic unit)
 		// If the group has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleGroup.forEach(groupId => {
-			if (state.groups.byGroupID[groupId].defaultGraphicUnit === -99) {
+			const groupGraphingUnit = state.groups.byGroupID[groupId].defaultGraphicUnit;
+			if (groupGraphingUnit === -99) {
 				//Default graphic unit is not set
 				incompatibleGroups.add(groupId);
 			}
 			else {
 				//Default graphic unit is set
-				if(state.graph.areaNormalization && state.units.units[state.groups.byGroupID[groupId].defaultGraphicUnit].unitRepresent === UnitRepresentType.raw) {
+				if (state.graph.areaNormalization && state.units.units[groupGraphingUnit] &&
+					state.units.units[groupGraphingUnit].unitRepresent === UnitRepresentType.raw) {
 					// area normalization is enabled and meter type is raw
 					incompatibleGroups.add(groupId);
 				} else {

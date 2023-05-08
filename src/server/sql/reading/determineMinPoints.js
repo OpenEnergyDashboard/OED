@@ -32,7 +32,7 @@ function determineMinPoints(){
 	// 00:00:00 - 00:00:59
 	// 00:01:00 - 00:59:59
 	// 01:00:00 - \d+:59:59
-	if(!regex.test(siteReadingRate)){
+	if (!regex.test(siteReadingRate)){
 		log.warn('Invalid Site Level Reading Rate format');
 	}
 

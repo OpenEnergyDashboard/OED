@@ -29,7 +29,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 	}
 
 	public componentDidUpdate(){
-		if(!this.state.showModal){
+		if (!this.state.showModal){
 			ReactTooltip.hide();
 		}
 	}

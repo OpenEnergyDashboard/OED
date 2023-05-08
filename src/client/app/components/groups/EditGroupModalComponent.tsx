@@ -171,17 +171,21 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
+				translate('group.area.calculate.header')
+				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${groupState.areaUnit}`);
 				if (notifyMsg != '') {
-					notifyUser(translate('group.area.calculate.error.header') + notifyMsg);
+					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
-				// the + here converts back into a number. this method also removes trailing zeroes.
-				setEditGroupsState({
-					...editGroupsState,
-					[groupState.id]: {
-						...editGroupsState[groupState.id],
-						['area']: +areaSum.toPrecision(6)
-					}
-				});
+				if (window.confirm(msg)) {
+					setEditGroupsState({
+						...editGroupsState,
+						[groupState.id]: {
+							...editGroupsState[groupState.id],
+							// the + here converts back into a number. this method also removes trailing zeroes.
+							['area']: +areaSum.toPrecision(6)
+						}
+					});
+				}
 			} else {
 				notifyUser(translate('group.area.calculate.error.group.unit'));
 			}
