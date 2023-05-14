@@ -10,6 +10,7 @@ import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
 import translate from '../../utils/translate';
+
 /**
  * Returns a range of values between the specified lower and upper bounds.
  * @param {number} lower The lower bound, which will be included in the range.
@@ -51,9 +52,20 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
 				const msg = await this.props.submitCSV(files[0]);
+				// If the meter was created then update the meter state so it is available.
+				// Getting this needed state is a pain with the old React system. Thus,
+				// this fetches the meter state in all cases. This should be fairly fast,
+				// esp. compared to the upload time.
+				// TODO When this is converted to React hooks it is hoped that getting the
+				// value about whether the meter was created will be easier and can be done then.
+				// Also, you cannot dispatch with Hooks so this is left until then. For now,
+				// we reload after the alert.
+				// dispatch(fetchMetersDetails());
 				// TODO Using an alert is not the best. At some point this should be integrated
 				// with react.
 				window.alert(msg);
+				// TODO remove when the above TODO is done.
+				window.location.reload();
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
@@ -259,7 +271,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<Input type='select' name='endOnly' onChange={this.handleSetEndOnly}>
 								<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
 								<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-								<option value={BooleanTypes.false}> {translate('BooleanTypes.false') } </option>
+								<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
 							</Input>
 						</Col>
 					</FormGroup>

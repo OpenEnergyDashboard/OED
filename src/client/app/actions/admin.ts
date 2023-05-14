@@ -175,7 +175,10 @@ export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefres
 		if (shouldUpdateCikAndDBViews(getState())) {
 			dispatch(updateCikAndDBViews());
 			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
-			window.location.reload();
+			if (shouldRedoCik || shouldRefreshReadingViews) {
+				// Only reload window if redoCik and/or refresh reading views.
+				window.location.reload();
+			}
 		}
 		return Promise.resolve();
 	};
