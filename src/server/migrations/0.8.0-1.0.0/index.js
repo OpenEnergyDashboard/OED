@@ -15,7 +15,7 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/create_units_table.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/conversion/create_conversions_table.sql'));
 		await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/unit/add_area_unit_types.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default_area.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default_meter_reading_frequency.sql'));
 		// Insert default units and conversions into the database. 
 		// This file should be called before these values are used for meters and groups.
