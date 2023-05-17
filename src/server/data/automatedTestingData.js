@@ -382,37 +382,403 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	// Should only delete automatically generated ones.
 	// Don't check cases of no default graphic unit since it is set to unit_id for meters.
 	const specialMeters = [
-		['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh 2-6', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'data/unit/quantity2-6.csv', false],
-		['Electric Utility kWh in BTU', 'Electric_Utility', 'BTU', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh in MTon CO₂', 'Electric_Utility', 'metric ton of CO₂', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility no unit', '', '', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Electric Utility kWh not displayable', 'Electric_Utility', 'kWh', false, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU', 'Natural_Gas_BTU', 'BTU', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas BTU in Dollar', 'Natural_Gas_BTU', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Dollar', 'Natural_Gas_Dollar', 'US dollar', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Natural Gas Cubic Meters', 'Natural_Gas_M3', 'm³ gas', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Water Gallon', 'Water_Gallon', 'gallon', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Trash Kg', 'Trash', 'kg', true, undefined, 'special meter', 'data/unit/quantity1-5.csv', false],
-		['Temp Fahrenheit 0-212', 'Temperature_Fahrenheit', 'Fahrenheit', true, undefined, 'special meter', 'data/unit/temp0-212.csv', false],
-		['Temp Fahrenheit in Celsius', 'Temperature_Fahrenheit', 'Celsius', true, undefined, 'special meter', 'data/unit/temp0-212.csv', false],
-		['Electric kW', 'Electric_kW', 'kW', true, undefined, 'special meter', 'data/unit/rate1-5.csv', false],
-		['Electric kW 2-6', 'Electric_kW', 'kW', true, undefined, 'special meter', 'data/unit/rate2-6.csv', false],
-		['Water Gallon flow 1-5 per minute', 'Water_Gallon_Per_Minute', 'gallon per minute', true, undefined, 'special meter', 'data/unit/rate1-5.csv', false],
-		['test4DaySin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fourDayFreqTestData.csv', true],
-		['test4HourSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fourHourFreqTestData.csv', true],
-		['test23MinSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv', true],
-		['test15MinSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv', true],
-		['test23MinCos kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/23FreqCosineTestData.csv', true],
-		['testSqSin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv', true],
-		['testSqCos kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv', true],
-		['testAmp1Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv', true],
-		['testAmp2Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv', true],
-		['testAmp3Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv', true],
-		['testAmp4Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv', true],
-		['testAmp5Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv', true],
-		['testAmp6Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv', true],
-		['testAmp7Sin kWh', 'Electric_Utility', 'kWh', true, undefined, 'special meter', 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv', true]
+		{
+			name: 'Electric Utility kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Electric Utility kWh 2-6',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity2-6.csv',
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'meters',
+			deleteFile: false
+		},
+		{
+			name: 'Electric Utility kWh in BTU',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Electric Utility kWh in MTon CO₂',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'metric ton of CO₂',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Electric Utility no unit',
+			unit: '',
+			defaultGraphicUnit: '',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			deleteFile: false
+		},
+		{
+			name: 'Electric Utility kWh not displayable',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			deleteFile: false
+		},
+		{
+			name: 'Natural Gas BTU',
+			unit: 'Natural_Gas_BTU',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Natural Gas BTU in Dollar',
+			unit: 'Natural_Gas_BTU',
+			defaultGraphicUnit: 'US dollar',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Natural Gas Dollar',
+			unit: 'Natural_Gas_Dollar',
+			defaultGraphicUnit: 'US dollar',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Natural Gas Cubic Meters',
+			unit: 'Natural_Gas_M3',
+			defaultGraphicUnit: 'm³ gas',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Water Gallon',
+			unit: 'Water_Gallon',
+			defaultGraphicUnit: 'gallon',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Trash Kg',
+			unit: 'Trash',
+			defaultGraphicUnit: 'kg',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/quantity1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Temp Fahrenheit 0-212',
+			unit: 'Temperature_Fahrenheit',
+			defaultGraphicUnit: 'Fahrenheit',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/temp0-212.csv',
+			// Many points less than 1 day but only 1 per day.
+			readingFrequency: '1 days',
+			deleteFile: false
+		},
+		{
+			name: 'Temp Fahrenheit in Celsius',
+			unit: 'Temperature_Fahrenheit',
+			defaultGraphicUnit: 'Celsius',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/temp0-212.csv',
+			// Many points less than 1 day but only 1 per day.
+			readingFrequency: '1 days',
+			deleteFile: false
+		},
+		{
+			name: 'Electric kW',
+			unit: 'Electric_kW',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/rate1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'Electric kW 2-6',
+			unit: 'Electric_kW',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/rate2-6.csv',
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'meters',
+			deleteFile: false
+		},
+		{
+			name: 'Water Gallon flow 1-5 per minute',
+			unit: 'Water_Gallon_Per_Minute',
+			defaultGraphicUnit: 'gallon per minute',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'data/unit/rate1-5.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '1 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: false
+		},
+		{
+			name: 'test4DaySin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/fourDayFreqTestData.csv',
+			readingFrequency: '4 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'test4HourSin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/fourHourFreqTestData.csv',
+			// Some points less than 1 day but this is what is typical.
+			readingFrequency: '4 hours',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'test23MinSin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv',
+			readingFrequency: '23 minutes',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'test15MinSin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'test23MinCos kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/23FreqCosineTestData.csv',
+			readingFrequency: '23 minutes',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'testSqSin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'testSqCos kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv',
+			readingFrequency: '15 minutes',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp1Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp2Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp3Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp4Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp5Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp6Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		},
+		{
+			name: 'testAmp7Sin kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			file: 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv',
+			readingFrequency: '15 minutes',
+			deleteFile: true
+		}
 	];
 
 	// This assumes the insertSpecialMeters has been run.

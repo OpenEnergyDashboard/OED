@@ -5,6 +5,7 @@
 const express = require('express');
 const Meter = require('../models/Meter');
 const User = require('../models/User');
+const Unit = require('../models/Unit');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
@@ -53,7 +54,9 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		endTimestamp: null,
 		previousEnd: null,
 		unitId: meter.unitId,
-		defaultGraphicUnit: meter.defaultGraphicUnit
+		defaultGraphicUnit: meter.defaultGraphicUnit,
+		areaUnit: meter.areaUnit,
+		readingFrequency: null
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -78,6 +81,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.startTimestamp = meter.startTimestamp;
 		formattedMeter.endTimestamp = meter.endTimestamp;
 		formattedMeter.previousEnd = meter.previousEnd;
+		formattedMeter.readingFrequency = meter.readingFrequency;
 	}
 
 	return formattedMeter;
@@ -145,7 +149,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 26,
+		maxProperties: 28,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -194,15 +198,7 @@ function validateMeterParams(params) {
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{
-						type: 'number',
-						minimum: 0,
-					},
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			cumulative: { type: 'bool' },
 			cumulativeReset: { type: 'bool' },
 			cumulativeResetStart: { type: 'string' },
@@ -219,13 +215,19 @@ function validateMeterParams(params) {
 			startTimestamp: { type: 'string' },
 			endTimestamp: { type: 'string' },
 			previousEnd: {
-                oneOf: [
-                    { type: 'string' },
-                    { type: 'null' }
-                ]
-            },
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
 			unitId: { type: 'integer' },
-			defaultGraphicUnit: { type: 'integer' }
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
+			},
+			readingFrequency: { type: 'string' },
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -267,12 +269,18 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd === null || req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnit,
+				req.body.readingFrequency
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
-			await meter.update(conn);
-			success(res);
+			// The frequency may be different since DB stores as interval so it is returned
+			// and the meter updated by this value.
+			meter.readingFrequency = await meter.update(conn);
+			// TODO This is not using the success function since it needs to return values.
+			// At some point we probably should fuse the success and returning values.
+			res.json(meter);
 		} catch (err) {
 			log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
 			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
@@ -317,10 +325,15 @@ router.post('/addMeter', async (req, res) => {
 				(req.body.endTimestamp.length === 0) ? undefined : req.body.endTimestamp,
 				(req.body.previousEnd.length === 0) ? undefined : moment(req.body.previousEnd),
 				req.body.unitId,
-				req.body.defaultGraphicUnit
+				req.body.defaultGraphicUnit,
+				req.body.areaUnit,
+				req.body.readingFrequency
 			);
+			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);
-			success(res);
+			// TODO This is not using the success function since it needs to return values.
+			// At some point we probably should fuse the success and returning values.
+			res.json(newMeter);
 		} catch (err) {
 			log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
 			failure(res, 500, err.toString() + ' with detail ' + err['detail']);

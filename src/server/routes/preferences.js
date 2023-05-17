@@ -60,6 +60,12 @@ router.post('/', async (req, res) => {
 				},
 				defaultFileSizeLimit: {
 					type: 'number'
+				},
+				defaultAreaNormalization: {
+					type: 'boolean'
+				},
+				defaultMeterReadingFrequency: {
+					type: 'string'
 				}
 			}
 		}

@@ -16,8 +16,12 @@ class Preferences {
 	 * @param {String} defaultTimezone - Option to set the default timezone
 	 * @param {Number} defaultWarningFileSize - Option to set the default warning file size
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
+	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
+	 * @param {String} defaultAreaUnit - The default area unit to normalize by
+	 * @param {String} defaultMeterReadingFrequency - The default meter reading frequency if none is given
 	 */
-	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone, defaultWarningFileSize, defaultFileSizeLimit) {
+	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
+		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -25,6 +29,9 @@ class Preferences {
 		this.defaultTimezone = defaultTimezone;
 		this.defaultWarningFileSize = defaultWarningFileSize;
 		this.defaultFileSizeLimit = defaultFileSizeLimit;
+		this.defaultAreaNormalization = defaultAreaNormalization;
+		this.defaultAreaUnit = defaultAreaUnit;
+		this.defaultMeterReadingFrequency = defaultMeterReadingFrequency;
 	}
 
 	/**
@@ -47,13 +54,16 @@ class Preferences {
 	 */
 	static mapRow(row) {
 		return new Preferences(
-			row.display_title, 
-			row.default_chart_to_render, 
-			row.default_bar_stacking, 
-			row.default_language, 
-			row.default_timezone, 
-			row.default_warning_file_size, 
-			row.default_file_size_limit
+			row.display_title,
+			row.default_chart_to_render,
+			row.default_bar_stacking,
+			row.default_language,
+			row.default_timezone,
+			row.default_warning_file_size,
+			row.default_file_size_limit,
+			row.default_area_normalization,
+			row.default_area_unit,
+			row.default_meter_reading_frequency
 		);
 	}
 
@@ -82,8 +92,15 @@ class Preferences {
 				defaultLanguage: preferences.defaultLanguage,
 				defaultTimezone: preferences.defaultTimezone,
 				defaultWarningFileSize: preferences.defaultWarningFileSize,
-				defaultFileSizeLimit: preferences.defaultFileSizeLimit
+				defaultFileSizeLimit: preferences.defaultFileSizeLimit,
+				defaultAreaNormalization: preferences.defaultAreaNormalization,
+				defaultAreaUnit: preferences.defaultAreaUnit,
+				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency
 			});
+		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
+		// input so return the new preferences. Easier just to return them all and only
+		// use value needed.
+		return this.get(conn);
 	}
 }
 

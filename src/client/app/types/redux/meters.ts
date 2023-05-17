@@ -3,6 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { GPSPoint } from 'utils/calibration';
 import { ActionType } from './actions';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 export interface RequestMetersDetailsAction {
 	type: ActionType.RequestMetersDetails;
@@ -20,7 +21,12 @@ export interface ChangeDisplayedMetersAction {
 
 export interface ConfirmEditedMeterAction {
 	type: ActionType.ConfirmEditedMeter;
-	editedMeter: MeterData;
+	editedMeter: MeterEditData;
+}
+
+export interface ConfirmAddMeterAction {
+	type: ActionType.ConfirmAddMeter;
+	addedMeter: MeterEditData;
 }
 
 export interface DeleteSubmittedMeterAction {
@@ -41,6 +47,7 @@ export type MetersAction = RequestMetersDetailsAction
 | ReceiveMetersDetailsAction
 | ChangeDisplayedMetersAction
 | ConfirmEditedMeterAction
+| ConfirmAddMeterAction
 | DeleteSubmittedMeterAction
 | SubmitEditedMeterAction
 | ConfirmMetersFetchedOnceAction;
@@ -89,6 +96,8 @@ export interface MeterData {
 	startTimestamp: string;
 	endTimestamp: string;
 	previousEnd: string;
+	areaUnit: AreaUnitType;
+	readingFrequency: string;
 }
 
 export interface MeterEditData {
@@ -118,6 +127,8 @@ export interface MeterEditData {
 	startTimestamp: string | undefined;
 	endTimestamp: string | undefined;
 	previousEnd: string | undefined;
+	areaUnit: AreaUnitType;
+	readingFrequency: string;
 }
 
 export interface MeterDataByID {

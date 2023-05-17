@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
--- Add default_graphic_unit to the groups table.
-ALTER TABLE groups
-    ADD COLUMN IF NOT EXISTS default_graphic_unit INTEGER REFERENCES units(id);
+DO $$ BEGIN 
+	CREATE TYPE area_unit_type AS ENUM('feet', 'meters', 'none');
+EXCEPTION
+	WHEN duplicate_object THEN null;
+END $$;

@@ -5,14 +5,14 @@
 const express = require('express');
 const _ = require('lodash');
 const validate = require('jsonschema').validate;
-const User = require('../models/User');
-const { isTokenAuthorized } = require('../util/userRoles');
+const Unit = require('../models/Unit');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const { log } = require('../log');
 const Point = require('../models/Point');
+const { failure, success } = require('./response');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -31,7 +31,7 @@ function formatGroupForResponse(item) {
 	return {
 		id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
 		note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit,
-		deepMeters: item.children
+		deepMeters: item.children, areaUnit: item.areaUnit
 	};
 }
 
@@ -52,7 +52,6 @@ router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		// TODO??? currently have a separate route to get all children that should be removed or modified including uses.
 		deepChildren = [];
 		promises = await rows.map(async (row) => {
 			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
@@ -76,7 +75,6 @@ router.get('/idname', async (req, res) => {
 	}
 });
 
-
 /**
  * GET meters and groups that are immediate children of a given group
  * This will only return IDs because it queries groups_immediate_children and groups_immediate_meters, which store
@@ -98,6 +96,23 @@ router.get('/children/:group_id', async (req, res) => {
 	}
 });
 
+/**
+ * GET meters and groups that are immediate children of all groups
+ * This will only return IDs because it queries groups_immediate_children and groups_immediate_meters, which store
+ * only the IDs of the children.
+ * @return {[int, [int], [int]]}  array where each entry has the group id, array of child meter IDs and array of child group IDs
+ */
+router.get('/allChildren/', async (req, res) => {
+	// There are not parameters so nothing to verify.
+	const conn = getConnection();
+	try {
+		const allChildren = await Group.getImmediateChildren(conn);
+		res.json(allChildren);
+	} catch (err) {
+		log.error(`Error while preforming GET on all immediate children (meters and groups) of all groups: ${err}`, err);
+	}
+});
+
 router.get('/deep/groups/:group_id', async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -110,8 +125,10 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group deep group children with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group deep group children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -136,8 +153,10 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group deep meter children with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group deep meter children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -150,12 +169,41 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
+router.get('/parents/:group_id', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			group_id: {
+				type: 'string',
+				pattern: '^\\d+$'
+			}
+		}
+	};
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request group parents with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request group parents with invalid data. Error(s): " + validatorResult.errors.toString());
+	} else {
+		const conn = getConnection();
+		try {
+			const parentGroups = await Group.getParentsByGroupID(req.params.group_id, conn);
+			res.json(parentGroups);
+		} catch (err) {
+			log.error(`Error while preforming GET on all parents of specific group: ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
+});
+
 router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 7,
+		maxProperties: 10,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
+			id: { type: 'integer' },
 			name: {
 				type: 'string',
 				minLength: 1
@@ -182,12 +230,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{ type: 'number' },
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
@@ -201,25 +244,34 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				items: {
 					type: 'integer'
 				}
+			},
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
 			}
 		}
 	};
 
-	if (!validate(req.body, validGroup).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.body, validGroup);
+	if (!validatorResult.valid) {
+		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
-				// TODO: pass arguments for units
 				const newGroup = new Group(
 					undefined,
 					req.body.name,
 					req.body.displayable,
 					newGPS,
 					req.body.note,
-					req.body.area
+					req.body.area,
+					req.body.defaultGraphicUnit,
+					req.body.areaUnit
 				);
 
 				await newGroup.insert(t);
@@ -227,13 +279,13 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
 				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
-			res.sendStatus(200);
+			success(res);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
-				res.status(400).json({ error: `Group "${req.body.name}" is already in use.` });
+				failure(res, 400, err.toString() + ' with detail ' + err['detail']);
 			} else {
 				log.error(`Error while inserting new group ${err}`, err);
-				res.sendStatus(500);
+				failure(res, 500, err.toString() + ' with detail ' + err['detail']);
 			}
 		}
 	}
@@ -242,7 +294,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 8,
+		maxProperties: 10,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },
@@ -272,12 +324,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 					{ type: 'null' }
 				]
 			},
-			area: {
-				oneOf: [
-					{ type: 'number' },
-					{ type: 'null' }
-				]
-			},
+			area: { type: 'number', minimum: 0 },
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
@@ -291,12 +338,20 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 				items: {
 					type: 'integer'
 				}
+			},
+			defaultGraphicUnit: { type: 'integer' },
+			areaUnit: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.areaUnitType)
 			}
 		}
 	};
 
-	if (!validate(req.body, validGroup).valid) {
-		res.sendStatus(400);
+	const validatorResult = validate(req.body, validGroup);
+	if (!validatorResult.valid) {
+		log.error(`Got request to edit group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		try {
 			const conn = getConnection();
@@ -306,14 +361,15 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 
 			await conn.tx(async t => {
 				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
-				// TODO: pass arguments for units
 				const newGroup = new Group(
 					req.body.id,
 					req.body.name,
 					req.body.displayable,
 					newGPS,
 					req.body.note,
-					req.body.area
+					req.body.area,
+					req.body.defaultGraphicUnit,
+					req.body.areaUnit
 				);
 
 				await newGroup.update(t);
@@ -354,8 +410,11 @@ router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => 
 			id: { type: 'integer' }
 		}
 	};
-	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request to delete group with invalid data, errors: ${validatorResult.errors}`);
+		failure(res, 400, "Got request to delete group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {

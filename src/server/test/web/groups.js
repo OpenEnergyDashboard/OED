@@ -34,19 +34,22 @@ mocha.describe('groups API', () => {
 		await new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT,
 			1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
 		const unitId = (await Unit.getByName('Unit', conn)).id;
-		groupA = new Group(undefined, 'A', true, gpsPoint, 'notes A', 33.5, unitId);
-		groupB = new Group(undefined, 'B', false, gpsPoint, 'notes B', 43.5, unitId);
-		groupC = new Group(undefined, 'C', true, gpsPoint, 'notes C', 53.5, unitId);
+		groupA = new Group(undefined, 'A', true, gpsPoint, 'notes A', 33.5, unitId, Unit.areaUnitType.METERS);
+		groupB = new Group(undefined, 'B', false, gpsPoint, 'notes B', 43.5, unitId, Unit.areaUnitType.METERS);
+		groupC = new Group(undefined, 'C', true, gpsPoint, 'notes C', 53.5, unitId, Unit.areaUnitType.METERS);
 		await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 		meterA = new Meter(undefined, 'A', null, false, true, Meter.type.MAMAC, null, gpsPoint,
 			'Identified A', 'notes A', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId);
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		meterB = new Meter(undefined, 'B', null, false, true, Meter.type.OTHER, null, gpsPoint,
 			'Identified B', 'notes B', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId);
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		meterC = new Meter(undefined, 'C', null, false, true, Meter.type.METASYS, null, gpsPoint,
 			'Identified C', 'notes C', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId);
+			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitId, unitId,
+			Unit.areaUnitType.METERS, undefined);
 		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
@@ -62,7 +65,7 @@ mocha.describe('groups API', () => {
 			// This route only returns the id and name. Since we have other properties, we need to remove them
 			// before doing the compare. All the groups are put into an array first and then a new array is created
 			// with only the two desired properties.
-			const groupArray = [groupA, groupB, groupC].map(({ displayable, gps, note, area, defaultGraphicUnit, ...keepAttrs }) => keepAttrs);
+			const groupArray = [groupA, groupB, groupC].map(({ displayable, gps, note, area, defaultGraphicUnit, areaUnit, ...keepAttrs }) => keepAttrs);
 			expect(res.body).to.deep.include.members(groupArray);
 		});
 		mocha.it('returns the immediate children of a group', async () => {
@@ -198,6 +201,7 @@ mocha.describe('groups API', () => {
 			});
 			mocha.it('allows adding a new child meter to a group', async () => {
 				const conn = testDB.getConnection();
+				// Several meter values not set but not needed so defaults fine.
 				const meterD = new Meter(undefined, 'D', null, false, true, Meter.type.MAMAC, null, gpsPoint,
 					'Identified D', 'notes D', 33.5, true, true, '05:05:09', '09:00:01', '0',
 					0, 1, 'increasing', false, 25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10');

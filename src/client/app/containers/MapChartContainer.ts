@@ -15,6 +15,8 @@ import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;
@@ -90,6 +92,9 @@ function mapStateToProps(state: State) {
 						// of graphics as we are doing for rate.
 						unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
 					}
+					if (state.graph.areaNormalization) {
+						unitLabel += ' / ' + translate(`AreaUnitType.${state.graph.selectedAreaUnit}`);
+					}
 				}
 			}
 
@@ -100,60 +105,71 @@ function mapStateToProps(state: State) {
 				const gps = state.meters.byMeterID[meterID].gps;
 				// filter meters with actual gps coordinates.
 				if (gps !== undefined && gps !== null && byMeterID !== undefined) {
-					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
-					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
-					// It must be on true north map since only there are the GPS axis parallel to the map axis.
-					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
-					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
-					// Only display items within valid info and within map.
-					if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
-						// The x, y value for Plotly to use that are on the user map.
-						x.push(meterGPSInUserGrid.x);
-						y.push(meterGPSInUserGrid.y);
-						// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
-						// and be fetching. The unit could change from that menu so also need to check.
-						if (byMeterID[timeInterval.toString()] !== undefined && byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-							// Get the bar data to use for the map circle.
-							const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
-							// This protects against there being no readings or that the data is being updated.
-							if (readingsData !== undefined && !readingsData.isFetching) {
-								// Meter name to include in hover on graph.
-								const label = state.meters.byMeterID[meterID].identifier;
-								// The usual color for this meter.
-								colors.push(getGraphColor(meterID, DataType.Meter));
-								if (readingsData.readings === undefined) {
-									throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-								}
-								// Use the most recent time reading for the circle on the map.
-								// This has the limitations of the bar value where the last one can include ranges without
-								// data (GitHub issue on this).
-								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-								const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
-								const mapReading = readings[0];
-								let timeReading: string;
-								let averagedReading = 0;
-								if (readings.length === 0) {
-									// No data. The next lines causes an issue so set specially.
-									// There may be a better overall fix for no data.
-									timeReading = 'no data to display';
-									size.push(0);
-								} else {
-									// only display a range of dates for the hover text if there is more than one day in the range
-									// Shift to UTC since want database time not local/browser time which is what moment does.
-									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-									if(barDuration.asDays() != 1) {
-										// subtracting one extra day caused by day ending at midnight of the next day.
-										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+					let meterArea = state.meters.byMeterID[meterID].area;
+					// we either don't care about area, or we do in which case there needs to be a nonzero area
+					if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
+						if (state.graph.areaNormalization) {
+							// convert the meter area into the proper unit, if needed
+							meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
+						}
+						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+						// It must be on true north map since only there are the GPS axis parallel to the map axis.
+						// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
+						// it coordinates on the true north map and then rotating/shifting to the user map.
+						const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
+						// Only display items within valid info and within map.
+						if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+							// The x, y value for Plotly to use that are on the user map.
+							x.push(meterGPSInUserGrid.x);
+							y.push(meterGPSInUserGrid.y);
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// and be fetching. The unit could change from that menu so also need to check.
+							if (byMeterID[timeInterval.toString()] !== undefined && byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+								// Get the bar data to use for the map circle.
+								const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
+								// This protects against there being no readings or that the data is being updated.
+								if (readingsData !== undefined && !readingsData.isFetching) {
+									// Meter name to include in hover on graph.
+									const label = state.meters.byMeterID[meterID].identifier;
+									// The usual color for this meter.
+									colors.push(getGraphColor(meterID, DataType.Meter));
+									if (readingsData.readings === undefined) {
+										throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 									}
-									// The value for the circle is the average daily usage.
-									averagedReading = mapReading.reading / barDuration.asDays();
-									// The size is the reading value. It will be scaled later.
-									size.push(averagedReading);
+									// Use the most recent time reading for the circle on the map.
+									// This has the limitations of the bar value where the last one can include ranges without
+									// data (GitHub issue on this).
+									// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+									const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+									const mapReading = readings[0];
+									let timeReading: string;
+									let averagedReading = 0;
+									if (readings.length === 0) {
+										// No data. The next lines causes an issue so set specially.
+										// There may be a better overall fix for no data.
+										timeReading = 'no data to display';
+										size.push(0);
+									} else {
+										// only display a range of dates for the hover text if there is more than one day in the range
+										// Shift to UTC since want database time not local/browser time which is what moment does.
+										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
+										if (barDuration.asDays() != 1) {
+											// subtracting one extra day caused by day ending at midnight of the next day.
+											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+										}
+										// The value for the circle is the average daily usage.
+										averagedReading = mapReading.reading / barDuration.asDays();
+										if (state.graph.areaNormalization) {
+											averagedReading /= meterArea;
+										}
+										// The size is the reading value. It will be scaled later.
+										size.push(averagedReading);
+									}
+									// The hover text.
+									hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 								}
-								// The hover text.
-								hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}
@@ -167,59 +183,69 @@ function mapStateToProps(state: State) {
 				const gps = state.groups.byGroupID[groupID].gps;
 				// Filter groups with actual gps coordinates.
 				if (gps !== undefined && gps !== null && byGroupID !== undefined) {
-					// Convert the gps value to the equivalent Plotly grid coordinates on user map.
-					// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
-					// It must be on true north map since only there are the GPS axis parallel to the map axis.
-					// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
-					// it coordinates on the true north map and then rotating/shifting to the user map.
-					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
-					// Only display items within valid info and within map.
-					if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
-						// The x, y value for Plotly to use that are on the user map.
-						x.push(groupGPSInUserGrid.x);
-						y.push(groupGPSInUserGrid.y);
-						// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
-						// and be fetching. The unit could change from that menu so also need to check.
-						if (byGroupID[timeInterval.toString()] !== undefined && byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
-							// Get the bar data to use for the map circle.
-							const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
-							// This protects against there being no readings or that the data is being updated.
-							if (readingsData !== undefined && !readingsData.isFetching) {
-								// Group name to include in hover on graph.
-								const label = state.groups.byGroupID[groupID].name;
-								// The usual color for this group.
-								colors.push(getGraphColor(groupID, DataType.Group));
-								if (readingsData.readings === undefined) {
-									throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-								}
-								// Use the most recent time reading for the circle on the map.
-								// This has the limitations of the bar value where the last one can include ranges without
-								// data (GitHub issue on this).
-								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-								const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
-								const mapReading = readings[0];
-								let timeReading: string;
-								let averagedReading = 0;
-								if (readings.length === 0) {
-									// No data. The next lines causes an issue so set specially.
-									// There may be a better overall fix for no data.
-									timeReading = 'no data to display';
-									size.push(0);
-								} else {
-									// only display a range of dates for the hover text if there is more than one day in the range
-									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-									if(barDuration.asDays() != 1) {
-										// subtracting one extra day caused by day ending at midnight of the next day.
-										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
-										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+					let groupArea = state.groups.byGroupID[groupID].area;
+					if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
+						if (state.graph.areaNormalization) {
+							// convert the meter area into the proper unit, if needed
+							groupArea *= getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit);
+						}
+						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+						// It must be on true north map since only there are the GPS axis parallel to the map axis.
+						// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
+						// it coordinates on the true north map and then rotating/shifting to the user map.
+						const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
+						// Only display items within valid info and within map.
+						if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
+							// The x, y value for Plotly to use that are on the user map.
+							x.push(groupGPSInUserGrid.x);
+							y.push(groupGPSInUserGrid.y);
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// and be fetching. The unit could change from that menu so also need to check.
+							if (byGroupID[timeInterval.toString()] !== undefined && byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+								// Get the bar data to use for the map circle.
+								const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
+								// This protects against there being no readings or that the data is being updated.
+								if (readingsData !== undefined && !readingsData.isFetching) {
+									// Group name to include in hover on graph.
+									const label = state.groups.byGroupID[groupID].name;
+									// The usual color for this group.
+									colors.push(getGraphColor(groupID, DataType.Group));
+									if (readingsData.readings === undefined) {
+										throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 									}
-									// The value for the circle is the average daily usage.
-									averagedReading = mapReading.reading / barDuration.asDays();
-									// The size is the reading value. It will be scaled later.
-									size.push(averagedReading);
+									// Use the most recent time reading for the circle on the map.
+									// This has the limitations of the bar value where the last one can include ranges without
+									// data (GitHub issue on this).
+									// TODO: It might be better to do this similarly to compare. (See GitHub issue)
+									const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+									const mapReading = readings[0];
+									let timeReading: string;
+									let averagedReading = 0;
+									if (readings.length === 0) {
+										// No data. The next lines causes an issue so set specially.
+										// There may be a better overall fix for no data.
+										timeReading = 'no data to display';
+										size.push(0);
+									} else {
+										// only display a range of dates for the hover text if there is more than one day in the range
+										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
+										if (barDuration.asDays() != 1) {
+											// subtracting one extra day caused by day ending at midnight of the next day.
+											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
+											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
+										}
+										// The value for the circle is the average daily usage.
+										averagedReading = mapReading.reading / barDuration.asDays();
+										if (state.graph.areaNormalization) {
+											averagedReading /= groupArea;
+										}
+										// The size is the reading value. It will be scaled later.
+										size.push(averagedReading);
+									}
+									// The hover text.
+									hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 								}
-								// The hover text.
-								hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
 							}
 						}
 					}

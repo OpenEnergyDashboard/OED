@@ -84,11 +84,32 @@ async function insertStandardConversions(conn) {
 }
 
 /**
- * Inserts meters specified into the database and adds readings from CSV file.
- * @param [[]] metersToInsert array of arrays that specify the meter info for inserting meters where each row has
- * meter name, unit name, default graphic unit name, displayable, gps, note, CSV reading data filename, whether to delete csv file, meter id.
- * A final [6] item in row can be the value to set the meter id to.
- * @param {*} conn database connection
+ * This inserts meters into the database. The meters are defined in the array metersToInsert
+ * where each entry is a JS object of key: value pairs. The keys can be any field of a meter,
+ * e.g., id, name, ..., readingFrequency. All fields are optional (except as
+ * noted next) where they will get the default value if not provided except those below.
+ * Other allowed fields are also given.
+ * 
+ * name is required with no default
+ * 
+ * file is required with no default (not meter value) where it specifies the file to get
+ * 
+ * deleteFile will delete the file with meter readings (file) if true (not meter value).
+ * If not provided then file is not deleted.
+ * 
+ * enabled has false as default
+ * 
+ * displayable has false as default
+ * 
+ * type has 'other' as default
+ * 
+ * readingGap has 90000 as default so normally won't get warnings
+ * 
+ * readingVariation has 90000 as default so normally won't get warnings
+ * 
+ * Note the values provided for the keys are not checked for validity.
+ * @param {[{}]} metersToInsert key:value pairs of meter values in array with entry for each meter
+ * @param {*} conn database connection to use
  */
 async function insertMeters(metersToInsert, conn) {
 	// Function used to map values when reading the CSV file.
@@ -102,95 +123,121 @@ async function insertMeters(metersToInsert, conn) {
 		return [reading, startTimestamp, endTimestamp];
 	}
 
-	// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current
-	// loading of data for meters from CSV files requires a lot of memory. Running them in parallel often causes
-	// the JS VM to run out of heap memeory if you load lots of meters with large CSV file as is done at times.
-	// Given this only slows down the process for developers and is not done too often, this seems okay.
-	// If we ever directly create the meter data instead of load via files then this should go away. 
-	// Second, the messages about changing the meter id do not align with the first meter message.
-	// This could be fixed in several ways but not doing because not using now.
+	// Loop over all meters.
 	for (let i = 0; i < metersToInsert.length; ++i) {
-		// Meter values from above.
+		// Meter key/value pairs for the current meter.
 		const meterData = metersToInsert[i];
-		const meterName = meterData[0];
-		console.log(`    loading meter ${meterName} from file ${meterData[6]}`);
-		// We get the needed unit id from the name given.
-		let meterUnit, meterGraphicUnit;
-		if (meterData[1] === '') {
-			// No unit so make it -99 for both unit and default graphic unit
-			meterUnit = -99;
-			meterGraphicUnit = -99;
-		} else {
-			meterUnit = (await Unit.getByName(meterData[1], conn)).id;
-			meterGraphicUnit = (await Unit.getByName(meterData[2], conn)).id;
-		}
-		const meter = new Meter(
-			undefined, // id
-			meterName, // name
-			null, // URL
-			false, // enabled
-			meterData[3], //displayable
-			'other', //type
-			null, // timezone
-			meterData[4], // gps
-			undefined, // identifier
-			meterData[5], // note
-			null, //area
-			undefined, // cumulative
-			undefined, //cumulativeReset
-			undefined, // cumulativeResetStart
-			undefined, // cumulativeResetEnd
-			90000, // readingGap
-			90000, // readingVariation
-			undefined, //readingDuplication
-			undefined, // timeSort
-			undefined, //endOnlyTime
-			undefined, // reading
-			undefined, // startTimestamp
-			undefined, // endTimestamp
-			undefined, // previousEnd
-			meterUnit, // unit
-			meterGraphicUnit // default graphic unit
-		);
-		const filename = `src/server/${meterData[6]}`;
-		if (await meter.existsByName(conn)) {
-			console.log(`        Warning: meter '${meter.name}' existed so not changed.`);
-		} else {
-			// Only insert the meter and its readings if the meter did not already exist.
-			await meter.insert(conn);
-			// If meterData[8] is not undefined then use value to set meter id.
-			// This is normally only done for the website data.
-			// It is best/easiest to do this before there is any readings for this meter or used in a group.
-			const newId = meterData[8];
-			if (newId != undefined) {
-				console.log('        meter id set to ', newId);
-				meter.id = newId;
-				const query = `update meters set id = ${meter.id} where name = '${meterName}'`;
-				await conn.none(query);
+
+		// Check that needed keys are there.
+		const requiredKeys = ['name', 'file'];
+		let ok = true;
+		requiredKeys.forEach(key => {
+			if (!meterData[key]) {
+				// Note 
+				console.log(`********key "${key}" is required but missing so meter number ${i} not processed`);
+				ok = false;
 			}
-			await loadCsvInput(
-				filename, // filePath
-				meter.id, // meterID
-				mapRowsToModel, // mapRowToModel
-				meter.timeSort, //timeSort
-				meter.readingDuplication, //readingRepetition
-				meter.cumulative, // isCumulative
-				meter.cumulativeReset, // cumulativeReset
-				meter.cumulativeResetStart, // cumulativeResetStart
-				meter.cumulativeResetEnd, // cumulativeResetEnd
-				meter.readingGap, // readingGap
-				meter.readingVariation, // readingLengthVariation
-				meter.endOnlyTime, // isEndOnly
-				true, // headerRow
-				false, // shouldUpdate
-				undefined, // conditionSet
-				conn
+		})
+
+		if (ok) {
+			console.log(`    loading meter ${meterData.name} from file ${meterData.file}`);
+			// Get the unit by name if provided or -99 if not
+			meterData.unit = meterData.unit ? (await Unit.getByName(meterData.unit, conn)).id : -99;
+			meterData.defaultGraphicUnit = meterData.defaultGraphicUnit ? (await Unit.getByName(meterData.defaultGraphicUnit, conn)).id : -99;
+			// enabled and displayable are false by default.
+			meterData.enabled = meterData.enabled ? meterData.enabled : false;
+			meterData.displayable = meterData.displayable ? meterData.displayable : false;
+			// type is other by default
+			meterData.type = meterData.type ? meterData.type : 'other';
+			// The gap and variation are set large by default to avoid complaints
+			meterData.readingGap = 90000;
+			meterData.readingVariation = 90000;
+
+			const meter = new Meter(
+				undefined, // id
+				meterData.name,
+				meterData.url,
+				meterData.enabled,
+				meterData.displayable,
+				meterData.type,
+				meterData.meterTimezone,
+				meterData.gps,
+				meterData.identifier,
+				meterData.note,
+				meterData.area,
+				meterData.cumulative,
+				meterData.cumulativeReset,
+				meterData.cumulativeResetStart,
+				meterData.cumulativeResetEnd,
+				meterData.readingGap,
+				meterData.readingVariation,
+				meterData.readingDuplication,
+				meterData.timeSort,
+				meterData.endOnlyTime,
+				meterData.reading,
+				meterData.startTimestamp,
+				meterData.endTimestamp,
+				meterData.previousEnd,
+				meterData.unit,
+				meterData.defaultGraphicUnit,
+				meterData.areaUnit,
+				meterData.readingFrequency
 			);
-		}
-		// Delete mathematical test data file just uploaded. They have true for delete.
-		// Try to delete even if not uploaded since created anyway.
-		if (meterData[7] === true) {
-			await fs.unlink(filename);
+
+			// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current
+			// loading of data for meters from CSV files requires a lot of memory. Running them in parallel often causes
+			// the JS VM to run out of heap memory if you load lots of meters with large CSV file as is done at times.
+			// Given this only slows down the process for developers and is not done too often, this seems okay.
+			// If we ever directly create the meter data instead of load via files then this should go away. 
+			// Second, the messages about changing the meter id do not align with the first meter message.
+			// This could be fixed in several ways but not doing because not using now.
+
+			let filename = `src/server/${meterData.file}`;
+			if (await meter.existsByName(conn)) {
+				console.log(`        Warning: meter '${meter.name}' existed so not changed.`);
+			} else {
+				// Only insert the meter and its readings if the meter did not already exist.
+				await meter.insert(conn);
+				// If meterData.id is not undefined then use value to set meter id.
+				// This is normally only done for the website data.
+				// It is best/easiest to do this before there is any readings for this meter or used in a group.
+				if (meterData.id) {
+					console.log('        meter id set to ', meterData.id);
+					meter.id = meterData.id;
+					const query = `update meters set id = ${meterData.id} where name = '${meter.name}'`;
+					await conn.none(query);
+				}
+				await loadCsvInput(
+					filename, // filePath
+					meter.id, // meterID
+					mapRowsToModel, // mapRowToModel
+					meter.timeSort, //timeSort
+					meter.readingDuplication, //readingRepetition
+					meter.cumulative, // isCumulative
+					meter.cumulativeReset, // cumulativeReset
+					meter.cumulativeResetStart, // cumulativeResetStart
+					meter.cumulativeResetEnd, // cumulativeResetEnd
+					meter.readingGap, // readingGap
+					meter.readingVariation, // readingLengthVariation
+					meter.endOnlyTime, // isEndOnly
+					true, // headerRow
+					false, // shouldUpdate
+					undefined, // conditionSet
+					conn
+				);
+			}
+			// Delete mathematical test data file just uploaded. They have true for delete.
+			// Try to delete even if not uploaded since created anyway.
+			if (meterData.deleteFile) {
+				// TODO Unsure why this check for the file existing does not work.
+				// Only delete if it exists.
+				// fs.access(filename, constants.F_OK, async err => {
+				// 	if (!err) {
+				// 		await fs.unlink(filename)
+				// 	}
+				// });
+				await fs.unlink(filename);
+			}
 		}
 	}
 }
@@ -223,8 +270,9 @@ async function insertGroups(groupsToInsert, conn) {
 			groupData[2], //displayable
 			groupData[3], // gps
 			groupData[4], // note
-			null, //area
-			groupDefaultGraphicUnit // default graphic unit
+			undefined, //area
+			groupDefaultGraphicUnit, // default graphic unit
+			undefined // area unit
 		);
 		if (await group.existsByName(conn)) {
 			console.log(`        Warning: group '${group.name}' existed so not changed.`);

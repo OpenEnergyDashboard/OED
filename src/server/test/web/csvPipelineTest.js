@@ -565,7 +565,7 @@ const testMeters = {
 				undefined, // gps
 				undefined, // identifier
 				null, // note
-				null, //area
+				undefined, //area
 				undefined, // cumulative
 				undefined, //cumulativeReset
 				undefined, // cumulativeResetStart
@@ -580,7 +580,9 @@ const testMeters = {
 				undefined, // endTimestamp
 				undefined, // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				undefined, // area unit
+				undefined // reading frequency
 			),
 			new Meter(
 				undefined, // id
@@ -609,7 +611,9 @@ const testMeters = {
 				'1777-08-09 05:07:11', // endTimestamp
 				'1888-09-10 11:12:13+00:00', // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				Unit.areaUnitType.METERS,// area unit
+				undefined // reading frequency
 			)
 		]
 	},
@@ -631,7 +635,7 @@ const testMeters = {
 				undefined, // gps
 				undefined, // identifier
 				null, // note
-				null, //area
+				undefined, //area
 				undefined, // cumulative
 				undefined, //cumulativeReset
 				undefined, // cumulativeResetStart
@@ -646,7 +650,9 @@ const testMeters = {
 				undefined, // endTimestamp
 				undefined, // previousEnd
 				undefined, // unitId
-				undefined // defaultGraphicUnit
+				undefined, // defaultGraphicUnit
+				undefined, // area unit
+				undefined // reading frequency
 			)
 		]
 	},
@@ -766,4 +772,5 @@ function compareMeters(expectMeter, receivedMeter) {
 	expect(receivedMeter.previousEnd.isSame(moment.parseZone(expectMeter.previousEnd, true).tz('UTC', true))).to.equal(true);
 	expect(receivedMeter).to.have.property('unitId', expectMeter.unitId);
 	expect(receivedMeter).to.have.property('defaultGraphicUnit', expectMeter.defaultGraphicUnit);
+	expect(receivedMeter).to.have.property('areaUnit', expectMeter.areaUnit);
 }

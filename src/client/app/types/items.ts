@@ -4,6 +4,7 @@
 
 import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from './redux/i18n';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * The type of options displayed in Select components.
@@ -13,6 +14,15 @@ export interface SelectOption {
 	value: number;
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
+	style?: React.CSSProperties;
+}
+
+/**
+ * SelectOption but holds strings
+ */
+export interface StringSelectOption {
+	label: string;
+	value: string;
 }
 
 /**
@@ -34,6 +44,9 @@ export interface PreferenceRequestItem {
 	defaultTimezone: string;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
+	defaultAreaNormalization: boolean;
+	defaultAreaUnit: AreaUnitType;
+	defaultMeterReadingFrequency: string;
 }
 
 /**
@@ -68,5 +81,5 @@ export enum UserRole {
 export enum TrueFalseType {
 	// Normally the values here are not used but the ones in data.js so translated.
 	true = 'yes',
-	false = 'no',
+	false = 'no'
 }

@@ -1,3 +1,3 @@
-name,url,enabled,displayable,type,timezone,gps,identifier,note,area,cumulative,reset,reset start,reset end,gap,variation,duplicates,timesort,end only,reading,start time,end time, previous end time, meter unit, graph unit
-pipe100,,FALSE,FALSE,other,,,,,,,,,,,,,,,,,,,,
-pipe100b,123.45.6.0,TRUE,TRUE,obvius,US/Central,"25, 50",pipe100b id,my Note,33,TRUE,TRUE,14:44,15:55,12.34,56.78,7,decreasing,true,89.90,1666-07-08 17:13:19,1777-08-09 05:07:11,1888-09-10 11:12:13,Electric_Utility,kWh
+name,url,enabled,displayable,type,timezone,gps,identifier,note,area,cumulative,reset,reset start,reset end,gap,variation,duplicates,timesort,end only,reading,start time,end time, previous end time, meter unit, graph unit, area unit
+pipe100,,FALSE,FALSE,other,,,,,,,,,,,,,,,,,,,,,
+pipe100b,123.45.6.0,TRUE,TRUE,obvius,US/Central,"25, 50",pipe100b id,my Note,33,TRUE,TRUE,14:44,15:55,12.34,56.78,7,decreasing,true,89.90,1666-07-08 17:13:19,1777-08-09 05:07:11,1888-09-10 11:12:13,Electric_Utility,kWh,meters

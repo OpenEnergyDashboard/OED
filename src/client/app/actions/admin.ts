@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { changeBarStacking, changeChartToRender } from './graph';
+import { toggleAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
@@ -13,6 +13,7 @@ import { conversionArrayApi, preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
@@ -35,6 +36,14 @@ export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
 	return { type: ActionType.ToggleDefaultBarStacking };
 }
 
+export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizationAction {
+	return { type: ActionType.ToggleDefaultAreaNormalization };
+}
+
+export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDefaultAreaUnitAction {
+	return { type: ActionType.UpdateDefaultAreaUnit, defaultAreaUnit };
+}
+
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
 	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
@@ -46,6 +55,10 @@ export function updateDefaultWarningFileSize(defaultWarningFileSize: number): t.
 
 export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.UpdateDefaultFileSizeLimit {
 	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
+}
+
+export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): t.UpdateDefaultMeterReadingFrequencyAction {
+	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
 }
 
 function requestPreferences(): t.RequestPreferencesAction {
@@ -60,8 +73,8 @@ function markPreferencesNotSubmitted(): t.MarkPreferencesNotSubmittedAction {
 	return { type: ActionType.MarkPreferencesNotSubmitted };
 }
 
-function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
-	return { type: ActionType.MarkPreferencesSubmitted };
+function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkPreferencesSubmittedAction {
+	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
 function fetchPreferences(): Thunk {
@@ -77,6 +90,9 @@ function fetchPreferences(): Thunk {
 				if (preferences.defaultBarStacking !== state.graph.barStacking) {
 					dispatch2(changeBarStacking());
 				}
+				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
+					dispatch2(toggleAreaNormalization());
+				}
 			});
 		}
 	};
@@ -86,16 +102,21 @@ export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
-			await preferencesApi.submitPreferences({
+			const preferences = await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
 				defaultTimezone: state.admin.defaultTimeZone,
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
-				defaultFileSizeLimit: state.admin.defaultFileSizeLimit
+				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
+				defaultAreaNormalization: state.admin.defaultAreaNormalization,
+				defaultAreaUnit: state.admin.defaultAreaUnit,
+				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
 			});
-			dispatch(markPreferencesSubmitted());
+			// Only return the defaultMeterReadingFrequency because the value from the DB
+			// generally differs from what the user input so update state with DB value.
+			dispatch(markPreferencesSubmitted(preferences.defaultMeterReadingFrequency));
 			showSuccessNotification(translate('updated.preferences'));
 		} catch (e) {
 			dispatch(markPreferencesNotSubmitted());

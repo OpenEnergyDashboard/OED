@@ -138,8 +138,20 @@ mocha.describe('readings API', () => {
 				mocha.it('response should have valid reading and timestamps,', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -160,8 +172,20 @@ mocha.describe('readings API', () => {
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -179,8 +203,20 @@ mocha.describe('readings API', () => {
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -196,8 +232,20 @@ mocha.describe('readings API', () => {
 				mocha.it('should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -211,8 +259,20 @@ mocha.describe('readings API', () => {
 				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -223,26 +283,50 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 
-				mocha.it('15 days barely gives hourly points & middle readings', async () => {
+				mocha.it('should barely have hourly points for middle readings of 15 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:00:00'), graphicUnitId: unitId });
+						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:15:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 14 days barely gives raw points & middle readings
 				mocha.it('14 days barely gives raw points & middle readings', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					// Load the data into the database
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -259,8 +343,20 @@ mocha.describe('readings API', () => {
 						['Electric', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
 					const conversionData = [['Electric', 'kW', false, 1, 0, 'Electric → kW']];
-					const meterData = [['Electric kW', 'Electric', 'kW', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric kW',
+							unit: 'Electric',
+							defaultGraphicUnit: 'kW',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -278,8 +374,20 @@ mocha.describe('readings API', () => {
 						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
 					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → C']];
-					const meterData = [['Degrees Celsius', 'Degrees', 'C', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Degrees Celsius',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'C',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -297,8 +405,20 @@ mocha.describe('readings API', () => {
 						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
 					];
-					const meterData = [['Electric Utility MJ', 'Electric_Utility', 'MJ', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -320,8 +440,20 @@ mocha.describe('readings API', () => {
 						// brings the values close enough to the expected values.
 						['MJ', 'kWh', true, 1 / 3.6, 0, 'MJ → KWh']
 					];
-					const meterData = [['Electric Utility MJ', 'Electric_Utility', 'MJ', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -343,11 +475,23 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
-					 	['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-					 	['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
+						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
 					];
-					const meterData = [['Electric_Utility BTU', 'Electric_Utility', 'BTU', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric_Utility BTU',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'BTU',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -369,8 +513,20 @@ mocha.describe('readings API', () => {
 						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
 					];
-					const meterData = [['Electric_Utility MJ', 'Electric_Utility', 'MJ', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric_Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -392,8 +548,20 @@ mocha.describe('readings API', () => {
 						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
 						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit']
 					];
-					const meterData = [['Degrees F', 'Degrees', 'F', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Degrees F',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'F',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -415,8 +583,20 @@ mocha.describe('readings API', () => {
 						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
 					];
-					const meterData = [['Electric_Utility MJ', 'Electric_Utility', 'MJ', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric_Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -438,8 +618,20 @@ mocha.describe('readings API', () => {
 						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
 						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit']
 					];
-					const meterData = [['Degrees F', 'Degrees', 'F', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Degrees F',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'F',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -459,8 +651,20 @@ mocha.describe('readings API', () => {
 					const conversionData = [
 						['Thing_36', 'thing unit', false, 1, 0, 'Thing_36 → thing unit']
 					];
-					const meterData = [['Thing_36 thing unit', 'Thing_36', 'thing unit', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Thing_36 thing unit',
+							unit: 'Thing_36',
+							defaultGraphicUnit: 'thing unit',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
@@ -479,8 +683,20 @@ mocha.describe('readings API', () => {
 						['invalidUnit', '', Unit.unitRepresentType.UNUSED, 1, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Invalid Unit']
 					];
 					const conversionData = [['invalidUnit', 'kWh', false, 1, 0, 'invalidUnit → kWh']];
-					const meterData = [['Invalid', 'invalidUnit', 'kWh', true, undefined,
-						'invalid meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Invalid',
+							unit: 'invalidUnit',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'invalid meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
@@ -496,10 +712,30 @@ mocha.describe('readings API', () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
-						['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-							'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID],
-						['Electric Utility kWh 2-6', 'Electric_Utility', 'kWh', true, undefined,
-							'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, (METER_ID + 1)]
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						},
+						{
+							name: 'Electric Utility kWh 2-6',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: (METER_ID + 1)
+						}
 					];
 					const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
 					// Load the data into the database
@@ -525,8 +761,20 @@ mocha.describe('readings API', () => {
 				mocha.it('response should have a valid reading, startTimestamp, and endTimestamp', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-						'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID]];
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
@@ -548,10 +796,30 @@ mocha.describe('readings API', () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
-						['Electric Utility kWh', 'Electric_Utility', 'kWh', true, undefined,
-							'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, METER_ID],
-						['Electric Utility kWh 2-6', 'Electric_Utility', 'kWh', true,
-							undefined, 'special meter', 'test/web/readingsData/readings_ri_15_days_75.csv', false, (METER_ID + 1)]
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						},
+						{
+							name: 'Electric Utility kWh 2-6',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: (METER_ID + 1)
+						}
 					];
 					const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
 					await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);

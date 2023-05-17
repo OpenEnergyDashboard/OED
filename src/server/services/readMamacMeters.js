@@ -11,6 +11,7 @@ const _ = require('lodash');
 const stopDB = require('../models/database').stopDB;
 const { log } = require('../log');
 const moment = require('moment');
+const Unit = require('../models/Unit');
 
 const parseXMLPromisified = util.promisify(parseString);
 
@@ -92,7 +93,9 @@ async function getMeterInfo(url, ip, csvLine) {
 				undefined, // endTimestamp
 				undefined, // previousEnd
 				unitId, // unit
-				unitId // default graphic unit
+				unitId, // default graphic unit
+				undefined, // area unit
+				undefined // reading frequency
 			);
 		});
 }

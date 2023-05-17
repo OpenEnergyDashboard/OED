@@ -63,6 +63,15 @@ class Unit {
 	}
 
 	/**
+	 * Returns a promise to create the areaUnitType enum.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<>}
+	 */
+	static createAreaUnitTypesEnum(conn) {
+		return conn.none(sqlFile('unit/create_area_unit_types_enum.sql'));
+	}
+
+	/**
 	 * Returns a promise to create the displayableType enum of admin, all, and none.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
@@ -238,7 +247,8 @@ class Unit {
 Unit.unitType = Object.freeze({
 	UNIT: 'unit',
 	METER: 'meter',
-	SUFFIX: 'suffix'
+	SUFFIX: 'suffix',
+	AREA: 'area'
 });
 
 Unit.displayableType = Object.freeze({
@@ -252,6 +262,13 @@ Unit.unitRepresentType = Object.freeze({
 	FLOW: 'flow',
 	RAW: 'raw',
 	UNUSED: 'unused'
+});
+
+Unit.areaUnitType = Object.freeze({
+	FEET: 'feet',
+	METERS: 'meters',
+	NONE: 'none'
+
 });
 
 module.exports = Unit;
