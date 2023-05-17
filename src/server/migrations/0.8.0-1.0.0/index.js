@@ -33,6 +33,8 @@ module.exports = {
 		// It is also important that the creation of new views below is done after this because
 		// you cannot alter a type that is used in a view.
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/set_reading_to_float.sql'));
+		// Need to create type before reading views since it is needed there.
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/add_reading_line_accuracy_type.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/set_function_get_compare_readings_to_float.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/create_reading_views.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_functions.sql'));
