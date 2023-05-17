@@ -98,6 +98,7 @@ async function createSchema(conn) {
 	// It needs to be called before meter table is created.
 	await conn.none(sqlFile('meter/check_timezone.sql'));
 	await Meter.createTable(conn);
+	await Reading.createReadingLineAccuracyEnum(conn);
 	await Reading.createTable(conn);
 	await User.createUserTypesEnum(conn);
 	await User.createTable(conn);

@@ -16,6 +16,7 @@ mocha.describe('Readings', () => {
 	let meter;
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
+		// Does not set may meter values but okay since getting readings directly.
 		await new Meter(undefined, 'Meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 	});

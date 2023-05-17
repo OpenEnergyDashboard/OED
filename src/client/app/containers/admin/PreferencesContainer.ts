@@ -14,7 +14,8 @@ import {
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit,
 	toggleDefaultAreaNormalization,
-	updateDefaultAreaUnit
+	updateDefaultAreaUnit,
+	updateDefaultMeterReadingFrequency
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -33,7 +34,8 @@ function mapStateToProps(state: State) {
 		defaultWarningFileSize: state.admin.defaultWarningFileSize,
 		defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 		defaultAreaNormalization: state.admin.defaultAreaNormalization,
-		defaultAreaUnit: state.admin.defaultAreaUnit
+		defaultAreaUnit: state.admin.defaultAreaUnit,
+		defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
 	};
 }
 
@@ -48,7 +50,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
 		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
 		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
-		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit))
+		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit)),
+		updateDefaultMeterReadingFrequency: (defaultMeterReadingFrequency: string) =>
+			dispatch(updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency))
 	};
 }
 

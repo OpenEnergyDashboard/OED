@@ -43,7 +43,11 @@ function mapStateToProps(state: State) {
 	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
 		const byMeterID = state.readings.line.byMeterID[meterID];
-		if (byMeterID !== undefined) {
+		// Make sure have the meter data. If you already have the meter, unselect, change
+		// the timeInterval via another meter and then reselect then this new timeInterval
+		// may not yet be in state so verify with the second condition on the if.
+		// Note the second part may not be used based on next checks but do here since simple.
+		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined) {
 			let meterArea = state.meters.byMeterID[meterID].area;
 			// we either don't care about area, or we do in which case there needs to be a nonzero area
 			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
@@ -135,7 +139,11 @@ function mapStateToProps(state: State) {
 	// Add all valid data from existing groups to the line plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
-		if (byGroupID !== undefined) {
+		// Make sure have the group data. If you already have the group, unselect, change
+		// the timeInterval via another meter and then reselect then this new timeInterval
+		// may not yet be in state so verify with the second condition on the if.
+		// Note the second part may not be used based on next checks but do here since simple.
+		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined) {
 			let groupArea = state.groups.byGroupID[groupID].area;
 			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
 				if (state.graph.areaNormalization) {

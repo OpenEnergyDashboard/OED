@@ -14,7 +14,8 @@ import {
 	UpdateDefaultWarningFileSize,
 	UpdateDefaultFileSizeLimit,
 	ToggleDefaultAreaNormalizationAction,
-	UpdateDefaultAreaUnitAction
+	UpdateDefaultAreaUnitAction,
+	UpdateDefaultMeterReadingFrequencyAction
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
@@ -35,6 +36,7 @@ interface PreferencesProps {
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
 	defaultAreaUnit: AreaUnitType;
+	defaultMeterReadingFrequency: string;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -45,6 +47,7 @@ interface PreferencesProps {
 	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
+	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -62,6 +65,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultFileSizeLimitChange = this.handleDefaultFileSizeLimitChange.bind(this);
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
+		this.handleDefaultMeterReadingFrequencyChange = this.handleDefaultMeterReadingFrequencyChange.bind(this);
 	}
 
 	public render() {
@@ -79,6 +83,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 			paddingBottom: '5px'
 		};
 		const messages = defineMessages({ name: { id: 'name' } });
+
 		return (
 			<div>
 				<div style={bottomPaddingStyle}>
@@ -278,6 +283,17 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						maxLength={50}
 					/>
 				</div>
+				{/* Reuse same style as title. */}
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.reading.frequency' />:
+					</p>
+					<Input
+						type='text'
+						value={this.props.defaultMeterReadingFrequency}
+						onChange={this.handleDefaultMeterReadingFrequencyChange}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -356,6 +372,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultFileSizeLimitChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultFileSizeLimit(parseFloat(e.target.value));
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterReadingFrequencyChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterReadingFrequency(e.target.value);
 		this.updateUnsavedChanges();
 	}
 }

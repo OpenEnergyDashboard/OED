@@ -41,6 +41,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
 
+	// Admin state so can get the default reading frequency.
+	const adminState = useSelector((state: State) => state.admin)
+
 	const defaultValues = {
 		id: -99,
 		identifier: '',
@@ -70,7 +73,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		startTimestamp: '',
 		endTimestamp: '',
 		previousEnd: '',
-		areaUnit: AreaUnitType.none
+		areaUnit: AreaUnitType.none,
+		readingFrequency: adminState.defaultMeterReadingFrequency
 	}
 
 	const dropdownsStateDefaults = {
@@ -453,6 +457,15 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 													return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
 												})}
 											</Input>
+										</div>
+										{/* Meter reading frequency */}
+										<div style={formInputStyle}>
+											<label><FormattedMessage id="meter.readingFrequency" /><label style={requiredStyle}>*</label></label>
+											<Input
+												name='readingFrequency'
+												type='text'
+												onChange={e => handleStringChange(e)}
+												value={state.readingFrequency} />
 										</div>
 										{/* URL input */}
 										<div style={formInputStyle}>

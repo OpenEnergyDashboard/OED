@@ -28,5 +28,8 @@ UPDATE meters
 		previous_end = ${previousEnd},
 		unit_id = ${unitId},
 		default_graphic_unit = ${defaultGraphicUnit},
-		area_unit = ${areaUnit}
-	WHERE id = ${id};
+		area_unit = ${areaUnit},
+		reading_frequency = ${readingFrequency}
+	WHERE id = ${id}
+	RETURNING reading_frequency;
+

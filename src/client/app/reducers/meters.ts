@@ -4,6 +4,7 @@
 import * as _ from 'lodash';
 import { MetersAction, MetersState } from '../types/redux/meters';
 import { ActionType } from '../types/redux/actions';
+import { durationFormat } from '../utils/durationFormat';
 
 const defaultState: MetersState = {
 	hasBeenFetchedOnce: false,
@@ -28,6 +29,10 @@ export default function meters(state = defaultState, action: MetersAction) {
 			};
 		}
 		case ActionType.ReceiveMetersDetails: {
+			// Convert the readingFrequency from the DB format to user friendly format.
+			action.data.forEach(meter => {
+				meter.readingFrequency = durationFormat(meter.readingFrequency);
+			});
 			return {
 				...state,
 				isFetching: false,
@@ -50,12 +55,28 @@ export default function meters(state = defaultState, action: MetersAction) {
 		}
 		case ActionType.ConfirmEditedMeter: {
 			// Return new state object with updated edited meter info.
+			// Convert the readingFrequency from the DB format to user friendly format.
+			action.editedMeter.readingFrequency = durationFormat(action.editedMeter.readingFrequency);
 			return {
 				...state,
 				byMeterID: {
 					...state.byMeterID,
 					[action.editedMeter.id]: {
 						...action.editedMeter
+					}
+				}
+			};
+		}
+		case ActionType.ConfirmAddMeter: {
+			// Return new state object with updated edited meter info.
+			// Convert the readingFrequency from the DB format to user friendly format.
+			action.addedMeter.readingFrequency = durationFormat(action.addedMeter.readingFrequency);
+			return {
+				...state,
+				byMeterID: {
+					...state.byMeterID,
+					[action.addedMeter.id]: {
+						...action.addedMeter
 					}
 				}
 			};

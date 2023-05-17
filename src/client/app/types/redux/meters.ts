@@ -21,7 +21,12 @@ export interface ChangeDisplayedMetersAction {
 
 export interface ConfirmEditedMeterAction {
 	type: ActionType.ConfirmEditedMeter;
-	editedMeter: MeterData;
+	editedMeter: MeterEditData;
+}
+
+export interface ConfirmAddMeterAction {
+	type: ActionType.ConfirmAddMeter;
+	addedMeter: MeterEditData;
 }
 
 export interface DeleteSubmittedMeterAction {
@@ -42,6 +47,7 @@ export type MetersAction = RequestMetersDetailsAction
 | ReceiveMetersDetailsAction
 | ChangeDisplayedMetersAction
 | ConfirmEditedMeterAction
+| ConfirmAddMeterAction
 | DeleteSubmittedMeterAction
 | SubmitEditedMeterAction
 | ConfirmMetersFetchedOnceAction;
@@ -91,6 +97,7 @@ export interface MeterData {
 	endTimestamp: string;
 	previousEnd: string;
 	areaUnit: AreaUnitType;
+	readingFrequency: string;
 }
 
 export interface MeterEditData {
@@ -121,6 +128,7 @@ export interface MeterEditData {
 	endTimestamp: string | undefined;
 	previousEnd: string | undefined;
 	areaUnit: AreaUnitType;
+	readingFrequency: string;
 }
 
 export interface MeterDataByID {

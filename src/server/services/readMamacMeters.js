@@ -94,7 +94,8 @@ async function getMeterInfo(url, ip, csvLine) {
 				undefined, // previousEnd
 				unitId, // unit
 				unitId, // default graphic unit
-				undefined // area unit
+				undefined, // area unit
+				undefined // reading frequency
 			);
 		});
 }
