@@ -40,7 +40,7 @@ echo ""
 
 # Change the postgres version up to the latest
 echo "Changing postgres version in Dockerfile ..."
-sed -i "s/^FROM postgres:10.13/FROM postgres:15.1/" containers/database/Dockerfile
+sed -i "s/^FROM postgres:10.13/FROM postgres:15.3/" containers/database/Dockerfile
 echo ""
 
 echo "Script completed"
