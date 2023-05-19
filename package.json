@@ -54,6 +54,12 @@
 			"src/client/"
 		]
 	},
+	"overrides": {
+		"react-notification-system": {
+			"react": "$react",
+			"react-dom": "$react-dom"
+		}
+	},
 	"dependencies": {
 		"@formatjs/intl": "~1.17.0",
 		"axios": "~0.24.0",
@@ -134,7 +140,7 @@
 		"mocha": "~9.2.2",
 		"nodemon": "~2.0.15",
 		"sinon": "~12.0.0",
-		"typescript": "~4.4.4",
+		"typescript": "~4.7.4",
 		"vite": "~4.2.0",
 		"vite-plugin-commonjs": "~0.6.2"
 	}
