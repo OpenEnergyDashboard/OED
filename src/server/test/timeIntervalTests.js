@@ -8,7 +8,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 const expect = chai.expect;
-const { TimeInterval } = import('../../common/TimeInterval.mjs');
+const { TimeInterval } = require('../../common/TimeInterval.js');
 
 
 mocha.describe('Time Intervals', () => {

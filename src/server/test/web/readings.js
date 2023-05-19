@@ -14,7 +14,7 @@
 */
 
 const { chai, mocha, expect, app, testDB } = require('../common');
-const { TimeInterval } = import('../../../common/TimeInterval.mjs');
+const { TimeInterval } = require('../../../common/TimeInterval.js');
 const { insertUnits, insertConversions, insertMeters, insertGroups } = require('../../util/insertData');
 const Unit = require('../../models/Unit');
 const { redoCik } = require('../../services/graph/redoCik');

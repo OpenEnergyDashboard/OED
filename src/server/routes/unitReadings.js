@@ -10,7 +10,7 @@ const _ = require('lodash');
 
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
-const { TimeInterval } = import('../../common/TimeInterval.mjs');
+const { TimeInterval } = require('../../common/TimeInterval.js');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
