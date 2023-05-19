@@ -17,7 +17,7 @@ v8-compile-cache*
 private
 
 # Build files
-/src/client/public/app/*
+/src/server/public/
 
 # Environment Variables
 .env

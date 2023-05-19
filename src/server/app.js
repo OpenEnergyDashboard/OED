@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const fs = require('fs');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
@@ -10,7 +9,6 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const config = require('./config');
 
 const { log, LogLevel } = require('./log');
 
@@ -83,18 +81,9 @@ app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);
 app.use('/api/units', units);
 app.use('/api/conversions', conversions);
-app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const router = express.Router();
-
-router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|maps|calibration|users|csv|units|conversions)?$/, (req, res) => {
-	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
-		const subdir = config.subdir || '/';
-		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
-		res.send(htmlPlusData);
-	});
-});
-
 
 app.use(router);
 
