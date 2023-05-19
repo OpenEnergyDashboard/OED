@@ -10,7 +10,7 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
-const escapeHtml = require('core-js/fn/string/escape-html');
+const escapeHtml = require('escape-html');
 
 /**
  * Middleware function to force a route to require authentication

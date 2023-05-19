@@ -27,7 +27,7 @@ const middleware = require('../middleware');
 const obvius = require('../util').obvius;
 const { obviusEmailAndPasswordAuthMiddleware } = require('./authenticator');
 const { getConnection } = require('../db');
-const escapeHtml = require('core-js/fn/string/escape-html');
+const escapeHtml = require('escape-html');
 
 const upload = multer({ storage: multer.memoryStorage() });
 const router = express.Router();
