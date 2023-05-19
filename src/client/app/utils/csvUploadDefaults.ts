@@ -22,7 +22,9 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	headerRow: false,
 	refreshHourlyReadings: false,
 	refreshReadings: false,
-	update: false
+	update: false,
+	honorDst: false,
+	relaxedParsing: false
 }
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {

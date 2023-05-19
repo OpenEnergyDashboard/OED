@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS units (
 	suffix VARCHAR(50) DEFAULT '',
 	displayable displayable_type NOT NULL,
 	preferred_display BOOLEAN NOT NULL,
-	note TEXT,
+	note TEXT
 );

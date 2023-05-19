@@ -4,6 +4,7 @@
 
 const database = require('./database');
 const Meter = require('./Meter');
+const Unit = require('./Unit');
 
 const sqlFile = database.sqlFile;
 
@@ -15,10 +16,11 @@ class Group {
 	 * @param displayable The group is available for display
 	 * @param gps Location in format of GIS coordinates, default null
 	 * @param note Note about the group
-	 * @param area Area of the group, default null
+	 * @param area Area of the group, default 0
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this group.
+	 * @param areaUnit The area unit, default 'none'
 	 */
-	constructor(id, name, displayable, gps, note, area, defaultGraphicUnit) {
+	constructor(id, name, displayable, gps, note, area = 0, defaultGraphicUnit, areaUnit = Unit.areaUnitType.NONE) {
 		this.id = id;
 		this.name = name;
 		this.displayable = displayable;
@@ -26,6 +28,7 @@ class Group {
 		this.note = note;
 		this.area = area;
 		this.defaultGraphicUnit = defaultGraphicUnit;
+		this.areaUnit = areaUnit;
 	}
 
 	/**
@@ -44,7 +47,7 @@ class Group {
 	 */
 	async insert(conn) {
 		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
-		const group = {...this};
+		const group = { ...this };
 		if (group.id !== undefined) {
 			throw new Error('Attempt to insert a group that already has an ID');
 		}
@@ -68,7 +71,7 @@ class Group {
 		if (defaultGraphicUnit === null) {
 			defaultGraphicUnit = -99;
 		}
-		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit);
+		return new Group(row.id, row.name, row.displayable, row.gps, row.note, row.area, defaultGraphicUnit, row.area_unit);
 	}
 
 	/**
@@ -87,7 +90,7 @@ class Group {
 	 * @param conn the connection to be used.
 	 * @returns {boolean} true if group exists.
 	 */
-	 async existsByName(conn) {
+	async existsByName(conn) {
 		const row = await conn.oneOrNone(sqlFile('group/get_group_by_name.sql'), { name: this.name });
 		return row !== null;
 	}
@@ -146,6 +149,38 @@ class Group {
 	}
 
 	/**
+	 * Returns a promise to retrieve the group ID and IDs of all the immediate child meters and groups of all groups.
+	 * @param id the id of the group whose children are to be retrieved
+	 * @param conn the connection to be used.
+	 * @returns {Promise.<*>}
+	 */
+	static async getImmediateChildren(conn) {
+		const rows = await conn.any(sqlFile('group/get_all_children.sql'));
+		// Rename the keys from the database ones to the JS ones.
+		const newRows = [];
+		for (const row of rows) {
+			// The database query returns a single item in the array as null if no child exists so remove that
+			// to make it an empty array.
+			this.purgeNull(row.child_meters);
+			this.purgeNull(row.child_groups);
+			// Now rename the keys.
+			newRows.push({ groupId: row.group_id, childMeters: row.child_meters, childGroups: row.child_groups });
+		}
+		return newRows;
+	}
+
+	/**
+	 * Removes first array entry if only one and null
+	 * @param {[]} array array to remove null
+	 */
+	static purgeNull(array) {
+		if (array.length === 1 && array[0] === null) {
+			// Length 1 and only item null so remove from array.
+			array.pop();
+		}
+	}
+
+	/**
 	 * Returns a promise to associate this group with a child group
 	 * @param childID ID of the meter to be the child
 	 * @param conn the connection to be used.
@@ -197,7 +232,7 @@ class Group {
 	 */
 	async update(conn) {
 		// Shallow copies the group object so that the original group's defaultGraphicUnit will not be changed to null.
-		const group = {...this};
+		const group = { ...this };
 		if (group.id === undefined) {
 			throw new Error('Attempt to update a group with no ID');
 		}
@@ -239,6 +274,17 @@ class Group {
 	}
 
 	/**
+	 * Returns a promise to retrieve an array of the group IDs of the parent groups of a group.
+	 * @param groupID the group's id that we need to find its parents.
+	 * @param conn the connection to be used.
+	 * @return {Promise<IArrayExt<any>>}
+	 */
+	static async getParentsByGroupID(groupID, conn) {
+		const rows = await conn.any(sqlFile('group/get_parents_by_group_id.sql'), { child_id: groupID });
+		return rows.map(row => row.parent_id);
+	}
+
+	/**
 	 * Returns a promise to delete a group and purge all trace of it form the memories of its parents and children
 	 * @param groupID The ID of the group to be deleted
 	 * @param conn the connection to be used.
@@ -249,4 +295,3 @@ class Group {
 	}
 }
 module.exports = Group;
-

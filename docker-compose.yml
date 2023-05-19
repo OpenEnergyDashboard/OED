@@ -20,7 +20,7 @@ services:
         #     - "5432:5432"
         # Uncomment the above lines to enable access to the PostgreSQL server
         # from the host machine.
-    # Web service runs Node
+        # Web service runs Node
     web:
         # Configuration variables for the app.
         environment:
@@ -40,17 +40,15 @@ services:
             - OED_MAIL_IDENT=someone@example.com # The user email that is used for sending emails (SMTP)
             - OED_MAIL_CREDENTIAL=credential # Set the email password for sending email here
             - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
-            - OED_MAIL_TO=someone@example.com  # Set the destination address here for where to send emails
+            - OED_MAIL_TO=someone@example.com # Set the destination address here for where to send emails
             - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
-            - OED_SITE_READING_RATE=00:15:00 # Set the reading rate (i.e. granularity) of meters here. This should be formatted hh:mm:ss. DEFAULT 15 minutes.
-            - OED_TEST_SITE_READING_RATE=00:15:00
             # Changing this value does not impact what OED displays.
             # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
             # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
             - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
-        # Set the correct build environment.
+            # Set the correct build environment.
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
@@ -68,14 +66,19 @@ services:
             # For production you might want something like:
             # - "80:3000"
             # and comment out the debug port and 3000:3000 line above
-        # Don't bring this up without the DB
+            # Don't bring this up without the DB
         depends_on:
             - database
-                # database:
-                    # We need the database and it has to be ready for work (see healthcheck above).
-                # condition: service_healthy
+              # database:
+              # We need the database and it has to be ready for work (see healthcheck above).
+              # condition: service_healthy
         # Lets docker-compose up work right
         # If environment variable install_args is not set then it becomes blank without warning user.
-        command: ["bash", "./src/scripts/installOED.sh", "${install_args:-}"]
+        command:
+            [
+                "bash",
+                "./src/scripts/installOED.sh",
+                "${install_args:-}"
+            ]
         # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
         # command: ["bash", "./src/scripts/installOED.sh"]

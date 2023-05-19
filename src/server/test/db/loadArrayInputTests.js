@@ -13,6 +13,7 @@ const loadArrayInput = require('../../services/pipeline-in-progress/loadArrayInp
 mocha.describe('PIPELINE: Load data from array', () => {
 	mocha.it('valid data input', async () => {
 		const conn = testDB.getConnection();
+		// Does not set may meter values but okay since getting readings directly.
 		const meter = new Meter(undefined, 'test_insert_array', 12345, true, true, Meter.type.MAMAC, null, undefined);
 		await meter.insert(conn);
 		const arrayInput = [[1, '17:00:00 1/24/20'],
@@ -43,7 +44,9 @@ mocha.describe('PIPELINE: Load data from array', () => {
 			false,
 			false,
 			undefined,
-			conn);
+			conn,
+			false,
+			false);
 		const result = await Reading.getAllByMeterID(meter.id, conn);
 		expect(result.length).to.equal(5);
 		let i = 0;

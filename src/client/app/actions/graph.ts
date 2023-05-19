@@ -15,10 +15,20 @@ import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
-import { changeSelectedMap } from './map';
+import { changeSelectedMap, fetchMapsDetails } from './map';
+import { fetchUnitsDetailsIfNeeded } from './units';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+
+export function changeRenderOnce() {
+	return { type: ActionType.ConfirmGraphRenderOnce };
+}
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
+}
+
+export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
+	return { type: ActionType.ToggleAreaNormalization };
 }
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
@@ -37,11 +47,15 @@ export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
 	return { type: ActionType.UpdateSelectedUnit, unitID };
 }
 
+export function updateSelectedAreaUnit(areaUnit: AreaUnitType): t.UpdateSelectedAreaUnitAction {
+	return { type: ActionType.UpdateSelectedAreaUnit, areaUnit };
+}
+
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
 	return { type: ActionType.UpdateBarDuration, barDuration };
 }
 
-export function updateLineGraphRate(lineGraphRate: t.LineGraphRate) {
+export function updateLineGraphRate(lineGraphRate: t.LineGraphRate): t.UpdateLineGraphRate {
 	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
 }
 
@@ -192,9 +206,12 @@ export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
 	chartType?: t.ChartTypes;
+	unitID?: number;
+	rate?: t.LineGraphRate;
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
+	toggleAreaNormalization?: boolean;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -204,14 +221,17 @@ export interface LinkOptions {
 
 /**
  * Update graph options from a link
- * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking
+ * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
  * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction
-	| t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility
-	| m.UpdateSelectedMapAction> = [];
+	// Visual Studio indents after the first line in autoformat but ESLint does not like that in this case so override.
+	/* eslint-disable @typescript-eslint/indent */
+	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
+		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
+	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
@@ -224,14 +244,24 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
 	}
+	if (options.unitID) {
+		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
+		dispatchSecond.push(changeSelectedUnit(options.unitID));
+	}
+	if (options.rate) {
+		dispatchSecond.push(updateLineGraphRate(options.rate));
+	}
 	if (options.barDuration) {
-		dispatchSecond.push(changeBarDuration(options.barDuration));
+		dispatchFirst.push(changeBarDuration(options.barDuration));
 	}
 	if (options.serverRange) {
 		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
 	}
 	if (options.sliderRange) {
 		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
+	}
+	if (options.toggleAreaNormalization) {
+		dispatchSecond.push(toggleAreaNormalization());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
@@ -246,6 +276,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
 	}
 	if (options.mapID) {
+		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
+		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))

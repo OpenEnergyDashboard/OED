@@ -14,7 +14,7 @@ async function refreshHourlyReadingViews() {
 
 	log.info('Refreshing Materialized Hourly Reading Views');
 	await Reading.refreshHourlyReadings(conn);
-	log.info('Materialized Hourly Views Refreshed');
+	log.info('Materialized Hourly View Refreshed');
 }
 
 module.exports = { refreshHourlyReadingViews };

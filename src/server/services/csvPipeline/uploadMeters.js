@@ -6,6 +6,7 @@ const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
+const Unit = require('../../models/Unit');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -27,55 +28,85 @@ async function uploadMeters(req, res, filepath, conn) {
 
 	// If there is a header row, we remove and ignore it for now.
 	const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
-	await Promise.all(meters.map(async meter => {
-		// First verify GPS is okay
-		// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
-		const gpsInput = meter[6];
-		// Skip if undefined.
-		if (gpsInput) {
-			// Verify GPS is okay values
-			if (!isValidGPSInput(gpsInput)) {
-				let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
+	// The original code used a Promise.all to run through the meters. The issue is that the promises are run in parallel.
+	// If the meters are independent as expected then this works fine. However, in the error case where one CSV file has
+	// the same meter name listed twice, the order of the attempts to add to the database was arbitrary. This meant one of them
+	// failed due to the duplicate name but you did not know which one. If some of the information on the two meters differed then
+	// you did not know which one you would get in the database. The best result would be the first one in the CSV file would be stored
+	// as this makes the most logical sense (no update here) and it is consistent. To make this happen a for loop is used as it
+	// is sequential. A small negative is the database requests do not run in parallel in the usual case without an error.
+	// However, uploading meters is not common so slowing it down slightly seems a reasonable price to get this behavior.
+	try {
+		for (let i = 0; i < meters.length; i++) {
+			let meter = meters[i];
+			// First verify GPS is okay
+			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
+			const gpsInput = meter[6];
+			// Skip if undefined.
+			if (gpsInput) {
+				// Verify GPS is okay values
+				if (!isValidGPSInput(gpsInput)) {
+					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
+				// DB is longitude, latitude.
+				meter[6] = switchGPS(gpsInput);
+			}
+
+			// Process unit.
+			const unitName = meter[23];
+			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
+			if (!unitId) {
+				const msg = `For meter ${meter[0]} the unit of ${unitName} is invalid`;
 				throw new CSVPipelineError(msg, undefined, 500);
 			}
-			// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
-			// DB is longitude, latitude.
-			meter[6] = switchGPS(gpsInput);
-		}
+			// Replace the unit's name by its id.
+			meter[23] = unitId;
 
-		if (req.body.update === 'true') {
-			// Updating the new meters.
-			// First get its id.
-			let nameOfMeter = req.body.meterName;
-			if (!nameOfMeter) {
-				// Seems no name provided so use one in CSV file.
-				nameOfMeter = meter[0];
-			} else if (meters.length !== 1) {
-				// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-				throw new CSVPipelineError(`Meter name provided (${nameOfMeter}) in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+			// Process default graphic unit.
+			const defaultGraphicUnitName = meter[24];
+			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
+			if (!defaultGraphicUnitId) {
+				const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
+				throw new CSVPipelineError(msg, undefined, 500);
 			}
-			let currentMeter;
-			currentMeter = await Meter.getByName(nameOfMeter, conn)
-				.catch(error => {
-					// Did not find the meter.
-					let msg = `Meter name of ${nameOfMeter} does not seem to exist with update for meters and got DB error of: ${error.message}`;
-					throw new CSVPipelineError(msg, undefined, 500);
-				});
-			currentMeter.merge(...meter);
-			await currentMeter.update(conn);
-		} else {
-			// Inserting the new meters.
-			await new Meter(undefined, ...meter).insert(conn)
-				.catch(error => {
-					// Probably duplicate meter.
-					throw new CSVPipelineError(
-						`Meter name of ${meter[0]} seems to exist when inserting new meters and got DB error of: ${error.message}`, undefined, 500);
-				});
+			// Replace the default graphic unit's name by its id.
+			meter[24] = defaultGraphicUnitId;
+
+			if (req.body.update === 'true') {
+				// Updating the new meters.
+				// First get its id.
+				let nameOfMeter = req.body.meterName;
+				if (!nameOfMeter) {
+					// Seems no name provided so use one in CSV file.
+					nameOfMeter = meter[0];
+				} else if (meters.length !== 1) {
+					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
+					throw new CSVPipelineError(`Meter name provided (\"${nameOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+				}
+				let currentMeter;
+				currentMeter = await Meter.getByName(nameOfMeter, conn)
+					.catch(error => {
+						// Did not find the meter.
+						let msg = `Meter name of \"${nameOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
+						throw new CSVPipelineError(msg, undefined, 500);
+					});
+				currentMeter.merge(...meter);
+				await currentMeter.update(conn);
+			} else {
+				// Inserting the new meters.
+				await new Meter(undefined, ...meter).insert(conn)
+					.catch(error => {
+						// Probably duplicate meter.
+						throw new CSVPipelineError(
+							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
+					});
+			}
 		}
-	}))
-		.catch(error => {
-			throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
-		});
+	} catch (error) {
+		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
+	}
 }
 
 /**
@@ -111,6 +142,24 @@ function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
 	return (array[1] + ',' + array[0]);
+}
+
+/**
+ * Return the id associated with the given unit's name.
+ * If the unit's name is invalid or its type is different from expected type, return null.
+ * @param {string} unitName The given unit's name.
+ * @param {Unit.unitType} expectedUnitType the expected unit's type.
+ * @param {*} conn The connection to use.
+ * @returns 
+ */
+async function getUnitId(unitName, expectedUnitType, conn) {
+	// Case no unit.
+	if (!unitName) return -99;
+	// Get the unit associated with the name.
+	const unit = await Unit.getByName(unitName, conn);
+	// Return null if the unit doesn't exist or its type is different from expectation.
+	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
+	return unit.id;
 }
 
 module.exports = uploadMeters;

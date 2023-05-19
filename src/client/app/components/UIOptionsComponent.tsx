@@ -7,7 +7,7 @@ import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } f
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import * as moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import ExportContainer from '../containers/ExportContainer';
+import ExportComponent from '../components/ExportComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
@@ -20,6 +20,7 @@ import 'rc-slider/assets/index.css';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -88,12 +89,13 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
+				<AreaUnitSelectComponent/>
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>
 						<div className='checkbox'>
-							<input type='checkbox' onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
+							<input type='checkbox' style={{ marginRight: '10px' }} onChange={this.handleChangeBarStacking} checked={this.props.barStacking} id='barStacking' />
 							<label htmlFor='barStacking'>
 								<FormattedMessage id='bar.stacking' />
 							</label>
@@ -249,7 +251,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				{/* We can't export compare data or map data */}
 				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
 					<div style={divTopPadding}>
-						<ExportContainer />
+						<ExportComponent />
 					</div>
 				}
 				<div style={divTopPadding}>
@@ -289,6 +291,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 	/**
 	 * Stores temporary barDuration until slider is released, used to update the UI of the slider
+	 * @param {number} value Bar duration to be stored
 	 */
 	private handleBarDurationChange(value: number) {
 		this.setState({ barDurationDays: value });

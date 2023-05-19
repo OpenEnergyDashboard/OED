@@ -14,7 +14,7 @@ import { BarReadings } from '../types/readings';
  * @param {State} state the Redux state
  * @param {number} meterID the ID of the meter to check
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given meter, time duration, bar length and unit are missing; false otherwise.
  */
@@ -50,7 +50,7 @@ export function shouldFetchMeterBarReadings(state: State, meterID: number, timeI
  * @param {State} state the Redux state
  * @param {number} groupID the ID of the group to check
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  * @returns {boolean} True if the readings for the given group, time duration, bar length and unit are missing; false otherwise.
  */
@@ -85,7 +85,7 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
 /**
  * @param {number} meterIDs the IDs of the meters to get readings
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  */
 export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
@@ -96,7 +96,7 @@ export function requestMeterBarReadings(meterIDs: number[], timeInterval: TimeIn
 /**
  * @param {number} groupIDs the IDs of the groups to get readings
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  */
 export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barDuration: moment.Duration,
@@ -107,7 +107,7 @@ export function requestGroupBarReadings(groupIDs: number[], timeInterval: TimeIn
 /**
  * @param {number} meterIDs the IDs of the meters to get readings
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  * @param {BarReadings} readings the readings for the given meters
  */
@@ -119,7 +119,7 @@ export function receiveMeterBarReadings(meterIDs: number[], timeInterval: TimeIn
 /**
  * @param {number} groupIDs the IDs of the groups to get readings
  * @param {TimeInterval} timeInterval the interval over which to check
- * @param {Moment.Duration} barDuration the duration of each bar for which to check
+ * @param {moment.Duration} barDuration the duration of each bar for which to check
  * @param {number} unitID the ID of the unit for which to check
  * @param {BarReadings} readings the readings for the given groups
  */
@@ -157,10 +157,10 @@ function fetchGroupBarReadings(groupIDs: number[], timeInterval: TimeInterval, u
 }
 
 /**
-* Fetches readings for the bar chart of all selected meters and groups, if needed.
-* @param {TimeInterval} timeInterval the interval over which to check
-* @param {number} unitID the ID of the unit for which to check
-*/
+ * Fetches readings for the bar chart of all selected meters and groups, if needed.
+ * @param {TimeInterval} timeInterval the interval over which to check
+ * @param {number} unitID the ID of the unit for which to check
+ */
 export function fetchNeededBarReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();

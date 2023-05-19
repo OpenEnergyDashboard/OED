@@ -28,8 +28,8 @@ async function processConfigFile(configFile) {
 		metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] };
 	}
 	// TODO: the unit name needs to come from the config file
-	const kWhUnit = await Unit.getByName( 'kWh', conn );
-	let unitId; 
+	const kWhUnit = await Unit.getByName('kWh', conn);
+	let unitId;
 	if (kWhUnit === null) {
 		console.log("kWh not found while processing Obvius data");
 		// TODO need a warning log
@@ -39,35 +39,38 @@ async function processConfigFile(configFile) {
 	}
 	for (internalMeterName of Object.keys(metersHash)) {
 		metersArray.push(new Meter(
-			undefined,
-			internalMeterName,
-			undefined,
-			false,
-			false,
-			Meter.type.OBVIUS,
-			null,
-			undefined,
+			undefined, // id
+			internalMeterName, // name
+			undefined, // URL
+			false, // enabled
+			false, // displayable
+			Meter.type.OBVIUS, // type 
+			null, // timezone
+			undefined, // gps
 			// Sometimes the NAME is not unique so append with internalMeterName so does not fail
 			// the uniqueness of the identifier.
-			metersHash[internalMeterName].NAME + ' for ' + internalMeterName,
-			'created via obvious config upload on ' + moment().format(),
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			undefined,
+			metersHash[internalMeterName].NAME + ' for ' + internalMeterName, // identifier
+			'created via obvious config upload on ' + moment().format(), // note
+			undefined, //area
+			undefined, // cumulative
+			undefined, // cumulativeReset
+			undefined, // cumulativeResetStart
+			undefined, // cumulativeResetEnd
+			undefined, // readingGap
+			undefined, // readingVariation
+			undefined, // readingDuplication
+			undefined, // timeSort
 			// Obvious meters only have one reading so end only.
-			true,
-			undefined,
-			undefined,
-			undefined,
-			unitId,
-			unitId
-			)
+			true, // endOnlyTime
+			undefined, // reading
+			undefined, // startTimestamp
+			undefined, // endTimestamp
+			undefined, // previousEnd
+			unitId, // unit
+			unitId, // default graphic unit
+			undefined, // area unit
+			undefined // reading frequency
+		)
 		);
 	}
 	return metersArray;

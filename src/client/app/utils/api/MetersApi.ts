@@ -30,10 +30,9 @@ export default class MetersApi {
 		);
 	}
 
-	public async rawLineReadings(meterIDs: number[], timeInterval: TimeInterval): Promise<RawReadings[]> {
-		const stringifiedIDs = meterIDs.join(',');
+	public async rawLineReadings(meterID: number, timeInterval: TimeInterval): Promise<RawReadings[]> {
 		return await this.backend.doGetRequest<RawReadings[]>(
-			`/api/readings/line/raw/meters/${stringifiedIDs}`,
+			`/api/readings/line/raw/meter/${meterID}`,
 			{ timeInterval: timeInterval.toString() }
 		);
 	}
@@ -44,8 +43,8 @@ export default class MetersApi {
 		);
 	}
 
-	public async addMeter(meter: MeterEditData): Promise<void> {
-		return await this.backend.doPostRequest('/api/meters/addMeter', meter);
+	public async addMeter(meter: MeterEditData): Promise<MeterEditData> {
+		return await this.backend.doPostRequest<MeterEditData>('/api/meters/addMeter', meter);
 	}
 
 	public async getMetersDetails(): Promise<MeterData[]> {

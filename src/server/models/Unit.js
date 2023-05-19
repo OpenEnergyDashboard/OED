@@ -63,6 +63,15 @@ class Unit {
 	}
 
 	/**
+	 * Returns a promise to create the areaUnitType enum.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<>}
+	 */
+	static createAreaUnitTypesEnum(conn) {
+		return conn.none(sqlFile('unit/create_area_unit_types_enum.sql'));
+	}
+
+	/**
 	 * Returns a promise to create the displayableType enum of admin, all, and none.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
@@ -78,33 +87,6 @@ class Unit {
 	 */
 	static createUnitRepresentTypesEnum(conn) {
 		return conn.none(sqlFile('unit/create_unit_represent_types_enum.sql'));
-	}
-
-	/**
-	 * Inserts standard units to the database.
-	 * @param {*} conn The connection to use.
-	 */
-	static async insertStandardUnits(conn) {
-		// The table contains units' data. 
-		// Each row contains: name, identifier, typeOfUnit, suffix, displayable, preferredDisplay.
-		const standardUnits = [
-			['kWh', 'kWh', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-			['MJ', 'MegaJoules', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, false],
-			['BTU', 'BTU', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true],
-			['M3_gas', 'cubic meters of gas', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['kg', 'kg', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Metric_ton', 'Metric ton', Unit.unitRepresentType.QUANTITY, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Fahrenheit', 'Fahrenheit', Unit.unitRepresentType.RAW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false],
-			['Celsius', 'Celsius', Unit.unitRepresentType.RAW, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false]
-		];
-
-		for (let i = 0; i < standardUnits.length; ++i) {
-			const unitData = standardUnits[i];
-			if (await Unit.getByName(unitData[0], conn) === null) {
-				await new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined,
-					unitData[3], null, unitData[4], unitData[5], unitData[6], 'standard unit').insert(conn);
-			}
-		}
 	}
 
 	/**
@@ -265,7 +247,8 @@ class Unit {
 Unit.unitType = Object.freeze({
 	UNIT: 'unit',
 	METER: 'meter',
-	SUFFIX: 'suffix'
+	SUFFIX: 'suffix',
+	AREA: 'area'
 });
 
 Unit.displayableType = Object.freeze({
@@ -279,6 +262,13 @@ Unit.unitRepresentType = Object.freeze({
 	FLOW: 'flow',
 	RAW: 'raw',
 	UNUSED: 'unused'
+});
+
+Unit.areaUnitType = Object.freeze({
+	FEET: 'feet',
+	METERS: 'meters',
+	NONE: 'none'
+
 });
 
 module.exports = Unit;

@@ -20,12 +20,13 @@ import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
 	updateSelectedGroups, updateSelectedUnit
 } from '../actions/graph';
-import { DisplayableType, UnitData, UnitType } from '../types/redux/units'
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { Dispatch } from '../types/redux/actions';
 import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -53,16 +54,33 @@ export default function ChartDataSelectComponent() {
 		const allGroups = state.groups.byGroupID;
 
 		// Map information about meters, groups and units into a format the component can display.
-		const sortedMeters = getMeterCompatibilityForDropdown(state);
-		const sortedGroups = getGroupCompatibilityForDropdown(state);
+		let sortedMeters = getMeterCompatibilityForDropdown(state);
+		let sortedGroups = getGroupCompatibilityForDropdown(state);
 		const sortedUnits = getUnitCompatibilityForDropdown(state);
 
-		//Map information about the currently selected meters into a format the component can display.
-		// do extra check for display if using mapChart.
-		const disableMeters: number[] = [];
-		const disableGroups: number[] = [];
+		// store meters which are found to be incompatible.
+		const incompatibleMeters = new Set<number>();
+		const incompatibleGroups = new Set<number>();
 
-		// Don't do this if there is no selected map.
+		// only run this check if area normalization is on
+		if (state.graph.areaNormalization) {
+			sortedMeters.forEach(meter => {
+				// do not allow meter to be selected if it has zero area or no area unit
+				if (allMeters[meter.value].area === 0 || allMeters[meter.value].areaUnit === AreaUnitType.none) {
+					meter.isDisabled = true;
+					incompatibleMeters.add(meter.value);
+				}
+			});
+			sortedGroups.forEach(group => {
+				// do not allow group to be selected if it has zero area or no area unit
+				if (allGroups[group.value].area === 0 || allGroups[group.value].areaUnit === AreaUnitType.none) {
+					group.isDisabled = true;
+					incompatibleGroups.add(group.value);
+				}
+			});
+		}
+
+		// ony run this check if we are displaying a map chart
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
@@ -104,12 +122,12 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(meter.value, DataType.Meter, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 						meter.isDisabled = true;
-						disableMeters.push(meter.value);
+						incompatibleMeters.add(meter.value);
 					}
 				} else {
 					// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
 					meter.isDisabled = true;
-					disableMeters.push(meter.value);
+					incompatibleMeters.add(meter.value);
 				}
 			});
 			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
@@ -121,18 +139,27 @@ export default function ChartDataSelectComponent() {
 					if (!(itemMapInfoOk(group.value, DataType.Group, mp, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 						group.isDisabled = true;
-						disableGroups.push(group.value);
+						incompatibleGroups.add(group.value);
 					}
 				} else {
 					group.isDisabled = true;
-					disableGroups.push(group.value);
+					incompatibleGroups.add(group.value);
 				}
 			});
 		}
 
-		const selectedMeters: SelectOption[] = [];
+		//Map information about the currently selected meters into a format the component can display.
+		const compatibleSelectedMeters: SelectOption[] = [];
+		const allSelectedMeters: SelectOption[] = [];
 		state.graph.selectedMeters.forEach(meterID => {
-			if (!(disableMeters.includes(meterID))) {
+			allSelectedMeters.push({
+				// For meters we display the identifier.
+				label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
+				value: meterID,
+				isDisabled: false
+			} as SelectOption)
+			// don't include meters that can't be graphed with current settings
+			if (!incompatibleMeters.has(meterID)) {
 				// If the selected unit is -99 then there is not graphic unit yet. In this case you can only select a
 				// meter that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -143,7 +170,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					dispatch(changeSelectedUnit(state.meters.byMeterID[meterID].defaultGraphicUnit));
 				}
-				selectedMeters.push({
+				compatibleSelectedMeters.push({
 					// For meters we display the identifier.
 					label: state.meters.byMeterID[meterID] ? state.meters.byMeterID[meterID].identifier : '',
 					value: meterID,
@@ -152,10 +179,30 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
-		const selectedGroups: SelectOption[] = [];
+		// re-sort by disabled because that status may have changed
+		sortedMeters = _.sortBy(sortedMeters, item => item.isDisabled, 'asc');
+		// push a dummy item as a divider.
+		const firstDisabledMeter: number = sortedMeters.findIndex(item => item.isDisabled);
+		if (firstDisabledMeter != -1) {
+			sortedMeters.splice(firstDisabledMeter, 0, {
+				value: 0,
+				label: '----- Incompatible Meters -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
+
+		const compatibleSelectedGroups: SelectOption[] = [];
+		const allSelectedGroups: SelectOption[] = [];
 		state.graph.selectedGroups.forEach(groupID => {
-			// Don't include disabled groups.
-			if (!(disableGroups.includes(groupID))) {
+			allSelectedGroups.push({
+				// For groups we display the name since no identifier.
+				label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
+				value: groupID,
+				isDisabled: false
+			} as SelectOption);
+			// don't include groups that can't be graphed with current settings
+			if (!incompatibleGroups.has(groupID)) {
 				// If the selected unit is -99 then there is no graphic unit yet. In this case you can only select a
 				// group that has a default graphic unit because that will become the selected unit. This should only
 				// happen if no meter or group is yet selected.
@@ -166,7 +213,7 @@ export default function ChartDataSelectComponent() {
 					// then this loop does not run. The loop is assumed to only run once in this case.
 					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
 				}
-				selectedGroups.push({
+				compatibleSelectedGroups.push({
 					// For groups we display the name since no identifier.
 					label: state.groups.byGroupID[groupID] ? state.groups.byGroupID[groupID].name : '',
 					value: groupID,
@@ -174,6 +221,19 @@ export default function ChartDataSelectComponent() {
 				} as SelectOption);
 			}
 		});
+
+		// re-sort by disabled because that status may have changed
+		sortedGroups = _.sortBy(sortedGroups, item => item.isDisabled, 'asc');
+		// dummy item as a divider
+		const firstDisabledGroup: number = sortedGroups.findIndex(item => item.isDisabled);
+		if (firstDisabledGroup != -1) {
+			sortedGroups.splice(firstDisabledGroup, 0, {
+				value: 0,
+				label: '----- Incompatible Groups -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
 
 		// You can only select one unit so variable name is singular.
 		// This does not need to be an array but we make it one for now so works similarly to meters & groups.
@@ -191,12 +251,34 @@ export default function ChartDataSelectComponent() {
 			}
 		});
 
+		// push a dummy item as a divider.
+		const firstDisabledUnit: number = sortedUnits.findIndex(item => item.isDisabled);
+		if (firstDisabledUnit != -1) {
+			sortedUnits.splice(firstDisabledUnit, 0, {
+				value: 0,
+				label: '----- Incompatible Units -----',
+				isDisabled: true
+			} as SelectOption
+			);
+		}
+
+		// if no area unit selected, set the default area as selected.
+		if (state.graph.selectedAreaUnit == AreaUnitType.none) {
+			state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
+		}
+
 		return {
+			// all items, sorted alphabetically and by compatibility
 			sortedMeters,
 			sortedGroups,
 			sortedUnits,
-			selectedMeters,
-			selectedGroups,
+			// only selected items which are compatible with the current graph type
+			compatibleSelectedMeters,
+			compatibleSelectedGroups,
+			// all selected items regardless of compatibility
+			allSelectedMeters,
+			allSelectedGroups,
+			// currently selected unit
 			selectedUnit
 		}
 	});
@@ -212,10 +294,21 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedGroups}
-					selectedOptions={dataProps.selectedGroups}
+					selectedOptions={dataProps.compatibleSelectedGroups}
 					placeholder={intl.formatMessage(messages.selectGroups)}
-					onValuesChange={(newSelectedGroupOptions: SelectOption[]) =>
-						dispatch(changeSelectedGroups(newSelectedGroupOptions.map(s => s.value)))}
+					onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
+						// see meters code below for comments, as the code functions the same
+						const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
+						const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
+						const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
+						const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
+						if (difference === undefined) {
+							allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
+						} else {
+							allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+						}
+						dispatch(changeSelectedGroups(allSelectedGroupIDs));
+					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</div>
@@ -225,10 +318,25 @@ export default function ChartDataSelectComponent() {
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
 					options={dataProps.sortedMeters}
-					selectedOptions={dataProps.selectedMeters}
+					selectedOptions={dataProps.compatibleSelectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
-					onValuesChange={(newSelectedMeterOptions: SelectOption[]) =>
-						dispatch(changeSelectedMeters(newSelectedMeterOptions.map(s => s.value)))}
+					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+						//computes difference between previously selected meters and current selected meters,
+						// then makes the change to all selected meters, which includes incompatible selected meters
+						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
+						const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
+						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
+						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+						// first filter finds items in the old list than are not in the new (deletions)
+						const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
+						if (difference === undefined) {
+							// finds items in the new list which are not in the old list (insertions)
+							allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
+						} else {
+							allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
+						}
+						dispatch(changeSelectedMeters(allSelectedMeterIDs));
+					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</div>
@@ -236,6 +344,7 @@ export default function ChartDataSelectComponent() {
 				<FormattedMessage id='units' />:
 			</p>
 			<div style={divBottomPadding}>
+				{/* TODO this could be converted to a regular Select component */}
 				<MultiSelectComponent
 					options={dataProps.sortedUnits}
 					selectedOptions={dataProps.selectedUnit}
@@ -266,7 +375,7 @@ export default function ChartDataSelectComponent() {
 /**
  * Determines the compatibility of units in the redux state for display in dropdown
  * @param {State} state - current redux state
- * @return {SelectOption[]} an array of SelectOption
+ * @returns {SelectOption[]} an array of SelectOption
  */
 function getUnitCompatibilityForDropdown(state: State) {
 
@@ -295,7 +404,11 @@ function getUnitCompatibilityForDropdown(state: State) {
 		// Every unit is okay/compatible in this case so skip the work needed below.
 		// Filter the units to be displayed by user status and displayable type
 		getVisibleUnitOrSuffixState(state).forEach(unit => {
-			compatibleUnits.add(unit.id);
+			if (state.graph.areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
+				incompatibleUnits.add(unit.id);
+			} else {
+				compatibleUnits.add(unit.id);
+			}
 		});
 	} else {
 		// Some meter or group is selected
@@ -314,7 +427,7 @@ function getUnitCompatibilityForDropdown(state: State) {
 			}
 		});
 	}
-	// Ready to display unit. Put selectable ones before unselectable ones.
+	// Ready to display unit. Put selectable ones before non-selectable ones.
 	const finalUnits = getSelectOptionsByItem(compatibleUnits, incompatibleUnits, state.units);
 	return finalUnits;
 }
@@ -325,7 +438,7 @@ function getUnitCompatibilityForDropdown(state: State) {
 /**
  * Determines the compatibility of meters in the redux state for display in dropdown
  * @param {State} state - current redux state
- * @return {SelectOption[]} an array of SelectOption
+ * @returns {SelectOption[]} an array of SelectOption
  */
 export function getMeterCompatibilityForDropdown(state: State) {
 	// Holds all meters visible to the user
@@ -357,13 +470,20 @@ export function getMeterCompatibilityForDropdown(state: State) {
 		// In this case, every meter is valid (provided it has a default graphic unit)
 		// If the meter has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleMeters.forEach(meterId => {
-			if (state.meters.byMeterID[meterId].defaultGraphicUnit === -99) {
+			const meterGraphingUnit = state.meters.byMeterID[meterId].defaultGraphicUnit;
+			if (meterGraphingUnit === -99) {
 				//Default graphic unit is not set
 				incompatibleMeters.add(meterId);
 			}
 			else {
 				//Default graphic unit is set
-				compatibleMeters.add(meterId);
+				if (state.graph.areaNormalization && state.units.units[meterGraphingUnit]
+					&& state.units.units[meterGraphingUnit].unitRepresent === UnitRepresentType.raw) {
+					// area normalization is enabled and meter type is raw
+					incompatibleMeters.add(meterId);
+				} else {
+					compatibleMeters.add(meterId);
+				}
 			}
 		});
 	}
@@ -393,7 +513,7 @@ export function getMeterCompatibilityForDropdown(state: State) {
 /**
  * Determines the compatibility of group in the redux state for display in dropdown
  * @param {State} state - current redux state
- * @return {SelectOption[]} an array of SelectOption
+ * @returns {SelectOption[]} an array of SelectOption
  */
 export function getGroupCompatibilityForDropdown(state: State) {
 	// Holds all groups visible to the user
@@ -425,13 +545,20 @@ export function getGroupCompatibilityForDropdown(state: State) {
 		// In this case, every group is valid (provided it has a default graphic unit)
 		// If the group has a default graphic unit set then it can graph, otherwise it cannot.
 		visibleGroup.forEach(groupId => {
-			if (state.groups.byGroupID[groupId].defaultGraphicUnit === -99) {
+			const groupGraphingUnit = state.groups.byGroupID[groupId].defaultGraphicUnit;
+			if (groupGraphingUnit === -99) {
 				//Default graphic unit is not set
 				incompatibleGroups.add(groupId);
 			}
 			else {
 				//Default graphic unit is set
-				compatibleGroups.add(groupId);
+				if (state.graph.areaNormalization && state.units.units[groupGraphingUnit] &&
+					state.units.units[groupGraphingUnit].unitRepresent === UnitRepresentType.raw) {
+					// area normalization is enabled and meter type is raw
+					incompatibleGroups.add(groupId);
+				} else {
+					compatibleGroups.add(groupId);
+				}
 			}
 		});
 	}
@@ -462,20 +589,20 @@ export function getGroupCompatibilityForDropdown(state: State) {
 /**
  * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
  * @param {State} state - current redux state
- * @return {UnitData[]} an array of UnitData
+ * @returns {UnitData[]} an array of UnitData
  */
 export function getVisibleUnitOrSuffixState(state: State) {
 	let visibleUnitsOrSuffixes;
 	if (state.currentUser.profile?.role === 'admin') {
 		// User is an admin, allow all units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable != DisplayableType.none;
+			return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable != DisplayableType.none;
 		});
 	}
 	else {
 		// User is not an admin, do not allow for admin units to be seen
 		visibleUnitsOrSuffixes = _.filter(state.units.units, (o: UnitData) => {
-			return o.typeOfUnit != UnitType.meter && o.displayable == DisplayableType.all;
+			return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable == DisplayableType.all;
 		});
 	}
 	return visibleUnitsOrSuffixes;
@@ -484,12 +611,12 @@ export function getVisibleUnitOrSuffixState(state: State) {
 /**
  *  Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
  * Visibility is determined by which set the items are contained in.
- * @param {State} state - current redux state, must be one of UnitsState, MetersState, or GroupsState
  * @param {Set<number>} compatibleItems - items that are compatible with current selected options
  * @param {Set<number>} incompatibleItems - units that are not compatible with current selected options
- * @return {SelectOption[]} an array of SelectOption
+ * @param {UnitsState | MetersState | GroupsState} state - current redux state, must be one of UnitsState, MetersState, or GroupsState
+ * @returns {SelectOption[]} an array of SelectOption
  */
-function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
+export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
 	// Holds the label of the select item, set dynamically according to the type of item passed in
 	let label = '';
 
@@ -514,6 +641,9 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.byGroupID[itemId].name;
 		}
 		else { label = ''; }
+		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
+		// This should clear once the state is loaded.
+		label = label === null ? '' : label;
 		finalItems.push({
 			value: itemId,
 			label: label,
@@ -533,6 +663,9 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 			label = state.byGroupID[itemId].name;
 		}
 		else { label = ''; }
+		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
+		// This should clear once the state is loaded.
+		label = label === null ? '' : label;
 		finalItems.push({
 			value: itemId,
 			label: label,
@@ -543,7 +676,21 @@ function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems:
 	return _.sortBy(_.sortBy(finalItems, item => item.label.toLowerCase(), 'asc'), item => item.isDisabled, 'asc');
 }
 
-// Helper functions to determine what type of state was passed in
+/**
+ * Helper function to determine what type of state was passed in
+ * @param {*} state The state to check
+ * @returns {boolean} Whether or not this is a UnitsState
+ */
 function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
+/**
+ * Helper function to determine what type of state was passed in
+ * @param {*} state The state to check
+ * @returns {boolean} Whether or not this is a MetersState
+ */
 function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
+/**
+ * Helper function to determine what type of state was passed in
+ * @param {*} state The state to check
+ * @returns {boolean} Whether or not this is a GroupsState
+ */
 function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }

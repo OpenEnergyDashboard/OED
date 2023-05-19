@@ -6,6 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
+import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -13,13 +14,17 @@ export type AdminAction =
 	| UpdateDefaultChartToRenderAction
 	| UpdateDefaultLanguageAction
 	| ToggleDefaultBarStackingAction
+	| ToggleDefaultAreaNormalizationAction
 	| RequestPreferencesAction
 	| ReceivePreferencesAction
 	| MarkPreferencesNotSubmittedAction
 	| UpdateDefaultTimeZone
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
-	| MarkPreferencesSubmittedAction;
+	| MarkPreferencesSubmittedAction
+	| UpdateCikAndDBViews
+	| UpdateDefaultAreaUnitAction
+	| UpdateDefaultMeterReadingFrequencyAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -38,6 +43,15 @@ export interface UpdateDefaultChartToRenderAction {
 
 export interface ToggleDefaultBarStackingAction {
 	type: ActionType.ToggleDefaultBarStacking;
+}
+
+export interface ToggleDefaultAreaNormalizationAction {
+	type: ActionType.ToggleDefaultAreaNormalization;
+}
+
+export interface UpdateDefaultAreaUnitAction {
+	type: ActionType.UpdateDefaultAreaUnit;
+	defaultAreaUnit: AreaUnitType;
 }
 
 export interface UpdateDefaultTimeZone {
@@ -65,6 +79,7 @@ export interface MarkPreferencesNotSubmittedAction {
 
 export interface MarkPreferencesSubmittedAction {
 	type: ActionType.MarkPreferencesSubmitted;
+	defaultMeterReadingFrequency: string;
 }
 
 export interface UpdateDefaultWarningFileSize {
@@ -75,6 +90,15 @@ export interface UpdateDefaultWarningFileSize {
 export interface UpdateDefaultFileSizeLimit {
 	type: ActionType.UpdateDefaultFileSizeLimit;
 	defaultFileSizeLimit: number;
+}
+
+export interface UpdateCikAndDBViews {
+	type: ActionType.UpdateCikAndDBViews;
+}
+
+export interface UpdateDefaultMeterReadingFrequencyAction {
+	type: ActionType.UpdateDefaultMeterReadingFrequency;
+	defaultMeterReadingFrequency: string;
 }
 
 export interface AdminState {
@@ -88,4 +112,8 @@ export interface AdminState {
 	submitted: boolean;
 	defaultWarningFileSize: number;
 	defaultFileSizeLimit: number;
+	isUpdatingCikAndDBViews: boolean;
+	defaultAreaNormalization: boolean;
+	defaultAreaUnit: AreaUnitType;
+	defaultMeterReadingFrequency: string;
 }

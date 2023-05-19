@@ -4,7 +4,7 @@
 
 const database = require('./database');
 const { mapToObject } = require('../util');
-const determineMinPoints = require('../sql/reading/determineMinPoints');
+const determineMaxPoints = require('../util/determineMaxPoints');
 
 const sqlFile = database.sqlFile;
 
@@ -51,6 +51,16 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to create the reading_line_accuracy type.
+	 * This needs to be run before Reading.createTable().
+	 * @param conn the connection to use
+	 * @return {Promise<void>}
+	 */
+	static createReadingLineAccuracyEnum(conn) {
+		return conn.none(sqlFile('reading/create_reading_line_accuracy_enum.sql'));
+	}
+
+	/**
 	 * Refreshes the daily readings view.
 	 * Should be called at least once a day, preferably in the middle of the night.
 	 * @param conn The connection to use
@@ -75,6 +85,16 @@ class Reading {
 		// This can't be a function because you can't call REFRESH inside a function
 		// TODO This will be removed once we completely transition to the unit version.
 		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+	}
+
+	/**
+	 * Because moment allows modification of its values, this creates a new Reading where all the timestamps
+	 * are cloned so they cannot change unless you modify this new one.
+	 * 
+	 * @returns a duplicate of the reading where the moment timestamps are cloned so cannot change.
+	 */
+	clone() {
+		return new Reading(this.meterID, this.reading, this.startTimestamp.clone(), this.endTimestamp.clone());
 	}
 
 	/**
@@ -161,7 +181,7 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to get all of the readings for this meter within (inclusive) a specified date range from the
+	 * Returns a promise to get all of the readings (so raw) for this meter within (inclusive) a specified date range from the
 	 * database. If no startDate is specified, all readings from the beginning of time to the endDate are returned.
 	 * If no endDate is specified, all readings after and including the startDate are returned.
 	 * @param meterID
@@ -176,7 +196,9 @@ class Reading {
 			startDate: startDate,
 			endDate: endDate
 		});
-		return rows.map(Reading.mapRow);
+		// This does not do the usual row mapping because the identifiers are not the usual ones and there
+		// is no meter id. All this is to make the data smaller.
+		return rows;
 	}
 
 	/**
@@ -216,13 +238,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getMeterLineReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
-		const [minHourPoints, minDayPoints] = determineMinPoints();
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 		const allMeterLineReadings = await conn.func('meter_line_readings_unit',
-			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
-			);
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
+		);
 
 		const readingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allMeterLineReadings) {
@@ -243,13 +265,14 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getGroupLineReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
-		const [minHourPoints, minDayPoints] = determineMinPoints();
+		// maxRawPoints is not used for groups.
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 		const allGroupLineReadings = await conn.func('group_line_readings_unit',
-			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
-			);
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, 'auto', maxHourlyPoints]
+		);
 
 		const readingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allGroupLineReadings) {
@@ -336,7 +359,7 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	 static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
 			'group_compare_readings_unit',
 			[groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);

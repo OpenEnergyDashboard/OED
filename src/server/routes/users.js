@@ -31,7 +31,7 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 /**
  * Route for obtaining the requestor's user info
  */
-router.get('/token', async(req, res) => {
+router.get('/token', async (req, res) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
 		type: 'string'
@@ -47,7 +47,7 @@ router.get('/token', async(req, res) => {
 					const conn = getConnection();
 					const userProfile = await User.getByID(decoded.data, conn);
 					res.status(200).json(
-						{ 
+						{
 							email: userProfile.email,
 							role: userProfile.role
 						});
@@ -112,15 +112,21 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
-			const conn = getConnection();
 			const { email, password, role } = req.body;
-			const hashedPassword = await bcrypt.hash(password, 10);
-			const user = new User(undefined, email, hashedPassword, role);
-			user.insert(conn);
-			res.sendStatus(200);
+			const conn = getConnection();
+			// Check if user already exists
+			const currentUser = await User.getByEmail(email, conn);
+			if (currentUser !== null) {
+				res.status(400).send({ message: `user ${email} already exists so cannot create` });
+			} else {
+				const hashedPassword = await bcrypt.hash(password, 10);
+				const user = new User(undefined, email, hashedPassword, role);
+				await user.insert(conn);
+				res.sendStatus(200);
+			}
 		} catch (error) {
 			log.error(`Error while performing POST request to create user: ${error}`, error);
-			res.status(500).json({ message: 'Internal Server Error', error: error });
+			res.status(500).send({ message: 'Internal Server Error', error: error });
 		}
 	}
 });
@@ -195,7 +201,7 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const { email } = req.body;
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
-			if(user.email === email){// Admins cannot delete themselves
+			if (user.email === email) {// Admins cannot delete themselves
 				res.sendStatus(400);
 			} else {
 				await User.deleteUser(email, conn);

@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const util = require('util');
 const reqPromise = require('request-promise-native');
-const promisify = require('es6-promisify');
 const csv = require('csv');
 const moment = require('moment');
 const Reading = require('../models/Reading');
 const loadArrayInput = require('./pipeline-in-progress/loadArrayInput');
 
-const parseCsv = promisify(csv.parse);
+const parseCsv = util.promisify(csv.parse);
 
 function parseTimestamp(raw, line) {
 	raw = raw.trim();
@@ -106,7 +106,9 @@ async function readMamacData(meter, conn) {
 		// Previous Mamac values should not change.
 		shouldUpdate = false,
 		conditionSet = undefined,
-		conn = conn
+		conn = conn,
+		honorDst = false,
+		relaxedParsing = false
 	);
 }
 

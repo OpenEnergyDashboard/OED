@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const express = require('express') /* needed to resolve types in JSDoc comments */
+
 /**
  * Inform the client of a success (200 OK).
  *

@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
+import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -16,6 +17,8 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
+import { notifyUser } from '../../utils/input'
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -73,6 +76,51 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		resetState();
 	}
 
+	// Validate the changes and return true if we should update this unit.
+	// Two reasons for not updating the unit:
+	//  0. The rate is not greater than 0.
+	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
+	//	2. There are no changes
+	const shouldUpdateUnit = (): boolean => {
+		// true if inputted values are okay and there are changes.
+		let inputOk = true;
+
+		// Check for case 0
+		if (state.secInRate <= 0) {
+			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}.`);
+			inputOk = false;
+		}
+
+		// Check for case 1
+		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
+			// Get an array of all meters
+			const meters = Object.values(store.getState().meters.byMeterID);
+			const meter = meters.find(m => m.unitId === props.unit.id);
+			if (meter) {
+				// There exists a meter that is still linked with this unit
+				notifyUser(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
+				inputOk = false;
+			}
+		}
+		if (inputOk) {
+			// The input passed validation so check if changes exist.
+			// Check for case 2 by comparing state to props
+			return props.unit.name != state.name
+				|| props.unit.identifier != state.identifier
+				|| props.unit.typeOfUnit != state.typeOfUnit
+				|| props.unit.unitRepresent != state.unitRepresent
+				|| props.unit.displayable != state.displayable
+				|| props.unit.preferredDisplay != state.preferredDisplay
+				|| props.unit.secInRate != state.secInRate
+				|| props.unit.suffix != state.suffix
+				|| props.unit.note != state.note;
+		} else {
+			// Tell user that not going to update due to input issues.
+			notifyUser(`${translate('unit.input.error')}`);
+			return false;
+		}
+	}
+
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
@@ -81,22 +129,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		// Check for changes by comparing state to props
-		const unitHasChanges =
-			(
-				props.unit.name != state.name ||
-				props.unit.identifier != state.identifier ||
-				props.unit.typeOfUnit != state.typeOfUnit ||
-				props.unit.unitRepresent != state.unitRepresent ||
-				props.unit.displayable != state.displayable ||
-				props.unit.preferredDisplay != state.preferredDisplay ||
-				props.unit.secInRate != state.secInRate ||
-				props.unit.suffix != state.suffix ||
-				props.unit.note != state.note);
-		// Only do work if there are changes
-		if (unitHasChanges) {
+		if (shouldUpdateUnit()) {
+			// Need to redo Cik if the suffix, displayable, or type of unit changes.
+			// For displayable, it only matters if it changes from/to NONE but a more general check is used here for simplification.
+			const shouldRedoCik = props.unit.suffix !== state.suffix
+				|| props.unit.typeOfUnit !== state.typeOfUnit
+				|| props.unit.displayable !== state.displayable;
+			// Need to refresh reading views if unitRepresent or secInRate (when the unit is flow or raw) changes.
+			const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent
+				|| (props.unit.secInRate !== state.secInRate
+					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 			// Save our changes by dispatching the submitEditedUnit action
-			dispatch(submitEditedUnit(state));
+			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
 			// The updated unit is not fetched to save time. However, the identifier might have been
 			// automatically set if it was empty. Mimic that here.
 			if (state.identifier === '') {
@@ -104,21 +148,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			}
 			dispatch(removeUnsavedChanges());
 		}
-
 	}
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		tooltipEditUnitView: 'help.admin.unitedit'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -126,9 +160,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="edit.unit" />
-						<TooltipHelpContainer page='units' />
+						<TooltipHelpContainer page='units-edit' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipEditUnitView} />
+							<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
@@ -151,7 +185,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div />
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.name" /></label><br />
+											<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'
@@ -164,8 +198,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 											<Input
 												name='typeOfUnit'
 												type='select'
-												onChange={e => handleStringChange(e)}>
-												value={state.typeOfUnit}
+												onChange={e => handleStringChange(e)}
+												value={state.typeOfUnit}>
 												{Object.keys(UnitType).map(key => {
 													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 												})}

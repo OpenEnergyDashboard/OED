@@ -17,6 +17,7 @@ import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
 import * as _ from 'lodash';
+import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -147,18 +148,8 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	};
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
-		// For now, it uses the same help text from conversion view page.
+		...tooltipBaseStyle,
 		tooltipCreateConversionView: 'help.admin.conversioncreate'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -171,9 +162,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			<Modal show={showModal} onHide={handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="create.conversion" />
-						<TooltipHelpContainer page='conversions' />
+						<TooltipHelpContainer page='conversions-create' />
 						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipCreateConversionView} />
+							<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 						</div>
 					</Modal.Title>
 				</Modal.Header>
@@ -186,7 +177,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 								<div style={tableStyle}>
 									{/* Source unit input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.source" /></label><br />
+										<label>{translate('conversion.source')} <label style={requiredStyle}>*</label></label>
 										<Input
 											name='sourceId'
 											type='select'
@@ -206,7 +197,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 									</div>
 									{/* Destination unit input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.destination" /></label><br />
+										<label>{translate('conversion.destination')} <label style={requiredStyle}>*</label></label>
 										<Input
 											name='destinationId'
 											type='select'
@@ -226,7 +217,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 									</div>
 									{/* Bidirectional Y/N input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.bidirectional" /></label><br />
+										<label><FormattedMessage id="conversion.bidirectional" /></label>
 										<Input
 											name='bidirectional'
 											type='select'
@@ -238,16 +229,17 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 									</div>
 									{/* Slope input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.slope" /></label><br />
+										<label><FormattedMessage id="conversion.slope" /></label>
 										<Input
 											name='slope'
 											type='number'
+											defaultValue={state.slope}
 											onChange={e => handleNumberChange(e)}
-											required value={state.slope} />
+										/>
 									</div>
 									{/* Intercept input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.intercept" /></label><br />
+										<label><FormattedMessage id="conversion.intercept" /></label>
 										<Input
 											name='intercept'
 											type='number'
@@ -256,7 +248,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 									</div>
 									{/* Note input*/}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.note.optional" /></label><br />
+										<label><FormattedMessage id="conversion.note" /></label>
 										<Input
 											name='note'
 											type='textarea'

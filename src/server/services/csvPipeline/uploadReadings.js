@@ -4,7 +4,7 @@
 
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
-const loadCsvInput = require('../pipeline-in-progress/loadCsvInput');
+const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
 const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
@@ -19,10 +19,12 @@ const moment = require('moment');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterName, createMeter, headerRow, update } = req.body; // extract query parameters
-	// headerRow has no value in the DB for a meter so always use the value passed.
+	const { meterName, createMeter, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === 'true');
 	const shouldUpdate = (update === 'true');
+	let shouldHonorDst = (honorDst === 'true');
+	let shouldRelaxedParsing = (relaxedParsing === 'true');
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
@@ -35,9 +37,37 @@ async function uploadReadings(req, res, filepath, conn) {
 				);
 			} else {
 				// If createMeter is true, we will create the meter for the user.
-				// The meter type is unknown so set to other.
-				const tempMeter = new Meter(undefined, meterName, undefined, false, false, Meter.type.OTHER, undefined, undefined, meterName,
-					'created via reading upload on ' + moment().format());
+				// The meter type is unknown so set to other. Most parameters take on default values.
+				const tempMeter = new Meter(
+					undefined, // id
+					meterName, // name
+					undefined, // URL
+					false, // enabled
+					false, // displayable
+					Meter.type.OTHER, // type 
+					undefined, // timezone
+					undefined, // gps
+					meterName, // identifier
+					'created via reading upload on ' + moment().format(), // note
+					undefined, //area
+					undefined, // cumulative
+					undefined, // cumulativeReset
+					undefined, // cumulativeResetStart
+					undefined, // cumulativeResetEnd
+					undefined, // readingGap
+					undefined, // readingVariation
+					undefined, // readingDuplication
+					undefined, // timeSort
+					undefined, // endOnlyTime
+					undefined, // reading
+					undefined, // startTimestamp
+					undefined, // endTimestamp
+					undefined, // previousEnd
+					undefined, // unit
+					undefined, // default graphic unit
+					undefined, // area unit
+					undefined // reading frequency
+				)
 				await tempMeter.insert(conn);
 				meterCreated = true;
 				log.info('Creating meter ' + tempMeter.name);
@@ -205,7 +235,9 @@ async function uploadReadings(req, res, filepath, conn) {
 		hasHeaderRow,
 		shouldUpdate,
 		undefined,
-		conn
+		conn,
+		shouldHonorDst,
+		shouldRelaxedParsing
 	); // load csv data
 }
 
