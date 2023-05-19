@@ -5,32 +5,32 @@
  */
 
 {
-    "compilerOptions": {
-        "baseUrl": "./src/client/app/",
-        "outDir": "./src/client/public/app/",
-        "sourceMap": true,
-        "module": "commonjs",
-        "target": "es5",
+	"compilerOptions": {
+		"baseUrl": "./src/client/app/",
+		"outDir": "./src/client/public/app/",
+		"sourceMap": true,
+		"module": "commonjs",
+		"target": "es5",
 		"jsx": "react",
 		"allowJs": true,
-        "lib": ["es6", "dom", "es2021"],
-        "moduleResolution": "node",
-        "rootDir": "src",
-        "allowSyntheticDefaultImports": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "noImplicitAny": true,
-        "strictNullChecks": true,
-        "noUnusedLocals": true,
-        "typeRoots": [
-            "./node_modules/@types",
-            "./src/client/app/types"
-        ]
-    },
-    "include": [
-        "./src/client/app/**/*", "desc.d.ts"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+		"lib": ["es6", "dom", "es2021"],
+		"moduleResolution": "node",
+		"rootDir": "src",
+		"allowSyntheticDefaultImports": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true,
+		"noUnusedLocals": true,
+		"typeRoots": [
+			"./node_modules/@types",
+			"./src/client/app/types"
+		]
+	},
+	"include": [
+		"./src/client/app/**/*", "desc.d.ts"
+	],
+	"exclude": [
+		"node_modules"
+	]
 }
