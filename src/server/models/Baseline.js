@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 const database = require('./database');
-const { TimeInterval } = require('../../common/TimeInterval');
+const { TimeInterval } = import('../../common/TimeInterval.mjs');
 const sqlFile = database.sqlFile;
 class Baseline {
 	constructor(meterID, applyStart, applyEnd, calcStart, calcEnd, note = null, baselineValue = null) {

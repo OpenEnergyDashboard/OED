@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const moment = require('moment')
+import moment from 'moment'
 
-class TimeInterval {
+export class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
 		// utc keeps the moments from changing timezone.
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
@@ -103,5 +103,3 @@ class TimeInterval {
 		return new TimeInterval(startTimestamp, endTimestamp);
 	}
 }
-
-exports.TimeInterval = TimeInterval

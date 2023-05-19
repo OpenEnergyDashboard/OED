@@ -21,7 +21,7 @@ const { meterLineReadings,
 	validateBarReadingsQueryParams
 } = require('../../routes/unitReadings');
 
-const { TimeInterval } = require('../../../common/TimeInterval');
+const { TimeInterval } = import('../../../common/TimeInterval.mjs');
 
 function mockResponse() {
 	return {
