@@ -38,8 +38,8 @@ while test $# -gt 0; do
 			shift
 			;;
 		*)
-			printf "Unknown argument \"%s\"\n" $1
-			printf "%s\n" $USAGE
+			printf "Unknown argument \"%s\"\n" "$1"
+			printf "%s\n" "$USAGE"
 			exit 1
 	esac
 done
