@@ -30,7 +30,7 @@ For a list of contributors, [click here](https://github.com/OpenEnergyDashboard/
 
 This project is licensed under the MPL version 2.0.
 
-See the full licensing agreement [here](License.txt)
+See the full licensing agreement [here](LICENSE.txt)
 
 ## Contributions ##
 
