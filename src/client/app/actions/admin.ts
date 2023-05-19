@@ -12,7 +12,7 @@ import { State } from '../types/redux/state';
 import { conversionArrayApi, preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
-import * as moment from 'moment';
+import moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 

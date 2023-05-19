@@ -17,7 +17,7 @@ import {State} from '../types/redux/state';
 import {mapsApi} from '../utils/api';
 import {showErrorNotification, showSuccessNotification} from '../utils/notifications';
 import translate from '../utils/translate';
-import * as moment from 'moment';
+import moment from 'moment';
 import {browserHistory} from '../utils/history';
 import {logToServer} from './logs';
 

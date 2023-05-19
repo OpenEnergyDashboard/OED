@@ -10,7 +10,7 @@ import MultiCompareChartContainer from '../containers/MultiCompareChartContainer
 import MapChartContainer from '../containers/MapChartContainer';
 import SpinnerComponent from './SpinnerComponent';
 import {ChartTypes} from '../types/redux/graph';
-import * as moment from 'moment';
+import moment from 'moment';
 import {TimeInterval} from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
 import { FormattedMessage } from 'react-intl';

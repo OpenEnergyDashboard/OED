@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../common/TimeInterval';
-import * as moment from 'moment';
+import moment from 'moment';
 import translate from '../utils/translate';
 
 /**

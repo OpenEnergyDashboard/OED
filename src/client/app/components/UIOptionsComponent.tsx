@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage, defineMessages, injectIntl, WrappedComponentProps } from 'react-intl';
 import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import ExportComponent from '../components/ExportComponent';
 import ChartSelectComponent from './ChartSelectComponent';

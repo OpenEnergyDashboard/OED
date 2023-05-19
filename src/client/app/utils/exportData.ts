@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { LineReading, RawReadings } from '../types/readings';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ChartTypes } from 'types/redux/graph';
 
 /**
