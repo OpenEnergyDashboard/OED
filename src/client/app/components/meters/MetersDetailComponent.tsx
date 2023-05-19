@@ -17,7 +17,7 @@ import CreateMeterModalComponent from './CreateMeterModalComponent';
 import { MeterData } from 'types/redux/meters';
 import '../../styles/card-page.css';
 import { UnitData, UnitType } from '../../types/redux/units';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 
 export default function MetersDetailComponent() {

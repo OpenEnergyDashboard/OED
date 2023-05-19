@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import NotificationSystem from 'react-notification-system';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';

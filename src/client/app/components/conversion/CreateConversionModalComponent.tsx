@@ -16,7 +16,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {

@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import {TimeInterval} from '../../../../common/TimeInterval';
 import {BarReadings, LineReading, LineReadings} from '../../types/readings';

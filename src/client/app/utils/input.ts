@@ -5,7 +5,7 @@
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
 import translate from './translate';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 // Notifies user of msg.
 // TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.

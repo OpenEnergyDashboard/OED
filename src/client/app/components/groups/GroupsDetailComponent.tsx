@@ -18,7 +18,7 @@ import { potentialGraphicUnits } from '../../utils/input';
 import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
-import * as _ from 'lodash';
+import _ from 'lodash';
 
 export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();

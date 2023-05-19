@@ -10,7 +10,7 @@ import {
 	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
 	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';

@@ -7,7 +7,7 @@ import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
 import localeData from '../translations/data';
 import { browserHistory } from '../utils/history';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import moment from 'moment';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
