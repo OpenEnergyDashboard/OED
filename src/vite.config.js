@@ -6,9 +6,6 @@ export default defineConfig({
 	root: './src',
 	build: {
 		outDir: './server/public',
-		commonjsOptions: {
-			// exclude: [/TimeInterval.js$/],
-		},
 	},
 	publicDir: './client/public',
 	plugins: [react(), commonjs()],

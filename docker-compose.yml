@@ -59,20 +59,19 @@ services:
     # Using a volume allows autorebuild to work.
     volumes:
       - ./:/usr/src/app
-    # Map the default port.
+    # List ports the container should expose
+    # For production you might want to add "80:3000" in place of the "3000:3000" line below
     ports:
-      - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
-      - "9229:9229" # Debug port, should be commented out for production
-      # For production you might want something like:
-      # - "80:3000"
-      # and comment out the debug port and 3000:3000 line above
-      # Don't bring this up without the DB
+      - "3000:3000"
+      - "9229:9229" # Development port; should be commented out for production
+      - "9230:9230"
+
     depends_on:
+      # Don't bring this up without the DB
       - database
         # database:
         # We need the database and it has to be ready for work (see healthcheck above).
         # condition: service_healthy
-    # Lets docker-compose up work right
     # If environment variable install_args is not set then it becomes blank without warning user.
     command:
       [
@@ -80,5 +79,3 @@ services:
         "./src/scripts/installOED.sh",
         "${install_args:-}"
       ]
-    # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
-    # command: ["bash", "./src/scripts/installOED.sh"]

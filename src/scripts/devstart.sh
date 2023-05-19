@@ -6,6 +6,8 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
+# If we're in a container, pass '--host' flag so server remains
+# accessible outside the container.
 extra_args=
 if [ -f /.dockerenv ]; then
 	# This is passed to vite, which exposts the port to the

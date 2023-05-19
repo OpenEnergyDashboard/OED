@@ -7,8 +7,8 @@
 	"scripts": {
 		"start": "node ./src/bin/www",
 		"start:dev": "nodemon --legacy-watch --inspect=0.0.0.0 ./src/bin/www",
-		"vite:dev": "vite --config ./src/vite.config.js build",
-		"vite:build": "vite --config",
+		"client:dev": "vite --config ./src/vite.config.js",
+		"client:build": "vite --config ./src/vite.config.js build",
 		"check": "./src/scripts/devcheck.sh",
 		"check:header": "./src/scripts/checkHeader.sh",
 		"check:typescript": "./src/scripts/checkTypescript.sh",
@@ -114,11 +114,8 @@
 	"devDependencies": {
 		"@redux-devtools/core": "~3.11.0",
 		"@redux-devtools/extension": "~3.2.2",
-		"@types/core-js": "~0.9.43",
-		"@types/express-rate-limit": "~6.0.0",
 		"@types/history": "~4.7.2",
 		"@types/lodash": "~4.14.122",
-		"@types/moment": "~2.13.0",
 		"@types/plotly.js": "~2.12.5",
 		"@types/rc-slider": "~8.2.3",
 		"@types/react": "~17.0.53",
