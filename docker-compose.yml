@@ -21,6 +21,24 @@ services:
     # Uncomment the above lines to enable access to the PostgreSQL server
     # from the host machine.
     # Web service runs Node
+  dev-server:
+    # Comment out the this service for production
+    build:
+      context: ./
+      dockerfile: ./containers/web/Dockerfile
+    # Using a volume allows autorebuild to work.
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - "9229:9229"
+    depends_on:
+      - web
+    command:
+      [
+        "bash",
+        "./src/scripts/devStartVite.sh",
+        "${install_args:-}"
+      ]
   web:
     # Configuration variables for the app.
     environment:
@@ -56,16 +74,12 @@ services:
     links:
       - database
     # Load the source code into the container.
-    # Using a volume allows autorebuild to work.
     volumes:
       - ./:/usr/src/app
     # List ports the container should expose
     # For production you might want to add "80:3000" in place of the "3000:3000" line below
     ports:
       - "3000:3000"
-      - "9229:9229" # Development port; should be commented out for production
-      - "9230:9230"
-
     depends_on:
       # Don't bring this up without the DB
       - database
