@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import * as _ from 'lodash';
-import * as NotificationSystem from 'react-notification-system';
+import NotificationSystem from 'react-notification-system';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
