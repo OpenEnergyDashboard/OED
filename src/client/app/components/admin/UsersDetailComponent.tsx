@@ -11,7 +11,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index'
+import { store }  from '../../store'
 
 interface UserDisplayComponentProps {
 	users: User[];

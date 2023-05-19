@@ -9,7 +9,7 @@ import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
 import { fetchMetersDetails } from '../../actions/meters';
-import store from '../../index';
+import { store }  from '../../store';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;

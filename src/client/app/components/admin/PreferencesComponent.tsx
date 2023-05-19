@@ -21,7 +21,7 @@ import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsave
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
-import store from '../../index';
+import { store }  from '../../store';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 

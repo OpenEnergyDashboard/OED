@@ -13,7 +13,7 @@ import {Link} from 'react-router-dom';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index';
+import { store }  from '../../store';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
 interface MapsDetailProps {

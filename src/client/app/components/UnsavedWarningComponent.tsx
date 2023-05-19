@@ -12,7 +12,7 @@ import ModalFooter from 'reactstrap/lib/ModalFooter';
 import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 import { deleteToken } from '../utils/token';
 import { clearCurrentUser } from '../actions/currentUser';
-import store from '../index';
+import { store }  from '../store';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
 	hasUnsavedChanges: boolean;

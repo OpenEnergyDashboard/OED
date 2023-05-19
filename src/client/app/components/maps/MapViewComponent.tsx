@@ -8,8 +8,8 @@ import { Link } from 'react-router-dom';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import store from '../../index';
 import moment from 'moment';
+import { store }  from '../../store';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
 

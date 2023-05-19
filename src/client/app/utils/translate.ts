@@ -4,7 +4,7 @@
 
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import localeData from '../translations/data';
-import store from '../index';
+import { store }  from '../store';
 
 // TODO This used to be multiple types of:
 // const enum AsTranslated {}

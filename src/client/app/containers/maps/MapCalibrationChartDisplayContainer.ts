@@ -8,7 +8,7 @@ import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
 import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
 import { updateCurrentCartesian } from '../../actions/map';
-import store from '../../index';
+import { store }  from '../../store';
 import { CalibrationSettings } from '../../types/redux/map';
 import Locales from '../../types/locales'
 
