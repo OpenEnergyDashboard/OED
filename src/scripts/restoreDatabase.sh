@@ -26,10 +26,12 @@ docker compose restart database
 echo ""
 
 # Restore the dump to the database
-#Add some delay to before restoring dump
+# Add some delay before restoring dump
 sleep 5
 echo "Restoring database dump ..."
-docker compose exec database psql -U postgres < script_database_dump.sql
+# The -T was needed so docker does not complain about tty on one Window 11 machine.
+# Hopefully this works on all OSes as it is part of docker.
+docker compose exec -T database psql -U postgres < script_database_dump.sql
 echo ""
 
 # Shut down the database container
