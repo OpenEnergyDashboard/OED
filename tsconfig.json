@@ -28,7 +28,7 @@
 		"typeRoots": [
 			"./node_modules/@types",
 			"./src/client/app/types"
-		]
+		],
 	},
 	"include": [
 		"./src/client/app/**/*",

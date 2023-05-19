@@ -58,7 +58,9 @@
 		"react-notification-system": {
 			"react": "$react",
 			"react-dom": "$react-dom"
-		}
+		},
+		"@formatjs/ecma402-abstract": "1.13.0"
+
 	},
 	"dependencies": {
 		"@formatjs/intl": "~1.17.0",
