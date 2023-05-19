@@ -6,79 +6,79 @@
 
 version: "3.8"
 services:
-    # Database service. It's PostgreSQL, see the
-    # Dockerfile in ./database
-    database:
-        build: ./containers/database/
-        environment:
-            # Custom PGDATA per recommendations from official Docker page
-            - PGDATA=/var/lib/postgresql/data/pgdata
-            - POSTGRES_PASSWORD=pleaseChange # default postgres password that should be changed for security.
-        volumes:
-            - ./postgres-data:/var/lib/postgresql/data/pgdata
-        # ports:
-        #     - "5432:5432"
-        # Uncomment the above lines to enable access to the PostgreSQL server
-        # from the host machine.
-        # Web service runs Node
-    web:
-        # Configuration variables for the app.
-        environment:
-            - OED_PRODUCTION=no
-            - OED_SERVER_PORT=3000
-            - OED_DB_USER=oed
-            - OED_DB_DATABASE=oed
-            - OED_DB_TEST_DATABASE=oed_testing
-            - OED_DB_PASSWORD=opened
-            - OED_DB_HOST=database # Docker will set this hostname
-            - OED_DB_PORT=5432
-            - OED_TOKEN_SECRET=?
-            - OED_LOG_FILE=log.txt
-            - OED_MAIL_METHOD=none # Method of sending mail. Supports "secure-smtp", "none". Case insensitive.
-            - OED_MAIL_SMTP=smtp.example.com # Edit this
-            - OED_MAIL_SMTP_PORT=465 # Edit this
-            - OED_MAIL_IDENT=someone@example.com # The user email that is used for sending emails (SMTP)
-            - OED_MAIL_CREDENTIAL=credential # Set the email password for sending email here
-            - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
-            - OED_MAIL_TO=someone@example.com # Set the destination address here for where to send emails
-            - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
-            # Changing this value does not impact what OED displays.
-            # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
-            # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
-            - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
-            # If in a subdirectory, set it here
-            # - OED_SUBDIR=/subdir/
-            # Set the correct build environment.
-        build:
-            context: ./
-            dockerfile: ./containers/web/Dockerfile
-        # Link to the database so the app can persist data
-        links:
-            - database
-        # Load the source code into the container.
-        # Using a volume allows autorebuild to work.
-        volumes:
-            - ./:/usr/src/app
-        # Map the default port.
-        ports:
-            - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
-            - "9229:9229" # Debug port, should be commented out for production
-            # For production you might want something like:
-            # - "80:3000"
-            # and comment out the debug port and 3000:3000 line above
-            # Don't bring this up without the DB
-        depends_on:
-            - database
-              # database:
-              # We need the database and it has to be ready for work (see healthcheck above).
-              # condition: service_healthy
-        # Lets docker-compose up work right
-        # If environment variable install_args is not set then it becomes blank without warning user.
-        command:
-            [
-                "bash",
-                "./src/scripts/installOED.sh",
-                "${install_args:-}"
-            ]
-        # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
-        # command: ["bash", "./src/scripts/installOED.sh"]
+  # Database service. It's PostgreSQL, see the
+  # Dockerfile in ./database
+  database:
+    build: ./containers/database/
+    environment:
+      # Custom PGDATA per recommendations from official Docker page
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - POSTGRES_PASSWORD=pleaseChange # default postgres password that should be changed for security.
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data/pgdata
+    # ports:
+    #     - "5432:5432"
+    # Uncomment the above lines to enable access to the PostgreSQL server
+    # from the host machine.
+    # Web service runs Node
+  web:
+    # Configuration variables for the app.
+    environment:
+      - OED_PRODUCTION=no
+      - OED_SERVER_PORT=3000
+      - OED_DB_USER=oed
+      - OED_DB_DATABASE=oed
+      - OED_DB_TEST_DATABASE=oed_testing
+      - OED_DB_PASSWORD=opened
+      - OED_DB_HOST=database # Docker will set this hostname
+      - OED_DB_PORT=5432
+      - OED_TOKEN_SECRET=?
+      - OED_LOG_FILE=log.txt
+      - OED_MAIL_METHOD=none # Method of sending mail. Supports "secure-smtp", "none". Case insensitive.
+      - OED_MAIL_SMTP=smtp.example.com # Edit this
+      - OED_MAIL_SMTP_PORT=465 # Edit this
+      - OED_MAIL_IDENT=someone@example.com # The user email that is used for sending emails (SMTP)
+      - OED_MAIL_CREDENTIAL=credential # Set the email password for sending email here
+      - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
+      - OED_MAIL_TO=someone@example.com # Set the destination address here for where to send emails
+      - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
+      # Changing this value does not impact what OED displays.
+      # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
+      # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
+      - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
+      # If in a subdirectory, set it here
+      # - OED_SUBDIR=/subdir/
+      # Set the correct build environment.
+    build:
+      context: ./
+      dockerfile: ./containers/web/Dockerfile
+    # Link to the database so the app can persist data
+    links:
+      - database
+    # Load the source code into the container.
+    # Using a volume allows autorebuild to work.
+    volumes:
+      - ./:/usr/src/app
+    # Map the default port.
+    ports:
+      - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
+      - "9229:9229" # Debug port, should be commented out for production
+      # For production you might want something like:
+      # - "80:3000"
+      # and comment out the debug port and 3000:3000 line above
+      # Don't bring this up without the DB
+    depends_on:
+      - database
+        # database:
+        # We need the database and it has to be ready for work (see healthcheck above).
+        # condition: service_healthy
+    # Lets docker-compose up work right
+    # If environment variable install_args is not set then it becomes blank without warning user.
+    command:
+      [
+        "bash",
+        "./src/scripts/installOED.sh",
+        "${install_args:-}"
+      ]
+    # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
+    # command: ["bash", "./src/scripts/installOED.sh"]

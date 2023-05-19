@@ -90,11 +90,11 @@ while [ $create_error == 0 ]; do
 		printf "%s\n" "FAILED! Too many tries. Try again but then check if your database at $OED_DB_HOST:$OED_DB_PORT is down."
 		exit 1
 	fi
-    # Sleep to let PostgreSQL chill out
-    sleep 3
-    printf "%s\n" "Attempting to create database..."
-    # Redirect stderr to a file
-    npm run createdb |& tee /tmp/oed.error > /dev/null
+	# Sleep to let PostgreSQL chill out
+	sleep 3
+	printf "%s\n" "Attempting to create database..."
+	# Redirect stderr to a file
+	npm run createdb |& tee /tmp/oed.error > /dev/null
 	createdb_code=${PIPESTATUS[0]}
 	# TODO: This should be moved to the error case below once issues with this process are under control.
 	# If all is well it could go inside the case where an unknown error occurred.
@@ -137,7 +137,7 @@ done
 # Create a user
 set -e
 if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
-    npm run createUser -- test@example.com password
+	npm run createUser -- test@example.com password
 	createuser_code=$?
 	if [ $createuser_code -ne 0 ]; then
 		# There was an error so stop process unless asked to continue on DB issues.
@@ -161,7 +161,7 @@ fi
 
 # Build webpack if needed
 if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
-    npm run webpack:build
+	npm run webpack:build
 elif [ "$dostart" == "no" ]; then
 	npm run webpack
 fi

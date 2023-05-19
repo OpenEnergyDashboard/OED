@@ -9,29 +9,29 @@ sudo: required
 
 language: node_js
 node_js:
-  - "14"
+  - '14'
 services:
   - postgresql
   - docker
 
 addons:
-  postgresql: "10"
+  postgresql: '10'
   apt:
-         packages:
-         - postgresql-10
-         - postgresql-client-10
+    packages:
+      - postgresql-10
+      - postgresql-client-10
 
 env:
-    - OED_DB_USER=test OED_DB_PASSWORD=test OED_DB_DATABASE=travis_ci_dummy OED_DB_TEST_DATABASE=travis_ci_test OED_DB_HOST=localhost OED_DB_PORT=5432 OED_TOKEN_SECRET=travis OED_SERVER_PORT=3000 OED_TEST_SITE_READING_RATE=00:15:00 DOCKER_COMPOSE_VERSION=1.27.4 POSTGRES_PASSWORD=travisTest
+  - OED_DB_USER=test OED_DB_PASSWORD=test OED_DB_DATABASE=travis_ci_dummy OED_DB_TEST_DATABASE=travis_ci_test OED_DB_HOST=localhost OED_DB_PORT=5432 OED_TOKEN_SECRET=travis OED_SERVER_PORT=3000 OED_TEST_SITE_READING_RATE=00:15:00 DOCKER_COMPOSE_VERSION=1.27.4 POSTGRES_PASSWORD=travisTest
 
 before_install:
-    - sudo rm /usr/local/bin/docker-compose
-    - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-    - chmod +x docker-compose
-    - sudo mv docker-compose /usr/local/bin
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 before_script:
-    # Database for non-Docker execution
+  # Database for non-Docker execution
   - psql -c 'CREATE DATABASE travis_ci_test' -U postgres
   - psql -c "CREATE USER test WITH PASSWORD 'test';" -U postgres
   - psql -c 'CREATE EXTENSION IF NOT EXISTS btree_gist;' -U postgres -d travis_ci_test
@@ -39,9 +39,9 @@ before_script:
   - docker-compose run --rm web src/scripts/installOED.sh --nostart
 
 script:
-    # Validate legal requirements on source files
+  # Validate legal requirements on source files
   - npm run check:header
-    # Validate that all areas which are intended to be typed, are typed
+  # Validate that all areas which are intended to be typed, are typed
   - npm run check:typescript
     # Validate that the client's type system is internally consistent
   - npm run check:types

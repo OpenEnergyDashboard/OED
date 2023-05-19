@@ -28,7 +28,8 @@
 		]
 	},
 	"include": [
-		"./src/client/app/**/*", "desc.d.ts"
+		"./src/client/app/**/*",
+		"desc.d.ts"
 	],
 	"exclude": [
 		"node_modules"

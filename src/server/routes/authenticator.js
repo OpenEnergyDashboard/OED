@@ -44,7 +44,7 @@ authMiddleware = (req, res, next) => {
 };
 
 /**
- * Middleware that checks the request body for the email and password parameters. If the body contains the email and password parameters, then next 
+ * Middleware that checks the request body for the email and password parameters. If the body contains the email and password parameters, then next
  * is executed. Otherwise, the server responds with a 400 error.
  */
 function credentialsRequestValidationMiddleware(req, res, next) {
@@ -72,9 +72,9 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 
 /**
  * Verifies the email and password of a user.
- * @param {string} email 
- * @param {string} password 
- * @param {boolean} returnUser 
+ * @param {string} email
+ * @param {string} password
+ * @param {boolean} returnUser
  * @returns true if the user exists in the database. False otherwise. Returns the user itself if returnUser is set to true and user is verified.
  */
 async function verifyCredentials(email, password, returnUser = false) {
@@ -96,8 +96,8 @@ async function verifyCredentials(email, password, returnUser = false) {
 
 /**
  * Returns middleware that verifies the requested token and only proceeds if the requestor is a particular user role or is Admin.
- * @param {string} role 
- * @param action 
+ * @param {string} role
+ * @param action
  */
 function roleTokenAuthMiddleware(role, action) {
 	return function (req, res, next) {
