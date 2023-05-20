@@ -7,21 +7,21 @@ This shouldn't ever be looking at more than a few weeks of data, so we don't nee
  */
 
 /*
-TODO This functioin can probably be improved for two reasons:
+TODO This function can probably be improved for two reasons:
 1) While it was noted that you don't look at too many days, it does limit its usage to modest time lengths.
 There has been thought to allowing comparisons, for example, or a whole year. It also assumes that the
 frequency of readings is not too high so the number of readings looked at could be large even over
 modest time frames.
 2) Readings are only included if they are within the current time period. This means that if you have
 a reading that crosses the timeframe they are excluded. This can be viewed as either a good thing or
-a bad thing. However, if the frequency of readings is high, then large segements of time can be excluded.
+a bad thing. However, if the frequency of readings is high, then large segments of time can be excluded.
 For example, monthly readings would not be includes in either day, week or four week comparisons that
 OED currently does. Also note that the daily and hourly views do include readings that span a time frame
 so including them would be consistent.
 
 We need to think about how best to deal with this but one option is to use the daily and hourly tables
 to get the reading values as in done with bar graphs. This needs to be a little different since partial
-days can be invovled. However, getting the full days from the daily table and then the hours from the
+days can be involved. However, getting the full days from the daily table and then the hours from the
 hourly table to be combined would solve this. (One could get the subhour from the raw readings but it is
 unclear users would want that.) Another consider is that the current system, as is the case for bar graphs,
 does not take into account missing times in readings which can lead to lower than expected values. The
@@ -29,7 +29,7 @@ daily and hourly readings would help fix this.
 */
 
 /*
-The following function returns data for plotting bacompare graphs. It works on meters.
+The following function returns data for plotting compare graphs. It works on meters.
 It should not be used on raw readings.
 It is the new version of compare_readings that works with units. It takes these parameters:
 meter_ids: A array of meter ids to query.
