@@ -3,97 +3,50 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-
 import { LanguageTypes } from '../types/redux/i18n';
-import { UpdateDefaultLanguageAction } from '../types/redux/admin';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import Dropdown from 'reactstrap/lib/Dropdown';
-import DropdownItem from 'reactstrap/lib/DropdownItem';
-import DropdownToggle from 'reactstrap/lib/DropdownToggle';
-import DropdownMenu from 'reactstrap/lib/DropdownMenu';
-
-interface LanguageSelectProps {
-	selectedLanguage: LanguageTypes;
-	changeLanguage(languageType: LanguageTypes): UpdateDefaultLanguageAction;
-}
-
-interface DropdownState {
-	dropdownOpen: boolean;
-	compareSortingDropdownOpen: boolean;
-}
-
-// Convert the i18n language type to its full name.
-enum LanguageNames {
-	en = 'English',
-	fr = 'Français',
-	es = 'Español'
-}
+import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateDefaultLanguage } from '../actions/admin';
+import { State } from '../types/redux/state';
+import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 
 /**
  * A component that allows users to select which language the page should be displayed in.
  */
-export default class LanguageSelectorComponent extends React.Component<LanguageSelectProps, DropdownState> {
-	constructor(props: LanguageSelectProps) {
-		super(props);
-		this.handleChangeLanguage = this.handleChangeLanguage.bind(this);
-		this.toggleDropdown = this.toggleDropdown.bind(this);
-		this.state = {
-			dropdownOpen: false,
-			compareSortingDropdownOpen: false
-		};
-	}
+export default function LanguageSelectorComponent() {
+	const dispatch = useDispatch();
 
-	public render() {
-		const divBottomPadding: React.CSSProperties = {
-			paddingBottom: '15px'
-		};
+	const selectedLanguage = useSelector((state: State) => state.admin.defaultLanguage);
 
-		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-
-		return (
-			<div style={divBottomPadding}>
-				<p style={labelStyle}>
-					<FormattedMessage id='language' />:
-				</p>
-				<Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown}>
-					<DropdownToggle outline caret>
-						{/* Show the currently selected language as its name */}
-						{LanguageNames[this.props.selectedLanguage]}
-					</DropdownToggle>
-					<DropdownMenu>
-						<DropdownItem
-							onClick={() => this.handleChangeLanguage(LanguageTypes.en)}
-						>
-							English
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeLanguage(LanguageTypes.fr)}
-						>
-							Français
-						</DropdownItem>
-						<DropdownItem
-							onClick={() => this.handleChangeLanguage(LanguageTypes.es)}
-						>
-							Español
-						</DropdownItem>
-					</DropdownMenu>
-				</Dropdown>
-				<div>
+	return (
+		<div>
+			<UncontrolledDropdown direction='end'>
+				<DropdownToggle nav caret>
+					<FormattedMessage id='language' />
+				</DropdownToggle>
+				<DropdownMenu>
+					<DropdownItem
+						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.en))}
+						disabled={selectedLanguage === LanguageTypes.en}>
+						English
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.fr))}
+						disabled={selectedLanguage === LanguageTypes.fr}>
+						Français
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.es))}
+						disabled={selectedLanguage === LanguageTypes.es}>
+						Español
+					</DropdownItem>
+					<DropdownItem divider />
+					<TooltipHelpContainer page='home' />
 					<TooltipMarkerComponent page='home' helpTextId='help.home.language' />
-				</div>
-			</div>
-		);
-	}
-
-	private handleChangeLanguage(value: LanguageTypes) {
-		this.props.changeLanguage(value);
-	}
-
-	private toggleDropdown() {
-		this.setState(prevState => ({ dropdownOpen: !prevState.dropdownOpen }));
-	}
+				</DropdownMenu>
+			</UncontrolledDropdown>
+		</div>
+	);
 }

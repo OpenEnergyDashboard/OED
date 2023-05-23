@@ -3,8 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, FormFeedback, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
@@ -109,6 +108,17 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
+
+	const [validMeter, setValidMeter] = useState(false);
+	useEffect(() => {
+		setValidMeter(
+			state.name !== '' &&
+			(state.area === 0 || (state.area > 0 && state.areaUnit !== AreaUnitType.none)) &&
+			state.readingGap >= 0 &&
+			state.readingVariation >= 0
+			&& (state.readingDuplication >= 1 && state.readingDuplication <= 9)
+		);
+	}, [state.area, state.name, state.readingGap, state.readingVariation, state.readingDuplication, state.areaUnit]);
 	/* End State */
 
 	// Reset the state to default values
@@ -170,39 +180,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
-
 			// TODO Maybe should do as a single popup?
 
 			// Set default identifier as name if left blank
 			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-
-			// Check if area is non-negative
-			if (state.area < 0) {
-				notifyUser(translate('area.invalid') + state.area + '.');
-				inputOk = false;
-			} else if (state.area > 0 && state.areaUnit === AreaUnitType.none) {
-				// If the meter has an assigned area, it must have a unit
-				notifyUser(translate('area.but.no.unit'));
-				inputOk = false;
-			}
-
-			// Check reading gap is at least zero.
-			if (state.readingGap < 0) {
-				notifyUser(translate('reading.gap.invalid') + state.readingGap + '.');
-				inputOk = false;
-			}
-
-			// Check reading variation is at least zero.
-			if (state.readingVariation < 0) {
-				notifyUser(translate('reading.variation.invalid') + state.readingVariation + '.');
-				inputOk = false;
-			}
-
-			// Check reading duplication is between 1 and 9.
-			if (state.readingDuplication < 1 || state.readingDuplication > 9) {
-				notifyUser(translate('duplication.invalid') + state.area + '.');
-				inputOk = false;
-			}
 
 			// Check GPS entered.
 			// Validate GPS is okay and take from string to GPSPoint to submit.
@@ -342,344 +323,355 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	return (
 		<>
-			<Modal show={props.show} onHide={props.handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.meter" />
-						<TooltipHelpContainer page='meters-edit' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the meter are changed call one of the functions. */}
+			<Modal isOpen={props.show} toggle={props.handleClose}>
+				<ModalHeader>
+					<FormattedMessage id="edit.meter" />
+					<TooltipHelpContainer page='meters-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
+					</div>
+				</ModalHeader>
+				{/* when any of the Meter values are changed call one of the functions. */}
 				{loggedInAsAdmin && // only render when logged in as Admin
-					<Modal.Body className="show-grid">
-						<div id="container">
-							<div id="modalChild">
-								{/* Modal content */}
-								<div className="container-fluid">
-									<div style={tableStyle}>
-										{/* Identifier input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.identifier" /></label>
-											<Input
-												name="identifier"
-												type="text"
-												onChange={e => handleStringChange(e)}
-												value={state.identifier} />
-										</div>
-										{/* Name input */}
-										<div style={formInputStyle}>
-											<label>{translate('meter.name')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												required value={state.name} />
-										</div>
-										{/* meter unit input */}
-										<div style={formInputStyle}>
-											<label> {translate('meter.unitName')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name="unitId"
-												type='select'
-												value={state.unitId}
-												onChange={e => handleNumberChange(e)}>
-												{Array.from(dropdownsState.compatibleUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-												{Array.from(dropdownsState.incompatibleUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
-										{/* default graphic unit input */}
-										<div style={formInputStyle}>
-											<label>{translate('meter.defaultGraphicUnit')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='defaultGraphicUnit'
-												type='select'
-												value={state.defaultGraphicUnit}
-												onChange={e => handleNumberChange(e)}>
-												{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-												{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Enabled input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.enabled" /></label>
-											<Input
-												name='enabled'
-												type='select'
-												// There is a subtle difference from create. In crete the state is set to
-												// the default values so always is there. In edit, it comes via props so
-												// it may not be set before the meter state is fetched. This probably only
-												// happens when your reload one of these pages but to avoid issues it uses
-												// the ? to avoid access. This only applies to items where you dereference
-												// the state value such as .toString() here.
-												value={state.enabled?.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Displayable input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.displayable" /></label>
-											<Input
-												name='displayable'
-												type='select'
-												value={state.displayable?.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Meter type input */}
-										<div style={formInputStyle}>
-											<label>{translate('meter.type')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='meterType'
-												type='select'
-												value={state.meterType}
-												onChange={e => handleStringChange(e)}>
-												{/* The dB expects lowercase. */}
-												{Object.keys(MeterType).map(key => {
-													return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Meter reading frequency */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingFrequency" /><label style={requiredStyle}>*</label></label>
-											<Input
-												name='readingFrequency'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state.readingFrequency} />
-										</div>
-										{/* URL input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.url" /></label>
-											<Input
-												name='url'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={nullToEmptyString(state.url)} />
-										</div>
-										{/* Area input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area" /></label>
-											<Input
-												name="area"
-												type="number"
-												min="0"
-												defaultValue={state.area}
-												onChange={e => handleNumberChange(e)} />
-										</div>
-										{/* meter area unit input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.area.unit" /></label>
-											<Input
-												name='areaUnit'
-												type='select'
-												value={state.areaUnit}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(AreaUnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* GPS input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.gps" /></label>
-											<Input
-												name='gps'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={getGPSString(state.gps)} />
-										</div>
-										{/* note input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.note" /></label>
-											<Input
-												name='note'
-												type='textarea'
-												onChange={e => handleStringChange(e)}
-												value={nullToEmptyString(state.note)}
-												placeholder='Note' />
-										</div>
-										{/* cumulative input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulative" /></label>
-											<Input
-												name='cumulative'
-												type='select'
-												value={state.cumulative?.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* cumulativeReset input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeReset" /></label>
-											<Input
-												name='cumulativeReset'
-												type='select'
-												value={state.cumulativeReset?.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* cumulativeResetStart input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeResetStart" /></label>
-											<Input
-												name='cumulativeResetStart'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state.cumulativeResetStart}
-												placeholder="HH:MM:SS" />
-										</div>
-										{/* cumulativeResetEnd input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.cumulativeResetEnd" /></label>
-											<Input
-												name='cumulativeResetEnd'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state?.cumulativeResetEnd}
-												placeholder="HH:MM:SS" />
-										</div>
-										{/* endOnlyTime input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endOnlyTime" /></label>
-											<Input
-												name='endOnlyTime'
-												type='select'
-												value={state.endOnlyTime?.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* readingGap input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingGap" /></label>
-											<Input
-												name='readingGap'
-												type='number'
-												onChange={e => handleNumberChange(e)}
-												min="0"
-												value={state?.readingGap} />
-										</div>
-										{/* readingVariation input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.readingVariation" /></label>
-											<Input
-												name="readingVariation"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												min="0"
-												defaultValue={state?.readingVariation} />
-										</div>
-										{/* readingDuplication input */}
-										<div style={formInputStyle}>
-											<label>{translate('meter.readingDuplication')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name="readingDuplication"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												step="1"
-												min="1"
-												max="9"
-												defaultValue={state?.readingDuplication} />
-										</div>
-										{/* timeSort input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.timeSort" /></label>
-											<Input
-												name='timeSort'
-												type='select'
-												value={state?.timeSort}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(MeterTimeSortType).map(key => {
-													// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
-													// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
-													return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Timezone input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.time.zone" /></label>
-											<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-										</div>
-										{/* reading input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.reading" /></label>
-											<Input
-												name="reading"
-												type="number"
-												onChange={e => handleNumberChange(e)}
-												defaultValue={state?.reading} />
-										</div>
-										{/* startTimestamp input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.startTimeStamp" /></label>
-											<Input
-												name='startTimestamp'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												placeholder="YYYY-MM-DD HH:MM:SS"
-												value={state?.startTimestamp} />
-										</div>
-										{/* endTimestamp input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.endTimeStamp" /></label>
-											<Input
-												name='endTimestamp'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												placeholder="YYYY-MM-DD HH:MM:SS"
-												value={state?.endTimestamp} />
-										</div>
-										{/* previousEnd input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="meter.previousEnd" /></label>
-											<Input
-												name='previousEnd'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												placeholder="YYYY-MM-DD HH:MM:SS"
-												value={state?.previousEnd} />
-										</div>
-									</div>
-								</div>
-							</div>
+					<ModalBody style={tableStyle}>
+						{/* Identifier input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.identifier" /></label>
+							<Input
+								name="identifier"
+								type="text"
+								onChange={e => handleStringChange(e)}
+								value={state.identifier} />
 						</div>
-					</Modal.Body>}
-				<Modal.Footer>
+						{/* Name input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.name" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name='name'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								required value={state.name} />
+						</div>
+						{/* meter unit input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.unitName" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name="unitId"
+								type='select'
+								value={state.unitId}
+								onChange={e => handleNumberChange(e)}>
+								{Array.from(dropdownsState.compatibleUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+								})}
+								{Array.from(dropdownsState.incompatibleUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+								})}
+							</Input>
+						</div>
+						{/* default graphic unit input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.defaultGraphicUnit" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name='defaultGraphicUnit'
+								type='select'
+								value={state.defaultGraphicUnit}
+								onChange={e => handleNumberChange(e)}>
+								{Array.from(dropdownsState.compatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+								})}
+								{Array.from(dropdownsState.incompatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Enabled input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.enabled" /></label>
+							<Input
+								name='enabled'
+								type='select'
+								// There is a subtle difference from create. In crete the state is set to
+								// the default values so always is there. In edit, it comes via props so
+								// it may not be set before the meter state is fetched. This probably only
+								// happens when your reload one of these pages but to avoid issues it uses
+								// the ? to avoid access. This only applies to items where you dereference
+								// the state value such as .toString() here.
+								value={state.enabled?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Displayable input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.displayable" /></label>
+							<Input
+								name='displayable'
+								type='select'
+								value={state.displayable?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Meter type input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.type" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name='meterType'
+								type='select'
+								value={state.meterType}
+								onChange={e => handleStringChange(e)}>
+								{/* The dB expects lowercase. */}
+								{Object.keys(MeterType).map(key => {
+									return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Meter reading frequency */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.readingFrequency" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name='readingFrequency'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={state.readingFrequency} />
+						</div>
+						{/* URL input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.url" /></label>
+							<Input
+								name='url'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={nullToEmptyString(state.url)} />
+						</div>
+						{/* Area input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.area" /></label>
+							<Input
+								name="area"
+								type="number"
+								min="0"
+								defaultValue={state.area}
+								onChange={e => handleNumberChange(e)}
+								invalid={state.area < 0} />
+							<FormFeedback invalid>
+								<FormattedMessage id="error.negative" />
+							</FormFeedback>
+						</div>
+						{/* meter area unit input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.area.unit" /></label>
+							<Input
+								name='areaUnit'
+								type='select'
+								value={state.areaUnit}
+								onChange={e => handleStringChange(e)}
+								invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
+								{Object.keys(AreaUnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+								})}
+							</Input>
+							<FormFeedback invalid>
+								<FormattedMessage id="area.but.no.unit" />
+							</FormFeedback>
+						</div>
+						{/* GPS input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.gps" /></label>
+							<Input
+								name='gps'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={getGPSString(state.gps)} />
+						</div>
+						{/* note input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.note" /></label>
+							<Input
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={nullToEmptyString(state.note)}
+								placeholder='Note' />
+						</div>
+						{/* cumulative input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.cumulative" /></label>
+							<Input
+								name='cumulative'
+								type='select'
+								value={state.cumulative?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* cumulativeReset input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.cumulativeReset" /></label>
+							<Input
+								name='cumulativeReset'
+								type='select'
+								value={state.cumulativeReset?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* cumulativeResetStart input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.cumulativeResetStart" /></label>
+							<Input
+								name='cumulativeResetStart'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={state.cumulativeResetStart}
+								placeholder="HH:MM:SS" />
+						</div>
+						{/* cumulativeResetEnd input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.cumulativeResetEnd" /></label>
+							<Input
+								name='cumulativeResetEnd'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={state?.cumulativeResetEnd}
+								placeholder="HH:MM:SS" />
+						</div>
+						{/* endOnlyTime input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.endOnlyTime" /></label>
+							<Input
+								name='endOnlyTime'
+								type='select'
+								value={state.endOnlyTime?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* readingGap input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.readingGap" /></label>
+							<Input
+								name='readingGap'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state?.readingGap}
+								invalid={state?.readingGap < 0}/>
+							<FormFeedback invalid>
+								<FormattedMessage id="error.negative" />
+							</FormFeedback>
+						</div>
+						{/* readingVariation input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.readingVariation" /></label>
+							<Input
+								name="readingVariation"
+								type="number"
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state?.readingVariation}
+								invalid={state?.readingVariation < 0} />
+							<FormFeedback invalid>
+								<FormattedMessage id="error.negative" />
+							</FormFeedback>
+						</div>
+						{/* readingDuplication input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.readingDuplication" /><label style={requiredStyle}>*</label></label>
+							<Input
+								name="readingDuplication"
+								type="number"
+								onChange={e => handleNumberChange(e)}
+								step="1"
+								min="1"
+								max="9"
+								defaultValue={state?.readingDuplication}
+								invalid={state?.readingDuplication < 1 || state?.readingDuplication > 9}/>
+							<FormFeedback invalid>
+								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9'}}  />
+							</FormFeedback>
+						</div>
+						{/* timeSort input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.timeSort" /></label>
+							<Input
+								name='timeSort'
+								type='select'
+								value={state?.timeSort}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(MeterTimeSortType).map(key => {
+									// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
+									// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
+									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Timezone input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.time.zone" /></label>
+							<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+						</div>
+						{/* reading input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.reading" /></label>
+							<Input
+								name="reading"
+								type="number"
+								onChange={e => handleNumberChange(e)}
+								defaultValue={state?.reading} />
+						</div>
+						{/* startTimestamp input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.startTimeStamp" /></label>
+							<Input
+								name='startTimestamp'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								placeholder="YYYY-MM-DD HH:MM:SS"
+								value={state?.startTimestamp} />
+						</div>
+						{/* endTimestamp input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.endTimeStamp" /></label>
+							<Input
+								name='endTimestamp'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								placeholder="YYYY-MM-DD HH:MM:SS"
+								value={state?.endTimestamp} />
+						</div>
+						{/* previousEnd input */}
+						<div style={formInputStyle}>
+							<label><FormattedMessage id="meter.previousEnd" /></label>
+							<Input
+								name='previousEnd'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								placeholder="YYYY-MM-DD HH:MM:SS"
+								value={state?.previousEnd} />
+						</div>
+					</ModalBody>
+				}
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!validMeter}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

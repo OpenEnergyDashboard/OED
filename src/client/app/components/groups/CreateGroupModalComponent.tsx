@@ -8,8 +8,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Input, InputGroup, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -289,208 +288,198 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button onClick={handleShow}>
 				<FormattedMessage id="create.group" />
 			</Button>
 
-			<Modal show={showModal} onHide={handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.group" />
-						<TooltipHelpContainer page='groups-create' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='groups-create' helpTextId={tooltipStyle.tooltipCreateGroupView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
+			<Modal isOpen={showModal} toggle={handleClose}>
+				<ModalHeader>
+					<FormattedMessage id="create.group" />
+					<TooltipHelpContainer page='groups-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='groups-create' helpTextId={tooltipStyle.tooltipCreateGroupView} />
+					</div>
+				</ModalHeader>
 				{/* when any of the group properties are changed call one of the functions. */}
 				{loggedInAsAdmin && // only render when logged in as Admin
-					<Modal.Body className="show-grid">
-						<div id="container">
-							<div id="modalChild">
-								{/* Modal content */}
-								<div className="container-fluid">
-									<div style={tableStyle}>
-										{/* Name input */}
-										<div style={formInputStyle}>
-											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												required value={state.name} />
-										</div>
-										{/* default graphic unit input */}
-										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
-											<Input
-												name='defaultGraphicUnit'
-												type='select'
-												value={state.defaultGraphicUnit}
-												onChange={e => handleNumberChange(e)}>
-												{/* First list the selectable ones and then the rest as disabled. */}
-												{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-												{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Displayable input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label>
-											<Input
-												name='displayable'
-												type='select'
-												value={state.displayable.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Area input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label>
-											<Input
-												name="area"
-												type="number"
-												min="0"
-												// cannot use defaultValue because it won't update when area is auto calculated
-												value={state.area}
-												onChange={e => handleNumberChange(e)} />
-										</div>
-										{/* meter area unit input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area.unit" /></label>
-											<Input
-												name='areaUnit'
-												type='select'
-												value={state.areaUnit}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(AreaUnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Calculate sum of meter areas */}
-										<div style={formInputStyle}>
-											<Button variant="secondary" onClick={handleAutoCalculateArea}>
-												<FormattedMessage id="group.area.calculate" />
-											</Button>
-											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
-										</div>
-										{/* GPS input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label>
-											<Input
-												name='gps'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={getGPSString(state.gps)} />
-										</div>
-										{/* Note input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label>
-											<Input
-												name='note'
-												type='textarea'
-												onChange={e => handleStringChange(e)}
-												value={state.note} />
-										</div>
-										{/* The child meters in this group */}
-										{
-											<div style={formInputStyle}>
-												<b><FormattedMessage id='child.meters' /></b>:
-												<MultiSelectComponent
-													options={groupChildrenState.meterSelectOptions}
-													selectedOptions={metersToSelectOptions()}
-													placeholder={translate('select.meters')}
-													onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
-														// The meters changed so update the current list of deep meters
-														// Get the currently included/selected meters as an array of the ids.
-														const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
-														// The id is not really needed so set to -1 since same function for edit.
-														const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 });
-														// The choice may have invalidated the default graphic unit so it needs
-														// to be reset to no unit.
-														// The selection encodes this information in the color but recalculate
-														// to see if this is the case.
-														// Get the units compatible with the new set of deep meters in group.
-														const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
-														// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
-														newAllowedDGU.add(-99);
-														let dgu = state.defaultGraphicUnit;
-														if (!newAllowedDGU.has(dgu)) {
-															// The current default graphic unit is not compatible so set to no unit and warn admin.
-															notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
-															dgu = -99;
-														}
-														// Update the deep meter, child meter & default graphic unit state based on the changes.
-														// Note could update child meters above to avoid updating state value for metersInChangedGroup but want
-														// to avoid too many state updates.
-														// It is possible the default graphic unit is unchanged but just do this.
-														setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters, defaultGraphicUnit: dgu });
-													}}
-												/>
-											</div>
-										}
-										{/* The child groups in this group */}
-										{<div style={formInputStyle}>
-											<b><FormattedMessage id='child.groups' /></b>:
-											<MultiSelectComponent
-												options={groupChildrenState.groupSelectOptions}
-												selectedOptions={groupsToSelectOptions()}
-												placeholder={translate('select.groups')}
-												onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
-													// The groups changed so update the current list of deep meters
-													// Get the currently included/selected meters as an array of the ids.
-													const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
-													// The id is not really needed so set to -1 since same function for edit.
-													const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 });
-													// The choice may have invalidated the default graphic unit so it needs
-													// to be reset to no unit.
-													// The selection encodes this information in the color but recalculate
-													// to see if this is the case.
-													// Get the units compatible with the new set of deep meters in group.
-													const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
-													// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
-													newAllowedDGU.add(-99);
-													let dgu = state.defaultGraphicUnit;
-													if (!newAllowedDGU.has(dgu)) {
-														// The current default graphic unit is not compatible so set to no unit and warn admin.
-														notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
-														dgu = -99;
-													}
-													// Update the deep meter, child meter & default graphic unit state based on the changes.
-													// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
-													// to avoid too many state updates.
-													// It is possible the default graphic unit is unchanged but just do this.
-													setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups, defaultGraphicUnit: dgu });
-												}}
-											/>
-										</div>
-										}
-										{/* All (deep) meters in this group */}
-										<div>
-											<b><FormattedMessage id='group.all.meters' /></b>:
-											<ListDisplayComponent items={deepMetersToList()} />
-										</div>
-									</div>
-								</div>
-							</div>
+					<ModalBody style={tableStyle}>
+						{/* Name input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.name" /><label style={requiredStyle}>*</label>
+							<Input
+								name='name'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								required value={state.name} />
 						</div>
-					</Modal.Body>}
-				<Modal.Footer>
+						{/* default graphic unit input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.defaultGraphicUnit" />
+							<Input
+								name='defaultGraphicUnit'
+								type='select'
+								value={state.defaultGraphicUnit}
+								onChange={e => handleNumberChange(e)}>
+								{/* First list the selectable ones and then the rest as disabled. */}
+								{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+								})}
+								{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Displayable input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.displayable" />
+							<Input
+								name='displayable'
+								type='select'
+								value={state.displayable.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Area input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.area" />
+							<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
+							<InputGroup>
+								<Input
+									name="area"
+									type="number"
+									min="0"
+									// cannot use defaultValue because it won't update when area is auto calculated
+									value={state.area}
+									onChange={e => handleNumberChange(e)} />
+								{/* Calculate sum of meter areas */}
+								<Button onClick={handleAutoCalculateArea}>
+									<FormattedMessage id="group.area.calculate" />
+								</Button>
+							</InputGroup>
+						</div>
+						{/* meter area unit input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.area.unit" />
+							<Input
+								name='areaUnit'
+								type='select'
+								value={state.areaUnit}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(AreaUnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* GPS input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.gps" />
+							<Input
+								name='gps'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={getGPSString(state.gps)} />
+						</div>
+						{/* Note input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.note" />
+							<Input
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={state.note} />
+						</div>
+						{/* The child meters in this group */}
+						{
+							<div style={formInputStyle}>
+								<b><FormattedMessage id='child.meters' /></b>:
+								<MultiSelectComponent
+									options={groupChildrenState.meterSelectOptions}
+									selectedOptions={metersToSelectOptions()}
+									placeholder={translate('select.meters')}
+									onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
+										// The meters changed so update the current list of deep meters
+										// Get the currently included/selected meters as an array of the ids.
+										const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
+										// The id is not really needed so set to -1 since same function for edit.
+										const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 });
+										// The choice may have invalidated the default graphic unit so it needs
+										// to be reset to no unit.
+										// The selection encodes this information in the color but recalculate
+										// to see if this is the case.
+										// Get the units compatible with the new set of deep meters in group.
+										const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+										// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
+										newAllowedDGU.add(-99);
+										let dgu = state.defaultGraphicUnit;
+										if (!newAllowedDGU.has(dgu)) {
+											// The current default graphic unit is not compatible so set to no unit and warn admin.
+											notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+											dgu = -99;
+										}
+										// Update the deep meter, child meter & default graphic unit state based on the changes.
+										// Note could update child meters above to avoid updating state value for metersInChangedGroup but want
+										// to avoid too many state updates.
+										// It is possible the default graphic unit is unchanged but just do this.
+										setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters, defaultGraphicUnit: dgu });
+									}}
+								/>
+							</div>
+						}
+						{/* The child groups in this group */}
+						{<div style={formInputStyle}>
+							<b><FormattedMessage id='child.groups' /></b>:
+							<MultiSelectComponent
+								options={groupChildrenState.groupSelectOptions}
+								selectedOptions={groupsToSelectOptions()}
+								placeholder={translate('select.groups')}
+								onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
+									// The groups changed so update the current list of deep meters
+									// Get the currently included/selected meters as an array of the ids.
+									const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
+									// The id is not really needed so set to -1 since same function for edit.
+									const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 });
+									// The choice may have invalidated the default graphic unit so it needs
+									// to be reset to no unit.
+									// The selection encodes this information in the color but recalculate
+									// to see if this is the case.
+									// Get the units compatible with the new set of deep meters in group.
+									const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+									// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
+									newAllowedDGU.add(-99);
+									let dgu = state.defaultGraphicUnit;
+									if (!newAllowedDGU.has(dgu)) {
+										// The current default graphic unit is not compatible so set to no unit and warn admin.
+										notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+										dgu = -99;
+									}
+									// Update the deep meter, child meter & default graphic unit state based on the changes.
+									// Note could update child groups above to avoid updating state value for metersInChangedGroup but want
+									// to avoid too many state updates.
+									// It is possible the default graphic unit is unchanged but just do this.
+									setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups, defaultGraphicUnit: dgu });
+								}}
+							/>
+						</div>
+						}
+						{/* All (deep) meters in this group */}
+						<div>
+							<b><FormattedMessage id='group.all.meters' /></b>:
+							<ListDisplayComponent items={deepMetersToList()} />
+						</div>
+					</ModalBody>}
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!state.name}>
+					<Button color='primary' onClick={handleSubmit} disabled={!state.name}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

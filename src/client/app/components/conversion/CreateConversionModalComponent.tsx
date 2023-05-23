@@ -5,8 +5,7 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
@@ -155,121 +154,111 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
 			</Button>
 
-			<Modal show={showModal} onHide={handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.conversion" />
-						<TooltipHelpContainer page='conversions-create' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the conversion are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Source unit input*/}
-									<div style={formInputStyle}>
-										<label>{translate('conversion.source')} <label style={requiredStyle}>*</label></label>
-										<Input
-											name='sourceId'
-											type='select'
-											defaultValue={-999}
-											onChange={e => handleNumberChange(e)}>
-											{<option
-												value={-999}
-												key={-999}
-												hidden={state.sourceId !== -999}
-												disabled>
-												{translate('conversion.select.source') + '...'}
-											</option>}
-											{Object.values(unitsSorted).map(unitData => {
-												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Destination unit input*/}
-									<div style={formInputStyle}>
-										<label>{translate('conversion.destination')} <label style={requiredStyle}>*</label></label>
-										<Input
-											name='destinationId'
-											type='select'
-											defaultValue={-999}
-											onChange={e => handleNumberChange(e)}>
-											{<option
-												value={-999}
-												key={-999}
-												hidden={state.destinationId !== -999}
-												disabled>
-												{translate('conversion.select.destination') + '...'}
-											</option>}
-											{Object.values(unitsSorted).map(unitData => {
-												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Bidirectional Y/N input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.bidirectional" /></label>
-										<Input
-											name='bidirectional'
-											type='select'
-											onChange={e => handleBooleanChange(e)}>
-											{Object.keys(TrueFalseType).map(key => {
-												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Slope input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.slope" /></label>
-										<Input
-											name='slope'
-											type='number'
-											defaultValue={state.slope}
-											onChange={e => handleNumberChange(e)}
-										/>
-									</div>
-									{/* Intercept input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.intercept" /></label>
-										<Input
-											name='intercept'
-											type='number'
-											onChange={e => handleNumberChange(e)}
-											required value={state.intercept} />
-									</div>
-									{/* Note input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.note" /></label>
-										<Input
-											name='note'
-											type='textarea'
-											onChange={e => handleStringChange(e)}
-											value={state.note} />
-									</div>
-								</div>
-							</div>
-						</div>
+			<Modal isOpen={showModal} toggle={handleClose}>
+				<ModalHeader>
+					<FormattedMessage id="create.conversion" />
+					<TooltipHelpContainer page='conversions-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalHeader>
+				{/* when any of the conversion are changed call one of the functions. */}
+				<ModalBody style={tableStyle}>
+					{/* Source unit input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.source" /><label style={requiredStyle}>*</label></label>
+						<Input
+							name='sourceId'
+							type='select'
+							defaultValue={-999}
+							onChange={e => handleNumberChange(e)}>
+							{<option
+								value={-999}
+								key={-999}
+								hidden={state.sourceId !== -999}
+								disabled>
+								{translate('conversion.select.source') + '...'}
+							</option>}
+							{Object.values(unitsSorted).map(unitData => {
+								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Destination unit input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.destination" /><label style={requiredStyle}>*</label></label>
+						<Input
+							name='destinationId'
+							type='select'
+							defaultValue={-999}
+							onChange={e => handleNumberChange(e)}>
+							{<option
+								value={-999}
+								key={-999}
+								hidden={state.destinationId !== -999}
+								disabled>
+								{translate('conversion.select.destination') + '...'}
+							</option>}
+							{Object.values(unitsSorted).map(unitData => {
+								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Bidirectional Y/N input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.bidirectional" /></label>
+						<Input
+							name='bidirectional'
+							type='select'
+							onChange={e => handleBooleanChange(e)}>
+							{Object.keys(TrueFalseType).map(key => {
+								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Slope input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.slope" /></label>
+						<Input
+							name='slope'
+							type='number'
+							defaultValue={state.slope}
+							onChange={e => handleNumberChange(e)}
+						/>
+					</div>
+					{/* Intercept input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.intercept" /></label>
+						<Input
+							name='intercept'
+							type='number'
+							onChange={e => handleNumberChange(e)}
+							required value={state.intercept} />
+					</div>
+					{/* Note input*/}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.note" /></label>
+						<Input
+							name='note'
+							type='textarea'
+							onChange={e => handleStringChange(e)}
+							value={state.note} />
+					</div>
+				</ModalBody>
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!validConversion}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

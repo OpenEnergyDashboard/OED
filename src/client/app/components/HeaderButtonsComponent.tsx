@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import MenuModalComponent from './MenuModalComponent';
@@ -19,6 +18,8 @@ import { deleteToken } from '../utils/token';
 import { clearCurrentUser } from '../actions/currentUser';
 import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
+import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import LanguageSelectorComponent from './LanguageSelectorComponent';
 
 export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: boolean, isModal: boolean }) {
 	const dispatch = useDispatch();
@@ -133,12 +134,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		}));
 	}, [currentUser]);
 
-	// Style for dropdown
-	const dropAlign: React.CSSProperties = {
-		right: 0,
-		margin: 0
-	};
-
 	// Handle actions on logout.
 	const handleLogOut = () => {
 		if (unsavedChangesState) {
@@ -163,76 +158,94 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 				) : null}
 			</div>
 			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-				<Dropdown style={dropAlign} align='end'>
-					{/* There is an issue where the help popup goes off the page. When this
-					happens, you lose help text and you generally don't see the help text
-					if you click the help icon a second time. Why this is the case and how to
-					get the placement correct is unclear. However, if the menuTitle is long enough
-					to shift the help icon to the left then there is enough space for the help
-					text box and this does not happen. The current possibilities for menuTitle
-					do this so the issue is not seen by the user. */}
-					<Dropdown.Toggle variant="outline-dark">{state.menuTitle}</Dropdown.Toggle>
-					<Dropdown.Menu style={dropAlign} align='end'>
-						<Dropdown.Item
+				<Navbar expand>
+					<Nav navbar>
+						<NavLink
 							style={state.adminViewableLinkStyle}
 							disabled={state.shouldAdminButtonDisabled}
-							as={Link} to='/admin'>
+							tag={Link}
+							to="/admin">
 							<FormattedMessage id='admin.panel' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							style={state.adminViewableLinkStyle}
-							disabled={state.shouldConversionsButtonDisabled}
-							as={Link} to='/conversions'>
-							<FormattedMessage id='conversions' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							style={state.csvViewableLinkStyle}
-							disabled={state.shouldCSVButtonDisabled}
-							as={Link} to='/csv'>
-							<FormattedMessage id='csv' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldGroupsButtonDisabled}
-							as={Link} to='/groups'>
-							<FormattedMessage id='groups' />
-						</Dropdown.Item>
-						<Dropdown.Item
+						</NavLink>
+						<NavLink
 							disabled={state.shouldHomeButtonDisabled}
-							as={Link} to='/'>
+							tag={Link}
+							to="/">
 							<FormattedMessage id='home' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							style={state.adminViewableLinkStyle}
-							disabled={state.shouldMapsButtonDisabled}
-							as={Link} to='/maps'>
-							<FormattedMessage id='maps' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							disabled={state.shouldMetersButtonDisabled}
-							as={Link} to='meters'>
-							<FormattedMessage id='meters' />
-						</Dropdown.Item>
-						<Dropdown.Item
-							style={state.adminViewableLinkStyle}
-							disabled={state.shouldUnitsButtonDisabled}
-							as={Link} to='/units'>
-							<FormattedMessage id='units' />
-						</Dropdown.Item>
-						<Dropdown.Divider />
-						<Dropdown.Item
+						</NavLink>
+						<UncontrolledDropdown nav inNavbar>
+							<DropdownToggle nav caret>
+								<FormattedMessage id='header.data' />
+							</DropdownToggle>
+							<DropdownMenu>
+								<DropdownItem
+									style={state.adminViewableLinkStyle}
+									disabled={state.shouldConversionsButtonDisabled}
+									tag={Link}
+									to="/conversions">
+									<FormattedMessage id='conversions' />
+								</DropdownItem>
+								<DropdownItem
+									style={state.csvViewableLinkStyle}
+									disabled={state.shouldCSVButtonDisabled}
+									tag={Link}
+									to="/csv">
+									<FormattedMessage id='csv' />
+								</DropdownItem>
+								<DropdownItem
+									disabled={state.shouldGroupsButtonDisabled}
+									tag={Link}
+									to="/groups">
+									<FormattedMessage id='groups' />
+								</DropdownItem>
+								<DropdownItem
+									style={state.adminViewableLinkStyle}
+									disabled={state.shouldMapsButtonDisabled}
+									tag={Link}
+									to="/maps">
+									<FormattedMessage id='maps' />
+								</DropdownItem>
+								<DropdownItem
+									disabled={state.shouldMetersButtonDisabled}
+									tag={Link}
+									to="/meters">
+									<FormattedMessage id='meters' />
+								</DropdownItem>
+								<DropdownItem
+									style={state.adminViewableLinkStyle}
+									disabled={state.shouldUnitsButtonDisabled}
+									tag={Link}
+									to="/units">
+									<FormattedMessage id='units' />
+								</DropdownItem>
+							</DropdownMenu>
+						</UncontrolledDropdown>
+						<UncontrolledDropdown nav inNavbar>
+							<DropdownToggle nav caret>
+								<FormattedMessage id='header.options' />
+							</DropdownToggle>
+							<DropdownMenu>
+								<LanguageSelectorComponent />
+								<DropdownItem divider />
+								<TooltipHelpContainer page={dataFor} />
+								<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
+							</DropdownMenu>
+						</UncontrolledDropdown>
+						<NavLink
 							style={state.loginLinkStyle}
-							as={Link} to='/login'>
+							tag={Link}
+							to='/login'>
 							<FormattedMessage id='log.in' />
-						</Dropdown.Item>
-						<Dropdown.Item
+						</NavLink>
+						<NavLink
 							style={state.logoutLinkStyle}
+							tag={Link}
+							to='/'
 							onClick={handleLogOut}>
 							<FormattedMessage id='log.out' />
-						</Dropdown.Item>
-					</Dropdown.Menu>
-				</Dropdown>
-				<TooltipHelpContainer page={dataFor} />
-				<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
+						</NavLink>
+					</Nav>
+				</Navbar>
 			</div>
 		</div>
 	);

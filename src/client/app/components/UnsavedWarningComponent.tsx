@@ -5,14 +5,11 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
-import Button from 'reactstrap/lib/Button';
-import Modal from 'reactstrap/lib/Modal';
-import ModalBody from 'reactstrap/lib/ModalBody';
-import ModalFooter from 'reactstrap/lib/ModalFooter';
 import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 import { deleteToken } from '../utils/token';
 import { clearCurrentUser } from '../actions/currentUser';
 import store from '../index';
+import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
 	hasUnsavedChanges: boolean;

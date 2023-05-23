@@ -2,9 +2,10 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Modal, Button } from 'react-bootstrap';
 import '../styles/modal.css';
 import translate from '../utils/translate';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { formInputStyle } from '../styles/modalStyle';
 
 interface ConfirmActionModalComponentProps {
 	// Control this through the parent component to open/close this modal
@@ -45,49 +46,30 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 		props.handleClose();
 	}
 
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
-	};
-
 	return (
 		<>
-			<Modal show={props.show} onHide={props.handleClose} centered>
-				<Modal.Header>
-					<Modal.Title>
-						{props.actionTitle ? props.actionTitle : translate('confirm.action')}
-					</Modal.Title>
-				</Modal.Header>
+			<Modal isOpen={props.show} onClosed={props.handleClose} backdrop='static' centered>
+				<ModalHeader>
+					{props.actionTitle ? props.actionTitle : translate('confirm.action')}
+				</ModalHeader>
 				{/* when any of the conversion are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* SourceId input*/}
-									<div style={formInputStyle}>
-										<p>{props.actionConfirmMessage}</p>
-									</div>
-								</div>
-							</div>
-						</div>
+				<ModalBody>
+					{/* SourceId input*/}
+					<div style={formInputStyle}>
+						<p>{props.actionConfirmMessage}</p>
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalBody>
+				<ModalFooter>
 					{/* Do not execute the actionFunction and instead close the action confirm modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						{/* Render the action reject text if it was passed, or else 'no' */}
 						{props.actionRejectText ? props.actionRejectText : translate('no')}
 					</Button>
 					{/* Execute the action function and close the action confirm modal */}
-					<Button variant="secondary" onClick={props.actionFunction}>
+					<Button onClick={props.actionFunction}>
 						{props.actionConfirmText ? props.actionConfirmText : translate('yes')}
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

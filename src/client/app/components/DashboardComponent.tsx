@@ -12,7 +12,7 @@ import SpinnerComponent from './SpinnerComponent';
 import {ChartTypes} from '../types/redux/graph';
 import * as moment from 'moment';
 import {TimeInterval} from '../../../common/TimeInterval';
-import Button from 'reactstrap/lib/Button';
+import { Button} from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 

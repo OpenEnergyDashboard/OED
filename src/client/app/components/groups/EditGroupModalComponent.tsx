@@ -10,8 +10,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Input, InputGroup, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -29,12 +28,12 @@ import {
 } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
-import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
+import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
 import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
-import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tableStyle, requiredStyle, tooltipBaseStyle, formInputStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
@@ -52,8 +51,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
-	// unit state
-	const unitState = useSelector((state: State) => state.units.units);
 	// Group state used on other pages
 	const globalGroupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Make a local copy of the group data so we can update during the edit process.
@@ -399,257 +396,222 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				actionFunction={handleDeleteGroup}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal show={props.show} onHide={props.handleClose}>
+			<Modal isOpen={props.show} toggle={props.handleClose}>
 				{/* In a number of the items that follow, what is shown varies on whether you are an admin. */}
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
-						<TooltipHelpContainer page='groups-edit' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='groups-edit' helpTextId={tooltipStyle.tooltipEditGroupView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Name where input if admin or shown if now */}
-									{loggedInAsAdmin ?
-										<div style={formInputStyle}>
-											<label>{translate('group.name')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												required value={groupState.name} />
-										</div>
-										:
-										<div className="item-container">
-											<b><FormattedMessage id="group.name" /></b> {groupState.name}
-										</div>
-									}
-									{/* default graphic unit input or display */}
-									{loggedInAsAdmin ?
-										< div style={formInputStyle}>
-											<label><FormattedMessage id="group.defaultGraphicUnit" /></label>
-											<Input
-												name='defaultGraphicUnit'
-												type='select'
-												value={groupState.defaultGraphicUnit}
-												onChange={e => handleNumberChange(e)}>
-												{/* First list the selectable ones and then the rest as disabled. */}
-												{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-												})}
-												{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-													return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-												})}
-											</Input>
-										</div>
-										:
-										<div className="item-container">
-											{/* Use meter translation id string since same one wanted. */}
-											{/* This is the default graphic unit associated with the group or no unit if none. */}
-											<b><FormattedMessage id='meter.defaultGraphicUnit' /></b>
-											{/* Not exactly sure why but must force a starting space after the label */}
-											{groupState.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[groupState.defaultGraphicUnit].identifier}
-										</div>
-									}
-									{/* Displayable input, only for admin. */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.displayable" /></label>
-											<Input
-												name='displayable'
-												type='select'
-												value={groupState.displayable.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-									}
-									{/* Area input, only for admin. */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area" /></label>
-											<Input
-												name="area"
-												type="number"
-												min="0"
-												// cannot use defaultValue because it won't update when area is auto calculated
-												value={groupState.area}
-												onChange={e => handleNumberChange(e)} />
-										</div>
-									}
-									{/* meter area unit input */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.area.unit" /></label>
-											<Input
-												name='areaUnit'
-												type='select'
-												value={groupState.areaUnit}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(AreaUnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-									}
-									{/* Calculate sum of meter areas */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<Button variant="secondary" onClick={handleAutoCalculateArea}>
-												<FormattedMessage id="group.area.calculate" />
-											</Button>
-											<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
-										</div>
-									}
-									{/* GPS input, only for admin. */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.gps" /></label>
-											<Input
-												name='gps'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={getGPSString(groupState.gps)} />
-										</div>
-									}
-									{/* Note input, only for admin. */}
-									{loggedInAsAdmin &&
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="group.note" /></label>
-											<Input
-												name='note'
-												type='textarea'
-												onChange={e => handleStringChange(e)}
-												value={nullToEmptyString(groupState.note)} />
-										</div>
-									}
-									{/* The child meters in this group */}
-									{loggedInAsAdmin ?
-										<div style={formInputStyle}>
-											<b><FormattedMessage id='child.meters' /></b>:
-											<MultiSelectComponent
-												options={groupChildrenState.meterSelectOptions}
-												selectedOptions={metersToSelectOptions()}
-												placeholder={translate('select.meters')}
-												onValuesChange={async (newSelectedMeterOptions: SelectOption[]) => {
-													// The meters changed so verify update is okay and deal with appropriately.
-													// The length of selected meters should only vary by 1 since each change is handled separately.
-													// Compare the new length to the original length that is the same as
-													// the number of child meters of group being edited.
-													if (newSelectedMeterOptions.length === groupState.childMeters.length + 1) {
-														// A meter was selected so it is considered for adding.
-														// The newly selected item is always the last one.
-														// Now attempt to add the child to see if okay.
-														const childAdded = await assignChildToGroup(newSelectedMeterOptions[newSelectedMeterOptions.length - 1].value, DataType.Meter);
-														if (!childAdded) {
-															// The new child meter was rejected so remove it. It is the last one.
-															newSelectedMeterOptions.pop();
-														}
-													} else {
-														// Could have removed any item so figure out which one it is. Need to convert options to ids.
-														const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
-														// There should only be one removed item.
-														const removedMeterId = removedMeter[0];
-														const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter)
-														if (!childRemoved) {
-															// The new child meter removal was rejected so put it back. Should only be one item so no need to sort.
-															newSelectedMeterOptions.push({
-																value: removedMeterId,
-																label: metersState[removedMeterId].identifier
-																// isDisabled not needed since only used for selected and not display.
-															} as SelectOption
-															);
-														}
-													}
-												}}
-											/>
-										</div>
-										:
-										<div>
-											<b><FormattedMessage id='child.meters' /></b>:
-											<ListDisplayComponent items={metersToList()} />
-										</div>
-									}
-									{/* The child groups in this group */}
-									{loggedInAsAdmin ?
-										<div style={formInputStyle}>
-											<b><FormattedMessage id='child.groups' /></b>:
-											<MultiSelectComponent
-												options={groupChildrenState.groupSelectOptions}
-												selectedOptions={groupsToSelectOptions()}
-												placeholder={translate('select.groups')}
-												onValuesChange={async (newSelectedGroupOptions: SelectOption[]) => {
-													// The groups changed so verify update is okay and deal with appropriately.
-													// The length of of selected groups should only vary by 1 since each change is handled separately.
-													// Compare the new length to the original length that is the same as
-													// the number of child groups of group being edited.
-													if (newSelectedGroupOptions.length === groupState.childGroups.length + 1) {
-														// A group was selected so it is considered for adding.
-														// The newly selected item is always the last one.
-														// Now attempt to add the child to see if okay.
-														const childAdded = await assignChildToGroup(newSelectedGroupOptions[newSelectedGroupOptions.length - 1].value, DataType.Group);
-														if (!childAdded) {
-															// The new child meter was rejected so remove it. It is the last one.
-															newSelectedGroupOptions.pop();
-														}
-													} else {
-														// Could have removed any item so figure out which one it is. Need to convert options to ids.
-														const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
-														// There should only be one removed item.
-														const removedGroupId = removedGroup[0];
-														const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group)
-														if (!childRemoved) {
-															// The new child group removal was rejected so put it back. Should only be one item so no need to sort.
-															newSelectedGroupOptions.push({
-																value: removedGroupId,
-																// The name should not have changed since cannot be group editing but use the edit state to be consistent.
-																label: editGroupsState[removedGroupId].name
-																// isDisabled not needed since only used for selected and not display.
-															} as SelectOption
-															);
-														}
-													}
-												}}
-											/>
-										</div>
-										:
-										<div>
-											<b><FormattedMessage id='child.groups' /></b>:
-											<ListDisplayComponent items={groupsToList()} />
-										</div>
-									}
-									{/* All (deep) meters in this group */}
-									<div>
-										<b><FormattedMessage id='group.all.meters' /></b>:
-										<ListDisplayComponent items={deepMetersToList()} />
-									</div>
-								</div>
-							</div>
-						</div>
+				<ModalHeader>
+					<FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
+					<TooltipHelpContainer page='groups-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='groups-edit' helpTextId={tooltipStyle.tooltipEditGroupView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalHeader>
+				<ModalBody style={tableStyle}>
+					{/* Name input, disabled if not admin */}
+					<div style={formInputStyle}>
+						<FormattedMessage id="group.name" /><label style={requiredStyle}>*</label>
+						<Input
+							name='name'
+							type='text'
+							onChange={e => handleStringChange(e)}
+							required value={groupState.name}
+							disabled={!loggedInAsAdmin}/>
+					</div>
+					{/* default graphic unit input, disabled if not admin */}
+					<div style={formInputStyle}>
+						<FormattedMessage id="group.defaultGraphicUnit" />
+						<Input
+							name='defaultGraphicUnit'
+							type='select'
+							value={groupState.defaultGraphicUnit}
+							onChange={e => handleNumberChange(e)}
+							disabled={!loggedInAsAdmin}>
+							{/* First list the selectable ones and then the rest as disabled. */}
+							{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
+								return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+							})}
+							{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
+								return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+							})}
+						</Input>
+					</div>
+					{loggedInAsAdmin && <>
+						{/* Displayable input, only for admin. */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.displayable" />
+							<Input
+								name='displayable'
+								type='select'
+								value={groupState.displayable.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* Area input, only for admin. */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.area" />
+							<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
+							<InputGroup>
+								<Input
+									name="area"
+									type="number"
+									min="0"
+									// cannot use defaultValue because it won't update when area is auto calculated
+									value={groupState.area}
+									onChange={e => handleNumberChange(e)} />
+								{/* Calculate sum of meter areas */}
+								<Button onClick={handleAutoCalculateArea}>
+									<FormattedMessage id="group.area.calculate" />
+								</Button>
+							</InputGroup>
+						</div>
+						{/* meter area unit input */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.area.unit" />
+							<Input
+								name='areaUnit'
+								type='select'
+								value={groupState.areaUnit}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(AreaUnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+								})}
+							</Input>
+						</div>
+						{/* GPS input, only for admin. */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.gps" />
+							<Input
+								name='gps'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								value={getGPSString(groupState.gps)} />
+						</div>
+						{/* Note input, only for admin. */}
+						<div style={formInputStyle}>
+							<FormattedMessage id="group.note" />
+							<Input
+								style={formInputStyle}
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={nullToEmptyString(groupState.note)} />
+						</div>
+					</>}
+					{/* The child meters in this group */}
+					{loggedInAsAdmin ?
+						<div style={formInputStyle}>
+							<FormattedMessage id='child.meters' />:
+							<MultiSelectComponent
+								options={groupChildrenState.meterSelectOptions}
+								selectedOptions={metersToSelectOptions()}
+								placeholder={translate('select.meters')}
+								onValuesChange={async (newSelectedMeterOptions: SelectOption[]) => {
+									// The meters changed so verify update is okay and deal with appropriately.
+									// The length of selected meters should only vary by 1 since each change is handled separately.
+									// Compare the new length to the original length that is the same as
+									// the number of child meters of group being edited.
+									if (newSelectedMeterOptions.length === groupState.childMeters.length + 1) {
+										// A meter was selected so it is considered for adding.
+										// The newly selected item is always the last one.
+										// Now attempt to add the child to see if okay.
+										const childAdded = await assignChildToGroup(newSelectedMeterOptions[newSelectedMeterOptions.length - 1].value, DataType.Meter);
+										if (!childAdded) {
+											// The new child meter was rejected so remove it. It is the last one.
+											newSelectedMeterOptions.pop();
+										}
+									} else {
+										// Could have removed any item so figure out which one it is. Need to convert options to ids.
+										const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
+										// There should only be one removed item.
+										const removedMeterId = removedMeter[0];
+										const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter)
+										if (!childRemoved) {
+											// The new child meter removal was rejected so put it back. Should only be one item so no need to sort.
+											newSelectedMeterOptions.push({
+												value: removedMeterId,
+												label: metersState[removedMeterId].identifier
+												// isDisabled not needed since only used for selected and not display.
+											} as SelectOption
+											);
+										}
+									}
+								}}
+							/>
+						</div>
+						:
+						<div style={formInputStyle}>
+							<FormattedMessage id='child.meters' />:
+							<ListDisplayComponent items={metersToList()} />
+						</div>
+					}
+					{/* The child groups in this group */}
+					{loggedInAsAdmin ?
+						<div style={formInputStyle}>
+							<FormattedMessage id='child.groups' />:
+							<MultiSelectComponent
+								options={groupChildrenState.groupSelectOptions}
+								selectedOptions={groupsToSelectOptions()}
+								placeholder={translate('select.groups')}
+								onValuesChange={async (newSelectedGroupOptions: SelectOption[]) => {
+									// The groups changed so verify update is okay and deal with appropriately.
+									// The length of of selected groups should only vary by 1 since each change is handled separately.
+									// Compare the new length to the original length that is the same as
+									// the number of child groups of group being edited.
+									if (newSelectedGroupOptions.length === groupState.childGroups.length + 1) {
+										// A group was selected so it is considered for adding.
+										// The newly selected item is always the last one.
+										// Now attempt to add the child to see if okay.
+										const childAdded = await assignChildToGroup(newSelectedGroupOptions[newSelectedGroupOptions.length - 1].value, DataType.Group);
+										if (!childAdded) {
+											// The new child meter was rejected so remove it. It is the last one.
+											newSelectedGroupOptions.pop();
+										}
+									} else {
+										// Could have removed any item so figure out which one it is. Need to convert options to ids.
+										const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
+										// There should only be one removed item.
+										const removedGroupId = removedGroup[0];
+										const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group)
+										if (!childRemoved) {
+											// The new child group removal was rejected so put it back. Should only be one item so no need to sort.
+											newSelectedGroupOptions.push({
+												value: removedGroupId,
+												// The name should not have changed since cannot be group editing but use the edit state to be consistent.
+												label: editGroupsState[removedGroupId].name
+												// isDisabled not needed since only used for selected and not display.
+											} as SelectOption
+											);
+										}
+									}
+								}}
+							/>
+						</div>
+						:
+						<div style={formInputStyle}>
+							<FormattedMessage id='child.groups' />:
+							<ListDisplayComponent items={groupsToList()} />
+						</div>
+					}
+					{/* All (deep) meters in this group */}
+					<FormattedMessage id='group.all.meters' />:
+					<ListDisplayComponent items={deepMetersToList()} />
+				</ModalBody>
+				<ModalFooter>
 					{/* Delete, discard & save buttons if admin and close button if not. */}
 					{loggedInAsAdmin ?
 						<div>
 							{/* delete group */}
-							<Button variant="danger" onClick={validateDelete}>
+							<Button color='danger' onClick={validateDelete}>
 								<FormattedMessage id="group.delete.group" />
 							</Button>
 							{/* Hides the modal */}
-							<Button variant="secondary" onClick={handleClose}>
+							<Button onClick={handleClose}>
 								<FormattedMessage id="discard.changes" />
 							</Button>
 							{/* On click calls the function handleSaveChanges in this component */}
-							<Button variant="primary" onClick={handleSubmit} disabled={!groupState.name}>
+							<Button color='primary' onClick={handleSubmit} disabled={!groupState.name}>
 								<FormattedMessage id="save.all" />
 							</Button>
 						</div>
@@ -658,7 +620,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<FormattedMessage id="close" />
 						</Button>
 					}
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal >
 		</>
 	);

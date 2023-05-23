@@ -5,8 +5,7 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -143,104 +142,94 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				actionFunction={handleDeleteConversion}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal show={props.show} onHide={props.handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="conversion.edit.conversion" />
-						<TooltipHelpContainer page='conversions-edit' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the conversion are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Source unit - display only */}
-									<div style={formInputStyle}>
-										<label>{translate('conversion.source')} <label style={requiredStyle}>*</label></label>
-										<Input
-											name='sourceId'
-											type='text'
-											defaultValue={props.unitsState[state.sourceId].identifier}
-											// Disable input to prevent changing ID value
-											disabled>
-										</Input>
-										<div />
-										{/* Destination unit - display only */}
-										<div style={formInputStyle}>
-											<label>{translate('conversion.destination')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='destinationId'
-												type='text'
-												defaultValue={props.unitsState[state.destinationId].identifier}
-												// Disable input to prevent changing ID value
-												disabled>
-											</Input>
-										</div>
-										{/* Bidirectional Y/N input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.bidirectional" /></label>
-											<Input
-												name='bidirectional'
-												type='select'
-												defaultValue={state.bidirectional.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Slope input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.slope" /></label>
-											<Input
-												name='slope'
-												type="number"
-												defaultValue={state.slope}
-												onChange={e => handleNumberChange(e)} />
-										</div>
-										{/* Intercept input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.intercept" /></label>
-											<Input
-												name="intercept"
-												type="number"
-												defaultValue={state.intercept}
-												onChange={e => handleNumberChange(e)} />
-										</div>
-										{/* Note input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.note" /></label>
-											<Input
-												name="note"
-												type="textarea"
-												defaultValue={state.note}
-												placeholder="Note"
-												onChange={e => handleStringChange(e)} />
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+			<Modal isOpen={props.show} toggle={props.handleClose}>
+				<ModalHeader>
+					<FormattedMessage id="conversion.edit.conversion" />
+					<TooltipHelpContainer page='conversions-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="danger" onClick={handleDeleteConfirmationModalOpen}>
+
+				</ModalHeader>
+				{/* when any of the conversion are changed call one of the functions. */}
+				<ModalBody style={tableStyle}>
+					{/* Source unit - display only */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.source" /><label style={requiredStyle}>*</label></label>
+						<Input
+							name='sourceId'
+							type='text'
+							defaultValue={props.unitsState[state.sourceId].identifier}
+							// Disable input to prevent changing ID value
+							disabled>
+						</Input>
+					</div>
+					{/* Destination unit - display only */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.destination" /><label style={requiredStyle}>*</label></label>
+						<Input
+							name='destinationId'
+							type='text'
+							defaultValue={props.unitsState[state.destinationId].identifier}
+							// Disable input to prevent changing ID value
+							disabled>
+						</Input>
+					</div>
+					{/* Bidirectional Y/N input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.bidirectional" /></label>
+						<Input
+							name='bidirectional'
+							type='select'
+							defaultValue={state.bidirectional.toString()}
+							onChange={e => handleBooleanChange(e)}>
+							{Object.keys(TrueFalseType).map(key => {
+								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Slope input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.slope" /></label>
+						<Input
+							name='slope'
+							type="number"
+							defaultValue={state.slope}
+							onChange={e => handleNumberChange(e)} />
+					</div>
+					{/* Intercept input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.intercept" /></label>
+						<Input
+							name="intercept"
+							type="number"
+							defaultValue={state.intercept}
+							onChange={e => handleNumberChange(e)} />
+					</div>
+					{/* Note input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="conversion.note" /></label>
+						<Input
+							name="note"
+							type="textarea"
+							defaultValue={state.note}
+							placeholder="Note"
+							onChange={e => handleStringChange(e)} />
+					</div>
+				</ModalBody>
+				<ModalFooter>
+					<Button color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="conversion.delete.conversion" />
 					</Button>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.sourceId || !state.destinationId || state.sourceId === state.destinationId}>
+					<Button color='primary' onClick={handleSaveChanges}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

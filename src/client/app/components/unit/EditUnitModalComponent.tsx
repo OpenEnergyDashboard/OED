@@ -6,8 +6,7 @@ import store from '../../index';
 //Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -157,142 +156,131 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	return (
 		<>
-			<Modal show={props.show} onHide={props.handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.unit" />
-						<TooltipHelpContainer page='units-edit' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the unit are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Identifier input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.identifier" /></label><br />
-										<Input
-											name="identifier"
-											type="text"
-											onChange={e => handleStringChange(e)}
-											value={state.identifier}
-											placeholder="Identifier" />
-										<div />
-										{/* Name input */}
-										<div style={formInputStyle}>
-											<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state.name} />
-										</div>
-										{/* Type of unit input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-											<Input
-												name='typeOfUnit'
-												type='select'
-												onChange={e => handleStringChange(e)}
-												value={state.typeOfUnit}>
-												{Object.keys(UnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Unit represent input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.represent" /></label><br />
-											<Input
-												name='unitRepresent'
-												type='select'
-												value={state.unitRepresent}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(UnitRepresentType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Displayable type input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.displayable" /></label><br />
-											<Input
-												name='displayable'
-												type='select'
-												value={state.displayable}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(DisplayableType).map(key => {
-													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Preferred display input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.preferred.display" /></label><br />
-											<Input
-												name='preferredDisplay'
-												type='select'
-												value={state.preferredDisplay.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Seconds in rate input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-											<Input
-												name='secInRate'
-												type="number"
-												value={state.secInRate}
-												onChange={e => handleNumberChange(e)}
-												placeholder="Sec In Rate"
-												// TODO validate negative input by typing for rate but database stops it.
-												// This stops negative input by use of arrows to change value.
-												min="1" />
-										</div>
-										{/* Suffix input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.suffix" /></label><br />
-											<Input
-												name="suffix"
-												type="text"
-												value={state.suffix}
-												placeholder="Suffix"
-												onChange={e => handleStringChange(e)} />
-										</div>
-										{/* Note input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note" /></label><br />
-											<Input
-												name="note"
-												type="textarea"
-												value={state.note}
-												placeholder="Note"
-												onChange={e => handleStringChange(e)} />
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+			<Modal isOpen={props.show} toggle={props.handleClose}>
+				<ModalHeader>
+					<FormattedMessage id="edit.unit" />
+					<TooltipHelpContainer page='units-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalHeader>
+				{/* when any of the unit are changed call one of the functions. */}
+				<ModalBody style={tableStyle}>
+					{/* Identifier input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.identifier" /></label><br />
+						<Input
+							name="identifier"
+							type="text"
+							onChange={e => handleStringChange(e)}
+							value={state.identifier}
+							placeholder="Identifier" />
+					</div>
+					{/* Name input */}
+					<div style={formInputStyle}>
+						<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
+						<Input
+							name='name'
+							type='text'
+							onChange={e => handleStringChange(e)}
+							value={state.name} />
+					</div>
+					{/* Type of unit input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.type.of.unit" /></label><br />
+						<Input
+							name='typeOfUnit'
+							type='select'
+							onChange={e => handleStringChange(e)}
+							value={state.typeOfUnit}>
+							{Object.keys(UnitType).map(key => {
+								return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Unit represent input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.represent" /></label><br />
+						<Input
+							name='unitRepresent'
+							type='select'
+							value={state.unitRepresent}
+							onChange={e => handleStringChange(e)}>
+							{Object.keys(UnitRepresentType).map(key => {
+								return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Displayable type input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.displayable" /></label><br />
+						<Input
+							name='displayable'
+							type='select'
+							value={state.displayable}
+							onChange={e => handleStringChange(e)}>
+							{Object.keys(DisplayableType).map(key => {
+								return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Preferred display input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.preferred.display" /></label><br />
+						<Input
+							name='preferredDisplay'
+							type='select'
+							value={state.preferredDisplay.toString()}
+							onChange={e => handleBooleanChange(e)}>
+							{Object.keys(TrueFalseType).map(key => {
+								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+							})}
+						</Input>
+					</div>
+					{/* Seconds in rate input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
+						<Input
+							name='secInRate'
+							type="number"
+							value={state.secInRate}
+							onChange={e => handleNumberChange(e)}
+							placeholder="Sec In Rate"
+							// TODO validate negative input by typing for rate but database stops it.
+							// This stops negative input by use of arrows to change value.
+							min="1" />
+					</div>
+					{/* Suffix input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.suffix" /></label><br />
+						<Input
+							name="suffix"
+							type="text"
+							value={state.suffix}
+							placeholder="Suffix"
+							onChange={e => handleStringChange(e)} />
+					</div>
+					{/* Note input */}
+					<div style={formInputStyle}>
+						<label><FormattedMessage id="unit.note" /></label><br />
+						<Input
+							name="note"
+							type="textarea"
+							value={state.note}
+							placeholder="Note"
+							onChange={e => handleStringChange(e)} />
+					</div>
+				</ModalBody>
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!state.name}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);
