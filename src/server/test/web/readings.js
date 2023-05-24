@@ -46,7 +46,7 @@ const HTTP_CODE = {
  */
 async function prepareTest(unitData, conversionData, meterData, groupData = []) {
 	const conn = testDB.getConnection();
-	await insertUnits(unitData, conn);
+	await insertUnits(unitData, false, conn);
 	await insertConversions(conversionData, conn);
 	await insertMeters(meterData, conn);
 	await insertGroups(groupData, conn);
