@@ -149,7 +149,7 @@
     "buffer": "~6.0.3",
     "chai": "~3.5.0",
     "chai-as-promised": "~7.1.1",
-    "chai-http": "~4.2.1",
+    "chai-http": "~4.3.0",
     "css-loader": "~6.4.0",
     "eslint": "~8.10.0",
     "eslint-plugin-jsdoc": "~39.2.9",
