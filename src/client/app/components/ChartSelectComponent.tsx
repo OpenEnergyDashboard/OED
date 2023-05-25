@@ -31,7 +31,7 @@ export default function ChartSelectComponent() {
 	const dispatch = useDispatch();
 	const [expand, setExpand] = useState(false);
 	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
-		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
 	)), 'label');
 
 	return (
