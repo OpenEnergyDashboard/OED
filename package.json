@@ -113,8 +113,6 @@
     "reactstrap": "~8.10.0",
     "redux": "~4.2.1",
     "redux-thunk": "~2.4.0",
-    "request": "~2.88.2",
-    "request-promise-native": "~1.0.7",
     "serve-favicon": "~2.5.0",
     "xml2js": "~0.5.0"
   },
