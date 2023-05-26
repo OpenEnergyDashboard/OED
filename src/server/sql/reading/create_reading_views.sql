@@ -398,38 +398,47 @@ DECLARE
 		-- Make sure the time range is within the reading values for this meter.
 		-- There may be a better way to create the array with one element as last argument.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), array_append(ARRAY[]::INTEGER[], current_meter_id));
-		if (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
+		IF (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
 			-- The request wants automatic calculation of the points returned.
 
-			-- The interval of time for the requested_range.
-			requested_interval := upper(requested_range) - lower(requested_range);
-			-- Get the seconds in the interval.
-			-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-			requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-			-- Get the frequency that this meter reads at.
-			select reading_frequency into frequency FROM meters where id = current_meter_id;
-			-- Get the seconds in the frequency.
-			frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
-
-			-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
-			-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
-			-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
-			-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
-			-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
-			-- Note this overrides the max raw points if it applies.
-			IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
-				-- Return raw meter data.
-				current_point_accuracy := 'raw'::reading_line_accuracy;
-			-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
-			-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
-			-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
-			-- so you don't interpolate points by using the hourly data.
-			ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
-				-- Return hourly reading data.
-				current_point_accuracy := 'hourly'::reading_line_accuracy;
-			ELSE
-				-- Return daily reading data.
+			-- The request_range will still be infinity if there is no meter data. This causes the
+			-- auto calculation to fail because you cannot subtract them.
+			-- Just check the upper range since simpler.
+			IF (upper(requested_range) = 'infinity') THEN
+				-- We know there is no data but easier to just let a query happen since fast.
+				-- Do daily since that should be the fastest due to the least data in most cases.
 				current_point_accuracy := 'daily'::reading_line_accuracy;
+			ELSE
+				-- The interval of time for the requested_range.
+				requested_interval := upper(requested_range) - lower(requested_range);
+				-- Get the seconds in the interval.
+				-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
+				requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
+				-- Get the frequency that this meter reads at.
+				select reading_frequency into frequency FROM meters where id = current_meter_id;
+				-- Get the seconds in the frequency.
+				frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
+
+				-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
+				-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
+				-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
+				-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
+				-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
+				-- Note this overrides the max raw points if it applies.
+				IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
+					-- Return raw meter data.
+					current_point_accuracy := 'raw'::reading_line_accuracy;
+				-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
+				-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
+				-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
+				-- so you don't interpolate points by using the hourly data.
+				ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
+					-- Return hourly reading data.
+					current_point_accuracy := 'hourly'::reading_line_accuracy;
+				ELSE
+					-- Return daily reading data.
+					current_point_accuracy := 'daily'::reading_line_accuracy;
+				END IF;
 			END IF;
 		END IF;
 		-- At this point current_point_accuracy should never be 'auto'.
@@ -549,34 +558,43 @@ BEGIN
 
 		-- Make sure the time range is within the reading values for meters in this group.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), meter_ids);
-		-- The interval of time for the requested_range.
-		requested_interval := upper(requested_range) - lower(requested_range);
-		-- Get the seconds in the interval.
-		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-		-- Make sure that the number of hour points is no more than maximum hourly readings.
-		-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
-		IF (requested_interval_seconds / 3600 <= max_hour_points) THEN
-			-- Return hourly reading data.
-			point_accuracy := 'hourly'::reading_line_accuracy;
-		ELSE
-			-- Return daily reading data.
+		-- The request_range will still be infinity if there is no meter data. This causes the
+		-- auto calculation to fail because you cannot subtract them.
+		-- Just check the upper range since simpler.
+		IF (upper(requested_range) = 'infinity') THEN
+			-- We know there is no data but easier to just let a query happen since fast.
+			-- Do daily since that should be the fastest due to the least data in most cases.
 			point_accuracy := 'daily'::reading_line_accuracy;
-		END IF;
+		ELSE
+			-- The interval of time for the requested_range.
+			requested_interval := upper(requested_range) - lower(requested_range);
+			-- Get the seconds in the interval.
+			-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
+			requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
+			-- Make sure that the number of hour points is no more than maximum hourly readings.
+			-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
+			IF (requested_interval_seconds / 3600 <= max_hour_points) THEN
+				-- Return hourly reading data.
+				point_accuracy := 'hourly'::reading_line_accuracy;
+			ELSE
+				-- Return daily reading data.
+				point_accuracy := 'daily'::reading_line_accuracy;
+			END IF;
 
-		-- Groups can require reading interpolation because of multiple meters. For example, if one meter
-		-- is 30 day reading frequency then it will interpolate to hourly or daily depending other
-		-- meters (if exist). However, to limit this effect, if hourly has been selected automatically,
-		-- check if shortest meter reading frequency for this group is more than an hour and then
-		-- choose daily instead.
-		IF (point_accuracy = 'hourly'::reading_line_accuracy) THEN
-			-- Find the min reading frequency for all meters in the group.
-			SELECT min(reading_frequency) INTO meters_min_frequency
-			FROM (meters m
-			INNER JOIN unnest(meter_ids) meters(id) ON m.id = meters.id);
-			IF (EXTRACT(EPOCH FROM meters_min_frequency) > 3600) THEN
-				-- The smallest meter frequency is greater than 1 hour (3600 seconds) so use daily instead.
-				point_accuracy = 'daily'::reading_line_accuracy;
+			-- Groups can require reading interpolation because of multiple meters. For example, if one meter
+			-- is 30 day reading frequency then it will interpolate to hourly or daily depending other
+			-- meters (if exist). However, to limit this effect, if hourly has been selected automatically,
+			-- check if shortest meter reading frequency for this group is more than an hour and then
+			-- choose daily instead.
+			IF (point_accuracy = 'hourly'::reading_line_accuracy) THEN
+				-- Find the min reading frequency for all meters in the group.
+				SELECT min(reading_frequency) INTO meters_min_frequency
+				FROM (meters m
+				INNER JOIN unnest(meter_ids) meters(id) ON m.id = meters.id);
+				IF (EXTRACT(EPOCH FROM meters_min_frequency) > 3600) THEN
+					-- The smallest meter frequency is greater than 1 hour (3600 seconds) so use daily instead.
+					point_accuracy = 'daily'::reading_line_accuracy;
+				END IF;
 			END IF;
 		END IF;
 	END IF;
@@ -641,7 +659,7 @@ BEGIN
 	This would fix this case and also impact other uses in what seems a positive way.
 	Note this does not address that missing days in a bar width get no value so the bar will likely read low.
 
-	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separatly is that if
+	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separately is that if
 	they have different end times then the bars may not align. For example, if you have 7 day bars and the end time of one meter is two days
 	earlier than the global max then all of its bars will be shifted two days. Since people want to compare among bars in a group, this
 	was undesirable so the global values are used. It means the shifted meters may have missing days that make them smaller than the others.
