@@ -280,7 +280,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 			meter.readingFrequency = await meter.update(conn);
 			// TODO This is not using the success function since it needs to return values.
 			// At some point we probably should fuse the success and returning values.
-			res.json(meter);
+			// Need to format since some properties have different names than come from DB.
+			res.json(formatMeterForResponse(meter, true));
 		} catch (err) {
 			log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
 			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
@@ -333,7 +334,8 @@ router.post('/addMeter', async (req, res) => {
 			await newMeter.insert(conn);
 			// TODO This is not using the success function since it needs to return values.
 			// At some point we probably should fuse the success and returning values.
-			res.json(newMeter);
+			// Need to format since some properties have different names than come from DB.
+			res.json(formatMeterForResponse(newMeter, true));
 		} catch (err) {
 			log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
 			failure(res, 500, err.toString() + ' with detail ' + err['detail']);
