@@ -10,7 +10,6 @@ Fixes #[issue]
 
 (Check the ones that apply by placing an "x" instead of the space in the [ ] so it becomes [x])
 
-- [ ] Note merging this changes the node modules
 - [ ] Note merging this changes the database configuration.
 - [ ] This change requires a documentation update
 
