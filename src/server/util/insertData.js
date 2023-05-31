@@ -14,15 +14,32 @@ const fs = require('fs').promises;
  * Inserts specified units into the database.
  * @param [[]] unitsToInsert array of arrays where each row specifies a unit with items:
  * name, identifier, unitRepresentType, secInRate, typeOfUnit, suffix, displayable, preferredDisplay, note.
+ * @param {boolean} update true if should update unit if it exists, false by default
  * @param {*} conn database connection to use.
  */
-async function insertUnits(unitsToInsert, conn) {
+async function insertUnits(unitsToInsert, update = false, conn) {
 	await Promise.all(unitsToInsert.map(
 		async unitData => {
-			if (await Unit.getByName(unitData[0], conn) === null) {
+			const dbUnit = await Unit.getByName(unitData[0], conn);
+			if (dbUnit === null) {
+				// The unit does not exist so add it.
 				await new Unit(undefined, unitData[0], unitData[1], unitData[2], unitData[3],
 					unitData[4], null, unitData[5], unitData[6], unitData[7], unitData[8]).insert(conn);
+			} else if (update) {
+				// Asked to update so will. Does not bother to check if no changes.
+				dbUnit.name = unitData[0];
+				dbUnit.identifier = unitData[1];
+				dbUnit.unitRepresent = unitData[2];
+				dbUnit.secInRate = unitData[3];
+				dbUnit.typeOfUnit = unitData[4];
+				dbUnit.suffix = unitData[5];
+				dbUnit.displayable = unitData[6];
+				dbUnit.preferredDisplay = unitData[7];
+				dbUnit.note = unitData[8];
+				// Should update even though exists.
+				await dbUnit.update(conn);
 			}
+			// Otherwise do not update.
 		}
 	));
 }
@@ -35,16 +52,18 @@ async function insertStandardUnits(conn) {
 	// The table contains units' data. 
 	const standardUnits = [
 		['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-		['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-		['m³ gas', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+		['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
+		['m³ gas', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
+		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
+		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
+		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
+		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
+		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
+		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
+		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'OED created meter unit'],
 	];
 
-	await insertUnits(standardUnits, conn);
+	await insertUnits(standardUnits, false, conn);
 }
 
 /**
@@ -72,11 +91,12 @@ async function insertConversions(conversionsToInsert, conn) {
 async function insertStandardConversions(conn) {
 	// The table contains standard conversions' data.
 	const standardConversions = [
-		['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-		['MJ', 'm³ gas', true, 2.6e-2, 0, 'MJ → m^3 gas'],
-		['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU'],
-		['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton'],
-		['Celsius', 'Fahrenheit', true, 1.8, 32, 'Celsius → Fahrenheit']
+		['kWh', 'BTU', true, 3412.142, 0, 'OED created kWh → BTU'],
+		['BTU', 'm³ gas', true, 9.625, 0, 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'],
+		['kg', 'metric ton', true, 1e-3, 0, 'OED created kg → Metric ton'],
+		['liter', 'gallon', true, 0.2641729, 0, 'OED created liter → gallon'],
+		['Celsius', 'Fahrenheit', true, 1.8, 32, 'OED created Celsius → Fahrenheit'],
+		['Electric_Utility', 'kWh', false, 1, 0, 'OED created  for meters Electric_Utility → kWh']
 	];
 
 	// await Conversion.insertMany(standardConversions, conn);
