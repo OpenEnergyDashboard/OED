@@ -26,6 +26,7 @@ import { ConversionArray } from '../../types/conversionArray';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { UnitRepresentType } from '../../types/redux/units';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -109,6 +110,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
+
+	// unit state
+	const unitState = useSelector((state: State) => state.units.units);
+
 	/* End State */
 
 	// Reset the state to default values
@@ -235,8 +240,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
 				const submitState = { ...state, gps: gps };
+				// The reading views need to be refreshed if going to/from no unit or
+				// to/from type quantity.
+				// The check does it by first seeing if the unit changed and, if so, it
+				// sees if either were non unit meaning it crossed since both cannot be no unit
+				// or the unit change to/from quantity.
+				const shouldRefreshReadingViews = (props.meter.unitId != state.unitId) &&
+					((props.meter.unitId == -99 || state.unitId == -99) ||
+						(unitState[props.meter.unitId].unitRepresent == UnitRepresentType.quantity
+							&& unitState[state.unitId].unitRepresent != UnitRepresentType.quantity) ||
+						(unitState[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
+							&& unitState[state.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
-				dispatch(submitEditedMeter(submitState));
+				dispatch(submitEditedMeter(submitState, shouldRefreshReadingViews));
 				dispatch(removeUnsavedChanges());
 			} else {
 				// Tell user that not going to update due to input issues.
