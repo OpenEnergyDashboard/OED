@@ -25,6 +25,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 	mocha.it('as array', async () => {
 		const conn = testDB.getConnection();
 		const arrayInput = await readCsv(testFilePath);
+		// Does not set may meter values but okay since getting readings directly.
 		const arrayMeter = new Meter(undefined, 'test_array', 1, true, true, Meter.type.MAMAC, null, undefined);
 		await arrayMeter.insert(conn);
 		// Return value is ignored for now.

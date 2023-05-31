@@ -4,7 +4,7 @@
 
 const database = require('./database');
 const { mapToObject } = require('../util');
-const determineMinPoints = require('../sql/reading/determineMinPoints');
+const determineMaxPoints = require('../util/determineMaxPoints');
 
 const sqlFile = database.sqlFile;
 
@@ -48,6 +48,16 @@ class Reading {
 	 */
 	static createCompareReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
+	}
+
+	/**
+	 * Returns a promise to create the reading_line_accuracy type.
+	 * This needs to be run before Reading.createTable().
+	 * @param conn the connection to use
+	 * @return {Promise<void>}
+	 */
+	static createReadingLineAccuracyEnum(conn) {
+		return conn.none(sqlFile('reading/create_reading_line_accuracy_enum.sql'));
 	}
 
 	/**
@@ -228,13 +238,13 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getMeterLineReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
-		const [minHourPoints, minDayPoints] = determineMinPoints();
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 		const allMeterLineReadings = await conn.func('meter_line_readings_unit',
-			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', minDayPoints, minHourPoints]
-			);
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
+		);
 
 		const readingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allMeterLineReadings) {
@@ -255,13 +265,14 @@ class Reading {
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
 	static async getGroupLineReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
-		const [minHourPoints, minDayPoints] = determineMinPoints();
+		// maxRawPoints is not used for groups.
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 		const allGroupLineReadings = await conn.func('group_line_readings_unit',
-			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, minDayPoints, minHourPoints]
-			);
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, 'auto', maxHourlyPoints]
+		);
 
 		const readingsByGroupID = mapToObject(groupIDs, () => []);
 		for (const row of allGroupLineReadings) {
@@ -348,7 +359,7 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<void>}
 	 */
-	 static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
+	static async getGroupCompareReadings(groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift, conn) {
 		const allCompareReadings = await conn.func(
 			'group_compare_readings_unit',
 			[groupIDs, graphicUnitId, currStartTimestamp, currEndTimestamp, compareShift.toISOString()]);

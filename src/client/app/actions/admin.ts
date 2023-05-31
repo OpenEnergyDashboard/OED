@@ -57,6 +57,10 @@ export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.Upda
 	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
 }
 
+export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): t.UpdateDefaultMeterReadingFrequencyAction {
+	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -69,8 +73,8 @@ function markPreferencesNotSubmitted(): t.MarkPreferencesNotSubmittedAction {
 	return { type: ActionType.MarkPreferencesNotSubmitted };
 }
 
-function markPreferencesSubmitted(): t.MarkPreferencesSubmittedAction {
-	return { type: ActionType.MarkPreferencesSubmitted };
+function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkPreferencesSubmittedAction {
+	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
 function fetchPreferences(): Thunk {
@@ -98,7 +102,7 @@ export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
-			await preferencesApi.submitPreferences({
+			const preferences = await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
@@ -107,9 +111,12 @@ export function submitPreferences() {
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
-				defaultAreaUnit: state.admin.defaultAreaUnit
+				defaultAreaUnit: state.admin.defaultAreaUnit,
+				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
 			});
-			dispatch(markPreferencesSubmitted());
+			// Only return the defaultMeterReadingFrequency because the value from the DB
+			// generally differs from what the user input so update state with DB value.
+			dispatch(markPreferencesSubmitted(preferences.defaultMeterReadingFrequency));
 			showSuccessNotification(translate('updated.preferences'));
 		} catch (e) {
 			dispatch(markPreferencesNotSubmitted());

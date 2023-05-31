@@ -581,7 +581,8 @@ const testMeters = {
 				undefined, // previousEnd
 				undefined, // unitId
 				undefined, // defaultGraphicUnit
-				undefined // area unit
+				undefined, // area unit
+				undefined // reading frequency
 			),
 			new Meter(
 				undefined, // id
@@ -611,7 +612,8 @@ const testMeters = {
 				'1888-09-10 11:12:13+00:00', // previousEnd
 				undefined, // unitId
 				undefined, // defaultGraphicUnit
-				Unit.areaUnitType.METERS // area unit
+				Unit.areaUnitType.METERS,// area unit
+				undefined // reading frequency
 			)
 		]
 	},
@@ -649,7 +651,8 @@ const testMeters = {
 				undefined, // previousEnd
 				undefined, // unitId
 				undefined, // defaultGraphicUnit
-				undefined // area unit
+				undefined, // area unit
+				undefined // reading frequency
 			)
 		]
 	},

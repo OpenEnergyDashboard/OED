@@ -32,7 +32,7 @@ postgres-data
 
 # Text files
 *.txt
-!License.txt
+!LICENSE.txt
 
 # Test data (normally for developers)
 src/server/test/db/data/automatedTests/*.csv

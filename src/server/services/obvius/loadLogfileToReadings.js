@@ -51,7 +51,8 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				undefined, // previousEnd
 				undefined, // unit
 				undefined, // default graphic unit
-				undefined // area unit
+				undefined, // area unit
+				undefined // reading frequency
 			);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +
