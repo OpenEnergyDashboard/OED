@@ -5,7 +5,7 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -17,7 +17,7 @@ import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
-import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -149,14 +149,14 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 					</div>
-
 				</ModalHeader>
 				{/* when any of the conversion are changed call one of the functions. */}
 				<ModalBody style={tableStyle}>
 					{/* Source unit - display only */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.source" /><label style={requiredStyle}>*</label></label>
+						<Label for='sourceId'><FormattedMessage id="conversion.source" /></Label>
 						<Input
+							id='sourceId'
 							name='sourceId'
 							type='text'
 							defaultValue={props.unitsState[state.sourceId].identifier}
@@ -166,8 +166,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 					{/* Destination unit - display only */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.destination" /><label style={requiredStyle}>*</label></label>
+						<Label for='destinationId'><FormattedMessage id="conversion.destination" /></Label>
 						<Input
+							id='destinationId'
 							name='destinationId'
 							type='text'
 							defaultValue={props.unitsState[state.destinationId].identifier}
@@ -177,8 +178,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 					{/* Bidirectional Y/N input */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.bidirectional" /></label>
+						<Label for='bidirectional'><FormattedMessage id="conversion.bidirectional" /></Label>
 						<Input
+							id='bidirectional'
 							name='bidirectional'
 							type='select'
 							defaultValue={state.bidirectional.toString()}
@@ -190,17 +192,18 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 					{/* Slope input */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.slope" /></label>
+						<Label for='slope'><FormattedMessage id="conversion.slope" /></Label>
 						<Input
-							name='slope'
+							id='slope'
 							type="number"
 							defaultValue={state.slope}
 							onChange={e => handleNumberChange(e)} />
 					</div>
 					{/* Intercept input */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.intercept" /></label>
+						<Label for='intercept'><FormattedMessage id="conversion.intercept" /></Label>
 						<Input
+							id='intercept'
 							name="intercept"
 							type="number"
 							defaultValue={state.intercept}
@@ -208,9 +211,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 					{/* Note input */}
 					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.note" /></label>
+						<Label for='note'><FormattedMessage id="conversion.note" /></Label>
 						<Input
-							name="note"
+							id='note'
 							type="textarea"
 							defaultValue={state.note}
 							placeholder="Note"

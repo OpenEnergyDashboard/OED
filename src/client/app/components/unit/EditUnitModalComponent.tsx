@@ -4,9 +4,9 @@
 import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -17,7 +17,7 @@ import { submitEditedUnit } from '../../actions/units';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
-import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -59,6 +59,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
+	const [validUnit, setValidUnit] = useState(false);
+	useEffect(() => {
+		setValidUnit(state.name !== '' && state.secInRate >= 1);
+	}, [state.name, state.secInRate]);
 	/* End State */
 
 	// Reset the state to default values
@@ -77,18 +82,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	// Validate the changes and return true if we should update this unit.
 	// Two reasons for not updating the unit:
-	//  0. The rate is not greater than 0.
 	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
 	//	2. There are no changes
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
-
-		// Check for case 0
-		if (state.secInRate <= 0) {
-			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}.`);
-			inputOk = false;
-		}
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
@@ -178,12 +176,16 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</div>
 					{/* Name input */}
 					<div style={formInputStyle}>
-						<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
+						<label><FormattedMessage id="unit.name" /></label>
 						<Input
 							name='name'
 							type='text'
 							onChange={e => handleStringChange(e)}
-							value={state.name} />
+							value={state.name}
+							invalid={state.name === ''}/>
+						<FormFeedback>
+							<FormattedMessage id="error.required" />
+						</FormFeedback>
 					</div>
 					{/* Type of unit input */}
 					<div style={formInputStyle}>
@@ -243,12 +245,14 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						<Input
 							name='secInRate'
 							type="number"
-							value={state.secInRate}
+							defaultValue={state.secInRate}
 							onChange={e => handleNumberChange(e)}
 							placeholder="Sec In Rate"
-							// TODO validate negative input by typing for rate but database stops it.
-							// This stops negative input by use of arrows to change value.
-							min="1" />
+							min="1"
+							invalid={state.secInRate < 1} />
+						<FormFeedback>
+							<FormattedMessage id="error.greater" values={{ min: '1'}}  />
+						</FormFeedback>
 					</div>
 					{/* Suffix input */}
 					<div style={formInputStyle}>
@@ -277,7 +281,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges} disabled={!state.name}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!validUnit}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

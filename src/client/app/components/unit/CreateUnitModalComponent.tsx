@@ -3,8 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
-import { useState } from 'react';
-import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, FormFeedback, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
@@ -13,8 +13,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 import { addUnit } from '../../actions/units';
-import { notifyUser } from '../../utils/input'
-import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();
@@ -61,6 +60,11 @@ export default function CreateUnitModalComponent() {
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
+	const [validUnit, setValidUnit] = useState(false);
+	useEffect(() => {
+		setValidUnit(state.name !== '' && state.secInRate >= 1);
+	}, [state.name, state.secInRate]);
 	/* End State */
 
 	// Reset the state to default values
@@ -73,17 +77,13 @@ export default function CreateUnitModalComponent() {
 
 	// Submit
 	const handleSubmit = () => {
-		if (state.secInRate <= 0) {
-			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}. ${translate('unit.input.error')}`);
-		} else {
-			// Close modal first to avoid repeat clicks
-			setShowModal(false);
-			// Set default identifier as name if left blank
-			state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
-			// Add the new unit and update the store
-			dispatch(addUnit(state));
-			resetState();
-		}
+		// Close modal first to avoid repeat clicks
+		setShowModal(false);
+		// Set default identifier as name if left blank
+		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
+		// Add the new unit and update the store
+		dispatch(addUnit(state));
+		resetState();
 	};
 
 	const tooltipStyle = {
@@ -118,12 +118,16 @@ export default function CreateUnitModalComponent() {
 					</div>
 					{/* Name input */}
 					<div style={formInputStyle}>
-						<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
+						<label><FormattedMessage id="unit.name" /></label>
 						<Input
 							name='name'
 							type='text'
 							onChange={e => handleStringChange(e)}
-							value={state.name} />
+							value={state.name}
+							invalid={state.name === ''}/>
+						<FormFeedback>
+							<FormattedMessage id="error.required" />
+						</FormFeedback>
 					</div>
 					{/* Type of unit input */}
 					<div style={formInputStyle}>
@@ -183,10 +187,12 @@ export default function CreateUnitModalComponent() {
 							name='secInRate'
 							type='number'
 							onChange={e => handleNumberChange(e)}
-							value={state.secInRate}
-							// TODO validate negative input by typing for rate but database stops it.
-							// This stops negative input by use of arrows to change value.
-							min="1" />
+							defaultValue={state.secInRate}
+							min="1"
+							invalid={state.secInRate < 1} />
+						<FormFeedback>
+							<FormattedMessage id="error.greater" values={{ min: '1'}}  />
+						</FormFeedback>
 					</div>
 					{/* Suffix input */}
 					<div style={formInputStyle}>
@@ -213,7 +219,7 @@ export default function CreateUnitModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!state.name}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validUnit}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

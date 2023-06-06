@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { Button, Input, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
@@ -16,7 +16,7 @@ import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
 import * as _ from 'lodash';
-import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
+import {formInputStyle, tableStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -169,13 +169,15 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				{/* when any of the conversion are changed call one of the functions. */}
 				<ModalBody style={tableStyle}>
 					{/* Source unit input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.source" /><label style={requiredStyle}>*</label></label>
+					<FormGroup>
+						<Label for='sourceId'><FormattedMessage id="conversion.source" /></Label>
 						<Input
+							id='sourceId'
 							name='sourceId'
 							type='select'
 							defaultValue={-999}
-							onChange={e => handleNumberChange(e)}>
+							onChange={e => handleNumberChange(e)}
+							invalid={state.sourceId === -999}>
 							{<option
 								value={-999}
 								key={-999}
@@ -187,15 +189,20 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 							})}
 						</Input>
-					</div>
+						<FormFeedback>
+							<FormattedMessage id="error.required" />
+						</FormFeedback>
+					</FormGroup>
 					{/* Destination unit input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.destination" /><label style={requiredStyle}>*</label></label>
+					<FormGroup>
+						<Label for='destinationId'><FormattedMessage id="conversion.destination" /></Label>
 						<Input
+							id='destinationId'
 							name='destinationId'
 							type='select'
 							defaultValue={-999}
-							onChange={e => handleNumberChange(e)}>
+							onChange={e => handleNumberChange(e)}
+							invalid={state.destinationId === -999}>
 							{<option
 								value={-999}
 								key={-999}
@@ -207,11 +214,15 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 							})}
 						</Input>
-					</div>
+						<FormFeedback>
+							<FormattedMessage id="error.required" />
+						</FormFeedback>
+					</FormGroup>
 					{/* Bidirectional Y/N input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.bidirectional" /></label>
+					<FormGroup>
+						<Label for='bidirectional'><FormattedMessage id="conversion.bidirectional" /></Label>
 						<Input
+							id='bidirectional'
 							name='bidirectional'
 							type='select'
 							onChange={e => handleBooleanChange(e)}>
@@ -219,35 +230,38 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Slope input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.slope" /></label>
+					<FormGroup>
+						<Label for='slope'><FormattedMessage id="conversion.slope" /></Label>
 						<Input
+							id='slope'
 							name='slope'
 							type='number'
 							defaultValue={state.slope}
 							onChange={e => handleNumberChange(e)}
 						/>
-					</div>
+					</FormGroup>
 					{/* Intercept input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.intercept" /></label>
+					<FormGroup>
+						<Label for='intercept'><FormattedMessage id="conversion.intercept" /></Label>
 						<Input
+							id='intercept'
 							name='intercept'
 							type='number'
 							onChange={e => handleNumberChange(e)}
 							required value={state.intercept} />
-					</div>
+					</FormGroup>
 					{/* Note input*/}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="conversion.note" /></label>
+					<FormGroup>
+						<Label for='note'><FormattedMessage id="conversion.note" /></Label>
 						<Input
+							id='note'
 							name='note'
 							type='textarea'
 							onChange={e => handleStringChange(e)}
 							value={state.note} />
-					</div>
+					</FormGroup>
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}

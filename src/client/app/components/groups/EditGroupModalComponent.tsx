@@ -10,7 +10,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, Input, InputGroup, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -33,7 +33,7 @@ import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
-import { tableStyle, requiredStyle, tooltipBaseStyle, formInputStyle } from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle, formInputStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
@@ -115,6 +115,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Dropdowns state
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
+
+	const [validGroup, setValidGroup] = useState(false);
+	useEffect(() => {
+		setValidGroup(groupState.name !== '' && (groupState.area === 0 || (groupState.area > 0 && groupState.areaUnit !== AreaUnitType.none)));
+	}, [groupState.area, groupState.areaUnit, groupState.name]);
 	/* End State */
 
 	/* Confirm Delete Modal */
@@ -247,15 +252,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		// Only validate and store if any changes.
 		if (groupHasChanges) {
-			// Check if area is non-negative
-			if (groupState.area < 0) {
-				notifyUser(translate('area.invalid') + groupState.area + '.');
-				inputOk = false;
-			} else if (groupState.area > 0 && groupState.areaUnit == AreaUnitType.none) {
-				// If the group has an assigned area, it must have a unit
-				notifyUser(translate('area.but.no.unit'));
-				inputOk = false;
-			}
 			//Check GPS is okay.
 			const gpsInput = groupState.gps;
 			let gps: GPSPoint | null = null;
@@ -408,18 +404,25 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				<ModalBody style={tableStyle}>
 					{/* Name input, disabled if not admin */}
 					<div style={formInputStyle}>
-						<FormattedMessage id="group.name" /><label style={requiredStyle}>*</label>
+						<Label for='name'><FormattedMessage id="group.name" /></Label>
 						<Input
+							autoComplete='off'
+							id='name'
 							name='name'
 							type='text'
 							onChange={e => handleStringChange(e)}
 							required value={groupState.name}
-							disabled={!loggedInAsAdmin}/>
+							disabled={!loggedInAsAdmin}
+							invalid={groupState.name === ''}/>
+						<FormFeedback>
+							<FormattedMessage id="error.required" />
+						</FormFeedback>
 					</div>
 					{/* default graphic unit input, disabled if not admin */}
 					<div style={formInputStyle}>
-						<FormattedMessage id="group.defaultGraphicUnit" />
+						<Label for='defaultGraphicUnit'><FormattedMessage id="group.defaultGraphicUnit" /></Label>
 						<Input
+							id="defaultGraphicUnit"
 							name='defaultGraphicUnit'
 							type='select'
 							value={groupState.defaultGraphicUnit}
@@ -437,8 +440,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					{loggedInAsAdmin && <>
 						{/* Displayable input, only for admin. */}
 						<div style={formInputStyle}>
-							<FormattedMessage id="group.displayable" />
+							<Label for='displayable'><FormattedMessage id="group.displayable" /></Label>
 							<Input
+								id='displayable'
 								name='displayable'
 								type='select'
 								value={groupState.displayable.toString()}
@@ -450,39 +454,51 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</div>
 						{/* Area input, only for admin. */}
 						<div style={formInputStyle}>
-							<FormattedMessage id="group.area" />
+							<Label for='area'><FormattedMessage id="group.area" /></Label>
 							<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 							<InputGroup>
 								<Input
+									id='area'
 									name="area"
 									type="number"
 									min="0"
 									// cannot use defaultValue because it won't update when area is auto calculated
+									// this makes the validation redundant but still a good idea
 									value={groupState.area}
-									onChange={e => handleNumberChange(e)} />
+									onChange={e => handleNumberChange(e)}
+									invalid={groupState.area < 0} />
 								{/* Calculate sum of meter areas */}
 								<Button onClick={handleAutoCalculateArea}>
 									<FormattedMessage id="group.area.calculate" />
 								</Button>
+								<FormFeedback>
+									<FormattedMessage id="error.negative" />
+								</FormFeedback>
 							</InputGroup>
 						</div>
 						{/* meter area unit input */}
 						<div style={formInputStyle}>
-							<FormattedMessage id="group.area.unit" />
+							<Label for='areaUnit'><FormattedMessage id="group.area.unit" /></Label>
 							<Input
+								id="areaUnit"
 								name='areaUnit'
 								type='select'
 								value={groupState.areaUnit}
-								onChange={e => handleStringChange(e)}>
+								onChange={e => handleStringChange(e)}
+								invalid={groupState.area > 0 && groupState.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
 									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
 								})}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id="area.but.no.unit" />
+							</FormFeedback>
 						</div>
 						{/* GPS input, only for admin. */}
 						<div style={formInputStyle}>
-							<FormattedMessage id="group.gps" />
+							<Label for='gps'><FormattedMessage id="group.gps" /></Label>
 							<Input
+								id='gps'
 								name='gps'
 								type='text'
 								onChange={e => handleStringChange(e)}
@@ -490,9 +506,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</div>
 						{/* Note input, only for admin. */}
 						<div style={formInputStyle}>
-							<FormattedMessage id="group.note" />
+							<Label for='note'><FormattedMessage id="group.note" /></Label>
 							<Input
-								style={formInputStyle}
+								id='note'
 								name='note'
 								type='textarea'
 								onChange={e => handleStringChange(e)}
@@ -611,7 +627,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								<FormattedMessage id="discard.changes" />
 							</Button>
 							{/* On click calls the function handleSaveChanges in this component */}
-							<Button color='primary' onClick={handleSubmit} disabled={!groupState.name}>
+							<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
 								<FormattedMessage id="save.all" />
 							</Button>
 						</div>

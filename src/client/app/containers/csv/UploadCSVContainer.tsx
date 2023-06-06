@@ -269,8 +269,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 		return (
 			<div>
-				<TooltipHelpContainer page='csv' />
 				<HeaderContainer />
+				<TooltipHelpContainer page='csv' />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.readings)}>

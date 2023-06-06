@@ -15,8 +15,8 @@ import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 export default function HomeComponent() {
 	return (
 		<div>
-			<TooltipHelpContainer page='home'/>
 			<HeaderContainer />
+			<TooltipHelpContainer page='home'/>
 			<DashboardContainer />
 			<FooterContainer />
 		</div>
