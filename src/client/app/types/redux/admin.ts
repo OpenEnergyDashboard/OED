@@ -22,7 +22,7 @@ export type AdminAction =
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
-	| UpdateCikAndDBViews
+	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
 	| UpdateDefaultMeterReadingFrequencyAction;
 
@@ -92,8 +92,8 @@ export interface UpdateDefaultFileSizeLimit {
 	defaultFileSizeLimit: number;
 }
 
-export interface UpdateCikAndDBViews {
-	type: ActionType.UpdateCikAndDBViews;
+export interface ToggleWaitForCikAndDB {
+	type: ActionType.ToggleWaitForCikAndDB;
 }
 
 export interface UpdateDefaultMeterReadingFrequencyAction {
