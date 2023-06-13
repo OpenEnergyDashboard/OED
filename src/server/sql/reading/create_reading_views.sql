@@ -415,7 +415,7 @@ DECLARE
 				-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
 				requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
 				-- Get the frequency that this meter reads at.
-				select reading_frequency into frequency FROM meters where id = current_meter_id;
+				SELECT reading_frequency INTO frequency FROM meters WHERE id = current_meter_id;
 				-- Get the seconds in the frequency.
 				frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
 
