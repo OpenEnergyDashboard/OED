@@ -119,10 +119,10 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
 				submitted: false
 			}
-		case ActionType.UpdateCikAndDBViews:
+		case ActionType.ToggleWaitForCikAndDB:
 			return {
 				...state,
-				isUpdatingCikAndDBViews: true
+				isUpdatingCikAndDBViews: !state.isUpdatingCikAndDBViews
 			}
 		case ActionType.UpdateDefaultMeterReadingFrequency:
 			return {
