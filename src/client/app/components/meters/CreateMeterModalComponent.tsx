@@ -325,7 +325,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="meter.create" />
 			</Button>
 
