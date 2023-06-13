@@ -485,7 +485,7 @@ for (let fileKey in testCases) {
 			const units = [
 				['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'for teting']
 			];
-			await insertUnits(units, conn);
+			await insertUnits(units, false, conn);
 			// Create conversions from meter units to standard units.
 			const conversions = [
 				['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
@@ -677,7 +677,7 @@ for (let fileKey in testMeters) {
 				['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'for teting'],
 				['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'for testing']
 			];
-			await insertUnits(units, conn);
+			await insertUnits(units, false, conn);
 			// Get the value from the DB so can get the id.
 			meterUnit = await Unit.getByName('Electric_Utility', conn);
 			graphUnit = await Unit.getByName('kWh', conn);
