@@ -6,7 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
-import { AreaUnitType } from 'utils/getAreaUnitConversion';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export type AdminAction =
 	| UpdateImportMeterAction
