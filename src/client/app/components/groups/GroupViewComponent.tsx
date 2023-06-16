@@ -24,6 +24,11 @@ interface GroupViewComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * React component that defines the group page cards
+ * @param {GroupViewComponentProps} props variables passed in to define
+ * @returns {Element} JSX Element
+ */
 export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.
 

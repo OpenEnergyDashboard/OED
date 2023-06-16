@@ -11,6 +11,7 @@ import { GroupDefinition, GroupEditData } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
+import React from 'react';
 
 /**
  * The intersect operation of two sets.
@@ -181,9 +182,9 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
 
 /**
  * Get options for the meter menu on the group page.
- * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
- * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
- * @return The current meter options for this group.
+ * @param {number} defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
+ * @param {number} deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @returns {SelectOption} The current meter options for this group.
  */
 export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
@@ -224,11 +225,11 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 
 /**
  * Get options for the group menu on the group page.
- * @param groupId The id of the group being worked on.
- * @param defaultGraphicUnit The group's current default graphic unit which may have been updated from what is in Redux state.
- * @param deepMeters The group's current deep meters (all recursively) which may have been updated from what is in Redux state.
- * @return The current group options for this group.
-*/
+ * @param {number} groupId The id of the group being worked on.
+ * @param {number} defaultGraphicUnit The group's current default graphic unit which may have been updated from what is in Redux state.
+ * @param {number[]} deepMeters The group's current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @returns {SelectOption} The current group options for this group.
+ */
 export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
@@ -284,12 +285,12 @@ export const enum GroupCase {
 
 /**
  * Return the case associated if we add the given meter/group to a group.
- * @param currentUnits The current compatible units of the group.
- * @param idToAdd The meter/group's id to add to the group.
- * @param type Can be METER or GROUP.
- * @param currentDefaultGraphicUnit The default graphic unit for group changing
- * @param deepMeters The deep meters for the group, ignored if meter
- * @returns GroupCase the type of change this involves.
+ * @param {Set<number>} currentUnits The current compatible units of the group.
+ * @param {number} idToAdd The meter/group's id to add to the group.
+ * @param {DataType} type Can be METER or GROUP.
+ * @param {number} currentDefaultGraphicUnit The default graphic unit for group changing
+ * @param {number[]} deepMeters The deep meters for the group, ignored if meter
+ * @returns {GroupCase} the type of change this involves.
  */
 export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType,
 	currentDefaultGraphicUnit: number, deepMeters: number[]): GroupCase {
@@ -301,10 +302,10 @@ export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: n
 
 /**
  * Given a meter or group's id, returns its compatible units.
- * @param id The meter or group's id.
- * @param type Can be Meter or Group.
- * @param deepMeters The deep meter of the id if it is a group, ignored if meter.
- * @returns Set of ids of compatible units.
+ * @param {number} id The meter or group's id.
+ * @param {DataType} type Can be Meter or Group.
+ * @param {number[]} deepMeters The deep meter of the id if it is a group, ignored if meter.
+ * @returns {Set<number>} Set of ids of compatible units.
  */
 function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): Set<number> {
 	if (type == DataType.Meter) {
@@ -321,10 +322,10 @@ function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): S
 
 /**
  * Returns the group case given current units and new units. See the enum GroupCase for the list of possible cases.
- * @param currentUnits The current compatible units set.
- * @param newUnits The new compatible units set.
- * @param defaultGraphicUnit The default graphic unit.
- * @returns GroupCase of impact on units from current to new unit sets.
+ * @param {Set<number>} currentUnits The current compatible units set.
+ * @param {Set<number>} newUnits The new compatible units set.
+ * @param {number} defaultGraphicUnit The default graphic unit.
+ * @returns {GroupCase} of impact on units from current to new unit sets.
  */
 function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGraphicUnit: number): GroupCase {
 	// The compatible units of a set of meters or groups is the intersection of the compatible units for each.
@@ -348,8 +349,8 @@ function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGrap
 
 /**
  * Returns the styling for the menu for the type of change in in GroupCase
- * @param compatibilityChangeCase Which GroupCase is involved.
- * @returns the desired color for styling.
+ * @param {GroupCase} compatibilityChangeCase Which GroupCase is involved.
+ * @returns {React.CSSProperties} the desired color for styling.
  */
 function getMenuOptionFont(compatibilityChangeCase: GroupCase): React.CSSProperties {
 	switch (compatibilityChangeCase) {

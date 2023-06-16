@@ -20,6 +20,10 @@ import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 
+/**
+ * React component that defines what details of a group are shown
+ * @returns {Element} JSX Element
+ */
 export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();
 

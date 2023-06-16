@@ -47,6 +47,11 @@ interface EditGroupModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * React component to define the group edit modal
+ * @param {EditGroupModalComponentProps} props state variables needed to define the component
+ * @returns {Element} JSX Element
+ */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const dispatch = useDispatch();
 
@@ -668,9 +673,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/**
 	 * Validates and warns user when adding a child group/meter to a specific group.
 	 * If the check pass, update the edited group and related groups.
-	 * @param childId The group/meter's id to add to the parent group.
-	 * @param childType Can be group or meter.
-	 * @return true if the child was assigned and false otherwise
+	 * @param {number} childId The group/meter's id to add to the parent group.
+	 * @param {DataType} childType Can be group or meter.
+	 * @returns {boolean} true if the child was assigned and false otherwise
 	 */
 	async function assignChildToGroup(childId: number, childType: DataType): Promise<boolean> {
 		// Create a deep copy of the edit state before adding the child. We only need some of the state but this is easier.
@@ -730,10 +735,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/**
 	 * Determines if the change in compatible units of one group are okay with another group.
 	 * Warns admin of changes and returns true if the changes should happen.
-	 * @param gid The group that has a change in compatible units.
-	 * @param parentGroupIds The parent groups' ids of that group.
-	 * @param groupsState The local group state to use.
-	 * @returns true if change fine or if admin agreed. false if admin does not or the change is an issue.
+	 * @param {number} gid The group that has a change in compatible units.
+	 * @param {number[]} parentGroupIds The parent groups' ids of that group.
+	 * @param {*} groupsState The local group state to use.
+	 * @returns {boolean} true if change fine or if admin agreed. false if admin does not or the change is an issue.
 	 */
 	function validateGroupPostAddChild(gid: number, parentGroupIds: number[], groupsState: any): boolean {
 		// This will hold the overall message for the admin alert.
@@ -788,9 +793,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	/**
 	 * Handles removing child from a group.
-	 * @param childId The group/meter's id to add to the parent group.
-	 * @param childType Can be group or meter.
-	 * @returns true if change fine or if admin agreed. false if admin does not or the change is an issue.
+	 * @param {number} childId The group/meter's id to add to the parent group.
+	 * @param {DataType} childType Can be group or meter.
+	 * @returns {boolean} true if change fine or if admin agreed. false if admin does not or the change is an issue.
 	 */
 	function removeChildFromGroup(childId: number, childType: DataType): boolean {
 		// Unlike adding, you do not change the default graphic unit by removing. Thus, you only need to recalculate the
@@ -873,7 +878,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	/**
 	 * Converts the child meters of this group to options for menu sorted by identifier
-	 * @returns sorted SelectOption for child meters of group editing.
+	 * @returns {SelectOption[]} sorted SelectOption for child meters of group editing.
 	 */
 	function metersToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
@@ -892,7 +897,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	/**
 	 * Converts the child groups of this group to options for menu sorted by name
-	 * @returns sorted SelectOption for child groups of group editing.
+	 * @returns {SelectOption[]} sorted SelectOption for child groups of group editing.
 	 */
 	function groupsToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
@@ -914,7 +919,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/**
 	 * Converts the child meters of this group to list options sorted by name.
 	 * This is needed for non-admins. Hidden items are not shown but noted in list.
-	 * @returns names of all child meters in sorted order.
+	 * @returns {string[]} names of all child meters in sorted order.
 	 */
 	function metersToList(): string[] {
 		// Hold the list for display.
@@ -943,7 +948,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/**
 	 * Converts the child meters of this group to list options sorted by name.
 	 * This is needed for non-admins. Hidden items are not shown but noted in list.
-	 * @returns names of all child meters in sorted order.
+	 * @returns {string[]} names of all child meters in sorted order.
 	 */
 	function groupsToList(): string[] {
 		const listedGroups: string[] = [];
@@ -974,7 +979,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	/**
 	 * Converts the deep meters of this group to list options sorted by identifier.
 	 * Hidden items are not shown but noted in list; admins should never see that.
-	 * @returns names of all child meters in sorted order.
+	 * @returns {string[]} names of all child meters in sorted order.
 	 */
 	function deepMetersToList() {
 		// Unlike child meter/group, these are lists for all users.
