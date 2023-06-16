@@ -6,6 +6,8 @@ import { ChartTypes } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { durationFormat } from '../utils/durationFormat';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -18,7 +20,10 @@ const defaultState: AdminState = {
 	submitted: true,
 	defaultWarningFileSize: 5,
 	defaultFileSizeLimit: 25,
-	isUpdatingCikAndDBViews: false
+	isUpdatingCikAndDBViews: false,
+	defaultAreaNormalization: false,
+	defaultAreaUnit: AreaUnitType.none,
+	defaultMeterReadingFrequency: '00:15:00'
 };
 
 /* eslint-disable jsdoc/require-jsdoc */
@@ -48,6 +53,18 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultBarStacking: !state.defaultBarStacking,
 				submitted: false
 			};
+		case ActionType.ToggleDefaultAreaNormalization:
+			return {
+				...state,
+				defaultAreaNormalization: !state.defaultAreaNormalization,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultAreaUnit:
+			return {
+				...state,
+				defaultAreaUnit: action.defaultAreaUnit,
+				submitted: false
+			}
 		case ActionType.UpdateDefaultTimeZone:
 			return {
 				...state,
@@ -75,7 +92,10 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultLanguage: action.data.defaultLanguage,
 				defaultTimeZone: action.data.defaultTimezone,
 				defaultWarningFileSize: action.data.defaultWarningFileSize,
-				defaultFileSizeLimit: action.data.defaultFileSizeLimit
+				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
+				defaultAreaNormalization: action.data.defaultAreaNormalization,
+				defaultAreaUnit: action.data.defaultAreaUnit,
+				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency)
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -85,6 +105,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 		case ActionType.MarkPreferencesSubmitted:
 			return {
 				...state,
+				// Convert the duration returned from Postgres into more human format.
+				defaultMeterReadingFrequency: durationFormat(action.defaultMeterReadingFrequency),
 				submitted: true
 			};
 		case ActionType.UpdateDefaultWarningFileSize:
@@ -99,11 +121,17 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
 				submitted: false
 			}
-		case ActionType.UpdateCikAndDBViews:
+		case ActionType.ToggleWaitForCikAndDB:
 			return {
 				...state,
-				isUpdatingCikAndDBViews: true
+				isUpdatingCikAndDBViews: !state.isUpdatingCikAndDBViews
 			}
+		case ActionType.UpdateDefaultMeterReadingFrequency:
+			return {
+				...state,
+				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
+				submitted: false
+			};
 		default:
 			return state;
 	}

@@ -28,13 +28,16 @@ async function setupGroupsAndMeters(conn) {
 	await Promise.all([groupA, groupB, groupC].map(group => group.insert(conn)));
 	const meterA = new Meter(undefined, 'MA', null, false, true, Meter.type.MAMAC, null, gps,
 	'Identified MA' ,'notes MA', 35.0, true, true, '01:01:25', '00:00:00', 5, 1, 1, 'increasing', false,
-	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitAId, unitBId);
+	1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitAId, unitBId,
+	Unit.areaUnitType.METERS, undefined);
 	const meterB = new Meter(undefined, 'MB', null, false, true, Meter.type.OTHER, null, gps,
 	'Identified MB', 'notes MB', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitBId, unitCId);
+	25.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitBId, unitCId,
+	Unit.areaUnitType.METERS, undefined);
 	const meterC = new Meter(undefined, 'MC', null, false, true, Meter.type.METASYS, null, gps,
 	'Identified MC', 'notes MC', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
-	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitCId, unitAId);
+	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitCId, unitAId,
+	Unit.areaUnitType.METERS, undefined);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 }
 

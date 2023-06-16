@@ -13,7 +13,7 @@ import { Dispatch } from '../types/redux/actions';
 
 function mapStateToProps(state: State) {
 	return {
-		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name.trim() })), 'name')
+		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name })), 'name')
 	};
 }
 function mapDispatchToProps(dispatch: Dispatch) {

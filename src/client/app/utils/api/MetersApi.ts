@@ -43,8 +43,8 @@ export default class MetersApi {
 		);
 	}
 
-	public async addMeter(meter: MeterEditData): Promise<void> {
-		return await this.backend.doPostRequest('/api/meters/addMeter', meter);
+	public async addMeter(meter: MeterEditData): Promise<MeterEditData> {
+		return await this.backend.doPostRequest<MeterEditData>('/api/meters/addMeter', meter);
 	}
 
 	public async getMetersDetails(): Promise<MeterData[]> {

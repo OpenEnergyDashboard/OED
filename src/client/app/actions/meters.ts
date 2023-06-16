@@ -7,6 +7,7 @@ import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
+import { updateCikAndDBViewsIfNeeded } from './admin';
 
 /* eslint-disable jsdoc/require-jsdoc */
 
@@ -45,8 +46,12 @@ export function submitMeterEdits(meterId: number): t.SubmitEditedMeterAction {
 	return { type: ActionType.SubmitEditedMeter, meterId };
 }
 
-export function confirmMeterEdits(editedMeter: t.MeterData): t.ConfirmEditedMeterAction {
+export function confirmMeterEdits(editedMeter: t.MeterEditData): t.ConfirmEditedMeterAction {
 	return { type: ActionType.ConfirmEditedMeter, editedMeter };
+}
+
+export function confirmMeterAdd(addedMeter: t.MeterEditData): t.ConfirmAddMeterAction {
+	return { type: ActionType.ConfirmAddMeter, addedMeter };
 }
 
 export function deleteSubmittedMeter(meterId: number): t.DeleteSubmittedMeterAction {
@@ -69,7 +74,7 @@ export function fetchMetersDetailsIfNeeded(): Thunk {
 	};
 }
 
-export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
+export function submitEditedMeter(editedMeter: t.MeterData, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if meterData is already submitting (indexOf returns -1 if item does not exist in array)
 		if (getState().meters.submitting.indexOf(editedMeter.id) === -1) {
@@ -81,10 +86,13 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 			try {
 				// posts the edited meterData to the meters API
 				await metersApi.edit(editedMeter);
+				// Update reading views if needed. Never redoCik so false.
+				dispatch(updateCikAndDBViewsIfNeeded(false, shouldRefreshReadingViews));
+				const changedMeter = await metersApi.edit(editedMeter);
 				// Clear meter Id from submitting state array
 				dispatch(deleteSubmittedMeter(editedMeter.id));
-				// Update the store with our new edits
-				dispatch(confirmMeterEdits(editedMeter));
+				// Update the store with our new edits based on what came from DB.
+				dispatch(confirmMeterEdits(changedMeter));
 				// Success!
 				showSuccessNotification(translate('meter.successfully.edited.meter'));
 			} catch (err) {
@@ -100,16 +108,14 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 }
 
 // Add meter to database
-// export function addMeter(meter: t.MeterData): Thunk {
 export function addMeter(meter: t.MeterEditData): Thunk {
 	return async (dispatch: Dispatch) => {
 		try {
 			// Attempt to add meter to database
-			await metersApi.addMeter(meter);
-			// Update the meters state from the database on a successful call
-			// In the future, getting rid of this database fetch and updating the store on a successful API call would make the page faster
-			// However, since the database currently assigns the id to the MeterData
-			dispatch(fetchMetersDetails());
+			const meterChanged = await metersApi.addMeter(meter);
+			// Update the store with our new edits based on what came from DB.
+			// The id and reading frequency may have been updated.
+			dispatch(confirmMeterAdd(meterChanged));
 			showSuccessNotification(translate('meter.successfully.create.meter'));
 		} catch (err) {
 			// TODO Better way than popup with React but want to stay so user can read/copy.

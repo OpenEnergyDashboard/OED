@@ -7,13 +7,17 @@ import { GroupsAction, GroupsState, DisplayMode } from '../types/redux/groups';
 import { ActionType } from '../types/redux/actions';
 
 const defaultState: GroupsState = {
+	hasBeenFetchedOnce: false,
+	// Has the child meters and groups of all groups already been put into state.
+	hasChildrenBeenFetchedOnce: false,
 	isFetching: false,
-	outdated: true,
+	// Are we currently getting the child meters/groups for all groups.
+	isFetchingAllChildren: false,
 	byGroupID: {},
 	selectedGroups: [],
-	groupInEditing: {
-		dirty: false
-	},
+	// TODO groupInEditing: {
+	// 	dirty: false
+	// },
 	displayMode: DisplayMode.View
 };
 
@@ -21,6 +25,21 @@ const defaultState: GroupsState = {
 
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {
+		// Records if group details have been fetched at least once
+		case ActionType.ConfirmGroupsFetchedOnce: {
+			return {
+				...state,
+				hasBeenFetchedOnce: true
+			};
+		}
+		// Records if all group meter/group children have been fetched at least once.
+		// Normally just once but can reset to get it to fetch again.
+		case ActionType.ConfirmAllGroupsChildrenFetchedOnce: {
+			return {
+				...state,
+				hasChildrenBeenFetchedOnce: true
+			};
+		}
 		// The following are reducers related to viewing and fetching groups data
 		case ActionType.RequestGroupsDetails:
 			return {
@@ -39,9 +58,11 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			const newGroups = action.data.map(group => ({
 				...group,
 				isFetching: false,
-				outdated: true,
-				childGroups: [],
-				childMeters: [],
+				// Sometimes OED fetches both the details and the child meters/groups as separate actions. Since the order they will happen is
+				// uncertain, we need to preserve the child meters/groups if they exist. If not, put empty so no issues when accessing in other
+				// places. Note this may be the wrong values but they should refresh quickly once all actions are done.
+				childGroups: (state.byGroupID[group.id] && state.byGroupID[group.id].childGroups) ? state.byGroupID[group.id].childGroups : [],
+				childMeters: (state.byGroupID[group.id] && state.byGroupID[group.id].childMeters) ? state.byGroupID[group.id].childMeters : [],
 				selectedGroups: [],
 				selectedMeters: []
 			}));
@@ -52,7 +73,6 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			return {
 				...state,
 				isFetching: false,
-				outdated: false,
 				byGroupID: newGroupsByID
 			};
 		}
@@ -81,13 +101,48 @@ export default function groups(state = defaultState, action: GroupsAction) {
 					[action.groupID]: {
 						...state.byGroupID[action.groupID],
 						isFetching: false,
-						outdated: false,
 						childGroups: action.data.groups,
 						childMeters: action.data.meters,
 						deepMeters: action.data.deepMeters
 					}
 				}
 			};
+		}
+
+		// When start fetching all groups meters/groups children.
+		case ActionType.RequestAllGroupsChildren: {
+			// Note that fetching
+			return {
+				...state,
+				isFetchingAllChildren: true,
+				// When the group children are forced to be re-fetched on creating a new group, we need to indicate
+				// here that the children are not yet gotten. This causes the group detail page to redraw when this
+				// is finished so the new group has the latest info.
+				hasChildrenBeenFetchedOnce: false
+			}
+		}
+
+		// When receive all groups meters/groups children.
+		case ActionType.ReceiveAllGroupsChildren: {
+			// Set up temporary state so only change/return once.
+			const newState: GroupsState = {
+				...state,
+				byGroupID: {
+					...state.byGroupID
+				}
+			}
+			// For each group that received data, set the children meters and groups.
+			for (const groupInfo of action.data) {
+				// Group id of the current item
+				const groupId = groupInfo.groupId;
+				// Reset the newState for this group to have child meters/groups.
+				newState.byGroupID[groupId].childMeters = groupInfo.childMeters;
+				newState.byGroupID[groupId].childGroups = groupInfo.childGroups;
+			}
+			// Note that not fetching children
+			newState.isFetchingAllChildren = false
+			// The updated state.
+			return newState;
 		}
 
 		case ActionType.ChangeDisplayedGroups: {
@@ -97,224 +152,16 @@ export default function groups(state = defaultState, action: GroupsAction) {
 			};
 		}
 
-		case ActionType.ChangeSelectedChildGroupsPerGroup: {
+		case ActionType.ConfirmEditedGroup: {
+			// Return new state object with updated edited group info.
 			return {
 				...state,
 				byGroupID: {
 					...state.byGroupID,
-					[action.parentID]: {
-						...state.byGroupID[action.parentID],
-						selectedGroups: action.groupIDs
-					}
-				}
-			};
-		}
-
-		case ActionType.ChangeSelectedChildMetersPerGroup: {
-			return {
-				...state,
-				byGroupID: {
-					...state.byGroupID,
-					[action.parentID]: {
-						...state.byGroupID[action.parentID],
-						selectedMeters: action.meterIDs
-					}
-				}
-			};
-		}
-
-		// The following are reducers related to creating and editing groups
-		case ActionType.ChangeGroupsUIDisplayMode: {
-			const validModes = _.values(DisplayMode);
-			if (_.includes(validModes, action.newMode)) {
-				return {
-					...state,
-					displayMode: action.newMode,
-					groupInEditing: {
-						dirty: false
-					},
-					selectedGroups: [] // zero out selected groups when we switch screens
-				};
-			}
-			return state;
-		}
-
-		case ActionType.CreateNewBlankGroup: {
-			if (!state.groupInEditing.dirty) {
-				return {
-					...state,
-					groupInEditing: {
-						// False when the changes are successfully inserted into the db OR the user cancels the editing
-						// OR when no changes have been made
-						dirty: false,
-						// True when a request to insert the changes into the DB has been sent
-						submitted: false,
-						name: '',
-						displayable: true,
-						note: '',
-						childGroups: [],
-						childMeters: []
-					}
-				};
-			}
-			return state;
-		}
-
-		case ActionType.BeginEditingGroup: {
-			if (!state.groupInEditing.dirty) {
-				const currentGroup = state.byGroupID[action.groupID];
-				const toEdit = {
-					dirty: false,
-					submitted: false,
-					id: currentGroup.id,
-					name: currentGroup.name,
-					gps: currentGroup.gps,
-					displayable: currentGroup.displayable,
-					note: currentGroup.note,
-					area: currentGroup.area,
-					childGroups: currentGroup.childGroups,
-					childMeters: currentGroup.childMeters
-				};
-				return {
-					...state,
-					groupInEditing: toEdit
-				};
-			}
-			return state;
-		}
-
-		case ActionType.EditGroupName: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					name: action.newName,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.EditGroupGPS: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					gps: action.newGPS,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.EditGroupDisplayable: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					displayable: action.newDisplay,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.EditGroupNote: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					note: action.newNote,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.EditGroupArea: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					area: action.newArea,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.ChangeChildGroups: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					childGroups: action.groupIDs,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.ChangeChildMeters: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					childMeters: action.meterIDs,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.MarkGroupInEditingSubmitted: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					submitted: true
-				}
-			};
-		}
-
-		case ActionType.MarkGroupInEditingNotSubmitted: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					submitted: false
-				}
-			};
-		}
-
-		case ActionType.MarkGroupInEditingClean: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					dirty: false
-				}
-			};
-		}
-
-		case ActionType.MarkGroupInEditingDirty: {
-			return {
-				...state,
-				groupInEditing: {
-					...state.groupInEditing,
-					dirty: true
-				}
-			};
-		}
-
-		case ActionType.MarkGroupsByIDOutdated: {
-			return {
-				...state,
-				outdated: true
-			};
-		}
-
-		case ActionType.MarkOneGroupOutdated: {
-			return {
-				...state,
-				byGroupID: {
-					...state.byGroupID,
-					[action.groupID]: {
-						...state.byGroupID[action.groupID],
-						outdated: true
+					[action.editedGroup.id]: {
+						// There is state that is in each group that is not part of the edit information state.
+						...state.byGroupID[action.editedGroup.id],
+						...action.editedGroup
 					}
 				}
 			};

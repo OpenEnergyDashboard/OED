@@ -17,6 +17,8 @@ import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
+import { notifyUser } from '../../utils/input'
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -81,9 +83,19 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	// Validate the changes and return true if we should update this unit.
 	// Two reasons for not updating the unit:
+	//  0. The rate is not greater than 0.
 	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
 	//	2. There are no changes
 	const shouldUpdateUnit = (): boolean => {
+		// true if inputted values are okay and there are changes.
+		let inputOk = true;
+
+		// Check for case 0
+		if (state.secInRate <= 0) {
+			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}.`);
+			inputOk = false;
+		}
+
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
 			// Get an array of all meters
@@ -91,21 +103,27 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			const meter = meters.find(m => m.unitId === props.unit.id);
 			if (meter) {
 				// There exists a meter that is still linked with this unit
-				window.alert(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`)
-				return false;
+				notifyUser(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
+				inputOk = false;
 			}
 		}
-
-		// Check for case 2 by comparing state to props
-		return props.unit.name != state.name
-			|| props.unit.identifier != state.identifier
-			|| props.unit.typeOfUnit != state.typeOfUnit
-			|| props.unit.unitRepresent != state.unitRepresent
-			|| props.unit.displayable != state.displayable
-			|| props.unit.preferredDisplay != state.preferredDisplay
-			|| props.unit.secInRate != state.secInRate
-			|| props.unit.suffix != state.suffix
-			|| props.unit.note != state.note;
+		if (inputOk) {
+			// The input passed validation so check if changes exist.
+			// Check for case 2 by comparing state to props
+			return props.unit.name != state.name
+				|| props.unit.identifier != state.identifier
+				|| props.unit.typeOfUnit != state.typeOfUnit
+				|| props.unit.unitRepresent != state.unitRepresent
+				|| props.unit.displayable != state.displayable
+				|| props.unit.preferredDisplay != state.preferredDisplay
+				|| props.unit.secInRate != state.secInRate
+				|| props.unit.suffix != state.suffix
+				|| props.unit.note != state.note;
+		} else {
+			// Tell user that not going to update due to input issues.
+			notifyUser(`${translate('unit.input.error')}`);
+			return false;
+		}
 	}
 
 	// Save changes
@@ -138,17 +156,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	}
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
+		...tooltipBaseStyle,
 		tooltipEditUnitView: 'help.admin.unitedit'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -181,7 +190,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										<div />
 										{/* Name input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.name" /></label><br />
+											<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='name'
 												type='text'

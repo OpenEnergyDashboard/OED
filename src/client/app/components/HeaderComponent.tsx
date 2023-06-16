@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
-import HeaderButtonsContainer from '../containers/HeaderButtonsContainer';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
 import getPage from '../utils/getPage';
 
 interface HeaderProps {
@@ -49,8 +49,10 @@ class HeaderComponent extends React.Component<HeaderProps> {
 						<h6 style={smallTitleStyle}>{this.props.title}</h6>
 					</div>
 					<div className='col-4 justify-content-end' style={divRightStyle}>
-						{ this.props.optionsVisibility ?
-							<HeaderButtonsContainer showCollapsedMenuButton isModal={false}/>
+						{this.props.optionsVisibility ?
+							// header buttons component and pass isModal as false and isModal is
+							// passed as argument for headerbuttonscomponent main function
+							<HeaderButtonsComponent showCollapsedMenuButton isModal={false} />
 							: <MenuModalComponent
 								showOptions={getPage() === ''}
 								showCollapsedMenuButton={false}

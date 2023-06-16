@@ -28,8 +28,8 @@ async function processConfigFile(configFile) {
 		metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] };
 	}
 	// TODO: the unit name needs to come from the config file
-	const kWhUnit = await Unit.getByName( 'kWh', conn );
-	let unitId; 
+	const kWhUnit = await Unit.getByName('kWh', conn);
+	let unitId;
 	if (kWhUnit === null) {
 		console.log("kWh not found while processing Obvius data");
 		// TODO need a warning log
@@ -67,8 +67,10 @@ async function processConfigFile(configFile) {
 			undefined, // endTimestamp
 			undefined, // previousEnd
 			unitId, // unit
-			unitId // default graphic unit
-			)
+			unitId, // default graphic unit
+			undefined, // area unit
+			undefined // reading frequency
+		)
 		);
 	}
 	return metersArray;

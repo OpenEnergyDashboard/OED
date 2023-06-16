@@ -18,7 +18,7 @@ export default class PreferencesApi {
 		return await this.backend.doGetRequest<PreferenceRequestItem>('/api/preferences');
 	}
 
-	public async submitPreferences(preferences: PreferenceRequestItem): Promise<void> {
-		await this.backend.doPostRequest('/api/preferences', { preferences });
+	public async submitPreferences(preferences: PreferenceRequestItem): Promise<PreferenceRequestItem> {
+		return await this.backend.doPostRequest('/api/preferences', { preferences });
 	}
 }

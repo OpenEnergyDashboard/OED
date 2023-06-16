@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export enum ChartTypes {
 	line = 'line',
@@ -37,6 +38,11 @@ export interface UpdateSelectedUnitAction {
 	unitID: number;
 }
 
+export interface UpdateSelectedAreaUnitAction {
+	type: ActionType.UpdateSelectedAreaUnit;
+	areaUnit: AreaUnitType;
+}
+
 export interface UpdateBarDurationAction {
 	type: ActionType.UpdateBarDuration;
 	barDuration: moment.Duration;
@@ -45,6 +51,10 @@ export interface UpdateBarDurationAction {
 export interface ChangeChartToRenderAction {
 	type: ActionType.ChangeChartToRender;
 	chartType: ChartTypes;
+}
+
+export interface ToggleAreaNormalizationAction {
+	type: ActionType.ToggleAreaNormalization;
 }
 
 export interface ChangeBarStackingAction {
@@ -100,11 +110,13 @@ export type GraphAction =
 	| ChangeSliderRangeAction
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
+	| ToggleAreaNormalizationAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
 	| UpdateSelectedMetersAction
 	| UpdateSelectedUnitAction
+	| UpdateSelectedAreaUnitAction
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
@@ -118,9 +130,11 @@ export interface LineGraphRate {
 }
 
 export interface GraphState {
+	areaNormalization: boolean;
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;
+	selectedAreaUnit: AreaUnitType;
 	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;

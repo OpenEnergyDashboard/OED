@@ -9,6 +9,7 @@ import { calculateCompareShift, SortingOrder } from '../utils/calculateCompare';
 import { CompareReadingsData } from '../types/redux/compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /* eslint-disable jsdoc/require-jsdoc */
 
@@ -58,7 +59,7 @@ function getDataForIDs(ids: number[], isGroup: boolean, state: State): CompareEn
 			identifier = getMeterIdentifier(state, id);
 			readingsData = getMeterReadingsData(state, id, timeInterval, compareShift);
 		}
-		if (isReadingsDataValid(readingsData)) {
+		if (isReadingsDataValid(readingsData) && areaNormalizationValid(state, id, isGroup)) {
 			/* eslint-disable @typescript-eslint/no-non-null-assertion */
 			const currUsage = readingsData!.curr_use!;
 			const prevUsage = readingsData!.prev_use!;
@@ -144,8 +145,8 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
 			ids.sort((a, b) => {
-				const identifierA = a.identifier.toLowerCase().trim();
-				const identifierB = b.identifier.toLowerCase().trim();
+				const identifierA = a.identifier.toLowerCase();
+				const identifierB = b.identifier.toLowerCase();
 				if (identifierA < identifierB) {
 					return -1;
 				}
@@ -181,6 +182,22 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 			throw new Error(`Unknown sorting order: ${sortingOrder}`);
 	}
 	return ids;
+}
+
+function areaNormalizationValid(state: State, id: number, isGroup: boolean): boolean {
+	if (!state.graph.areaNormalization) {
+		return true;
+	}
+	// normalization is valid if the group/meter has a nonzero area and an area unit
+	if (isGroup) {
+		if (state.groups.byGroupID[id].area > 0 && state.groups.byGroupID[id].areaUnit !== AreaUnitType.none) {
+			return true;
+		}
+	}
+	if (state.meters.byMeterID[id].area > 0 && state.meters.byMeterID[id].areaUnit !== AreaUnitType.none) {
+		return true;
+	}
+	return false;
 }
 
 export default connect(mapStateToProps)(MultiCompareChartComponent);

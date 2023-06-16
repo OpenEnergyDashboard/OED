@@ -16,7 +16,7 @@ identifier: Is name that will be shown to user in future
 note: Notes about the meter
 area: Area covered by the meter
 cumulative: True if cumulative values can reset back to zero
-cumulative_reset: True if pipline is to be reset
+cumulative_reset: True if pipeline is to be reset
 cumulative_reset_start: The earliest time of day that a reset can occur
 cumulative_reset_end: The latest time of day that a reset can occur
 reading_gap: Specify the time in seconds that can exist between the end of the last reading and the start of the next reading
@@ -30,6 +30,8 @@ end_timestamp: End timestamp of last reading for this meter
 previous_end: This is used if the readings are split during the processing of crossing away from DST. moment(0) if not this case.
 unit_id: The foreign key to the unit table. The meter receives data and points to this unit in the graph
 default_graphic_unit: The foreign key to the unit table represents the preferred unit to display this meter
+area_unit: The area unit enum
+reading_frequency: The time between readings
 */
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
@@ -42,7 +44,7 @@ CREATE TABLE IF NOT EXISTS meters (
     gps POINT DEFAULT NULL,
     identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
     note TEXT,
-    area REAL DEFAULT NULL CHECK (area >= 0),
+    area REAL NOT NULL DEFAULT 0 CHECK (area >= 0),
     cumulative BOOLEAN DEFAULT false,
     cumulative_reset BOOLEAN DEFAULT false,
     cumulative_reset_start TIME DEFAULT '00:00:00',
@@ -60,5 +62,7 @@ CREATE TABLE IF NOT EXISTS meters (
     end_timestamp VARCHAR(50) DEFAULT '1970-01-01 00:00:00+00:00',
     previous_end TIMESTAMP DEFAULT '1970-01-01 00:00:00',
     unit_id INTEGER REFERENCES units(id),
-    default_graphic_unit INTEGER REFERENCES units(id)
+    default_graphic_unit INTEGER REFERENCES units(id),
+    area_unit area_unit_type NOT NULL DEFAULT 'none',
+    reading_frequency INTERVAL NOT NULL DEFAULT '00:15:00'
 );

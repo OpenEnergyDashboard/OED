@@ -18,6 +18,7 @@ import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
+import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -134,18 +135,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	}
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '60%',
-		// For now, it uses the same help text from conversion view page.
+		...tooltipBaseStyle,
 		tooltipEditConversionView: 'help.admin.conversionedit'
-	};
-
-	const formInputStyle: React.CSSProperties = {
-		paddingBottom: '5px'
-	}
-
-	const tableStyle: React.CSSProperties = {
-		width: '100%'
 	};
 
 	return (
@@ -156,7 +147,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				handleClose={handleDeleteConfirmationModalClose}
 				actionFunction={handleDeleteConversion}
 				actionConfirmText={deleteConfirmText}
-				actionRejectText={deleteRejectText}/>
+				actionRejectText={deleteRejectText} />
 			<Modal show={props.show} onHide={props.handleClose}>
 				<Modal.Header>
 					<Modal.Title> <FormattedMessage id="conversion.edit.conversion" />
@@ -175,7 +166,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								<div style={tableStyle}>
 									{/* Source unit - display only */}
 									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.source" /></label><br />
+										<label>{translate('conversion.source')} <label style={requiredStyle}>*</label></label>
 										<Input
 											name='sourceId'
 											type='text'
@@ -186,7 +177,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										<div />
 										{/* Destination unit - display only */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.destination" /></label><br />
+											<label>{translate('conversion.destination')} <label style={requiredStyle}>*</label></label>
 											<Input
 												name='destinationId'
 												type='text'
@@ -197,7 +188,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										</div>
 										{/* Bidirectional Y/N input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.bidirectional" /></label><br />
+											<label><FormattedMessage id="conversion.bidirectional" /></label>
 											<Input
 												name='bidirectional'
 												type='select'
@@ -210,27 +201,25 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										</div>
 										{/* Slope input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.slope" /></label><br />
+											<label><FormattedMessage id="conversion.slope" /></label>
 											<Input
 												name='slope'
 												type="number"
 												defaultValue={state.slope}
-												placeholder="Slope"
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* Intercept input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.intercept" /></label><br />
+											<label><FormattedMessage id="conversion.intercept" /></label>
 											<Input
 												name="intercept"
 												type="number"
 												defaultValue={state.intercept}
-												placeholder="Intercept"
 												onChange={e => handleNumberChange(e)} />
 										</div>
 										{/* Note input */}
 										<div style={formInputStyle}>
-											<label><FormattedMessage id="conversion.note" /></label><br />
+											<label><FormattedMessage id="conversion.note" /></label>
 											<Input
 												name="note"
 												type="textarea"

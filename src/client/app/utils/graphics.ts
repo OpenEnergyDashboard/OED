@@ -5,6 +5,7 @@
 import { LineGraphRate } from 'types/redux/graph';
 import { UnitData, UnitRepresentType } from '../types/redux/units';
 import translate from '../utils/translate';
+import { AreaUnitType } from './getAreaUnitConversion';
 
 // Has functions for use with graphics
 
@@ -13,9 +14,13 @@ import translate from '../utils/translate';
  *
  * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
  * @param {LineGraphRate} currentSelectedRate The current selected rate
+ * @param {boolean} areaNormalization Whether area normalization is enabled
+ * @param {AreaUnitType} selectedAreaUnit The currently selected area unit to normalize to
  * @returns {{unitLabel: string, needsRateScaling: boolean}} y-axis label and boolean of whether rate needs to be scaled (true if does)
  */
-export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate): { unitLabel: string, needsRateScaling: boolean } {
+export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,
+	selectedAreaUnit: AreaUnitType): { unitLabel: string, needsRateScaling: boolean } {
+
 	let unitLabel: string = '';
 	let needsRateScaling = false;
 	// Quantity and flow units have different unit labels.
@@ -42,6 +47,9 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
 		// Rate scaling is needed
 		needsRateScaling = true;
 	}
+	if (areaNormalization) {
+		unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);
+	}
 	return { unitLabel, needsRateScaling };
 }
 
@@ -49,9 +57,11 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
  * Returns the y-axis label for a bar graph
  *
  * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
+ * @param {boolean} areaNormalization Whether or not area normalization is enabled
+ * @param {AreaUnitType} selectedAreaUnit The currently selected area unit
  * @returns {string} y-axis label
  */
-export function barUnitLabel(selectUnitState: UnitData): string {
+export function barUnitLabel(selectUnitState: UnitData, areaNormalization: boolean, selectedAreaUnit: AreaUnitType): string {
 	let unitLabel: string = '';
 	// Quantity and flow units have different unit labels.
 	// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
@@ -68,6 +78,9 @@ export function barUnitLabel(selectUnitState: UnitData): string {
 		// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
 		// of graphics as we are doing for rate.
 		unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
+	}
+	if (areaNormalization) {
+		unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);
 	}
 	return unitLabel;
 }

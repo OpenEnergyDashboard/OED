@@ -15,6 +15,7 @@ import { isRoleAdmin } from '../../utils/hasPermissions';
 import { CurrentUserState } from 'types/redux/currentUser';
 import '../../styles/card-page.css';
 import { UnitData} from '../../types/redux/units';
+import { noUnitTranslated } from '../../utils/input';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -53,10 +54,10 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// since the state should be set and the page redrawn so just use 'no unit'.
 	// The second test of -99 is for meters without units.
 	const unitName = (Object.keys(currentUnitState).length === 0 || props.meter.unitId === -99) ?
-		'no unit' : currentUnitState[props.meter.unitId].identifier;
+		noUnitTranslated().identifier : currentUnitState[props.meter.unitId].identifier;
 	// This is the default graphic unit associated with the meter. See above for how code works.
 	const graphicName = (Object.keys(currentUnitState).length === 0 || props.meter.defaultGraphicUnit === -99) ?
-		'no unit' : currentUnitState[props.meter.defaultGraphicUnit].identifier;
+		noUnitTranslated().identifier : currentUnitState[props.meter.defaultGraphicUnit].identifier;
 
 	// Only display limited data if not an admin.
 	return (
@@ -93,7 +94,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 			}
 			{loggedInAsAdmin &&
 				<div className="edit-btn">
-					<Button variant="Secondary" onClick={handleShow}>
+					<Button color="secondary" onClick={handleShow}>
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}
@@ -102,7 +103,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 						meter={props.meter}
 						handleClose={handleClose}
 						possibleMeterUnits={props.possibleMeterUnits}
-						possibleGraphicUnits={props.possibleGraphicUnits}/>
+						possibleGraphicUnits={props.possibleGraphicUnits} />
 				</div>
 			}
 		</div>

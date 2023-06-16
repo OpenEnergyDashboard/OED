@@ -4,7 +4,7 @@
 
 const pgp = require('pg-promise')({
 	// This sets the style of returned durations so that Moment can parse them
-	connect(client, dc, useCount) {
+	connect({ client, useCount }) {
 		// Only set the style on fresh connections
 		if (useCount === 0) {
 			client.query('SET intervalStyle = iso_8601');
@@ -87,6 +87,7 @@ async function createSchema(conn) {
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
+	await Unit.createAreaUnitTypesEnum(conn);
 	await Unit.createDisplayableTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
@@ -97,6 +98,7 @@ async function createSchema(conn) {
 	// It needs to be called before meter table is created.
 	await conn.none(sqlFile('meter/check_timezone.sql'));
 	await Meter.createTable(conn);
+	await Reading.createReadingLineAccuracyEnum(conn);
 	await Reading.createTable(conn);
 	await User.createUserTypesEnum(conn);
 	await User.createTable(conn);

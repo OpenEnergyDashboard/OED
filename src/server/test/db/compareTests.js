@@ -59,7 +59,9 @@ mocha.describe('Compare readings', () => {
 			undefined, // endTimestamp
 			undefined, // previousEnd
 			meterUnitId, // unit
-			meterUnitId // default graphic unit
+			meterUnitId, // default graphic unit
+			undefined, // area unit
+			undefined // reading frequency
 		).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
 		await Reading.insertAll([

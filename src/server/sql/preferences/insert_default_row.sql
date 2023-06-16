@@ -13,8 +13,10 @@ IF NOT EXISTS(SELECT *
 	FROM preferences
 	)
 	THEN
-	INSERT INTO preferences (display_title, default_chart_to_render, default_bar_stacking, default_language, default_timezone, default_warning_file_size, default_file_size_limit) 
-	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25);
+	INSERT INTO preferences (display_title, default_chart_to_render, default_bar_stacking,
+	default_language, default_timezone, default_warning_file_size, default_file_size_limit,
+	default_area_normalization, default_area_unit, default_meter_reading_frequency) 
+	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00');
 
     END IF ;
 

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
-import HeaderButtonsContainer from '../containers/HeaderButtonsContainer';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 
@@ -29,7 +29,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 	}
 
 	public componentDidUpdate(){
-		if(!this.state.showModal){
+		if (!this.state.showModal){
 			ReactTooltip.hide();
 		}
 	}
@@ -60,7 +60,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 							<p style={labelStyle}>
 								<FormattedMessage id='navigation' />:
 							</p>
-							<HeaderButtonsContainer  showCollapsedMenuButton={false} isModal={true} />
+							<HeaderButtonsComponent  showCollapsedMenuButton={false} isModal={true} />
 						</div>
 						{ this.props.showOptions &&
 							<UIOptionsContainer />

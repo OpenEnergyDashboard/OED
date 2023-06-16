@@ -21,7 +21,7 @@ class Meter {
 	 * @param gps location in format of GIS coordinates
 	 * @param identifier Another way to identify a meter
 	 * @param note Note about the meter
-	 * @param area Area of the meter default null
+	 * @param area Area of the meter default 0
 	 * @param cumulative Identifies if meter readings that are stored are the sum of usage or the particular reading, default false
 	 * @param cumulativeReset True if cumulative values can reset back to zero., default false
 	 * @param cumulativeResetStart The earliest time of day that a reset can occur, default '00:00:00'
@@ -37,14 +37,22 @@ class Meter {
 	 * @param previousEnd  The last okay reading before crossed out of DST or moment(0) if not, default'1970-01-01 00:00:00'
 	 * @param unitId The foreign key to the unit table. The meter receives data and points to this unit in the graph, default -99
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
+	 * @param areaUnit The meter's area unit, default 'none'
+	 * @param readingFrequency The time between readings for this meter with default of '00:15:00' but should not depend on that.
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
-	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area,
+	// The software should stop a meter being created with no reading frequency
+	// but just in case this sets it to the default for the database.
+	// It would be better to use the admin preferences default but that
+	// would be async and not desired.
+	// Could also do in insert/update but then there is one floating around
+	// with a bad value that may cause issues.
+	constructor(id, name, url, enabled, displayable, type, meterTimezone, gps = undefined, identifier = name, note, area = 0,
 		cumulative = false, cumulativeReset = false, cumulativeResetStart = '00:00:00', cumulativeResetEnd = '23:59:59.999999',
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
-		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99) {
+		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = '00:15:00') {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -73,6 +81,8 @@ class Meter {
 		this.previousEnd = previousEnd;
 		this.unitId = unitId;
 		this.defaultGraphicUnit = defaultGraphicUnit;
+		this.areaUnit = areaUnit;
+		this.readingFrequency = readingFrequency;
 	}
 
 	/**
@@ -124,7 +134,7 @@ class Meter {
 		var meter = new Meter(row.id, row.name, row.url, row.enabled, row.displayable, row.meter_type, row.default_timezone_meter,
 			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
 			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
-			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit);
+			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.area_unit, row.reading_frequency);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		return meter;
@@ -209,7 +219,10 @@ class Meter {
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		const resp = await conn.one(sqlFile('meter/insert_new_meter.sql'), meter);
+		// The ID was set by the DB
 		this.id = resp.id;
+		// The reading frequency was interpreted by the DB when set so use its value now.
+		this.readingFrequency = resp.reading_frequency;
 	}
 
 	/**
@@ -222,7 +235,8 @@ class Meter {
 		cumulativeResetEnd = this.cumulativeResetEnd, readingGap = this.readingGap, readingVariation = this.readingVariation,
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
-		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.default_graphic_unit) {
+		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.defaultGraphicUnit, areaUnit = this.areaUnit,
+		readingFrequency = this.readingFrequency) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -248,6 +262,8 @@ class Meter {
 		this.previousEnd = previousEnd;
 		this.unitId = unitId;
 		this.defaultGraphicUnit = defaultGraphicUnit;
+		this.areaUnit = areaUnit;
+		this.readingFrequency = readingFrequency;
 	}
 
 	/**
@@ -263,7 +279,10 @@ class Meter {
 		}
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
-		await conn.none(sqlFile('meter/update_meter.sql'), meter);
+		// Postgres interprets the readingFrequency and it might not be what was
+		// input. Thus, the query returns that value.
+		const resp = await conn.one(sqlFile('meter/update_meter.sql'), meter);
+		return resp.reading_frequency;
 	}
 
 	/**

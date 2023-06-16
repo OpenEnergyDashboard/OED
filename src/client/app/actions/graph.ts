@@ -17,6 +17,7 @@ import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /* eslint-disable jsdoc/require-jsdoc */
 /* eslint-disable jsdoc/require-returns */
@@ -27,6 +28,10 @@ export function changeRenderOnce() {
 
 export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
 	return { type: ActionType.ChangeChartToRender, chartType };
+}
+
+export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
+	return { type: ActionType.ToggleAreaNormalization };
 }
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
@@ -43,6 +48,10 @@ export function updateSelectedGroups(groupIDs: number[]): t.UpdateSelectedGroups
 
 export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
 	return { type: ActionType.UpdateSelectedUnit, unitID };
+}
+
+export function updateSelectedAreaUnit(areaUnit: AreaUnitType): t.UpdateSelectedAreaUnitAction {
+	return { type: ActionType.UpdateSelectedAreaUnit, areaUnit };
 }
 
 export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
@@ -205,6 +214,7 @@ export interface LinkOptions {
 	barDuration?: moment.Duration;
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
+	toggleAreaNormalization?: boolean;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -222,7 +232,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate> = [];
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -251,6 +261,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.sliderRange) {
 		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
+	}
+	if (options.toggleAreaNormalization) {
+		dispatchSecond.push(toggleAreaNormalization());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
