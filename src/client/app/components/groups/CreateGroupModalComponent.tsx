@@ -8,7 +8,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, FormFeedback, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -25,7 +25,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
-import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
@@ -103,6 +103,12 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 
+	/* Create Group Validation:
+		Name cannot be blank
+		Area must be positive or zero
+		If area is nonzero, area unit must be set
+		Group must have at least one child (checked on submit)
+	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
 		setValidGroup(state.name !== '' && (state.area === 0 || (state.area > 0 && state.areaUnit !== AreaUnitType.none)));
@@ -271,7 +277,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			});
 		}
 		// If any of these change then it needs to be updated.
-		// metersState normally does not change but can so include.
+		// metersState normally does not change but can so include.')}</Label>
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
 
@@ -298,22 +304,23 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				{/* when any of the group properties are changed call one of the functions. */}
 				<ModalBody style={tableStyle}>
 					{/* Name input */}
-					<div style={formInputStyle}>
-						<Label for='name'><FormattedMessage id="group.name" /></Label>
+					<FormGroup>
+						<Label for='name'>{translate('group.name')}</Label>
 						<Input
 							id='name'
 							name='name'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							required value={state.name}
 							invalid={state.name === ''}/>
 						<FormFeedback>
 							<FormattedMessage id="error.required" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* default graphic unit input */}
-					<div style={formInputStyle}>
-						<Label for='defaultGraphicUnit'><FormattedMessage id="group.defaultGraphicUnit" /></Label>
+					<FormGroup>
+						<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
 						<Input
 							id="defaultGraphicUnit"
 							name='defaultGraphicUnit'
@@ -328,10 +335,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Displayable input */}
-					<div style={formInputStyle}>
-						<Label for='displayable'><FormattedMessage id="group.displayable" /></Label>
+					<FormGroup>
+						<Label for='displayable'>{translate('group.displayable')}</Label>
 						<Input
 							id='displayable'
 							name='displayable'
@@ -342,10 +349,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Area input */}
-					<div style={formInputStyle}>
-						<Label for='area'><FormattedMessage id="group.area" /></Label>
+					<FormGroup>
+						<Label for='area'>{translate('group.area')}</Label>
 						<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
 						<InputGroup>
 							<Input
@@ -366,10 +373,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>
 						</InputGroup>
-					</div>
+					</FormGroup>
 					{/* meter area unit input */}
-					<div style={formInputStyle}>
-						<Label for='areaUnit'><FormattedMessage id="group.area.unit" /></Label>
+					<FormGroup>
+						<Label for='areaUnit'>{translate('group.area.unit')}</Label>
 						<Input
 							id="areaUnit"
 							name='areaUnit'
@@ -384,30 +391,31 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						<FormFeedback>
 							<FormattedMessage id="area.but.no.unit" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* GPS input */}
-					<div style={formInputStyle}>
-						<Label for='gps'><FormattedMessage id="group.gps" /></Label>
+					<FormGroup>
+						<Label for='gps'>{translate('group.gps')}</Label>
 						<Input
 							id='gps'
 							name='gps'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							value={getGPSString(state.gps)} />
-					</div>
+					</FormGroup>
 					{/* Note input */}
-					<div style={formInputStyle}>
-						<Label for='note'><FormattedMessage id="group.note" /></Label>
+					<FormGroup>
+						<Label for='note'>{translate('group.note')}</Label>
 						<Input
 							id='note'
 							name='note'
 							type='textarea'
 							onChange={e => handleStringChange(e)}
 							value={state.note} />
-					</div>
+					</FormGroup>
 					{/* The child meters in this group */}
 					{
-						<div style={formInputStyle}>
+						<FormGroup>
 							<b><FormattedMessage id='child.meters' /></b>:
 							<MultiSelectComponent
 								options={groupChildrenState.meterSelectOptions}
@@ -440,10 +448,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 									setState({ ...state, deepMeters: newDeepMeters, childMeters: updatedChildMeters, defaultGraphicUnit: dgu });
 								}}
 							/>
-						</div>
+						</FormGroup>
 					}
 					{/* The child groups in this group */}
-					{<div style={formInputStyle}>
+					{<FormGroup>
 						<b><FormattedMessage id='child.groups' /></b>:
 						<MultiSelectComponent
 							options={groupChildrenState.groupSelectOptions}
@@ -476,13 +484,13 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								setState({ ...state, deepMeters: newDeepMeters, childGroups: updatedChildGroups, defaultGraphicUnit: dgu });
 							}}
 						/>
-					</div>
+					</FormGroup>
 					}
 					{/* All (deep) meters in this group */}
-					<div>
+					<FormGroup>
 						<b><FormattedMessage id='group.all.meters' /></b>:
 						<ListDisplayComponent items={deepMetersToList()} />
-					</div>
+					</FormGroup>
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}

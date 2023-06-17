@@ -10,7 +10,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, FormFeedback, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -33,7 +33,7 @@ import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
-import { tableStyle, tooltipBaseStyle, formInputStyle } from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
@@ -116,6 +116,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 
+	/* Edit Group Validation:
+		Name cannot be blank
+		Area must be positive or zero
+		If area is nonzero, area unit must be set
+		Group must have at least one child (checked on submit)
+	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
 		setValidGroup(groupState.name !== '' && (groupState.area === 0 || (groupState.area > 0 && groupState.areaUnit !== AreaUnitType.none)));
@@ -403,13 +409,13 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				</ModalHeader>
 				<ModalBody style={tableStyle}>
 					{/* Name input, disabled if not admin */}
-					<div style={formInputStyle}>
-						<Label for='name'><FormattedMessage id="group.name" /></Label>
+					<FormGroup>
+						<Label for='name'>{translate('group.name')}</Label>
 						<Input
-							autoComplete='off'
 							id='name'
 							name='name'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							required value={groupState.name}
 							disabled={!loggedInAsAdmin}
@@ -417,10 +423,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						<FormFeedback>
 							<FormattedMessage id="error.required" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* default graphic unit input, disabled if not admin */}
-					<div style={formInputStyle}>
-						<Label for='defaultGraphicUnit'><FormattedMessage id="group.defaultGraphicUnit" /></Label>
+					<FormGroup>
+						<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
 						<Input
 							id="defaultGraphicUnit"
 							name='defaultGraphicUnit'
@@ -436,11 +442,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{loggedInAsAdmin && <>
 						{/* Displayable input, only for admin. */}
-						<div style={formInputStyle}>
-							<Label for='displayable'><FormattedMessage id="group.displayable" /></Label>
+						<FormGroup>
+							<Label for='displayable'>{translate('group.displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -451,10 +457,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 								})}
 							</Input>
-						</div>
+						</FormGroup>
 						{/* Area input, only for admin. */}
-						<div style={formInputStyle}>
-							<Label for='area'><FormattedMessage id="group.area" /></Label>
+						<FormGroup>
+							<Label for='area'>{translate('group.area')}</Label>
 							<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 							<InputGroup>
 								<Input
@@ -475,10 +481,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<FormattedMessage id="error.negative" />
 								</FormFeedback>
 							</InputGroup>
-						</div>
+						</FormGroup>
 						{/* meter area unit input */}
-						<div style={formInputStyle}>
-							<Label for='areaUnit'><FormattedMessage id="group.area.unit" /></Label>
+						<FormGroup>
+							<Label for='areaUnit'>{translate('group.area.unit')}</Label>
 							<Input
 								id="areaUnit"
 								name='areaUnit'
@@ -493,31 +499,32 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<FormFeedback>
 								<FormattedMessage id="area.but.no.unit" />
 							</FormFeedback>
-						</div>
+						</FormGroup>
 						{/* GPS input, only for admin. */}
-						<div style={formInputStyle}>
-							<Label for='gps'><FormattedMessage id="group.gps" /></Label>
+						<FormGroup>
+							<Label for='gps'>{translate('group.gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'
 								type='text'
+								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={getGPSString(groupState.gps)} />
-						</div>
+						</FormGroup>
 						{/* Note input, only for admin. */}
-						<div style={formInputStyle}>
-							<Label for='note'><FormattedMessage id="group.note" /></Label>
+						<FormGroup>
+							<Label for='note'>{translate('group.note')}</Label>
 							<Input
 								id='note'
 								name='note'
 								type='textarea'
 								onChange={e => handleStringChange(e)}
 								value={nullToEmptyString(groupState.note)} />
-						</div>
+						</FormGroup>
 					</>}
 					{/* The child meters in this group */}
 					{loggedInAsAdmin ?
-						<div style={formInputStyle}>
+						<FormGroup>
 							<FormattedMessage id='child.meters' />:
 							<MultiSelectComponent
 								options={groupChildrenState.meterSelectOptions}
@@ -555,16 +562,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									}
 								}}
 							/>
-						</div>
+						</FormGroup>
 						:
-						<div style={formInputStyle}>
+						<FormGroup>
 							<FormattedMessage id='child.meters' />:
 							<ListDisplayComponent items={metersToList()} />
-						</div>
+						</FormGroup>
 					}
 					{/* The child groups in this group */}
 					{loggedInAsAdmin ?
-						<div style={formInputStyle}>
+						<FormGroup>
 							<FormattedMessage id='child.groups' />:
 							<MultiSelectComponent
 								options={groupChildrenState.groupSelectOptions}
@@ -603,12 +610,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									}
 								}}
 							/>
-						</div>
+						</FormGroup>
 						:
-						<div style={formInputStyle}>
+						<FormGroup>
 							<FormattedMessage id='child.groups' />:
 							<ListDisplayComponent items={groupsToList()} />
-						</div>
+						</FormGroup>
 					}
 					{/* All (deep) meters in this group */}
 					<FormattedMessage id='group.all.meters' />:

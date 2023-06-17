@@ -16,7 +16,7 @@ import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
 import * as _ from 'lodash';
-import {formInputStyle, tableStyle, tooltipBaseStyle} from '../../styles/modalStyle';
+import {tableStyle, tooltipBaseStyle} from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -170,7 +170,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				<ModalBody style={tableStyle}>
 					{/* Source unit input*/}
 					<FormGroup>
-						<Label for='sourceId'><FormattedMessage id="conversion.source" /></Label>
+						<Label for='sourceId'>{translate('conversion.source')}</Label>
 						<Input
 							id='sourceId'
 							name='sourceId'
@@ -195,7 +195,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</FormGroup>
 					{/* Destination unit input*/}
 					<FormGroup>
-						<Label for='destinationId'><FormattedMessage id="conversion.destination" /></Label>
+						<Label for='destinationId'>{translate('conversion.destination')}</Label>
 						<Input
 							id='destinationId'
 							name='destinationId'
@@ -220,7 +220,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</FormGroup>
 					{/* Bidirectional Y/N input*/}
 					<FormGroup>
-						<Label for='bidirectional'><FormattedMessage id="conversion.bidirectional" /></Label>
+						<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
 						<Input
 							id='bidirectional'
 							name='bidirectional'
@@ -233,7 +233,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</FormGroup>
 					{/* Slope input*/}
 					<FormGroup>
-						<Label for='slope'><FormattedMessage id="conversion.slope" /></Label>
+						<Label for='slope'>{translate('conversion.slope')}</Label>
 						<Input
 							id='slope'
 							name='slope'
@@ -244,7 +244,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</FormGroup>
 					{/* Intercept input*/}
 					<FormGroup>
-						<Label for='intercept'><FormattedMessage id="conversion.intercept" /></Label>
+						<Label for='intercept'>{translate('conversion.intercept')}</Label>
 						<Input
 							id='intercept'
 							name='intercept'
@@ -254,7 +254,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</FormGroup>
 					{/* Note input*/}
 					<FormGroup>
-						<Label for='note'><FormattedMessage id="conversion.note" /></Label>
+						<Label for='note'>{translate('conversion.note')}</Label>
 						<Input
 							id='note'
 							name='note'

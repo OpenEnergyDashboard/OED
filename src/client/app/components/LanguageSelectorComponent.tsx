@@ -22,7 +22,7 @@ export default function LanguageSelectorComponent() {
 
 	return (
 		<div>
-			<UncontrolledDropdown direction='end'>
+			<UncontrolledDropdown direction='start'>
 				<DropdownToggle nav caret>
 					<FormattedMessage id='language' />
 				</DropdownToggle>

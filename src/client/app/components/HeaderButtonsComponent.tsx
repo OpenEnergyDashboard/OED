@@ -161,13 +161,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 				<Navbar expand>
 					<Nav navbar>
 						<NavLink
-							style={state.adminViewableLinkStyle}
-							disabled={state.shouldAdminButtonDisabled}
-							tag={Link}
-							to="/admin">
-							<FormattedMessage id='admin.panel' />
-						</NavLink>
-						<NavLink
 							disabled={state.shouldHomeButtonDisabled}
 							tag={Link}
 							to="/">
@@ -175,7 +168,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 						</NavLink>
 						<UncontrolledDropdown nav inNavbar>
 							<DropdownToggle nav caret>
-								<FormattedMessage id='header.data' />
+								<FormattedMessage id='header.pages' />
 							</DropdownToggle>
 							<DropdownMenu>
 								<DropdownItem
@@ -218,6 +211,14 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 									to="/units">
 									<FormattedMessage id='units' />
 								</DropdownItem>
+								<DropdownItem divider />
+								<DropdownItem
+									style={state.adminViewableLinkStyle}
+									disabled={state.shouldAdminButtonDisabled}
+									tag={Link}
+									to="/admin">
+									<FormattedMessage id='admin.panel' />
+								</DropdownItem>
 							</DropdownMenu>
 						</UncontrolledDropdown>
 						<UncontrolledDropdown nav inNavbar>
@@ -226,23 +227,28 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 							</DropdownToggle>
 							<DropdownMenu>
 								<LanguageSelectorComponent />
-								<DropdownItem divider />
-								<TooltipHelpContainer page={dataFor} />
-								<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
+								{/* <DropdownItem divider /> */}
+								<DropdownItem
+									style={state.loginLinkStyle}
+									tag={Link}
+									to='/login'>
+									<FormattedMessage id='log.in' />
+								</DropdownItem>
+								<DropdownItem
+									style={state.logoutLinkStyle}
+									tag={Link}
+									to='/'
+									onClick={handleLogOut}>
+									<FormattedMessage id='log.out' />
+								</DropdownItem>
 							</DropdownMenu>
 						</UncontrolledDropdown>
 						<NavLink
-							style={state.loginLinkStyle}
 							tag={Link}
-							to='/login'>
-							<FormattedMessage id='log.in' />
-						</NavLink>
-						<NavLink
-							style={state.logoutLinkStyle}
-							tag={Link}
-							to='/'
-							onClick={handleLogOut}>
-							<FormattedMessage id='log.out' />
+							to="/">
+							<FormattedMessage id='help' />
+							<TooltipHelpContainer page={dataFor} />
+							<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 						</NavLink>
 					</Nav>
 				</Navbar>

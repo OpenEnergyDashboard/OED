@@ -5,7 +5,7 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -17,7 +17,7 @@ import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
-import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -153,8 +153,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				{/* when any of the conversion are changed call one of the functions. */}
 				<ModalBody style={tableStyle}>
 					{/* Source unit - display only */}
-					<div style={formInputStyle}>
-						<Label for='sourceId'><FormattedMessage id="conversion.source" /></Label>
+					<FormGroup>
+						<Label for='sourceId'>{translate('conversion.source')}</Label>
 						<Input
 							id='sourceId'
 							name='sourceId'
@@ -163,10 +163,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							// Disable input to prevent changing ID value
 							disabled>
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Destination unit - display only */}
-					<div style={formInputStyle}>
-						<Label for='destinationId'><FormattedMessage id="conversion.destination" /></Label>
+					<FormGroup>
+						<Label for='destinationId'>{translate('conversion.destination')}</Label>
 						<Input
 							id='destinationId'
 							name='destinationId'
@@ -175,10 +175,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							// Disable input to prevent changing ID value
 							disabled>
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Bidirectional Y/N input */}
-					<div style={formInputStyle}>
-						<Label for='bidirectional'><FormattedMessage id="conversion.bidirectional" /></Label>
+					<FormGroup>
+						<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
 						<Input
 							id='bidirectional'
 							name='bidirectional'
@@ -189,36 +189,36 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Slope input */}
-					<div style={formInputStyle}>
-						<Label for='slope'><FormattedMessage id="conversion.slope" /></Label>
+					<FormGroup>
+						<Label for='slope'>{translate('conversion.slope')}</Label>
 						<Input
 							id='slope'
 							type="number"
 							defaultValue={state.slope}
 							onChange={e => handleNumberChange(e)} />
-					</div>
+					</FormGroup>
 					{/* Intercept input */}
-					<div style={formInputStyle}>
-						<Label for='intercept'><FormattedMessage id="conversion.intercept" /></Label>
+					<FormGroup>
+						<Label for='intercept'>{translate('conversion.intercept')}</Label>
 						<Input
 							id='intercept'
 							name="intercept"
 							type="number"
 							defaultValue={state.intercept}
 							onChange={e => handleNumberChange(e)} />
-					</div>
+					</FormGroup>
 					{/* Note input */}
-					<div style={formInputStyle}>
-						<Label for='note'><FormattedMessage id="conversion.note" /></Label>
+					<FormGroup>
+						<Label for='note'>{translate('conversion.note')}</Label>
 						<Input
 							id='note'
 							type="textarea"
 							defaultValue={state.note}
 							placeholder="Note"
 							onChange={e => handleStringChange(e)} />
-					</div>
+					</FormGroup>
 				</ModalBody>
 				<ModalFooter>
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen}>

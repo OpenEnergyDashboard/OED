@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { Button, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +21,7 @@ import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { ConversionArray } from '../../types/conversionArray';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser } from '../../utils/input'
-import { formInputStyle, tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 
 // TODO Moved the possible meters/graphic units calculations up to the details component
@@ -109,6 +109,18 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
 
+	/* Create Meter Validation:
+		Name cannot be blank
+		Area must be positive or zero
+		If area is nonzero, area unit must be set
+		Reading Gap must be greater than zero
+		Reading Variation must be greater than zero
+		Reading Duplication must be between 1 and 9
+		Reading frequency cannot be blank
+		Unit and Default Graphic Unit must be set (can be to no unit)
+		Meter type must be set
+		If displayable is true and unitId is set to -99, warn admin
+	*/
 	const [validMeter, setValidMeter] = useState(false);
 	useEffect(() => {
 		setValidMeter(
@@ -313,34 +325,36 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 				{/* when any of the Meter values are changed call one of the functions. */}
 				<ModalBody style={tableStyle}>
 					{/* Identifier input */}
-					<div style={formInputStyle}>
-						<Label for="identifier"><FormattedMessage id="meter.identifier" /></Label>
+					<FormGroup>
+						<Label for="identifier">{translate('meter.identifier')}</Label>
 						<Input
 							id='identifier'
 							name="identifier"
-							type="text"
+							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							value={state.identifier} />
-					</div>
+					</FormGroup>
 					{/* Name input */}
-					<div style={formInputStyle}>
-						{/* <Label for="name"><FormattedMessage id="meter.name" /></Label> */}
+					<FormGroup>
 						<Label for="name">{translate('meter.name')}</Label>
 						<Input
 							id='name'
 							name='name'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							required value={state.name}
 							invalid={state.name === ''} />
 						<FormFeedback>
 							<FormattedMessage id="error.required" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* meter unit input */}
-					<div style={formInputStyle}>
-						<label> {translate('meter.unitName')}</label>
+					<FormGroup>
+						<Label for='unitId'> {translate('meter.unitName')}</Label>
 						<Input
+							id='unitId'
 							name="unitId"
 							type='select'
 							value={state.unitId}
@@ -361,11 +375,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							})}
 						</Input>
 						<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
-					</div>
+					</FormGroup>
 					{/* default graphic unit input */}
-					<div style={formInputStyle}>
-						<label>{translate('meter.defaultGraphicUnit')}</label>
+					<FormGroup>
+						<Label for='defaultGraphicUnit'>{translate('meter.defaultGraphicUnit')}</Label>
 						<Input
+							id='defaultGraphicUnit'
 							name='defaultGraphicUnit'
 							type='select'
 							value={state.defaultGraphicUnit}
@@ -386,11 +401,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							})}
 						</Input>
 						<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
-					</div>
+					</FormGroup>
 					{/* Enabled input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.enabled" /></label>
+					<FormGroup>
+						<Label for='enabled'>{translate('meter.enabled')}</Label>
 						<Input
+							id='enabled'
 							name='enabled'
 							type='select'
 							value={state.enabled.toString()}
@@ -399,24 +415,30 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Displayable input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.displayable" /></label>
+					<FormGroup>
+						<Label for='displayable'>{translate('meter.displayable')}</Label>
 						<Input
+							id='displayable'
 							name='displayable'
 							type='select'
 							value={state.displayable.toString()}
-							onChange={e => handleBooleanChange(e)}>
+							onChange={e => handleBooleanChange(e)}
+							invalid={state.displayable && state.unitId === -99}>
 							{Object.keys(TrueFalseType).map(key => {
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+						<FormFeedback>
+							<FormattedMessage id="error.displayable" />
+						</FormFeedback>
+					</FormGroup>
 					{/* Meter type input */}
-					<div style={formInputStyle}>
-						<label>{translate('meter.type')}</label>
+					<FormGroup>
+						<Label for='meterType'>{translate('meter.type')}</Label>
 						<Input
+							id='meterType'
 							name='meterType'
 							type='select'
 							value={state.meterType}
@@ -436,33 +458,38 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							})}
 						</Input>
 						<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
-					</div>
+					</FormGroup>
 					{/* Meter reading frequency */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.readingFrequency" /></label>
+					<FormGroup>
+						<Label for='readingFrequency'>{translate('meter.readingFrequency')}</Label>
 						<Input
+							id='readingFrequency'
 							name='readingFrequency'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							value={state.readingFrequency}
 							invalid={state.readingFrequency === ''}/>
 						<FormFeedback>
 							<FormattedMessage id="error.required" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* URL input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.url" /></label>
+					<FormGroup>
+						<Label for='url'>{translate('meter.url')}</Label>
 						<Input
+							id='url'
 							name='url'
 							type='text'
+							autoComplete='off'
 							onChange={e => handleStringChange(e)}
 							value={state.url} />
-					</div>
+					</FormGroup>
 					{/* Area input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.area" /></label>
+					<FormGroup>
+						<Label for='area'>{translate('meter.area')}</Label>
 						<Input
+							id='area'
 							name="area"
 							type="number"
 							min="0"
@@ -472,11 +499,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<FormFeedback>
 							<FormattedMessage id="error.negative" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* meter area unit input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.area.unit" /></label>
+					<FormGroup>
+						<Label for='areaUnit'>{translate('meter.area.unit')}</Label>
 						<Input
+							id='areaUnit'
 							name='areaUnit'
 							type='select'
 							value={state.areaUnit}
@@ -489,30 +517,33 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<FormFeedback>
 							<FormattedMessage id="area.but.no.unit" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* GPS input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.gps" /></label>
+					<FormGroup>
+						<Label for='gps'>{translate('meter.gps')}</Label>
 						<Input
+							id='gps'
 							name='gps'
 							type='text'
 							onChange={e => handleStringChange(e)}
 							value={state.gps} />
-					</div>
+					</FormGroup>
 					{/* note input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.note" /></label>
+					<FormGroup>
+						<Label for='note'>{translate('meter.note')}</Label>
 						<Input
+							id='note'
 							name='note'
 							type='textarea'
 							onChange={e => handleStringChange(e)}
 							value={state.note}
 							placeholder='Note' />
-					</div>
+					</FormGroup>
 					{/* cumulative input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.cumulative" /></label>
+					<FormGroup>
+						<Label for='cumulative'>{translate('meter.cumulative')}</Label>
 						<Input
+							id='cumulative'
 							name='cumulative'
 							type='select'
 							value={state.cumulative.toString()}
@@ -521,11 +552,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* cumulativeReset input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.cumulativeReset" /></label>
+					<FormGroup>
+						<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
 						<Input
+							id='cumulativeReset'
 							name='cumulativeReset'
 							type='select'
 							value={state.cumulativeReset.toString()}
@@ -534,31 +566,36 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* cumulativeResetStart input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.cumulativeResetStart" /></label>
+					<FormGroup>
+						<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
 						<Input
+							id='cumulativeResetStart'
 							name='cumulativeResetStart'
 							type='text'
+							autoComplete='off'
 							onChange={e => handleStringChange(e)}
 							value={state.cumulativeResetStart}
 							placeholder="HH:MM:SS" />
-					</div>
+					</FormGroup>
 					{/* cumulativeResetEnd input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.cumulativeResetEnd" /></label>
+					<FormGroup>
+						<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
 						<Input
+							id='cumulativeResetEnd'
 							name='cumulativeResetEnd'
 							type='text'
+							autoComplete='off'
 							onChange={e => handleStringChange(e)}
 							value={state.cumulativeResetEnd}
 							placeholder="HH:MM:SS" />
-					</div>
+					</FormGroup>
 					{/* endOnlyTime input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.endOnlyTime" /></label>
+					<FormGroup>
+						<Label for='endOnlyTime'>{translate('meter.endOnlyTime')}</Label>
 						<Input
+							id='endOnlyTime'
 							name='endOnlyTime'
 							type='select'
 							value={state.endOnlyTime.toString()}
@@ -567,11 +604,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* readingGap input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.readingGap" /></label>
+					<FormGroup>
+						<Label for='readingGap'>{translate('meter.readingGap')}</Label>
 						<Input
+							id='readingGap'
 							name='readingGap'
 							type='number'
 							onChange={e => handleNumberChange(e)}
@@ -581,11 +619,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<FormFeedback>
 							<FormattedMessage id="error.negative" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* readingVariation input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.readingVariation" /></label>
+					<FormGroup>
+						<Label for='readingVariation'>{translate('meter.readingVariation')}</Label>
 						<Input
+							id='readingVariation'
 							name="readingVariation"
 							type="number"
 							onChange={e => handleNumberChange(e)}
@@ -595,11 +634,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<FormFeedback>
 							<FormattedMessage id="error.negative" />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* readingDuplication input */}
-					<div style={formInputStyle}>
-						<label>{translate('meter.readingDuplication')}</label>
+					<FormGroup>
+						<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 						<Input
+							id='readingDuplication'
 							name="readingDuplication"
 							type="number"
 							onChange={e => handleNumberChange(e)}
@@ -611,11 +651,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<FormFeedback>
 							<FormattedMessage id="error.bounds" values={{ min: '1', max: '9'}}  />
 						</FormFeedback>
-					</div>
+					</FormGroup>
 					{/* timeSort input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.timeSort" /></label>
+					<FormGroup>
+						<Label for='timeSort'>{translate('meter.timeSort')}</Label>
 						<Input
+							id='timeSort'
 							name='timeSort'
 							type='select'
 							value={state.timeSort}
@@ -626,51 +667,58 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
 							})}
 						</Input>
-					</div>
+					</FormGroup>
 					{/* Timezone input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.time.zone" /></label>
+					<FormGroup>
+						<Label>{translate('meter.time.zone')}</Label>
 						<TimeZoneSelect current={timeZoneValue} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-					</div>
+					</FormGroup>
 					{/* reading input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.reading" /></label>
+					<FormGroup>
+						<Label for='reading'>{translate('meter.reading')}</Label>
 						<Input
+							id='reading'
 							name="reading"
 							type="number"
 							onChange={e => handleNumberChange(e)}
 							defaultValue={state.reading} />
-					</div>
+					</FormGroup>
 					{/* startTimestamp input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.startTimeStamp" /></label>
+					<FormGroup>
+						<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
 						<Input
+							id='startTimestamp'
 							name='startTimestamp'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							placeholder="YYYY-MM-DD HH:MM:SS"
 							value={state.startTimestamp} />
-					</div>
+					</FormGroup>
 					{/* endTimestamp input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.endTimeStamp" /></label>
+					<FormGroup>
+						<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
 						<Input
+							id='endTimestamp'
 							name='endTimestamp'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							placeholder="YYYY-MM-DD HH:MM:SS"
 							value={state.endTimestamp} />
-					</div>
+					</FormGroup>
 					{/* endTimestamp input */}
-					<div style={formInputStyle}>
-						<label><FormattedMessage id="meter.previousEnd" /></label>
+					<FormGroup>
+						<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
 						<Input
+							id='previousEnd'
 							name='previousEnd'
 							type='text'
+							autoComplete='on'
 							onChange={e => handleStringChange(e)}
 							placeholder="YYYY-MM-DD HH:MM:SS"
 							value={state.previousEnd} />
-					</div>
+					</FormGroup>
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
