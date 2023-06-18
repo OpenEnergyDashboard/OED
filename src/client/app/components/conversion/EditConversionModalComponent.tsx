@@ -225,7 +225,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						<FormattedMessage id="conversion.delete.conversion" />
 					</Button>
 					{/* Hides the modal */}
-					<Button onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}

@@ -71,7 +71,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 				</div>
 			}
 			<div className="edit-btn">
-				<Button color="secondary" onClick={handleShow}>
+				<Button color='secondary' onClick={handleShow}>
 					{/* admins can edit a group but others can only view the details */}
 					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>

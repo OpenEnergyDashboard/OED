@@ -48,7 +48,7 @@ export default class MenuModalComponent extends React.Component<MenuModalProps, 
 		};
 		return (
 			<div style={inlineStyle}>
-				<Button outline onClick={this.toggle}>
+				<Button color='secondary' outline onClick={this.toggle}>
 					<FormattedMessage id='menu'/>
 				</Button>
 				<Modal isOpen={this.state.showModal} toggle={this.toggle} onOpened={ReactTooltip.rebuild} onClick={() => ReactTooltip.hide()}>

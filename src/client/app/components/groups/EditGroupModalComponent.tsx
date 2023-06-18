@@ -474,7 +474,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									onChange={e => handleNumberChange(e)}
 									invalid={groupState.area < 0} />
 								{/* Calculate sum of meter areas */}
-								<Button onClick={handleAutoCalculateArea}>
+								<Button color='secondary' onClick={handleAutoCalculateArea}>
 									<FormattedMessage id="group.area.calculate" />
 								</Button>
 								<FormFeedback>
@@ -630,7 +630,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								<FormattedMessage id="group.delete.group" />
 							</Button>
 							{/* Hides the modal */}
-							<Button onClick={handleClose}>
+							<Button color='secondary' onClick={handleClose}>
 								<FormattedMessage id="discard.changes" />
 							</Button>
 							{/* On click calls the function handleSaveChanges in this component */}
@@ -639,7 +639,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							</Button>
 						</div>
 						:
-						<Button onClick={handleClose}>
+						<Button color='secondary' onClick={handleClose}>
 							<FormattedMessage id="close" />
 						</Button>
 					}

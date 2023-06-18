@@ -180,7 +180,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	return (
 		<>
 			{/* Show modal button */}
-			<Button onClick={handleShow}>
+			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
 			</Button>
 
@@ -291,7 +291,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
-					<Button onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}

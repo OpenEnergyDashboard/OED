@@ -73,17 +73,13 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 				<Modal isOpen={this.state.warningVisible} toggle={this.closeWarning}>
 					<ModalBody><FormattedMessage id='unsaved.warning' /></ModalBody>
 					<ModalFooter>
-						<Button outline onClick={this.closeWarning}><FormattedMessage id='cancel' /></Button>
-						<Button
-							color='danger'
-							onClick={this.handleLeaveClicked}
-						>
+						<Button color='secondary' outline onClick={this.closeWarning}>
+							<FormattedMessage id='cancel' />
+						</Button>
+						<Button color='danger' onClick={this.handleLeaveClicked}>
 							<FormattedMessage id='leave' />
 						</Button>
-						<Button
-							color='success'
-							onClick={this.handleSubmitClicked}
-						>
+						<Button color='success' onClick={this.handleSubmitClicked}>
 							<FormattedMessage id='save.all' />
 						</Button>
 					</ModalFooter>

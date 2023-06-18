@@ -88,7 +88,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 			}
 			{loggedInAsAdmin &&
 				<div className="edit-btn">
-					<Button color="secondary" onClick={handleShow}>
+					<Button color='secondary' onClick={handleShow}>
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}

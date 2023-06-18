@@ -69,7 +69,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				<b><FormattedMessage id="conversion.note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
-				<Button onClick={handleShow}>
+				<Button color='secondary' onClick={handleShow}>
 					<FormattedMessage id="conversion.edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}

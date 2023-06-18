@@ -730,7 +730,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
-					<Button onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}

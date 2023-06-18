@@ -289,7 +289,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button onClick={handleShow}>
+			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.group" />
 			</Button>
 
@@ -366,7 +366,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								onChange={e => handleNumberChange(e)}
 								invalid={state.area < 0}/>
 							{/* Calculate sum of meter areas */}
-							<Button onClick={handleAutoCalculateArea}>
+							<Button color='secondary' onClick={handleAutoCalculateArea}>
 								<FormattedMessage id="group.area.calculate" />
 							</Button>
 							<FormFeedback>
@@ -494,7 +494,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
-					<Button onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}

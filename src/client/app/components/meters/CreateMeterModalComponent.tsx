@@ -311,7 +311,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button onClick={handleShow}>
+			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="meter.create" />
 			</Button>
 			<Modal isOpen={showModal} toggle={handleClose}>
@@ -722,7 +722,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
-					<Button onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
