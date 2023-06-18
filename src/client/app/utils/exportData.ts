@@ -4,7 +4,7 @@
 
 import { LineReading, RawReadings } from '../types/readings';
 import * as moment from 'moment';
-import { ChartTypes } from 'types/redux/graph';
+import { ChartTypes } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.

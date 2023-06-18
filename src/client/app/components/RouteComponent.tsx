@@ -12,7 +12,7 @@ import * as moment from 'moment';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
-import { LinkOptions } from 'actions/graph';
+import { LinkOptions } from '../actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes, LineGraphRate } from '../types/redux/graph';

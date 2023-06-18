@@ -90,7 +90,9 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	const xTitle: string = `${lastStartTimeLabel} -<br> ${LastEndTimeLabel} (A) &<br>${thisStartTimeLabel} -<br> ${thisEndTimeLabel} (B)`;
 
 	const colorize = (changeForColorization: number) => {
-		if (changeForColorization < 0) {
+		if (isNaN(changeForColorization)) {
+			return 'black';
+		} else if (changeForColorization < 0) {
 			return 'green';
 		}
 		return 'red';
@@ -105,33 +107,35 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 
-	if (state.graph.areaNormalization) {
-		const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
-		const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
-		const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
-		previousPeriod /= normalization;
-		currentPeriod /= normalization;
-	}
-
-	datasets.push(
-		{
-			x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
-			y: [previousPeriod, currentPeriod],
-			hovertext: [
-				`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
-			],
-			hoverinfo: 'text',
-			type: 'bar',
-			marker: { color: barColor },
-			text: [`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b>`, `<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b>`],
-			textposition: 'auto',
-			textfont: {
-				color: 'rgba(0,0,0,1)'
-			}
+	// Check if there is data to graph.
+	if (previousPeriod !== null && currentPeriod !== null) {
+		if (state.graph.areaNormalization) {
+			const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
+			const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
+			const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
+			previousPeriod /= normalization;
+			currentPeriod /= normalization;
 		}
-	);
 
+		datasets.push(
+			{
+				x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
+				y: [previousPeriod, currentPeriod],
+				hovertext: [
+					`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+					`<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				],
+				hoverinfo: 'text',
+				type: 'bar',
+				marker: { color: barColor },
+				text: [`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b>`, `<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b>`],
+				textposition: 'auto',
+				textfont: {
+					color: 'rgba(0,0,0,1)'
+				}
+			}
+		);
+	}
 	const layout: any = {
 		title: `<b>${changeSummary}</b>`,
 		titlefont: {

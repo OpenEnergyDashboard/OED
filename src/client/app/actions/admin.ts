@@ -159,8 +159,8 @@ export function submitPreferencesIfNeeded(): Thunk {
 	};
 }
 
-function updateCikAndDBViews(): t.UpdateCikAndDBViews {
-	return { type: ActionType.UpdateCikAndDBViews };
+function toggleWaitForCikAndDB(): t.ToggleWaitForCikAndDB {
+	return { type: ActionType.ToggleWaitForCikAndDB };
 }
 
 /**
@@ -180,9 +180,15 @@ function shouldUpdateCikAndDBViews(state: State): boolean {
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		if (shouldUpdateCikAndDBViews(getState())) {
-			dispatch(updateCikAndDBViews());
+			// set the page to a loading state
+			dispatch(toggleWaitForCikAndDB());
 			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
-			window.location.reload();
+			// revert to normal state once refresh is complete
+			dispatch(toggleWaitForCikAndDB());
+			if (shouldRedoCik || shouldRefreshReadingViews) {
+				// Only reload window if redoCik and/or refresh reading views.
+				window.location.reload();
+			}
 		}
 		return Promise.resolve();
 	};

@@ -4,7 +4,7 @@
 
 const pgp = require('pg-promise')({
 	// This sets the style of returned durations so that Moment can parse them
-	connect(client, dc, useCount) {
+	connect({ client, useCount }) {
 		// Only set the style on fresh connections
 		if (useCount === 0) {
 			client.query('SET intervalStyle = iso_8601');

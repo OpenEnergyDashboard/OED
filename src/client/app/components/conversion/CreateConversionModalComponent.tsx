@@ -15,8 +15,10 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { addConversion } from '../../actions/conversions';
 import { UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
+import { UnitType } from '../../types/redux/units';
+import { notifyUser } from '../../utils/input'
 import * as _ from 'lodash';
-import {tableStyle, tooltipBaseStyle} from '../../styles/modalStyle';
+import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -88,7 +90,18 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			Conversion exists: invalid conversion
 			Conversion does not exist:
 				Inverse exists:
-					Conversion is bidirectional: invalid conversion */
+					Conversion is bidirectional: invalid conversion
+			Destination cannot be a meter
+			Cannot mix unit represent
+
+			TODO Some of these can go away when we make the menus dynamic.
+		*/
+
+		// The destination cannot be a meter unit.
+		if (destinationId !== -999 && props.unitsState[destinationId].typeOfUnit === UnitType.meter) {
+			notifyUser(translate('conversion.create.destination.meter'));
+			return false;
+		}
 
 		// Source or destination not set
 		if (sourceId === -999 || destinationId === -999) {
@@ -97,6 +110,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 		// Source equals destination: invalid conversion
 		if (sourceId === destinationId) {
+			notifyUser(translate('conversion.create.source.destination.same'));
 			return false
 		}
 
@@ -104,8 +118,17 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		if ((props.conversionsState.findIndex(conversionData => ((
 			conversionData.sourceId === state.sourceId) &&
 			conversionData.destinationId === state.destinationId))) !== -1) {
+			notifyUser(translate('conversion.create.exists'));
 			return false;
 		}
+
+		// You cannot have a conversion between units that differ in unit_represent.
+		// This means you cannot mix quantity, flow & raw.
+		if (props.unitsState[sourceId].unitRepresent !== props.unitsState[destinationId].unitRepresent) {
+			notifyUser(translate('conversion.create.mixed.represent'));
+			return false;
+		}
+
 
 		let isValid = true;
 		// Loop over conversions and check for existence of inverse of conversion passed in
@@ -128,6 +151,9 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				}
 			}
 		});
+		if (!isValid) {
+			notifyUser(translate('conversion.create.exists.inverse'));
+		}
 		return isValid;
 	}
 

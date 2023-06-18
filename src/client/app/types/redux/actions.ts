@@ -81,7 +81,7 @@ export enum ActionType {
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 	UpdateDefaultWarningFileSize = 'UPDATE_DEFAULT_WARNING_FILE_SIZE',
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
-	UpdateCikAndDBViews = 'UPDATE_CIK_AND_DB_VIEWS',
+	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
