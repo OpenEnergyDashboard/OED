@@ -210,6 +210,9 @@ export default class RouteComponent extends React.Component<RouteProps> {
 									options.toggleAreaNormalization = true;
 								}
 								break;
+							case 'areaUnit':
+								options.areaUnit = info;
+								break;
 							case 'comparePeriod':
 								options.comparePeriod = validateComparePeriod(info);
 								break;

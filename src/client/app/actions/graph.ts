@@ -212,6 +212,7 @@ export interface LinkOptions {
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
 	toggleAreaNormalization?: boolean;
+	areaUnit?: string;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -230,7 +231,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
+		t.UpdateSelectedAreaUnitAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -262,6 +264,10 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.toggleAreaNormalization) {
 		dispatchSecond.push(toggleAreaNormalization());
+	}
+	if (options.areaUnit) {
+		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
+
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
