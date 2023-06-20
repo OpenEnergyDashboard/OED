@@ -30,6 +30,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
+ * @returns {Element} Chart Data Select JSX element
  */
 export default function ChartDataSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {

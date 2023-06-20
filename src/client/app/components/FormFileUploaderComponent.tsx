@@ -13,6 +13,11 @@ interface FileUploader {
 	labelStyle?: React.CSSProperties;
 }
 
+/**
+ * Defines component used to upload files
+ * @param {FileUploader} props defined above
+ * @returns {Element} File Uploader JSX element
+ */
 export default function FileUploaderComponent(props: FileUploader) {
 	return (
 		<FormGroup>

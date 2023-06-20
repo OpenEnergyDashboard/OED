@@ -11,6 +11,11 @@ interface ManageUserLinkButtonComponentProps {
 	style?: React.CSSProperties;
 }
 
+/**
+ * Component which creates a button link to the manage users page
+ * @param {ManageUserLinkButtonComponentProps} props defined above
+ * @returns {Element} Manage user button component
+ */
 export default function ManageUsersLinkButtonComponent(props: ManageUserLinkButtonComponentProps) {
 	const inlineButtonStyle: React.CSSProperties = {
 		display: 'inline',

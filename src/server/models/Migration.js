@@ -27,7 +27,7 @@ class Migration {
 	 * @param conn is the connection to use.
 	 * @param insertDefault { boolean } whether or not to insert the default migration.
 	 *     True by default.
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static async createTable(conn, insertDefault = true) {
 		await conn.none(sqlFile('migration/create_migration_table.sql'));

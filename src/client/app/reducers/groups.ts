@@ -21,6 +21,7 @@ const defaultState: GroupsState = {
 	displayMode: DisplayMode.View
 };
 
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {

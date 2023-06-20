@@ -136,7 +136,7 @@ function isValidGPSInput(input) {
  * Reverses the latitude and longitude in GPS string. More basically, it switches the two values separated by a comma.
  * Assumes went through isValidGPSInput first so know it has a single comma so does what it should.
  * @param gpsString The string with GPS pair separated by a comma to reverse
- * @return the new string with the updated GPS pair
+ * @returns the new string with the updated GPS pair
  */
 function switchGPS(gpsString) {
 	const array = gpsString.split(',');

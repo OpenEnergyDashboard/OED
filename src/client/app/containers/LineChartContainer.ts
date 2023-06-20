@@ -13,6 +13,8 @@ import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const unitID = state.graph.selectedUnit;

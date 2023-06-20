@@ -21,6 +21,11 @@ interface CreateUserFormProps {
 	submitNewUser: () => void;
 }
 
+/**
+ * Component that defines the form to create a new user
+ * @param {CreateUserFormProps} props defined above
+ * @returns {Element} Create User element
+ */
 export default function CreateUserFormComponent(props: CreateUserFormProps) {
 
 	const formInputStyle: React.CSSProperties = {

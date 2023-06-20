@@ -18,6 +18,7 @@ import { SelectOption } from '../types/items';
 
 /**
  *  A component that allows users to select which chart should be displayed.
+ * @returns {Element} Chart select element
  */
 export default function ChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {

@@ -9,6 +9,8 @@ import * as t from '../types/redux/currentUser';
 import { User } from '../types/items';
 import { deleteToken, hasToken } from '../utils/token';
 
+/* eslint-disable jsdoc/require-jsdoc*/
+
 export function requestCurrentUser(): t.RequestCurrentUser {
 	return { type: ActionType.RequestCurrentUser };
 }

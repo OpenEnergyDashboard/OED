@@ -36,7 +36,11 @@ interface EditMeterModalComponentProps {
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
-
+/**
+ * Defines the edit meter modal form
+ * @param {object} props for the edit component
+ * @returns {Element} Edit meter menu
+ */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const dispatch = useDispatch();
 
