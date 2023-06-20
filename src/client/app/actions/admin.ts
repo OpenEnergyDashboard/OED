@@ -15,6 +15,7 @@ import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -77,6 +78,12 @@ function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkP
 	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
+/* eslint-enable */
+/* eslint-disable jsdoc/require-returns*/
+
+/**
+ * Dispatches a fetch for admin preferences and sets the state based upon the result
+ */
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
@@ -98,6 +105,9 @@ function fetchPreferences(): Thunk {
 	};
 }
 
+/**
+ * Submits preferences stored in the state to the API to be stored in the database
+ */
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
@@ -140,6 +150,8 @@ function shouldFetchPreferenceData(state: State): boolean {
 function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
 }
+
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function fetchPreferencesIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {

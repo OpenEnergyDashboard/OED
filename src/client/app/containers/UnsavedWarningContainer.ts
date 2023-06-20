@@ -8,6 +8,8 @@ import UnsavedWarningComponent from '../components/UnsavedWarningComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 	return {
 		hasUnsavedChanges: state.unsavedWarning.hasUnsavedChanges,

@@ -7,23 +7,33 @@ import { Thunk, ActionType, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/version';
 
-/*
-* Defines function that performs the API call to retrieve the current version of the app,
-* and dispatches the corresponding action types.
-* This function will be called on component initialization.
-*/
+/* eslint-disable jsdoc/require-returns */
+/**
+ * Request version action
+ */
 export function requestVersion(): t.RequestVersion {
 	return { type: ActionType.RequestVersion };
 }
 
+/**
+ * Receive version action
+ * @param {string} data Received version
+ */
 export function receiveVersion(data: string): t.ReceiveVersion {
 	return { type: ActionType.ReceiveVersion, data };
 }
 
+/**
+ * @param {State} state The redux state.
+ * @returns {boolean} Whether preferences are fetching
+ */
 function shouldFetchVersion(state: State): boolean {
 	return !state.version.isFetching;
 }
 
+/**
+ * Dispatches version fetch actions
+ */
 export function fetchVersion(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestVersion());
@@ -33,6 +43,11 @@ export function fetchVersion(): Thunk {
 	};
 }
 
+/**
+ * Function that performs the API call to retrieve the current version of the app,
+ * and dispatches the corresponding action types.
+ * This function will be called on component initialization.
+ */
 export function fetchVersionIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchVersion(getState())) {

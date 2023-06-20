@@ -9,12 +9,15 @@ import { Dispatch } from '../types/redux/actions';
 import { updateDefaultLanguage } from '../actions/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
 
-/*
-*  Passes the current redux state of the language selection, and turns it into props for the React
-*  component, which is what will be visible on the page. Makes it possible to access
-*  your reducer state objects from within your React components.
-*/
+/**
+ * Passes the current redux state of the language selection, and turns it into props for the React
+ * component, which is what will be visible on the page. Makes it possible to access
+ * your reducer state objects from within your React components.
+ */
 function mapStateToProps(state: State) {
 	return {
 		selectedLanguage: state.admin.defaultLanguage

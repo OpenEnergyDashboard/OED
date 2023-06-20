@@ -12,6 +12,8 @@ interface LogoProps {
 
 /**
  * React component that creates an logo image from a file path
+ * @param {LogoProps} props defined above
+ * @returns {HTMLImageElement} Logo Image element
  */
 function LogoComponent(props: LogoProps) {
 	const imgStyle: React.CSSProperties = {

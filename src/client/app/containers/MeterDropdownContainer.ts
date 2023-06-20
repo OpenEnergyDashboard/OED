@@ -9,9 +9,8 @@ import MeterDropdownComponent from '../components/MeterDropDownComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
-/**
- * @param {State} state
- */
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 	return {
 		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name })), 'name')

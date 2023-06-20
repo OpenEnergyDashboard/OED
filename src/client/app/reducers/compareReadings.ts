@@ -13,6 +13,8 @@ const defaultState: CompareReadingsState = {
 	groupsFetching: false
 };
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export default function readings(state = defaultState, action: CompareReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterCompareReadings: {
