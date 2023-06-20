@@ -19,7 +19,7 @@ interface ConversionViewComponentProps {
 }
 
 /**
- * Shows conversion details as a bubble
+ * Defines the conversion info card
  * @param {ConversionViewComponentProps} props defined above
  * @returns {Element} Single conversion element
  */

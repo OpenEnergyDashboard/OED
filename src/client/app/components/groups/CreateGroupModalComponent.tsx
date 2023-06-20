@@ -34,7 +34,7 @@ interface CreateGroupModalComponentProps {
 }
 
 /**
- * React component that defines the group create modal
+ * Defines the create group modal form
  * @param {CreateGroupModalComponentProps} props pass in graphic units
  * @returns {Element} JSX Element
  */

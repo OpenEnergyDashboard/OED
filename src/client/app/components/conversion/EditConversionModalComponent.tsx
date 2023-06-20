@@ -32,7 +32,7 @@ interface EditConversionModalComponentProps {
 }
 
 /**
- * Creates the menu to edit a conversion
+ * Defines the edit conversion modal form
  * @param {object} props Props for the component
  * @returns {Element} The edit menu
  */

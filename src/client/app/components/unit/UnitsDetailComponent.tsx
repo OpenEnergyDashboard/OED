@@ -17,7 +17,7 @@ import { UnitData } from 'types/redux/units';
 import SpinnerComponent from '../../components/SpinnerComponent';
 
 /**
- * Component which defines units page
+ * Defines the units page card view
  * @returns {Element} Units page element
  */
 export default function UnitsDetailComponent() {

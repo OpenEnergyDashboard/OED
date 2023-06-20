@@ -27,7 +27,7 @@ interface MeterViewComponentProps {
 }
 
 /**
- * Creates the meter info bubble shown on meters page
+ * Defines the meter info card
  * @param {object} props component props
  * @returns {Element} Meter info card
  */

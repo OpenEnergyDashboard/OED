@@ -48,7 +48,7 @@ interface EditGroupModalComponentProps {
 }
 
 /**
- * React component to define the group edit modal
+ * Defines the edit group modal form
  * @param {EditGroupModalComponentProps} props state variables needed to define the component
  * @returns {Element} JSX Element
  */

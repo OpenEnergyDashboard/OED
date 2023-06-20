@@ -18,7 +18,7 @@ import { ConversionData } from 'types/redux/conversions';
 import SpinnerComponent from '../../components/SpinnerComponent';
 
 /**
- * Component which displays conversions page
+ * Defines the conversions page card view
  * @returns {Element} Conversion page element
  */
 export default function ConversionsDetailComponent() {

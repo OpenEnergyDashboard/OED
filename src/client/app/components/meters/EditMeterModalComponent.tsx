@@ -37,7 +37,7 @@ interface EditMeterModalComponentProps {
 	handleClose: () => void;
 }
 /**
- * Creates the meter edit menu
+ * Defines the edit meter modal form
  * @param {object} props for the edit component
  * @returns {Element} Edit meter menu
  */

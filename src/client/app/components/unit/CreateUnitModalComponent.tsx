@@ -18,7 +18,7 @@ import { notifyUser } from '../../utils/input'
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
- * Creates the menu for unit creation
+ * Defines the create unit modal form
  * @returns {Element} Unit creation menu
  */
 export default function CreateUnitModalComponent() {

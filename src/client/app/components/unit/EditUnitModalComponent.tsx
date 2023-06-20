@@ -28,7 +28,7 @@ interface EditUnitModalComponentProps {
 }
 
 /**
- * Creates menu for editing meters
+ * Defines the edit unit modal form
  * @param {object} props props for component
  * @returns {Element} Meter edit menu element
  */

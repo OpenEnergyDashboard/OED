@@ -25,7 +25,7 @@ interface GroupViewComponentProps {
 }
 
 /**
- * React component that defines the group page cards
+ * Defines the group info card
  * @param {GroupViewComponentProps} props variables passed in to define
  * @returns {Element} JSX Element
  */

@@ -26,7 +26,7 @@ interface CreateConversionModalComponentProps {
 	unitsState: UnitDataById;
 }
 /**
- * Creates the conversion creation menu
+ * Defines the create conversion modal form
  * @param {object} props Props for the component
  * @returns {Element} Conversion element
  */

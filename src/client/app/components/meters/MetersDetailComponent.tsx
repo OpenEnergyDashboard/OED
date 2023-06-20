@@ -22,7 +22,7 @@ import * as _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 
 /**
- * Creates the page to view current meters
+ * Defines the meters page card view
  * @returns {Element} Meters page element
  */
 export default function MetersDetailComponent() {

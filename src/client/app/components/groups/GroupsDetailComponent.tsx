@@ -21,8 +21,8 @@ import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 
 /**
- * React component that defines what details of a group are shown
- * @returns {Element} JSX Element
+ * Defines the groups page card view
+ * @returns {Element} Groups page element
  */
 export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();
