@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const util = require('util');
-const reqPromise = require('request-promise-native');
+const axios = require('axios');
 const csv = require('csv');
 const moment = require('moment');
 const Reading = require('../models/Reading');
@@ -45,8 +45,8 @@ async function readMamacData(meter, conn) {
 	if (!meter.id) {
 		throw new Error(`${meter} doesn't have an id to associate readings with`);
 	}
-	const rawReadings = await reqPromise(`http://${meter.url}/int2.csv`);
-	const parsedReadings = await parseCsv(rawReadings);
+	const rawReadings = await axios.get(`http://${meter.url}/int2.csv`);
+	const parsedReadings = await parseCsv(rawReadings.data);
 	// Hold the end and start date/timestamp for each reading as processed.
 	let endTs;
 	let startTs;

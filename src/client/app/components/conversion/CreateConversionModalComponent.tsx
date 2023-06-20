@@ -181,7 +181,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
 			</Button>
 

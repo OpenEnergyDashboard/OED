@@ -95,7 +95,7 @@ export default function CreateUnitModalComponent() {
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="create.unit" />
 			</Button>
 

@@ -289,7 +289,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="create.group" />
 			</Button>
 
