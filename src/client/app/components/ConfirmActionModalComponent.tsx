@@ -66,7 +66,7 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 						{props.actionRejectText ? props.actionRejectText : translate('no')}
 					</Button>
 					{/* Execute the action function and close the action confirm modal */}
-					<Button color='danger' onClick={props.actionFunction}>
+					<Button color='primary' onClick={props.actionFunction}>
 						{props.actionConfirmText ? props.actionConfirmText : translate('yes')}
 					</Button>
 				</ModalFooter>

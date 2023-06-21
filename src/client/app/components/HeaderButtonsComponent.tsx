@@ -211,7 +211,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 									to="/units">
 									<FormattedMessage id='units' />
 								</DropdownItem>
-								<DropdownItem divider />
+								<DropdownItem divider style={state.adminViewableLinkStyle} />
 								<DropdownItem
 									style={state.adminViewableLinkStyle}
 									disabled={state.shouldAdminButtonDisabled}

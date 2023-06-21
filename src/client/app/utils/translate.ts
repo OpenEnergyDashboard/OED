@@ -28,11 +28,11 @@ export default function translate(messageID: string): TranslatedString {
 	let lang = 'en';
 	if (store)
 	{
-		lang = store.getState().admin.defaultLanguage;
+		lang = store.getState().options.selectedLanguage;
 	}
 	/*
 	const state: any = store.getState();
-	const lang = state.admin.defaultLanguage;
+	const lang = state.options.selectedLanguage;
 	*/
 
 	const messages = (localeData as any)[lang];

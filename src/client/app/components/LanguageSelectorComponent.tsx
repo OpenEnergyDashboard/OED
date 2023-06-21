@@ -8,9 +8,9 @@ import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateDefaultLanguage } from '../actions/admin';
 import { State } from '../types/redux/state';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
+import { updateSelectedLanguage } from '../actions/options';
 
 /**
  * A component that allows users to select which language the page should be displayed in.
@@ -18,7 +18,7 @@ import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 export default function LanguageSelectorComponent() {
 	const dispatch = useDispatch();
 
-	const selectedLanguage = useSelector((state: State) => state.admin.defaultLanguage);
+	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
 
 	return (
 		<div>
@@ -28,17 +28,17 @@ export default function LanguageSelectorComponent() {
 				</DropdownToggle>
 				<DropdownMenu>
 					<DropdownItem
-						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.en))}
+						onClick={() => dispatch(updateSelectedLanguage(LanguageTypes.en))}
 						disabled={selectedLanguage === LanguageTypes.en}>
 						English
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.fr))}
+						onClick={() => dispatch(updateSelectedLanguage(LanguageTypes.fr))}
 						disabled={selectedLanguage === LanguageTypes.fr}>
 						Français
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch(updateDefaultLanguage(LanguageTypes.es))}
+						onClick={() => dispatch(updateSelectedLanguage(LanguageTypes.es))}
 						disabled={selectedLanguage === LanguageTypes.es}>
 						Español
 					</DropdownItem>

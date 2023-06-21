@@ -83,6 +83,8 @@ export enum ActionType {
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
+	ToggleShowMenu = 'TOGGLE_SHOW_MENU',
+	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',

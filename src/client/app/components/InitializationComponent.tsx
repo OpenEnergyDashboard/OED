@@ -17,12 +17,15 @@ import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
+import { updateSelectedLanguage } from '../actions/options';
 
 export default function InitializationComponent() {
 
 	const dispatch = useDispatch();
 
 	let notificationSystem: NotificationSystem;
+
+	const defaultLanguage = useSelector((state: State) => state.admin.defaultLanguage);
 
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
@@ -32,6 +35,7 @@ export default function InitializationComponent() {
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
 		dispatch(fetchConversionsDetailsIfNeeded());
+		dispatch(updateSelectedLanguage(defaultLanguage));
 		ConversionArray.fetchPik();
 	}, []);
 
