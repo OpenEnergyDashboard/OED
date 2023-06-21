@@ -14,6 +14,7 @@ import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 
 /**
  * React component that controls the line graph rate menu
+ * @returns {Element} Rate selection element
  */
 export default function GraphicRateMenuComponent() {
 	const dispatch = useDispatch();

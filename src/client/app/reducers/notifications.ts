@@ -9,6 +9,8 @@ const defaultState: NotificationsState = {
 	notification: {}
 };
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export default function topLevel(state = defaultState, action: NotificationAction) {
 	switch (action.type) {
 		case ActionType.ShowNotification:

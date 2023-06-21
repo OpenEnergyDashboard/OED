@@ -10,7 +10,7 @@ const _ = require('lodash');
  * @param array the array
  * @param valueMapper a function that produces values that should correspond to array
  * elements
- * @return {Object} An object with key-value pairs item, valueMapper(item) for each item
+ * @returns {Object} An object with key-value pairs item, valueMapper(item) for each item
  * in the array
  */
 function mapToObject(array, valueMapper) {

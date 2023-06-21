@@ -8,9 +8,13 @@ import FooterComponent from '../components/FooterComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
-/*
-* A container that does data fetching for FooterComponent and connects it to the redux store.
-*/
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
+
+/**
+ * A container that does data fetching for FooterComponent and connects it to the redux store.
+ */
 function mapStateToProps(state: State) {
 	return {
 		version: state.version.version

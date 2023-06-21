@@ -31,6 +31,11 @@ interface EditConversionModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * Defines the edit conversion modal form
+ * @param {object} props Props for the component
+ * @returns {Element} The edit menu
+ */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const dispatch = useDispatch();
 

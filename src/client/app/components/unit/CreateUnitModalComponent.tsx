@@ -17,6 +17,10 @@ import { addUnit } from '../../actions/units';
 import { notifyUser } from '../../utils/input'
 import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
+/**
+ * Defines the create unit modal form
+ * @returns {Element} Unit creation menu
+ */
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();
 

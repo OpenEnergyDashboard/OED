@@ -5,6 +5,8 @@
 import { ActionType } from '../types/redux/actions';
 import * as t from '../types/redux/unsavedWarning';
 
+/* eslint-disable jsdoc/require-returns */
+
 /**
  * Notify that there are unsaved changes
  * @param {*} removeFunction The function to remove local changes

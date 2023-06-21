@@ -11,6 +11,8 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export interface CompareEntity {
 	id: number;
 	isGroup: boolean;

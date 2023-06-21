@@ -7,6 +7,8 @@ import {State} from '../../types/redux/state';
 import MapCalibrationComponent from '../../components/maps/MapCalibrationComponent';
 import {CalibrationModeTypes} from '../../types/redux/map';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	return {

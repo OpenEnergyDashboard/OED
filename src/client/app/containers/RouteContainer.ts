@@ -11,6 +11,8 @@ import { clearCurrentUser } from '../actions/currentUser';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { UserRole } from '../types/items';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
 	let loggedInAsAdmin = false;

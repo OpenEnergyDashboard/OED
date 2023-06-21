@@ -9,6 +9,10 @@ import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import translate from '../utils/translate';
 
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-returns */
+/* eslint-disable jsdoc/require-returns-description */
+
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
 }
@@ -162,9 +166,9 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
 
 /**
  * Pushes group changes out to DB.
- * @param group The group to update
- * @param reload If true, the window is reloaded to reset everything on change
- * @returns Function to do this for an action
+ * @param {t.GroupEditData} group The group to update
+ * @param {boolean} reload If true, the window is reloaded to reset everything on change
+ * @returns {*} Function to do this for an action
  */
 export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true): Thunk {
 	return async (dispatch: Dispatch) => {

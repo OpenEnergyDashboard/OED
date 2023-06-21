@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import HeaderComponent from '../components/HeaderComponent';
 import { State } from '../types/redux/state';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 function mapStateToProps(state: State) {
 
 	return {

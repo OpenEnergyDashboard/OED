@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { State } from 'types/redux/state';
@@ -25,6 +26,11 @@ interface MeterViewComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Defines the meter info card
+ * @param {object} props component props
+ * @returns {Element} Meter info card
+ */
 export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
