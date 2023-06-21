@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderContainer from '../containers/HeaderContainer';
 import DashboardContainer from '../containers/DashboardContainer';
 import FooterContainer from '../containers/FooterContainer';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
+import HeaderComponent from './HeaderComponent';
 
 /**
  * Top-level React component that controls the home page
@@ -15,7 +15,7 @@ import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 export default function HomeComponent() {
 	return (
 		<div>
-			<HeaderContainer />
+			<HeaderComponent />
 			<TooltipHelpContainer page='home'/>
 			<DashboardContainer />
 			<FooterContainer />

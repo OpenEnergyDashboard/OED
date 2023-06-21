@@ -6,12 +6,12 @@ import * as React from 'react';
 import { browserHistory } from '../utils/history';
 import { injectIntl, defineMessages, FormattedMessage, WrappedComponentProps } from 'react-intl';
 import { Input, Button, InputGroup, Form } from 'reactstrap';
-import HeaderContainer from '../containers/HeaderContainer';
 import FooterContainer from '../containers/FooterContainer';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
 import { User } from '../types/items';
+import HeaderComponent from './HeaderComponent';
 
 interface LoginState {
 	email: string;
@@ -56,7 +56,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 
 		return (
 			<div>
-				<HeaderContainer />
+				<HeaderComponent />
 				<Form style={formStyle}>
 					<InputGroup>
 						<Input

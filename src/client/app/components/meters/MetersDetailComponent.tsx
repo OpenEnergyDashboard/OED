@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -19,6 +18,7 @@ import '../../styles/card-page.css';
 import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
+import HeaderComponent from '../../components/HeaderComponent';
 
 export default function MetersDetailComponent() {
 
@@ -85,7 +85,7 @@ export default function MetersDetailComponent() {
 
 	return (
 		<div>
-			<HeaderContainer />
+			<HeaderComponent />
 			<TooltipHelpContainer page='meters' />
 
 			<div className='container-fluid'>

@@ -8,70 +8,40 @@ import UIOptionsContainer from '../containers/UIOptionsContainer';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
+import { useState } from 'react';
+import getPage from '../utils/getPage';
 
-interface MenuModalProps {
-	showOptions: boolean;
-	showCollapsedMenuButton: boolean;
-}
+export default function MenuModalComponent() {
+	const [showModal, setShowModal] = useState(false);
+	const toggleModal = () => { setShowModal(!showModal); }
 
-interface MenuModalState {
-	showModal: boolean;
-}
+	const inlineStyle: React.CSSProperties = {
+		display: 'inline',
+		paddingLeft: '5px'
+	};
+	const labelStyle: React.CSSProperties = {
+		fontWeight: 'bold',
+		margin: 0
+	};
 
-export default class MenuModalComponent extends React.Component<MenuModalProps, MenuModalState> {
-
-	public state: MenuModalState;
-
-	constructor(props: MenuModalProps) {
-		super(props);
-		this.toggle = this.toggle.bind(this);
-		this.state = { showModal: false };
-	}
-
-	public componentDidUpdate(){
-		if (!this.state.showModal){
-			ReactTooltip.hide();
-		}
-	}
-
-	public render(): React.ReactNode {
-		const inlineStyle: React.CSSProperties = {
-			display: 'inline',
-			paddingLeft: '5px'
-		};
-		const marginBottomStyle: React.CSSProperties = {
-			marginBottom: '15px'
-		};
-		const labelStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			margin: 0
-		};
-		return (
-			<div style={inlineStyle}>
-				<Button color='secondary' outline onClick={this.toggle}>
-					<FormattedMessage id='menu'/>
-				</Button>
-				<Modal isOpen={this.state.showModal} toggle={this.toggle} onOpened={ReactTooltip.rebuild} onClick={() => ReactTooltip.hide()}>
-					<ModalHeader toggle={this.toggle}>
-						<FormattedMessage id='options' />
-					</ModalHeader>
-					<ModalBody>
-						<div style={marginBottomStyle}>
-							<p style={labelStyle}>
-								<FormattedMessage id='navigation' />:
-							</p>
-							<HeaderButtonsComponent  showCollapsedMenuButton={false} isModal={true} />
-						</div>
-						{ this.props.showOptions &&
-							<UIOptionsContainer />
-						}
-					</ModalBody>
-				</Modal>
-			</div>
-		);
-	}
-
-	private toggle() {
-		this.setState(prevState => ({ showModal: !prevState.showModal }));
-	}
+	return (
+		<div style={inlineStyle}>
+			<Button color='secondary' outline onClick={toggleModal}>
+				<FormattedMessage id='menu'/>
+			</Button>
+			<Modal isOpen={showModal} toggle={toggleModal} onOpened={ReactTooltip.rebuild} onClick={() => ReactTooltip.hide()}>
+				<ModalHeader>
+					<FormattedMessage id='menu' />
+				</ModalHeader>
+				<ModalBody>
+					<div style={labelStyle}><FormattedMessage id='navigation' /></div>
+					<HeaderButtonsComponent isModal={true} />
+					{/* Only render graph options if on the graph page */}
+					{getPage() === '' &&
+						<UIOptionsContainer />
+					}
+				</ModalBody>
+			</Modal>
+		</div>
+	)
 }

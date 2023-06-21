@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
@@ -11,6 +10,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import HeaderComponent from '../../components/HeaderComponent';
 
 /**
  * Top-level React component that controls the home page
@@ -38,7 +38,7 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<UnsavedWarningContainer />
-			<HeaderContainer />
+			<HeaderComponent />
 			<TooltipHelpContainer page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>

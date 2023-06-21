@@ -9,7 +9,3 @@ import * as t from '../types/redux/options';
 export function updateSelectedLanguage(selectedLanguage: LanguageTypes): t.UpdateSelectedLanguageAction {
 	return {type: ActionType.UpdateSelectedLanguage, selectedLanguage };
 }
-
-export function toggleShowMenu(): t.ToggleShowMenuAction {
-	return {type: ActionType.ToggleShowMenu };
-}

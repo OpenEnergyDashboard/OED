@@ -10,15 +10,8 @@ export interface UpdateSelectedLanguageAction {
 	selectedLanguage: LanguageTypes;
 }
 
-export interface ToggleShowMenuAction {
-	type: ActionType.ToggleShowMenu;
-}
-
-export type OptionsAction =
-	| UpdateSelectedLanguageAction
-	| ToggleShowMenuAction
+export type OptionsAction = UpdateSelectedLanguageAction
 
 export interface OptionsState {
 	selectedLanguage: LanguageTypes;
-	showMenu: boolean;
 }

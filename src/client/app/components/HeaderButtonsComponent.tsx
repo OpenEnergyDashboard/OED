@@ -6,7 +6,6 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
-import MenuModalComponent from './MenuModalComponent';
 import getPage from '../utils/getPage';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
@@ -20,8 +19,9 @@ import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
+import { toggleOptionsVisibility } from '../actions/graph';
 
-export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: boolean, isModal: boolean }) {
+export default function HeaderButtonsComponent(args: { isModal: boolean }) {
 	const dispatch = useDispatch();
 
 	// Tracks modal or not so helps works as desired.
@@ -46,6 +46,9 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		logoutLinkStyle: {
 			display: 'none'
 		} as React.CSSProperties,
+		showOptionsStyle: {
+			display: 'none'
+		} as React.CSSProperties,
 		// The should ones tell if see but not selectable.
 		shouldHomeButtonDisabled: true,
 		shouldAdminButtonDisabled: true,
@@ -55,8 +58,6 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		shouldCSVButtonDisabled: true,
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
-		// Controls if the options are shown on the right side for some pages.
-		showOptions: false,
 		// Translated menu title that depend on whether logged in.
 		menuTitle: ''
 	};
@@ -67,6 +68,8 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	// Tracks unsaved changes.
 	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
+	// whether to collapse options when on graphs page
+	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
 
 	// This updates which page is disabled because it is the one you are on.
 	useEffect(() => {
@@ -79,8 +82,7 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 			shouldMapsButtonDisabled: currentPage === 'maps',
 			shouldCSVButtonDisabled: currentPage === 'csv',
 			shouldUnitsButtonDisabled: currentPage === 'units',
-			shouldConversionsButtonDisabled: currentPage === 'conversions',
-			showOptions: currentPage === ''
+			shouldConversionsButtonDisabled: currentPage === 'conversions'
 		}));
 	}, [currentPage]);
 
@@ -124,13 +126,17 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 		const currentLogoutLinkStyle = {
 			display: !renderLoginButton ? 'block' : 'none'
 		};
+		const currentShowOptionsStyle = {
+			display: currentPage === '' ? 'block' : 'none'
+		}
 		setState(prevState => ({
 			...prevState,
 			adminViewableLinkStyle: currentAdminViewableLinkStyle,
 			csvViewableLinkStyle: currentCsvViewableLinkStyle,
 			loginLinkStyle: currentLoginLinkStyle,
 			logoutLinkStyle: currentLogoutLinkStyle,
-			menuTitle: currentMenuTitle
+			menuTitle: currentMenuTitle,
+			showOptionsStyle: currentShowOptionsStyle
 		}));
 	}, [currentUser]);
 
@@ -149,110 +155,105 @@ export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: 
 
 	return (
 		<div>
-			<div className="d-lg-none">
-				{args.showCollapsedMenuButton ? (
-					<MenuModalComponent
-						showOptions={state.showOptions}
-						showCollapsedMenuButton={false}
-					/>
-				) : null}
-			</div>
-			<div className={args.showCollapsedMenuButton ? 'd-none d-lg-block' : ''}>
-				<Navbar expand>
-					<Nav navbar>
-						<NavLink
-							disabled={state.shouldHomeButtonDisabled}
-							tag={Link}
-							to="/">
-							<FormattedMessage id='home' />
-						</NavLink>
-						<UncontrolledDropdown nav inNavbar>
-							<DropdownToggle nav caret>
-								<FormattedMessage id='header.pages' />
-							</DropdownToggle>
-							<DropdownMenu>
-								<DropdownItem
-									style={state.adminViewableLinkStyle}
-									disabled={state.shouldConversionsButtonDisabled}
-									tag={Link}
-									to="/conversions">
-									<FormattedMessage id='conversions' />
-								</DropdownItem>
-								<DropdownItem
-									style={state.csvViewableLinkStyle}
-									disabled={state.shouldCSVButtonDisabled}
-									tag={Link}
-									to="/csv">
-									<FormattedMessage id='csv' />
-								</DropdownItem>
-								<DropdownItem
-									disabled={state.shouldGroupsButtonDisabled}
-									tag={Link}
-									to="/groups">
-									<FormattedMessage id='groups' />
-								</DropdownItem>
-								<DropdownItem
-									style={state.adminViewableLinkStyle}
-									disabled={state.shouldMapsButtonDisabled}
-									tag={Link}
-									to="/maps">
-									<FormattedMessage id='maps' />
-								</DropdownItem>
-								<DropdownItem
-									disabled={state.shouldMetersButtonDisabled}
-									tag={Link}
-									to="/meters">
-									<FormattedMessage id='meters' />
-								</DropdownItem>
-								<DropdownItem
-									style={state.adminViewableLinkStyle}
-									disabled={state.shouldUnitsButtonDisabled}
-									tag={Link}
-									to="/units">
-									<FormattedMessage id='units' />
-								</DropdownItem>
-								<DropdownItem divider style={state.adminViewableLinkStyle} />
-								<DropdownItem
-									style={state.adminViewableLinkStyle}
-									disabled={state.shouldAdminButtonDisabled}
-									tag={Link}
-									to="/admin">
-									<FormattedMessage id='admin.panel' />
-								</DropdownItem>
-							</DropdownMenu>
-						</UncontrolledDropdown>
-						<UncontrolledDropdown nav inNavbar>
-							<DropdownToggle nav caret>
-								<FormattedMessage id='header.options' />
-							</DropdownToggle>
-							<DropdownMenu>
-								<LanguageSelectorComponent />
-								{/* <DropdownItem divider /> */}
-								<DropdownItem
-									style={state.loginLinkStyle}
-									tag={Link}
-									to='/login'>
-									<FormattedMessage id='log.in' />
-								</DropdownItem>
-								<DropdownItem
-									style={state.logoutLinkStyle}
-									tag={Link}
-									to='/'
-									onClick={handleLogOut}>
-									<FormattedMessage id='log.out' />
-								</DropdownItem>
-							</DropdownMenu>
-						</UncontrolledDropdown>
-						<NavLink
-							tag={Link}
-							to="/">
-							<FormattedMessage id='help' />
-							<TooltipHelpContainer page={dataFor} />
-							<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
-						</NavLink>
-					</Nav>
-				</Navbar>
-			</div>
+			<Navbar expand>
+				<Nav navbar>
+					<NavLink
+						disabled={state.shouldHomeButtonDisabled}
+						tag={Link}
+						to="/">
+						<FormattedMessage id='home' />
+					</NavLink>
+					<UncontrolledDropdown nav inNavbar>
+						<DropdownToggle nav caret>
+							<FormattedMessage id='header.pages' />
+						</DropdownToggle>
+						<DropdownMenu>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldConversionsButtonDisabled}
+								tag={Link}
+								to="/conversions">
+								<FormattedMessage id='conversions' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.csvViewableLinkStyle}
+								disabled={state.shouldCSVButtonDisabled}
+								tag={Link}
+								to="/csv">
+								<FormattedMessage id='csv' />
+							</DropdownItem>
+							<DropdownItem
+								disabled={state.shouldGroupsButtonDisabled}
+								tag={Link}
+								to="/groups">
+								<FormattedMessage id='groups' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldMapsButtonDisabled}
+								tag={Link}
+								to="/maps">
+								<FormattedMessage id='maps' />
+							</DropdownItem>
+							<DropdownItem
+								disabled={state.shouldMetersButtonDisabled}
+								tag={Link}
+								to="/meters">
+								<FormattedMessage id='meters' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldUnitsButtonDisabled}
+								tag={Link}
+								to="/units">
+								<FormattedMessage id='units' />
+							</DropdownItem>
+							<DropdownItem divider style={state.adminViewableLinkStyle} />
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldAdminButtonDisabled}
+								tag={Link}
+								to="/admin">
+								<FormattedMessage id='admin.panel' />
+							</DropdownItem>
+						</DropdownMenu>
+					</UncontrolledDropdown>
+					<UncontrolledDropdown nav inNavbar>
+						<DropdownToggle nav caret>
+							<FormattedMessage id='header.options' />
+						</DropdownToggle>
+						<DropdownMenu>
+							<LanguageSelectorComponent />
+							<DropdownItem
+								style={state.showOptionsStyle}
+								onClick={() => dispatch(toggleOptionsVisibility())}>
+								<FormattedMessage id={optionsVisibility ? 'hide.options' : 'show.options'} />
+							</DropdownItem>
+							<DropdownItem divider />
+							<DropdownItem
+								style={state.loginLinkStyle}
+								tag={Link}
+								to='/login'>
+								<FormattedMessage id='log.in' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.logoutLinkStyle}
+								tag={Link}
+								to='/'
+								onClick={handleLogOut}>
+								<FormattedMessage id='log.out' />
+							</DropdownItem>
+						</DropdownMenu>
+					</UncontrolledDropdown>
+					<NavLink
+						tag={Link}
+						to="/">
+						<FormattedMessage id='help' />
+						<TooltipHelpContainer page={dataFor} />
+						<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
+					</NavLink>
+				</Nav>
+			</Navbar>
 		</div>
 	);
 }

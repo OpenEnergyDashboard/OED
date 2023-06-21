@@ -49,7 +49,7 @@ export enum ActionType {
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	ChangeSliderRange = 'CHANGE_SLIDER_RANGE',
 	ResetRangeSliderStack = 'RESET_RANGE_SLIDER_STACK',
-	SetOptionsVisibility = 'SET_OPTIONS_VISIBILITY',
+	ToggleOptionsVisibility = 'TOGGLE_OPTIONS_VISIBILITY',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
@@ -83,7 +83,6 @@ export enum ActionType {
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
-	ToggleShowMenu = 'TOGGLE_SHOW_MENU',
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',

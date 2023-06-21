@@ -7,8 +7,7 @@ import { LanguageTypes } from '../types/redux/i18n';
 import { OptionsAction, OptionsState } from '../types/redux/options';
 
 const defaultState: OptionsState = {
-	selectedLanguage: LanguageTypes.en,
-	showMenu: true
+	selectedLanguage: LanguageTypes.en
 };
 
 export default function options(state = defaultState, action: OptionsAction) {
@@ -17,11 +16,6 @@ export default function options(state = defaultState, action: OptionsAction) {
 			return {
 				...state,
 				selectedLanguage: action.selectedLanguage
-			};
-		case ActionType.ToggleShowMenu:
-			return {
-				...state,
-				showMenu: !state.showMenu
 			};
 		default:
 			return state;
