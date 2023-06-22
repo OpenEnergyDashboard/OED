@@ -16,7 +16,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React Component that creates the area unit selector dropdown
- * @returns JSX Element
+ * @returns Area unit select element
  */
 export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();

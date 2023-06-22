@@ -36,7 +36,7 @@ interface CreateGroupModalComponentProps {
 /**
  * Defines the create group modal form
  * @param props pass in graphic units
- * @returns JSX Element
+ * @returns Group create element
  */
 export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
 	const dispatch = useDispatch();

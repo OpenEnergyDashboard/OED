@@ -50,7 +50,7 @@ interface EditGroupModalComponentProps {
 /**
  * Defines the edit group modal form
  * @param props state variables needed to define the component
- * @returns JSX Element
+ * @returns Group edit element
  */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const dispatch = useDispatch();

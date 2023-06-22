@@ -150,7 +150,7 @@ export function metersInGroup(groupId: number): Set<number> {
  * Returns array of deep meter ids of the changed group. This only works if all other groups in state
  * do not include this group.
  * @param changedGroupState The state for the changed group
- * @returns returns array of deep meter ids of the changed group considering possible changes
+ * @returns array of deep meter ids of the changed group considering possible changes
  */
 export function metersInChangedGroup(changedGroupState: GroupEditData): number[] {
 	const state = store.getState();

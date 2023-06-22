@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
  * @param args arguments for modal displays
  * @param args.showCollapsedMenuButton if the menu is collapsed
  * @param args.isModal if the current page is a modal
- * @returns JSX Element
+ * @returns Header buttons element
  */
 export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: boolean, isModal: boolean }) {
 	const dispatch = useDispatch();

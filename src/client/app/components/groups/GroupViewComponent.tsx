@@ -27,7 +27,7 @@ interface GroupViewComponentProps {
 /**
  * Defines the group info card
  * @param props variables passed in to define
- * @returns JSX Element
+ * @returns Group info card element
  */
 export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.

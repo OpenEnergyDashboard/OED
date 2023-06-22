@@ -28,7 +28,7 @@ interface CreateConversionModalComponentProps {
 /**
  * Defines the create conversion modal form
  * @param props Props for the component
- * @returns Conversion element
+ * @returns Conversion create element
  */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
@@ -87,7 +87,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	 * @param sourceId New conversion sourceId
 	 * @param destinationId New conversion destinationId
 	 * @param bidirectional New conversion bidirectional status
-	 * @returns representing if new conversion is valid or not
+	 * @returns boolean representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
 		/*
