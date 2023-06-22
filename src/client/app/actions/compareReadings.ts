@@ -12,12 +12,12 @@ import { metersApi, groupsApi } from '../utils/api';
 import { ComparePeriod, calculateCompareShift } from '../utils/calculateCompare';
 
 /**
- * @param {State} state the Redux state
- * @param {number} meterID the ID of the meter to check
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {compareShift} compareShift The time shift between curr and prev
- * @param {number} unitID the ID of the unit for which to check
- * @returns {boolean} True if the readings for the given meter, time and unit are missing; false otherwise.
+ * @param state the Redux state
+ * @param meterID the ID of the meter to check
+ * @param timeInterval the interval over which to check
+ * @param compareShift The time shift between curr and prev
+ * @param unitID the ID of the unit for which to check
+ * @returns True if the readings for the given meter, time and unit are missing; false otherwise.
  */
 function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInterval: TimeInterval,
 	compareShift: moment.Duration, unitID: number): boolean {
@@ -43,12 +43,12 @@ function shouldFetchMeterCompareReadings(state: State, meterID: number, timeInte
 }
 
 /**
- * @param {State} state the Redux state
- * @param {number} groupID the ID of the group to check
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {compareShift} compareShift The time shift between curr and prev
- * @param {number} unitID the ID of the unit for which to check
- * @returns {boolean} True if the readings for the given group, and time are missing; false otherwise.
+ * @param state the Redux state
+ * @param groupID the ID of the group to check
+ * @param timeInterval the interval over which to check
+ * @param compareShift The time shift between curr and prev
+ * @param unitID the ID of the unit for which to check
+ * @returns True if the readings for the given group, and time are missing; false otherwise.
  */
 function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInterval: TimeInterval,
 	compareShift: moment.Duration, unitID: number): boolean {
@@ -76,10 +76,10 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
 /* eslint-disable jsdoc/require-returns */
 
 /**
- * @param {number} meterIDs the IDs of the meters to get readings
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {moment.Duration} compareShift time to shift the timeInterval to get previous interval
- * @param {number} unitID the ID of the unit for which to check
+ * @param meterIDs the IDs of the meters to get readings
+ * @param timeInterval the interval over which to check
+ * @param compareShift time to shift the timeInterval to get previous interval
+ * @param unitID the ID of the unit for which to check
  */
 function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval,
 	compareShift: moment.Duration, unitID: number):
@@ -88,10 +88,10 @@ function requestMeterCompareReadings(meterIDs: number[], timeInterval: TimeInter
 }
 
 /**
- * @param {number} groupIDs the IDs of the groups to get readings
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {moment.Duration} compareShift time to shift the timeInterval to get previous interval
- * @param {number} unitID the ID of the unit for which to check
+ * @param groupIDs the IDs of the groups to get readings
+ * @param timeInterval the interval over which to check
+ * @param compareShift time to shift the timeInterval to get previous interval
+ * @param unitID the ID of the unit for which to check
  */
 function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval,
 	compareShift: moment.Duration, unitID: number):
@@ -100,11 +100,11 @@ function requestGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
 }
 
 /**
- * @param {number} meterIDs the IDs of the meters to get readings
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {moment.Duration} compareShift time to shift the timeInterval to get previous interval
- * @param {number} unitID the ID of the unit for which to check
- * @param {CompareReadings} readings the readings for the given meters
+ * @param meterIDs the IDs of the meters to get readings
+ * @param timeInterval the interval over which to check
+ * @param compareShift time to shift the timeInterval to get previous interval
+ * @param unitID the ID of the unit for which to check
+ * @param readings the readings for the given meters
  */
 function receiveMeterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration,
 	unitID: number, readings: CompareReadings): t.ReceiveMeterCompareReadingsAction {
@@ -112,11 +112,11 @@ function receiveMeterCompareReadings(meterIDs: number[], timeInterval: TimeInter
 }
 
 /**
- * @param {number} groupIDs the IDs of the groups to get readings
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {moment.Duration} compareShift time to shift the timeInterval to get previous interval
- * @param {number} unitID the ID of the unit for which to check
- * @param {CompareReadings} readings the readings for the given meters
+ * @param groupIDs the IDs of the groups to get readings
+ * @param timeInterval the interval over which to check
+ * @param compareShift time to shift the timeInterval to get previous interval
+ * @param unitID the ID of the unit for which to check
+ * @param readings the readings for the given meters
  */
 function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, compareShift: moment.Duration,
 	unitID: number, readings: CompareReadings): t.ReceiveGroupCompareReadingsAction {
@@ -124,9 +124,9 @@ function receiveGroupCompareReadings(groupIDs: number[], timeInterval: TimeInter
 }
 
 /**
- * @param {number} meterIDs the IDs of the meters to get readings
- * @param {ComparePeriod} comparePeriod the period over which to check
- * @param {number} unitID the ID of the unit to get readings in
+ * @param meterIDs the IDs of the meters to get readings
+ * @param comparePeriod the period over which to check
+ * @param unitID the ID of the unit to get readings in
  */
 function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePeriod, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
@@ -140,9 +140,9 @@ function fetchMeterCompareReadings(meterIDs: number[], comparePeriod: ComparePer
 
 /**
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
- * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {ComparePeriod} comparePeriod enum to represent a kind of time shift between curr and prev
- * @param {number} unitID the ID of the unit for which to check
+ * @param groupIDs The IDs of the groups whose data should be fetched
+ * @param comparePeriod enum to represent a kind of time shift between curr and prev
+ * @param unitID the ID of the unit for which to check
  */
 function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePeriod, unitID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
@@ -157,9 +157,9 @@ function fetchGroupCompareReadings(groupIDs: number[], comparePeriod: ComparePer
 
 /**
  * Fetches readings for the compare chart of all selected meterIDs if they are not already fetched or being fetched
- * @param {ComparePeriod} comparePeriod The period to fetch readings for on the compare chart
- * @param {number} unitID the ID of the unit for which to check
- * @returns {*} An action to fetch the needed readings
+ * @param comparePeriod The period to fetch readings for on the compare chart
+ * @param unitID the ID of the unit for which to check
+ * @returns An action to fetch the needed readings
  */
 export function fetchNeededCompareReadings(comparePeriod: ComparePeriod, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {

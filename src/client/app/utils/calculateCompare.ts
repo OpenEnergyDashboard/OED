@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import translate from '../utils/translate';
 
 /**
- * @enum {ComparePeriod} 'Day', 'Week' or 'FourWeeks'
+ * 'Day', 'Week' or 'FourWeeks'
  */
 export enum ComparePeriod {
 	Day = 'Day',
@@ -16,7 +16,7 @@ export enum ComparePeriod {
 }
 
 /**
- * @enum {SortingOrder} 'Alphabetical', 'Ascending' or 'Descending'
+ * 'Alphabetical', 'Ascending' or 'Descending'
  */
 export enum SortingOrder {
 	Alphabetical = 'Alphabetical',
@@ -25,8 +25,8 @@ export enum SortingOrder {
 }
 
 /**
- * @param {string} comparePeriod A string to validate as a comparePeriod
- * @returns {ComparePeriod} Validated enum
+ * @param comparePeriod A string to validate as a comparePeriod
+ * @returns Validated enum
  */
 export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 	switch (comparePeriod) {
@@ -42,8 +42,8 @@ export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 }
 
 /**
- * @param {string} sortingOrder A string to validate as a SortingOrder
- * @returns {SortingOrder} Validated enum
+ * @param sortingOrder A string to validate as a SortingOrder
+ * @returns Validated enum
  */
 export function validateSortingOrder(sortingOrder: string): SortingOrder {
 	switch (sortingOrder) {
@@ -60,9 +60,9 @@ export function validateSortingOrder(sortingOrder: string): SortingOrder {
 
 /**
  * Calculates a time interval for compare based on a period and moment
- * @param {ComparePeriod} comparePeriod The compare length
- * @param {moment.Moment} currentTime The current time as a moment
- * @returns {TimeInterval} The time interval for compare
+ * @param comparePeriod The compare length
+ * @param currentTime The current time as a moment
+ * @returns The time interval for compare
  */
 export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, currentTime: moment.Moment): TimeInterval {
 	// begin will be the start of the compare time and end will be the end of the compare time.
@@ -102,8 +102,8 @@ export function calculateCompareTimeInterval(comparePeriod: ComparePeriod, curre
 // TODO This function does not appear to be used - should it be removed?
 /**
  * Converts a comparePeriod into a moment duration for the quality of the readings to use.
- * @param {ComparePeriod} comparePeriod The compare length
- * @returns {moment.Duration} The duration to compare
+ * @param comparePeriod The compare length
+ * @returns The duration to compare
  */
 export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.Duration {
 	let compareDuration;
@@ -126,8 +126,8 @@ export function calculateCompareDuration(comparePeriod: ComparePeriod): moment.D
 
 /**
  * Calculates amount of time to shift as a moment duration
- * @param {ComparePeriod} comparePeriod The compare length
- * @returns {moment.Duration} The shift as a moment duration
+ * @param comparePeriod The compare length
+ * @returns The shift as a moment duration
  */
 export function calculateCompareShift(comparePeriod: ComparePeriod): moment.Duration {
 	let compareShift;
@@ -155,8 +155,8 @@ export interface ComparePeriodLabels {
 
 /**
  * Determines the human-readable names of a comparison period.
- * @param {ComparePeriod} comparePeriod the machine-readable name of the period
- * @returns {{prev: string, current: string}} human-readable names for the compare period
+ * @param comparePeriod the machine-readable name of the period
+ * @returns human-readable names for the compare period
  */
 export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePeriodLabels {
 	switch (comparePeriod) {
@@ -174,10 +174,10 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
 
 /**
  * Composes a label to summarize compare chart data.
- * @param {number} change the ratio of change between the current and previous period
- * @param {string} name the name of the entity being measured
- * @param {{prev: string, current: string}} labels the names of the periods in question
- * @returns {string} The label summary
+ * @param change the ratio of change between the current and previous period
+ * @param name the name of the entity being measured
+ * @param labels the names of the periods in question
+ * @returns The label summary
  */
 export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels): string {
 	if (isNaN(change)) {

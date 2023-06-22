@@ -19,7 +19,7 @@ import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../
 
 /**
  * Defines the create unit modal form
- * @returns {Element} Unit creation menu
+ * @returns Unit creation menu
  */
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();

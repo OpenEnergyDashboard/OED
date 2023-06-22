@@ -35,8 +35,8 @@ interface CreateGroupModalComponentProps {
 
 /**
  * Defines the create group modal form
- * @param {CreateGroupModalComponentProps} props pass in graphic units
- * @returns {Element} JSX Element
+ * @param props pass in graphic units
+ * @returns JSX Element
  */
 export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
 	const dispatch = useDispatch();
@@ -502,7 +502,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	/**
 	 * Converts the child meters of this group to options for menu sorted by identifier
-	 * @returns {SelectOption} sorted for child meters of group creating.
+	 * @returns SelectOptions sorted for child meters of group creating.
 	 */
 	function metersToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
@@ -521,7 +521,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	/**
 	 * Converts the child groups of this group to options for menu sorted by name
-	 * @returns {SelectOption} sorted for child groups of group editing.
+	 * @returns SelectOptions sorted for child groups of group editing.
 	 */
 	function groupsToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
@@ -540,7 +540,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	/**
 	 * Converts the deep meters of this group to list options sorted by identifier.
-	 * @returns {string[]} names of all child meters in sorted order.
+	 * @returns names of all child meters in sorted order.
 	 */
 	function deepMetersToList() {
 		// Create list of meter identifiers.

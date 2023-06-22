@@ -28,8 +28,8 @@ interface MeterViewComponentProps {
 
 /**
  * Defines the meter info card
- * @param {object} props component props
- * @returns {Element} Meter info card
+ * @param props component props
+ * @returns Meter info card
  */
 export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// Edit Modal Show

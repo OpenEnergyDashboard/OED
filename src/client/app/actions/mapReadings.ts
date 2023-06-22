@@ -20,10 +20,10 @@ import {readingsApi} from '../utils/api';
 /**
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  * Reads bar duration from the state.
- * @param {[number]} meterIDs The IDs of the meters whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- * @param {moment.Duration} duration The length of time covered in this timeInterval
- * @param {number} unitID the ID of the unit for which to check
+ * @param meterIDs The IDs of the meters whose data should be fetched
+ * @param timeInterval The time interval over which data should be fetched
+ * @param duration The length of time covered in this timeInterval
+ * @param unitID the ID of the unit for which to check
  */
 function fetchMeterMapReadings(meterIDs: number[], timeInterval: TimeInterval, duration: moment.Duration, unitID: number): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -36,10 +36,10 @@ function fetchMeterMapReadings(meterIDs: number[], timeInterval: TimeInterval, d
 /**
  * Fetch the data for the given groups over the given interval. Fully manages the Redux lifecycle.
  * Reads bar duration from the state.
- * @param {[number]} groupIDs The IDs of the groups whose data should be fetched
- * @param {TimeInterval} timeInterval The time interval over which data should be fetched
- * @param {moment.Duration} duration The length of time covered in this timeInterval
- * @param {number} unitID the ID of the unit for which to check
+ * @param groupIDs The IDs of the groups whose data should be fetched
+ * @param timeInterval The time interval over which data should be fetched
+ * @param duration The length of time covered in this timeInterval
+ * @param unitID the ID of the unit for which to check
  */
 function fetchGroupMapReadings(groupIDs: number[], timeInterval: TimeInterval, duration: moment.Duration, unitID: number): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -51,8 +51,8 @@ function fetchGroupMapReadings(groupIDs: number[], timeInterval: TimeInterval, d
 
 /**
  * Fetches readings for the map chart of all selected meters and groups, if needed.
- * @param {TimeInterval} timeInterval the interval over which to check
- * @param {number} unitID the ID of the unit for which to check
+ * @param timeInterval the interval over which to check
+ * @param unitID the ID of the unit for which to check
  */
 export function fetchNeededMapReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {

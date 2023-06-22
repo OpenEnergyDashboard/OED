@@ -4,8 +4,7 @@
 
 /**
  * Get Token from local storage
- *
- * @returns {string} if found token, return it, otherwise, throw error
+ * @returns if found token, return it, otherwise, throw error
  */
 export function getToken(): string {
 	const token = localStorage.getItem('token');
@@ -17,8 +16,7 @@ export function getToken(): string {
 
 /**
  * Check if there is a Token in local storage
- *
- * @returns {boolean} If there is a Token, return True; otherwise return false
+ * @returns If there is a Token, return True; otherwise return false
  */
 export function hasToken(): boolean {
 	try {

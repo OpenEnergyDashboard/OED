@@ -22,7 +22,7 @@ import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConvers
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
- * @returns {Element} HTML for export buttons
+ * @returns HTML for export buttons
  */
 export default function ExportComponent() {
 	// Meters state

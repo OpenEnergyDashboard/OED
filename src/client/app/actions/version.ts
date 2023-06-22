@@ -17,15 +17,15 @@ export function requestVersion(): t.RequestVersion {
 
 /**
  * Receive version action
- * @param {string} data Received version
+ * @param data Received version
  */
 export function receiveVersion(data: string): t.ReceiveVersion {
 	return { type: ActionType.ReceiveVersion, data };
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether preferences are fetching
+ * @param state The redux state.
+ * @returns Whether preferences are fetching
  */
 function shouldFetchVersion(state: State): boolean {
 	return !state.version.isFetching;

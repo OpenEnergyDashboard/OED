@@ -22,10 +22,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 /**
  * React Component that defines the header buttons at the top of a page
- * @param {*} args arguments for modal displays
- * @param {boolean} args.showCollapsedMenuButton if the menu is collapsed
- * @param {boolean} args.isModal if the current page is a modal
- * @returns {Element} JSX Element
+ * @param args arguments for modal displays
+ * @param args.showCollapsedMenuButton if the menu is collapsed
+ * @param args.isModal if the current page is a modal
+ * @returns JSX Element
  */
 export default function HeaderButtonsComponent(args: { showCollapsedMenuButton: boolean, isModal: boolean }) {
 	const dispatch = useDispatch();

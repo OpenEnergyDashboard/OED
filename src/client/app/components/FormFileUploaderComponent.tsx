@@ -15,8 +15,8 @@ interface FileUploader {
 
 /**
  * Defines component used to upload files
- * @param {FileUploader} props defined above
- * @returns {Element} File Uploader JSX element
+ * @param props defined above
+ * @returns File Uploader JSX element
  */
 export default function FileUploaderComponent(props: FileUploader) {
 	return (

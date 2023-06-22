@@ -166,9 +166,9 @@ export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEdited
 
 /**
  * Pushes group changes out to DB.
- * @param {t.GroupEditData} group The group to update
- * @param {boolean} reload If true, the window is reloaded to reset everything on change
- * @returns {*} Function to do this for an action
+ * @param group The group to update
+ * @param reload If true, the window is reloaded to reset everything on change
+ * @returns Function to do this for an action
  */
 export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true): Thunk {
 	return async (dispatch: Dispatch) => {

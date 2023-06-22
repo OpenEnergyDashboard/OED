@@ -8,12 +8,11 @@ import { ChartTypes } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
- *
- * @param {LineReading[]} readings The meter readings.
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unitLabel the full y-axis label on the graphic
- * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
- * @returns {string} output A string containing the CSV formatted meter readings.
+ * @param readings The meter readings.
+ * @param meter the meter identifier for data being exported
+ * @param unitLabel the full y-axis label on the graphic
+ * @param scaling factor to scale readings by, normally the rate factor for line or 1
+ * @returns A string containing the CSV formatted meter readings.
  */
 function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number) {
 	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unitLabel}\n`;
@@ -32,9 +31,8 @@ function convertToCSV(readings: LineReading[], meter: string, unitLabel: string,
 
 /**
  * Function to download the formatted CSV file to the users computer.
- *
- * @param {string} inputCSV A String containing the formatted CSV data.
- * @param {string} fileName A string representing the name of the file.
+ * @param inputCSV A String containing the formatted CSV data.
+ * @param fileName A string representing the name of the file.
  */
 function downloadCSV(inputCSV: string, fileName: string) {
 	const element = document.createElement('a');
@@ -51,13 +49,12 @@ function downloadCSV(inputCSV: string, fileName: string) {
 
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
- *
- * @param {LineReading[]} readings The readings from the meter to export the graphic points.
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unitLabel the full y-axis label on the graphic
- * @param {string} unitIdentifier the unit identifier for data being exported
- * @param {ChartTypes} chartName the name of the chart/graphic being exported
- * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param readings The readings from the meter to export the graphic points.
+ * @param meter the meter identifier for data being exported
+ * @param unitLabel the full y-axis label on the graphic
+ * @param unitIdentifier the unit identifier for data being exported
+ * @param chartName the name of the chart/graphic being exported
+ * @param scaling factor to scale readings by, normally the rate factor for line or 1
  */
 export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string,
 	chartName: ChartTypes, scaling: number) {
@@ -83,10 +80,9 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 
 /**
  * Function to export raw data that we request on button click
- *
- * @param {RawReadings[]} readings list of readings directly from the database
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unit the unit identifier for data being exported
+ * @param readings list of readings directly from the database
+ * @param meter the meter identifier for data being exported
+ * @param unit the unit identifier for data being exported
  */
 export function downloadRawCSV(readings: RawReadings[], meter: string, unit: string) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).

@@ -69,8 +69,8 @@ export function setNewMap(): Thunk {
 
 /**
  * start a new calibration session
- * @param {CalibrationModeTypes} mode calibration modes
- * @param {number} mapID id of map being calibrated
+ * @param mode calibration modes
+ * @param mapID id of map being calibrated
  */
 export function setCalibration(mode: CalibrationModeTypes, mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {
@@ -119,7 +119,7 @@ export function updateMapMode(nextMode: CalibrationModeTypes): t.ChangeMapModeAc
 
 /**
  * Changes the selected map ID
- * @param {number} newSelectedMapID new map ID
+ * @param newSelectedMapID new map ID
  */
 export function changeSelectedMap(newSelectedMapID: number): t.UpdateSelectedMapAction {
 	return { type: ActionType.UpdateSelectedMap, mapID: newSelectedMapID };
@@ -132,7 +132,7 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
 /**
  * pair collected GPS coordinate with cartesian coordinate to form a complete data point,
  * append to calibration set and trigger calibration if needed
- * @param {GPSPoint} currentGPS GPS data, from user input
+ * @param currentGPS GPS data, from user input
  */
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
@@ -171,8 +171,8 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
 
 /**
  * use a default number as the threshold in determining if it's safe to call the calibration function
- * @param {State} state The redux state
- * @returns {boolean} Result of safety check
+ * @param state The redux state
+ * @returns Result of safety check
  */
 function isReadyForCalculation(state: State): boolean {
 	const calibrationThreshold = 3;
@@ -184,8 +184,8 @@ function isReadyForCalculation(state: State): boolean {
 
 /**
  *  prepare data to required formats to pass it to function calculating mapScales
- * @param {State} state The redux state
- * @returns {CalibrationResult} Result of map calibration
+ * @param state The redux state
+ * @returns Result of map calibration
  */
 function prepareDataToCalculation(state: State): CalibrationResult {
 	const mapID = state.maps.calibratingMap;
@@ -266,7 +266,7 @@ export function submitNewMap(): Thunk {
 
 /**
  * submit changes of an existing map to database at the end of a calibration session
- * @param {number} mapID the edited map being updated at database
+ * @param mapID the edited map being updated at database
  */
 export function submitEditedMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
@@ -307,7 +307,7 @@ export function submitEditedMap(mapID: number): Thunk {
 
 /**
  * permanently remove a map
- * @param {number} mapID map to be removed
+ * @param mapID map to be removed
  */
 export function removeMap(mapID: number): Thunk {
 	return async (dispatch: Dispatch) => {

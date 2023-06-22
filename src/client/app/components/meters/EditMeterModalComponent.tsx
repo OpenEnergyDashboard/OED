@@ -38,8 +38,8 @@ interface EditMeterModalComponentProps {
 }
 /**
  * Defines the edit meter modal form
- * @param {object} props for the edit component
- * @returns {Element} Edit meter menu
+ * @param props for the edit component
+ * @returns Edit meter menu
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const dispatch = useDispatch();

@@ -9,7 +9,7 @@ import { Notification } from 'react-notification-system';
 /* eslint-disable jsdoc/require-returns */
 /**
  * Shows notification to the user
- * @param {Notification} notification Notification to display
+ * @param notification Notification to display
  */
 export function showNotification(notification: Notification): t.ShowNotificationAction {
 	return { type: ActionType.ShowNotification, notification };
