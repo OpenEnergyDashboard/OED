@@ -13,8 +13,6 @@ const defaultState: LineReadingsState = {
 	groupsFetching: false
 };
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 export default function readings(state = defaultState, action: LineReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterLineReadings: {

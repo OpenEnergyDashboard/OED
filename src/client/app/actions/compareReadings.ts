@@ -73,8 +73,6 @@ function shouldFetchGroupCompareReadings(state: State, groupID: number, timeInte
 	return !readingsForUnit.isFetching;
 }
 
-/* eslint-disable jsdoc/require-returns */
-
 /**
  * @param meterIDs the IDs of the meters to get readings
  * @param timeInterval the interval over which to check

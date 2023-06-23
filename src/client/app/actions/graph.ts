@@ -19,9 +19,6 @@ import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable jsdoc/require-returns */
-
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
 }

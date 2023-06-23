@@ -7,7 +7,6 @@ import { Thunk, ActionType, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/version';
 
-/* eslint-disable jsdoc/require-returns */
 /**
  * Request version action
  */

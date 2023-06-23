@@ -9,10 +9,6 @@ import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import translate from '../utils/translate';
 
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable jsdoc/require-returns */
-/* eslint-disable jsdoc/require-returns-description */
-
 function requestGroupsDetails(): t.RequestGroupsDetailsAction {
 	return { type: ActionType.RequestGroupsDetails };
 }

@@ -90,8 +90,6 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 		);
 	}
 
-	/* eslint-disable jsdoc/require-param-type */
-
 	/**
 	 * Sets the email state whenever the user changes the email input field
 	 * @param e The event fired

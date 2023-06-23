@@ -6,7 +6,6 @@ import { ActionType } from '../types/redux/actions';
 import * as t from '../types/redux/notifications';
 import { Notification } from 'react-notification-system';
 
-/* eslint-disable jsdoc/require-returns */
 /**
  * Shows notification to the user
  * @param notification Notification to display

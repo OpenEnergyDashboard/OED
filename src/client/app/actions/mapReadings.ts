@@ -15,8 +15,6 @@ import {
 } from './barReadings';
 import {readingsApi} from '../utils/api';
 
-/* eslint-disable jsdoc/require-returns */
-
 /**
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
  * Reads bar duration from the state.
