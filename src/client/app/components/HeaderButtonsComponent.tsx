@@ -7,8 +7,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FormattedMessage } from 'react-intl';
 import getPage from '../utils/getPage';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import translate from '../utils/translate';
 import { UserRole } from '../types/items';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
@@ -21,11 +19,9 @@ import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMen
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
 
-export default function HeaderButtonsComponent(args: { isModal: boolean }) {
+export default function HeaderButtonsComponent() {
 	const dispatch = useDispatch();
 
-	// Tracks modal or not so helps works as desired.
-	const dataFor = args.isModal ? 'all-modal' : 'all';
 	// Get the current page so know which one should not be shown in menu.
 	const currentPage = getPage();
 
@@ -70,6 +66,8 @@ export default function HeaderButtonsComponent(args: { isModal: boolean }) {
 	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
+	// OED version is needed for help redirect
+	const version = useSelector((state: State) => state.version.version);
 
 	// This updates which page is disabled because it is the one you are on.
 	useEffect(() => {
@@ -161,7 +159,7 @@ export default function HeaderButtonsComponent(args: { isModal: boolean }) {
 						disabled={state.shouldHomeButtonDisabled}
 						tag={Link}
 						to="/">
-						<FormattedMessage id='home' />
+						<FormattedMessage id='graph' />
 					</NavLink>
 					<UncontrolledDropdown nav inNavbar>
 						<DropdownToggle nav caret>
@@ -246,11 +244,8 @@ export default function HeaderButtonsComponent(args: { isModal: boolean }) {
 						</DropdownMenu>
 					</UncontrolledDropdown>
 					<NavLink
-						tag={Link}
-						to="/">
+						href={'https://openenergydashboard.github.io/help/' + version}>
 						<FormattedMessage id='help' />
-						<TooltipHelpContainer page={dataFor} />
-						<TooltipMarkerComponent page={dataFor} helpTextId="help.home.header" />
 					</NavLink>
 				</Nav>
 			</Navbar>

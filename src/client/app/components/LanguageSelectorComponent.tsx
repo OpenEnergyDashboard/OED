@@ -5,11 +5,9 @@
 import * as React from 'react';
 import { LanguageTypes } from '../types/redux/i18n';
 import { FormattedMessage } from 'react-intl';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
-import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import { updateSelectedLanguage } from '../actions/options';
 
 /**
@@ -19,6 +17,7 @@ export default function LanguageSelectorComponent() {
 	const dispatch = useDispatch();
 
 	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
+	const version = useSelector((state: State) => state.version.version);
 
 	return (
 		<div>
@@ -43,8 +42,10 @@ export default function LanguageSelectorComponent() {
 						Español
 					</DropdownItem>
 					<DropdownItem divider />
-					<TooltipHelpContainer page='home' />
-					<TooltipMarkerComponent page='home' helpTextId='help.home.language' />
+					<DropdownItem
+						href={'https://openenergydashboard.github.io/help/' + version + '/language.html'}>
+						<FormattedMessage id="help" />
+					</DropdownItem>
 				</DropdownMenu>
 			</UncontrolledDropdown>
 		</div>

@@ -55,7 +55,7 @@ export default function HeaderComponent() {
 					{/* collapse menu if optionsVisibility is false */}
 					{!showOptions ?
 						<MenuModalComponent /> :
-						<HeaderButtonsComponent isModal={false} />
+						<HeaderButtonsComponent />
 					}
 				</div>
 			</div>

@@ -35,7 +35,7 @@ export default function MenuModalComponent() {
 				</ModalHeader>
 				<ModalBody>
 					<div style={labelStyle}><FormattedMessage id='navigation' /></div>
-					<HeaderButtonsComponent isModal={true} />
+					<HeaderButtonsComponent />
 					{/* Only render graph options if on the graph page */}
 					{getPage() === '' &&
 						<UIOptionsContainer />
