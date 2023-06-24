@@ -8,10 +8,13 @@ import { receiveCurrentUser } from '../actions/currentUser'
 import LoginComponent from '../components/LoginComponent';
 import { Dispatch } from '../types/redux/actions';
 
-/*
-* A container that does data fetching for FooterComponent and connects it to the redux store.
-*/
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
 
+/**
+ * A container that does data fetching for FooterComponent and connects it to the redux store.
+ */
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		saveCurrentUser: (profile: User) => dispatch(receiveCurrentUser(profile))

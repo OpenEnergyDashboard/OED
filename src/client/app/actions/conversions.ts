@@ -9,6 +9,10 @@ import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-param */
+/* eslint-disable jsdoc/require-returns */
+
 export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
 	return { type: ActionType.RequestConversionsDetails };
 }
@@ -39,7 +43,9 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 	return { type: ActionType.ChangeDisplayedConversions, selectedConversions: conversions };
 }
 
-// Pushes ConversionData onto submitting conversions state array
+/**
+ * Pushes ConversionData onto submitting conversions state array
+ */
 export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
 	return { type: ActionType.SubmitEditedConversion, conversionData};
 }
@@ -48,7 +54,9 @@ export function confirmConversionEdits(editedConversion: t.ConversionData): t.Co
 	return { type: ActionType.ConfirmEditedConversion, editedConversion };
 }
 
-// Removes ConversionData from submitting state array
+/**
+ * Removes ConversionData from submitting state array
+ */
 export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
 	return {type: ActionType.DeleteSubmittedConversion, conversionData}
 }
@@ -57,12 +65,16 @@ export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnce
 	return { type: ActionType.ConfirmConversionsFetchedOnce };
 }
 
-// Removes the passed ConversionData from the store
+/**
+ * Removes the passed ConversionData from the store
+ */
 export function confirmDeletedConversion(conversionData: t.ConversionData): t.DeleteConversionAction {
 	return { type: ActionType.DeleteConversion, conversionData }
 }
 
-// Fetch the conversions details from the database if they have not already been fetched once
+/**
+ * Fetch the conversions details from the database if they have not already been fetched once
+ */
 export function fetchConversionsDetailsIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		// If conversions have not been fetched once, return the fetchConversionDetails function

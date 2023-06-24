@@ -19,6 +19,9 @@ import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
+/* eslint-disable jsdoc/require-returns */
+
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
 }
@@ -212,6 +215,7 @@ export interface LinkOptions {
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
 	toggleAreaNormalization?: boolean;
+	areaUnit?: string;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -222,7 +226,6 @@ export interface LinkOptions {
 /**
  * Update graph options from a link
  * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
- * @returns {function(*)}
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
@@ -230,7 +233,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
+		t.UpdateSelectedAreaUnitAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -262,6 +266,10 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.toggleAreaNormalization) {
 		dispatchSecond.push(toggleAreaNormalization());
+	}
+	if (options.areaUnit) {
+		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
+
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());

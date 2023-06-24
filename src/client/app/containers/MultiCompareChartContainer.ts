@@ -11,6 +11,8 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export interface CompareEntity {
 	id: number;
 	isGroup: boolean;
@@ -143,8 +145,8 @@ function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntit
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
 			ids.sort((a, b) => {
-				const identifierA = a.identifier.toLowerCase().trim();
-				const identifierB = b.identifier.toLowerCase().trim();
+				const identifierA = a.identifier.toLowerCase();
+				const identifierB = b.identifier.toLowerCase();
 				if (identifierA < identifierB) {
 					return -1;
 				}

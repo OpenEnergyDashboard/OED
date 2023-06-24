@@ -12,10 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
-/**
- * Top-level React component that controls the home page
- * @return JSX to create the home page
- */
+/* eslint-disable jsdoc/require-jsdoc */
 
 export default function AdminComponent() {
 

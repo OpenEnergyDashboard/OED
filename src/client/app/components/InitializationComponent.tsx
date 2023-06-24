@@ -18,11 +18,15 @@ import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 
+/**
+ * Initializes OED redux with needed details
+ * @returns {Element} Initialization JSX element
+ */
 export default function InitializationComponent() {
 
 	const dispatch = useDispatch();
 
-	let notificationSystem: NotificationSystem.System;
+	let notificationSystem: NotificationSystem;
 
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
@@ -60,7 +64,7 @@ export default function InitializationComponent() {
 
 	return (
 		<div>
-			<NotificationSystem ref={(c: NotificationSystem.System) => { notificationSystem = c; }} />
+			<NotificationSystem ref={(c: NotificationSystem) => { notificationSystem = c; }} />
 		</div>
 	);
 }

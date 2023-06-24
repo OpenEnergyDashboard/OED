@@ -11,6 +11,10 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
+/**
+ * Component used to select the desired map
+ * @returns {Element} Map Chart element
+ */
 export default function MapChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
 		paddingBottom: '15px'
@@ -26,7 +30,7 @@ export default function MapChartSelectComponent() {
 	//Utilizes useDispatch and useSelector hooks
 	const dispatch = useDispatch();
 	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
-		{ value: map.id, label: map.name.trim(), isDisabled: !(map.origin && map.opposite) } as SelectOption
+		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
 	)), 'label');
 
 	const selectedMap = {

@@ -15,6 +15,7 @@ import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
+/* eslint-disable jsdoc/require-jsdoc */
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -77,6 +78,12 @@ function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkP
 	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
+/* eslint-enable */
+/* eslint-disable jsdoc/require-returns*/
+
+/**
+ * Dispatches a fetch for admin preferences and sets the state based upon the result
+ */
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
@@ -98,6 +105,9 @@ function fetchPreferences(): Thunk {
 	};
 }
 
+/**
+ * Submits preferences stored in the state to the API to be stored in the database
+ */
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
@@ -141,6 +151,8 @@ function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
 }
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export function fetchPreferencesIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		if (shouldFetchPreferenceData(getState())) {
@@ -159,8 +171,8 @@ export function submitPreferencesIfNeeded(): Thunk {
 	};
 }
 
-function updateCikAndDBViews(): t.UpdateCikAndDBViews {
-	return { type: ActionType.UpdateCikAndDBViews };
+function toggleWaitForCikAndDB(): t.ToggleWaitForCikAndDB {
+	return { type: ActionType.ToggleWaitForCikAndDB };
 }
 
 /**
@@ -180,8 +192,11 @@ function shouldUpdateCikAndDBViews(state: State): boolean {
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		if (shouldUpdateCikAndDBViews(getState())) {
-			dispatch(updateCikAndDBViews());
+			// set the page to a loading state
+			dispatch(toggleWaitForCikAndDB());
 			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
+			// revert to normal state once refresh is complete
+			dispatch(toggleWaitForCikAndDB());
 			if (shouldRedoCik || shouldRefreshReadingViews) {
 				// Only reload window if redoCik and/or refresh reading views.
 				window.location.reload();

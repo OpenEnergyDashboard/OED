@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { Input } from 'reactstrap';
@@ -33,6 +34,11 @@ interface CreateMeterModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Defines the create meter modal form
+ * @param {object} props Component props
+ * @returns {Element} JSX of the create meter page
+ */
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 
 	const dispatch = useDispatch();
@@ -325,7 +331,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="meter.create" />
 			</Button>
 

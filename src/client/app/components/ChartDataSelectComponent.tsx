@@ -30,6 +30,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
+ * @returns {Element} Chart Data Select JSX element
  */
 export default function ChartDataSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
@@ -298,16 +299,18 @@ export default function ChartDataSelectComponent() {
 					placeholder={intl.formatMessage(messages.selectGroups)}
 					onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
 						// see meters code below for comments, as the code functions the same
-						const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
-						const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
-						const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
-						const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
-						if (difference === undefined) {
-							allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
-						} else {
-							allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+						if (dataProps.compatibleSelectedGroups.length !== 0 || newSelectedGroupOptions.length !== 0) {
+							const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
+							const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
+							const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
+							const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
+							if (difference === undefined) {
+								allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
+							} else {
+								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+							}
+							dispatch(changeSelectedGroups(allSelectedGroupIDs));
 						}
-						dispatch(changeSelectedGroups(allSelectedGroupIDs));
 					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
@@ -321,21 +324,27 @@ export default function ChartDataSelectComponent() {
 					selectedOptions={dataProps.compatibleSelectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
 					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
-						//computes difference between previously selected meters and current selected meters,
-						// then makes the change to all selected meters, which includes incompatible selected meters
-						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
-						const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
-						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
-						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
-						// first filter finds items in the old list than are not in the new (deletions)
-						const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
-						if (difference === undefined) {
-							// finds items in the new list which are not in the old list (insertions)
-							allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
-						} else {
-							allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
+						// If the user deletes when no item then this is considered a change so this executes.
+						// The difference is undefined and the resulting push puts undefined due to the filter.
+						// This if statement stops this case from being considered a change by not doing it
+						// if both the old and new lengths are zero.
+						if (dataProps.compatibleSelectedMeters.length !== 0 || newSelectedMeterOptions.length !== 0) {
+							//computes difference between previously selected meters and current selected meters,
+							// then makes the change to all selected meters, which includes incompatible selected meters
+							const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
+							const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
+							const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
+							// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+							// first filter finds items in the old list than are not in the new (deletions)
+							const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
+							if (difference === undefined) {
+								// finds items in the new list which are not in the old list (insertions)
+								allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
+							} else {
+								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
+							}
+							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 						}
-						dispatch(changeSelectedMeters(allSelectedMeterIDs));
 					}}
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />

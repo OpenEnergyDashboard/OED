@@ -25,7 +25,11 @@ interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
 	unitsState: UnitDataById;
 }
-
+/**
+ * Defines the create conversion modal form
+ * @param {object} props Props for the component
+ * @returns {Element} Conversion element
+ */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
 	const dispatch = useDispatch();
@@ -80,10 +84,10 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 	/**
 	 * Checks if conversion is valid
-	 * @param sourceId New conversion sourceId
-	 * @param destinationId New conversion destinationId
-	 * @param bidirectional New conversion bidirectional status
-	 * @returns boolean representing if new conversion is valid or not
+	 * @param {number} sourceId New conversion sourceId
+	 * @param {number} destinationId New conversion destinationId
+	 * @param {boolean} bidirectional New conversion bidirectional status
+	 * @returns {boolean} representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
 		/*
@@ -181,7 +185,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button variant="secondary" onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
 			</Button>
 

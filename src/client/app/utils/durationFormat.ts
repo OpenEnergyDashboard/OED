@@ -7,8 +7,8 @@ import * as moment from 'moment';
 /**
  * Returns the string interval formatted for display. Normally this
  * is the interval returned by Postgres.
- * @param {string} durationToFormat The moment duration to format
- * @returns The string formatted with day(s) hh:mm:ss.
+ * @param {string} durationPassed The moment duration to format
+ * @returns {string} formatted with day(s) hh:mm:ss.
  */
 export function durationFormat(durationPassed: string): string {
 	// Convert the string to milliseconds via moment Duration.

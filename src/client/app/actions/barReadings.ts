@@ -82,6 +82,8 @@ export function shouldFetchGroupBarReadings(state: State, groupID: number, timeI
 	return !readingsForUnit.isFetching;
 }
 
+/* eslint-disable jsdoc/require-returns */
+
 /**
  * @param {number} meterIDs the IDs of the meters to get readings
  * @param {TimeInterval} timeInterval the interval over which to check

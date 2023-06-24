@@ -24,6 +24,11 @@ interface GroupViewComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Defines the group info card
+ * @param {GroupViewComponentProps} props variables passed in to define
+ * @returns {Element} JSX Element
+ */
 export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.
 
@@ -71,7 +76,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 				</div>
 			}
 			<div className="edit-btn">
-				<Button variant="Secondary" onClick={handleShow}>
+				<Button color="secondary" onClick={handleShow}>
 					{/* admins can edit a group but others can only view the details */}
 					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>

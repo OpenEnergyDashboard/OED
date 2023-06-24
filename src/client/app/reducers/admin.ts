@@ -26,6 +26,8 @@ const defaultState: AdminState = {
 	defaultMeterReadingFrequency: '00:15:00'
 };
 
+/* eslint-disable jsdoc/require-jsdoc */
+
 export default function admin(state = defaultState, action: AdminAction) {
 	switch (action.type) {
 		case ActionType.UpdateImportMeter:
@@ -119,10 +121,10 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
 				submitted: false
 			}
-		case ActionType.UpdateCikAndDBViews:
+		case ActionType.ToggleWaitForCikAndDB:
 			return {
 				...state,
-				isUpdatingCikAndDBViews: true
+				isUpdatingCikAndDBViews: !state.isUpdatingCikAndDBViews
 			}
 		case ActionType.UpdateDefaultMeterReadingFrequency:
 			return {

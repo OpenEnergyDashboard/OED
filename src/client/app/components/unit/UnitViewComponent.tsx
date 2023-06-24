@@ -16,6 +16,11 @@ interface UnitViewComponentProps {
 	unit: UnitData;
 }
 
+/**
+ * Defines the unit info card
+ * @param {UnitViewComponentProps} props variables passed in to define
+ * @returns {Element} JSX Element
+ */
 export default function UnitViewComponent(props: UnitViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
 
@@ -61,7 +66,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<b><FormattedMessage id="unit.note" /></b> {props.unit.note ? props.unit.note.slice(0, 29) : ''}
 			</div>
 			<div className="edit-btn">
-				<Button variant="Secondary" onClick={handleShow}>
+				<Button color="secondary" onClick={handleShow}>
 					<FormattedMessage id="edit.unit" />
 				</Button>
 				{/* Creates a child UnitModalEditComponent */}
