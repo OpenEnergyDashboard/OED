@@ -688,7 +688,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['F', 'C', true, 1/1.8, -32/1.8, 'Fahrenheit → Celsius']
+						['F', 'C', true, 1 / 1.8, -32 / 1.8, 'Fahrenheit → Celsius']
 					];
 					const meterData = [
 						{
