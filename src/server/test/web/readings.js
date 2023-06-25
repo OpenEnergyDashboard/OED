@@ -342,7 +342,9 @@ mocha.describe('readings API', () => {
 						['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'kilowatts'],
 						['Electric', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
-					const conversionData = [['Electric', 'kW', false, 1, 0, 'Electric → kW']];
+					const conversionData = [
+						['Electric', 'kW', false, 1, 0, 'Electric → kW']
+					];
 					const meterData = [
 						{
 							name: 'Electric kW',
@@ -373,7 +375,9 @@ mocha.describe('readings API', () => {
 						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
 						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
 					];
-					const conversionData = [['Degrees', 'C', false, 1, 0, 'Degrees → C']];
+					const conversionData = [
+						['Degrees', 'C', false, 1, 0, 'Degrees → C']
+					];
 					const meterData = [
 						{
 							name: 'Degrees Celsius',
@@ -400,11 +404,12 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
-					const unitData = unitDatakWh.concat([['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']]);
-					const conversionData = [
-						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+					const unitData = unitDatakWh.concat([
+						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+					]);
+					const conversionData = conversionDatakWh.concat([
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
-					];
+					]);
 					const meterData = [
 						{
 							name: 'Electric Utility MJ',
@@ -431,15 +436,12 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
-					const unitData = unitDatakWh.concat([['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']]);
-					const conversionData = [
-						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
-						// The conversion in the design doc (https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md)
-						// has the slope as 0.277778, but this is too imprecise and the resulting values are not close enough the expected values, so the test fails.
-						// Using a more precise conversion (0.2777777778) or doing this division to calculate the conversion
-						// brings the values close enough to the expected values.
+					const unitData = unitDatakWh.concat([
+						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+					]);
+					const conversionData = conversionDatakWh.concat([
 						['MJ', 'kWh', true, 1 / 3.6, 0, 'MJ → KWh']
-					];
+					]);
 					const meterData = [
 						{
 							name: 'Electric Utility MJ',
@@ -466,18 +468,49 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
-					const unitData = [
-						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+					const unitData = unitDatakWh.concat([
 						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
-						// Not present in design docs, but taken from the insertStandardUnits() function src/server/util/insertData.js
 						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
-					];
-					const conversionData = [
-						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+					]);
+					const conversionData = conversionDatakWh.concat([
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
 						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+					]);
+					const meterData = [
+						{
+							name: 'Electric_Utility BTU',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'BTU',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
 					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('BTU');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained with reverse conversion', async () => {
+					const unitData = unitDatakWh.concat([
+						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
+						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+					]);
+					const conversionData = conversionDatakWh.concat([
+						['MJ', 'kWh', true, 1 / 3.6, 0, 'MJ → KWh'],
+						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+					]);
 					const meterData = [
 						{
 							name: 'Electric_Utility BTU',
@@ -504,15 +537,12 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units & kWh as MJ', async () => {
-					const unitData = [
-						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+					const unitData = unitDatakWh.concat([
 						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
-					];
-					const conversionData = [
-						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+					]);
+					const conversionData = conversionDatakWh.concat([
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
-					];
+					]);
 					const meterData = [
 						{
 							name: 'Electric_Utility MJ',
@@ -574,15 +604,12 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
-					const unitData = [
-						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+					const unitData = unitDatakWh.concat([
 						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
-					];
-					const conversionData = [
-						['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+					]);
+					const conversionData = conversionDatakWh.concat([
 						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
-					];
+					]);
 					const meterData = [
 						{
 							name: 'Electric_Utility MJ',
@@ -676,13 +703,89 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
+				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained', async () => {
+					const unitData = [
+						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
+						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+						['Widget', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'fake unit']
+					];
+					const conversionData = [
+						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
+						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit'],
+						['F', 'Widget', true, 5, 3, 'Fahrenheit → Widget']
+					];
+					const meterData = [
+						{
+							name: 'Degrees Widget',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'Widget',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('Widget');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_Widget_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () => {
+					const unitData = [
+						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
+						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+						['Widget', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'fake unit']
+					];
+					const conversionData = [
+						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
+						['F', 'C', true, 1 / 1.8, -32 / 1.8, 'Fahrenheit → Celsius'],
+						['Widget', 'F', true, 0.2, -3 / 5, 'Fahrenheit → Widget']
+					];
+					const meterData = [
+						{
+							name: 'Degrees Widget',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'Widget',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('Widget');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_Widget_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
 				// When an invalid unit is added to a meter and loaded to the db, the API should return an empty array
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [
 						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
 						['invalidUnit', '', Unit.unitRepresentType.UNUSED, 1, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Invalid Unit']
 					];
-					const conversionData = [['invalidUnit', 'kWh', false, 1, 0, 'invalidUnit → kWh']];
+					const conversionData = [
+						['invalidUnit', 'kWh', false, 1, 0, 'invalidUnit → kWh']
+					];
 					const meterData = [
 						{
 							name: 'Invalid',
