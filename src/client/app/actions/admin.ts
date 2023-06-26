@@ -76,8 +76,6 @@ function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkP
 	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
-/* eslint-enable */
-
 /**
  * Dispatches a fetch for admin preferences and sets the state based upon the result
  */

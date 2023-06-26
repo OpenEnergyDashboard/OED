@@ -60,7 +60,7 @@ export default class ReadingsApi {
 	 * @param timeInterval The range of time to get readings for
 	 * @param barWidthDays The width of the bar in days
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns LineReadings in sorted order
+	 * @returns BarReadings in sorted order
 	 */
 	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
@@ -76,7 +76,7 @@ export default class ReadingsApi {
 	 * @param timeInterval The range of time to get readings for
 	 * @param barWidthDays The width of the bar in days
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns LineReadings in sorted order
+	 * @returns BarReadings in sorted order
 	 */
 	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');

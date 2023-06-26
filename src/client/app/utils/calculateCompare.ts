@@ -156,7 +156,7 @@ export interface ComparePeriodLabels {
 /**
  * Determines the human-readable names of a comparison period.
  * @param comparePeriod the machine-readable name of the period
- * @returns human-readable names for the compare period
+ * @returns human-readable names for the compare period as {{prev: string, current: string}}
  */
 export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePeriodLabels {
 	switch (comparePeriod) {
@@ -176,7 +176,7 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
  * Composes a label to summarize compare chart data.
  * @param change the ratio of change between the current and previous period
  * @param name the name of the entity being measured
- * @param labels the names of the periods in question
+ * @param labels the names of the periods in question as {{prev: string, current: string}}
  * @returns The label summary
  */
 export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels): string {

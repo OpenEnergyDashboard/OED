@@ -99,7 +99,6 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-/* eslint-enable */
 /**
  * use a transparent heatmap to capture which point the user clicked on the map
  * @param imageDimensions Normalized dimensions of the image
