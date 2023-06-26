@@ -11,12 +11,11 @@ import { AreaUnitType } from './getAreaUnitConversion';
 
 /**
  * Returns the y-axis label for a line graph and whether the rate needs scaling
- *
- * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
- * @param {LineGraphRate} currentSelectedRate The current selected rate
- * @param {boolean} areaNormalization Whether area normalization is enabled
- * @param {AreaUnitType} selectedAreaUnit The currently selected area unit to normalize to
- * @returns {{unitLabel: string, needsRateScaling: boolean}} y-axis label and boolean of whether rate needs to be scaled (true if does)
+ * @param selectUnitState The unit state for the selected unit for graphing
+ * @param currentSelectedRate The current selected rate
+ * @param areaNormalization Whether area normalization is enabled
+ * @param selectedAreaUnit The currently selected area unit to normalize to
+ * @returns y-axis label and boolean of whether rate needs to be scaled (true if does)
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,
 	selectedAreaUnit: AreaUnitType): { unitLabel: string, needsRateScaling: boolean } {
@@ -55,11 +54,10 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
 
 /**
  * Returns the y-axis label for a bar graph
- *
- * @param {UnitData} selectUnitState The unit state for the selected unit for graphing
- * @param {boolean} areaNormalization Whether or not area normalization is enabled
- * @param {AreaUnitType} selectedAreaUnit The currently selected area unit
- * @returns {string} y-axis label
+ * @param selectUnitState The unit state for the selected unit for graphing
+ * @param areaNormalization Whether or not area normalization is enabled
+ * @param selectedAreaUnit The currently selected area unit
+ * @returns y-axis label
  */
 export function barUnitLabel(selectUnitState: UnitData, areaNormalization: boolean, selectedAreaUnit: AreaUnitType): string {
 	let unitLabel: string = '';

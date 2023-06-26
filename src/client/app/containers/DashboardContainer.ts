@@ -9,10 +9,6 @@ import { Dispatch } from '../types/redux/actions';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { changeGraphZoomIfNeeded } from '../actions/graph';
 
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable jsdoc/require-param */
-/* eslint-disable jsdoc/require-returns */
-
 /**
  * Passes the current redux state of the dashboard, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access

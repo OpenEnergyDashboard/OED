@@ -20,7 +20,7 @@ import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 
 /**
  * Initializes OED redux with needed details
- * @returns {Element} Initialization JSX element
+ * @returns Initialization JSX element
  */
 export default function InitializationComponent() {
 

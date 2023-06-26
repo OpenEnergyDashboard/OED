@@ -13,8 +13,6 @@ const defaultState: BarReadingsState = {
 	groupsFetching: false
 };
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 export default function readings(state = defaultState, action: BarReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterBarReadings: {

@@ -18,10 +18,10 @@ export default class ReadingsApi {
 
 	/**
 	 * Gets line readings for meters for the given time range
-	 * @param {number[]} meterIDs The meter IDs to get readings for
-	 * @param {TimeInterval} timeInterval The range of time to get readings for
-	 * @param {number} unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns {Promise<Object<number, Array<{reading: number, start_timestamp: number, end_timestamp: number}>>>} in sorted order
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns lineReadings in sorted order
 	 */
 	public async meterLineReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');
@@ -37,10 +37,10 @@ export default class ReadingsApi {
 
 	/**
 	 * Gets line readings for groups for the given time range
-	 * @param {number[]} groupIDs The group IDs to get readings for
-	 * @param {TimeInterval} timeInterval The range of time to get readings for
-	 * @param {number} unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns {Promise<Object<number, Array<{reading: number, start_timestamp: number, end_timestamp: number}>>>} in sorted order
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns LineReadings in sorted order
 	 */
 	public async groupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = groupIDs.join(',');
@@ -56,11 +56,11 @@ export default class ReadingsApi {
 
 	/**
 	 * Gets bar readings for meters for the given time range
-	 * @param {number[]} meterIDs The meter IDs to get readings for
-	 * @param {TimeInterval} timeInterval The range of time to get readings for
-	 * @param {number} barWidthDays The width of the bar in days
-	 * @param {number} unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns {Promise<Object<number, Array<{reading: number, start_timestamp: number, end_timestamp: number}>>>} in sorted order
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param barWidthDays The width of the bar in days
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns BarReadings in sorted order
 	 */
 	public async meterBarReadings(meterIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
@@ -72,11 +72,11 @@ export default class ReadingsApi {
 
 	/**
 	 * Gets bar readings for groups for the given time range
-	 * @param {number[]} groupIDs The group IDs to get readings for
-	 * @param {TimeInterval} timeInterval The range of time to get readings for
-	 * @param {number} barWidthDays The width of the bar in days
-	 * @param {number} unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns {Promise<Object<number, Array<{reading: number, start_timestamp: number, end_timestamp: number}>>>} in sorted order
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param barWidthDays The width of the bar in days
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns BarReadings in sorted order
 	 */
 	public async groupBarReadings(groupIDs: number[], timeInterval: TimeInterval, barWidthDays: number, unitID: number): Promise<BarReadings> {
 		const stringifiedIDs = groupIDs.join(',');

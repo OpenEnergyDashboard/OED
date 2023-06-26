@@ -18,8 +18,6 @@ import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;
 	// Map to use.

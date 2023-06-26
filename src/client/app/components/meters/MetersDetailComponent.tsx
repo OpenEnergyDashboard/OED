@@ -23,7 +23,7 @@ import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 
 /**
  * Defines the meters page card view
- * @returns {Element} Meters page element
+ * @returns Meters page element
  */
 export default function MetersDetailComponent() {
 

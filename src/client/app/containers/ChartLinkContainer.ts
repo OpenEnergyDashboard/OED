@@ -6,10 +6,6 @@ import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
 import { State } from '../types/redux/state';
 
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable jsdoc/require-param */
-/* eslint-disable jsdoc/require-returns */
-
 /**
  * Passes the current redux state of the chart link text, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access

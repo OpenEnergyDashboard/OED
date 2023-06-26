@@ -33,8 +33,8 @@ interface EditConversionModalComponentProps {
 
 /**
  * Defines the edit conversion modal form
- * @param {object} props Props for the component
- * @returns {Element} The edit menu
+ * @param props Props for the component
+ * @returns Conversion edit element
  */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const dispatch = useDispatch();

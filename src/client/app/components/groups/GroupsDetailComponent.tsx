@@ -22,7 +22,7 @@ import * as _ from 'lodash';
 
 /**
  * Defines the groups page card view
- * @returns {Element} Groups page element
+ * @returns Groups page element
  */
 export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();

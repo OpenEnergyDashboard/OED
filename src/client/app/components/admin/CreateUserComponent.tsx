@@ -23,8 +23,8 @@ interface CreateUserFormProps {
 
 /**
  * Component that defines the form to create a new user
- * @param {CreateUserFormProps} props defined above
- * @returns {Element} Create User element
+ * @param props defined above
+ * @returns Create User element
  */
 export default function CreateUserFormComponent(props: CreateUserFormProps) {
 

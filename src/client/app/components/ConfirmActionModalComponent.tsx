@@ -6,10 +6,6 @@ import { Modal, Button } from 'react-bootstrap';
 import '../styles/modal.css';
 import translate from '../utils/translate';
 
-// TODO consider commenting this better, as according to proper standards
-/* eslint-disable jsdoc/require-param-type */
-/* eslint-disable jsdoc/require-returns-type */
-
 interface ConfirmActionModalComponentProps {
 	// Control this through the parent component to open/close this modal
 	show: boolean;
