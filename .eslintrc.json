@@ -11,7 +11,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended", 
-        "plugin:jsdoc/recommended"
+        "plugin:jsdoc/recommended-typescript"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -30,7 +30,6 @@
         "indent": [
             "off"
         ],
-        "jsdoc/newline-after-description": 0,
         "@typescript-eslint/indent": [
             "error",
             "tab",
@@ -72,7 +71,7 @@
     },
     "overrides": [
         {
-            // also possible in the future to limit to src/client/app/components/**/*.tsx files, where we make sure {} is only used for props.
+            // TODO: Remove this override once these components have been converted to use hooks
             "files": [
                 "src/client/app/components/UIModalComponent.tsx",
                 "src/client/app/containers/admin/CreateUserContainer.tsx",
@@ -148,6 +147,31 @@
                     "error",
                     "as-needed"
                 ]
+            }
+        },
+        {
+            // disable jsdoc requirement for reducers and actions
+            "files": [
+                "src/client/app/reducers/*.ts",
+                "src/client/app/actions/*.ts"
+            ],
+            "rules": {
+                "jsdoc/require-jsdoc": "off",
+                "jsdoc/require-returns": "off"
+            }
+        },
+        {
+            // disable jsdoc for containers separately
+            // jsdoc makes sense for containers but we are working on removing them from the codebase
+            // TODO: Remove this override once containers have been converted
+            "files": [
+                "src/client/app/containers/*/*",
+                "src/client/app/containers/*"
+            ],
+            "rules": {
+                "jsdoc/require-jsdoc": "off",
+                "jsdoc/require-returns": "off",
+                "jsdoc/require-param": "off"
             }
         }
     ]

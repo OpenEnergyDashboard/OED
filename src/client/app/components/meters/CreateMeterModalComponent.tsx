@@ -36,8 +36,8 @@ interface CreateMeterModalComponentProps {
 
 /**
  * Defines the create meter modal form
- * @param {object} props Component props
- * @returns {Element} JSX of the create meter page
+ * @param props Component props
+ * @returns Meter create element
  */
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 

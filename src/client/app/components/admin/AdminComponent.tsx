@@ -12,8 +12,10 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 
-/* eslint-disable jsdoc/require-jsdoc */
-
+/**
+ * React component that defines the admin page
+ * @returns Admin page element
+ */
 export default function AdminComponent() {
 
 	const bottomPaddingStyle: React.CSSProperties = {

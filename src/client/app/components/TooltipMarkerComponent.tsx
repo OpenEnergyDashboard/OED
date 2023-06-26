@@ -11,8 +11,8 @@ interface TooltipMarker {
 
 /**
  * Component that renders a help icon that shows a tooltip on hover
- * @param {TooltipMarker} props defined above
- * @returns {Element} Tooltip Marker element
+ * @param props defined above
+ * @returns Tooltip Marker element
  */
 export default function TooltipMarkerComponent(props: TooltipMarker) {
 	return (

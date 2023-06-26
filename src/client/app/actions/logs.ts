@@ -6,11 +6,11 @@ import { logsApi } from '../utils/api';
 
 /**
  * pass client-side information to server console using logsApi on server-side, mainly for debugging purposes
- * @param {string} level type of message being logged
- * @param {string} message message to log
- * @param {Error?} error An optional error object to provide a stacktrace
- * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
- * @returns {undefined} logs to server based on level
+ * @param level type of message being logged
+ * @param message message to log
+ * @param error An optional error object to provide a stacktrace
+ * @param skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
+ * @returns logs to server based on level
  */
 export function logToServer(level: string, message: string, error?: Error, skipMail?: boolean) {
 	const log: LogData = {

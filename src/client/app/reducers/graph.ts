@@ -29,8 +29,6 @@ const defaultState: GraphState = {
 	renderOnce: false
 };
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
 		case ActionType.ConfirmGraphRenderOnce: {

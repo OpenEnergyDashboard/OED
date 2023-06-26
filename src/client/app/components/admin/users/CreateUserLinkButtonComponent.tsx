@@ -13,8 +13,8 @@ interface CreateUserLinkButtonComponentProps {
 
 /**
  * Component which links a button to the create user form
- * @param {CreateUserLinkButtonComponentProps} props defined above
- * @returns {Element} Create User button element
+ * @param props defined above
+ * @returns Create User button element
  */
 export default function CreateUserLinkButtonComponent(props: CreateUserLinkButtonComponentProps) {
 	const inlineButtonStyle: React.CSSProperties = {

@@ -53,11 +53,11 @@ export default class MetersApi {
 
 	/**
 	 * Gets compare readings for meters for the given current time range and a shift for previous time range
-	 * @param {number[]} meterIDs The meter IDs to get readings for
-	 * @param {TimeInterval} timeInterval  start and end of current/this compare period
-	 * @param {moment.Duration} shift how far to shift back in time from current period to previous period
-	 * @param {number} unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns {Promise<Object<number, Array<{curr_use: number, prev_use: number}>>>} in sorted order
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval  start and end of current/this compare period
+	 * @param shift how far to shift back in time from current period to previous period
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns CompareReadings in sorted order
 	 */
 	public async meterCompareReadings(meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration,
 		unitID: number): Promise<CompareReadings> {

@@ -9,8 +9,6 @@ import * as t from '../types/redux/currentUser';
 import { User } from '../types/items';
 import { deleteToken, hasToken } from '../utils/token';
 
-/* eslint-disable jsdoc/require-jsdoc*/
-
 export function requestCurrentUser(): t.RequestCurrentUser {
 	return { type: ActionType.RequestCurrentUser };
 }
@@ -21,8 +19,8 @@ export function receiveCurrentUser(data: User): t.ReceiveCurrentUser {
 
 /**
  * Check if we should fetch the current user's data. This function has the side effect of deleting an invalid token from local storage.
- * @param {State} state The redux state
- * @returns {boolean} Return true if we should fetch the current user's data. Returns false otherwise.
+ * @param state The redux state
+ * @returns Return true if we should fetch the current user's data. Returns false otherwise.
  */
 async function shouldFetchCurrentUser(state: State): Promise<boolean> {
 	// If we are currently fetching the current user, we should not fetch the data again.

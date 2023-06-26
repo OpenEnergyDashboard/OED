@@ -13,7 +13,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * Component used to select the desired map
- * @returns {Element} Map Chart element
+ * @returns Map Chart element
  */
 export default function MapChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {

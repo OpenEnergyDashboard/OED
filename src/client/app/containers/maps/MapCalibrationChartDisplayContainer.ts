@@ -12,8 +12,6 @@ import store from '../../index';
 import { CalibrationSettings } from '../../types/redux/map';
 import Locales from '../../types/locales'
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 function mapStateToProps(state: State) {
 	const x: number[] = [];
 	const y: number[] = [];
@@ -101,12 +99,11 @@ function mapStateToProps(state: State) {
 	return props;
 }
 
-/* eslint-enable */
 /**
  * use a transparent heatmap to capture which point the user clicked on the map
- * @param {Dimensions} imageDimensions Normalized dimensions of the image
- * @param {CalibrationSettings} settings Settings for calibration displays
- * @returns {object} point and data
+ * @param imageDimensions Normalized dimensions of the image
+ * @param settings Settings for calibration displays
+ * @returns point and data
  */
 function createBackgroundTrace(imageDimensions: Dimensions, settings: CalibrationSettings) {
 	// define the grid of heatmap
@@ -142,8 +139,6 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	};
 	return trace;
 }
-
-/* eslint-disable jsdoc/require-jsdoc */
 
 function handlePointClick(event: plotly.PlotMouseEvent) {
 	event.event.preventDefault();

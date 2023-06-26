@@ -18,7 +18,7 @@ import SpinnerComponent from '../../components/SpinnerComponent';
 
 /**
  * Defines the units page card view
- * @returns {Element} Units page element
+ * @returns Units page element
  */
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.

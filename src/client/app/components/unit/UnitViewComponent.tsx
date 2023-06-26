@@ -18,8 +18,8 @@ interface UnitViewComponentProps {
 
 /**
  * Defines the unit info card
- * @param {UnitViewComponentProps} props variables passed in to define
- * @returns {Element} JSX Element
+ * @param props variables passed in to define
+ * @returns Unit info card element
  */
 export default function UnitViewComponent(props: UnitViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.

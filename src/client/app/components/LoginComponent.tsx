@@ -37,7 +37,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	}
 
 	/**
-	 * @returns {Element} JSX to create the login panel
+	 * @returns JSX to create the login panel
 	 */
 	public render() {
 		const formStyle = {
@@ -89,8 +89,6 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 			</div>
 		);
 	}
-
-	/* eslint-disable jsdoc/require-param-type */
 
 	/**
 	 * Sets the email state whenever the user changes the email input field

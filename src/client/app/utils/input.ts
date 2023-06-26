@@ -13,7 +13,7 @@ import * as _ from 'lodash';
 // Use a function so can easily change how it works.
 /**
  * Causes a window popup with msg
- * @param {string} msg message to display
+ * @param msg message to display
  */
 export function notifyUser(msg: string) {
 	window.alert(msg);
@@ -21,8 +21,8 @@ export function notifyUser(msg: string) {
 
 /**
  * get string value from GPSPoint or null.
- * @param {GPSPoint | null} gps GPS point to get value from and can be null
- * @returns {string} to represent the GPS value or empty string if null
+ * @param gps GPS point to get value from and can be null
+ * @returns to represent the GPS value or empty string if null
  */
 export function getGPSString(gps: GPSPoint | null) {
 	if (gps === null) {
@@ -45,8 +45,8 @@ export function getGPSString(gps: GPSPoint | null) {
  * Checks if the input is null and returns empty string if that is the case. Otherwise return input.
  * This is needed because React does not want values to be of type null for display and null is the
  * state for some of DB values. This only should change what is displayed and not the state or props.
- * @param {*} item item to check if null and convert to empty string
- * @returns {string} item if not null or empty string
+ * @param item item to check if null and convert to empty string
+ * @returns item if not null or empty string
  */
 export function nullToEmptyString(item: any) {
 	if (item === null) {
@@ -59,8 +59,8 @@ export function nullToEmptyString(item: any) {
 /**
  * Calculates the set of all possible graphic units for a meter/group.
  * This is any unit that is of type unit or suffix.
- * @param {UnitDataById} units candidate graphic units
- * @returns {Set<UnitData>} The set of all possible graphic units for a meter/group
+ * @param units candidate graphic units
+ * @returns The set of all possible graphic units for a meter/group
  */
 export function potentialGraphicUnits(units: UnitDataById) {
 	// Set of possible graphic units
@@ -97,7 +97,7 @@ export const NoUnit: UnitData = {
 
 /**
  * The enum is fine if don't want translation but this is dynamic so translation works.
- * @returns {UnitData} a unit to represent no unit with translated identifier
+ * @returns a unit to represent no unit with translated identifier
  */
 export function noUnitTranslated(): UnitData {
 	// Untranslated no unit.

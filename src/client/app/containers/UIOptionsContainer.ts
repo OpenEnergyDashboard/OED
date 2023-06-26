@@ -16,8 +16,6 @@ import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 function mapStateToProps(state: State) {
 	return {
 		chartToRender: state.graph.chartToRender,

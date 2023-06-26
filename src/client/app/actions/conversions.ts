@@ -9,10 +9,6 @@ import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
-/* eslint-disable jsdoc/require-jsdoc */
-/* eslint-disable jsdoc/require-param */
-/* eslint-disable jsdoc/require-returns */
-
 export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
 	return { type: ActionType.RequestConversionsDetails };
 }
@@ -45,6 +41,7 @@ export function changeDisplayedConversions(conversions: number[]): t.ChangeDispl
 
 /**
  * Pushes ConversionData onto submitting conversions state array
+ * @param conversionData data to push
  */
 export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
 	return { type: ActionType.SubmitEditedConversion, conversionData};
@@ -56,6 +53,7 @@ export function confirmConversionEdits(editedConversion: t.ConversionData): t.Co
 
 /**
  * Removes ConversionData from submitting state array
+ * @param conversionData data to remove
  */
 export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
 	return {type: ActionType.DeleteSubmittedConversion, conversionData}
@@ -67,6 +65,7 @@ export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnce
 
 /**
  * Removes the passed ConversionData from the store
+ * @param conversionData data to remove
  */
 export function confirmDeletedConversion(conversionData: t.ConversionData): t.DeleteConversionAction {
 	return { type: ActionType.DeleteConversion, conversionData }

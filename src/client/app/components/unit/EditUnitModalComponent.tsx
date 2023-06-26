@@ -29,8 +29,8 @@ interface EditUnitModalComponentProps {
 
 /**
  * Defines the edit unit modal form
- * @param {object} props props for component
- * @returns {Element} Meter edit menu element
+ * @param props props for component
+ * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const dispatch = useDispatch();

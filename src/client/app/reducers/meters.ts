@@ -14,8 +14,6 @@ const defaultState: MetersState = {
 	submitting: []
 };
 
-/* eslint-disable jsdoc/require-jsdoc */
-
 export default function meters(state = defaultState, action: MetersAction) {
 	switch (action.type) {
 		case ActionType.ConfirmMetersFetchedOnce: {
