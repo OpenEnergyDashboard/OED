@@ -8,7 +8,8 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
+	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -25,7 +26,7 @@ import {
 import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
-import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface CreateGroupModalComponentProps {
@@ -293,7 +294,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				<FormattedMessage id="create.group" />
 			</Button>
 
-			<Modal isOpen={showModal} toggle={handleClose}>
+			<Modal isOpen={showModal} toggle={handleClose} size='lg' >
 				<ModalHeader>
 					<FormattedMessage id="create.group" />
 					<TooltipHelpContainer page='groups-create' />
@@ -302,107 +303,111 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</div>
 				</ModalHeader>
 				{/* when any of the group properties are changed call one of the functions. */}
-				<ModalBody style={tableStyle}>
-					{/* Name input */}
-					<FormGroup>
-						<Label for='name'>{translate('group.name')}</Label>
-						<Input
-							id='name'
-							name='name'
-							type='text'
-							autoComplete='on'
-							onChange={e => handleStringChange(e)}
-							required value={state.name}
-							invalid={state.name === ''}/>
-						<FormFeedback>
-							<FormattedMessage id="error.required" />
-						</FormFeedback>
-					</FormGroup>
-					{/* default graphic unit input */}
-					<FormGroup>
-						<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
-						<Input
-							id="defaultGraphicUnit"
-							name='defaultGraphicUnit'
-							type='select'
-							value={state.defaultGraphicUnit}
-							onChange={e => handleNumberChange(e)}>
-							{/* First list the selectable ones and then the rest as disabled. */}
-							{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-								return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-							})}
-							{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-								return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-							})}
-						</Input>
-					</FormGroup>
-					{/* Displayable input */}
-					<FormGroup>
-						<Label for='displayable'>{translate('group.displayable')}</Label>
-						<Input
-							id='displayable'
-							name='displayable'
-							type='select'
-							value={state.displayable.toString()}
-							onChange={e => handleBooleanChange(e)}>
-							{Object.keys(TrueFalseType).map(key => {
-								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-							})}
-						</Input>
-					</FormGroup>
-					{/* Area input */}
-					<FormGroup>
-						<Label for='area'>{translate('group.area')}</Label>
-						<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
-						<InputGroup>
+				<ModalBody><Container>
+					<Row xs='1' lg='2'>
+						{/* Name input */}
+						<Col><FormGroup>
+							<Label for='name'>{translate('group.name')}</Label>
 							<Input
-								id='area'
-								name="area"
-								type="number"
-								min="0"
-								// cannot use defaultValue because it won't update when area is auto calculated
-								// this makes the validation redundant but still a good idea
-								value={state.area}
-								onChange={e => handleNumberChange(e)}
-								invalid={state.area < 0}/>
-							{/* Calculate sum of meter areas */}
-							<Button color='secondary' onClick={handleAutoCalculateArea}>
-								<FormattedMessage id="group.area.calculate" />
-							</Button>
+								id='name'
+								name='name'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								required value={state.name}
+								invalid={state.name === ''} />
 							<FormFeedback>
-								<FormattedMessage id="error.negative" />
+								<FormattedMessage id="error.required" />
 							</FormFeedback>
-						</InputGroup>
-					</FormGroup>
-					{/* meter area unit input */}
-					<FormGroup>
-						<Label for='areaUnit'>{translate('group.area.unit')}</Label>
-						<Input
-							id="areaUnit"
-							name='areaUnit'
-							type='select'
-							value={state.areaUnit}
-							onChange={e => handleStringChange(e)}
-							invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
-							{Object.keys(AreaUnitType).map(key => {
-								return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
-							})}
-						</Input>
-						<FormFeedback>
-							<FormattedMessage id="area.but.no.unit" />
-						</FormFeedback>
-					</FormGroup>
-					{/* GPS input */}
-					<FormGroup>
-						<Label for='gps'>{translate('group.gps')}</Label>
-						<Input
-							id='gps'
-							name='gps'
-							type='text'
-							autoComplete='on'
-							onChange={e => handleStringChange(e)}
-							value={getGPSString(state.gps)} />
-					</FormGroup>
+						</FormGroup></Col>
+						{/* default graphic unit input */}
+						<Col><FormGroup>
+							<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+							<Input
+								id="defaultGraphicUnit"
+								name='defaultGraphicUnit'
+								type='select'
+								value={state.defaultGraphicUnit}
+								onChange={e => handleNumberChange(e)}>
+								{/* First list the selectable ones and then the rest as disabled. */}
+								{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+								})}
+								{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+					</Row><Row xs='1' lg='2'>
+						{/* Displayable input */}
+						<Col><FormGroup>
+							<Label for='displayable'>{translate('group.displayable')}</Label>
+							<Input
+								id='displayable'
+								name='displayable'
+								type='select'
+								value={state.displayable.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+						{/* GPS input */}
+						<Col><FormGroup>
+							<Label for='gps'>{translate('group.gps')}</Label>
+							<Input
+								id='gps'
+								name='gps'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								value={getGPSString(state.gps)} />
+						</FormGroup></Col>
+					</Row><Row xs='1' lg='2'>
+						{/* Area input */}
+						<Col><FormGroup>
+							<Label for='area'>{translate('group.area')}</Label>
+							<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
+							<InputGroup>
+								<Input
+									id='area'
+									name="area"
+									type="number"
+									min="0"
+									// cannot use defaultValue because it won't update when area is auto calculated
+									// this makes the validation redundant but still a good idea
+									value={state.area}
+									onChange={e => handleNumberChange(e)}
+									invalid={state.area < 0} />
+								{/* Calculate sum of meter areas */}
+								<Button color='secondary' onClick={handleAutoCalculateArea}>
+									<FormattedMessage id="group.area.calculate" />
+								</Button>
+								<FormFeedback>
+									<FormattedMessage id="error.negative" />
+								</FormFeedback>
+							</InputGroup>
+						</FormGroup></Col>
+						{/* meter area unit input */}
+						<Col><FormGroup>
+							<Label for='areaUnit'>{translate('group.area.unit')}</Label>
+							<Input
+								id="areaUnit"
+								name='areaUnit'
+								type='select'
+								value={state.areaUnit}
+								onChange={e => handleStringChange(e)}
+								invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
+								{Object.keys(AreaUnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+								})}
+							</Input>
+							<FormFeedback>
+								<FormattedMessage id="area.but.no.unit" />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
 					{/* Note input */}
 					<FormGroup>
 						<Label for='note'>{translate('group.note')}</Label>
@@ -491,7 +496,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						<b><FormattedMessage id='group.all.meters' /></b>:
 						<ListDisplayComponent items={deepMetersToList()} />
 					</FormGroup>
-				</ModalBody>
+				</Container></ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>

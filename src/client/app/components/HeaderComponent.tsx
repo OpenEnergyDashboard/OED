@@ -41,10 +41,10 @@ export default function HeaderComponent() {
 				<div className='d-none d-xl-block col-4 text-center'>
 					<h1 style={largeTitleStyle}>{siteTitle}</h1>
 				</div>
-				<div className='d-xl-none d-none d-lg-block col-4 text-center'>
+				<div className='d-xl-none d-none d-sm-block col-4 text-center'>
 					<h3 style={largeTitleStyle}>{siteTitle}</h3>
 				</div>
-				<div className='d-lg-none col-4 text-center'>
+				<div className='d-sm-none col-4 text-center'>
 					<h6 style={smallTitleStyle}>{siteTitle}</h6>
 				</div>
 				{/* Render menuModal regardless of settings if on a smaller screen */}

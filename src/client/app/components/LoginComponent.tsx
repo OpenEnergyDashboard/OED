@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 import { browserHistory } from '../utils/history';
-import { injectIntl, defineMessages, FormattedMessage, WrappedComponentProps } from 'react-intl';
-import { Input, Button, InputGroup, Form } from 'reactstrap';
+import { injectIntl, FormattedMessage, WrappedComponentProps } from 'react-intl';
+import { Input, Button, Form, Label, FormGroup } from 'reactstrap';
 import FooterContainer from '../containers/FooterContainer';
 import { showErrorNotification } from '../utils/notifications';
 import { verificationApi } from '../utils/api';
@@ -45,39 +45,34 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 			margin: 'auto',
 			width: '50%'
 		};
-		const buttonStyle = {
-			marginTop: '10px'
-		};
-
-		const messages = defineMessages({
-			email: { id: 'email' },
-			password: { id: 'password' }
-		});
 
 		return (
 			<div>
 				<HeaderComponent />
 				<Form style={formStyle}>
-					<InputGroup>
+					<FormGroup>
+						<Label for='email'>{translate('email')}</Label>
 						<Input
+							id='email'
 							type='text'
-							placeholder={this.props.intl.formatMessage(messages.email)}
+							autoComplete='email'
 							innerRef={c => { this.inputEmail = c; }}
 							value={this.state.email}
 							onChange={this.handleEmailChange}
 						/>
-					</InputGroup>
-					<InputGroup>
+					</FormGroup>
+					<FormGroup>
+						<Label for='password'>{translate('password')}</Label>
 						<Input
+							id='password'
 							type='password'
-							placeholder={this.props.intl.formatMessage(messages.password)}
+							autoComplete='current-password'
 							value={this.state.password}
 							onChange={this.handlePasswordChange}
 						/>
-					</InputGroup>
+					</FormGroup>
 					<Button
 						outline
-						style={buttonStyle}
 						type='submit'
 						onClick={this.handleSubmit}
 						disabled={this.state.email.length === 0 || this.state.password.length === 0}

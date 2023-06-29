@@ -10,7 +10,8 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
+	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -33,7 +34,7 @@ import { GroupDefinition } from '../../types/redux/groups';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
-import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 
 interface EditGroupModalComponentProps {
@@ -398,7 +399,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				actionFunction={handleDeleteGroup}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal isOpen={props.show} toggle={props.handleClose}>
+			<Modal isOpen={props.show} toggle={props.handleClose} size={loggedInAsAdmin ? 'lg' : 'md'}>
 				{/* In a number of the items that follow, what is shown varies on whether you are an admin. */}
 				<ModalHeader>
 					<FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
@@ -407,110 +408,150 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						<TooltipMarkerComponent page='groups-edit' helpTextId={tooltipStyle.tooltipEditGroupView} />
 					</div>
 				</ModalHeader>
-				<ModalBody style={tableStyle}>
-					{/* Name input, disabled if not admin */}
-					<FormGroup>
-						<Label for='name'>{translate('group.name')}</Label>
-						<Input
-							id='name'
-							name='name'
-							type='text'
-							autoComplete='on'
-							onChange={e => handleStringChange(e)}
-							required value={groupState.name}
-							disabled={!loggedInAsAdmin}
-							invalid={groupState.name === ''}/>
-						<FormFeedback>
-							<FormattedMessage id="error.required" />
-						</FormFeedback>
-					</FormGroup>
-					{/* default graphic unit input, disabled if not admin */}
-					<FormGroup>
-						<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
-						<Input
-							id="defaultGraphicUnit"
-							name='defaultGraphicUnit'
-							type='select'
-							value={groupState.defaultGraphicUnit}
-							onChange={e => handleNumberChange(e)}
-							disabled={!loggedInAsAdmin}>
-							{/* First list the selectable ones and then the rest as disabled. */}
-							{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-								return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
-							})}
-							{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-								return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
-							})}
-						</Input>
-					</FormGroup>
-					{loggedInAsAdmin && <>
-						{/* Displayable input, only for admin. */}
-						<FormGroup>
-							<Label for='displayable'>{translate('group.displayable')}</Label>
-							<Input
-								id='displayable'
-								name='displayable'
-								type='select'
-								value={groupState.displayable.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-								})}
-							</Input>
-						</FormGroup>
-						{/* Area input, only for admin. */}
-						<FormGroup>
-							<Label for='area'>{translate('group.area')}</Label>
-							<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
-							<InputGroup>
+				<ModalBody><Container>
+					{loggedInAsAdmin ?
+						<Row xs='1' lg='2'>
+							{/* Name input for admin*/}
+							<Col><FormGroup>
+								<Label for='name'>{translate('group.name')}</Label>
 								<Input
-									id='area'
-									name="area"
-									type="number"
-									min="0"
-									// cannot use defaultValue because it won't update when area is auto calculated
-									// this makes the validation redundant but still a good idea
-									value={groupState.area}
-									onChange={e => handleNumberChange(e)}
-									invalid={groupState.area < 0} />
-								{/* Calculate sum of meter areas */}
-								<Button color='secondary' onClick={handleAutoCalculateArea}>
-									<FormattedMessage id="group.area.calculate" />
-								</Button>
+									id='name'
+									name='name'
+									type='text'
+									autoComplete='on'
+									onChange={e => handleStringChange(e)}
+									required value={groupState.name}
+									invalid={groupState.name === ''}/>
 								<FormFeedback>
-									<FormattedMessage id="error.negative" />
+									<FormattedMessage id="error.required" />
 								</FormFeedback>
-							</InputGroup>
-						</FormGroup>
-						{/* meter area unit input */}
-						<FormGroup>
-							<Label for='areaUnit'>{translate('group.area.unit')}</Label>
-							<Input
-								id="areaUnit"
-								name='areaUnit'
-								type='select'
-								value={groupState.areaUnit}
-								onChange={e => handleStringChange(e)}
-								invalid={groupState.area > 0 && groupState.areaUnit === AreaUnitType.none}>
-								{Object.keys(AreaUnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
-								})}
-							</Input>
-							<FormFeedback>
-								<FormattedMessage id="area.but.no.unit" />
-							</FormFeedback>
-						</FormGroup>
-						{/* GPS input, only for admin. */}
-						<FormGroup>
-							<Label for='gps'>{translate('group.gps')}</Label>
-							<Input
-								id='gps'
-								name='gps'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								value={getGPSString(groupState.gps)} />
-						</FormGroup>
+							</FormGroup></Col>
+							{/* default graphic unit input for admin */}
+							<Col><FormGroup>
+								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Input
+									id="defaultGraphicUnit"
+									name='defaultGraphicUnit'
+									type='select'
+									value={groupState.defaultGraphicUnit}
+									onChange={e => handleNumberChange(e)}>
+									{/* First list the selectable ones and then the rest as disabled. */}
+									{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
+										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									})}
+									{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
+										return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									})}
+								</Input>
+							</FormGroup></Col>
+						</Row>
+						: <>
+							{/* Name display for non-admin */}
+							<FormGroup>
+								<Label for='name'>{translate('group.name')}</Label>
+								<Input
+									id='name'
+									name='name'
+									type='text'
+									autoComplete='on'
+									value={groupState.name}
+									disabled/>
+							</FormGroup>
+							{/* default graphic unit display for non-admin */}
+							<FormGroup>
+								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Input
+									id="defaultGraphicUnit"
+									name='defaultGraphicUnit'
+									type='select'
+									value={groupState.defaultGraphicUnit}
+									disabled>
+									{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
+										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									})}
+								</Input>
+							</FormGroup>
+						</>}
+					{loggedInAsAdmin && <>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Displayable input, only for admin. */}
+								<FormGroup>
+									<Label for='displayable'>{translate('group.displayable')}</Label>
+									<Input
+										id='displayable'
+										name='displayable'
+										type='select'
+										value={groupState.displayable.toString()}
+										onChange={e => handleBooleanChange(e)}>
+										{Object.keys(TrueFalseType).map(key => {
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+										})}
+									</Input>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* GPS input, only for admin. */}
+								<FormGroup>
+									<Label for='gps'>{translate('group.gps')}</Label>
+									<Input
+										id='gps'
+										name='gps'
+										type='text'
+										autoComplete='on'
+										onChange={e => handleStringChange(e)}
+										value={getGPSString(groupState.gps)} />
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Area input, only for admin. */}
+								<FormGroup>
+									<Label for='area'>{translate('group.area')}</Label>
+									<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
+									<InputGroup>
+										<Input
+											id='area'
+											name="area"
+											type="number"
+											min="0"
+											// cannot use defaultValue because it won't update when area is auto calculated
+											// this makes the validation redundant but still a good idea
+											value={groupState.area}
+											onChange={e => handleNumberChange(e)}
+											invalid={groupState.area < 0} />
+										{/* Calculate sum of meter areas */}
+										<Button color='secondary' onClick={handleAutoCalculateArea}>
+											<FormattedMessage id="group.area.calculate" />
+										</Button>
+										<FormFeedback>
+											<FormattedMessage id="error.negative" />
+										</FormFeedback>
+									</InputGroup>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* meter area unit input */}
+								<FormGroup>
+									<Label for='areaUnit'>{translate('group.area.unit')}</Label>
+									<Input
+										id="areaUnit"
+										name='areaUnit'
+										type='select'
+										value={groupState.areaUnit}
+										onChange={e => handleStringChange(e)}
+										invalid={groupState.area > 0 && groupState.areaUnit === AreaUnitType.none}>
+										{Object.keys(AreaUnitType).map(key => {
+											return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="area.but.no.unit" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
 						{/* Note input, only for admin. */}
 						<FormGroup>
 							<Label for='note'>{translate('group.note')}</Label>
@@ -620,7 +661,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					{/* All (deep) meters in this group */}
 					<FormattedMessage id='group.all.meters' />:
 					<ListDisplayComponent items={deepMetersToList()} />
-				</ModalBody>
+				</Container></ModalBody>
 				<ModalFooter>
 					{/* Delete, discard & save buttons if admin and close button if not. */}
 					{loggedInAsAdmin ?

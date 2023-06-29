@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { Button, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
@@ -18,7 +18,7 @@ import { ConversionData } from 'types/redux/conversions';
 import { UnitType } from '../../types/redux/units';
 import { notifyUser } from '../../utils/input'
 import * as _ from 'lodash';
-import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -184,7 +184,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				<FormattedMessage id="create.conversion" />
 			</Button>
 
-			<Modal isOpen={showModal} toggle={handleClose}>
+			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.conversion" />
 					<TooltipHelpContainer page='conversions-create' />
@@ -193,101 +193,119 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 					</div>
 				</ModalHeader>
 				{/* when any of the conversion are changed call one of the functions. */}
-				<ModalBody style={tableStyle}>
-					{/* Source unit input*/}
-					<FormGroup>
-						<Label for='sourceId'>{translate('conversion.source')}</Label>
-						<Input
-							id='sourceId'
-							name='sourceId'
-							type='select'
-							defaultValue={-999}
-							onChange={e => handleNumberChange(e)}
-							invalid={state.sourceId === -999}>
-							{<option
-								value={-999}
-								key={-999}
-								hidden={state.sourceId !== -999}
-								disabled>
-								{translate('conversion.select.source') + '...'}
-							</option>}
-							{Object.values(unitsSorted).map(unitData => {
-								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-							})}
-						</Input>
-						<FormFeedback>
-							<FormattedMessage id="error.required" />
-						</FormFeedback>
-					</FormGroup>
-					{/* Destination unit input*/}
-					<FormGroup>
-						<Label for='destinationId'>{translate('conversion.destination')}</Label>
-						<Input
-							id='destinationId'
-							name='destinationId'
-							type='select'
-							defaultValue={-999}
-							onChange={e => handleNumberChange(e)}
-							invalid={state.destinationId === -999}>
-							{<option
-								value={-999}
-								key={-999}
-								hidden={state.destinationId !== -999}
-								disabled>
-								{translate('conversion.select.destination') + '...'}
-							</option>}
-							{Object.values(unitsSorted).map(unitData => {
-								return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-							})}
-						</Input>
-						<FormFeedback>
-							<FormattedMessage id="error.required" />
-						</FormFeedback>
-					</FormGroup>
-					{/* Bidirectional Y/N input*/}
-					<FormGroup>
-						<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
-						<Input
-							id='bidirectional'
-							name='bidirectional'
-							type='select'
-							onChange={e => handleBooleanChange(e)}>
-							{Object.keys(TrueFalseType).map(key => {
-								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-							})}
-						</Input>
-					</FormGroup>
-					{/* Slope input*/}
-					<FormGroup>
-						<Label for='slope'>{translate('conversion.slope')}</Label>
-						<Input
-							id='slope'
-							name='slope'
-							type='number'
-							defaultValue={state.slope}
-							onChange={e => handleNumberChange(e)}
-						/>
-					</FormGroup>
-					{/* Intercept input*/}
-					<FormGroup>
-						<Label for='intercept'>{translate('conversion.intercept')}</Label>
-						<Input
-							id='intercept'
-							name='intercept'
-							type='number'
-							onChange={e => handleNumberChange(e)}
-							required value={state.intercept} />
-					</FormGroup>
-					{/* Note input*/}
-					<FormGroup>
-						<Label for='note'>{translate('conversion.note')}</Label>
-						<Input
-							id='note'
-							name='note'
-							type='textarea'
-							onChange={e => handleStringChange(e)}
-							value={state.note} />
-					</FormGroup>
+				<ModalBody>
+					<Container>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Source unit input*/}
+								<FormGroup>
+									<Label for='sourceId'>{translate('conversion.source')}</Label>
+									<Input
+										id='sourceId'
+										name='sourceId'
+										type='select'
+										defaultValue={-999}
+										onChange={e => handleNumberChange(e)}
+										invalid={state.sourceId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={state.sourceId !== -999}
+											disabled>
+											{translate('conversion.select.source') + '...'}
+										</option>}
+										{Object.values(unitsSorted).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Destination unit input*/}
+								<FormGroup>
+									<Label for='destinationId'>{translate('conversion.destination')}</Label>
+									<Input
+										id='destinationId'
+										name='destinationId'
+										type='select'
+										defaultValue={-999}
+										onChange={e => handleNumberChange(e)}
+										invalid={state.destinationId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={state.destinationId !== -999}
+											disabled>
+											{translate('conversion.select.destination') + '...'}
+										</option>}
+										{Object.values(unitsSorted).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+
+
+						{/* Bidirectional Y/N input*/}
+						<FormGroup>
+							<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
+							<Input
+								id='bidirectional'
+								name='bidirectional'
+								type='select'
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Slope input*/}
+								<FormGroup>
+									<Label for='slope'>{translate('conversion.slope')}</Label>
+									<Input
+										id='slope'
+										name='slope'
+										type='number'
+										defaultValue={state.slope}
+										onChange={e => handleNumberChange(e)}
+									/>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Intercept input*/}
+								<FormGroup>
+									<Label for='intercept'>{translate('conversion.intercept')}</Label>
+									<Input
+										id='intercept'
+										name='intercept'
+										type='number'
+										onChange={e => handleNumberChange(e)}
+										required value={state.intercept} />
+								</FormGroup>
+							</Col>
+						</Row>
+
+
+						{/* Note input*/}
+						<FormGroup>
+							<Label for='note'>{translate('conversion.note')}</Label>
+							<Input
+								id='note'
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={state.note} />
+						</FormGroup>
+					</Container>
 				</ModalBody>
 				<ModalFooter>
 					{/* Hides the modal */}

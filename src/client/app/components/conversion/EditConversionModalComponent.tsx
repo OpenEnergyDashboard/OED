@@ -5,7 +5,7 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Button, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -17,7 +17,7 @@ import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
-import { tableStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -151,74 +151,88 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 				</ModalHeader>
 				{/* when any of the conversion are changed call one of the functions. */}
-				<ModalBody style={tableStyle}>
-					{/* Source unit - display only */}
-					<FormGroup>
-						<Label for='sourceId'>{translate('conversion.source')}</Label>
-						<Input
-							id='sourceId'
-							name='sourceId'
-							type='text'
-							defaultValue={props.unitsState[state.sourceId].identifier}
-							// Disable input to prevent changing ID value
-							disabled>
-						</Input>
-					</FormGroup>
-					{/* Destination unit - display only */}
-					<FormGroup>
-						<Label for='destinationId'>{translate('conversion.destination')}</Label>
-						<Input
-							id='destinationId'
-							name='destinationId'
-							type='text'
-							defaultValue={props.unitsState[state.destinationId].identifier}
-							// Disable input to prevent changing ID value
-							disabled>
-						</Input>
-					</FormGroup>
-					{/* Bidirectional Y/N input */}
-					<FormGroup>
-						<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
-						<Input
-							id='bidirectional'
-							name='bidirectional'
-							type='select'
-							defaultValue={state.bidirectional.toString()}
-							onChange={e => handleBooleanChange(e)}>
-							{Object.keys(TrueFalseType).map(key => {
-								return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-							})}
-						</Input>
-					</FormGroup>
-					{/* Slope input */}
-					<FormGroup>
-						<Label for='slope'>{translate('conversion.slope')}</Label>
-						<Input
-							id='slope'
-							type="number"
-							defaultValue={state.slope}
-							onChange={e => handleNumberChange(e)} />
-					</FormGroup>
-					{/* Intercept input */}
-					<FormGroup>
-						<Label for='intercept'>{translate('conversion.intercept')}</Label>
-						<Input
-							id='intercept'
-							name="intercept"
-							type="number"
-							defaultValue={state.intercept}
-							onChange={e => handleNumberChange(e)} />
-					</FormGroup>
-					{/* Note input */}
-					<FormGroup>
-						<Label for='note'>{translate('conversion.note')}</Label>
-						<Input
-							id='note'
-							type="textarea"
-							defaultValue={state.note}
-							placeholder="Note"
-							onChange={e => handleStringChange(e)} />
-					</FormGroup>
+				<ModalBody>
+					<Container>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Source unit - display only */}
+								<FormGroup>
+									<Label for='sourceId'>{translate('conversion.source')}</Label>
+									<Input
+										id='sourceId'
+										name='sourceId'
+										type='text'
+										defaultValue={props.unitsState[state.sourceId].identifier}
+										// Disable input to prevent changing ID value
+										disabled>
+									</Input>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Destination unit - display only */}
+								<FormGroup>
+									<Label for='destinationId'>{translate('conversion.destination')}</Label>
+									<Input
+										id='destinationId'
+										name='destinationId'
+										type='text'
+										defaultValue={props.unitsState[state.destinationId].identifier}
+										// Disable input to prevent changing ID value
+										disabled>
+									</Input>
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Bidirectional Y/N input */}
+						<FormGroup>
+							<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
+							<Input
+								id='bidirectional'
+								name='bidirectional'
+								type='select'
+								defaultValue={state.bidirectional.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Slope input */}
+								<FormGroup>
+									<Label for='slope'>{translate('conversion.slope')}</Label>
+									<Input
+										id='slope'
+										type="number"
+										defaultValue={state.slope}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Intercept input */}
+								<FormGroup>
+									<Label for='intercept'>{translate('conversion.intercept')}</Label>
+									<Input
+										id='intercept'
+										name="intercept"
+										type="number"
+										defaultValue={state.intercept}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Note input */}
+						<FormGroup>
+							<Label for='note'>{translate('conversion.note')}</Label>
+							<Input
+								id='note'
+								type="textarea"
+								defaultValue={state.note}
+								placeholder="Note"
+								onChange={e => handleStringChange(e)} />
+						</FormGroup>
+					</Container>
 				</ModalBody>
 				<ModalFooter>
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen}>
