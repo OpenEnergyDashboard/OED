@@ -236,7 +236,7 @@ async function insertWebsiteData() {
 			displayable: true,
 			readingFrequency: '00:20:00',
 			gps: undefined,
-			note:  undefined,
+			note: undefined,
 			file: 'data/webData/LibraryTemperature.csv',
 			deleteFile: false,
 			id: 10021
@@ -334,7 +334,7 @@ async function insertWebsiteData() {
 			displayable: true,
 			readingFrequency: '7 days',
 			gps: undefined,
-			note:  undefined,
+			note: undefined,
 			file: 'data/webData/CampusRecycling.csv',
 			deleteFile: false,
 			id: 10026
@@ -351,7 +351,7 @@ async function insertWebsiteData() {
 		['Theater Energy', 'kWh', true, ' -87.9975, 40.0027', 'Theater Electric and Gas', ['Theater Electric', 'Theater Gas'], [], 10014],
 		['Theater All', 'short ton of CO₂', true, ' -87.9975, 40.0027', 'Theater All', [], ['Theater Energy'], 10015],
 		['Dining & Theater Electric Power', 'kW', true, undefined, 'Dining & Theater Electric Power', ['Dining Hall Electric Power', 'Theater Electric Power'], [], 10016],
-		['Library Electric', 'kWh', true, '-87.99916, 40.00419', 'Library Electric', ['Library Electric'], [], 10017],
+		['Library Energy', 'kWh', true, '-87.99916, 40.00419', 'Library Electric', ['Library Electric'], [], 10017],
 		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric
 		[compareGroups[0], 'kWh', true, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareMeters[3], compareMeters[4]], [], 10018],
 		[compareName(compareGroups[0]), 'kWh', false, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareName(compareMeters[3]), compareName(compareMeters[4])], [], compareId(10018)],
@@ -398,22 +398,24 @@ async function insertWebsiteData() {
 	const conversions = [
 		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
-		['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → kg CO₂'],
+		['Electric_Utility', 'kg CO₂', false, 1.9, 0, 'Electric_Utility → kg CO₂'],
 		['Electric_Solar', 'kWh', false, 1, 0, 'Electric_Solar → kWh'],
 		['Electric_Solar', 'US dollar', false, 0.7, 0, 'Electric_Solar → US dollar'],
 		['Electric_Solar', 'kg CO₂', false, 0, 0, 'Electric_Solar → kg CO₂ (zero value)'],
 		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
-		['Natural_Gas_BTU', 'US dollar', false, 2.29e-6, 0, 'Natural_Gas_BTU → US dollar'],
-		['Natural_Gas_BTU', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → kg CO₂'],
+		['Natural_Gas_BTU', 'US dollar', false, 6.75e-6, 0, 'Natural_Gas_BTU → US dollar'],
+		['Natural_Gas_BTU', 'kg CO₂', false, 5.29e-5, 0, 'Natural_Gas_BTU → kg CO₂'],
 		['Natural_Gas_M3', 'm³ gas', false, 1, 0, 'Natural_Gas_M3 → m^3 gas'],
-		['Natural_Gas_M3', 'US dollar', false, 0.11, 0, 'Natural_Gas_M3 → US dollar'],
-		['Natural_Gas_M3', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → kg CO₂'],
+		['Natural_Gas_M3', 'US dollar', false, 0.25, 0, 'Natural_Gas_M3 → US dollar'],
+		['Natural_Gas_M3', 'kg CO₂', false, 1.94, 0, 'Natural_Gas_M3 → kg CO₂'],
 		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
-		['Water_Gallon', 'kg CO₂', false, 1.7e-2, 0, 'Water_Gallon → kg CO₂'],  // TODO what is reasonable value for this?
-		['Water_Gallon', 'US dollar', false, 0.15, 0, 'Water_Gallon → US dollar'],
+		// Average of https://www.danfoss.com/en/about-danfoss/articles/dhs/the-carbon-footprint-of-potable-water/
+		// and https://www.brightest.io/calculate-carbon-footprint-water-emissions for water CO2.
+		['Water_Gallon', 'kg CO₂', false, 1.2e-3, 0, 'Water_Gallon → kg CO₂'],
+		['Water_Gallon', 'US dollar', false, 0.011, 0, 'Water_Gallon → US dollar'],
 		['Water_Liter', 'liter', false, 1, 0, 'Water_Liter → liter'],
-		['Water_Liter', 'kg CO₂', false, 4.25e-3, 0, 'Water_Liter → kg CO₂'],  // TODO what is reasonable value for this?
-		['Water_Liter', 'US dollar', false, 0.0397, 0, 'Water_Liter → US dollar'],
+		['Water_Liter', 'kg CO₂', false, 3.1e-4, 0, 'Water_Liter → kg CO₂'],
+		['Water_Liter', 'US dollar', false, 0.00291, 0, 'Water_Liter → US dollar'],
 		['Temperature_Fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature_Fahrenheit → Fahrenheit'],
 		['Temperature_Celsius', 'Celsius', false, 1, 0, 'Temperature_Celsius → Celsius'],
 		['Electric_kW', 'kW', false, 1, 0, 'Electric kW → kW'],
@@ -422,11 +424,9 @@ async function insertWebsiteData() {
 		['Recycling', 'kg CO₂', false, -2.89e3, 0, 'Recycling → kg CO₂'],
 		// This assumes it costs the same to recycle as trash and you want the net cost as was done for Recycle CO2.
 		['Recycling', 'US dollar', false, 0, 0, 'Recycling → US dollar'],
-		['liter', 'gallon', true, 0.2641729, 0, 'Liter → Gallon'],
-		['kg', 'pound', true, 2.2, 0, 'kg → lbs'],
-		['short ton', 'pound', true, 2000, 0, 'ton → lbs'],
+		['kg', 'pound', true, 2.2, 0, 'kg ↔ lbs'],
+		['short ton', 'pound', true, 2000, 0, 'ton ↔ lbs'],
 		['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg'],
-		['gallon', 'liter', true, 3.7854, 0, 'gallon → liter']
 	];
 
 	const conn = getConnection();
