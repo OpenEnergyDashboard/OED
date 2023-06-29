@@ -91,11 +91,11 @@ async function insertConversions(conversionsToInsert, conn) {
 async function insertStandardConversions(conn) {
 	// The table contains standard conversions' data.
 	const standardConversions = [
-		['kWh', 'BTU', true, 3412.142, 0, 'OED created kWh → BTU'],
-		['BTU', 'm³ gas', true, 9.625, 0, 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'],
-		['kg', 'metric ton', true, 1e-3, 0, 'OED created kg → Metric ton'],
-		['liter', 'gallon', true, 0.2641729, 0, 'OED created liter → gallon'],
-		['Celsius', 'Fahrenheit', true, 1.8, 32, 'OED created Celsius → Fahrenheit'],
+		['kWh', 'BTU', true, 3412.142, 0, 'OED created kWh ↔ BTU'],
+		['BTU', 'm³ gas', true, 2.73e-5, 0, 'OED created BTU ↔ m³ gas (average U.S. for 2021 according to U.S. E.I.A)'],
+		['kg', 'metric ton', true, 1e-3, 0, 'OED created kg ↔ Metric ton'],
+		['liter', 'gallon', true, 0.2641729, 0, 'OED created liter ↔ gallon'],
+		['Celsius', 'Fahrenheit', true, 1.8, 32, 'OED created Celsius ↔ Fahrenheit'],
 		['Electric_Utility', 'kWh', false, 1, 0, 'OED created  for meters Electric_Utility → kWh']
 	];
 
