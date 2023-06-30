@@ -417,7 +417,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</Input>
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* Enabled input */}
 						<Col><FormGroup>
 							<Label for='enabled'>{translate('meter.enabled')}</Label>
@@ -457,7 +457,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* Meter type input */}
 						<Col><FormGroup>
 							<Label for='meterType'>{translate('meter.type')}</Label>
@@ -489,7 +489,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* URL input */}
 						<Col><FormGroup>
 							<Label for='url'>{translate('meter.url')}</Label>
@@ -513,7 +513,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={getGPSString(state.gps)} />
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* Area input */}
 						<Col><FormGroup>
 							<Label for='area'>{translate('meter.area')}</Label>
@@ -559,7 +559,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							value={nullToEmptyString(state.note)}
 							placeholder='Note' />
 					</FormGroup>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* cumulative input */}
 						<Col><FormGroup>
 							<Label for='cumulative'>{translate('meter.cumulative')}</Label>
@@ -613,7 +613,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								placeholder="HH:MM:SS" />
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* endOnlyTime input */}
 						<Col><FormGroup>
 							<Label for='endOnlyTime'>{translate('meter.endOnlyTime')}</Label>
@@ -644,7 +644,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* readingVariation input */}
 						<Col><FormGroup>
 							<Label for='readingVariation'>{translate('meter.readingVariation')}</Label>
@@ -678,7 +678,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
-					<Row md='1'>
+					<Row xs='1' lg='2'>
 						{/* timeSort input */}
 						<Col><FormGroup>
 							<Label for='timeSort'>{translate('meter.timeSort')}</Label>
