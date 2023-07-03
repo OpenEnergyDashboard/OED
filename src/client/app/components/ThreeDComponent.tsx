@@ -1,16 +1,15 @@
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import * as moment from 'moment';
+import { readingsApi } from '../utils/api';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { useEffect, useState } from 'react';
+
 
 export default function ThreeDComponent() {
-	// Testing moment.utc()
-	console.log(moment.utc(1622505600000));
-	// Extract hour from moment in the format of e.g. 12:00 AM
-	console.log(moment.utc(1622505600000).format('h:mm A'));
-	// Extract Date from moment in the format of e.g. Jun 01, 2021
-	console.log(moment.utc(1622505600000).format('MMM DD, YYYY'));
 
-	// Data requirements
+
+	// Sample Data requirements
 	//  xData, and yData will use moment when implemented
 	const xData = ['12:00', '12:30', '13:00'];
 	const yData = ['2023-06-01', '2023-06-02', '2023-06-03'];
@@ -20,7 +19,37 @@ export default function ThreeDComponent() {
 		[7, 8, 9]
 	];
 
-	const data = [
+	// Api Testing/data requirement purposes only.
+	const [data, setData] = useState(null);
+	const unboundedInterval: TimeInterval = TimeInterval.unbounded();
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				// const response = await fetch('https://api.example.com/data');
+				// const data = await response.json();
+				const threeDReadings = await readingsApi.meterThreeDReadings(21, unboundedInterval, 1);
+				console.log(threeDReadings);
+				const updatedData = [
+					{
+						type: 'surface',
+						x: threeDReadings.xData,
+						y: threeDReadings.yData,
+						z: threeDReadings.zData,
+						hoverinfo: 'text',
+						hovertext: threeDReadings.zData.map((day, i) => day.map((hour, j) => `Date: ${threeDReadings.yData[i]}<br>Time: ${threeDReadings.xData[j]}<br>Usage: ${hour}`))
+					}
+				];
+				setData(updatedData);
+			} catch (error) {
+				console.error('Error fetching data:', error);
+			}
+		};
+		fetchData();
+	}, []); // Run the effect only once when the component mounts (For Demo Purposes)
+
+
+
+	const defaultState = [
 		{
 			type: 'surface',
 			x: xData,
@@ -38,12 +67,11 @@ export default function ThreeDComponent() {
 		scene: {
 			xaxis: {
 				title: 'Hours of Day',
-				tickformat: '%-I:%M %p'
+				nticks: 4
 			},
 			yaxis: {
 				title: 'Days of Calendar Year',
-				tickformat: '%m-%d-%Y',
-				dtick: 'D1' // displays every other month, will probably need to be calculated in the body to avoid cluttered labels,
+				nticks: 6
 			},
 			zaxis: { title: 'Resource Usage' },
 			camera: {
@@ -59,6 +87,9 @@ export default function ThreeDComponent() {
 	const config = {
 		responsive: true
 	}
-
-	return (<Plot data={data} layout={layout} config={config} />);
+	return (
+		<div>
+			<Plot data={data} layout={layout} config={config} />
+		</div>
+	);
 }

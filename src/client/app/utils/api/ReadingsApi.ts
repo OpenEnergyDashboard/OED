@@ -6,8 +6,8 @@
 
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
-import {TimeInterval} from '../../../../common/TimeInterval';
-import {BarReadings, LineReading, LineReadings} from '../../types/readings';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import { BarReadings, LineReading, LineReadings, ThreeDReading } from '../../types/readings';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -31,7 +31,7 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
@@ -50,7 +50,7 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
@@ -85,4 +85,21 @@ export default class ReadingsApi {
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
+
+	/**
+	 * Gets 3D readings for a single meter in the given time range.
+	 * @param meterID Meter to query
+	 * @param timeInterval Range of time to get readings from
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns ThreeDReadings in sorted order
+	 */
+	public async meterThreeDReadings(meterIDs: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
+		// const stringifiedIDs = meterIDs.join(',');
+
+		return await this.backend.doGetRequest<ThreeDReading>(
+			`/api/unitReadings/threed/meters/${meterIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+	}
+
 }
