@@ -45,6 +45,14 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to create the compare function
+	 * @param conn the database connection to use
+	 */
+	static createCompareReadingsFunction(conn) {
+		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
+	}
+	
+	/**
 	 * Returns a promise to create the reading_line_accuracy type.
 	 * This needs to be run before Reading.createTable().
 	 * @param conn the connection to use
