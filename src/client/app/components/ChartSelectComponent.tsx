@@ -71,6 +71,11 @@ export default function ChartSelectComponent() {
 					>
 						<FormattedMessage id='map' />
 					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD})}
+					>
+						<FormattedMessage id='3D' />
+					</DropdownItem>
 				</DropdownMenu>
 			</Dropdown>
 			<div>

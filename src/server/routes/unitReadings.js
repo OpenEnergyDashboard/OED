@@ -159,7 +159,7 @@ function formatBarReadingRow(readingRow) {
 async function meterBarReadings(meterIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterBarReadings(
-	meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
+		meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
@@ -187,11 +187,27 @@ function validateGroupBarReadingsParams(params) {
  * @param timeInterval The range of time to get readings for
  * @returns {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
  */
- async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
+async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupBarReadings(
 		groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
+}
+
+/**
+ * Gets line readings for meters for the given time range
+ * @param meterIDs The meter IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval) {
+	// TODO Determine the proper format that should be returned
+	// TODO Determine proper logic and logic placement.
+	// TODO Proper JSDOC return Values
+	const conn = getConnection();
+	const rawReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	return rawReadings;
 }
 
 function createRouter() {
@@ -244,6 +260,20 @@ function createRouter() {
 			const forJson = await groupBarReadings(groupIDs, graphicUnitID, barWidthDays, timeInterval);
 			res.json(forJson);
 		}
+	});
+
+	router.get('/threed/meters/:meter_ids', async (req, res) => {
+
+		// TODO Determine valid params and query params
+		// TODO Validate params & query params
+		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
+		// }
+
+		const meterID = req.params.meter_ids;
+		const graphicUnitID = req.query.graphicUnitId;
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval);
+		res.json(forJson);
 	});
 
 	return router;
