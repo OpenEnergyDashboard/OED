@@ -33,6 +33,11 @@ interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
 }
 
+/**
+ * Defines the create group modal form
+ * @param props pass in graphic units
+ * @returns Group create element
+ */
 export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
 	const dispatch = useDispatch();
 
@@ -513,7 +518,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	/**
 	 * Converts the child meters of this group to options for menu sorted by identifier
-	 * @returns sorted SelectOption for child meters of group creating.
+	 * @returns SelectOptions sorted for child meters of group creating.
 	 */
 	function metersToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.
@@ -532,7 +537,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	/**
 	 * Converts the child groups of this group to options for menu sorted by name
-	 * @returns sorted SelectOption for child groups of group editing.
+	 * @returns SelectOptions sorted for child groups of group editing.
 	 */
 	function groupsToSelectOptions(): SelectOption[] {
 		// In format for the display component for menu.

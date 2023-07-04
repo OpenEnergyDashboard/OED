@@ -6,10 +6,9 @@ import { UserRole } from '../types/items';
 
 /**
  * Checks if the user has the permissions of a given role.
- *
- * @param {UserRole} user User role to evaluate
- * @param {UserRole} compareTo User role to compare to
- * @returns {boolean} Whether or not the user has the compareTo role
+ * @param user User role to evaluate
+ * @param compareTo User role to compare to
+ * @returns Whether or not the user has the compareTo role
  */
 export function hasPermissions(user: UserRole, compareTo: UserRole): boolean {
 	// Admins always have any other role.
@@ -18,9 +17,8 @@ export function hasPermissions(user: UserRole, compareTo: UserRole): boolean {
 
 /**
  * Checks if user is an Admin.
- *
- * @param {UserRole} user User role to evaluate
- * @returns {boolean} Whether or not user is an admin
+ * @param user User role to evaluate
+ * @returns Whether or not user is an admin
  */
 export function isRoleAdmin(user: UserRole): boolean {
 	return user === UserRole.ADMIN;

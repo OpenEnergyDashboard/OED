@@ -30,6 +30,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
+ * @returns Chart data select element
  */
 export default function ChartDataSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
@@ -382,8 +383,8 @@ export default function ChartDataSelectComponent() {
 
 /**
  * Determines the compatibility of units in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible units
  */
 function getUnitCompatibilityForDropdown(state: State) {
 
@@ -445,8 +446,8 @@ function getUnitCompatibilityForDropdown(state: State) {
 
 /**
  * Determines the compatibility of meters in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible meters
  */
 export function getMeterCompatibilityForDropdown(state: State) {
 	// Holds all meters visible to the user
@@ -520,8 +521,8 @@ export function getMeterCompatibilityForDropdown(state: State) {
 
 /**
  * Determines the compatibility of group in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible groups
  */
 export function getGroupCompatibilityForDropdown(state: State) {
 	// Holds all groups visible to the user
@@ -596,8 +597,8 @@ export function getGroupCompatibilityForDropdown(state: State) {
 
 /**
  * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
- * @param {State} state - current redux state
- * @returns {UnitData[]} an array of UnitData
+ * @param state - current redux state
+ * @returns an array of UnitData
  */
 export function getVisibleUnitOrSuffixState(state: State) {
 	let visibleUnitsOrSuffixes;
@@ -619,10 +620,10 @@ export function getVisibleUnitOrSuffixState(state: State) {
 /**
  *  Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
  * Visibility is determined by which set the items are contained in.
- * @param {Set<number>} compatibleItems - items that are compatible with current selected options
- * @param {Set<number>} incompatibleItems - units that are not compatible with current selected options
- * @param {UnitsState | MetersState | GroupsState} state - current redux state, must be one of UnitsState, MetersState, or GroupsState
- * @returns {SelectOption[]} an array of SelectOption
+ * @param compatibleItems - items that are compatible with current selected options
+ * @param incompatibleItems - units that are not compatible with current selected options
+ * @param state - current redux state, must be one of UnitsState, MetersState, or GroupsState
+ * @returns list of selectOptions of the given item
  */
 export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
 	// Holds the label of the select item, set dynamically according to the type of item passed in
@@ -686,19 +687,19 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
 
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a UnitsState
+ * @param state The state to check
+ * @returns Whether or not this is a UnitsState
  */
 function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a MetersState
+ * @param state The state to check
+ * @returns Whether or not this is a MetersState
  */
 function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a GroupsState
+ * @param state The state to check
+ * @returns Whether or not this is a GroupsState
  */
 function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }

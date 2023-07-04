@@ -37,7 +37,7 @@ class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
 	}
 
 	/**
-	 * @return JSX to create the login panel
+	 * @returns JSX to create the login panel
 	 */
 	public render() {
 		const formStyle = {

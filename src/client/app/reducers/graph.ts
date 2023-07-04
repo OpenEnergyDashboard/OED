@@ -29,7 +29,6 @@ const defaultState: GraphState = {
 	renderOnce: false
 };
 
-
 export default function graph(state = defaultState, action: GraphAction) {
 	switch (action.type) {
 		case ActionType.ConfirmGraphRenderOnce: {

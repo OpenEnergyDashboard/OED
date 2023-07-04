@@ -17,6 +17,10 @@ import { ConversionData } from 'types/redux/conversions';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import HeaderComponent from '../../components/HeaderComponent';
 
+/**
+ * Defines the conversions page card view
+ * @returns Conversion page element
+ */
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 

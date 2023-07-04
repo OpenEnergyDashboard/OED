@@ -60,7 +60,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Their async blocks evaluate properly, but the returns inside of them are never honored. The end return statement is always what is evaluated.
 	 * Fixing this may require some major changes to how page redirects are done. This is detailed more in issue #817.
 	 * The errors can be obtained by putting breakpoints on all returns and then stepping through a page load in a debugger.
-	*/
+	 */
 
 	/**
 	 * Generates middleware that requires proper role and authentication for a page route
@@ -149,6 +149,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Middleware function that allows hotlinking to a graph with options
 	 * @param component The component of the page redirecting
 	 * @param search The string of queries in the path
+	 * @returns component
 	 */
 	public linkToGraph(component: JSX.Element, search: string) {
 		/*
@@ -209,6 +210,9 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								if (this.props.areaNormalization.toString() !== info) {
 									options.toggleAreaNormalization = true;
 								}
+								break;
+							case 'areaUnit':
+								options.areaUnit = info;
 								break;
 							case 'comparePeriod':
 								options.comparePeriod = validateComparePeriod(info);
@@ -294,11 +298,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Generates new time interval based on current time and user selected amount to trace back;
-	 * @param message: currently able to accept how many days to go back in time;
+	 * @param {string} message currently able to accept how many days to go back in time;
+	 * @returns {string} interval as a string
 	 */
 	// private getNewIntervalFromMessage(message: string) {
 	// 	const numDays = parseInt(message);
-	//
 	// If we ever use this code we might need to fix up moment for UTC as elsewhere in the code.
 	// 	const current = moment();
 	// 	const newMinTimeStamp = current.clone();

@@ -15,6 +15,10 @@ import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/
 import { addUnit } from '../../actions/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 
+/**
+ * Defines the create unit modal form
+ * @returns Unit create element
+ */
 export default function CreateUnitModalComponent() {
 	const dispatch = useDispatch();
 

@@ -47,6 +47,11 @@ interface EditGroupModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * Defines the edit group modal form
+ * @param props state variables needed to define the component
+ * @returns Group edit element
+ */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const dispatch = useDispatch();
 
@@ -696,7 +701,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * If the check pass, update the edited group and related groups.
 	 * @param childId The group/meter's id to add to the parent group.
 	 * @param childType Can be group or meter.
-	 * @return true if the child was assigned and false otherwise
+	 * @returns true if the child was assigned and false otherwise
 	 */
 	async function assignChildToGroup(childId: number, childType: DataType): Promise<boolean> {
 		// Create a deep copy of the edit state before adding the child. We only need some of the state but this is easier.
@@ -1032,11 +1037,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
  * only uses the direct meter and group children. It uses a store passed to it so it can
  * be changed without changing the Redux group store. Thus, it directly and recursively gets
  * the deep meters of a group.
- *
- * @param {number} groupId The groupId.
- * @param {GroupDefinition[]} groupState The group state to use in the calculation.
- * @param {number} times The number of times the function has been recursively called. Not passed on first call and only used internally.
- * @returns {number[]} Array of deep children ids of this group or empty array if none/circular dependency.
+ * @param groupId The groupId.
+ * @param groupState The group state to use in the calculation.
+ * @param times The number of times the function has been recursively called. Not passed on first call and only used internally.
+ * @returns Array of deep children ids of this group or empty array if none/circular dependency.
  */
 function calculateMetersInGroup(groupId: number, groupState: any, times: number = 0): number[] {
 	// The number of times should be set to zero on the first call. Each time add one and assume

@@ -18,6 +18,11 @@ interface ConversionViewComponentProps {
 	units: UnitDataById;
 }
 
+/**
+ * Defines the conversion info card
+ * @param props defined above
+ * @returns Single conversion element
+ */
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
 

@@ -20,6 +20,10 @@ import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 import HeaderComponent from '../../components/HeaderComponent';
 
+/**
+ * Defines the groups page card view
+ * @returns Groups page element
+ */
 export default function GroupsDetailComponent() {
 	const dispatch = useDispatch();
 

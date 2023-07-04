@@ -30,7 +30,7 @@ interface ConfirmActionModalComponentProps {
 // TODO This is a function that deals with confirm/reject that may be useful in other places.
 /**
  * This is a modal component that can be used to confirm/reject any action by executing the actionFunction or handleClose passed in.
- * @param props
+ * @param props The props for the component
  * @param props.show Boolean to handle showing/hiding the modal.
  * @param props.actionTitle (Optional) The title of the modal.
  * @param props.actionConfirmMessage The message that will display in the center when the modal opens.

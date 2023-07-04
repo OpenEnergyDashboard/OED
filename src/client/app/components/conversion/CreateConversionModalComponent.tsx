@@ -24,7 +24,11 @@ interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
 	unitsState: UnitDataById;
 }
-
+/**
+ * Defines the create conversion modal form
+ * @param props Props for the component
+ * @returns Conversion create element
+ */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
 	const dispatch = useDispatch();

@@ -26,6 +26,11 @@ interface EditUnitModalComponentProps {
 	handleClose: () => void;
 }
 
+/**
+ * Defines the edit unit modal form
+ * @param props props for component
+ * @returns Unit edit element
+ */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const dispatch = useDispatch();
 

@@ -15,9 +15,8 @@ export type TranslatedString = string;
 
 /**
  * Translate a message
- *
- * @param {string} messageID identifier for a message
- * @returns {TranslatedString} get translated string from original string
+ * @param messageID identifier for a message
+ * @returns get translated string from original string
  */
 export default function translate(messageID: string): TranslatedString {
 

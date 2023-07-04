@@ -16,6 +16,10 @@ import { UnitData } from 'types/redux/units';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import HeaderComponent from '../../components/HeaderComponent';
 
+/**
+ * Defines the units page card view
+ * @returns Units page element
+ */
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 

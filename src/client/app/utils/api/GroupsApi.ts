@@ -51,8 +51,8 @@ export default class GroupsApi {
 	 * @param groupIDs The group IDs to get readings for
 	 * @param timeInterval  start and end of current/this compare period
 	 * @param shift how far to shift back in time from current period to previous period
-	 * @param unitId The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns CompareReadings in sorted order
 	 */
 	public async groupCompareReadings(groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration,
 		unitID: number): Promise<CompareReadings> {

@@ -5,6 +5,9 @@
 import {ActionType} from './actions';
 import {CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint} from '../../utils/calibration';
 
+/**
+ * 'initiate', 'calibrate' or 'unavailable'
+ */
 export enum CalibrationModeTypes {
 	initiate = 'initiate',
 	calibrate = 'calibrate',
@@ -114,7 +117,6 @@ export type MapsAction =
 
 /**
  * data format stored in the database
- *
  * @param id
  * @param name
  * @param note
@@ -139,7 +141,6 @@ export interface MapData{
 
 /**
  *  Data format used keep track of map's state
- *
  *  @param id {number} id <= -1 means it's a new map;
  *  @param name
  *  @param displayable

@@ -15,7 +15,6 @@ import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
-
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
 }
@@ -77,6 +76,9 @@ function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkP
 	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
+/**
+ * Dispatches a fetch for admin preferences and sets the state based upon the result
+ */
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
@@ -98,6 +100,9 @@ function fetchPreferences(): Thunk {
 	};
 }
 
+/**
+ * Submits preferences stored in the state to the API to be stored in the database
+ */
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
@@ -126,16 +131,16 @@ export function submitPreferences() {
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether preferences are fetching
+ * @param state The redux state.
+ * @returns Whether preferences are fetching
  */
 function shouldFetchPreferenceData(state: State): boolean {
 	return !state.admin.isFetching;
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether preferences are submitted
+ * @param state The redux state.
+ * @returns Whether preferences are submitted
  */
 function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
@@ -164,8 +169,8 @@ function toggleWaitForCikAndDB(): t.ToggleWaitForCikAndDB {
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether or not the Cik and views are updating
+ * @param state The redux state.
+ * @returns Whether or not the Cik and views are updating
  */
 function shouldUpdateCikAndDBViews(state: State): boolean {
 	return !state.admin.isUpdatingCikAndDBViews;
@@ -174,8 +179,8 @@ function shouldUpdateCikAndDBViews(state: State): boolean {
 /**
  * Redo Cik and/or refresh reading views.
  * This function is called when some changes in units/conversions affect the Cik table or reading views.
- * @param {boolean} shouldRedoCik Whether to refresh Cik.
- * @param {boolean} shouldRefreshReadingViews Whether to refresh reading views.
+ * @param shouldRedoCik Whether to refresh Cik.
+ * @param shouldRefreshReadingViews Whether to refresh reading views.
  */
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {

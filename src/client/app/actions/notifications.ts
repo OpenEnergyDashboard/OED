@@ -6,10 +6,17 @@ import { ActionType } from '../types/redux/actions';
 import * as t from '../types/redux/notifications';
 import { Notification } from 'react-notification-system';
 
+/**
+ * Shows notification to the user
+ * @param notification Notification to display
+ */
 export function showNotification(notification: Notification): t.ShowNotificationAction {
 	return { type: ActionType.ShowNotification, notification };
 }
 
+/**
+ * Clears current notifications
+ */
 export function clearNotifications(): t.ClearNotificationAction {
 	return { type: ActionType.ClearNotifications };
 }

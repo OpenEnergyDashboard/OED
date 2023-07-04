@@ -101,8 +101,9 @@ function mapStateToProps(state: State) {
 
 /**
  * use a transparent heatmap to capture which point the user clicked on the map
- * @param imageDimensions {Dimensions} Normalized dimensions of the image
- * @param settings {CalibrationSettings} Settings for calibration displays
+ * @param imageDimensions Normalized dimensions of the image
+ * @param settings Settings for calibration displays
+ * @returns point and data
  */
 function createBackgroundTrace(imageDimensions: Dimensions, settings: CalibrationSettings) {
 	// define the grid of heatmap

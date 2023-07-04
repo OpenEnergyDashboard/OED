@@ -20,7 +20,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 	}
 
 	/**
-	 * @return JSX to create the help icons with links
+	 * @returns JSX to create the help icons with links
 	 */
 	public render() {
 		const divStyle = {

@@ -19,6 +19,10 @@ import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMen
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
 
+/**
+ * React Component that defines the header buttons at the top of a page
+ * @returns Header buttons element
+ */
 export default function HeaderButtonsComponent() {
 	const dispatch = useDispatch();
 

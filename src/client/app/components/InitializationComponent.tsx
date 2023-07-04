@@ -19,6 +19,10 @@ import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { updateSelectedLanguage } from '../actions/options';
 
+/**
+ * Initializes OED redux with needed details
+ * @returns Initialization JSX element
+ */
 export default function InitializationComponent() {
 
 	const dispatch = useDispatch();

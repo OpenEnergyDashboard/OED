@@ -13,10 +13,9 @@ import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderComponent from '../../components/HeaderComponent';
 
 /**
- * Top-level React component that controls the home page
- * @return JSX to create the home page
+ * React component that defines the admin page
+ * @returns Admin page element
  */
-
 export default function AdminComponent() {
 
 	const bottomPaddingStyle: React.CSSProperties = {

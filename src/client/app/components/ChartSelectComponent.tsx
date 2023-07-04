@@ -15,6 +15,7 @@ import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap
 
 /**
  *  A component that allows users to select which chart should be displayed.
+ * @returns Chart select element
  */
 export default function ChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
