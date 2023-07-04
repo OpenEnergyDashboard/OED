@@ -5,6 +5,8 @@
 const database = require('./database');
 const { mapToObject } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
+const moment = require('moment');
+const _ = require('lodash');
 
 const sqlFile = database.sqlFile;
 
@@ -49,7 +51,7 @@ class Reading {
 	static createCompareReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
 	}
-
+	
 	/**
 	 * Returns a promise to create the reading_line_accuracy type.
 	 * This needs to be run before Reading.createTable().
@@ -58,6 +60,14 @@ class Reading {
 	 */
 	static createReadingLineAccuracyEnum(conn) {
 		return conn.none(sqlFile('reading/create_reading_line_accuracy_enum.sql'));
+	}
+
+	/**
+	 * Returns a promise to create the 3D readings function
+	 * @param conn the database connection to use
+	 */
+	static create3dReadingsFunction(conn) {
+		return conn.none(sqlFile('reading/create_function_get_3d_readings.sql'));
 	}
 
 	/**
@@ -371,6 +381,61 @@ class Reading {
 			};
 		}
 		return compareReadingsByGroupID;
+	}
+
+	/**
+	 * Gets hourly line readings for a meter for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param conn the connection to use.
+	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
+		/**
+		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		// TODO Determine the proper format that should be returned
+		// TODO Determine proper logic and logic placement.
+		// TODO Proper JSDOC return Values and 'typeing'
+		// The logic in this method is for demonstrative purposes only.
+		// We will need to write proper solutions moving forward
+
+		
+		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity']
+		);
+
+		const sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
+
+		// Using Lodash.chunk Not ideal, proof of concept only;
+		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
+		const chunkedReadings = _.chunk(sortedReadings, 24);
+
+		// Data may change need based on steve's feedback 
+		const xData = [];
+		const yData = [];
+		const zData = [];
+
+		// Data data may need to be converted into 'moment' to save on network load
+		chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.format('h:mm A')));
+		chunkedReadings.forEach(day => {
+			let dayReadings = [];
+			// Data data may need to be converted into 'moment' to save on network load
+			yData.push(day[0].start_timestamp.format('MM-DD-YYYY'));
+
+			day.forEach(hour => dayReadings.push(hour.reading_rate));
+			zData.push(dayReadings);
+			// console.log(day[0].start_timestamp);
+		});
+
+		const threeDData = {
+			xData: xData,
+			yData: yData,
+			zData: zData
+		}
+		return threeDData;
 	}
 
 	toString() {

@@ -9,6 +9,7 @@ import { localeData } from 'moment';
 // This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
 const localeData = {
 	"en": {
+		"3D": "3D",
 		"400": "400 Bad Request",
 		"404": "404 Not Found",
 		"4.weeks": "4 Weeks",
@@ -459,6 +460,7 @@ const localeData = {
 		"you.cannot.create.a.cyclic.group": "You cannot create a cyclic group"
 	},
 	"fr": {
+		"3D": "3D",
 		"400": "(Need French) 400 Bad Request",
 		"404": "404 Introuvable",
 		"4.weeks": "4 Semaines",
@@ -909,6 +911,7 @@ const localeData = {
 		"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique"
 	},
 	"es": {
+		"3D": "3D",
 		"400": "(Need Spanish) 400 Bad Request",
 		"404": "404 Página no encontrada",
 		"4.weeks": "4 Semanas",
