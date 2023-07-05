@@ -37,6 +37,9 @@ export enum ActionType {
 	RequestMeterCompareReadings = 'REQUEST_METER_COMPARE_READINGS',
 	ReceiveMeterCompareReadings = 'RECEIVE_METER_COMPARE_READINGS',
 
+	RequestMeterThreeDReadings = 'REQUEST_METER_THREED_READINGS',
+	ReceiveMeterThreeDReadings = 'RECEIVE_METER_THREED_READINGS',
+
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
 	UpdateSelectedUnit = 'UPDATE_SELECTED_UNIT',
