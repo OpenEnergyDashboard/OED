@@ -51,7 +51,7 @@ class Reading {
 	static createCompareReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
 	}
-	
+
 	/**
 	 * Returns a promise to create the reading_line_accuracy type.
 	 * This needs to be run before Reading.createTable().
@@ -402,7 +402,7 @@ class Reading {
 		// The logic in this method is for demonstrative purposes only.
 		// We will need to write proper solutions moving forward
 
-		
+
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity']
 		);
@@ -413,7 +413,6 @@ class Reading {
 		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
 		// ENUM
 		const chunkedReadings = _.chunk(sortedReadings, 24);
-
 		// Data may change need based on steve's feedback 
 		const xData = [];
 		const yData = [];
@@ -421,16 +420,18 @@ class Reading {
 
 		// Data data may need to be converted into 'moment' to save on network load
 		// beware moment.utc()
-		chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.format('h:mm A')));
-		chunkedReadings.forEach(day => {
-			let dayReadings = [];
-			// Data data may need to be converted into 'moment' to save on network load
-			yData.push(day[0].start_timestamp.format('MM-DD-YYYY'));
+		if (chunkedReadings.length > 0) {
+			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.format('h:mm A')));
+			chunkedReadings.forEach(day => {
+				let dayReadings = [];
+				// Data data may need to be converted into 'moment' to save on network load
+				yData.push(day[0].start_timestamp.format('MM-DD-YYYY'));
 
-			day.forEach(hour => dayReadings.push(hour.reading_rate));
-			zData.push(dayReadings);
-			// console.log(day[0].start_timestamp);
-		});
+				day.forEach(hour => dayReadings.push(hour.reading_rate));
+				zData.push(dayReadings);
+				// console.log(day[0].start_timestamp);
+			});
+		}
 
 		const threeDData = {
 			xData: xData,

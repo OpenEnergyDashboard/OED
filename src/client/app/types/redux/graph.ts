@@ -153,4 +153,5 @@ export interface GraphState {
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
 	threeDAxisPrecision: ThreeDReadingPrecision;
+	threeDTimeInterval: TimeInterval;
 }

@@ -27,7 +27,8 @@ const defaultState: GraphState = {
 	optionsVisibility: true,
 	lineGraphRate: {label: 'hour', rate: 1},
 	renderOnce: false,
-	threeDAxisPrecision: ThreeDReadingPrecision.hourly
+	threeDAxisPrecision: ThreeDReadingPrecision.hourly,
+	threeDTimeInterval: TimeInterval.unbounded()
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
