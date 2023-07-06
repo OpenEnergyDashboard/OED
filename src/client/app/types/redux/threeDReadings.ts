@@ -11,6 +11,7 @@ export interface RequestMeterThreeDReadingsAction {
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
+	precision: string;
 }
 
 export interface ReceiveMeterThreeDReadingsAction {
@@ -18,6 +19,7 @@ export interface ReceiveMeterThreeDReadingsAction {
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
+	precision: string;
 	readings: ThreeDReading;
 }
 
@@ -30,8 +32,10 @@ export interface ThreeDReadingsState {
 		[meterID: number]: {
 			[timeInterval: string]: {
 				[unitID: number]: {
-					isFetching: boolean;
-					readings?: ThreeDReading;
+					[precision: string]: {
+						isFetching: boolean;
+						readings?: ThreeDReading;
+					}
 				}
 			}
 		}

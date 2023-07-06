@@ -411,6 +411,7 @@ class Reading {
 
 		// Using Lodash.chunk Not ideal, proof of concept only;
 		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
+		// ENUM
 		const chunkedReadings = _.chunk(sortedReadings, 24);
 
 		// Data may change need based on steve's feedback 
@@ -419,6 +420,7 @@ class Reading {
 		const zData = [];
 
 		// Data data may need to be converted into 'moment' to save on network load
+		// beware moment.utc()
 		chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.format('h:mm A')));
 		chunkedReadings.forEach(day => {
 			let dayReadings = [];

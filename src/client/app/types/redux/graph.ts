@@ -24,6 +24,10 @@ export const LineGraphRates = {
 	'day': 24
 }
 
+export enum ThreeDReadingPrecision {
+	hourly = 'hourly'
+}
+
 export interface UpdateSelectedMetersAction {
 	type: ActionType.UpdateSelectedMeters;
 	meterIDs: number[];
@@ -148,4 +152,5 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
+	threeDAxisPrecision: ThreeDReadingPrecision;
 }

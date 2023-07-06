@@ -14,15 +14,16 @@ const defaultState: ThreeDReadingsState = {
 export default function readings(state = defaultState, action: ThreeDReadingsAction) {
 	switch (action.type) {
 		case ActionType.RequestMeterThreeDReadings: {
+			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const newState = {
+			const readingCount = action.precision;
+			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: true
 			};
 
-			const meterID = action.meterID;
-			// Create meter wrapper if needed
+			// Create meter wrappers if needed
 			if (newState.byMeterID[meterID] === undefined)
 				newState.byMeterID[meterID] = {};
 
@@ -30,24 +31,31 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 				newState.byMeterID[meterID][timeInterval] = {};
 
 			// Preserve existing data if exists
-			if (newState.byMeterID[meterID][timeInterval][unitID] !== undefined)
-				newState.byMeterID[meterID][timeInterval][unitID] = { ...newState.byMeterID[meterID][timeInterval][unitID], isFetching: true };
+			if (newState.byMeterID[meterID][timeInterval][unitID] === undefined)
+				newState.byMeterID[meterID][timeInterval][unitID] = {};
+
+			if (newState.byMeterID[meterID][timeInterval][unitID][readingCount] !== undefined)
+				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = {
+					...newState.byMeterID[meterID][timeInterval][unitID][readingCount],
+					isFetching: true
+				};
 			else
-				newState.byMeterID[meterID][timeInterval][unitID] = { isFetching: true };
+				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { isFetching: true };
 
 			return newState;
 		}
 		case ActionType.ReceiveMeterThreeDReadings: {
+			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
+			const readingCount = action.precision;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: false
 			};
 
-			const meterID = action.meterID;
 			const readingsForMeter = action.readings;
-			newState.byMeterID[meterID][timeInterval][unitID] = { readings: readingsForMeter, isFetching: false };
+			newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { readings: readingsForMeter, isFetching: false };
 			return newState;
 		}
 

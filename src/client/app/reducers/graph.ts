@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes } from '../types/redux/graph';
+import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
@@ -26,7 +26,8 @@ const defaultState: GraphState = {
 	hotlinked: false,
 	optionsVisibility: true,
 	lineGraphRate: {label: 'hour', rate: 1},
-	renderOnce: false
+	renderOnce: false,
+	threeDAxisPrecision: ThreeDReadingPrecision.hourly
 };
 
 export default function graph(state = defaultState, action: GraphAction) {

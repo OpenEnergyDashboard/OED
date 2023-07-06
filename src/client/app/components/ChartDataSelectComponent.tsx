@@ -27,6 +27,7 @@ import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -280,7 +281,9 @@ export default function ChartDataSelectComponent() {
 			allSelectedMeters,
 			allSelectedGroups,
 			// currently selected unit
-			selectedUnit
+			selectedUnit,
+			// chart currently being rendered
+			chartToRender
 		}
 	});
 
@@ -343,7 +346,26 @@ export default function ChartDataSelectComponent() {
 							} else {
 								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
 							}
-							dispatch(changeSelectedMeters(allSelectedMeterIDs));
+							/* TODO Not Ideal. Find better approach to supporting 3D meter selection}
+							 3D cannot effectively handle more than one meter, therefore users must
+							be able to only pick a single meter at a time, works similar to 'units'*/
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								const selectedThreeDMeter = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
+								// no meters selected.
+								if (selectedThreeDMeter === undefined) {
+									dispatch(changeSelectedGroups([]))
+									dispatch(changeSelectedMeters([]));
+									dispatch(updateSelectedUnit(-99));
+								}
+								else {
+									//
+									dispatch(changeSelectedMeters([selectedThreeDMeter]));
+									dispatch(fetchNeededThreeDReadings(selectedThreeDMeter));
+								}
+
+							} else {
+								dispatch(changeSelectedMeters(allSelectedMeterIDs));
+							}
 						}
 					}}
 				/>

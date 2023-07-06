@@ -263,7 +263,7 @@ function createRouter() {
 	});
 
 	router.get('/threed/meters/:meter_ids', async (req, res) => {
-
+		// TODO LOOK INTO camelcasing
 		// TODO Determine valid params and query params
 		// TODO Validate params & query params
 		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
