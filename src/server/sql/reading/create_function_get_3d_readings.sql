@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+
 /*
     The meter_3d_readings_unit function works similarly to the meter_line_readings_unit but it returns
     a table of hourly readings. The parameters are meter_id (ID of meter requested),
