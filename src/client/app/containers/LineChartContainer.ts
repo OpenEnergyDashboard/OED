@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
+import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
@@ -241,34 +242,61 @@ function mapStateToProps(state: State) {
 	const start = moment.utc(minTimestamp).toISOString();
 	const end = moment.utc(maxTimestamp).toISOString();
 
+	let layout: any;
 	// Customize the layout of the plot
-	const layout: any = {
-		autosize: true,
-		showlegend: true,
-		height: 700,
-		legend: {
-			x: 0,
-			y: 1.1,
-			orientation: 'h'
-		},
-		yaxis: {
-			title: unitLabel,
-			gridcolor: '#ddd'
-		},
-
-		xaxis: {
-			range: [start, end], // Specifies the start and end points of visible part of graph
-			rangeslider: {
-				thickness: 0.1
+	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	if (datasets.length === 0) {
+		// There is not data so tell user.
+		layout = {
+			"xaxis": {
+				"visible": false
 			},
-			showgrid: true,
-			gridcolor: '#ddd'
-		},
-		margin: {
-			t: 10,
-			b: 10
+			"yaxis": {
+				"visible": false
+			},
+			"annotations": [
+				{
+					"text": `${translate('select.meter.group')}`,
+					"xref": "paper",
+					"yref": "paper",
+					"showarrow": false,
+					"font": {
+						"size": 28
+					}
+				}
+			]
 		}
-	};
+
+	} else {
+		// This normal so plot.
+		layout = {
+			autosize: true,
+			showlegend: true,
+			height: 700,
+			legend: {
+				x: 0,
+				y: 1.1,
+				orientation: 'h'
+			},
+			yaxis: {
+				title: unitLabel,
+				gridcolor: '#ddd'
+			},
+
+			xaxis: {
+				range: [start, end], // Specifies the start and end points of visible part of graph
+				rangeslider: {
+					thickness: 0.1
+				},
+				showgrid: true,
+				gridcolor: '#ddd'
+			},
+			margin: {
+				t: 10,
+				b: 10
+			}
+		};
+	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true

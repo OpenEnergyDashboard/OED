@@ -7,11 +7,13 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
+import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { barUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { UnitRepresentType } from '../types/redux/units';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -28,6 +30,7 @@ function mapStateToProps(state: State) {
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
 	let unitLabel: string = '';
+	let raw = false;
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
@@ -35,6 +38,10 @@ function mapStateToProps(state: State) {
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label.
 			unitLabel = barUnitLabel(selectUnitState, state.graph.areaNormalization, state.graph.selectedAreaUnit);
+			if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
+				// Cannot graph raw units as bar so put title to indicate that and empty otherwise.
+				raw = true;
+			}
 		}
 	}
 
@@ -155,41 +162,89 @@ function mapStateToProps(state: State) {
 		}
 	}
 
+	let layout: any;
 	// Customize the layout of the plot
-	const layout: any = {
-		barmode: (state.graph.barStacking ? 'stack' : 'group'),
-		bargap: 0.2, // Gap between different times of readings
-		bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
-		autosize: true,
-		height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
-		showlegend: true,
-		legend: {
-			x: 0,
-			y: 1.1,
-			orientation: 'h'
-		},
-		yaxis: {
-			title: unitLabel,
-			showgrid: true,
-			gridcolor: '#ddd'
-		},
-		xaxis: {
-			showgrid: true,
-			gridcolor: '#ddd',
-			tickfont: {
-				size: 10
+	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	if (raw) {
+		// This is a raw type graphing unit so cannot plot
+		layout = {
+			"xaxis": {
+				"visible": false
 			},
-			tickangle: -45,
-			autotick: true,
-			nticks: 10,
-			automargin: true
-		},
-		margin: {
-			t: 0,
-			b: 120,
-			l: 120
+			"yaxis": {
+				"visible": false
+			},
+			"annotations": [
+				{
+					"text": `<b>${translate('bar.raw')}</b>`,
+					"xref": "paper",
+					"yref": "paper",
+					"showarrow": false,
+					"font": {
+						"size": 28
+					}
+				}
+			]
 		}
-	};
+	} else if (datasets.length === 0) {
+		// There is not data so tell user.
+		layout = {
+			"xaxis": {
+				"visible": false
+			},
+			"yaxis": {
+				"visible": false
+			},
+			"annotations": [
+				{
+					"text": `${translate('select.meter.group')}`,
+					"xref": "paper",
+					"yref": "paper",
+					"showarrow": false,
+					"font": {
+						"size": 28
+					}
+				}
+			]
+		}
+
+	} else {
+		// This normal so plot.
+		layout = {
+			barmode: (state.graph.barStacking ? 'stack' : 'group'),
+			bargap: 0.2, // Gap between different times of readings
+			bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
+			autosize: true,
+			height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
+			showlegend: true,
+			legend: {
+				x: 0,
+				y: 1.1,
+				orientation: 'h'
+			},
+			yaxis: {
+				title: unitLabel,
+				showgrid: true,
+				gridcolor: '#ddd'
+			},
+			xaxis: {
+				showgrid: true,
+				gridcolor: '#ddd',
+				tickfont: {
+					size: 10
+				},
+				tickangle: -45,
+				autotick: true,
+				nticks: 10,
+				automargin: true
+			},
+			margin: {
+				t: 0,
+				b: 120,
+				l: 120
+			}
+		};
+	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
