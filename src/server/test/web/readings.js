@@ -851,23 +851,23 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
 					const unitData = [
-						//['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
 						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
 						['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+						['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
 						['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit']
 					];
 					const conversionData = [
-						//['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
 						['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → kg CO₂'],
-						['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg']
+						['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg'],
+						['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton']
 					];
 					const meterData = [
 						{
-							name: 'Electric_Utility kg',
+							name: 'Electric_Utility metric ton of CO₂',
 							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kg',
+							defaultGraphicUnit: 'metric ton of CO₂',
 							displayable: true,
 							gps: undefined,
 							note: 'special meter',
@@ -880,14 +880,50 @@ mocha.describe('readings API', () => {
 
 					await prepareTest(unitData, conversionData, meterData);
 					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('kg');
+					const unitId = await getUnitId('Widget');
 					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kgCO2_st_-inf_et_inf.csv');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
 
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
+				/*
+				mocha.it('partial days/hours for daily: 292:227, 6873:6821', async () => {
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28.csv');
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-08-20', '00:00:00', '2022-10-20', '00:00:00'), graphicUnitId: unitId });
+					expect(res).to.be.json;
+					expect(res).to.have.status(HTTP_CODE.OK);
+					// Did the response have the correct number of readings.
+					expect(res.body).to.have.property(`${METER_ID}`).to.have.lengthOf(expected.length-4);
+					// Loop over each reading
+					for (let i = 0; i < expected.length-4; i++) {
+						// Check that the reading's value is within the expected tolerance (DELTA).
+						expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), DELTA);
+						// Reading has correct start/end date and time.
+						expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][1]));
+						expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
+					}
+				});*/
 				// When an invalid unit is added to a meter and loaded to the db, the API should return an empty array
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [
