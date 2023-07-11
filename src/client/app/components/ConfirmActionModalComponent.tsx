@@ -5,7 +5,6 @@ import * as React from 'react';
 import '../styles/modal.css';
 import translate from '../utils/translate';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import { formInputStyle } from '../styles/modalStyle';
 
 interface ConfirmActionModalComponentProps {
 	// Control this through the parent component to open/close this modal
@@ -52,13 +51,8 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 				<ModalHeader>
 					{props.actionTitle ? props.actionTitle : translate('confirm.action')}
 				</ModalHeader>
-				{/* when any of the conversion are changed call one of the functions. */}
-				<ModalBody>
-					{/* SourceId input*/}
-					<div style={formInputStyle}>
-						<p>{props.actionConfirmMessage}</p>
-					</div>
-				</ModalBody>
+				{/* Passed message is already translated */}
+				<ModalBody>{props.actionConfirmMessage}</ModalBody>
 				<ModalFooter>
 					{/* Do not execute the actionFunction and instead close the action confirm modal */}
 					<Button color='secondary' onClick={handleClose}>

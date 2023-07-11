@@ -9,9 +9,11 @@ import MenuModalComponent from './MenuModalComponent';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
+import getPage from '../utils/getPage';
 
 /**
  * React component that controls the header strip at the top of all pages
+ * @returns header element
  */
 export default function HeaderComponent() {
 	const siteTitle = useSelector((state: State) => state.admin.displayTitle);
@@ -53,7 +55,7 @@ export default function HeaderComponent() {
 				</div>
 				<div className='col-4 justify-content-end d-lg-flex d-none'>
 					{/* collapse menu if optionsVisibility is false */}
-					{!showOptions ?
+					{getPage() === '' && !showOptions ?
 						<MenuModalComponent /> :
 						<HeaderButtonsComponent />
 					}
@@ -61,5 +63,4 @@ export default function HeaderComponent() {
 			</div>
 		</div>
 	);
-
 }

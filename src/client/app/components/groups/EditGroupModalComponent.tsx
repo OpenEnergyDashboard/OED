@@ -126,12 +126,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		Name cannot be blank
 		Area must be positive or zero
 		If area is nonzero, area unit must be set
-		Group must have at least one child (checked on submit)
+		Group must have at least one child
 	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
-		setValidGroup(groupState.name !== '' && (groupState.area === 0 || (groupState.area > 0 && groupState.areaUnit !== AreaUnitType.none)));
-	}, [groupState.area, groupState.areaUnit, groupState.name]);
+		setValidGroup(
+			groupState.name !== '' &&
+			(groupState.area === 0 || (groupState.area > 0 && groupState.areaUnit !== AreaUnitType.none)) &&
+			(groupState.deepMeters.length > 0)
+		);
+	}, [groupState.area, groupState.areaUnit, groupState.name, groupState.deepMeters]);
 	/* End State */
 
 	/* Confirm Delete Modal */
@@ -167,7 +171,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
 	// or if any other errors are encountered.
 	const handleAutoCalculateArea = () => {
-		if (groupState.deepMeters != undefined && groupState.deepMeters.length > 0) {
+		if (groupState.deepMeters.length > 0) {
 			if (groupState.areaUnit != AreaUnitType.none) {
 				let areaSum = 0;
 				let notifyMsg = '';

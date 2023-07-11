@@ -117,14 +117,18 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
-		setValidGroup(state.name !== '' && (state.area === 0 || (state.area > 0 && state.areaUnit !== AreaUnitType.none)));
-	}, [state.area, state.areaUnit, state.name]);
+		setValidGroup(
+			state.name !== '' &&
+			(state.area === 0 || (state.area > 0 && state.areaUnit !== AreaUnitType.none)) &&
+			(state.deepMeters.length > 0)
+		);
+	}, [state.area, state.areaUnit, state.name, state.deepMeters]);
 	/* End State */
 
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
 	// or if any other errors are encountered.
 	const handleAutoCalculateArea = () => {
-		if (state.deepMeters != undefined && state.deepMeters.length > 0) {
+		if (state.deepMeters.length > 0) {
 			if (state.areaUnit != AreaUnitType.none) {
 				let areaSum = 0;
 				let notifyMsg = '';
@@ -209,13 +213,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			}
 		}
 
-		// Do not allow groups without any child meters and groups. From a practical standpoint, this
-		// means there are no deep children.
-		if (state.deepMeters?.length === 0) {
-			notifyUser(translate('group.children.error'));
-			inputOk = false;
-		}
-
 		if (inputOk) {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
@@ -298,7 +295,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.group" />
 			</Button>
-
 			<Modal isOpen={showModal} toggle={handleClose} size='lg' >
 				<ModalHeader>
 					<FormattedMessage id="create.group" />

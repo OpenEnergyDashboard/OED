@@ -14,6 +14,7 @@ import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { updateSelectedLanguage } from './options';
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -94,6 +95,9 @@ function fetchPreferences(): Thunk {
 				}
 				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
 					dispatch2(toggleAreaNormalization());
+				}
+				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
+					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
 				}
 			});
 		}

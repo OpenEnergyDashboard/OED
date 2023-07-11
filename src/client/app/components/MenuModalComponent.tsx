@@ -11,6 +11,10 @@ import ReactTooltip from 'react-tooltip';
 import { useState } from 'react';
 import getPage from '../utils/getPage';
 
+/**
+ * React component to define the collapsed menu modal
+ * @returns Modal element
+ */
 export default function MenuModalComponent() {
 	const [showModal, setShowModal] = useState(false);
 	const toggleModal = () => { setShowModal(!showModal); }

@@ -12,6 +12,7 @@ import { updateSelectedLanguage } from '../actions/options';
 
 /**
  * A component that allows users to select which language the page should be displayed in.
+ * @returns Language selector element for navbar
  */
 export default function LanguageSelectorComponent() {
 	const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export default function LanguageSelectorComponent() {
 	const version = useSelector((state: State) => state.version.version);
 
 	return (
-		<div>
+		<>
 			<UncontrolledDropdown direction='start'>
 				<DropdownToggle nav caret>
 					<FormattedMessage id='language' />
@@ -48,6 +49,6 @@ export default function LanguageSelectorComponent() {
 					</DropdownItem>
 				</DropdownMenu>
 			</UncontrolledDropdown>
-		</div>
+		</>
 	);
 }
