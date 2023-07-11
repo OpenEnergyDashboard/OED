@@ -168,20 +168,20 @@ function mapStateToProps(state: State) {
 	if (raw) {
 		// This is a raw type graphing unit so cannot plot
 		layout = {
-			"xaxis": {
-				"visible": false
+			'xaxis': {
+				'visible': false
 			},
-			"yaxis": {
-				"visible": false
+			'yaxis': {
+				'visible': false
 			},
-			"annotations": [
+			'annotations': [
 				{
-					"text": `<b>${translate('bar.raw')}</b>`,
-					"xref": "paper",
-					"yref": "paper",
-					"showarrow": false,
-					"font": {
-						"size": 28
+					'text': `<b>${translate('bar.raw')}</b>`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 28
 					}
 				}
 			]
@@ -189,20 +189,20 @@ function mapStateToProps(state: State) {
 	} else if (datasets.length === 0) {
 		// There is not data so tell user.
 		layout = {
-			"xaxis": {
-				"visible": false
+			'xaxis': {
+				'visible': false
 			},
-			"yaxis": {
-				"visible": false
+			'yaxis': {
+				'visible': false
 			},
-			"annotations": [
+			'annotations': [
 				{
-					"text": `${translate('select.meter.group')}`,
-					"xref": "paper",
-					"yref": "paper",
-					"showarrow": false,
-					"font": {
-						"size": 28
+					'text': `${translate('select.meter.group')}`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 28
 					}
 				}
 			]

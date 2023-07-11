@@ -49,7 +49,7 @@ function mapStateToProps(state: State) {
 		// may not yet be in state so verify with the second condition on the if.
 		// Note the second part may not be used based on next checks but do here since simple.
 		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined) {
-			let meterArea = state.meters.byMeterID[meterID].area;
+			const meterArea = state.meters.byMeterID[meterID].area;
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
 			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
 				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
@@ -231,20 +231,20 @@ function mapStateToProps(state: State) {
 	if (datasets.length === 0) {
 		// There is not data so tell user.
 		layout = {
-			"xaxis": {
-				"visible": false
+			'xaxis': {
+				'visible': false
 			},
-			"yaxis": {
-				"visible": false
+			'yaxis': {
+				'visible': false
 			},
-			"annotations": [
+			'annotations': [
 				{
-					"text": `${translate('select.meter.group')}`,
-					"xref": "paper",
-					"yref": "paper",
-					"showarrow": false,
-					"font": {
-						"size": 28
+					'text': `${translate('select.meter.group')}`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 28
 					}
 				}
 			]

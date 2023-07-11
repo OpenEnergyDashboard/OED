@@ -145,23 +145,23 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
 		// This is a raw type graphing unit so cannot plot
 		layout = {
-			"xaxis": {
-				"visible": false
+			'xaxis': {
+				'visible': false
 			},
-			"yaxis": {
-				"visible": false
+			'yaxis': {
+				'visible': false
 			},
-			"annotations": [
+			'annotations': [
 				{
-					"text": `<b>${translate('compare.raw')}</b>`,
-					"xref": "paper",
-					"yref": "paper",
-					"showarrow": false,
-					"font": {
-						"size": 18
+					'text': `<b>${translate('compare.raw')}</b>`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 18
 					}
 				}
-			],
+			]
 		}
 	} else {
 		layout = {
