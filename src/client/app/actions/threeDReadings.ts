@@ -56,7 +56,7 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
 export function fetchNeededThreeDReadings(meterID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		if (shouldFetchMeterThreeDReadings(state, meterID, state.graph.timeInterval, state.graph.selectedUnit, ThreeDReadingPrecision.hourly)) {
+		if (shouldFetchMeterThreeDReadings(state, meterID, state.graph.threeDTimeInterval, state.graph.selectedUnit, ThreeDReadingPrecision.hourly)) {
 			return dispatch(fetchMeterThreeDReadings(meterID, state.graph.timeInterval, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
 		}
 		else {

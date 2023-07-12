@@ -120,6 +120,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				lineGraphRate: action.lineGraphRate
 			};
+		case ActionType.UpdateThreeDTimeInterval:
+			return {
+				...state,
+				timeInterval: action.timeInterval
+			};
 		default:
 			return state;
 	}

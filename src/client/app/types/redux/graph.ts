@@ -110,6 +110,11 @@ export interface ConfirmGraphRenderOnce {
 	type: ActionType.ConfirmGraphRenderOnce;
 }
 
+export interface UpdateThreeDTimeInterval {
+	type: ActionType.UpdateThreeDTimeInterval;
+	timeInterval: TimeInterval;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -127,7 +132,8 @@ export type GraphAction =
 	| ChangeCompareSortingOrderAction
 	| SetOptionsVisibility
 	| UpdateLineGraphRate
-	| ConfirmGraphRenderOnce;
+	| ConfirmGraphRenderOnce
+	| UpdateThreeDTimeInterval;
 
 export interface LineGraphRate {
 	label: string,

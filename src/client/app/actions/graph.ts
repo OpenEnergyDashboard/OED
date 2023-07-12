@@ -202,6 +202,11 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
+
+export function updateThreeDTimeInterval(timeInterval: TimeInterval): t.UpdateThreeDTimeInterval {
+	return {type: ActionType.UpdateThreeDTimeInterval, timeInterval };
+}
+
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
