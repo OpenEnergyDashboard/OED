@@ -456,11 +456,11 @@ class Reading {
 		
 		//TODO push moments in xData, yData. 
 		if (chunkedReadings.length > 0) {
-			chunkedReadings[0].forEach(hour => xData.push(moment(hour.start_timestamp).hour()));
+			chunkedReadings[0].forEach(hour => xData.push(moment(hour.start_timestamp)));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				// Data data may need to be converted into 'moment' to save on network load
-				yData.push(moment(day[0].start_timestamp).day());
+				yData.push(moment(day[0].start_timestamp));
 
 				day.forEach(hour => dayReadings.push(hour.reading_rate));
 				zData.push(dayReadings);
