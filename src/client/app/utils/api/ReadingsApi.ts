@@ -95,9 +95,8 @@ export default class ReadingsApi {
 	 */
 	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
 		// const stringifiedIDs = meterIDs.join(',');
-
 		return await this.backend.doGetRequest<ThreeDReading>(
-			`/api/unitReadings/threed/meters/${meterID}`,
+			`/api/unitReadings/threeD/meters/${meterID}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
