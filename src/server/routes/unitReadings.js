@@ -195,7 +195,7 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
 }
 
 /**
- * Gets line readings for meters for the given time range
+ * Gets hourly line readings for meters for the given time range
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
@@ -206,8 +206,8 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval) {
 	// TODO Determine proper logic and logic placement.
 	// TODO Proper JSDOC return Values
 	const conn = getConnection();
-	const rawReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return rawReadings;
+	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	return hourlyReadings;
 }
 
 function createRouter() {
@@ -262,13 +262,11 @@ function createRouter() {
 		}
 	});
 
-	router.get('/threed/meters/:meter_ids', async (req, res) => {
-		// TODO LOOK INTO camelcasing
+	router.get('/threeD/meters/:meter_ids', async (req, res) => {
 		// TODO Determine valid params and query params
 		// TODO Validate params & query params
 		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
 		// }
-
 		const meterID = req.params.meter_ids;
 		const graphicUnitID = req.query.graphicUnitId;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
