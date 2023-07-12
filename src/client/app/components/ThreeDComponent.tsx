@@ -1,64 +1,15 @@
 import * as React from 'react';
 import Plot from 'react-plotly.js';
-import * as moment from 'moment';
-import { readingsApi } from '../utils/api';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { useEffect, useState } from 'react';
+import { State } from '../types/redux/state';
+import { useSelector } from 'react-redux';
+// import * as moment from 'moment';
+// import { useState } from 'react';
 
-
+/**
+ * Component used to render 3D graphics
+ * @returns 3D Plotly 3D Surface Graph
+ */
 export default function ThreeDComponent() {
-
-
-	// Sample Data requirements
-	//  xData, and yData will use moment when implemented
-	const xData = ['12:00', '12:30', '13:00'];
-	const yData = ['2023-06-01', '2023-06-02', '2023-06-03'];
-	const zData = [
-		[0, 1, 2],
-		[4, 5, 6],
-		[7, 8, 9]
-	];
-
-	// Api Testing/data requirement purposes only.
-	const [data, setData] = useState(null);
-	const unboundedInterval: TimeInterval = TimeInterval.unbounded();
-	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				// const response = await fetch('https://api.example.com/data');
-				// const data = await response.json();
-				const threeDReadings = await readingsApi.meterThreeDReadings(21, unboundedInterval, 1);
-				console.log(threeDReadings);
-				const updatedData = [
-					{
-						type: 'surface',
-						x: threeDReadings.xData,
-						y: threeDReadings.yData,
-						z: threeDReadings.zData,
-						hoverinfo: 'text',
-						hovertext: threeDReadings.zData.map((day, i) => day.map((hour, j) => `Date: ${threeDReadings.yData[i]}<br>Time: ${threeDReadings.xData[j]}<br>Usage: ${hour}`))
-					}
-				];
-				setData(updatedData);
-			} catch (error) {
-				console.error('Error fetching data:', error);
-			}
-		};
-		fetchData();
-	}, []); // Run the effect only once when the component mounts (For Demo Purposes)
-
-
-
-	const defaultState = [
-		{
-			type: 'surface',
-			x: xData,
-			y: yData,
-			z: zData,
-			hoverinfo: 'text',
-			hovertext: zData.map((day, i) => day.map((hour, j) => `Date: ${yData[i]}<br>Time: ${xData[j]}<br>Usage: ${hour}`))
-		}
-	];
 
 	const layout = {
 		autosize: true,
@@ -84,12 +35,37 @@ export default function ThreeDComponent() {
 			}
 		}
 	};
+
 	const config = {
 		responsive: true
-	}
+	};
+
+	const selectedMeterData = useSelector((state: State) => {
+		if (state.graph.selectedMeters[0] === undefined)
+			return [undefined];
+		const selectedMeter = state.graph.selectedMeters[0];
+		const selectedTimeInterval = state.graph.threeDTimeInterval.toString();
+		const selectedUnit = state.graph.selectedUnit;
+		const selected3DPrecision = state.graph.threeDAxisPrecision;
+		const meter3DReadings = state.readings.threeD.byMeterID[selectedMeter][selectedTimeInterval][selectedUnit][selected3DPrecision].readings;
+		if (meter3DReadings)
+			return [{
+				type: 'surface',
+				x: meter3DReadings.xData,
+				y: meter3DReadings.yData,
+				z: meter3DReadings.zData,
+				hoverinfo: 'text',
+				hovertext: meter3DReadings.zData.map(
+					(day, i) => day.map(
+						(readings, j) => `Date: ${meter3DReadings.yData[i]}<br>Time: ${meter3DReadings.xData[j]}<br>Usage: ${readings}`))
+			}]
+		else
+			return [undefined];
+
+	});
 	return (
 		<div>
-			<Plot data={data} layout={layout} config={config} />
+			<Plot data={selectedMeterData} layout={layout} config={config} />
 		</div>
 	);
 }

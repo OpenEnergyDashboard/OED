@@ -93,11 +93,11 @@ export default class ReadingsApi {
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @returns ThreeDReadings in sorted order
 	 */
-	public async meterThreeDReadings(meterIDs: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
+	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
 		// const stringifiedIDs = meterIDs.join(',');
 
 		return await this.backend.doGetRequest<ThreeDReading>(
-			`/api/unitReadings/threed/meters/${meterIDs}`,
+			`/api/unitReadings/threed/meters/${meterID}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
