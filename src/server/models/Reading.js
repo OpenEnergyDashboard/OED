@@ -440,7 +440,7 @@ class Reading {
 		else{
 			sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
 		}
-		
+		console.log(sortedReadings);
 		// Using Lodash.chunk Not ideal, proof of concept only;
 		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
 		// ENUM
@@ -456,11 +456,11 @@ class Reading {
 		
 		//TODO push moments in xData, yData. 
 		if (chunkedReadings.length > 0) {
-			chunkedReadings[0].forEach(hour => xData.push(moment(hour.start_timestamp).format('h:mm A')));
+			chunkedReadings[0].forEach(hour => xData.push(moment(hour.start_timestamp).hour()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				// Data data may need to be converted into 'moment' to save on network load
-				yData.push(moment(day[0].start_timestamp).format('YYYY-MM-DD'));
+				yData.push(moment(day[0].start_timestamp).day());
 
 				day.forEach(hour => dayReadings.push(hour.reading_rate));
 				zData.push(dayReadings);
@@ -472,6 +472,7 @@ class Reading {
 			yData: yData,
 			zData: zData
 		}
+		console.log(zData);
 		return threeDData;
 	}
 
