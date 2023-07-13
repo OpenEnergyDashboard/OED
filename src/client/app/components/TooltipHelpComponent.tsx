@@ -34,6 +34,8 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 		// Debug URL where need to put own GitHub ID before .github.io.
 		// This works if you have a fork of the web pages and setup your GitHub
 		// account to serve them up.
+		// NOTE: LanguageSelectorComponent and HeaderButtonsComponent reference the OED help directly,
+		// and will not update automatically if this link is changed.
 		// const BASE_URL = `https://xxx.github.io/OpenEnergyDashboard.github.io/help/${version}`;
 
 		const helpLinks: Record<string, Record<string, string>> = {
@@ -63,15 +65,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.compare.interval.tip': { link: `${BASE_URL}/compareGraphic.html#usage` },
 			'help.home.compare.sort.tip': { link: `${BASE_URL}/compareGraphic.html#usage` },
 			'help.home.export.graph.data': { link: `${BASE_URL}/export.html` },
-			'help.home.header': {
-				link0: `${BASE_URL}/pageChoices.html`,
-				link1: `${BASE_URL}/meterViewing.html`,
-				link2: `${BASE_URL}/groupViewing.html`,
-				link3: `${BASE_URL}/mapGraphic.html`,
-				link4: `${BASE_URL}/admin.html`
-			},
 			'help.home.hide.or.show.options': { link: `${BASE_URL}/hideOptions.html` },
-			'help.home.language': { link: `${BASE_URL}/language.html` },
 			'help.home.map.interval.tip': { link: `${BASE_URL}/mapGraphic.html#usage` },
 			'help.home.select.groups': { link: `${BASE_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${BASE_URL}/mapGraphic.html` },

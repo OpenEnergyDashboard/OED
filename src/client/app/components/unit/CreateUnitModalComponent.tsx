@@ -214,9 +214,9 @@ export default function CreateUnitModalComponent() {
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state.secInRate}
 								min="1"
-								invalid={state.secInRate < 1} />
+								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater.or.equal" values={{ min: '1'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}

@@ -89,7 +89,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	 * @returns boolean representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
-		/*
+		/* Create Conversion Validation:
 			Source equals destination: invalid conversion
 			Conversion exists: invalid conversion
 			Conversion does not exist:

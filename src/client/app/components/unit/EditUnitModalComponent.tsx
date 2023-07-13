@@ -72,7 +72,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	*/
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.name !== '' && state.secInRate >= 1);
+		setValidUnit(state.name !== '' && state.secInRate > 0);
 	}, [state.name, state.secInRate]);
 	/* End State */
 
@@ -277,9 +277,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								onChange={e => handleNumberChange(e)}
 								placeholder="Sec In Rate"
 								min="1"
-								invalid={state.secInRate < 1} />
+								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater.or.equal" values={{ min: '1'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}
