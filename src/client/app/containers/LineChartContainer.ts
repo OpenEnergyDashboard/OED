@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { connect } from 'react-redux';
 import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
+import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
@@ -36,9 +37,9 @@ function mapStateToProps(state: State) {
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 		}
-		// If the current rate is per hour (default rate) then don't bother with the extra calculations since we'd be multiplying by 1
-		needsRateScaling = needsRateScaling && (currentSelectedRate.rate != 1);
 	}
+	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
+	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
 	// Add all valid data from existing meters to the line plot
 	for (const meterID of state.graph.selectedMeters) {
@@ -48,13 +49,14 @@ function mapStateToProps(state: State) {
 		// may not yet be in state so verify with the second condition on the if.
 		// Note the second part may not be used based on next checks but do here since simple.
 		if (byMeterID !== undefined && byMeterID[timeInterval.toString()] !== undefined) {
-			let meterArea = state.meters.byMeterID[meterID].area;
-			// we either don't care about area, or we do in which case there needs to be a nonzero area
+			const meterArea = state.meters.byMeterID[meterID].area;
+			// We either don't care about area, or we do in which case there needs to be a nonzero area.
 			if (!state.graph.areaNormalization || (meterArea > 0 && state.meters.byMeterID[meterID].areaUnit != AreaUnitType.none)) {
-				if (state.graph.areaNormalization) {
-					// convert the meter area into the proper unit, if needed
-					meterArea *= getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit);
-				}
+				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
+				const areaScaling = state.graph.areaNormalization ?
+					meterArea * getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit) : 1;
+				// Divide areaScaling into the rate so have complete scaling factor for readings.
+				const scaling = rateScaling / areaScaling;
 				const readingsData = byMeterID[timeInterval.toString()][unitID];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.meters.byMeterID[meterID].identifier;
@@ -68,37 +70,19 @@ function mapStateToProps(state: State) {
 					const yData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
-					// Check if reading needs scaling outside of the loop so only one check is needed
-					// Results in more code but SLIGHTLY better efficiency :D
-					if (needsRateScaling) {
-						const rate = currentSelectedRate.rate;
-						readings.forEach(reading => {
-							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-							// are equivalent to Unix timestamp in milliseconds.
-							const st = moment.utc(reading.startTimestamp);
-							// Time reading is in the middle of the start and end timestamp
-							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-							yData.push(reading.reading * rate);
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
-						});
-					}
-					else {
-						readings.forEach(reading => {
-							// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-							// are equivalent to Unix timestamp in milliseconds.
-							const st = moment.utc(reading.startTimestamp);
-							// Time reading is in the middle of the start and end timestamp
-							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-							let readingValue = reading.reading;
-							if (state.graph.areaNormalization) {
-								readingValue /= meterArea;
-							}
-							yData.push(readingValue);
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
-						});
-					}
+					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
+					// const scaling = currentSelectedRate.rate / meterArea;
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
+						const readingValue = reading.reading * scaling;
+						yData.push(readingValue);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+					});
 
 					/*
 					get the min and max timestamp of the meter, and compare it to the global values
@@ -241,34 +225,61 @@ function mapStateToProps(state: State) {
 	const start = moment.utc(minTimestamp).toISOString();
 	const end = moment.utc(maxTimestamp).toISOString();
 
+	let layout: any;
 	// Customize the layout of the plot
-	const layout: any = {
-		autosize: true,
-		showlegend: true,
-		height: 700,
-		legend: {
-			x: 0,
-			y: 1.1,
-			orientation: 'h'
-		},
-		yaxis: {
-			title: unitLabel,
-			gridcolor: '#ddd'
-		},
-
-		xaxis: {
-			range: [start, end], // Specifies the start and end points of visible part of graph
-			rangeslider: {
-				thickness: 0.1
+	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	if (datasets.length === 0) {
+		// There is not data so tell user.
+		layout = {
+			'xaxis': {
+				'visible': false
 			},
-			showgrid: true,
-			gridcolor: '#ddd'
-		},
-		margin: {
-			t: 10,
-			b: 10
+			'yaxis': {
+				'visible': false
+			},
+			'annotations': [
+				{
+					'text': `${translate('select.meter.group')}`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 28
+					}
+				}
+			]
 		}
-	};
+
+	} else {
+		// This normal so plot.
+		layout = {
+			autosize: true,
+			showlegend: true,
+			height: 700,
+			legend: {
+				x: 0,
+				y: 1.1,
+				orientation: 'h'
+			},
+			yaxis: {
+				title: unitLabel,
+				gridcolor: '#ddd'
+			},
+
+			xaxis: {
+				range: [start, end], // Specifies the start and end points of visible part of graph
+				rangeslider: {
+					thickness: 0.1
+				},
+				showgrid: true,
+				gridcolor: '#ddd'
+			},
+			margin: {
+				t: 10,
+				b: 10
+			}
+		};
+	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
