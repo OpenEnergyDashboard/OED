@@ -69,7 +69,7 @@ function formatThreeDData(data: ThreeDReading, state: State): Array<object> {
 					meterArea * getAreaUnitConversion(state.meters.byMeterID[selectedMeterID].areaUnit, state.graph.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				data.zData = data.zData.map(day => day.map(reading => reading * scaling));
+				data.zData = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
 	}
@@ -89,6 +89,7 @@ function formatThreeDData(data: ThreeDReading, state: State): Array<object> {
 const layout = {
 	autosize: true,
 	showlegend: true,
+	connectgaps: false, //Leaves holes in graph for missing,NaN, or null values.
 	height: 700,
 	scene: {
 		xaxis: {
