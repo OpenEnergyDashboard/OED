@@ -124,7 +124,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededThreeDReadings())
+			dispatch2(fetchNeededThreeDReadings(getState().graph.timeInterval))
 		});
 		return Promise.resolve();
 	};
@@ -162,7 +162,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
-		dispatch(fetchNeededThreeDReadings());
+		dispatch(fetchNeededThreeDReadings(timeInterval));
 		return Promise.resolve();
 	};
 }

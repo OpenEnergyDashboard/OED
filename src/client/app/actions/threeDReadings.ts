@@ -51,9 +51,10 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
 
 /**
  * Fetches 3D readings for the selected meter if needed.
+ * @param timeInterval - Time Interval to be queried.
  */
 // export function fetchNeededThreeDReadings(timeInterval: TimeInterval, unitID: number): Thunk {
-export function fetchNeededThreeDReadings(): Thunk {
+export function fetchNeededThreeDReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const selectedMeterID = state.graph.selectedMeters[0];
@@ -66,7 +67,7 @@ export function fetchNeededThreeDReadings(): Thunk {
 		}
 
 		//3D Graphic currently only allows full days. Round start down && end up
-		const intervalToQuery = roundTimeIntervalForFetch(state.graph.timeInterval);
+		const intervalToQuery = roundTimeIntervalForFetch(timeInterval);
 		if (shouldFetchMeterThreeDReadings(state, selectedMeterID, intervalToQuery, state.graph.selectedUnit, ThreeDReadingPrecision.hourly)) {
 			return dispatch(fetchMeterThreeDReadings(selectedMeterID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
 		}
