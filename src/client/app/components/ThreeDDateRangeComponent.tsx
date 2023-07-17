@@ -19,17 +19,17 @@ export default function ThreeDDateRangeComponent() {
 	const intl = useIntl();
 	const messages = defineMessages({ selectDateRange: { id: 'select.dateRange' }, redraw: { id: 'redraw' } });
 	const dispatch: Dispatch = useDispatch();
-	const graphState = useSelector((state: State) => state.graph);
+	const threeDTimeInterval = useSelector((state: State) => state.graph.threeDTimeInterval);
+	const chartToRender = useSelector((state: State) => state.graph.chartToRender);
 	const onDatePickerChange = (value: Value) => dispatch(updateThreeDTimeInterval(value));
-	const updateTimeInterval = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(graphState.threeDTimeInterval))); };
 	const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };
-	const onCalClose = () => { updateTimeInterval() };
+	const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(threeDTimeInterval))) };
 	// Don't Close Calendar when selecting dates.
 	// This allows the value to update before calling the onCalClose() method to fetch data if needed.
 	const shouldCloseCal = (props: { reason: CloseReason; }) => { return props.reason === 'select' ? false : true; };
 
 	// Only Render if a 3D Graphic Type Selected.
-	if (graphState.chartToRender === ChartTypes.threeD)
+	if (chartToRender === ChartTypes.threeD)
 		return (
 			<div style={{ width: '100%' }}>
 				<p style={labelStyle}>{intl.formatMessage(messages.selectDateRange)}:</p>
@@ -37,7 +37,7 @@ export default function ThreeDDateRangeComponent() {
 					onChange={onDatePickerChange}
 					onCalendarClose={onCalClose}
 					shouldCloseCalendar={shouldCloseCal}
-					value={graphState.threeDTimeInterval}
+					value={threeDTimeInterval}
 					minDate={new Date(1970, 0, 1)}
 					maxDate={new Date()}
 					defaultView={'year'}
