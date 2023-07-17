@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as moment from 'moment';
 import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
@@ -12,11 +13,14 @@ const layout = {
 	scene: {
 		xaxis: {
 			title: 'Hours of Day',
-			nticks: 4
+			tickformat: '%I:%M %p'
+			// tickformat: '%X' default locale formatting
+			// nticks: 4 auto works fine.
 		},
 		yaxis: {
 			title: 'Days of Calendar Year',
-			nticks: 6
+			tickformat: '%x' // Locale aware date formatting.
+			// nticks: 6
 		},
 		zaxis: { title: 'Resource Usage' },
 		camera: {
@@ -37,7 +41,6 @@ const config = {
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
-	// const graphState = useSelector((state: State)=> state.graph);
 	const dataToRender = useSelector((state: State) => {
 		const selectedMeterID = state.graph.selectedMeters[0];
 
@@ -66,17 +69,15 @@ export default function ThreeDComponent() {
  * @param data 3D data to be formatted
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
-function formatThreeDData(data: ThreeDReading): any {
-	// TODO FIX RETURN TYPE
+function formatThreeDData(data: ThreeDReading): Array<object> {
 	return [{
 		type: 'surface',
-		x: data.xData,
-		y: data.yData,
+		x: data.xData.map(xData => moment.utc(xData).format()),
+		y: data.yData.map(yData => moment.utc(yData).format()),
 		z: data.zData,
 		hoverinfo: 'text',
-		hovertext: data.zData.map(
-			(day, i) => day.map(
-				(readings, j) => `Date: ${data.yData[i]}<br>Time: ${data.xData[j]}<br>Usage: ${readings}`))
+		hovertext: data.zData.map((day, i) => day.map((readings, j) => //TODO format hover-text based on locale
+			`Date: ${moment.utc(data.yData[i]).format('MMM DD, YYYY')}<br>Time: ${moment.utc(data.xData[j]).format('h:mm A')}<br>Usage: ${readings}`))
 	}]
 }
 
