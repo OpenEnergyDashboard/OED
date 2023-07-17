@@ -8,9 +8,9 @@ import * as moment from 'moment';
 
 
 /**
- * Converts from OED's TimeInterval into a DateRange for compatibility with @wojtekmaj's DateRangePicker
+ * Converts from DateRange for to OED's Time interval for compatibility with @wojtekmaj's DateRangePicker
  * @param dateRange - DateRange to be converted
- * @returns the a time interval into a dateRange compatible for a date-picker using Date().
+ * @returns the translated TimeInterval
  */
 export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 	let start = null;
@@ -30,7 +30,7 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
  * Converts from OED's TimeInterval into a DateRange for compatibility with DateRangePicker
  * @param timeInterval - current redux state
  * @returns the converted DateRange [start, end] as Date() Objects.
-*/
+ */
 export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
 	if (timeInterval.getIsBounded()) {
 		const startTimeStamp = timeInterval.getStartTimestamp().toISOString().slice(0, -1);
@@ -42,30 +42,24 @@ export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
 	return null;
 }
 /**
- * Converts from OED's TimeInterval into a DateRange for compatibility with @wojtekmaj's DateRangePicker
- * @param dateRange - DateRange to be converted
- * @returns the a time interval into a dateRange compatible for a date-picker using Date().
+ * Rounds Time interval for a full day's worth of readings for use with 3d Graphics
+ * @param timeInterval - DateRange to be converted
+ * @returns the a time interval into a dateRange compatible for 3d graphics
  */
-export function dateRangeToTimeIntervalFetch(dateRange: Value): TimeInterval {
-	let start: Date | null = null;
-	let end: Date | null = null;
-	if (Array.isArray(dateRange)) {
-		[start, end] = dateRange;
-	}
-	if (start && end) {
-		const startRound = new Date(start);
-		const endRound = new Date(end);
-		startRound.setHours(0,0,0,0);
-		endRound.setHours(0,0,0,0);
-		endRound.setDate(endRound.getDate() + 1);
-		const startInterval = moment(toUTC(startRound));
-		const endInterval = moment(toUTC(endRound));
-		return new TimeInterval(startInterval, endInterval);
+export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInterval {
+	if (timeInterval.getIsBounded()) {
+		// clone() prevents startOf/EndOf from mutating the original timeInterval which will cause issues down the nested dispatch chain
+		const startTS = timeInterval.getStartTimestamp().clone();
+		const endTS = timeInterval.getEndTimestamp().clone();
+		startTS.startOf('day');
+		endTS.endOf('day');
+		endTS.add(1,'millisecond');
+		return new TimeInterval(startTS,endTS);
 	}
 	return TimeInterval.unbounded();
 }
 /**
- * Handles Date Object locale conversion to utc for compatibility with Moment.UTC
+ * Handles Date Object locale stripping. Removes the timeZoneOffset from Date Object's UTC String.
  * @param date - Date Object to be converted.
  * @returns modified date to remove locale quirks with Moment.UTC
  */

@@ -7,6 +7,7 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 
 export enum ChartTypes {
 	line = 'line',
@@ -112,7 +113,7 @@ export interface ConfirmGraphRenderOnce {
 
 export interface UpdateThreeDTimeInterval {
 	type: ActionType.UpdateThreeDTimeInterval;
-	timeInterval: TimeInterval;
+	dateRange: Value;
 }
 
 export type GraphAction =
@@ -159,5 +160,5 @@ export interface GraphState {
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
 	threeDAxisPrecision: ThreeDReadingPrecision;
-	threeDTimeInterval: TimeInterval;
+	threeDTimeInterval: Value;
 }

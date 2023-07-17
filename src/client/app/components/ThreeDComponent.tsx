@@ -1,12 +1,10 @@
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
-import { Dispatch } from 'types/redux/actions';
-import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
 const layout = {
 	autosize: true,
 	showlegend: true,
@@ -37,60 +35,29 @@ const config = {
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
-*/
+ */
 export default function ThreeDComponent() {
-	const allThreeDReadings = useSelector((state: State) => state.readings.threeD);
-	const graphState = useSelector((state: State) => state.graph);
-	const [threeDData, setThreeDData] = useState<any>(null);
-	const dispatch: Dispatch = useDispatch();
+	// const graphState = useSelector((state: State)=> state.graph);
+	const dataToRender = useSelector((state: State) => {
+		const selectedMeterID = state.graph.selectedMeters[0];
 
-	useEffect(() => {
-		// no selected meters
-		console.log('GSUE END >>>>');
-		if (graphState.selectedMeters.length < 1) return;
-		const selectedMeterID = graphState.selectedMeters[0];
-		const timeInterval = graphState.timeInterval;
-		if (isValidThreeDInterval(timeInterval)) {
-			console.log('Valid Time Interval, Fetching!');
-			dispatch(fetchNeededThreeDReadings(selectedMeterID));
+		// No Meter Selected => undefined => falsy
+		if (!selectedMeterID || state.readings.threeD.isFetching) {
+			return null;
 		}
-		else
-			setThreeDData(null);
-		console.log(threeDData);
-		console.log('GSUE END <<<<');
-	}, [graphState.selectedMeters]); //Fetch on Selected Meter Change
-
-	useEffect(() => {
-		console.log('ATDR START >>>>');
-		// no selected meters
-		if (graphState.selectedMeters.length < 1) return;
-		const selectedMeterID = graphState.selectedMeters[0];
-		const timeInterval = graphState.timeInterval.toString();
-		const unitID = graphState.selectedUnit;
-		const precision = graphState.threeDAxisPrecision;
-		console.log(allThreeDReadings);
-		// Check if Readings Exist In State
-		if (allThreeDReadings.byMeterID[selectedMeterID]) {
-			console.log('Meter Data Exists.');
-			const data = allThreeDReadings.byMeterID[selectedMeterID][timeInterval][unitID][precision].readings;
-			if (data) setThreeDData(formatThreeDData(data));
-			else setThreeDData(null);
+		// const timeInterval = state.graph.timeInterval.toString();
+		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
+		const unitID = state.graph.selectedUnit;
+		const precision = state.graph.threeDAxisPrecision;
+		const meterThreeDReadings = state.readings.threeD.byMeterID?.[selectedMeterID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+		if (!meterThreeDReadings) {
+			return null;
 		}
-
-		console.log(threeDData);
-		console.log('ATDR END <<<<');
-
-	}, [allThreeDReadings]);
+		return formatThreeDData(meterThreeDReadings);
+	});
 
 	return (
-		<div>
-			{
-				threeDData !== null ?
-					(<Plot data={threeDData} layout={layout} config={config} />)
-					:
-					(<p>No Data Yet!</p>)
-			}
-		</div>
+		<Plot data={dataToRender} layout={layout} config={config} />
 	);
 }
 

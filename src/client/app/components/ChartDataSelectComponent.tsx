@@ -350,7 +350,9 @@ export default function ChartDataSelectComponent() {
 								//	3D cannot effectively handle more than one meter, therefore users must
 								//	be able to only pick a single meter at a time, works similar to 'units'
 								// When selecting 3D meters, empty groups if any.
-								if (dataProps.allSelectedGroups.length > 0) dispatch(changeSelectedGroups([]));
+								if (dataProps.allSelectedGroups.length > 0) {
+									dispatch(changeSelectedGroups([]));
+								}
 								// Reset units if no meters selected
 								if (allSelectedMeterIDs.length < 1) {
 									dispatch(changeSelectedMeters([]));

@@ -6,9 +6,10 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/threeDReadings';
-import { ThreeDReadingPrecision } from '../types/redux/graph'
+import { ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph'
 import { readingsApi } from '../utils/api';
 import { ThreeDReading } from '../types/readings';
+import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
 
 /**
  * @param meterID the IDs of the meters to get readings
@@ -50,18 +51,27 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
 
 /**
  * Fetches 3D readings for the selected meter if needed.
- * @param meterID Meter for which to fetch data
  */
 // export function fetchNeededThreeDReadings(timeInterval: TimeInterval, unitID: number): Thunk {
-export function fetchNeededThreeDReadings(meterID: number): Thunk {
+export function fetchNeededThreeDReadings(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		if (shouldFetchMeterThreeDReadings(state, meterID, state.graph.threeDTimeInterval, state.graph.selectedUnit, ThreeDReadingPrecision.hourly)) {
-			return dispatch(fetchMeterThreeDReadings(meterID, state.graph.timeInterval, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
-		}
-		else {
+		const selectedMeterID = state.graph.selectedMeters[0];
+
+		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
+			!state.graph.timeInterval.getIsBounded() || // Time interval must be bounded, Infinite intervals not allowed
+			!selectedMeterID)// no meter selected
+		{
 			return Promise.resolve();
 		}
+
+		//3D Graphic currently only allows full days. Round start down && end up
+		const intervalToQuery = roundTimeIntervalForFetch(state.graph.timeInterval);
+		if (shouldFetchMeterThreeDReadings(state, selectedMeterID, intervalToQuery, state.graph.selectedUnit, ThreeDReadingPrecision.hourly)) {
+			return dispatch(fetchMeterThreeDReadings(selectedMeterID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
+		}
+
+		return Promise.resolve();
 	};
 }
 

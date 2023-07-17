@@ -28,7 +28,7 @@ const defaultState: GraphState = {
 	lineGraphRate: {label: 'hour', rate: 1},
 	renderOnce: false,
 	threeDAxisPrecision: ThreeDReadingPrecision.hourly,
-	threeDTimeInterval: TimeInterval.unbounded()
+	threeDTimeInterval: null
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -123,7 +123,7 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.UpdateThreeDTimeInterval:
 			return {
 				...state,
-				timeInterval: action.timeInterval
+				threeDTimeInterval: action.dateRange
 			};
 		default:
 			return state;
