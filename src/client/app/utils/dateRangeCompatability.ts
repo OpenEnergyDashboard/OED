@@ -66,3 +66,12 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
 export function toUTC(date: Date) {
 	return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 }
+
+/**
+ * Determines if Time Interval is valid for 3d graphic. Is bounded, and a year or less.
+ * @param timeInterval - current redux state
+ * @returns the a time interval into a dateRange compatible for a date-picker.
+ */
+export function isValidThreeDInterval(timeInterval: TimeInterval): boolean {
+	return (timeInterval.getIsBounded() && timeInterval.duration('days') <= 365) ? true : false;
+}
