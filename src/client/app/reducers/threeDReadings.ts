@@ -24,24 +24,28 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			};
 
 			// Create meter wrappers if needed
-			if (newState.byMeterID[meterID] === undefined)
+			if (newState.byMeterID[meterID] === undefined) {
 				newState.byMeterID[meterID] = {};
+			}
 
-			if (newState.byMeterID[meterID][timeInterval] === undefined)
+			if (newState.byMeterID[meterID][timeInterval] === undefined) {
 				newState.byMeterID[meterID][timeInterval] = {};
+			}
 
 			// Preserve existing data if exists
-			if (newState.byMeterID[meterID][timeInterval][unitID] === undefined)
+			if (newState.byMeterID[meterID][timeInterval][unitID] === undefined) {
 				newState.byMeterID[meterID][timeInterval][unitID] = {};
+			}
 
-			if (newState.byMeterID[meterID][timeInterval][unitID][readingCount] !== undefined)
+			if (newState.byMeterID[meterID][timeInterval][unitID][readingCount] !== undefined) {
 				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = {
 					...newState.byMeterID[meterID][timeInterval][unitID][readingCount],
 					isFetching: true
 				};
-			else
+			}
+			else {
 				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { isFetching: true };
-
+			}
 			return newState;
 		}
 		case ActionType.ReceiveMeterThreeDReadings: {
