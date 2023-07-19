@@ -152,6 +152,7 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededThreeDReadings(getState().graph.timeInterval));
 		});
 		return Promise.resolve();
 	}

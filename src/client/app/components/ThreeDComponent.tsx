@@ -1,3 +1,6 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 import * as moment from 'moment';
 import Plot from 'react-plotly.js';
@@ -32,7 +35,17 @@ export default function ThreeDComponent() {
 	});
 
 	return (
-		<Plot data={dataToRender} layout={layout} config={config} />
+		<div style={{ width: '100%', height: '100%' }}>
+			<Plot
+				data={dataToRender}
+				layout={layout}
+				config={config}
+				style={{ width: '100%', height: '100%' }}
+				useResizeHandler={true}
+			// Camera Testing Purposes only.
+			// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
+			/>
+		</div>
 	);
 }
 
@@ -77,6 +90,9 @@ function formatThreeDData(data: ThreeDReading, state: State): Array<object> {
 
 	return [{
 		type: 'surface',
+		showlegend: false,
+		showscale: false,
+		// zmin: 0,
 		x: data.xData.map(xData => moment.utc(xData).format()),
 		y: data.yData.map(yData => moment.utc(yData).format()),
 		z: data.zData,
@@ -88,28 +104,28 @@ function formatThreeDData(data: ThreeDReading, state: State): Array<object> {
 
 const layout = {
 	autosize: true,
-	showlegend: true,
-	connectgaps: false, //Leaves holes in graph for missing,NaN, or null values.
-	height: 700,
+	connectgaps: false, //Leaves holes in graph for missing, undefined, NaN, or null values.
 	scene: {
 		xaxis: {
 			title: 'Hours of Day',
 			tickformat: '%I:%M %p'
-			// tickformat: '%X' default locale formatting
-			// nticks: 4 auto works fine.
 		},
 		yaxis: {
-			title: 'Days of Calendar Year',
+			title: { text: 'Days of Calendar Year' },
 			tickformat: '%x' // Locale aware date formatting.
-			// nticks: 6
 		},
 		zaxis: { title: 'Resource Usage' },
+		aspectratio: {
+			x: 1,
+			y: 2.75,
+			z: 1
+		},
 		camera: {
 			// Somewhat suitable camera eye values for data of zResource[day][hour]
 			eye: {
-				x: 2, // Adjust x value for zoom
-				y: -1.25, // Adjust y value for zoom
-				z: 0.1 // Adjust z value for zoom
+				x: 2.5,
+				y: -1.6,
+				z: 0.8
 			}
 		}
 	}
