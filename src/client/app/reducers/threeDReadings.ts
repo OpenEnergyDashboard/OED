@@ -7,6 +7,7 @@ import { ActionType } from '../types/redux/actions';
 
 const defaultState: ThreeDReadingsState = {
 	byMeterID: {},
+	byGroupID: {},
 	isFetching: false,
 	metersFetching: false
 };
@@ -60,6 +61,55 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 
 			const readingsForMeter = action.readings;
 			newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { readings: readingsForMeter, isFetching: false };
+			return newState;
+		}
+		case ActionType.RequestGroupThreeDReadings: {
+			const groupID = action.groupID;
+			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
+			const readingCount = action.precision;
+			const newState: ThreeDReadingsState = {
+				...state,
+				isFetching: true
+			};
+
+			// Create group wrappers if needed
+			if (newState.byGroupID[groupID] === undefined) {
+				newState.byGroupID[groupID] = {};
+			}
+
+			if (newState.byGroupID[groupID][timeInterval] === undefined) {
+				newState.byGroupID[groupID][timeInterval] = {};
+			}
+
+			// Preserve existing data if exists
+			if (newState.byGroupID[groupID][timeInterval][unitID] === undefined) {
+				newState.byGroupID[groupID][timeInterval][unitID] = {};
+			}
+
+			if (newState.byGroupID[groupID][timeInterval][unitID][readingCount] !== undefined) {
+				newState.byGroupID[groupID][timeInterval][unitID][readingCount] = {
+					...newState.byGroupID[groupID][timeInterval][unitID][readingCount],
+					isFetching: true
+				};
+			}
+			else {
+				newState.byGroupID[groupID][timeInterval][unitID][readingCount] = { isFetching: true };
+			}
+			return newState;
+		}
+		case ActionType.ReceiveGroupThreeDReadings: {
+			const groupID = action.groupID;
+			const timeInterval = action.timeInterval.toString();
+			const unitID = action.unitID;
+			const readingCount = action.precision;
+			const newState: ThreeDReadingsState = {
+				...state,
+				isFetching: false
+			};
+
+			const readingsForGroup = action.readings;
+			newState.byGroupID[groupID][timeInterval][unitID][readingCount] = { readings: readingsForGroup, isFetching: false };
 			return newState;
 		}
 

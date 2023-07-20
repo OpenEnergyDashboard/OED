@@ -311,7 +311,25 @@ export default function ChartDataSelectComponent() {
 							} else {
 								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
 							}
-							dispatch(changeSelectedGroups(allSelectedGroupIDs));
+							/* TODO Not Ideal. Find better approach to supporting 3D meter selection*/
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								// 3D cannot effectively handle more than one meter, therefore users must
+								// be able to only pick a single meter or group at a time, works similar to 'units'
+
+								// When selecting 3D groups, empty meters if any.
+								if (dataProps.allSelectedMeters.length > 0) {
+									dispatch(changeSelectedMeters([]));
+								}
+								if (allSelectedGroupIDs.length < 1) {
+									dispatch(changeSelectedGroups([]));
+								} else {
+									// Utilize the last group selected to simulate single select
+									dispatch(changeSelectedGroups([allSelectedGroupIDs[allSelectedGroupIDs.length - 1]]));
+								}
+
+							} else {
+								dispatch(changeSelectedGroups(allSelectedGroupIDs));
+							}
 						}
 					}}
 				/>
@@ -348,15 +366,14 @@ export default function ChartDataSelectComponent() {
 							/* TODO Not Ideal. Find better approach to supporting 3D meter selection*/
 							if (dataProps.chartToRender === ChartTypes.threeD) {
 								//	3D cannot effectively handle more than one meter, therefore users must
-								//	be able to only pick a single meter at a time, works similar to 'units'
+								//	be able to only pick a single meter or group at a time, works similar to 'units'
+
 								// When selecting 3D meters, empty groups if any.
 								if (dataProps.allSelectedGroups.length > 0) {
 									dispatch(changeSelectedGroups([]));
 								}
-								// Reset units if no meters selected
 								if (allSelectedMeterIDs.length < 1) {
 									dispatch(changeSelectedMeters([]));
-									dispatch(updateSelectedUnit(-99));
 								} else {
 									// Utilize the last meter selected
 									dispatch(changeSelectedMeters([allSelectedMeterIDs[allSelectedMeterIDs.length - 1]]));

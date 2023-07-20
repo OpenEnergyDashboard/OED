@@ -44,6 +44,8 @@ export default function ThreeDDateRangeComponent() {
 					minDate={new Date(1970, 0, 1)}
 					maxDate={new Date()}
 					defaultView={'year'}
+					clearIcon={null} // clear not necessary for 3D interval must be bounded
+					calendarIcon={null} // unnecessary
 				/>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.dateRange' />
 			</div>);

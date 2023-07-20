@@ -9,7 +9,7 @@ import * as t from '../types/redux/threeDReadings';
 import { ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph'
 import { readingsApi } from '../utils/api';
 import { ThreeDReading } from '../types/readings';
-import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
+import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
 
 /**
  * @param meterID the IDs of the meters to get readings
@@ -53,14 +53,13 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
  * Fetches 3D readings for the selected meter if needed.
  * @param timeInterval - Time Interval to be queried.
  */
-// export function fetchNeededThreeDReadings(timeInterval: TimeInterval, unitID: number): Thunk {
-export function fetchNeededThreeDReadings(timeInterval: TimeInterval): Thunk {
+export function fetchNeededMeterThreeDReadings(timeInterval: TimeInterval): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const selectedMeterID = state.graph.selectedMeters[0];
 
 		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
-			!timeInterval.getIsBounded() || // Time interval must be bounded, Infinite intervals not allowed
+			!isValidThreeDInterval(timeInterval) || // Time interval must be bounded, Infinite intervals not allowed
 			!selectedMeterID)// no meter selected
 		{
 			return Promise.resolve();
@@ -90,6 +89,105 @@ function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInter
 	const timeIntervalIndex = timeInterval.toString();
 
 	const readingsForID = state.readings.threeD.byMeterID[meterID];
+	if (readingsForID === undefined) {
+		return true;
+	}
+
+	const readingsForTimeInterval = readingsForID[timeIntervalIndex];
+	if (readingsForTimeInterval === undefined) {
+		return true;
+	}
+
+	const readingsForUnit = readingsForTimeInterval[unitID];
+	if (readingsForUnit === undefined) {
+		return true;
+	}
+
+	const readingsForReadingCount = readingsForUnit[precision];
+	if (readingsForReadingCount === undefined) {
+		return true;
+	}
+	return false;
+}
+
+//////////////
+/**
+ * @param groupID the IDs of the groups to get readings
+ * @param timeInterval the interval over which to check
+ * @param unitID the ID of the unit for which to check
+ * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ */
+function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision)
+	: t.RequestGroupThreeDReadingsAction {
+	return { type: ActionType.RequestGroupThreeDReadings, groupID, timeInterval, unitID, precision: readingCount };
+}
+
+/**
+ * @param groupID the IDs of the groups to get readings
+ * @param timeInterval the interval over which to check
+ * @param unitID the ID of the unit for which to check
+ * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readings the readings for the given groups
+ */
+function receiveGroupThreeDReadings(
+	groupID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision, readings: ThreeDReading)
+	: t.ReceiveGroupThreeDReadingsAction {
+	return { type: ActionType.ReceiveGroupThreeDReadings, groupID, timeInterval, unitID, precision: readingCount, readings };
+}
+
+/**
+ * @param groupID the IDs of the groups to get readings
+ * @param timeInterval the interval over which to check
+ * @param unitID the ID of the unit for which to check
+ * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ */
+function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision): Thunk {
+	return async (dispatch: Dispatch) => {
+		dispatch(requestGroupThreeDReadings(groupID, timeInterval, unitID, precision));
+		const groupThreeDReadings = await readingsApi.groupThreeDReadings(groupID, timeInterval, unitID);
+		dispatch(receiveGroupThreeDReadings(groupID, timeInterval, unitID, precision, groupThreeDReadings));
+	};
+}
+
+/**
+ * Fetches 3D readings for the selected group if needed.
+ * @param timeInterval - Time Interval to be queried.
+ */
+export function fetchNeededGroupThreeDReadings(timeInterval: TimeInterval): Thunk {
+	return (dispatch: Dispatch, getState: GetState) => {
+		const state = getState();
+		const selectedGroupID = state.graph.selectedGroups[0];
+
+		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
+			!timeInterval.getIsBounded() || // Time interval must be bounded, Infinite intervals not allowed
+			!selectedGroupID)// no group selected
+		{
+			return Promise.resolve();
+		}
+
+		//3D Graphic currently only allows full days. Round start down && end up
+		const intervalToQuery = roundTimeIntervalForFetch(timeInterval);
+		if (shouldFetchGroupThreeDReadings(state, selectedGroupID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision)) {
+			return dispatch(fetchGroupThreeDReadings(selectedGroupID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
+		}
+
+		return Promise.resolve();
+	};
+}
+
+/**
+ * @param state the Redux state
+ * @param groupID the ID of the group to check
+ * @param timeInterval the interval over which to check
+ * @param unitID the ID of the unit for which to check
+ * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @returns True if the readings for the given group, time duration and unit are missing; false otherwise.
+ */
+function shouldFetchGroupThreeDReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision)
+	: boolean {
+	const timeIntervalIndex = timeInterval.toString();
+
+	const readingsForID = state.readings.threeD.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}

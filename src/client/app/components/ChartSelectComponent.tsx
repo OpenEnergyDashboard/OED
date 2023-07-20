@@ -31,7 +31,6 @@ export default function ChartSelectComponent() {
 		margin: 0
 	};
 
-	const selectedMeters = useSelector((state: State) => state.graph.selectedMeters);
 	const dispatch: Dispatch = useDispatch();
 	const [expand, setExpand] = useState(false);
 	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
@@ -79,14 +78,9 @@ export default function ChartSelectComponent() {
 							// Resets all meters and group when switching to 3D graph
 							// 3D should not be able to render more than 1 graph at a time,
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
-							if (selectedMeters.length > 0) {
-								// If meters are selected, use the most recently selected as the default value for initial 3d graphic.
-								dispatch(changeSelectedMeters([selectedMeters[selectedMeters.length - 1]]));
-							} else {
-								dispatch(changeSelectedMeters([]));
-								dispatch(updateSelectedGroups([]));
-								dispatch(updateSelectedUnit(-99));
-							}
+							dispatch(changeSelectedMeters([]));
+							dispatch(updateSelectedGroups([]));
+							dispatch(updateSelectedUnit(-99));
 						}
 						}
 					>

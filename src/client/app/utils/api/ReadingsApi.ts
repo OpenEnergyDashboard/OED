@@ -94,9 +94,23 @@ export default class ReadingsApi {
 	 * @returns ThreeDReadings in sorted order
 	 */
 	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
-		// const stringifiedIDs = meterIDs.join(',');
 		return await this.backend.doGetRequest<ThreeDReading>(
 			`/api/unitReadings/threeD/meters/${meterID}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+	}
+
+	/**
+	 * Gets 3D readings for a single meter in the given time range.
+	 * @param groupID Meter to query
+	 * @param timeInterval Range of time to get readings from
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns ThreeDReadings in sorted order
+	 */
+	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
+		// TODO update api endpoint to meters! meter hardcoded to simulate data retrieval
+		return await this.backend.doGetRequest<ThreeDReading>(
+			`/api/unitReadings/threeD/meters/${21}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 	}

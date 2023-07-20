@@ -22,10 +22,28 @@ export interface ReceiveMeterThreeDReadingsAction {
 	precision: string;
 	readings: ThreeDReading;
 }
+export interface RequestGroupThreeDReadingsAction {
+	type: ActionType.RequestGroupThreeDReadings;
+	groupID: number;
+	unitID: number;
+	timeInterval: TimeInterval;
+	precision: string;
+}
+
+export interface ReceiveGroupThreeDReadingsAction {
+	type: ActionType.ReceiveGroupThreeDReadings;
+	groupID: number;
+	unitID: number;
+	timeInterval: TimeInterval;
+	precision: string;
+	readings: ThreeDReading;
+}
 
 export type ThreeDReadingsAction =
 	ReceiveMeterThreeDReadingsAction |
-	RequestMeterThreeDReadingsAction;
+	RequestMeterThreeDReadingsAction |
+	RequestGroupThreeDReadingsAction |
+	ReceiveGroupThreeDReadingsAction;
 
 export interface ThreeDReadingsState {
 	byMeterID: {
@@ -40,6 +58,20 @@ export interface ThreeDReadingsState {
 			}
 		}
 	};
+
+	byGroupID: {
+		[groupID: number]: {
+			[timeInterval: string]: {
+				[unitID: number]: {
+					[precision: string]: {
+						isFetching: boolean;
+						readings?: ThreeDReading;
+					}
+				}
+			}
+		}
+	};
+
 	isFetching: boolean;
 	metersFetching: boolean;
 }
