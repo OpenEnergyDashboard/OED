@@ -20,22 +20,22 @@ const fs = require('fs').promises;
 async function insertUnits(unitsToInsert, update = false, conn) {
 	await Promise.all(unitsToInsert.map(
 		async unitData => {
-			const dbUnit = await Unit.getByName(unitData[0], conn);
+			const dbUnit = await Unit.getByName(unitData.name, conn);
 			if (dbUnit === null) {
 				// The unit does not exist so add it.
-				await new Unit(undefined, unitData[0], unitData[1], unitData[2], unitData[3],
-					unitData[4], null, unitData[5], unitData[6], unitData[7], unitData[8]).insert(conn);
+				await new Unit(undefined, unitData.name, unitData.identifier, unitData.unitRepresent, unitData.secInRate,
+					unitData.typeOfUnit, null, unitData.suffix, unitData.displayable, unitData.preferredDisplay, unitData.note).insert(conn);
 			} else if (update) {
 				// Asked to update so will. Does not bother to check if no changes.
-				dbUnit.name = unitData[0];
-				dbUnit.identifier = unitData[1];
-				dbUnit.unitRepresent = unitData[2];
-				dbUnit.secInRate = unitData[3];
-				dbUnit.typeOfUnit = unitData[4];
-				dbUnit.suffix = unitData[5];
-				dbUnit.displayable = unitData[6];
-				dbUnit.preferredDisplay = unitData[7];
-				dbUnit.note = unitData[8];
+				dbUnit.name = unitData.name;
+				dbUnit.identifier = unitData.identifier;
+				dbUnit.unitRepresent = unitData.unitRepresent;
+				dbUnit.secInRate = unitData.secInRate;
+				dbUnit.typeOfUnit = unitData.typeOfUnit;
+				dbUnit.suffix = unitData.suffix;
+				dbUnit.displayable = unitData.displayable;
+				dbUnit.preferredDisplay = unitData.preferredDisplay;
+				dbUnit.note = unitData.note;
 				// Should update even though exists.
 				await dbUnit.update(conn);
 			}
@@ -75,10 +75,10 @@ async function insertStandardUnits(conn) {
 async function insertConversions(conversionsToInsert, conn) {
 	await Promise.all(conversionsToInsert.map(
 		async conversionData => {
-			const sourceId = (await Unit.getByName(conversionData[0], conn)).id;
-			const destinationId = (await Unit.getByName(conversionData[1], conn)).id;
+			const sourceId = (await Unit.getByName(conversionData.sourceId, conn)).id;
+			const destinationId = (await Unit.getByName(conversionData.destinationId, conn)).id;
 			if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
-				await new Conversion(sourceId, destinationId, conversionData[2], conversionData[3], conversionData[4], conversionData[5]).insert(conn);
+				await new Conversion(sourceId, destinationId, conversionData.bidirectional, conversionData.slope, conversionData.intercept, conversionData.note).insert(conn);
 			}
 		}
 	));
