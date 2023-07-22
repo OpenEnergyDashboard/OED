@@ -12,6 +12,10 @@ import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
+import { GraphState } from 'types/redux/graph';
+import { UnitsState } from 'types/redux/units';
+import { MetersState } from 'types/redux/meters';
+import { GroupsState } from 'types/redux/groups';
 
 type ThreeDPlotlyData = {
 	type: 'surface';
@@ -30,70 +34,35 @@ type ThreeDPlotlyData = {
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
-	const metersSelected = useSelector((state: State) => state.graph.selectedMeters[0] || state.graph.selectedGroups[0]);
-	const timeInterval = useSelector((state: State) => state.graph.timeInterval);
-	const dataToRender = useSelector((state: State) => {
-		const selectedMeterID = state.graph.selectedMeters[0];
-		const selectedGroupID = state.graph.selectedGroups[0];
+	// Uses many selects as to grab relevant data only
+	// Particularly important to avoid rerenders for data dispatches not pertaining to 3D. ( line, bar, etc...)
+	const graphState = useSelector((state: State) => state.graph);
+	const metersState = useSelector((state: State) => state.meters);
+	const groupsState = useSelector((state: State) => state.groups);
+	const unitsState = useSelector((state: State) => state.units);
+	const threeDReadings = useSelector((state: State) => state.readings.threeD); // Update on 3dData changes only
 
-		// No Meters or Groups are selected
-		if (!selectedMeterID && !selectedGroupID) {
-			return null;
-		}
-		// In the current implementation, meters and groups should never both be populated at the same time
-		const meterOrGroupID = selectedMeterID ? selectedMeterID : selectedGroupID;	// If a meter id is present use it, use group meter.
-		const meterOrGroup = selectedMeterID ? 'byMeterID' : 'byGroupID'; // If a meter id is present look in byMeterId else look in byGroupId
-		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
-		const unitID = state.graph.selectedUnit;
-		const precision = state.graph.threeDAxisPrecision;
-
-		const threeDReadings = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
-
-		// if readings for the meter or group don't exist return null
-		if (!threeDReadings) {
-			return null;
-		}
-
-		// return formatted data.
-		return formatThreeDData(threeDReadings, state);
-	});
+	const selectedMeterID = graphState.selectedMeters[0];
+	const selectedGroupID = graphState.selectedGroups[0];
+	// In the current implementation, groups and meters cannot be both populated
+	const meterOrGroupID = selectedMeterID ? selectedMeterID : selectedGroupID;	// If a meter id is present use it,  else use group.
+	const meterOrGroup = selectedMeterID ? 'byMeterID' : 'byGroupID'; // If a meter id is present look in byMeterId else look in byGroupId
+	const timeInterval = roundTimeIntervalForFetch(graphState.timeInterval).toString();// 3D dispatches rounds time interval to full days.
+	const unitID = graphState.selectedUnit;
+	const precision = graphState.threeDAxisPrecision; // Level of detail along the xAxis / Readings per day,
+	const threeDData = threeDReadings[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
 	// TODO Refactor layout logic info 3d utilities files.
 	let layout: object = {};
-	if (!metersSelected) {
-		layout = {
-			...helpInfoLayout,
-			annotations: [{
-				...helpInfoLayout.annotations[0],
-				'text': `${translate('select.meter.group')}`
-			}]
-		};
-	}
-	else if (!isValidThreeDInterval(timeInterval)) {
-		layout = {
-			...helpInfoLayout,
-			annotations: [{
-				...helpInfoLayout.annotations[0],
-				'text': 'Date Range Must Be A year or less!'
-			}]
-		};
-	} else if (dataToRender === null) {
-		layout = {
-			...helpInfoLayout,
-			annotations: [{
-				...helpInfoLayout.annotations[0],
-				'text': `${translate('select.meter.group')}`
-			}]
-		};
+	let dataToRender = null;
 
-	} else if (dataToRender[0].z.length === 0) {
-		layout = {
-			...helpInfoLayout,
-			annotations: [{
-				...helpInfoLayout.annotations[0],
-				'text': 'No Data In Date Range.'
-			}]
-		}
+	if (!selectedMeterID && !selectedGroupID) { // No selected Meters
+		layout = setLayout(translate('select.meter.group'));
+	} else if (!isValidThreeDInterval(graphState.timeInterval)) { // Not a valid time interval.
+		layout = setLayout('Date Range Must be a year or less.');
+	} else if (!threeDData || threeDData.zData.length === 0) { // There is no data.
+		layout = setLayout('No Data In Date Range.');
 	} else {
+		dataToRender = formatThreeDData(threeDData, metersState, groupsState, graphState, unitsState);
 		layout = threeDLayout;
 	}
 
@@ -115,50 +84,55 @@ export default function ThreeDComponent() {
 /**
  * Formats Readings for plotly 3d surface
  * @param data 3D data to be formatted
- * @param state current application state
+ * @param meterState current application meter state
+ * @param groupState current application group state
+ * @param graphState current application graph state
+ * @param unitsState current application units state
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
-function formatThreeDData(data: ThreeDReading, state: State): Array<ThreeDPlotlyData> {
-	const selectedMeterOrGroupID = state.graph.selectedMeters[0] ? state.graph.selectedMeters[0] : state.graph.selectedGroups[0];
+function formatThreeDData(data: ThreeDReading, meterState: MetersState, groupState: GroupsState, graphState: GraphState, unitsState: UnitsState)
+	: Array<ThreeDPlotlyData> {
+	const selectedMeterOrGroupID = graphState.selectedMeters[0] ? graphState.selectedMeters[0] : graphState.selectedGroups[0];
 	// This variable helps when looking into state readings....byMeterID or readings...byGroupID
-	const meterOrGroup = state.graph.selectedMeters[0] ? 'meter' : 'group';
+	const meterOrGroup = graphState.selectedMeters[0] ? 'meter' : 'group';
 
 	// The unit label depends on the unit which is in selectUnit state.
-	const graphingUnit = state.graph.selectedUnit;
+	const graphingUnit = graphState.selectedUnit;
 	// The current selected rate
-	const currentSelectedRate = state.graph.lineGraphRate;
+	const currentSelectedRate = graphState.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
 	if (graphingUnit !== -99) {
-		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		const selectUnitState = unitsState.units[graphState.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
+			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, graphState.areaNormalization, graphState.selectedAreaUnit);
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
 			const meterArea = meterOrGroup === 'meter' ?
-				state.meters.byMeterID[selectedMeterOrGroupID].area :
-				state.groups.byGroupID[selectedMeterOrGroupID].area;
+				meterState.byMeterID[selectedMeterOrGroupID].area :
+				groupState.byGroupID[selectedMeterOrGroupID].area;
 
 			const areaUnit = meterOrGroup === 'meter' ?
-				state.meters.byMeterID[selectedMeterOrGroupID].areaUnit :
-				state.groups.byGroupID[selectedMeterOrGroupID].areaUnit;
+				meterState.byMeterID[selectedMeterOrGroupID].areaUnit :
+				groupState.byGroupID[selectedMeterOrGroupID].areaUnit;
 
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!state.graph.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
+			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
 
 				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = state.graph.areaNormalization ?
-					meterArea * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit) : 1;
+				const areaScaling = graphState.areaNormalization ?
+					meterArea * getAreaUnitConversion(areaUnit, graphState.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
 				data.zData = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
 	}
+	// TODO find a better way to set the zAxis
 	threeDLayout.scene.zaxis.title = unitLabel;
 
 	return [{
@@ -173,6 +147,23 @@ function formatThreeDData(data: ThreeDReading, state: State): Array<ThreeDPlotly
 		hovertext: data.zData.map((day, i) => day.map((readings, j) => //TODO format hover-text based on locale
 			`Date: ${moment.utc(data.yData[i]).format('MMM DD, YYYY')}<br>Time: ${moment.utc(data.xData[j]).format('h:mm A')}<br>${unitLabel}: ${readings}`))
 	}]
+}
+
+/**
+ * Utility to get plotlyLayout
+ * @param helpText 3D data to be formatted
+ * @param fontSize current application state
+ * @returns plotly layout object.
+ */
+function setLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
+	return {
+		...helpInfoLayout,
+		annotations: [{
+			...helpInfoLayout.annotations[0],
+			'text': helpText,
+			'fontsize': fontSize
+		}]
+	}
 }
 
 const threeDLayout = {
@@ -210,15 +201,11 @@ const helpInfoLayout = {
 	'yaxis': {
 		'visible': false
 	},
-	'zaxis': {
-		'visible': false
-	},
 	'annotations': [
 		{
-			'text': `${translate('select.meter.group')}`,
+			'text': 'Help Text Goes here',
 			'xref': 'paper',
 			'yref': 'paper',
-			'zref': 'paper',
 			'showarrow': false,
 			'font': {
 				'size': 28
