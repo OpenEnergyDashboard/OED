@@ -113,7 +113,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		Name cannot be blank
 		Area must be positive or zero
 		If area is nonzero, area unit must be set
-		Group must have at least one child (checked on submit)
+		Group must have at least one child (i.e has deep child meters)
 	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
@@ -280,7 +280,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			});
 		}
 		// If any of these change then it needs to be updated.
-		// metersState normally does not change but can so include.')}</Label>
+		// metersState normally does not change but can so include.
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
 

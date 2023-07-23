@@ -73,7 +73,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 	//Update the valid conversion state any time the source id, destination id, or bidirectional status changes
 	useEffect(() => {
-		setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional));
+		setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional, state.slope, state.intercept));
 	}, [state.sourceId, state.destinationId, state.bidirectional]);
 
 	// Reset the state to default values
@@ -86,9 +86,11 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	 * @param sourceId New conversion sourceId
 	 * @param destinationId New conversion destinationId
 	 * @param bidirectional New conversion bidirectional status
+	 * @param slope New slope
+	 * @param intercept New intercept
 	 * @returns boolean representing if new conversion is valid or not
 	 */
-	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
+	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean, slope: number, intercept: number) => {
 		/* Create Conversion Validation:
 			Source equals destination: invalid conversion
 			Conversion exists: invalid conversion
@@ -104,6 +106,10 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && props.unitsState[destinationId].typeOfUnit === UnitType.meter) {
 			notifyUser(translate('conversion.create.destination.meter'));
+			return false;
+		}
+
+		if(slope === null || intercept === null) {
 			return false;
 		}
 
@@ -255,8 +261,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 								</FormGroup>
 							</Col>
 						</Row>
-
-
 						{/* Bidirectional Y/N input*/}
 						<FormGroup>
 							<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
@@ -281,7 +285,11 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										type='number'
 										defaultValue={state.slope}
 										onChange={e => handleNumberChange(e)}
+										invalid={state.slope == null}
 									/>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -293,7 +301,11 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										name='intercept'
 										type='number'
 										onChange={e => handleNumberChange(e)}
-										required value={state.intercept} />
+										value={state.intercept}
+										invalid={state.intercept == null} />
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>

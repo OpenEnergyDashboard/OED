@@ -126,7 +126,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		Name cannot be blank
 		Area must be positive or zero
 		If area is nonzero, area unit must be set
-		Group must have at least one child
+		Group must have at least one child (i.e has deep child meters)
 	*/
 	const [validGroup, setValidGroup] = useState(false);
 	useEffect(() => {
