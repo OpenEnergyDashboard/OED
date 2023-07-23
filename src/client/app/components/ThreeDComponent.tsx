@@ -4,6 +4,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import Plot from 'react-plotly.js';
+import ThreeDPillComponent from './ThreeDPillComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
@@ -45,12 +46,13 @@ export default function ThreeDComponent() {
 		return [dataToRender, layout]
 	});
 	return (
-		<div style={{ width: '100%', height: '100%' }}>
+		<div style={{ width: '100%', height: '75vh'}}>
+			<ThreeDPillComponent />
 			<Plot
 				data={dataToRender}
 				layout={layout}
 				config={config}
-				style={{ width: '100%', height: '100%' }}
+				style={{ width: '100%', height: 'auto' }}
 				useResizeHandler={true}
 			// Camera Testing Config Purposes only.
 			// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}

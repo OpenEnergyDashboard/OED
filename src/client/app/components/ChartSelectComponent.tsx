@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
-import { changeSelectedMeters, updateSelectedGroups, updateSelectedUnit } from '../actions/graph';
 import { Dispatch } from '../types/redux/actions';
 
 /**
@@ -78,9 +77,9 @@ export default function ChartSelectComponent() {
 							// Resets all meters and group when switching to 3D graph
 							// 3D should not be able to render more than 1 graph at a time,
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
-							dispatch(changeSelectedMeters([]));
-							dispatch(updateSelectedGroups([]));
-							dispatch(updateSelectedUnit(-99));
+							// dispatch(changeSelectedMeters([]));
+							// dispatch(updateSelectedGroups([]));
+							// dispatch(updateSelectedUnit(-99));
 						}
 						}
 					>
