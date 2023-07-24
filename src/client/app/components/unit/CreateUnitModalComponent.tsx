@@ -213,7 +213,7 @@ export default function CreateUnitModalComponent() {
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state.secInRate}
-								min="1"
+								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
 								<FormattedMessage id="error.greater" values={{ min: '0'}}  />

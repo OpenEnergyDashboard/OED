@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
+import { BASE_URL } from './TooltipHelpComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -72,6 +73,7 @@ export default function HeaderButtonsComponent() {
 	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
+	const HELP_URL = BASE_URL + version;
 
 	// This updates which page is disabled because it is the one you are on.
 	useEffect(() => {
@@ -248,7 +250,7 @@ export default function HeaderButtonsComponent() {
 						</DropdownMenu>
 					</UncontrolledDropdown>
 					<NavLink
-						href={'https://openenergydashboard.github.io/help/' + version}>
+						href={HELP_URL}>
 						<FormattedMessage id='help' />
 					</NavLink>
 				</Nav>

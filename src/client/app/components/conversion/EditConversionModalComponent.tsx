@@ -210,8 +210,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 									<Label for='slope'>{translate('conversion.slope')}</Label>
 									<Input
 										id='slope'
-										type="number"
-										defaultValue={state.slope}
+										name='slope'
+										type='number'
+										value={state.slope}
 										onChange={e => handleNumberChange(e)} />
 								</FormGroup>
 							</Col>
@@ -221,9 +222,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 									<Label for='intercept'>{translate('conversion.intercept')}</Label>
 									<Input
 										id='intercept'
-										name="intercept"
-										type="number"
-										defaultValue={state.intercept}
+										name='intercept'
+										type='number'
+										value={state.intercept}
 										onChange={e => handleNumberChange(e)} />
 								</FormGroup>
 							</Col>
@@ -233,9 +234,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							<Label for='note'>{translate('conversion.note')}</Label>
 							<Input
 								id='note'
-								type="textarea"
+								name='note'
+								type='textarea'
 								defaultValue={state.note}
-								placeholder="Note"
+								placeholder='Note'
 								onChange={e => handleStringChange(e)} />
 						</FormGroup>
 					</Container>

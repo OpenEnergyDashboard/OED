@@ -180,12 +180,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Label for='identifier'>{translate('unit.identifier')}</Label>
 							<Input
 								id='identifier'
-								name="identifier"
-								type="text"
+								name='identifier'
+								type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.identifier}
-								placeholder="Identifier" />
+								placeholder='Identifier' />
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
@@ -272,11 +272,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Input
 								id='secInRate'
 								name='secInRate'
-								type="number"
+								type='number'
 								defaultValue={state.secInRate}
 								onChange={e => handleNumberChange(e)}
-								placeholder="Sec In Rate"
-								min="1"
+								placeholder='Sec In Rate'
+								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
 								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
@@ -287,10 +287,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Label for='suffix'>{translate('unit.suffix')}</Label>
 							<Input
 								id='suffix'
-								name="suffix"
-								type="text"
+								name='suffix'
+								type='text'
 								value={state.suffix}
-								placeholder="Suffix"
+								placeholder='Suffix'
 								onChange={e => handleStringChange(e)} />
 						</FormGroup></Col>
 					</Row>
@@ -299,10 +299,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						<Label for='note'>{translate('unit.note')}</Label>
 						<Input
 							id='note'
-							name="note"
-							type="textarea"
+							name='note'
+							type='textarea'
 							value={state.note}
-							placeholder="Note"
+							placeholder='Note'
 							onChange={e => handleStringChange(e)} />
 					</FormGroup>
 				</Container></ModalBody>

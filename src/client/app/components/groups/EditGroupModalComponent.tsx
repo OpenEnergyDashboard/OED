@@ -439,7 +439,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col><FormGroup>
 								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
 								<Input
-									id="defaultGraphicUnit"
+									id='defaultGraphicUnit'
 									name='defaultGraphicUnit'
 									type='select'
 									value={groupState.defaultGraphicUnit}
@@ -470,7 +470,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<FormGroup>
 								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
 								<Input
-									id="defaultGraphicUnit"
+									id='defaultGraphicUnit'
 									name='defaultGraphicUnit'
 									type='select'
 									value={groupState.defaultGraphicUnit}
@@ -522,9 +522,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									<InputGroup>
 										<Input
 											id='area'
-											name="area"
-											type="number"
-											min="0"
+											name='area'
+											type='number'
+											min='0'
 											// cannot use defaultValue because it won't update when area is auto calculated
 											// this makes the validation redundant but still a good idea
 											value={groupState.area}
@@ -545,7 +545,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								<FormGroup>
 									<Label for='areaUnit'>{translate('group.area.unit')}</Label>
 									<Input
-										id="areaUnit"
+										id='areaUnit'
 										name='areaUnit'
 										type='select'
 										value={groupState.areaUnit}

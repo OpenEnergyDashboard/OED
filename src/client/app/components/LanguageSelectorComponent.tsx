@@ -9,6 +9,7 @@ import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { updateSelectedLanguage } from '../actions/options';
+import { BASE_URL } from './TooltipHelpComponent';
 
 /**
  * A component that allows users to select which language the page should be displayed in.
@@ -19,6 +20,8 @@ export default function LanguageSelectorComponent() {
 
 	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
 	const version = useSelector((state: State) => state.version.version);
+
+	const HELP_URL = BASE_URL + version;
 
 	return (
 		<>
@@ -44,7 +47,7 @@ export default function LanguageSelectorComponent() {
 					</DropdownItem>
 					<DropdownItem divider />
 					<DropdownItem
-						href={'https://openenergydashboard.github.io/help/' + version + '/language.html'}>
+						href={HELP_URL + '/language.html'}>
 						<FormattedMessage id="help" />
 					</DropdownItem>
 				</DropdownMenu>

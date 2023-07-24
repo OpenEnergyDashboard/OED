@@ -333,10 +333,10 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for="identifier">{translate('meter.identifier')}</Label>
+							<Label for='identifier'>{translate('meter.identifier')}</Label>
 							<Input
 								id='identifier'
-								name="identifier"
+								name='identifier'
 								type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
@@ -344,7 +344,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for="name">{translate('meter.name')}</Label>
+							<Label for='name'>{translate('meter.name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -364,7 +364,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='unitId'> {translate('meter.unitName')}</Label>
 							<Input
 								id='unitId'
-								name="unitId"
+								name='unitId'
 								type='select'
 								value={state.unitId}
 								onChange={e => handleNumberChange(e)}
@@ -517,9 +517,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='area'>{translate('meter.area')}</Label>
 							<Input
 								id='area'
-								name="area"
-								type="number"
-								min="0"
+								name='area'
+								type='number'
+								min='0'
 								defaultValue={state.area}
 								onChange={e => handleNumberChange(e)}
 								invalid={state.area < 0} />
@@ -596,7 +596,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={state.cumulativeResetStart}
-								placeholder="HH:MM:SS" />
+								placeholder='HH:MM:SS' />
 						</FormGroup>
 						{/* cumulativeResetEnd input */}
 						<FormGroup>
@@ -608,7 +608,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={state.cumulativeResetEnd}
-								placeholder="HH:MM:SS" />
+								placeholder='HH:MM:SS' />
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -634,7 +634,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								name='readingGap'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
+								min='0'
 								defaultValue={state.readingGap}
 								invalid={state?.readingGap < 0}/>
 							<FormFeedback>
@@ -648,10 +648,10 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='readingVariation'>{translate('meter.readingVariation')}</Label>
 							<Input
 								id='readingVariation'
-								name="readingVariation"
-								type="number"
+								name='readingVariation'
+								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
+								min='0'
 								defaultValue={state.readingVariation}
 								invalid={state?.readingVariation < 0} />
 							<FormFeedback>
@@ -663,12 +663,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 							<Input
 								id='readingDuplication'
-								name="readingDuplication"
-								type="number"
+								name='readingDuplication'
+								type='number'
 								onChange={e => handleNumberChange(e)}
-								step="1"
-								min="1"
-								max="9"
+								step='1'
+								min='1'
+								max='9'
 								defaultValue={state.readingDuplication}
 								invalid={state?.readingDuplication < 1 || state?.readingDuplication > 9}/>
 							<FormFeedback>
@@ -703,8 +703,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='reading'>{translate('meter.reading')}</Label>
 							<Input
 								id='reading'
-								name="reading"
-								type="number"
+								name='reading'
+								type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state.reading} />
 						</FormGroup></Col>
@@ -717,7 +717,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								placeholder="YYYY-MM-DD HH:MM:SS"
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.startTimestamp} />
 						</FormGroup>
 						{/* endTimestamp input */}
@@ -729,7 +729,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								placeholder="YYYY-MM-DD HH:MM:SS"
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.endTimestamp} />
 						</FormGroup>
 						{/* endTimestamp input */}
@@ -741,7 +741,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								placeholder="YYYY-MM-DD HH:MM:SS"
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.previousEnd} />
 						</FormGroup></Col>
 					</Row>
