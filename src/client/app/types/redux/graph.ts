@@ -122,7 +122,8 @@ export interface UpdateThreeDPrecision {
 }
 export interface UpdateThreeDMeterOrGroupInfo {
 	type: ActionType.UpdateThreeDMeterOrGroupInfo;
-	meterOrGroupInfo: MeterOrGroupInfo;
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
 }
 
 export type GraphAction =
@@ -151,14 +152,14 @@ export interface LineGraphRate {
 	label: string,
 	rate: number
 }
+
+export type MeterOrGroupID = number | null;
+export type MeterOrGroup = 'meters' | 'groups';
 export interface ThreeDState {
-	meterOrGroupInfo: MeterOrGroupInfo;
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
 	xAxisPrecision: ThreeDReadingPrecision;
 	timeInterval: Value;
-}
-export interface MeterOrGroupInfo {
-	meterOrGroupID: number | null;
-	meterOrGroup: 'meters' | 'groups' | null;
 }
 
 export interface GraphState {

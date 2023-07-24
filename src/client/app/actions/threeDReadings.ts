@@ -55,8 +55,8 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
 export function fetchNeededThreeDReadings(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		const selectedMeterOrGroupID = state.graph.threeD.meterOrGroupInfo.meterOrGroupID;
-		const meterOrGroup = state.graph.threeD.meterOrGroupInfo.meterOrGroup;
+		const selectedMeterOrGroupID = state.graph.threeD.meterOrGroupID;
+		const meterOrGroup = state.graph.threeD.meterOrGroup;
 		//3D Graphic currently only allows full days. Round start down && end up
 
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval);

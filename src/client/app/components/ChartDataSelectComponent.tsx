@@ -10,7 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
-import { ChartTypes, MeterOrGroupInfo } from '../types/redux/graph';
+import { ChartTypes } from '../types/redux/graph';
 import { DataType } from '../types/Datasources';
 import {
 	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
@@ -18,7 +18,7 @@ import {
 } from '../utils/calibration';
 import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit, updateThreeDMeterOrGroupInfo, changeMeterOrGroupInfo
+	updateSelectedGroups, updateSelectedUnit, changeMeterOrGroupInfo
 } from '../actions/graph';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
@@ -319,13 +319,12 @@ export default function ChartDataSelectComponent() {
 							if (dataProps.chartToRender === ChartTypes.threeD) {
 								const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
 								const groupRemoved = !groupAdded;
-								const groupIsSelected = difference === dataProps.threeDState.meterOrGroupInfo.meterOrGroupID;
+								const groupIsSelected = difference === dataProps.threeDState.meterOrGroupID;
 								if (groupAdded) {
 									const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
 									dispatch(changeMeterOrGroupInfo(addedMeterID, 'groups'));
 								} else if (groupRemoved && groupIsSelected) {
-									const meterOrGroupInfo: MeterOrGroupInfo = { meterOrGroupID: null, meterOrGroup: null };
-									dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupInfo));
+									dispatch(changeMeterOrGroupInfo(null));
 								}
 							}
 							dispatch(changeSelectedGroups(allSelectedGroupIDs));
@@ -365,13 +364,12 @@ export default function ChartDataSelectComponent() {
 							if (dataProps.chartToRender === ChartTypes.threeD) {
 								const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
 								const meterRemoved = !meterAdded;
-								const meterIsSelected = difference === dataProps.threeDState.meterOrGroupInfo.meterOrGroupID;
+								const meterIsSelected = difference === dataProps.threeDState.meterOrGroupID;
 								if (meterAdded) {
 									const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
 									dispatch(changeMeterOrGroupInfo(addedMeterID, 'meters'));
 								} else if (meterRemoved && meterIsSelected) {
-									const meterOrGroupInfo: MeterOrGroupInfo = { meterOrGroupID: null, meterOrGroup: null };
-									dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupInfo));
+									dispatch(changeMeterOrGroupInfo(null));
 								}
 							}
 							dispatch(changeSelectedMeters(allSelectedMeterIDs));

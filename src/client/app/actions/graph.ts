@@ -220,13 +220,12 @@ export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision):
 	return { type: ActionType.UpdateThreeDPrecision, xAxisPrecision };
 }
 
-export function updateThreeDMeterOrGroupInfo(meterOrGroupInfo: t.MeterOrGroupInfo): t.UpdateThreeDMeterOrGroupInfo {
-	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupInfo };
+export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
+	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
 }
-export function changeMeterOrGroupInfo(meterOrGroupID: number, meterOrGroup: 'meters' | 'groups'): Thunk {
-	const meterOrGroupInfo: t.MeterOrGroupInfo = { meterOrGroupID: meterOrGroupID, meterOrGroup };
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = 'meters'): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupInfo));
+		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
 		return Promise.resolve();
 	};

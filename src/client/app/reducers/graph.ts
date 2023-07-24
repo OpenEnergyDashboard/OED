@@ -28,10 +28,8 @@ const defaultState: GraphState = {
 	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
 	threeD: {
-		meterOrGroupInfo: {
-			meterOrGroupID: null,
-			meterOrGroup: null
-		},
+		meterOrGroupID: null,
+		meterOrGroup: 'meters',
 		xAxisPrecision: ThreeDReadingPrecision.hourly,
 		timeInterval: null
 	}
@@ -147,9 +145,8 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				threeD: {
 					...state.threeD,
-					meterOrGroupInfo: {
-						...action.meterOrGroupInfo
-					}
+					meterOrGroupID: action.meterOrGroupID,
+					meterOrGroup: action.meterOrGroup
 				}
 			};
 		default:
