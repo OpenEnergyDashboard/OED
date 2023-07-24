@@ -19,8 +19,8 @@ export enum ChartTypes {
 
 // Rates that can be graphed, only relevant to line graphs.
 export const LineGraphRates = {
-	'second': (1/3600),
-	'minute': (1/60),
+	'second': (1 / 3600),
+	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
 }
@@ -116,6 +116,15 @@ export interface UpdateThreeDTimeInterval {
 	dateRange: Value;
 }
 
+export interface UpdateThreeDPrecision {
+	type: ActionType.UpdateThreeDPrecision;
+	xAxisPrecision: ThreeDReadingPrecision;
+}
+export interface UpdateThreeDMeterOrGroupInfo {
+	type: ActionType.UpdateThreeDMeterOrGroupInfo;
+	meterOrGroupInfo: MeterOrGroupInfo;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -134,11 +143,22 @@ export type GraphAction =
 	| SetOptionsVisibility
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce
-	| UpdateThreeDTimeInterval;
+	| UpdateThreeDTimeInterval
+	| UpdateThreeDPrecision
+	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
 	label: string,
 	rate: number
+}
+export interface ThreeDState {
+	meterOrGroupInfo: MeterOrGroupInfo;
+	xAxisPrecision: ThreeDReadingPrecision;
+	timeInterval: Value;
+}
+export interface MeterOrGroupInfo {
+	meterOrGroupID: number | null;
+	meterOrGroup: 'meters' | 'groups' | null;
 }
 
 export interface GraphState {
@@ -159,6 +179,5 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
-	threeDAxisPrecision: ThreeDReadingPrecision;
-	threeDTimeInterval: Value;
+	threeD: ThreeDState;
 }

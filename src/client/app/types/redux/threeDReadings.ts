@@ -39,6 +39,7 @@ export interface ReceiveGroupThreeDReadingsAction {
 	readings: ThreeDReading;
 }
 
+
 export type ThreeDReadingsAction =
 	ReceiveMeterThreeDReadingsAction |
 	RequestMeterThreeDReadingsAction |

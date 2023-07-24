@@ -10,7 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroupInfo } from '../types/redux/graph';
 import { DataType } from '../types/Datasources';
 import {
 	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
@@ -18,7 +18,7 @@ import {
 } from '../utils/calibration';
 import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit
+	updateSelectedGroups, updateSelectedUnit, updateThreeDMeterOrGroupInfo, changeMeterOrGroupInfo
 } from '../actions/graph';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
@@ -84,6 +84,7 @@ export default function ChartDataSelectComponent() {
 		// ony run this check if we are displaying a map chart
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
+		const threeDState = state.graph.threeD;
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
 			const mp = state.maps.byMapID[selectedMap];
 			// filter meters;
@@ -282,7 +283,9 @@ export default function ChartDataSelectComponent() {
 			// currently selected unit
 			selectedUnit,
 			// chart currently being rendered
-			chartToRender
+			chartToRender,
+			// current state of threeD
+			threeDState
 		}
 	});
 
@@ -311,23 +314,20 @@ export default function ChartDataSelectComponent() {
 							} else {
 								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
 							}
-							// /* TODO Not Ideal. Find better approach to supporting 3D meter selection*/
-							// if (dataProps.chartToRender === ChartTypes.threeD) {
-							// 	// 3D cannot effectively handle more than one meter, therefore users must
-							// 	// be able to only pick a single meter or group at a time, works similar to 'units'
 
-							// 	// When selecting 3D groups, empty meters if any.
-							// 	if (dataProps.allSelectedMeters.length > 0) {
-							// 		dispatch(changeSelectedMeters([]));
-							// 	}
-							// 	if (allSelectedGroupIDs.length < 1) {
-							// 		dispatch(changeSelectedGroups([]));
-							// 	} else {
-							// 		// Utilize the last group selected to simulate single select
-							// 		dispatch(changeSelectedGroups([allSelectedGroupIDs[allSelectedGroupIDs.length - 1]]));
-							// 	}
-
-							// }
+							// Do additional things relevant to 3D graphics
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
+								const groupRemoved = !groupAdded;
+								const groupIsSelected = difference === dataProps.threeDState.meterOrGroupInfo.meterOrGroupID;
+								if (groupAdded) {
+									const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
+									dispatch(changeMeterOrGroupInfo(addedMeterID, 'groups'));
+								} else if (groupRemoved && groupIsSelected) {
+									const meterOrGroupInfo: MeterOrGroupInfo = { meterOrGroupID: null, meterOrGroup: null };
+									dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupInfo));
+								}
+							}
 							dispatch(changeSelectedGroups(allSelectedGroupIDs));
 						}
 					}}
@@ -362,25 +362,18 @@ export default function ChartDataSelectComponent() {
 							} else {
 								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
 							}
-							/* TODO Not Ideal. Find better approach to supporting 3D meter selection*/
-							// if (dataProps.chartToRender === ChartTypes.threeD) {
-							// 	//	3D cannot effectively handle more than one meter, therefore users must
-							// 	//	be able to only pick a single meter or group at a time, works similar to 'units'
-
-							// 	// When selecting 3D meters, empty groups if any.
-							// 	if (dataProps.allSelectedGroups.length > 0) {
-							// 		dispatch(changeSelectedGroups([]));
-							// 	}
-							// 	if (allSelectedMeterIDs.length < 1) {
-							// 		dispatch(changeSelectedMeters([]));
-							// 	} else {
-							// 		// Utilize the last meter selected
-							// 		dispatch(changeSelectedMeters([allSelectedMeterIDs[allSelectedMeterIDs.length - 1]]));
-							// 	}
-
-							// } else {
-							// 	dispatch(changeSelectedMeters(allSelectedMeterIDs));
-							// }
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
+								const meterRemoved = !meterAdded;
+								const meterIsSelected = difference === dataProps.threeDState.meterOrGroupInfo.meterOrGroupID;
+								if (meterAdded) {
+									const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
+									dispatch(changeMeterOrGroupInfo(addedMeterID, 'meters'));
+								} else if (meterRemoved && meterIsSelected) {
+									const meterOrGroupInfo: MeterOrGroupInfo = { meterOrGroupID: null, meterOrGroup: null };
+									dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupInfo));
+								}
+							}
 							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 						}
 					}}

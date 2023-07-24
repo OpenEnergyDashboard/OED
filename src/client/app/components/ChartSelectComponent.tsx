@@ -74,12 +74,7 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
-							// Resets all meters and group when switching to 3D graph
-							// 3D should not be able to render more than 1 graph at a time,
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
-							// dispatch(changeSelectedMeters([]));
-							// dispatch(updateSelectedGroups([]));
-							// dispatch(updateSelectedUnit(-99));
 						}
 						}
 					>

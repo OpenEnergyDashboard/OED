@@ -23,7 +23,6 @@ function mapStateToProps(state: State) {
 		barLoading: state.readings.bar.isFetching,
 		compareLoading: state.readings.bar.isFetching,
 		mapLoading: state.maps.isLoading,
-		threeDLoading: state.readings.threeD.isFetching,
 		optionsVisibility: state.graph.optionsVisibility,
 		selectedTimeInterval: state.graph.timeInterval
 	};

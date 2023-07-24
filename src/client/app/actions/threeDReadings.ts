@@ -53,22 +53,29 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
  * Fetches 3D readings for the selected meter if needed.
  * @param timeInterval - Time Interval to be queried.
  */
-export function fetchNeededMeterThreeDReadings(timeInterval: TimeInterval): Thunk {
+export function fetchNeededThreeDReadings(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		const selectedMeterID = state.graph.selectedMeters[0];
+		const selectedMeterOrGroupID = state.graph.threeD.meterOrGroupInfo.meterOrGroupID;
+		const meterOrGroup = state.graph.threeD.meterOrGroupInfo.meterOrGroup;
+		//3D Graphic currently only allows full days. Round start down && end up
+
+		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval);
 
 		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
 			!isValidThreeDInterval(timeInterval) || // Time interval must be bounded, Infinite intervals not allowed
-			!selectedMeterID)// no meter selected
+			!selectedMeterOrGroupID)// no meter selected
 		{
 			return Promise.resolve();
 		}
-
-		//3D Graphic currently only allows full days. Round start down && end up
-		const intervalToQuery = roundTimeIntervalForFetch(timeInterval);
-		if (shouldFetchMeterThreeDReadings(state, selectedMeterID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision)) {
-			return dispatch(fetchMeterThreeDReadings(selectedMeterID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
+		if (meterOrGroup === 'meters') {
+			if (shouldFetchMeterThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.xAxisPrecision)) {
+				return dispatch(fetchMeterThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.xAxisPrecision));
+			}
+		} else {
+			if (shouldFetchGroupThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.xAxisPrecision)) {
+				return dispatch(fetchGroupThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.xAxisPrecision));
+			}
 		}
 
 		return Promise.resolve();
@@ -87,27 +94,10 @@ export function fetchNeededMeterThreeDReadings(timeInterval: TimeInterval): Thun
 function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision)
 	: boolean {
 	const timeIntervalIndex = timeInterval.toString();
-
-	const readingsForID = state.readings.threeD.byMeterID[meterID];
-	if (readingsForID === undefined) {
-		return true;
-	}
-
-	const readingsForTimeInterval = readingsForID[timeIntervalIndex];
-	if (readingsForTimeInterval === undefined) {
-		return true;
-	}
-
-	const readingsForUnit = readingsForTimeInterval[unitID];
-	if (readingsForUnit === undefined) {
-		return true;
-	}
-
-	const readingsForReadingCount = readingsForUnit[precision];
-	if (readingsForReadingCount === undefined) {
-		return true;
-	}
-	return false;
+	// Optional chaining returns undefined if any of the properties in the chain aren't present
+	const hasReadings = state.readings.threeD.byMeterID[meterID]?.[timeIntervalIndex]?.[unitID]?.[precision]?.readings;
+	// return true if readings aren't present.
+	return !hasReadings ? true : false;
 }
 
 //////////////
@@ -150,32 +140,6 @@ function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, u
 }
 
 /**
- * Fetches 3D readings for the selected group if needed.
- * @param timeInterval - Time Interval to be queried.
- */
-export function fetchNeededGroupThreeDReadings(timeInterval: TimeInterval): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		const state = getState();
-		const selectedGroupID = state.graph.selectedGroups[0];
-
-		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
-			!timeInterval.getIsBounded() || // Time interval must be bounded, Infinite intervals not allowed
-			!selectedGroupID)// no group selected
-		{
-			return Promise.resolve();
-		}
-
-		//3D Graphic currently only allows full days. Round start down && end up
-		const intervalToQuery = roundTimeIntervalForFetch(timeInterval);
-		if (shouldFetchGroupThreeDReadings(state, selectedGroupID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision)) {
-			return dispatch(fetchGroupThreeDReadings(selectedGroupID, intervalToQuery, state.graph.selectedUnit, state.graph.threeDAxisPrecision));
-		}
-
-		return Promise.resolve();
-	};
-}
-
-/**
  * @param state the Redux state
  * @param groupID the ID of the group to check
  * @param timeInterval the interval over which to check
@@ -186,25 +150,8 @@ export function fetchNeededGroupThreeDReadings(timeInterval: TimeInterval): Thun
 function shouldFetchGroupThreeDReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision)
 	: boolean {
 	const timeIntervalIndex = timeInterval.toString();
-
-	const readingsForID = state.readings.threeD.byGroupID[groupID];
-	if (readingsForID === undefined) {
-		return true;
-	}
-
-	const readingsForTimeInterval = readingsForID[timeIntervalIndex];
-	if (readingsForTimeInterval === undefined) {
-		return true;
-	}
-
-	const readingsForUnit = readingsForTimeInterval[unitID];
-	if (readingsForUnit === undefined) {
-		return true;
-	}
-
-	const readingsForReadingCount = readingsForUnit[precision];
-	if (readingsForReadingCount === undefined) {
-		return true;
-	}
-	return false;
+	// Optional chaining returns undefined if any of the properties in the chain aren't present
+	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[precision]?.readings;
+	// return true if readings aren't present.
+	return !hasReadings ? true : false;
 }

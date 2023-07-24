@@ -5,6 +5,7 @@ import * as React from 'react';
 import * as moment from 'moment';
 import Plot from 'react-plotly.js';
 import ThreeDPillComponent from './ThreeDPillComponent';
+import SpinnerComponent from './SpinnerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
@@ -20,23 +21,27 @@ import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
-		const selectedMeterID = state.graph.selectedMeters[0];
-		const selectedGroupID = state.graph.selectedGroups[0];
-		// In the current implementation, groups and meters cannot be both populated
-		const meterOrGroupID = selectedMeterID ? selectedMeterID : selectedGroupID;	// If a meter id is present use it,  else use group.
-		const meterOrGroup = selectedMeterID ? 'byMeterID' : 'byGroupID'; // If a meter id is present look in byMeterId else look in byGroupId
+		const meterOrGroupInfo = state.graph.threeD.meterOrGroupInfo;
+		// // In the current implementation, groups and meters cannot be both populated
+		const meterOrGroupID = meterOrGroupInfo.meterOrGroupID;
+		const meterOrGroup = meterOrGroupInfo.meterOrGroup === 'meters' ? 'byMeterID' : 'byGroupID';
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();// 3D dispatches rounds time interval to full days.
 		const unitID = state.graph.selectedUnit;
-		const precision = state.graph.threeDAxisPrecision; // Level of detail along the xAxis / Readings per day,
-		const threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+		const precision = state.graph.threeD.xAxisPrecision; // Level of detail along the xAxis / Readings per day,
+		let threeDData = null;
+		//
+		if (meterOrGroupID) {
+			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+		}
 
 		let layout = {};
 		let dataToRender = null;
-		// TODO internationalize / translate layout text
-		if (!selectedMeterID && !selectedGroupID) { // No selected Meters
+		// // TODO internationalize / translate layout text
+		if (!meterOrGroupID) { // No selected Meters
 			layout = setLayout(translate('select.meter.group'));
-		} else if (!isValidThreeDInterval(state.graph.timeInterval)) { // Not a valid time interval.
+		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) { // Not a valid time interval.
 			layout = setLayout('Date Range Must be a year or less.');
 		} else if (!threeDData || threeDData.zData.length === 0) { // There is no data.
 			layout = setLayout('No Data In Date Range.');
@@ -46,17 +51,21 @@ export default function ThreeDComponent() {
 		return [dataToRender, layout]
 	});
 	return (
-		<div style={{ width: '100%', height: '75vh'}}>
+		<div style={{ width: '100%', height: '75vh' }}>
 			<ThreeDPillComponent />
-			<Plot
-				data={dataToRender}
-				layout={layout}
-				config={config}
-				style={{ width: '100%', height: 'auto' }}
-				useResizeHandler={true}
-			// Camera Testing Config Purposes only.
-			// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
-			/>
+			{isFetching ?
+				<SpinnerComponent loading width={50} height={50} />
+				:
+				<Plot
+					data={dataToRender}
+					layout={layout}
+					config={config}
+					style={{ width: '100%', height: 'auto' }}
+					useResizeHandler={true}
+				// Camera Testing Config Purposes only.
+				// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
+				/>
+			}
 		</div>
 	);
 }

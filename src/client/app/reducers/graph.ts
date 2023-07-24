@@ -25,10 +25,16 @@ const defaultState: GraphState = {
 	areaNormalization: false,
 	hotlinked: false,
 	optionsVisibility: true,
-	lineGraphRate: {label: 'hour', rate: 1},
+	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
-	threeDAxisPrecision: ThreeDReadingPrecision.hourly,
-	threeDTimeInterval: null
+	threeD: {
+		meterOrGroupInfo: {
+			meterOrGroupID: null,
+			meterOrGroup: null
+		},
+		xAxisPrecision: ThreeDReadingPrecision.hourly,
+		timeInterval: null
+	}
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -123,7 +129,28 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.UpdateThreeDTimeInterval:
 			return {
 				...state,
-				threeDTimeInterval: action.dateRange
+				threeD: {
+					...state.threeD,
+					timeInterval: action.dateRange
+				}
+			};
+		case ActionType.UpdateThreeDPrecision:
+			return {
+				...state,
+				threeD: {
+					...state.threeD,
+					xAxisPrecision: action.xAxisPrecision
+				}
+			};
+		case ActionType.UpdateThreeDMeterOrGroupInfo:
+			return {
+				...state,
+				threeD: {
+					...state.threeD,
+					meterOrGroupInfo: {
+						...action.meterOrGroupInfo
+					}
+				}
 			};
 		default:
 			return state;

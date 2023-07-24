@@ -22,7 +22,7 @@ export default function ThreeDDateRangeComponent() {
 	const intl = useIntl();
 	const messages = defineMessages({ selectDateRange: { id: 'select.dateRange' }, redraw: { id: 'redraw' } });
 	const dispatch: Dispatch = useDispatch();
-	const threeDTimeInterval = useSelector((state: State) => state.graph.threeDTimeInterval);
+	const threeDTimeInterval = useSelector((state: State) => state.graph.threeD.timeInterval);
 	const chartToRender = useSelector((state: State) => state.graph.chartToRender);
 	const onDatePickerChange = (value: Value) => dispatch(updateThreeDTimeInterval(value));
 	const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };
