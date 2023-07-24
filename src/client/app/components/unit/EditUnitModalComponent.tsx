@@ -4,10 +4,9 @@
 import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -18,7 +17,7 @@ import { submitEditedUnit } from '../../actions/units';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
-import { formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -65,6 +64,16 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
+
+	/* Edit Unit Validation:
+		Name cannot be blank
+		Sec in Rate must be greater than zero
+		Unit type mismatches checked on submit
+	*/
+	const [validUnit, setValidUnit] = useState(false);
+	useEffect(() => {
+		setValidUnit(state.name !== '' && state.secInRate > 0);
+	}, [state.name, state.secInRate]);
 	/* End State */
 
 	// Reset the state to default values
@@ -83,18 +92,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	// Validate the changes and return true if we should update this unit.
 	// Two reasons for not updating the unit:
-	//  0. The rate is not greater than 0.
 	//	1. typeOfUnit is changed from meter to something else while some meters are still linked with this unit
 	//	2. There are no changes
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
-
-		// Check for case 0
-		if (state.secInRate <= 0) {
-			notifyUser(`${translate('unit.rate.error')} ${state.secInRate}.`);
-			inputOk = false;
-		}
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
@@ -162,142 +164,158 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	return (
 		<>
-			<Modal show={props.show} onHide={props.handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="edit.unit" />
-						<TooltipHelpContainer page='units-edit' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the unit are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Identifier input */}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="unit.identifier" /></label><br />
-										<Input
-											name="identifier"
-											type="text"
-											onChange={e => handleStringChange(e)}
-											value={state.identifier}
-											placeholder="Identifier" />
-										<div />
-										{/* Name input */}
-										<div style={formInputStyle}>
-											<label>{translate('unit.name')} <label style={requiredStyle}>*</label></label>
-											<Input
-												name='name'
-												type='text'
-												onChange={e => handleStringChange(e)}
-												value={state.name} />
-										</div>
-										{/* Type of unit input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.type.of.unit" /></label><br />
-											<Input
-												name='typeOfUnit'
-												type='select'
-												onChange={e => handleStringChange(e)}
-												value={state.typeOfUnit}>
-												{Object.keys(UnitType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Unit represent input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.represent" /></label><br />
-											<Input
-												name='unitRepresent'
-												type='select'
-												value={state.unitRepresent}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(UnitRepresentType).map(key => {
-													return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Displayable type input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.displayable" /></label><br />
-											<Input
-												name='displayable'
-												type='select'
-												value={state.displayable}
-												onChange={e => handleStringChange(e)}>
-												{Object.keys(DisplayableType).map(key => {
-													return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Preferred display input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.preferred.display" /></label><br />
-											<Input
-												name='preferredDisplay'
-												type='select'
-												value={state.preferredDisplay.toString()}
-												onChange={e => handleBooleanChange(e)}>
-												{Object.keys(TrueFalseType).map(key => {
-													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-												})}
-											</Input>
-										</div>
-										{/* Seconds in rate input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.sec.in.rate" /></label><br />
-											<Input
-												name='secInRate'
-												type="number"
-												value={state.secInRate}
-												onChange={e => handleNumberChange(e)}
-												placeholder="Sec In Rate"
-												// TODO validate negative input by typing for rate but database stops it.
-												// This stops negative input by use of arrows to change value.
-												min="1" />
-										</div>
-										{/* Suffix input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.suffix" /></label><br />
-											<Input
-												name="suffix"
-												type="text"
-												value={state.suffix}
-												placeholder="Suffix"
-												onChange={e => handleStringChange(e)} />
-										</div>
-										{/* Note input */}
-										<div style={formInputStyle}>
-											<label><FormattedMessage id="unit.note" /></label><br />
-											<Input
-												name="note"
-												type="textarea"
-												value={state.note}
-												placeholder="Note"
-												onChange={e => handleStringChange(e)} />
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
+			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
+				<ModalHeader>
+					<FormattedMessage id="edit.unit" />
+					<TooltipHelpContainer page='units-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalHeader>
+				{/* when any of the unit are changed call one of the functions. */}
+				<ModalBody><Container>
+					<Row xs='1' lg='2'>
+						{/* Identifier input */}
+						<Col><FormGroup>
+							<Label for='identifier'>{translate('unit.identifier')}</Label>
+							<Input
+								id='identifier'
+								name='identifier'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								value={state.identifier}
+								placeholder='Identifier' />
+						</FormGroup></Col>
+						{/* Name input */}
+						<Col><FormGroup>
+							<Label for='name'>{translate('unit.name')}</Label>
+							<Input
+								id='name'
+								name='name'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								value={state.name}
+								invalid={state.name === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* Type of unit input */}
+						<Col><FormGroup>
+							<Label for='typeOfUnit'>{translate('unit.type.of.unit')}</Label>
+							<Input
+								id='typeOfUnit'
+								name='typeOfUnit'
+								type='select'
+								onChange={e => handleStringChange(e)}
+								value={state.typeOfUnit}>
+								{Object.keys(UnitType).map(key => {
+									return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+						{/* Unit represent input */}
+						<Col><FormGroup>
+							<Label for='unitRepresent'>{translate('unit.represent')}</Label>
+							<Input
+								id='unitRepresent'
+								name='unitRepresent'
+								type='select'
+								value={state.unitRepresent}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(UnitRepresentType).map(key => {
+									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+
+						{/* Displayable type input */}
+						<Col><FormGroup>
+							<Label for='displayable'>{translate('unit.displayable')}</Label>
+							<Input
+								id='displayable'
+								name='displayable'
+								type='select'
+								value={state.displayable}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(DisplayableType).map(key => {
+									return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+						{/* Preferred display input */}
+						<Col><FormGroup>
+							<Label for='preferredDisplay'>{translate('unit.preferred.display')}</Label>
+							<Input
+								id='preferredDisplay'
+								name='preferredDisplay'
+								type='select'
+								value={state.preferredDisplay.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+
+						{/* Seconds in rate input */}
+						<Col><FormGroup>
+							<Label for='secInRate'>{translate('unit.sec.in.rate')}</Label>
+							<Input
+								id='secInRate'
+								name='secInRate'
+								type='number'
+								defaultValue={state.secInRate}
+								onChange={e => handleNumberChange(e)}
+								placeholder='Sec In Rate'
+								min='1'
+								invalid={state.secInRate <= 0} />
+							<FormFeedback>
+								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* Suffix input */}
+						<Col><FormGroup>
+							<Label for='suffix'>{translate('unit.suffix')}</Label>
+							<Input
+								id='suffix'
+								name='suffix'
+								type='text'
+								value={state.suffix}
+								placeholder='Suffix'
+								onChange={e => handleStringChange(e)} />
+						</FormGroup></Col>
+					</Row>
+					{/* Note input */}
+					<FormGroup>
+						<Label for='note'>{translate('unit.note')}</Label>
+						<Input
+							id='note'
+							name='note'
+							type='textarea'
+							value={state.note}
+							placeholder='Note'
+							onChange={e => handleStringChange(e)} />
+					</FormGroup>
+				</Container></ModalBody>
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSaveChanges} disabled={!state.name}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!validUnit}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

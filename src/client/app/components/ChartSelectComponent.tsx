@@ -7,14 +7,11 @@ import * as _ from 'lodash';
 import { ChartTypes } from '../types/redux/graph';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import Dropdown from 'reactstrap/lib/Dropdown';
-import DropdownItem from 'reactstrap/lib/DropdownItem';
-import DropdownToggle from 'reactstrap/lib/DropdownToggle';
-import DropdownMenu from 'reactstrap/lib/DropdownMenu';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 /**
  *  A component that allows users to select which chart should be displayed.

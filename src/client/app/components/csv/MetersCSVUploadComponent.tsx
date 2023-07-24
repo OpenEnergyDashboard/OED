@@ -90,7 +90,7 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 						</Label>
 						<Input value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
 					</FormGroup>
-					<Button type='submit'>
+					<Button color='secondary' type='submit'>
 						<FormattedMessage id='csv.submit.button' />
 					</Button>
 				</Form>
