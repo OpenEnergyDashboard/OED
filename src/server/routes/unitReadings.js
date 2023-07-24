@@ -50,6 +50,8 @@ function validateLineReadingsQueryParams(queryParams) {
 function formatReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading_rate,
+		min: readingRow.min_rate,
+		max: readingRow.max_rate,
 		// This returns a Unix timestamp in milliseconds. This should be smaller in size when sent to the client
 		// compared to sending the formatted moment object. All values are sent as a string.
 		// The consequence of doing this is that when the client recreates this as a moment it will do it in
@@ -159,7 +161,7 @@ function formatBarReadingRow(readingRow) {
 async function meterBarReadings(meterIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterBarReadings(
-	meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
+		meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
@@ -187,7 +189,7 @@ function validateGroupBarReadingsParams(params) {
  * @param timeInterval The range of time to get readings for
  * @returns {Promise<object<int, array<{reading_rate: number: number. end_timestamp: number} in sorted order
  */
- async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
+async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupBarReadings(
 		groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);

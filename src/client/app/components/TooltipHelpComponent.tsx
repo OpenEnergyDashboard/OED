@@ -62,6 +62,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.chart.select': { link: `${BASE_URL}/graphType.html` },
 			'help.home.compare.interval.tip': { link: `${BASE_URL}/compareGraphic.html#usage` },
 			'help.home.compare.sort.tip': { link: `${BASE_URL}/compareGraphic.html#usage` },
+			'help.home.error.bar': { link: `${BASE_URL}/errorBar.html#usage` },
 			'help.home.export.graph.data': { link: `${BASE_URL}/export.html` },
 			'help.home.header': {
 				link0: `${BASE_URL}/pageChoices.html`,

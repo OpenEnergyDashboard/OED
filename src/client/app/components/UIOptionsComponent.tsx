@@ -21,6 +21,7 @@ import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
+import ErrorBarComponent from './ErrorBarComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -89,8 +90,11 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
-				<AreaUnitSelectComponent/>
-
+				<AreaUnitSelectComponent />
+				{/* Controls error bar, specifically for the line chart.  */}
+				{this.props.chartToRender === ChartTypes.line &&
+					<ErrorBarComponent />
+				}
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>

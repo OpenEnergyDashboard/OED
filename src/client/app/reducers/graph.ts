@@ -26,7 +26,8 @@ const defaultState: GraphState = {
 	hotlinked: false,
 	optionsVisibility: true,
 	lineGraphRate: {label: 'hour', rate: 1},
-	renderOnce: false
+	renderOnce: false,
+	showMinMax: false,
 };
 
 export default function graph(state = defaultState, action: GraphAction) {

@@ -17,6 +17,8 @@ function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
+	const yMinData: number[] = [];
+	const yMaxData: number[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
@@ -80,6 +82,9 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 							yData.push(reading.reading * rate);
+							// Min and Max values.
+							yMinData.push(reading.min); 
+							yMaxData.push(reading.max); 
 							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
 						});
 					}
@@ -92,11 +97,18 @@ function mapStateToProps(state: State) {
 							const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
 							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 							let readingValue = reading.reading;
+							let minValue = reading.min;
+							let maxValue = reading.max;
+
 							if (state.graph.areaNormalization) {
 								readingValue /= meterArea;
+								minValue /= meterArea;
+								maxValue /= meterArea;
 							}
 							yData.push(readingValue);
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+							yMinData.push(minValue);
+							yMaxData.push(maxValue);
+							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
 						});
 					}
 
@@ -119,6 +131,12 @@ function mapStateToProps(state: State) {
 						name: label,
 						x: xData,
 						y: yData,
+						error_y: state.readings.line.showMinMax ? {
+							type: 'data',
+							symmetric: false,
+							array: yMaxData.map((maxValue, index) => (maxValue - yData[index])),
+							arrayminus: yData.map((value, index) => (value - yMinData[index])),
+						} : undefined,
 						text: hoverText,
 						hoverinfo: 'text',
 						type: 'scatter',
@@ -129,6 +147,7 @@ function mapStateToProps(state: State) {
 							color: getGraphColor(colorID, DataType.Meter)
 						}
 					});
+
 				}
 			}
 		}

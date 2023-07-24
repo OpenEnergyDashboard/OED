@@ -25,6 +25,8 @@ export interface LineReading {
 	reading: number;
 	startTimestamp: number;
 	endTimestamp: number;
+	min: number;
+	max: number;
 }
 
 export interface LineReadings {

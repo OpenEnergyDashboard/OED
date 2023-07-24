@@ -10,7 +10,8 @@ const defaultState: LineReadingsState = {
 	byGroupID: {},
 	isFetching: false,
 	metersFetching: false,
-	groupsFetching: false
+	groupsFetching: false,
+	showMinMax: false,
 };
 
 export default function readings(state = defaultState, action: LineReadingsAction) {
@@ -116,6 +117,9 @@ export default function readings(state = defaultState, action: LineReadingsActio
 			}
 
 			return newState;
+		}
+		case ActionType.ToggleShowMinMax: {
+			return { ...state, showMinMax: !state.showMinMax };
 		}
 		default:
 			return state;

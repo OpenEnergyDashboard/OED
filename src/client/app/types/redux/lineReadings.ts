@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import {LineReading, LineReadings} from '../readings';
+import { LineReading, LineReadings } from '../readings';
 
 export interface RequestMeterLineReadingsAction {
 	type: ActionType.RequestMeterLineReadings;
@@ -26,6 +26,7 @@ export interface ReceiveMeterLineReadingsAction {
 	unitID: number;
 	timeInterval: TimeInterval;
 	readings: LineReadings;
+
 }
 
 export interface ReceiveGroupLineReadingsAction {
@@ -35,12 +36,16 @@ export interface ReceiveGroupLineReadingsAction {
 	timeInterval: TimeInterval;
 	readings: LineReadings;
 }
+export interface ToggleShowMinMaxAction {
+	type: ActionType.ToggleShowMinMax;
+}
 
 export type LineReadingsAction =
 	ReceiveMeterLineReadingsAction |
 	ReceiveGroupLineReadingsAction |
 	RequestMeterLineReadingsAction |
-	RequestGroupLineReadingsAction;
+	RequestGroupLineReadingsAction |
+	ToggleShowMinMaxAction;
 
 export interface LineReadingsState {
 	byMeterID: {
@@ -66,4 +71,5 @@ export interface LineReadingsState {
 	isFetching: boolean;
 	metersFetching: boolean;
 	groupsFetching: boolean;
+	showMinMax: boolean;
 }

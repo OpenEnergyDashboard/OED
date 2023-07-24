@@ -6,8 +6,8 @@
 
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
-import {TimeInterval} from '../../../../common/TimeInterval';
-import {BarReadings, LineReading, LineReadings} from '../../types/readings';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import { BarReadings, LineReading, LineReadings } from '../../types/readings';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -31,7 +31,7 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
@@ -50,7 +50,7 @@ export default class ReadingsApi {
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach( (value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
 
