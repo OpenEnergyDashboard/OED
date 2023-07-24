@@ -23,6 +23,7 @@ import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
 export default function ThreeDComponent() {
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
+		console.log('USELRunning!');
 		const meterOrGroupInfo = state.graph.threeD.meterOrGroupInfo;
 		// // In the current implementation, groups and meters cannot be both populated
 		const meterOrGroupID = meterOrGroupInfo.meterOrGroupID;
@@ -43,7 +44,12 @@ export default function ThreeDComponent() {
 			layout = setLayout(translate('select.meter.group'));
 		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) { // Not a valid time interval.
 			layout = setLayout('Date Range Must be a year or less.');
-		} else if (!threeDData || threeDData.zData.length === 0) { // There is no data.
+		} else if (!threeDData) {
+			// Weird edge case due to excess re-renders
+			// Not actually 'rendering', but from the user perspective should make sense.
+			layout = setLayout('Rendering');
+			// console.log(meterOrGroupID, state.readings.threeD.isFetching);
+		} else if (threeDData.zData.length === 0) { // There is no data.
 			layout = setLayout('No Data In Date Range.');
 		} else {
 			[dataToRender, layout] = formatThreeDData(threeDData, state);
@@ -60,7 +66,7 @@ export default function ThreeDComponent() {
 					data={dataToRender}
 					layout={layout}
 					config={config}
-					style={{ width: '100%', height: 'auto' }}
+					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
 				// Camera Testing Config Purposes only.
 				// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}

@@ -16,6 +16,7 @@ import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
+import { updateThreeDMeterOrGroupInfo } from '../actions/graph'
 
 /**
  *  A component that allows users to select which chart should be displayed.
@@ -74,6 +75,7 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
+							dispatch(updateThreeDMeterOrGroupInfo({ meterOrGroupID: null, meterOrGroup: null }));
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
 						}
 						}

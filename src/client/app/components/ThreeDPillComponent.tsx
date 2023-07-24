@@ -23,11 +23,11 @@ export default function ThreeDPillComponent() {
 	const handlePillClick = (meterOrGroupID: number, meterOrGroup: 'meters' | 'groups') => dispatch(changeMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
 	const populatePills = (meterOrGroupList: number[], meterOrGroup: 'meters' | 'groups') => {
 		return meterOrGroupList.map(meterOrGroupID => {
-			const meterOrGroupName = meterOrGroup === 'meters' ?
-				meters.byMeterID[meterOrGroupID].identifier : groups.byGroupID[meterOrGroupID].name;
+			const meterOrGroupName = meterOrGroup === 'meters' ? meters.byMeterID[meterOrGroupID].identifier : groups.byGroupID[meterOrGroupID].name;
 			const selectedMeterOrGroupID = threeDState.meterOrGroupInfo.meterOrGroupID;
 			const meterOrGroupSelected = threeDState.meterOrGroupInfo.meterOrGroup === 'meters';
 			const isMeterOrGroup = meterOrGroup === 'meters';
+			// Determines if the current pill is the one being rendered, and sets its color accordingly
 			const colorToRender = (meterOrGroupID === selectedMeterOrGroupID && meterOrGroupSelected === isMeterOrGroup) ? 'primary' : 'secondary';
 
 			return (

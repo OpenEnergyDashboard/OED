@@ -51,7 +51,6 @@ function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, u
 
 /**
  * Fetches 3D readings for the selected meter if needed.
- * @param timeInterval - Time Interval to be queried.
  */
 export function fetchNeededThreeDReadings(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
