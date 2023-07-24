@@ -23,16 +23,13 @@ import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
 export default function ThreeDComponent() {
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
-		console.log('USELRunning!');
-		const meterOrGroupInfo = state.graph.threeD.meterOrGroupInfo;
-		// // In the current implementation, groups and meters cannot be both populated
-		const meterOrGroupID = meterOrGroupInfo.meterOrGroupID;
-		const meterOrGroup = meterOrGroupInfo.meterOrGroup === 'meters' ? 'byMeterID' : 'byGroupID';
+		const threeDState = state.graph.threeD;
+		const meterOrGroupID = threeDState.meterOrGroupID;
+		const meterOrGroup = threeDState.meterOrGroup === 'meters' ? 'byMeterID' : 'byGroupID';
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();// 3D dispatches rounds time interval to full days.
 		const unitID = state.graph.selectedUnit;
 		const precision = state.graph.threeD.xAxisPrecision; // Level of detail along the xAxis / Readings per day,
 		let threeDData = null;
-		//
 		if (meterOrGroupID) {
 			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
 		}
@@ -45,8 +42,7 @@ export default function ThreeDComponent() {
 		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) { // Not a valid time interval.
 			layout = setLayout('Date Range Must be a year or less.');
 		} else if (!threeDData) {
-			// Weird edge case due to excess re-renders
-			// Not actually 'rendering', but from the user perspective should make sense.
+			// Weird edge case due Not actually 'rendering', but from the user perspective should make sense.
 			layout = setLayout('Rendering');
 			// console.log(meterOrGroupID, state.readings.threeD.isFetching);
 		} else if (threeDData.zData.length === 0) { // There is no data.
@@ -56,6 +52,7 @@ export default function ThreeDComponent() {
 		}
 		return [dataToRender, layout]
 	});
+	
 	return (
 		<div style={{ width: '100%', height: '75vh' }}>
 			<ThreeDPillComponent />

@@ -452,7 +452,7 @@ class Reading {
 			// Data may change need based on steve's feedback 
 
 			if (chunkedReadings.length > 0) {
-				chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+				chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 
 				chunkedReadings.forEach(day => {
 					let dayReadings = [];
