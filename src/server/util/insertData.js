@@ -201,7 +201,12 @@ async function insertMeters(metersToInsert, conn) {
 				meterData.unit,
 				meterData.defaultGraphicUnit,
 				meterData.areaUnit,
-				meterData.readingFrequency
+				meterData.readingFrequency,
+				meterData.minVal,
+				meterData.maxVal,
+				meterData.minDate,
+				meterData.maxDate,
+				meterData.maxError
 			);
 
 			// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current
@@ -227,6 +232,14 @@ async function insertMeters(metersToInsert, conn) {
 					const query = `update meters set id = ${meterData.id} where name = '${meter.name}'`;
 					await conn.none(query);
 				}
+				// setup conditionset variable
+				const conditionSetMap = new Map();
+				conditionSetMap.set('minVal', meter.minVal);
+				conditionSetMap.set('maxVal', meter.maxVal);
+				conditionSetMap.set('minDate', meter.minDate);
+				conditionSetMap.set('maxDate', meter.maxDate);
+				conditionSetMap.set('threshold', meter.readingGap);
+				conditionSetMap.set('maxError', meter.maxError);
 				await loadCsvInput(
 					filename, // filePath
 					meter.id, // meterID
@@ -242,7 +255,7 @@ async function insertMeters(metersToInsert, conn) {
 					meter.endOnlyTime, // isEndOnly
 					true, // headerRow
 					false, // shouldUpdate
-					undefined, // conditionSet
+					conditionSetMap, // conditionSet
 					conn
 				);
 			}

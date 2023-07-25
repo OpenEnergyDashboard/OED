@@ -74,7 +74,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		endTimestamp: '',
 		previousEnd: '',
 		areaUnit: AreaUnitType.none,
-		readingFrequency: adminState.defaultMeterReadingFrequency
+		readingFrequency: adminState.defaultMeterReadingFrequency,
+		minVal: 0,
+		maxVal: 0,
+		minDate: '',
+		maxDate: '',
+		maxError: 0
 	}
 
 	const dropdownsStateDefaults = {

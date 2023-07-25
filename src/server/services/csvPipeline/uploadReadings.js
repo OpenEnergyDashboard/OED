@@ -66,7 +66,12 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // unit
 					undefined, // default graphic unit
 					undefined, // area unit
-					undefined // reading frequency
+					undefined, // reading frequency
+					undefined, // minVal
+					undefined, // maxVal
+					undefined, // minDate
+					undefined, // maxDate
+					undefined  // maxError
 				)
 				await tempMeter.insert(conn);
 				meterCreated = true;
@@ -219,6 +224,15 @@ async function uploadReadings(req, res, filepath, conn) {
 	const areReadingsEndOnly = (readingEndOnly === BooleanTypesJS.true);
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
+
+	const conditionSetMap = new Map();
+	conditionSetMap.set('minVal', meter.minVal);
+	conditionSetMap.set('maxVal', meter.maxVal);
+	conditionSetMap.set('minDate', meter.minDate);
+	conditionSetMap.set('maxDate', meter.maxDate);
+	conditionSetMap.set('threshold', meter.readingGap);
+	conditionSetMap.set('maxError', meter.maxError);
+	
 	return await loadCsvInput(
 		filepath,
 		meter.id,
@@ -234,7 +248,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		areReadingsEndOnly,
 		hasHeaderRow,
 		shouldUpdate,
-		undefined,
+		conditionSetMap,
 		conn,
 		shouldHonorDst,
 		shouldRelaxedParsing
