@@ -61,6 +61,11 @@ export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency:
 	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
 }
 
+// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+export function updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): t.UpdateDefaultMeterMinimumValueAction {
+	return { type: ActionType.UpdateDefaultMeterMinimumValue, defaultMeterMinimumValue };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -121,7 +126,8 @@ export function submitPreferences() {
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
 				defaultAreaUnit: state.admin.defaultAreaUnit,
-				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
+				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
+				defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

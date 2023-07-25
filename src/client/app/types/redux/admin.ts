@@ -24,7 +24,9 @@ export type AdminAction =
 	| MarkPreferencesSubmittedAction
 	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
-	| UpdateDefaultMeterReadingFrequencyAction;
+	| UpdateDefaultMeterReadingFrequencyAction
+	| UpdateDefaultMeterMinimumValueAction;
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -101,6 +103,11 @@ export interface UpdateDefaultMeterReadingFrequencyAction {
 	defaultMeterReadingFrequency: string;
 }
 
+export interface UpdateDefaultMeterMinimumValueAction {
+	type: ActionType.UpdateDefaultMeterMinimumValue;
+	defaultMeterMinimumValue: number;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -116,4 +123,5 @@ export interface AdminState {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
 }

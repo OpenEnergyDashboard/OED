@@ -23,7 +23,9 @@ const defaultState: AdminState = {
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
-	defaultMeterReadingFrequency: '00:15:00'
+	defaultMeterReadingFrequency: '00:15:00',
+	defaultMeterMinimumValue: 0
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -93,7 +95,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
 				defaultAreaUnit: action.data.defaultAreaUnit,
-				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency)
+				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency),
+				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -117,6 +120,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMinimumValue:
+			return {
+				...state,
+				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
 				submitted: false
 			}
 		case ActionType.ToggleWaitForCikAndDB:

@@ -15,7 +15,9 @@ import {
 	UpdateDefaultFileSizeLimit,
 	ToggleDefaultAreaNormalizationAction,
 	UpdateDefaultAreaUnitAction,
-	UpdateDefaultMeterReadingFrequencyAction
+	UpdateDefaultMeterReadingFrequencyAction,
+	UpdateDefaultMeterMinimumValueAction
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
@@ -37,6 +39,8 @@ interface PreferencesProps {
 	defaultFileSizeLimit: number;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -48,6 +52,7 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -66,6 +71,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
 		this.handleDefaultMeterReadingFrequencyChange = this.handleDefaultMeterReadingFrequencyChange.bind(this);
+		this.handleDefaultMeterMinumumValueChange = this.handleDefaultMeterMinumumValueChange.bind(this);
 	}
 
 	public render() {
@@ -294,6 +300,17 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						onChange={this.handleDefaultMeterReadingFrequencyChange}
 					/>
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.minimum.value' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultMeterMinimumValue}
+						onChange={this.handleDefaultMeterMinumumValueChange}
+						maxLength={50}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -377,6 +394,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultMeterReadingFrequencyChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultMeterReadingFrequency(e.target.value);
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterMinumumValueChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMinimumValue(parseFloat(e.target.value));
 		this.updateUnsavedChanges();
 	}
 }

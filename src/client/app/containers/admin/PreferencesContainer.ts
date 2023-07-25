@@ -15,7 +15,9 @@ import {
 	updateDefaultFileSizeLimit,
 	toggleDefaultAreaNormalization,
 	updateDefaultAreaUnit,
-	updateDefaultMeterReadingFrequency
+	updateDefaultMeterReadingFrequency,
+	updateDefaultMeterMinimumValue
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -35,7 +37,9 @@ function mapStateToProps(state: State) {
 		defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 		defaultAreaNormalization: state.admin.defaultAreaNormalization,
 		defaultAreaUnit: state.admin.defaultAreaUnit,
-		defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency
+		defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
+		defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue
+		// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 	};
 }
 
@@ -52,7 +56,9 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
 		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit)),
 		updateDefaultMeterReadingFrequency: (defaultMeterReadingFrequency: string) =>
-			dispatch(updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency))
+			dispatch(updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency)),
+		
+		updateDefaultMeterMinimumValue: (defaultMeterMinimumValue: number) => dispatch(updateDefaultMeterMinimumValue(defaultMeterMinimumValue))
 	};
 }
 
