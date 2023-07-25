@@ -5,10 +5,10 @@
 INSERT INTO meters(name, url, enabled, displayable, meter_type, default_timezone_meter, gps, identifier,
     note, area, cumulative, cumulative_reset, cumulative_reset_start, cumulative_reset_end, reading_gap, reading_variation, 
     reading_duplication, time_sort, end_only_time, reading, start_timestamp, end_timestamp, previous_end, unit_id,
-    default_graphic_unit, area_unit, reading_frequency)
+    default_graphic_unit, area_unit, reading_frequency, min_val, max_val, min_date, max_date, max_error)
 VALUES (${name}, ${url}, ${enabled}, ${displayable}, ${type}, ${meterTimezone}, ${gps}, ${identifier},
    ${note}, ${area}, ${cumulative}, ${cumulativeReset}, ${cumulativeResetStart}, ${cumulativeResetEnd},
     ${readingGap}, ${readingVariation}, ${readingDuplication}, ${timeSort}, ${endOnlyTime},
     ${reading}, ${startTimestamp}, ${endTimestamp}, ${previousEnd}, ${unitId}, ${defaultGraphicUnit}, ${areaUnit},
-    ${readingFrequency})
+    ${readingFrequency}, ${minVal}, ${maxVal}, ${minDate}, ${maxDate}, ${maxError})
 RETURNING id, reading_frequency;

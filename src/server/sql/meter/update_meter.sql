@@ -29,7 +29,12 @@ UPDATE meters
 		unit_id = ${unitId},
 		default_graphic_unit = ${defaultGraphicUnit},
 		area_unit = ${areaUnit},
-		reading_frequency = ${readingFrequency}
+		reading_frequency = ${readingFrequency},
+		min_val = ${minVal},
+		max_val = ${maxVal},
+		min_date = ${minDate},
+		max_date = ${maxDate},
+		max_error = ${maxError}
 	WHERE id = ${id}
 	RETURNING reading_frequency;
 

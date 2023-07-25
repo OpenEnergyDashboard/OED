@@ -56,7 +56,12 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		unitId: meter.unitId,
 		defaultGraphicUnit: meter.defaultGraphicUnit,
 		areaUnit: meter.areaUnit,
-		readingFrequency: null
+		readingFrequency: null,
+		minVal: null,
+		maxVal: null,
+		minDate: null,
+		maxDate: null,
+		maxError: null
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -82,6 +87,11 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.endTimestamp = meter.endTimestamp;
 		formattedMeter.previousEnd = meter.previousEnd;
 		formattedMeter.readingFrequency = meter.readingFrequency;
+		formattedMeter.minVal = meter.minVal;
+		formattedMeter.maxVal = meter.maxVal;
+		formattedMeter.minDate = meter.minDate;
+		formattedMeter.maxDate = meter.maxDate;
+		formattedMeter.maxError = meter.maxError;
 	}
 
 	return formattedMeter;
@@ -149,7 +159,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 28,
+		maxProperties: 33,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -228,6 +238,11 @@ function validateMeterParams(params) {
 				enum: Object.values(Unit.areaUnitType)
 			},
 			readingFrequency: { type: 'string' },
+			minVal: { type: 'number' },
+			maxVal: { type: 'number' },
+			minDate: { type: 'string' },
+			maxDate: { type: 'string' },
+			minError: { type: 'number' },
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -271,7 +286,12 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.unitId,
 				req.body.defaultGraphicUnit,
 				req.body.areaUnit,
-				req.body.readingFrequency
+				req.body.readingFrequency,
+				req.body.minVal,
+				req.body.maxVal,
+				req.body.minDate,
+				req.body.maxDate,
+				req.body.maxError
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
@@ -328,7 +348,12 @@ router.post('/addMeter', async (req, res) => {
 				req.body.unitId,
 				req.body.defaultGraphicUnit,
 				req.body.areaUnit,
-				req.body.readingFrequency
+				req.body.readingFrequency,
+				req.body.minVal,
+				req.body.maxVal,
+				req.body.minDate,
+				req.body.maxDate,
+				req.body.maxError
 			);
 			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);

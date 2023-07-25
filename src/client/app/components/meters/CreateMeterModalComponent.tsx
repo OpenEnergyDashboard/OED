@@ -74,7 +74,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		endTimestamp: '',
 		previousEnd: '',
 		areaUnit: AreaUnitType.none,
-		readingFrequency: adminState.defaultMeterReadingFrequency
+		readingFrequency: adminState.defaultMeterReadingFrequency,
+		minVal: 0,
+		maxVal: 0,
+		minDate: '',
+		maxDate: '',
+		maxError: 0
 	}
 
 	const dropdownsStateDefaults = {
@@ -732,7 +737,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.endTimestamp} />
 						</FormGroup>
-						{/* endTimestamp input */}
+						{/* previousEnd input */}
 						<FormGroup>
 							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
 							<Input
@@ -743,6 +748,66 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.previousEnd} />
+						</FormGroup>
+						{/* minVal input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Input
+								id='minVal'
+								name='minVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.minVal}
+								value={state.minVal} />
+						</FormGroup>
+						{/* maxVal input */}
+						<FormGroup>
+						<Label for='minVal'>{translate('meter.maxVal')}</Label>
+							<Input
+								id='maxVal'
+								name='maxVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxVal}
+								value={state.maxVal} />
+						</FormGroup>
+						{/* minDate input */}
+						<FormGroup>
+						<Label for='minVal'>{translate('meter.minDate')}</Label>
+							<Input
+								id='minDate'
+								name='minDate'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								min="0"
+								defaultValue={state.minDate}
+								value={state.minDate} />
+						</FormGroup>
+						{/* maxDate input */}
+						<FormGroup>
+						<Label for='minVal'>{translate('meter.maxDate')}</Label>
+							<Input
+								id='maxDate'
+								name='maxDate'
+								type='text'
+								onChange={e => handleStringChange(e)}
+								min="0"
+								defaultValue={state.maxDate}
+								value={state.maxDate} />
+						</FormGroup>
+						{/* maxError input */}
+						<FormGroup>
+						<Label for='minVal'>{translate('meter.maxError')}</Label>
+							<Input
+								id='maxError'
+								name='maxError'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxError}
+								value={state.maxError} />
 						</FormGroup></Col>
 					</Row>
 				</Container></ModalBody>
