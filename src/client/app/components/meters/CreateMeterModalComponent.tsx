@@ -754,6 +754,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 							<Label for='minVal'>{translate('meter.minVal')}</Label>
 							<Input
 								id='minVal'
+								name='minVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
@@ -765,6 +766,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<Label for='minVal'>{translate('meter.maxVal')}</Label>
 							<Input
 								id='maxVal'
+								name='maxVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
@@ -776,8 +778,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<Label for='minVal'>{translate('meter.minDate')}</Label>
 							<Input
 								id='minDate'
+								name='minDate'
 								type='text'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => handleStringChange(e)}
 								min="0"
 								defaultValue={state.minDate}
 								value={state.minDate} />
@@ -787,8 +790,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<Label for='minVal'>{translate('meter.maxDate')}</Label>
 							<Input
 								id='maxDate'
+								name='maxDate'
 								type='text'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => handleStringChange(e)}
 								min="0"
 								defaultValue={state.maxDate}
 								value={state.maxDate} />
@@ -798,6 +802,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						<Label for='minVal'>{translate('meter.maxError')}</Label>
 							<Input
 								id='maxError'
+								name='maxError'
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
