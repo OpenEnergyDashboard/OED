@@ -89,6 +89,10 @@ export default function CreateUnitModalComponent() {
 		setShowModal(false);
 		// Set default identifier as name if left blank
 		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
+		// set displayable to none if unit is meter
+		if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+			state.displayable = DisplayableType.none;
+		}
 		// Add the new unit and update the store
 		dispatch(addUnit(state));
 		resetState();
@@ -182,11 +186,16 @@ export default function CreateUnitModalComponent() {
 								name='displayable'
 								type='select'
 								onChange={e => handleStringChange(e)}
-								value={state.displayable} >
+								value={state.displayable}
+								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
 								{Object.keys(DisplayableType).map(key => {
-									return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
+										{translate(`DisplayableType.${key}`)}</option>)
 								})}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id="error.displayable.meter" />
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* Preferred display input */}
 						<Col><FormGroup>
