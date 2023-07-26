@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { BarReadings, LineReading, LineReadings, ThreeDReading } from '../../types/readings';
+import { ThreeDReadingPrecision } from 'types/redux/graph';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -91,12 +92,14 @@ export default class ReadingsApi {
 	 * @param meterID Meter to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param xAxisPrecision The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @returns ThreeDReadings in sorted order
 	 */
-	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
+	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision)
+		: Promise<ThreeDReading> {
 		return await this.backend.doGetRequest<ThreeDReading>(
 			`/api/unitReadings/threeD/meters/${meterID}`,
-			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: xAxisPrecision.toString() }
 		);
 	}
 
@@ -105,13 +108,15 @@ export default class ReadingsApi {
 	 * @param groupID Meter to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param xAxisPrecision The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @returns ThreeDReadings in sorted order
 	 */
-	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
+	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision)
+		: Promise<ThreeDReading> {
 		// TODO update api endpoint to meters! meter hardcoded to simulate data retrieval
 		return await this.backend.doGetRequest<ThreeDReading>(
 			`/api/unitReadings/threeD/meters/${21}`,
-			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: xAxisPrecision.toString() }
 		);
 	}
 

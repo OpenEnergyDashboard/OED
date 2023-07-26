@@ -4,6 +4,8 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import Plot from 'react-plotly.js';
+import ThreeDPillComponent from './ThreeDPillComponent';
+import SpinnerComponent from './SpinnerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
@@ -12,49 +14,67 @@ import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
-
+import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
 
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
-		const selectedMeterID = state.graph.selectedMeters[0];
-		const selectedGroupID = state.graph.selectedGroups[0];
-		// In the current implementation, groups and meters cannot be both populated
-		const meterOrGroupID = selectedMeterID ? selectedMeterID : selectedGroupID;	// If a meter id is present use it,  else use group.
-		const meterOrGroup = selectedMeterID ? 'byMeterID' : 'byGroupID'; // If a meter id is present look in byMeterId else look in byGroupId
-		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();// 3D dispatches rounds time interval to full days.
+		//TODO ADD PRECISION BUTTON
+		// threeDState contains the currentMeterOrGroup to be fetched.
+		const threeDState = state.graph.threeD;
+		const meterOrGroupID = threeDState.meterOrGroupID;
+		// meterOrGroup Determines wether to get readings from state .byMeterID or .byGroupID
+		const meterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
+		// 3D requires intervals to be rounded to a full day.
+		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
 		const unitID = state.graph.selectedUnit;
-		const precision = state.graph.threeDAxisPrecision; // Level of detail along the xAxis / Readings per day,
-		const threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+		// Level of detail along the xAxis / Readings per day,
+		const precision = state.graph.threeD.xAxisPrecision;
+		let threeDData = null;
+		if (meterOrGroupID) {
+			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+		}
 
 		let layout = {};
 		let dataToRender = null;
-		// TODO internationalize / translate layout text
-		if (!selectedMeterID && !selectedGroupID) { // No selected Meters
+		if (!meterOrGroupID) {
+			// No selected Meters
 			layout = setLayout(translate('select.meter.group'));
-		} else if (!isValidThreeDInterval(state.graph.timeInterval)) { // Not a valid time interval.
-			layout = setLayout('Date Range Must be a year or less.');
-		} else if (!threeDData || threeDData.zData.length === 0) { // There is no data.
-			layout = setLayout('No Data In Date Range.');
+		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
+			// Not a valid time interval. ThreeD can only support up to 1 year of readings
+			layout = setLayout(translate('threeD.dateRange.too.long'));
+		} else if (!threeDData) {
+			// Not actually 'rendering', but from the user perspective should make sense.
+			layout = setLayout(translate('threeD.rendering'));
+		} else if (threeDData.zData.length === 0) {
+			// There is no data in the selected date range.
+			layout = setLayout(translate('threeD.noData'));
 		} else {
 			[dataToRender, layout] = formatThreeDData(threeDData, state);
 		}
 		return [dataToRender, layout]
 	});
+
 	return (
-		<div style={{ width: '100%', height: '100%' }}>
-			<Plot
-				data={dataToRender}
-				layout={layout}
-				config={config}
-				style={{ width: '100%', height: '100%' }}
-				useResizeHandler={true}
-			// Camera Testing Config Purposes only.
-			// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
-			/>
+		<div style={{ width: '100%', height: '75vh' }}>
+			<ThreeDPillComponent />
+			{isFetching ?
+				<SpinnerComponent loading width={50} height={50} />
+				:
+				<Plot
+					data={dataToRender}
+					layout={layout}
+					config={config}
+					style={{ width: '100%', height: '80%' }}
+					useResizeHandler={true}
+				// Camera Testing Config Purposes only.
+				// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
+				/>
+			}
 		</div>
 	);
 }
@@ -105,18 +125,24 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 			}
 		}
 	}
+	const hoverText = data.zData.map((day, i) => day.map((readings, j) => {
+		const date = moment.utc(data.yData[i]).format('LL');
+		const time = moment.utc(data.xData[j]).format('h:mm A');
+		// ThreeD graphic readings can be null. If not null round the precision.
+		const readingValue = readings ? readings.toPrecision(6) : null;
+		return `Date: ${date}<br>Time: ${time}<br>${unitLabel}: ${readingValue}`;
+	}));
 	// TODO find a better way to set the zAxis
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
 		showscale: false,
 		// zmin: 0,
-		x: data.xData.map(xData => moment.utc(xData).format()),
-		y: data.yData.map(yData => moment.utc(yData).format()),
+		x: data.xData.map(xData => moment.utc(xData).format('h:mm A')),
+		y: data.yData.map(yData => moment.utc(yData).format('L')),
 		z: data.zData,
 		hoverinfo: 'text',
-		hovertext: data.zData.map((day, i) => day.map((readings, j) => //TODO format hover-text based on locale
-			`Date: ${moment.utc(data.yData[i]).format('MMM DD, YYYY')}<br>Time: ${moment.utc(data.xData[j]).format('h:mm A')}<br>${unitLabel}: ${readings}`))
+		hovertext: hoverText
 	}]
 	const layout = setThreeDLayout(unitLabel);
 	return [formattedData, layout]
@@ -157,18 +183,15 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	}
 }
 
-// TODO The layout can be tweaked a bit. E.G. yAxis labels are overlapping with yTicks.
 const threeDLayout = {
 	autosize: true,
 	connectgaps: false, //Leaves holes in graph for missing, undefined, NaN, or null values.
 	scene: {
 		xaxis: {
-			title: 'Hours of Day',
-			tickformat: '%I:%M %p'
+			title: { text: 'Hours of Day' }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year' },
-			tickformat: '%x' // Locale aware date formatting.
+			title: { text: 'Days of Calendar Year' }
 		},
 		zaxis: { title: 'Resource Usage' },
 		aspectratio: {
@@ -176,8 +199,8 @@ const threeDLayout = {
 			y: 2.75,
 			z: 1
 		},
+		// Somewhat suitable camera eye values for data of zResource[day][hour]
 		camera: {
-			// Somewhat suitable camera eye values for data of zResource[day][hour]
 			eye: {
 				x: 2.5,
 				y: -1.6,

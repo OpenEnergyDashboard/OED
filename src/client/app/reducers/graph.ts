@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph';
+import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision, MeterOrGroup } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
@@ -25,10 +25,14 @@ const defaultState: GraphState = {
 	areaNormalization: false,
 	hotlinked: false,
 	optionsVisibility: true,
-	lineGraphRate: {label: 'hour', rate: 1},
+	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
-	threeDAxisPrecision: ThreeDReadingPrecision.hourly,
-	threeDTimeInterval: null
+	threeD: {
+		meterOrGroupID: null,
+		meterOrGroup: MeterOrGroup.meters,
+		xAxisPrecision: ThreeDReadingPrecision.hourly,
+		timeInterval: null
+	}
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -123,7 +127,27 @@ export default function graph(state = defaultState, action: GraphAction) {
 		case ActionType.UpdateThreeDTimeInterval:
 			return {
 				...state,
-				threeDTimeInterval: action.dateRange
+				threeD: {
+					...state.threeD,
+					timeInterval: action.dateRange
+				}
+			};
+		case ActionType.UpdateThreeDPrecision:
+			return {
+				...state,
+				threeD: {
+					...state.threeD,
+					xAxisPrecision: action.xAxisPrecision
+				}
+			};
+		case ActionType.UpdateThreeDMeterOrGroupInfo:
+			return {
+				...state,
+				threeD: {
+					...state.threeD,
+					meterOrGroupID: action.meterOrGroupID,
+					meterOrGroup: action.meterOrGroup
+				}
 			};
 		default:
 			return state;

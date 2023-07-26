@@ -15,8 +15,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
-import { changeSelectedMeters, updateSelectedGroups, updateSelectedUnit } from '../actions/graph';
 import { Dispatch } from '../types/redux/actions';
+import { changeMeterOrGroupInfo } from '../actions/graph'
 
 /**
  *  A component that allows users to select which chart should be displayed.
@@ -75,12 +75,8 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
-							// Resets all meters and group when switching to 3D graph
-							// 3D should not be able to render more than 1 graph at a time,
+							dispatch(changeMeterOrGroupInfo(null));
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
-							dispatch(changeSelectedMeters([]));
-							dispatch(updateSelectedGroups([]));
-							dispatch(updateSelectedUnit(-99));
 						}
 						}
 					>

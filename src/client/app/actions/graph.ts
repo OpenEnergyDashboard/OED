@@ -20,7 +20,7 @@ import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import { timeIntervalToDateRange } from '../utils/dateRangeCompatability';
-import { fetchNeededMeterThreeDReadings, fetchNeededGroupThreeDReadings } from './threeDReadings';
+import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -124,7 +124,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededMeterThreeDReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -139,7 +139,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededGroupThreeDReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -154,8 +154,7 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
 			//TODO Consolidate 3D Group and Meter 'fetchNeeded' to single dispatch
-			dispatch2(fetchNeededMeterThreeDReadings(getState().graph.timeInterval));
-			dispatch2(fetchNeededGroupThreeDReadings(getState().graph.timeInterval));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	}
@@ -167,8 +166,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
 		//TODO Consolidate 3D Group and Meter 'fetchNeeded' to single dispatch
-		dispatch(fetchNeededMeterThreeDReadings(timeInterval));
-		dispatch(fetchNeededGroupThreeDReadings(timeInterval));
+		dispatch(fetchNeededThreeDReadings());
 		return Promise.resolve();
 	};
 }
@@ -214,11 +212,29 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
-
 export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeInterval {
 	return { type: ActionType.UpdateThreeDTimeInterval, dateRange };
 }
 
+
+export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDPrecision, xAxisPrecision });
+		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
+
+		return Promise.resolve();
+	};
+	// return { type: ActionType.UpdateThreeDPrecision, xAxisPrecision };
+}
+
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
+	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup });
+		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
+		return Promise.resolve();
+	};
+}
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];

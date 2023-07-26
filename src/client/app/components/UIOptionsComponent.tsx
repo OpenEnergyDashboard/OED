@@ -22,6 +22,7 @@ import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import ThreeDDateRangeComponent from './ThreeDDateRangeComponent';
+import ThreeDSelectComponent from './ThreeDSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -91,6 +92,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
 				<ThreeDDateRangeComponent />
+				<ThreeDSelectComponent />
 				<AreaUnitSelectComponent />
 
 				{/* Controls specific to the bar chart. */}

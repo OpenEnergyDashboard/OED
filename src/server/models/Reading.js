@@ -392,78 +392,85 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
+	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, sequenceNumber, conn) {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		*/
 
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
-			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity']
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', sequenceNumber]
 		);
+
+		//console.log(allMeterThreeDReadings);
+
+		let sortedReadings;
+		const numOfReadings = allMeterThreeDReadings.length;
+		// TODO do no data validation check before this
+		// This line crashes if no readings return, 
+		const expectedNumOfReadings = allMeterThreeDReadings[allMeterThreeDReadings.length - 1].end_timestamp.diff(allMeterThreeDReadings[0].start_timestamp, 'hours')
+		// console.log(numOfReadings);
+		// console.log(expectedNumOfReadings / sequenceNumber);
+		//Check to see if there is any missing data in the hourly readings table. 
+		if (numOfReadings != expectedNumOfReadings / sequenceNumber && numOfReadings != 0) {
+			//Hold the objects of missing readings.
+			const tempArray = [];
+			//Check that table has all hourly readings for each day within the range of dates requested.  
+			for (let i = 0; i < allMeterThreeDReadings.length - 1; i++) {
+				//Checks to see if the end_timestamp of current reading matches the start_timestamp for the next reading.
+				if (!allMeterThreeDReadings[i].end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
+					//Create a new object, temp, based on the existing object in allMeterThreeDReadings[i] position. 
+					//The new object will have an increment of start and end timestamp. 
+					let temp =
+					{
+						...allMeterThreeDReadings[i],
+						reading_rate: undefined,
+						start_timestamp: allMeterThreeDReadings[i].start_timestamp.clone().add(1, 'hour'),
+						end_timestamp: allMeterThreeDReadings[i].end_timestamp.clone().add(1, 'hour')
+					};
+					//Push temp object to tempArray
+					tempArray.push(temp);
+					//Checks if the temp variable's end_timestamp matches the next readings start_timestamp. 
+					while (!temp.end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
+						temp = {
+							...temp,
+							start_timestamp: temp.start_timestamp.clone().add(1, 'hour'),
+							end_timestamp: temp.end_timestamp.clone().add(1, 'hour')
+						};
+						tempArray.push(temp);
+					}
+				}
+			}
+			//sortedReadings will hold the sorted readings with the missing data. 
+			sortedReadings = _.sortBy(allMeterThreeDReadings.concat(tempArray), meter_reading => meter_reading.start_timestamp, 'asc');
+		}
+		else {
+			sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
+		}
+		// Using Lodash.chunk Not ideal, proof of concept only;
+		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
+		// TODO ENUM for chunksize
+		const chunkedReadings = _.chunk(sortedReadings, 24 / sequenceNumber);
+		// console.log(chunkedReadings);
+		//console.log(chunkedReadings);
+		// Data may change need based on steve's feedback 
+
 		const xData = [];
 		const yData = [];
 		const zData = [];
-		let sortedReadings;
-		const numOfReadings = allMeterThreeDReadings.length;
-		if (numOfReadings > 0) {
 
-			const expectedNumOfReadings = allMeterThreeDReadings[allMeterThreeDReadings.length - 1].end_timestamp.diff(allMeterThreeDReadings[0].start_timestamp, 'hours');
+		if (chunkedReadings.length > 0) {
+			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
 
-			//Check to see if there is any missing data in the hourly readings table. 
-			if (numOfReadings.length != expectedNumOfReadings) {
-				//Hold the objects of missing readings.
-				const tempArray = [];
-				//Check that table has all hourly readings for each day within the range of dates requested.  
-				for (let i = 0; i < allMeterThreeDReadings.length - 1; i++) {
-					//Checks to see if the end_timestamp of current reading matches the start_timestamp for the next reading.
-					if (!allMeterThreeDReadings[i].end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
-						//Create a new object, temp, based on the existing object in allMeterThreeDReadings[i] position. 
-						//The new object will have an increment of start and end timestamp. 
-						let temp =
-						{
-							...allMeterThreeDReadings[i],
-							reading_rate: undefined,
-							start_timestamp: allMeterThreeDReadings[i].start_timestamp.clone().add(1, 'hour'),
-							end_timestamp: allMeterThreeDReadings[i].end_timestamp.clone().add(1, 'hour')
-						};
-						//Push temp object to tempArray
-						tempArray.push(temp);
-						//Checks if the temp variable's end_timestamp matches the next readings start_timestamp. 
-						while (!temp.end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
-							temp = {
-								...temp,
-								start_timestamp: temp.start_timestamp.clone().add(1, 'hour'),
-								end_timestamp: temp.end_timestamp.clone().add(1, 'hour')
-							};
-							tempArray.push(temp);
-						}
-					}
-				}
-				//sortedReadings will hold the sorted readings with the missing data. 
-				sortedReadings = _.sortBy(allMeterThreeDReadings.concat(tempArray), meter_reading => meter_reading.start_timestamp, 'asc');
-			}
-			else {
-				sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
-			}
-			// Using Lodash.chunk Not ideal, proof of concept only;
-			// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
-			// TODO ENUM for chunksize
-			const chunkedReadings = _.chunk(sortedReadings, 24);
-			// Data may change need based on steve's feedback 
+			chunkedReadings.forEach(day => {
+				let dayReadings = [];
+				// Data data may need to be converted into 'moment' to save on network load
+				yData.push(day[0].start_timestamp.valueOf());
 
-			if (chunkedReadings.length > 0) {
-				chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
-
-				chunkedReadings.forEach(day => {
-					let dayReadings = [];
-					// Data data may need to be converted into 'moment' to save on network load
-					yData.push(day[0].start_timestamp.valueOf());
-
-					day.forEach(hour => dayReadings.push(hour.reading_rate));
-					zData.push(dayReadings);
-				});
-			}
+				day.forEach(hour => dayReadings.push(hour.reading_rate));
+				zData.push(dayReadings);
+			});
 		}
+
 		const threeDData = {
 			xData: xData,
 			yData: yData,
