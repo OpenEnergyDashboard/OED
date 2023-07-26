@@ -223,7 +223,8 @@ export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision):
 export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
 	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
 }
-export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = 'meters'): Thunk {
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
+	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
 		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));

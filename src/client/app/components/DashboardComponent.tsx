@@ -68,7 +68,8 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 			}
 			ChartToRender = MapChartContainer;
 		} else if (this.props.chartToRender === ChartTypes.threeD) {
-			// 3D breaks the show spinner pattern, the spinner lives inside the component instead.
+			/* To avoid the spinner rendering over UI elements (PillBadges) in the 3d component,
+			the spinner and logic now lives inside the 3dComponent instead. 'showSpinner' is hardcoded to false here.*/
 			showSpinner = false;
 			ChartToRender = ThreeDComponent;
 		} else {

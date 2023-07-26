@@ -154,7 +154,9 @@ export interface LineGraphRate {
 }
 
 export type MeterOrGroupID = number | null;
-export type MeterOrGroup = 'meters' | 'groups';
+export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
+export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
+
 export interface ThreeDState {
 	meterOrGroupID: MeterOrGroupID;
 	meterOrGroup: MeterOrGroup;

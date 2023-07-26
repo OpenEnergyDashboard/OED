@@ -8,6 +8,7 @@ import { Badge } from 'reactstrap';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 import { changeMeterOrGroupInfo } from '../actions/graph';
+import { MeterOrGroup } from '../types/redux/graph';
 /**
  * A component used in the threeD graphics to select a single meter from the
  * currently selected meters and groups.
@@ -20,15 +21,20 @@ export default function ThreeDPillComponent() {
 	const selectedGroups = useSelector((state: State) => state.graph.selectedGroups);
 	const threeDState = useSelector((state: State) => state.graph.threeD);
 	const dispatch: Dispatch = useDispatch();
-	const handlePillClick = (meterOrGroupID: number, meterOrGroup: 'meters' | 'groups') => dispatch(changeMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
-	const populatePills = (meterOrGroupList: number[], meterOrGroup: 'meters' | 'groups') => {
+
+	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
+	const handlePillClick = (meterOrGroupID: number, meterOrGroup: MeterOrGroup) => dispatch(changeMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
+
+	// Method Generates Reactstrap Pill Badges for selected meters or groups
+	const populatePills = (meterOrGroupList: number[], meterOrGroup: MeterOrGroup) => {
 		return meterOrGroupList.map(meterOrGroupID => {
+			// Depending on passed meterOrGroup parameter, retrieve and validate data from appropriate state slice .meters .group
 			const meterOrGroupName = meterOrGroup === 'meters' ? meters.byMeterID[meterOrGroupID].identifier : groups.byGroupID[meterOrGroupID].name;
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;
-			const meterOrGroupSelected = threeDState.meterOrGroup === 'meters';
-			const isMeterOrGroup = meterOrGroup === 'meters';
-			// Determines if the current pill is the one being rendered, and sets its color accordingly
-			const colorToRender = (meterOrGroupID === selectedMeterOrGroupID && meterOrGroupSelected === isMeterOrGroup) ? 'primary' : 'secondary';
+			const meterOrGroupSelected = threeDState.meterOrGroup === MeterOrGroup.meters;
+			const isMeterOrGroup = meterOrGroup === MeterOrGroup.meters;
+			// Determines if the current pill is the one being generated, and sets its color accordingly
+			const colorToRender = (meterOrGroupID === selectedMeterOrGroupID) && (meterOrGroupSelected === isMeterOrGroup) ? 'primary' : 'secondary';
 
 			return (
 				<Badge onClick={() => handlePillClick(meterOrGroupID, meterOrGroup)}
@@ -39,27 +45,31 @@ export default function ThreeDPillComponent() {
 			)
 		});
 	}
+
 	return (
 		<div style={pillContainer}>
 			{selectedMeters.length > 0 &&
 				<div style={pillBox}>
 					<p style={pillBoxLabel}>Meters</p>
 					<div style={pills}>
-						{populatePills(selectedMeters, 'meters')}
+						{populatePills(selectedMeters, MeterOrGroup.meters)}
 					</div>
 				</div>
 			}
+
 			{selectedGroups.length > 0 &&
 				<div style={pillBox}>
 					<p style={pillBoxLabel}>Groups</p>
 					<div style={pills} >
-						{populatePills(selectedGroups, 'groups')}
+						{populatePills(selectedGroups, MeterOrGroup.groups)}
 					</div>
 				</div>
 			}
 		</div >
 	)
 }
+
+// Styling for the component, may need to be converted into .css files in the future.
 const pillContainer: React.CSSProperties = {
 	display: 'flex', justifyContent: 'space-between', margin: '0px', padding: '0px', minHeight: '100px', maxHeight: '200px'
 };

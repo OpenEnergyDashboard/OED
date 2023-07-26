@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph';
+import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision, MeterOrGroup } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
@@ -29,7 +29,7 @@ const defaultState: GraphState = {
 	renderOnce: false,
 	threeD: {
 		meterOrGroupID: null,
-		meterOrGroup: 'meters',
+		meterOrGroup: MeterOrGroup.meters,
 		xAxisPrecision: ThreeDReadingPrecision.hourly,
 		timeInterval: null
 	}
