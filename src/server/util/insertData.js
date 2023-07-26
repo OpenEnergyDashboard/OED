@@ -233,13 +233,14 @@ async function insertMeters(metersToInsert, conn) {
 					await conn.none(query);
 				}
 				// setup conditionset variable
-				const conditionSetMap = new Map();
-				conditionSetMap.set('minVal', meter.minVal);
-				conditionSetMap.set('maxVal', meter.maxVal);
-				conditionSetMap.set('minDate', meter.minDate);
-				conditionSetMap.set('maxDate', meter.maxDate);
-				conditionSetMap.set('threshold', meter.readingGap);
-				conditionSetMap.set('maxError', meter.maxError);
+				const conditionSet = {
+					minVal: meter.minVal,
+					maxVal: meter.maxVal,
+					minDate: meter.minDate,
+					maxDate: meter.maxDate,
+					threshold: meter.readingGap,
+					maxError: meter.maxError
+				}
 				await loadCsvInput(
 					filename, // filePath
 					meter.id, // meterID
@@ -255,7 +256,7 @@ async function insertMeters(metersToInsert, conn) {
 					meter.endOnlyTime, // isEndOnly
 					true, // headerRow
 					false, // shouldUpdate
-					conditionSetMap, // conditionSet
+					conditionSet, // conditionSet
 					conn
 				);
 			}
