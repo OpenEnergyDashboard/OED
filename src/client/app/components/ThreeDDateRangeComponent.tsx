@@ -47,7 +47,7 @@ export default function ThreeDDateRangeComponent() {
 					maxDate={new Date()}
 					locale={locale} // Formats Dates, and Calendar months base on locale
 				/>
-				<TooltipMarkerComponent page='home' helpTextId={translate('help.home.select.dateRange')} />
+				<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
 			</div>);
 	else
 		return null;

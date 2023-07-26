@@ -402,14 +402,16 @@ class Reading {
 		);
 
 		//console.log(allMeterThreeDReadings);
-		
+
 		let sortedReadings;
 		const numOfReadings = allMeterThreeDReadings.length;
+		// TODO do no data validation check before this
+		// This line crashes if no readings return, 
 		const expectedNumOfReadings = allMeterThreeDReadings[allMeterThreeDReadings.length - 1].end_timestamp.diff(allMeterThreeDReadings[0].start_timestamp, 'hours')
-		console.log(numOfReadings);
-		console.log(expectedNumOfReadings/sequenceNumber);
+		// console.log(numOfReadings);
+		// console.log(expectedNumOfReadings / sequenceNumber);
 		//Check to see if there is any missing data in the hourly readings table. 
-		if (numOfReadings != expectedNumOfReadings/sequenceNumber && numOfReadings !=0) {
+		if (numOfReadings != expectedNumOfReadings / sequenceNumber && numOfReadings != 0) {
 			//Hold the objects of missing readings.
 			const tempArray = [];
 			//Check that table has all hourly readings for each day within the range of dates requested.  
@@ -447,28 +449,28 @@ class Reading {
 		// Using Lodash.chunk Not ideal, proof of concept only;
 		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
 		// TODO ENUM for chunksize
-		const chunkedReadings = _.chunk(sortedReadings, 24/sequenceNumber);
-		console.log(chunkedReadings);
+		const chunkedReadings = _.chunk(sortedReadings, 24 / sequenceNumber);
+		// console.log(chunkedReadings);
 		//console.log(chunkedReadings);
 		// Data may change need based on steve's feedback 
-		
+
 		const xData = [];
 		const yData = [];
 		const zData = [];
-		
+
 		if (chunkedReadings.length > 0) {
 			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
 
-				chunkedReadings.forEach(day => {
-					let dayReadings = [];
-					// Data data may need to be converted into 'moment' to save on network load
-					yData.push(day[0].start_timestamp.valueOf());
+			chunkedReadings.forEach(day => {
+				let dayReadings = [];
+				// Data data may need to be converted into 'moment' to save on network load
+				yData.push(day[0].start_timestamp.valueOf());
 
 				day.forEach(hour => dayReadings.push(hour.reading_rate));
 				zData.push(dayReadings);
 			});
 		}
-		
+
 		const threeDData = {
 			xData: xData,
 			yData: yData,

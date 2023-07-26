@@ -5,13 +5,14 @@
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ThreeDReading } from '../readings';
+import { ThreeDReadingPrecision } from './graph';
 
 export interface RequestMeterThreeDReadingsAction {
 	type: ActionType.RequestMeterThreeDReadings;
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
 }
 
 export interface ReceiveMeterThreeDReadingsAction {
@@ -19,7 +20,7 @@ export interface ReceiveMeterThreeDReadingsAction {
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
 	readings: ThreeDReading;
 }
 export interface RequestGroupThreeDReadingsAction {
@@ -27,7 +28,7 @@ export interface RequestGroupThreeDReadingsAction {
 	groupID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
 }
 
 export interface ReceiveGroupThreeDReadingsAction {
@@ -35,7 +36,7 @@ export interface ReceiveGroupThreeDReadingsAction {
 	groupID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
 	readings: ThreeDReading;
 }
 

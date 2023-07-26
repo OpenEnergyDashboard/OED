@@ -216,17 +216,21 @@ export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeIn
 	return { type: ActionType.UpdateThreeDTimeInterval, dateRange };
 }
 
-export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision): t.UpdateThreeDPrecision {
-	return { type: ActionType.UpdateThreeDPrecision, xAxisPrecision };
+
+export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDPrecision, xAxisPrecision });
+		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
+
+		return Promise.resolve();
+	};
+	// return { type: ActionType.UpdateThreeDPrecision, xAxisPrecision };
 }
 
-export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
-	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
-}
 export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
-		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
+		dispatch({ type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup });
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
 		return Promise.resolve();
 	};
