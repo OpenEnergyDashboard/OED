@@ -201,12 +201,12 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param timeInterval The range of time to get readings for
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval) {
+async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequenceNumber) {
 	// TODO Determine the proper format that should be returned
 	// TODO Determine proper logic and logic placement.
 	// TODO Proper JSDOC return Values
 	const conn = getConnection();
-	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
 	return hourlyReadings;
 }
 
@@ -270,7 +270,8 @@ function createRouter() {
 		const meterID = req.params.meter_ids;
 		const graphicUnitID = req.query.graphicUnitId;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval);
+		const sequenceNumber = req.query.sequenceNumber;
+		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
 		res.json(forJson);
 	});
 
