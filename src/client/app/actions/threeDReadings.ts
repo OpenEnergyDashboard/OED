@@ -15,37 +15,37 @@ import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateR
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision)
+function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision)
 	: t.RequestMeterThreeDReadingsAction {
-	return { type: ActionType.RequestMeterThreeDReadings, meterID, timeInterval, unitID, precision: readingCount };
+	return { type: ActionType.RequestMeterThreeDReadings, meterID, timeInterval, unitID, xAxisPrecision };
 }
 
 /**
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @param readings the readings for the given meters
  */
 function receiveMeterThreeDReadings(
-	meterID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision, readings: ThreeDReading)
+	meterID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision, readings: ThreeDReading)
 	: t.ReceiveMeterThreeDReadingsAction {
-	return { type: ActionType.ReceiveMeterThreeDReadings, meterID, timeInterval, unitID, precision: readingCount, readings };
+	return { type: ActionType.ReceiveMeterThreeDReadings, meterID, timeInterval, unitID, xAxisPrecision, readings };
 }
 
 /**
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision): Thunk {
+function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestMeterThreeDReadings(meterID, timeInterval, unitID, precision));
-		const meterThreeDReadings = await readingsApi.meterThreeDReadings(meterID, timeInterval, unitID);
-		dispatch(receiveMeterThreeDReadings(meterID, timeInterval, unitID, precision, meterThreeDReadings));
+		dispatch(requestMeterThreeDReadings(meterID, timeInterval, unitID, xAxisPrecision));
+		const meterThreeDReadings = await readingsApi.meterThreeDReadings(meterID, timeInterval, unitID, xAxisPrecision);
+		dispatch(receiveMeterThreeDReadings(meterID, timeInterval, unitID, xAxisPrecision, meterThreeDReadings));
 	};
 }
 
@@ -104,37 +104,37 @@ function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInter
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision)
+function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision)
 	: t.RequestGroupThreeDReadingsAction {
-	return { type: ActionType.RequestGroupThreeDReadings, groupID, timeInterval, unitID, precision: readingCount };
+	return { type: ActionType.RequestGroupThreeDReadings, groupID, timeInterval, unitID, xAxisPrecision };
 }
 
 /**
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingCount number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @param readings the readings for the given groups
  */
 function receiveGroupThreeDReadings(
-	groupID: number, timeInterval: TimeInterval, unitID: number, readingCount: ThreeDReadingPrecision, readings: ThreeDReading)
+	groupID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision, readings: ThreeDReading)
 	: t.ReceiveGroupThreeDReadingsAction {
-	return { type: ActionType.ReceiveGroupThreeDReadings, groupID, timeInterval, unitID, precision: readingCount, readings };
+	return { type: ActionType.ReceiveGroupThreeDReadings, groupID, timeInterval, unitID, xAxisPrecision, readings };
 }
 
 /**
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision): Thunk {
+function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestGroupThreeDReadings(groupID, timeInterval, unitID, precision));
-		const groupThreeDReadings = await readingsApi.groupThreeDReadings(groupID, timeInterval, unitID);
-		dispatch(receiveGroupThreeDReadings(groupID, timeInterval, unitID, precision, groupThreeDReadings));
+		dispatch(requestGroupThreeDReadings(groupID, timeInterval, unitID, xAxisPrecision));
+		const groupThreeDReadings = await readingsApi.groupThreeDReadings(groupID, timeInterval, unitID, xAxisPrecision);
+		dispatch(receiveGroupThreeDReadings(groupID, timeInterval, unitID, xAxisPrecision, groupThreeDReadings));
 	};
 }
 
@@ -143,14 +143,14 @@ function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, u
  * @param groupID the ID of the group to check
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param xAxisPrecision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @returns True if the readings for the given group, time duration and unit are missing; false otherwise.
  */
-function shouldFetchGroupThreeDReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number, precision: ThreeDReadingPrecision)
-	: boolean {
+function shouldFetchGroupThreeDReadings(
+	state: State, groupID: number, timeInterval: TimeInterval, unitID: number, xAxisPrecision: ThreeDReadingPrecision): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	// Optional chaining returns undefined if any of the properties in the chain aren't present
-	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[precision]?.readings;
+	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[xAxisPrecision]?.readings;
 	// return true if readings aren't present.
 	return !hasReadings ? true : false;
 }

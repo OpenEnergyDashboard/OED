@@ -26,7 +26,13 @@ export const LineGraphRates = {
 }
 
 export enum ThreeDReadingPrecision {
-	hourly = 'hourly'
+	hourly = 1,
+	twoHour = 2,
+	threeHour = 3,
+	fourHour = 4,
+	sixHour = 6,
+	eightHour = 8,
+	twelveHour = 12
 }
 
 export interface UpdateSelectedMetersAction {

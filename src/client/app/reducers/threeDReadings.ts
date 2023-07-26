@@ -18,7 +18,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.precision;
+			const readingCount = action.xAxisPrecision;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: true
@@ -53,7 +53,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.precision;
+			const readingCount = action.xAxisPrecision;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: false
@@ -67,7 +67,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const groupID = action.groupID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.precision;
+			const readingCount = action.xAxisPrecision;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: true
@@ -102,7 +102,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const groupID = action.groupID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.precision;
+			const readingCount = action.xAxisPrecision;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: false
