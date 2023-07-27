@@ -11,6 +11,7 @@ const _ = require('lodash');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
+const { request } = require('chai');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -39,7 +40,7 @@ function validateLineReadingsQueryParams(queryParams) {
 			},
 			graphicUnitId: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$' //this is the pattern to use!!
 			}
 		}
 	};
@@ -262,17 +263,63 @@ function createRouter() {
 		}
 	});
 
+	// function validateMeterId(meter_id) {
+	// 	const isValidMeterId = typeof meter_id === 'string' && /^\d+$/.test(meter_id);
+	// 	console.log('Is valid id', isValidMeterId);
+	// 	return isValidMeterId;
+		
+	// } 
+
+	function validateMeterId(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 3,
+			required: ['meter_ids'], ['timeInterval'], ['sequence'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+	
+	// function validateMeterId(params) {
+	// 	const isValidMeterId = {
+	// 		type: 'object',
+	// 		maxProperties: 1,
+	// 		required: [meterID],
+	// 		properties: {
+	// 			meterID: {
+	// 				type: 'string',
+	// 				pattern: '^\\d+$'
+	// 			}
+	// 		}
+	// 	};
+	// 	const meterValidationResult = validate(meter_id, isValidMeterId);
+	// 	return meterValidationResult.valid; // || isValidMeterId;
+	// }
+
+	// If multiple integers -> multiple meter ids
+	// down the line send multi line readings
+	// once params are added Max Properties: 3
+
+
 	router.get('/threed/meters/:meter_ids', async (req, res) => {
-		// TODO LOOK INTO camelcasing
-		// TODO Determine valid params and query params
-		// TODO Validate params & query params
 		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
 		// }
+		//const meterID = req.params.meter_ids; ARBITRARILY CHANGE VAL TO RAND #
+		console.log('meterID: ', meterID);
 
-		const meterID = req.params.meter_ids;
+		if (!validateMeterId(meterID)) {
+			return res.status(400).json({ error: 'Invalid meter_ids parameter' });
+		  }
+		const meterID = req.params.meterID;  
 		const graphicUnitID = req.query.graphicUnitId;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval);
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval); //validate these as well
+		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval); //^^
 		res.json(forJson);
 	});
 
