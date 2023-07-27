@@ -39,6 +39,8 @@ export default function ExportComponent() {
 	const adminState = useSelector((state: State) => state.admin);
 	// readings state
 	const readingsState = useSelector((state: State) => state.readings);
+	// error bar state
+	const errorBarState = useSelector((state: State) => state.graph.showMinMax);
 	// Time range of graphic
 	const timeInterval = graphState.timeInterval;
 
@@ -84,7 +86,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current meter.
 								const meterIdentifier = metersState[meterId].identifier;
-								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
+								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, errorBarState);
 							}
 						}
 					}

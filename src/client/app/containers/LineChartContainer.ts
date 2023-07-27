@@ -83,8 +83,8 @@ function mapStateToProps(state: State) {
 							xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 							yData.push(reading.reading * rate);
 							// Min and Max values.
-							yMinData.push(reading.min); 
-							yMaxData.push(reading.max); 
+							yMinData.push(reading.min);
+							yMaxData.push(reading.max);
 							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${(reading.reading * rate).toPrecision(6)} ${unitLabel}`);
 						});
 					}
@@ -105,10 +105,16 @@ function mapStateToProps(state: State) {
 								minValue /= meterArea;
 								maxValue /= meterArea;
 							}
+
 							yData.push(readingValue);
 							yMinData.push(minValue);
 							yMaxData.push(maxValue);
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
+
+							if (state.graph.showMinMax) {
+								hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
+							} else {
+								hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+							}
 						});
 					}
 

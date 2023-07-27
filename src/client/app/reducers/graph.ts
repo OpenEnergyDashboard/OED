@@ -94,6 +94,12 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				areaNormalization: !state.areaNormalization
 			};
+		case ActionType.ToggleShowMinMax:
+			return {
+				...state,
+				showMinMax: !state.showMinMax
+			};
+
 		case ActionType.ChangeBarStacking:
 			return {
 				...state,

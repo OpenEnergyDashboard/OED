@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { ActionType } from '../types/redux/actions';
-import { LineReadingsState } from 'types/redux/lineReadings';
+import { State } from '../types/redux/state';
+import { toggleShowMinMax } from '../actions/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -15,13 +15,13 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 const ErrorBarComponent = () => {
     const dispatch = useDispatch();
-    const showMinMax = useSelector((state: LineReadingsState) => state.showMinMax);
+    const graphState = useSelector((state: State) => state.graph);
 
     /**
      * Dispatches an action to toggle visibility of min/max lines on checkbox interaction
      */
     const handleToggleShowMinMax = () => {
-        dispatch({ type: ActionType.ToggleShowMinMax });
+        dispatch(toggleShowMinMax());
     }
 
     return (
@@ -30,7 +30,7 @@ const ErrorBarComponent = () => {
                 type='checkbox'
                 style={{ marginRight: '10px' }}
                 onChange={() => handleToggleShowMinMax()}
-                checked={showMinMax}
+                checked={graphState.showMinMax}
                 id='errorBar'
             />
             <label htmlFor='errorBar'>
