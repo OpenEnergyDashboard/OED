@@ -45,7 +45,10 @@ export default function GraphicRateMenuComponent() {
 			{
 				graphState.chartToRender == 'line' &&
 				<div>
-					<p style={labelStyle}><FormattedMessage id='rate' />:</p>
+					<p style={labelStyle}>
+						<FormattedMessage id='rate' />:
+						<TooltipMarkerComponent page='home' helpTextId='help.home.select.rates' />
+					</p>
 					{ /* On change update the line graph rate in the store after a null check */}
 					<Select
 						options={rateOptions}
@@ -59,7 +62,6 @@ export default function GraphicRateMenuComponent() {
 							}
 						}}
 					/>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.select.rates' />
 				</div>
 			}
 		</div>

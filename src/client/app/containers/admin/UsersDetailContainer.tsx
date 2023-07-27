@@ -6,11 +6,11 @@ import * as React from 'react';
 import * as _ from 'lodash';
 import { User, UserRole } from '../../types/items';
 import UserDetailComponent from '../../components/admin/UsersDetailComponent';
-import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { usersApi } from '../../utils/api';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
+import HeaderComponent from '../../components/HeaderComponent';
 
 interface UsersDisplayContainerProps {
 	fetchUsers: () => User[];
@@ -82,7 +82,7 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 	public render() {
 		return (
 			<div>
-				<HeaderContainer />
+				<HeaderComponent />
 				<UserDetailComponent
 					deleteUser={this.deleteUser}
 					edited={!_.isEqual(this.state.users, this.state.history[0])}
