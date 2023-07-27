@@ -21,6 +21,8 @@ import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
+import ThreeDDateRangeComponent from './ThreeDDateRangeComponent';
+import ThreeDSelectComponent from './ThreeDSelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -89,7 +91,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
-				<AreaUnitSelectComponent/>
+				<ThreeDDateRangeComponent />
+				<ThreeDSelectComponent />
+				<AreaUnitSelectComponent />
 
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
@@ -247,6 +251,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 						<MapChartSelectComponent key='chart' />
 					</div>
 				}
+
 
 				{/* We can't export compare data or map data */}
 				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&

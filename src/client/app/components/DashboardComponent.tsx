@@ -10,9 +10,9 @@ import MultiCompareChartContainer from '../containers/MultiCompareChartContainer
 import MapChartContainer from '../containers/MapChartContainer';
 import ThreeDComponent from './ThreeDComponent';
 import SpinnerComponent from './SpinnerComponent';
-import {ChartTypes} from '../types/redux/graph';
+import { ChartTypes } from '../types/redux/graph';
 import * as moment from 'moment';
-import {TimeInterval} from '../../../common/TimeInterval';
+import { TimeInterval } from '../../../common/TimeInterval';
 import Button from 'reactstrap/lib/Button';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -24,7 +24,6 @@ interface DashboardProps {
 	barLoading: false;
 	compareLoading: false;
 	mapLoading: false;
-	threeDLoading: false;
 	selectedTimeInterval: TimeInterval;
 	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
 }
@@ -69,10 +68,9 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 			}
 			ChartToRender = MapChartContainer;
 		} else if (this.props.chartToRender === ChartTypes.threeD) {
-			// TODO threeDLoading is always false, Fix this.
-			if (this.props.threeDLoading) {
-				showSpinner = true;
-			}
+			/* To avoid the spinner rendering over UI elements (PillBadges) in the 3d component,
+			the spinner and logic now lives inside the 3dComponent instead. 'showSpinner' is hardcoded to false here.*/
+			showSpinner = false;
 			ChartToRender = ThreeDComponent;
 		} else {
 			throw new Error('unrecognized type of chart');
@@ -92,23 +90,23 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 						<UIOptionsContainer />
 					</div>
 					<div className={`${chartClassName} align-self-auto text-center`}>
-						{ showSpinner ? (
+						{showSpinner ? (
 							<SpinnerComponent loading width={50} height={50} />
 						) : (
 							<ChartToRender />
 						)}
-						{ (this.props.chartToRender === ChartTypes.line) ? (
+						{(this.props.chartToRender === ChartTypes.line) ? (
 							[<Button
 								key={1}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('range')}
-							> <FormattedMessage id='redraw'/>
+							> <FormattedMessage id='redraw' />
 							</Button>,
 							<Button
 								key={2}
 								style={buttonMargin}
 								onClick={() => this.handleTimeIntervalChange('all')}
-							> <FormattedMessage id='restore'/>
+							> <FormattedMessage id='restore' />
 							</Button>,
 							<TooltipMarkerComponent
 								key={3}

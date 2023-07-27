@@ -7,6 +7,7 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 
 export enum ChartTypes {
 	line = 'line',
@@ -18,14 +19,20 @@ export enum ChartTypes {
 
 // Rates that can be graphed, only relevant to line graphs.
 export const LineGraphRates = {
-	'second': (1/3600),
-	'minute': (1/60),
+	'second': (1 / 3600),
+	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
 }
 
 export enum ThreeDReadingPrecision {
-	hourly = 'hourly'
+	hourly = 1,
+	twoHour = 2,
+	threeHour = 3,
+	fourHour = 4,
+	sixHour = 6,
+	eightHour = 8,
+	twelveHour = 12
 }
 
 export interface UpdateSelectedMetersAction {
@@ -110,6 +117,21 @@ export interface ConfirmGraphRenderOnce {
 	type: ActionType.ConfirmGraphRenderOnce;
 }
 
+export interface UpdateThreeDTimeInterval {
+	type: ActionType.UpdateThreeDTimeInterval;
+	dateRange: Value;
+}
+
+export interface UpdateThreeDPrecision {
+	type: ActionType.UpdateThreeDPrecision;
+	xAxisPrecision: ThreeDReadingPrecision;
+}
+export interface UpdateThreeDMeterOrGroupInfo {
+	type: ActionType.UpdateThreeDMeterOrGroupInfo;
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -127,11 +149,25 @@ export type GraphAction =
 	| ChangeCompareSortingOrderAction
 	| SetOptionsVisibility
 	| UpdateLineGraphRate
-	| ConfirmGraphRenderOnce;
+	| ConfirmGraphRenderOnce
+	| UpdateThreeDTimeInterval
+	| UpdateThreeDPrecision
+	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
 	label: string,
 	rate: number
+}
+
+export type MeterOrGroupID = number | null;
+export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
+export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
+
+export interface ThreeDState {
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
+	xAxisPrecision: ThreeDReadingPrecision;
+	timeInterval: Value;
 }
 
 export interface GraphState {
@@ -152,6 +188,5 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
-	threeDAxisPrecision: ThreeDReadingPrecision;
-	threeDTimeInterval: TimeInterval;
+	threeD: ThreeDState;
 }

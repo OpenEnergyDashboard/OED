@@ -5,13 +5,14 @@
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ThreeDReading } from '../readings';
+import { ThreeDReadingPrecision } from './graph';
 
 export interface RequestMeterThreeDReadingsAction {
 	type: ActionType.RequestMeterThreeDReadings;
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
 }
 
 export interface ReceiveMeterThreeDReadingsAction {
@@ -19,13 +20,32 @@ export interface ReceiveMeterThreeDReadingsAction {
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	precision: string;
+	xAxisPrecision: ThreeDReadingPrecision;
+	readings: ThreeDReading;
+}
+export interface RequestGroupThreeDReadingsAction {
+	type: ActionType.RequestGroupThreeDReadings;
+	groupID: number;
+	unitID: number;
+	timeInterval: TimeInterval;
+	xAxisPrecision: ThreeDReadingPrecision;
+}
+
+export interface ReceiveGroupThreeDReadingsAction {
+	type: ActionType.ReceiveGroupThreeDReadings;
+	groupID: number;
+	unitID: number;
+	timeInterval: TimeInterval;
+	xAxisPrecision: ThreeDReadingPrecision;
 	readings: ThreeDReading;
 }
 
+
 export type ThreeDReadingsAction =
 	ReceiveMeterThreeDReadingsAction |
-	RequestMeterThreeDReadingsAction;
+	RequestMeterThreeDReadingsAction |
+	RequestGroupThreeDReadingsAction |
+	ReceiveGroupThreeDReadingsAction;
 
 export interface ThreeDReadingsState {
 	byMeterID: {
@@ -40,6 +60,20 @@ export interface ThreeDReadingsState {
 			}
 		}
 	};
+
+	byGroupID: {
+		[groupID: number]: {
+			[timeInterval: string]: {
+				[unitID: number]: {
+					[precision: string]: {
+						isFetching: boolean;
+						readings?: ThreeDReading;
+					}
+				}
+			}
+		}
+	};
+
 	isFetching: boolean;
 	metersFetching: boolean;
 }

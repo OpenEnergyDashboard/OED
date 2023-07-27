@@ -18,4 +18,5 @@ export class TimeInterval {
 	public duration(specifier: string): number;
 	public getStartTimestamp(): moment.Moment;
 	public getEndTimestamp(): moment.Moment;
+	public getIsBounded(): boolean;
 }

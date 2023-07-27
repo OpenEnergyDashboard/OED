@@ -10,7 +10,8 @@ import { SelectOption } from '../types/items';
 import Select from 'react-select';
 import translate from '../utils/translate';
 import { updateLineGraphRate } from '../actions/graph'
-import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React component that controls the line graph rate menu
@@ -42,7 +43,7 @@ export default function GraphicRateMenuComponent() {
 	return (
 		<div>
 			{
-				graphState.chartToRender == 'line' &&
+				(graphState.chartToRender === ChartTypes.line || graphState.chartToRender === ChartTypes.threeD) &&
 				<div>
 					<p style={labelStyle}><FormattedMessage id='rate' />:</p>
 					{ /* On change update the line graph rate in the store after a null check */}
@@ -58,6 +59,7 @@ export default function GraphicRateMenuComponent() {
 							}
 						}}
 					/>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.rates' />
 				</div>
 			}
 		</div>

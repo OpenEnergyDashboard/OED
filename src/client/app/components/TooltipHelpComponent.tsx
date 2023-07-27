@@ -76,6 +76,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.select.groups': { link: `${BASE_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${BASE_URL}/mapGraphic.html` },
 			'help.home.select.meters': { link: `${BASE_URL}/graphingMeters.html` },
+			'help.home.select.rates': { link: `${BASE_URL}/graphingRates.html` },
 			'help.home.select.units': { link: `${BASE_URL}/graphingUnits.html` },
 			'help.home.toggle.chart.link': { link: `${BASE_URL}/chartLink.html` },
 			'help.groups.groupdetails': { link: `${BASE_URL}/groupDetails.html` },

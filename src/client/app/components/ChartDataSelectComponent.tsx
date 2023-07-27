@@ -10,7 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { DataType } from '../types/Datasources';
 import {
 	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
@@ -18,7 +18,7 @@ import {
 } from '../utils/calibration';
 import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit
+	updateSelectedGroups, updateSelectedUnit, changeMeterOrGroupInfo
 } from '../actions/graph';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
@@ -27,7 +27,6 @@ import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -85,6 +84,7 @@ export default function ChartDataSelectComponent() {
 		// ony run this check if we are displaying a map chart
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
+		const threeDState = state.graph.threeD;
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
 			const mp = state.maps.byMapID[selectedMap];
 			// filter meters;
@@ -283,7 +283,9 @@ export default function ChartDataSelectComponent() {
 			// currently selected unit
 			selectedUnit,
 			// chart currently being rendered
-			chartToRender
+			chartToRender,
+			// current state of threeD
+			threeDState
 		}
 	});
 
@@ -313,6 +315,24 @@ export default function ChartDataSelectComponent() {
 								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
 							}
 							dispatch(changeSelectedGroups(allSelectedGroupIDs));
+
+							// Do additional things relevant to 3D graphics
+							// This block is responsible for keeping 3D state in sync with meters and group menus
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								// Variables determine whether the component change added or removed a group.
+								const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
+								const groupRemoved = !groupAdded;
+								// Reference threeDState to check if the updated meter is actively selected
+								const isActive = (difference === dataProps.threeDState.meterOrGroupID) && (dataProps.threeDState.meterOrGroup === MeterOrGroup.groups);
+								if (groupAdded) {
+									// When a meter is added, update 3D MeterOrGroup state
+									const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
+									dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.groups));
+								} else if (groupRemoved && isActive) {
+									// When a meter is removed, and is the currently active graph to render. Update ThreeDState to reflect the change.
+									dispatch(changeMeterOrGroupInfo(null));
+								}
+							}
 						}
 					}}
 				/>
@@ -346,25 +366,21 @@ export default function ChartDataSelectComponent() {
 							} else {
 								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
 							}
-							/* TODO Not Ideal. Find better approach to supporting 3D meter selection}
-							 3D cannot effectively handle more than one meter, therefore users must
-							be able to only pick a single meter at a time, works similar to 'units'*/
-							if (dataProps.chartToRender === ChartTypes.threeD) {
-								const selectedThreeDMeter = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
-								// no meters selected.
-								if (selectedThreeDMeter === undefined) {
-									dispatch(changeSelectedGroups([]))
-									dispatch(changeSelectedMeters([]));
-									dispatch(updateSelectedUnit(-99));
-								}
-								else {
-									//
-									dispatch(changeSelectedMeters([selectedThreeDMeter]));
-									dispatch(fetchNeededThreeDReadings(selectedThreeDMeter));
-								}
+							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 
-							} else {
-								dispatch(changeSelectedMeters(allSelectedMeterIDs));
+							// Do additional things relevant to 3D graphics
+							// This block is responsible for keeping 3D state in sync with meters and group menus
+							if (dataProps.chartToRender === ChartTypes.threeD) {
+								// Logic mirrors the group multiselect onValuesChange()
+								const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
+								const meterRemoved = !meterAdded;
+								const meterIsSelected = difference === dataProps.threeDState.meterOrGroupID;
+								if (meterAdded) {
+									const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
+									dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.meters));
+								} else if (meterRemoved && meterIsSelected) {
+									dispatch(changeMeterOrGroupInfo(null));
+								}
 							}
 						}
 					}}
@@ -390,6 +406,8 @@ export default function ChartDataSelectComponent() {
 							dispatch(updateSelectedGroups([]));
 							dispatch(updateSelectedMeters([]));
 							dispatch(updateSelectedUnit(-99));
+							// Sync threeD state.
+							dispatch(changeMeterOrGroupInfo(null));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
 						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }

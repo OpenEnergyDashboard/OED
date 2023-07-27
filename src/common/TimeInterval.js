@@ -81,6 +81,10 @@ class TimeInterval {
 		return this.endTimestamp;
 	}
 
+	getIsBounded() {
+		return this.isBounded;
+	}
+
 	/**
 	 * Creates a new unbounded time interval
 	 * @returns {TimeInterval}

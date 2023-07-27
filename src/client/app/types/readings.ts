@@ -48,7 +48,7 @@ export interface MeterReading {
 }
 
 export interface ThreeDReading {
-	xData: string[];
-	yData: string[];
-	zData: number[][];
+	xData: number[];
+	yData: number[];
+	zData: (number | null)[][];
 }
