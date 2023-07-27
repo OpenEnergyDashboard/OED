@@ -75,7 +75,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		previousEnd: '',
 		areaUnit: AreaUnitType.none,
 		readingFrequency: adminState.defaultMeterReadingFrequency,
-		minVal: 0,
+		minVal: adminState.defaultMeterMinimumValue,
 		maxVal: 0,
 		minDate: '',
 		maxDate: '',

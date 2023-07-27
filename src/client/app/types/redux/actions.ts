@@ -83,8 +83,15 @@ export enum ActionType {
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS)
 	UpdateDefaultMeterMinimumValue = 'UPDATE_DEFAULT_METER_MINIMUM_VALUE',
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+	UpdateDefaultMeterMaximumValue = 'UPDATE_DEFAULT_METER_MAXIMUM_VALUE',
+	UpdateDefaultMeterMinimumDate = 'UPDATE_DEFAULT_METER_MINIMUM_DATE',
+	UpdateDefaultMeterMaximumDate = 'UPDATE_DEFAULT_METER_MAXIMUM_DATE',
+	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_READING_GAP',
+	UpdateDefaultMeterMaximumErrors = 'UPDATE_DEFAULT_METER_MAXIMUM_ERRORS',
+
+
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',

@@ -16,8 +16,13 @@ import {
 	toggleDefaultAreaNormalization,
 	updateDefaultAreaUnit,
 	updateDefaultMeterReadingFrequency,
-	updateDefaultMeterMinimumValue
 	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+	updateDefaultMeterMinimumValue,
+	updateDefaultMeterMaximumValue,
+	updateDefaultMeterMinimumDate,
+	updateDefaultMeterMaximumDate,
+	updateDefaultMeterReadingGap,
+	updateDefaultMeterMaximumErrors
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -38,8 +43,13 @@ function mapStateToProps(state: State) {
 		defaultAreaNormalization: state.admin.defaultAreaNormalization,
 		defaultAreaUnit: state.admin.defaultAreaUnit,
 		defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
-		defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue
 		// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+		defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue,
+		defaultMeterMaximumValue: state.admin.defaultMeterMaximumValue,
+		defaultMeterMinimumDate: state.admin.defaultMeterMinimumDate,
+		defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
+		defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
+		defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors
 	};
 }
 
@@ -58,7 +68,12 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultMeterReadingFrequency: (defaultMeterReadingFrequency: string) =>
 			dispatch(updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency)),
 		
-		updateDefaultMeterMinimumValue: (defaultMeterMinimumValue: number) => dispatch(updateDefaultMeterMinimumValue(defaultMeterMinimumValue))
+		updateDefaultMeterMinimumValue: (defaultMeterMinimumValue: number) => dispatch(updateDefaultMeterMinimumValue(defaultMeterMinimumValue)),
+		updateDefaultMeterMaximumValue: (defaultMeterMaximumValue: number) => dispatch(updateDefaultMeterMaximumValue(defaultMeterMaximumValue)),
+		updateDefaultMeterMinimumDate: (defaultMeterMinimumDate: string) => dispatch(updateDefaultMeterMinimumDate(defaultMeterMinimumDate)),
+		updateDefaultMeterMaximumDate: (defaultMeterMaximumDate: string) => dispatch(updateDefaultMeterMaximumDate(defaultMeterMaximumDate)),
+		updateDefaultMeterMaximumErrors: (defaultMeterMaximumErrors: number) => dispatch(updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
+		updateDefaultMeterReadingGap: (defaultMeterReadingGap: number) => dispatch(updateDefaultMeterReadingGap(defaultMeterReadingGap))
 	};
 }
 

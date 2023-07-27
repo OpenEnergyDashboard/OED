@@ -24,8 +24,13 @@ const defaultState: AdminState = {
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
-	defaultMeterMinimumValue: 0
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros)
+	defaultMeterMinimumValue: 0,
+	defaultMeterMaximumValue: 0,
+	defaultMeterMinimumDate: '',
+	defaultMeterMaximumDate: '',
+	defaultMeterReadingGap: 0,
+	defaultMeterMaximumErrors: 0
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -96,7 +101,13 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
 				defaultAreaUnit: action.data.defaultAreaUnit,
 				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency),
-				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue
+				// TODO ADD CONDSET VALUES TO RECIEVE PREFRERENCES
+				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue,
+				defaultMeterMaximumValue: action.data.defaultMeterMaximumValue,
+				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
+				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
+				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
+				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -122,12 +133,6 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.defaultFileSizeLimit,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMinimumValue:
-			return {
-				...state,
-				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
-				submitted: false
-			}
 		case ActionType.ToggleWaitForCikAndDB:
 			return {
 				...state,
@@ -137,6 +142,42 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMinimumValue: // TODO : ADD ACTIONTYPE FOR EACH CONDSET VALUE MINVAL,MAXVAL,MINDATE,MAXDATE,MAXERROR,READINGAP
+			return {
+				...state,
+				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumValue: 
+			return {
+				...state,
+				defaultMeterMaximumValue: action.defaultMeterMaximumValue,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMinimumDate: 
+			return {
+				...state,
+				defaultMeterMinimumDate: action.defaultMeterMinimumDate,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumDate: 
+			return {
+				...state,
+				defaultMeterMaximumDate: action.defaultMeterMaximumDate,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterReadingGap: 
+			return {
+				...state,
+				defaultMeterReadingGap: action.defaultMeterReadingGap,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumErrors: 
+			return {
+				...state,
+				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
 				submitted: false
 			};
 		default:
