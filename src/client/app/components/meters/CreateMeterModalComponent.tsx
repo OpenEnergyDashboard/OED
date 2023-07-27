@@ -65,7 +65,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		cumulativeResetStart: '',
 		cumulativeResetEnd: '',
 		endOnlyTime: false,
-		readingGap: 0,
+		readingGap: adminState.defaultMeterReadingGap,
 		readingVariation: 0,
 		readingDuplication: 1,
 		timeSort: MeterTimeSortType.increasing,
@@ -76,10 +76,10 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		areaUnit: AreaUnitType.none,
 		readingFrequency: adminState.defaultMeterReadingFrequency,
 		minVal: adminState.defaultMeterMinimumValue,
-		maxVal: 0,
-		minDate: '',
-		maxDate: '',
-		maxError: 0
+		maxVal: adminState.defaultMeterMaximumValue,
+		minDate: adminState.defaultMeterMinimumDate,
+		maxDate: adminState.defaultMeterMaximumDate,
+		maxError: adminState.defaultMeterMaximumErrors
 	}
 
 	const dropdownsStateDefaults = {
