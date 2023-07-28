@@ -322,31 +322,281 @@ async function insertSpecialUnits(conn) {
 	// The table contains special units' data.
 	const specialUnits = [
 		// Some units must be redone so visible since not for standard units.
-		['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['m³ gas', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['100 w bulb', '100 w bulb for 10 hrs', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Natural_Gas_Dollar', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Water_Gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['US dollar', 'US $', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['euro', '€', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit'],
-		['Trash', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Temperature_Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['gallon per minute', 'gallon (rate)', Unit.unitRepresentType.FLOW, 60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['liter per hour', 'liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW, 60, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+		{
+			name: 'BTU',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'm³ gas',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'kg',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'metric ton',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'gallon',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'liter',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Fahrenheit',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Celsius',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Electric_Utility',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'MJ',
+			identifier: 'megaJoules',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_BTU',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: '100 w bulb',
+			identifier: '100 w bulb for 10 hrs',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_M3',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_Dollar',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Water_Gallon',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'US dollar',
+			identifier: 'US $',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'euro',
+			identifier: '€',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'kg CO₂',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: 'CO₂',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Trash',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Temperature_Fahrenheit',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'kW',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Electric_kW',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'gallon per minute',
+			identifier: 'gallon (rate)',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 60,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'liter per hour',
+			identifier: 'liter (rate)',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Water_Gallon_Per_Minute',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 60,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		}
 	];
 	// For now it updates any units that exist since standard ones are changed for developers. This will wipe out any changes on restart.
 	await insertUnits(specialUnits, true, conn);
@@ -359,27 +609,174 @@ async function insertSpecialUnits(conn) {
 async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	const specialConversions = [
-		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 w bulb'],
-		['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
-		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
-		['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → CO2'],
-		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
-		['Natural_Gas_BTU', 'euro', false, 2.6e-6, 0, 'Natural_Gas_BTU → euro'],
-		['Natural_Gas_BTU', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → CO2'],
-		['Natural_Gas_M3', 'm³ gas', false, 1, 0, 'Natural_Gas_M3 → m3 of gas'],
-		['Natural_Gas_M3', 'US dollar', false, 0.11, 0, 'Natural_Gas_M3 → US dollar'],
-		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
-		['liter', 'gallon', true, 0.2641729, 0, 'liter → gallon'],
-		['US dollar', 'euro', true, 0.88, 0, 'US dollar → euro'],
-		['Natural_Gas_Dollar', 'US dollar', false, 1, 0, 'Natural_Gas_Dollar → US dollar'],
-		['kg CO₂', 'kg', false, 1, 0, 'CO2 → kg'],
-		['Trash', 'kg CO₂', false, 3.24e-6, 0, 'Trash → CO2'],
-		['Trash', 'kg', false, 1, 0, 'Trash → kg'],
-		['Temperature_Fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature_Fahrenheit → Fahrenheit'],
-		['Electric_kW', 'kW', false, 1, 0, 'Electric_kW → kW'],
-		['Water_Gallon_Per_Minute', 'gallon per minute', false, 1, 0, 'Water_Gallon_Per_Minute → gallon per minute'],
-		['gallon per minute', 'liter per hour', true, 227.12398, 0, 'gallon per minute → liter per hour']
+		{
+			sourceId: 'kWh',
+			destinationId: '100 w bulb',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'kWh → 100 w bulb'
+		},
+		{
+			sourceId: 'kWh',
+			destinationId: 'MJ',
+			bidirectional: true,
+			slope: 3.6,
+			intercept: 0,
+			note: 'kWh → MJ'
+		},
+		{
+			sourceId: 'Electric_Utility',
+			destinationId: 'kWh',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Electric_Utility → kWh'
+		},
+		{
+			sourceId: 'Electric_Utility',
+			destinationId: 'US dollar',
+			bidirectional: false,
+			slope: 0.115,
+			intercept: 0,
+			note: 'Electric_Utility → US dollar'
+		},
+		{
+			sourceId: 'Electric_Utility',
+			destinationId: 'kg CO₂',
+			bidirectional: false,
+			slope: 0.709,
+			intercept: 0,
+			note: 'Electric_Utility → CO2'
+		},
+		{
+			sourceId: 'Natural_Gas_BTU',
+			destinationId: 'BTU',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → BTU'
+		},
+		{
+			sourceId: 'Natural_Gas_BTU',
+			destinationId: 'euro',
+			bidirectional: false,
+			slope: 2.6e-6,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → euro'
+		},
+		{
+			sourceId: 'Natural_Gas_BTU',
+			destinationId: 'kg CO₂',
+			bidirectional: false,
+			slope: 5.28e-5,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → CO2'
+		},
+		{
+			sourceId: 'Natural_Gas_M3',
+			destinationId: 'm³ gas',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_M3 → m3 of gas'
+		},
+		{
+			sourceId: 'Natural_Gas_M3',
+			destinationId: 'US dollar',
+			bidirectional: false,
+			slope: 0.11,
+			intercept: 0,
+			note: 'Natural_Gas_M3 → US dollar'
+		},
+		{
+			sourceId: 'Water_Gallon',
+			destinationId: 'gallon',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Water_Gallon → gallon'
+		},
+		{
+			sourceId: 'liter',
+			destinationId: 'gallon',
+			bidirectional: true,
+			slope: 0.2641729,
+			intercept: 0,
+			note: 'liter → gallon'
+		},
+		{
+			sourceId: 'US dollar',
+			destinationId: 'euro',
+			bidirectional: true,
+			slope: 0.88,
+			intercept: 0,
+			note: 'US dollar → euro'
+		},
+		{
+			sourceId: 'Natural_Gas_Dollar',
+			destinationId: 'US dollar',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_Dollar → US dollar'
+		},
+		{
+			sourceId: 'kg CO₂',
+			destinationId: 'kg',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'CO2 → kg'
+		},
+		{
+			sourceId: 'Trash',
+			destinationId: 'kg CO₂',
+			bidirectional: false,
+			slope: 3.24e-6,
+			intercept: 0,
+			note: 'Trash → CO2'
+		},
+		{
+			sourceId: 'Trash',
+			destinationId: 'kg',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Trash → kg'
+		},
+		{
+			sourceId: 'Temperature_Fahrenheit',
+			destinationId: 'Fahrenheit',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Temperature_Fahrenheit → Fahrenheit'
+		},
+		{
+			sourceId: 'Electric_kW',
+			destinationId: 'kW',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Electric_kW → kW'
+		},
+		{
+			sourceId: 'Water_Gallon_Per_Minute',
+			destinationId: 'gallon per minute',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Water_Gallon_Per_Minute → gallon per minute'
+		},
+		{
+			sourceId: 'gallon per minute',
+			destinationId: 'liter per hour',
+			bidirectional: true,
+			slope: 227.12398,
+			intercept: 0,
+			note: 'gallon per minute → liter per hour'
+		}
 	];
 	await insertConversions(specialConversions, conn);
 }

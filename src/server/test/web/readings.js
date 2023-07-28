@@ -118,11 +118,40 @@ async function getUnitId(unitName) {
 // These units and conversions are used in many tests.
 // These are the 2D arrays for units, conversions to feed into the database
 // For kWh units.
-const unitDatakWh = [
-	['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-	['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+const unitDatakWh = [	
+	{
+	    name: 'kWh',
+		identifier: '',
+		unitRepresent: Unit.unitRepresentType.QUANTITY,
+		secInRate:  3600,
+		typeOfUnit:  Unit.unitType.UNIT,
+		suffix: '',
+		displayable:  Unit.displayableType.ALL,
+		preferredDisplay: true,
+		note: 'OED created standard unit'
+	},
+	{
+	    name: 'Electric_Utility',
+		identifier: '',
+		unitRepresent: Unit.unitRepresentType.QUANTITY,
+		secInRate:  3600,
+		typeOfUnit:  Unit.unitType.METER,
+		suffix: '',
+		displayable:  Unit.displayableType.NONE,
+		preferredDisplay: false,
+		note: 'special unit'
+	}
 ];
-const conversionDatakWh = [['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh']];
+const conversionDatakWh = [
+	{
+		sourceId: 'Electric_Utility',
+		destinationId: 'kWh',
+		bidirectional: false,
+		slope: 1,
+		intercept: 0,
+		note: 'Electric_Utility → kWh'
+	}
+];
 
 // TODO
 // Test readings from meters at different rates (15 min, 23 min)
@@ -135,7 +164,7 @@ mocha.describe('readings API', () => {
 		mocha.describe('for line charts', () => {
 			mocha.describe('for meters', () => {
 				// A reading response should have a reading, startTimestamp, and endTimestamp key
-				/*mocha.it('response should have valid reading and timestamps,', async () => {
+				mocha.it('response should have valid reading and timestamps,', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -169,7 +198,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
 				// Test using a date range of infinity, which should return as days
-				/*mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -339,11 +368,38 @@ mocha.describe('readings API', () => {
 				// Test 15 minutes over all time for flow unit.
 				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
 					const unitData = [
-						['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'kilowatts'],
-						['Electric', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+						{
+							name: 'kW',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'kilowatts'
+						},
+											{
+							name: 'Electric',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
 					];
 					const conversionData = [
-						['Electric', 'kW', false, 1, 0, 'Electric → kW']
+						{
+							sourceId: 'Electric',
+							destinationId: 'kW',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Electric → kW'
+						}
 					];
 					const meterData = [
 						{
@@ -372,11 +428,38 @@ mocha.describe('readings API', () => {
 				// Test 15 minutes over all time for raw unit.
 				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						}
 					];
 					const meterData = [
 						{
@@ -405,10 +488,27 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
+						{
+							sourceId: 'kWh',
+							destinationId: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						}
 					]);
 					const meterData = [
 						{
@@ -437,10 +537,27 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['MJ', 'kWh', true, 1 / 3.6, 0, 'MJ → KWh']
+						{
+							sourceId: 'MJ',
+							destinationId: 'kWh',
+							bidirectional: true,
+							slope: 1 / 3.6,
+							intercept: 0,
+							note: 'MJ → KWh'
+						}
 					]);
 					const meterData = [
 						{
@@ -469,12 +586,46 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
-						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						},
+						{
+							name: 'BTU',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+						{
+							sourceId: 'kWh',
+							destinationId: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						},
+						{
+							sourceId: 'MJ',
+							destinationId: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
+						}
 					]);
 					const meterData = [
 						{
@@ -504,12 +655,46 @@ mocha.describe('readings API', () => {
 
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained with reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
-						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						},
+						{
+							name: 'BTU',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['MJ', 'kWh', true, 1 / 3.6, 0, 'MJ → KWh'],
-						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+						{
+							sourceId: 'MJ',
+							destinationId: 'kWh',
+							bidirectional: true,
+							slope: 1 / 3.6,
+							intercept: 0,
+							note: 'MJ → KWh'
+						},
+						{
+							sourceId: 'MJ',
+							destinationId: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
+						}
 					]);
 					const meterData = [
 						{
@@ -538,10 +723,27 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units & kWh as MJ', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
+						{
+							sourceId: 'kWh',
+							destinationId: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						}
 					]);
 					const meterData = [
 						{
@@ -567,7 +769,7 @@ mocha.describe('readings API', () => {
 					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
-				});*/
+				});
 				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
 					const unitData = [
 						{
@@ -603,9 +805,6 @@ mocha.describe('readings API', () => {
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						}
-						//['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						//['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						//['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
 					];
 					const conversionData = [
 						{
@@ -624,8 +823,6 @@ mocha.describe('readings API', () => {
 							intercept: 32,
 							note: 'Celsius → Fahrenheit'
 						}
-						//['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						//['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit']
 					];
 					const meterData = [
 						{
@@ -652,12 +849,29 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				/*mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
+				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ']
+						{
+							sourceId: 'kWh',
+							destinationId: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						}
 					]);
 					const meterData = [
 						{
@@ -686,13 +900,57 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and raw units & C as F with intercept', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							sourceId: 'C',
+							destinationId: 'F',
+							bidirectional: true,
+							slope: 1.8,
+							intercept: 32,
+							note: 'Celsius → Fahrenheit'
+						}
 					];
 					const meterData = [
 						{
@@ -722,13 +980,57 @@ mocha.describe('readings API', () => {
 
 				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							sourceId: 'C',
+							destinationId: 'F',
+							bidirectional: true,
+							slope: 1.8,
+							intercept: 32,
+							note: 'Celsius → Fahrenheit'
+						}
 					];
 					const meterData = [
 						{
@@ -758,13 +1060,57 @@ mocha.describe('readings API', () => {
 
 				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept reverse conversion', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['F', 'C', true, 1 / 1.8, -32 / 1.8, 'Fahrenheit → Celsius']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							sourceId: 'F',
+							destinationId: 'C',
+							bidirectional: true,
+							slope: 1 / 1.8,
+							intercept: -32 / 1.8,
+							note: 'Fahrenheit → Celsius'
+						}
 					];
 					const meterData = [
 						{
@@ -795,11 +1141,38 @@ mocha.describe('readings API', () => {
 
 				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
 					const unitData = [
-						['Thing_36', '', Unit.unitRepresentType.FLOW, 36, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['thing unit', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit']
+						{
+							name: 'Thing_36',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate:  36,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'thing unit',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
 					];
 					const conversionData = [
-						['Thing_36', 'thing unit', false, 1, 0, 'Thing_36 → thing unit']
+						{
+							sourceId: 'Thing_36',
+							destinationId: 'thing unit',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Thing_36 → thing unit'
+						}
 					];
 					const meterData = [
 						{
@@ -828,15 +1201,76 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-						['Widget', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'fake unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+											{
+							name: 'Widget',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'fake unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['C', 'F', true, 1.8, 32, 'Celsius → Fahrenheit'],
-						['F', 'Widget', true, 5, 3, 'Fahrenheit → Widget']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							sourceId: 'C',
+							destinationId: 'F',
+							bidirectional: true,
+							slope: 1.8,
+							intercept: 32,
+							note: 'Celsius → Fahrenheit'
+						},
+						{
+							sourceId: 'F',
+							destinationId: 'Widget',
+							bidirectional: true,
+							slope: 5,
+							intercept: 3,
+							note: 'Fahrenheit → Widget'
+						}
 					];
 					const meterData = [
 						{
@@ -865,15 +1299,76 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () => {
 					const unitData = [
-						['C', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Celsius'],
-						['Degrees', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['F', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-						['Widget', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'fake unit']
+						{
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+											{
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.METER,
+							suffix: '',
+							displayable:  Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+											{
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+											{
+							name: 'Widget',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'fake unit'
+						}
 					];
 					const conversionData = [
-						['Degrees', 'C', false, 1, 0, 'Degrees → C'],
-						['F', 'C', true, 1 / 1.8, -32 / 1.8, 'Fahrenheit → Celsius'],
-						['Widget', 'F', true, 0.2, -3 / 5, 'Fahrenheit → Widget']
+						{
+							sourceId: 'Degrees',
+							destinationId: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							sourceId: 'F',
+							destinationId: 'C',
+							bidirectional: true,
+							slope: 1 / 1.8,
+							intercept: -32 / 1.8,
+							note: 'Fahrenheit → Celsius'
+						},
+						{
+							sourceId: 'Widget',
+							destinationId: 'F',
+							bidirectional: true,
+							slope: 0.2,
+							intercept: -3 / 5,
+							note: 'Fahrenheit → Widget'
+						}
 					];
 					const meterData = [
 						{
@@ -903,11 +1398,38 @@ mocha.describe('readings API', () => {
 				// When an invalid unit is added to a meter and loaded to the db, the API should return an empty array
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [
-						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-						['invalidUnit', '', Unit.unitRepresentType.UNUSED, 1, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Invalid Unit']
+						{
+							name: 'kWh',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate:  3600,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						},
+											{
+							name: 'invalidUnit',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.UNUSED,
+							secInRate:  1,
+							typeOfUnit:  Unit.unitType.UNIT,
+							suffix: '',
+							displayable:  Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Invalid Unit'
+						}
 					];
 					const conversionData = [
-						['invalidUnit', 'kWh', false, 1, 0, 'invalidUnit → kWh']
+						{
+							sourceId: 'invalidUnit',
+							destinationId: 'kWh',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'invalidUnit → kWh'
+						}
 					];
 					const meterData = [
 						{
@@ -1062,7 +1584,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('endTimestamp');
-				});*/
+				});
 			})
 		});
 	});

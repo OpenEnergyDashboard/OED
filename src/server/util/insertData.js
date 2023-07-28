@@ -51,16 +51,116 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 async function insertStandardUnits(conn) {
 	// The table contains units' data. 
 	const standardUnits = [
-		['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-		['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
-		['m³ gas', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
-		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
-		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
-		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
-		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, true, 'OED created standard unit'],
-		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.NONE, false, 'OED created standard unit'],
-		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'OED created meter unit'],
+		{
+			name: 'kWh',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'BTU',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: true,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'm³ gas',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'kg',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'metric ton',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'gallon',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: true,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'liter',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: true,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'Fahrenheit',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'Celsius',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.UNIT,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created standard unit'
+		},
+		{
+			name: 'Electric_Utility',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate:  3600,
+			typeOfUnit:  Unit.unitType.METER,
+			suffix: '',
+			displayable:  Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'OED created meter unit'
+		},
 	];
 
 	await insertUnits(standardUnits, false, conn);
@@ -91,12 +191,54 @@ async function insertConversions(conversionsToInsert, conn) {
 async function insertStandardConversions(conn) {
 	// The table contains standard conversions' data.
 	const standardConversions = [
-		['kWh', 'BTU', true, 3412.142, 0, 'OED created kWh → BTU'],
-		['BTU', 'm³ gas', true, 9.625, 0, 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'],
-		['kg', 'metric ton', true, 1e-3, 0, 'OED created kg → Metric ton'],
-		['liter', 'gallon', true, 0.2641729, 0, 'OED created liter → gallon'],
-		['Celsius', 'Fahrenheit', true, 1.8, 32, 'OED created Celsius → Fahrenheit'],
-		['Electric_Utility', 'kWh', false, 1, 0, 'OED created  for meters Electric_Utility → kWh']
+		{
+			sourceId: 'kWh',
+			destinationId: 'BTU',
+			bidirectional: true,
+			slope: 3412.142,
+			intercept: 0,
+			note: 'OED created kWh → BTU'
+		},
+		{
+			sourceId: 'BTU',
+			destinationId: 'm³ gas',
+			bidirectional: true,
+			slope: 9.625,
+			intercept: 0,
+			note: 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'
+		},
+		{
+			sourceId: 'kg',
+			destinationId: 'metric ton',
+			bidirectional: true,
+			slope: 1e-3,
+			intercept: 0,
+			note: 'OED created kg → Metric ton'
+		},
+		{
+			sourceId: 'liter',
+			destinationId: 'gallon',
+			bidirectional: true,
+			slope: 0.2641729,
+			intercept: 0,
+			note: 'OED created liter → gallon'
+		},
+		{
+			sourceId: 'Celsius',
+			destinationId: 'Fahrenheit',
+			bidirectional: true,
+			slope: 1.8,
+			intercept: 32,
+			note: 'OED created Celsius → Fahrenheit'
+		},
+		{
+			sourceId: 'Electric_Utility',
+			destinationId: 'kWh',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'OED created  for meters Electric_Utility → kWh'
+		}
 	];
 
 	// await Conversion.insertMany(standardConversions, conn);

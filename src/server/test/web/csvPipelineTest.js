@@ -483,12 +483,29 @@ for (let fileKey in testCases) {
 			await insertStandardConversions(conn);
 			// Create needed units for meters.
 			const units = [
-				['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'for teting']
+				{
+					name: 'Electric_Utility',
+					identifier: '',
+					unitRepresent: Unit.unitRepresentType.QUANTITY,
+					secInRate:  3600,
+					typeOfUnit:  Unit.unitType.METER,
+					suffix: '',
+					displayable:  Unit.displayableType.NONE,
+					preferredDisplay: false,
+					note: 'for teting'
+				}
 			];
 			await insertUnits(units, false, conn);
 			// Create conversions from meter units to standard units.
 			const conversions = [
-				['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
+				{
+					sourceId: 'Electric_Utility',
+					destinationId: 'kWh',
+					bidirectional: false,
+					slope: 1,
+					intercept: 0,
+					note: 'Electric_Utility → kWh'
+				},
 			];
 			await insertConversions(conversions, conn);
 			// Recreate the Cik entries since changed units/conversions.
@@ -674,8 +691,28 @@ for (let fileKey in testMeters) {
 			const conn = testDB.getConnection();
 			// Create needed units for meters.
 			const units = [
-				['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'for teting'],
-				['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'for testing']
+				{
+					name: 'Electric_Utility',
+					identifier: '',
+					unitRepresent: Unit.unitRepresentType.QUANTITY,
+					secInRate:  3600,
+					typeOfUnit:  Unit.unitType.METER,
+					suffix: '',
+					displayable:  Unit.displayableType.NONE,
+					preferredDisplay: false,
+					note: 'for teting'
+				},
+							{
+					name: 'kWh',
+					identifier: '',
+					unitRepresent: Unit.unitRepresentType.QUANTITY,
+					secInRate:  3600,
+					typeOfUnit:  Unit.unitType.UNIT,
+					suffix: '',
+					displayable:  Unit.displayableType.ALL,
+					preferredDisplay: true,
+					note: 'for testing'
+				}
 			];
 			await insertUnits(units, false, conn);
 			// Get the value from the DB so can get the id.
