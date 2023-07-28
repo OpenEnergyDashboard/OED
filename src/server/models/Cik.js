@@ -54,11 +54,11 @@ class Cik {
 	 * Returns Pik array based on Cik values in the database.
 	 */
 	static async getPik(conn) {
-		// Get the max index for Cik rows and columns. Length is one greater.
+		// Get the max index for pik rows and columns. Length is one greater.
 		let temp;
-		temp = await conn.one(sqlFile('cik/get_number_rows.sql'));
+		temp = await conn.one(sqlFile('unit/get_max_meter_row_index.sql'));
 		const numRows = temp.max + 1;
-		temp = await conn.one(sqlFile('cik/get_number_columns.sql'));
+		temp = await conn.one(sqlFile('unit/get_max_non_meter_row_index.sql'));
 		const numColumns = temp.max + 1;
 		// Fill the Pik with false values.
 		let pik = new Array(numRows).fill(0).map(() => new Array(numColumns).fill(false));

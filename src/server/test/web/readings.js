@@ -1395,6 +1395,42 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
+				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
+					const unitData = [
+						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
+						['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+						['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
+						['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit']
+					];
+					const conversionData = [
+						['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → kg CO₂'],
+						['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg'],
+						['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton']
+					];
+					const meterData = [
+						{
+							name: 'Electric_Utility metric ton of CO₂',
+							unit: 'Electric_Utility',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('metric ton of CO₂');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
 				// When an invalid unit is added to a meter and loaded to the db, the API should return an empty array
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [

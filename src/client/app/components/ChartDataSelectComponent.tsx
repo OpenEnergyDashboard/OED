@@ -291,6 +291,7 @@ export default function ChartDataSelectComponent() {
 		<div>
 			<p style={labelStyle}>
 				<FormattedMessage id='groups' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</p>
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
@@ -313,10 +314,10 @@ export default function ChartDataSelectComponent() {
 						}
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='meters' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</p>
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
@@ -347,10 +348,10 @@ export default function ChartDataSelectComponent() {
 						}
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='units' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</p>
 			<div style={divBottomPadding}>
 				{/* TODO this could be converted to a regular Select component */}
@@ -375,7 +376,6 @@ export default function ChartDataSelectComponent() {
 						else { dispatch(changeSelectedUnit(-99)); }
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</div>
 		</div>
 	);

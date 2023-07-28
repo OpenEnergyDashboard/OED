@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router-dom';
@@ -15,6 +14,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import HeaderComponent from '../../components/HeaderComponent';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -60,7 +60,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		return (
 			<div>
 				<UnsavedWarningContainer />
-				<HeaderContainer />
+				<HeaderComponent />
 				<TooltipHelpContainer page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>

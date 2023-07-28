@@ -16,7 +16,7 @@ import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
 import { UnitsState } from './units';
 import { ConversionsState } from './conversions';
-
+import { OptionsState } from './options';
 
 export interface State {
 	meters: MetersState;
@@ -35,4 +35,5 @@ export interface State {
 	unsavedWarning: UnsavedWarningState;
 	units: UnitsState;
 	conversions: ConversionsState;
+	options: OptionsState;
 }
