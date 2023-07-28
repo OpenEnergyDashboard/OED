@@ -238,7 +238,7 @@ const localeData = {
 		"help.meters.meterview": "This page shows information on meters. Please visit {link} for further details and information.",
 		"here": "here",
 		"hide": "Hide",
-		"hide.options": " options",
+		"hide.options": "hide options",
 		"hide.options.in.link": "Hide menu in link",
 		"home": "Home",
 		"hour": "Hour",

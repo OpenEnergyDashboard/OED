@@ -130,7 +130,7 @@ daily_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
+		-- The following code does the min/max for daily readings
 		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
     		(max(( --Extract the maximum rate over each day
 				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
@@ -256,7 +256,7 @@ hourly_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
+		-- The following code does the min/max for hourly readings
 		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
     		(max(( -- Extract the maximum rate over each day
 				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw

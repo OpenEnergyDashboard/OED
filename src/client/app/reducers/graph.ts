@@ -25,7 +25,7 @@ const defaultState: GraphState = {
 	areaNormalization: false,
 	hotlinked: false,
 	optionsVisibility: true,
-	lineGraphRate: {label: 'hour', rate: 1},
+	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
 	showMinMax: false,
 };
