@@ -10,9 +10,8 @@ import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownIt
 import ExportComponent from '../components/ExportComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, SetOptionsVisibility } from '../types/redux/graph';
+import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, ToggleOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
-import LanguageSelectorContainer from '../containers/LanguageSelectorContainer'
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -33,7 +32,7 @@ export interface UIOptionsProps {
 	optionsVisibility: boolean;
 	changeDuration(duration: moment.Duration): Promise<any>;
 	changeBarStacking(): ChangeBarStackingAction;
-	setOptionsVisibility(visibility: boolean): SetOptionsVisibility;
+	toggleOptionsVisibility(): ToggleOptionsVisibility;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
 	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
 }
@@ -56,7 +55,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.handleBarButton = this.handleBarButton.bind(this);
 		this.handleCompareButton = this.handleCompareButton.bind(this);
 		this.handleSortingButton = this.handleSortingButton.bind(this);
-		this.handleSetOptionsVisibility = this.handleSetOptionsVisibility.bind(this);
+		this.handleToggleOptionsVisibility = this.handleToggleOptionsVisibility.bind(this);
 		this.toggleSlider = this.toggleSlider.bind(this);
 		this.toggleDropdown = this.toggleDropdown.bind(this);
 		this.state = {
@@ -258,14 +257,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					<ChartLinkContainer />
 				</div>
 
-				{/* Language selector dropdown */}
-				<div style={divTopPadding}>
-					<LanguageSelectorContainer />
-				</div>
-
 				<div style={divTopPadding} className='d-none d-lg-block'>
 					<Button
-						onClick={this.handleSetOptionsVisibility}
+						onClick={this.handleToggleOptionsVisibility}
 						outline
 					>
 						{this.props.optionsVisibility ?
@@ -309,8 +303,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 		this.props.changeCompareSortingOrder(sortingOrder);
 	}
 
-	private handleSetOptionsVisibility() {
-		this.props.setOptionsVisibility(!this.props.optionsVisibility);
+	private handleToggleOptionsVisibility() {
+		this.props.toggleOptionsVisibility();
 	}
 
 	private toggleSlider() {

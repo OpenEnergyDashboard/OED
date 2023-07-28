@@ -73,7 +73,6 @@
         {
             // TODO: Remove this override once these components have been converted to use hooks
             "files": [
-                "src/client/app/components/UIModalComponent.tsx",
                 "src/client/app/containers/admin/CreateUserContainer.tsx",
                 "src/client/app/containers/csv/UploadCSVContainer.tsx"
             ],
@@ -93,7 +92,7 @@
                 "@typescript-eslint"
             ],
             "rules": {
-                // only to be used when declaring props as {}. Example is in UIModalComponent, ie; extends React.Component<{}>
+                // only to be used when declaring props as {}.
                 // is used in conjunction with overrides
                 // https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-based-on-glob-patterns
                 "@typescript-eslint/ban-types": [
