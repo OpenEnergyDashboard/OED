@@ -36,16 +36,12 @@ export interface ReceiveGroupLineReadingsAction {
 	timeInterval: TimeInterval;
 	readings: LineReadings;
 }
-export interface ToggleShowMinMaxAction {
-	type: ActionType.ToggleShowMinMax;
-}
 
 export type LineReadingsAction =
 	ReceiveMeterLineReadingsAction |
 	ReceiveGroupLineReadingsAction |
 	RequestMeterLineReadingsAction |
-	RequestGroupLineReadingsAction |
-	ToggleShowMinMaxAction;
+	RequestGroupLineReadingsAction ;
 
 export interface LineReadingsState {
 	byMeterID: {
@@ -71,5 +67,4 @@ export interface LineReadingsState {
 	isFetching: boolean;
 	metersFetching: boolean;
 	groupsFetching: boolean;
-	showMinMax: boolean;
 }

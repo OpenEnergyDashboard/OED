@@ -130,28 +130,6 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, 
 		dispatch(receiveGroupLineReadings(groupIDs, timeInterval, unitID, groupLineReadings));
 	};
 }
-
-/**
- * Generates an action object to toggle the visibility of min/max lines.
- * @returns {t.ToggleShowMinMaxAction} Action object
- */
-function toggleShowMinMax(): t.ToggleShowMinMaxAction {
-	return { type: ActionType.ToggleShowMinMax };
-}
-
-/**
- * Dispatches the toggleShowMinMax action in a Redux Thunk.
- * @returns {Thunk} Thunk action that dispatches toggleShowMinMax when invoked
- */
-export const dispatchToggleShowMinMax = (): Thunk => {
-	return (dispatch: Dispatch): Promise<void> => {
-		return new Promise((resolve, reject) => {
-			dispatch(toggleShowMinMax());
-			resolve();
-		});
-	};
-};
-
 /**
  * Fetches readings for the line chart of all selected meters and groups, if needed.
  * @param timeInterval the interval over which to check

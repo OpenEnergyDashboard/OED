@@ -137,7 +137,7 @@ function mapStateToProps(state: State) {
 						name: label,
 						x: xData,
 						y: yData,
-						error_y: state.readings.line.showMinMax ? {
+						error_y: state.graph.showMinMax ? {
 							type: 'data',
 							symmetric: false,
 							array: yMaxData.map((maxValue, index) => (maxValue - yData[index])),
