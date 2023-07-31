@@ -455,6 +455,7 @@ DECLARE
 					-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
 					-- to per hour.
 					((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
+				--The next two case expressions are copied from the case expression above. "reading_rate AS min/max_rate" does not work.
 				END AS reading_rate,
 				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
 					-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
