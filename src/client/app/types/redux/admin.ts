@@ -166,4 +166,5 @@ export interface AdminState {
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }

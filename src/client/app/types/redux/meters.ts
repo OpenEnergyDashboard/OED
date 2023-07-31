@@ -103,6 +103,7 @@ export interface MeterData {
 	minDate: string;
 	maxDate: string;
 	maxError: number;
+	disableChecks: boolean;
 }
 
 export interface MeterEditData {
@@ -139,6 +140,7 @@ export interface MeterEditData {
 	minDate: string;
 	maxDate: string;
 	maxError: number;
+	disableChecks: boolean;
 }
 
 export interface MeterDataByID {

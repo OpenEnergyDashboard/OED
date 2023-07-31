@@ -79,7 +79,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		maxVal: adminState.defaultMeterMaximumValue,
 		minDate: adminState.defaultMeterMinimumDate,
 		maxDate: adminState.defaultMeterMaximumDate,
-		maxError: adminState.defaultMeterMaximumErrors
+		maxError: adminState.defaultMeterMaximumErrors,
+		disableChecks: adminState.defaultMeterDisableChecks
 	}
 
 	const dropdownsStateDefaults = {
@@ -712,6 +713,39 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state.reading} />
+						</FormGroup>
+						{/* minVal input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Input
+								id='minVal'
+								name='minVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.minVal}/>
+						</FormGroup>
+						{/* maxVal input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.maxVal')}</Label>
+							<Input
+								id='maxVal'
+								name='maxVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxVal}/>
+						</FormGroup>
+						{/* maxError input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.maxError')}</Label>
+							<Input
+								id='maxError'
+								name='maxError'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxError}/>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
@@ -749,66 +783,42 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state.previousEnd} />
 						</FormGroup>
-						{/* minVal input */}
-						<FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
-							<Input
-								id='minVal'
-								name='minVal'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.minVal}
-								value={state.minVal} />
-						</FormGroup>
-						{/* maxVal input */}
-						<FormGroup>
-						<Label for='minVal'>{translate('meter.maxVal')}</Label>
-							<Input
-								id='maxVal'
-								name='maxVal'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxVal}
-								value={state.maxVal} />
-						</FormGroup>
 						{/* minDate input */}
 						<FormGroup>
-						<Label for='minVal'>{translate('meter.minDate')}</Label>
+							<Label for='minVal'>{translate('meter.minDate')}</Label>
 							<Input
 								id='minDate'
 								name='minDate'
 								type='text'
 								onChange={e => handleStringChange(e)}
-								min="0"
-								defaultValue={state.minDate}
-								value={state.minDate} />
+								defaultValue={state.minDate}/>
 						</FormGroup>
 						{/* maxDate input */}
 						<FormGroup>
-						<Label for='minVal'>{translate('meter.maxDate')}</Label>
+							<Label for='minVal'>{translate('meter.maxDate')}</Label>
 							<Input
 								id='maxDate'
 								name='maxDate'
 								type='text'
 								onChange={e => handleStringChange(e)}
-								min="0"
-								defaultValue={state.maxDate}
-								value={state.maxDate} />
+								defaultValue={state.maxDate}/>
 						</FormGroup>
-						{/* maxError input */}
+						{/* DisableChecks input */}
 						<FormGroup>
-						<Label for='minVal'>{translate('meter.maxError')}</Label>
+							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
 							<Input
-								id='maxError'
-								name='maxError'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxError}
-								value={state.maxError} />
-						</FormGroup></Col>
+								id='disableChecks'
+								name='disableChecks'
+								type='select'
+								value={state.disableChecks.toString()}
+								onChange={e => handleBooleanChange(e)}
+								invalid={state.disableChecks && state.unitId === -99}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						</Col>
 					</Row>
 				</Container></ModalBody>
 				<ModalFooter>
