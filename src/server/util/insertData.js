@@ -206,7 +206,8 @@ async function insertMeters(metersToInsert, conn) {
 				meterData.maxVal,
 				meterData.minDate,
 				meterData.maxDate,
-				meterData.maxError
+				meterData.maxError,
+				meterData.disableChecks
 			);
 
 			// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current

@@ -71,7 +71,8 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // maxVal
 					undefined, // minDate
 					undefined, // maxDate
-					undefined  // maxError
+					undefined, // maxError
+					undefined  // disableChecks
 				)
 				await tempMeter.insert(conn);
 				meterCreated = true;

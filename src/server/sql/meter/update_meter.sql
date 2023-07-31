@@ -34,7 +34,8 @@ UPDATE meters
 		max_val = ${maxVal},
 		min_date = ${minDate},
 		max_date = ${maxDate},
-		max_error = ${maxError}
+		max_error = ${maxError},
+		disable_checks = ${disableChecks}
 	WHERE id = ${id}
 	RETURNING reading_frequency;
 
