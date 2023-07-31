@@ -763,14 +763,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* maxVal input */}
 						<FormGroup>
-						<Label for='minVal'>{translate('meter.maxVal')}</Label>
+						<Label for='maxVal'>{translate('meter.maxVal')}</Label>
 							<Input
 								id='maxVal'
 								name='maxVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
-								defaultValue={state.maxVal}
+								// defaultValue={state.maxVal}
 								value={state.maxVal} />
 						</FormGroup>
 						{/* minDate input */}
@@ -780,9 +780,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='minDate'
 								name='minDate'
 								type='text'
+								placeholder='YYYY-MM-DD'
 								onChange={e => handleStringChange(e)}
-								min="0"
-								defaultValue={state.minDate}
+								// defaultValue={state.minDate}
 								value={state.minDate} />
 						</FormGroup>
 						{/* maxDate input */}
@@ -792,9 +792,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='maxDate'
 								name='maxDate'
 								type='text'
+								placeholder='YYYY-MM-DD'
 								onChange={e => handleStringChange(e)}
-								min="0"
-								defaultValue={state.maxDate}
+								// defaultValue={state.maxDate}
 								value={state.maxDate} />
 						</FormGroup>
 						{/* maxError input */}
@@ -806,7 +806,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
-								defaultValue={state.maxError}
+								// defaultValue={state.maxError}
 								value={state.maxError} />
 						</FormGroup></Col>
 					</Row>

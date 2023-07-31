@@ -66,6 +66,10 @@ router.post('/', async (req, res) => {
 				},
 				defaultMeterReadingFrequency: {
 					type: 'string'
+				},
+				//TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
+				defaultMeterMinimumValue: {
+					type: 'number'
 				}
 			}
 		}

@@ -14,5 +14,7 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_file_size_limit FLOAT NOT NULL,
 	default_area_normalization BOOLEAN NOT NULL,
 	default_area_unit area_unit_type NOT NULL,
-	default_meter_reading_frequency INTERVAL NOT NULL
+	default_meter_reading_frequency INTERVAL NOT NULL,
+	-- //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
+	default_meter_minimum_value FLOAT NOT NULL
 );

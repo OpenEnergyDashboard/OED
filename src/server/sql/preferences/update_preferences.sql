@@ -13,5 +13,7 @@ SET
 	default_file_size_limit = ${defaultFileSizeLimit},
 	default_area_normalization = ${defaultAreaNormalization},
 	default_area_unit = ${defaultAreaUnit},
-	default_meter_reading_frequency = ${defaultMeterReadingFrequency}
+	default_meter_reading_frequency = ${defaultMeterReadingFrequency},
+	-- //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
+	default_meter_minimum_value = ${default_meter_minimum_value}
 ;
