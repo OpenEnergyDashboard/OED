@@ -7,6 +7,7 @@ const { mapToObject } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
 const moment = require('moment');
 const _ = require('lodash');
+const log = require('../log');
 
 const sqlFile = database.sqlFile;
 
@@ -396,71 +397,88 @@ class Reading {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		*/
-
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', sequenceNumber]
 		);
-
-		//console.log(allMeterThreeDReadings);
-
-		let sortedReadings;
-		const numOfReadings = allMeterThreeDReadings.length;
-		// TODO do no data validation check before this
-		// This line crashes if no readings return, 
-		const expectedNumOfReadings = allMeterThreeDReadings[allMeterThreeDReadings.length - 1].end_timestamp.diff(allMeterThreeDReadings[0].start_timestamp, 'hours')
-		// console.log(numOfReadings);
-		// console.log(expectedNumOfReadings / sequenceNumber);
-		//Check to see if there is any missing data in the hourly readings table. 
-		if (numOfReadings != expectedNumOfReadings / sequenceNumber && numOfReadings != 0) {
-			//Hold the objects of missing readings.
-			const tempArray = [];
-			//Check that table has all hourly readings for each day within the range of dates requested.  
-			for (let i = 0; i < allMeterThreeDReadings.length - 1; i++) {
-				//Checks to see if the end_timestamp of current reading matches the start_timestamp for the next reading.
-				if (!allMeterThreeDReadings[i].end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
-					//Create a new object, temp, based on the existing object in allMeterThreeDReadings[i] position. 
-					//The new object will have an increment of start and end timestamp. 
-					let temp =
-					{
-						...allMeterThreeDReadings[i],
-						reading_rate: undefined,
-						start_timestamp: allMeterThreeDReadings[i].start_timestamp.clone().add(1, 'hour'),
-						end_timestamp: allMeterThreeDReadings[i].end_timestamp.clone().add(1, 'hour')
-					};
-					//Push temp object to tempArray
-					tempArray.push(temp);
-					//Checks if the temp variable's end_timestamp matches the next readings start_timestamp. 
-					while (!temp.end_timestamp.isSame(allMeterThreeDReadings[i + 1].start_timestamp)) {
-						temp = {
-							...temp,
-							start_timestamp: temp.start_timestamp.clone().add(1, 'hour'),
-							end_timestamp: temp.end_timestamp.clone().add(1, 'hour')
-						};
-						tempArray.push(temp);
-					}
-				}
-			}
-			//sortedReadings will hold the sorted readings with the missing data. 
-			sortedReadings = _.sortBy(allMeterThreeDReadings.concat(tempArray), meter_reading => meter_reading.start_timestamp, 'asc');
-		}
-		else {
-			sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
-		}
-		// Using Lodash.chunk Not ideal, proof of concept only;
-		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
-		// TODO ENUM for chunksize
-		const chunkedReadings = _.chunk(sortedReadings, 24 / sequenceNumber);
-		// console.log(chunkedReadings);
-		//console.log(chunkedReadings);
-		// Data may change need based on steve's feedback 
-
 		const xData = [];
 		const yData = [];
 		const zData = [];
 
-		if (chunkedReadings.length > 0) {
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+		const numOfReadings = allMeterThreeDReadings.length;
+		// If no readings, do nothing and return empty arrays
+		if (numOfReadings > 0) {
+			const readingsPerDay = 24 / sequenceNumber;
+			// get the number of days days between start and end timestamps * readings per day.
+			const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
 
+			let readingsToReturn = allMeterThreeDReadings;
+			// Run Fill holes algorithm if expected num of readings to not match received reading count.
+			if (allMeterThreeDReadings.length !== expectedNumOfReadings) {
+				console.log('Running!');
+				// Check if query returned data with the first or last values missing 
+				if (allMeterThreeDReadings[0].start_timestamp === fromTimestamp) {
+
+					// push null reading start timestamp to the front of array
+					allMeterThreeDReadings.unshift({
+						reading_rate: null,
+						start_timestamp_timestamp: fromTimestamp,
+						end_timestamp: fromTimestamp
+					})
+				}
+				if (allMeterThreeDReadings[0].end_timestamp === toTimestamp) {
+					// push null reading end timestamp to end of array
+					allMeterThreeDReadings.push({
+						reading_rate: null,
+						start_timestamp_timestamp: toTimestamp,
+						end_timestamp: toTimestamp
+					})
+				}
+
+				let missingReadings = [];
+				allMeterThreeDReadings.forEach((reading, index, arr) => {
+					// If the next index is defined, and current / next timestamps don't overlap fill the gap.
+					if (arr[index + 1] && arr[index].end_timestamp.valueOf() !== arr[index + 1].start_timestamp.valueOf()) {
+						const currEndTimestamp = arr[index].end_timestamp;
+						const targetStartTimestamp = arr[index + 1].start_timestamp;
+						let nextStartTimeStamp = currEndTimestamp.clone();
+						let nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						//Push missing null readings until the readings overlap
+						do {
+							missingReadings.push({
+								reading_rate: null,
+								start_timestamp: nextStartTimeStamp,
+								end_timestamp: nextEndTimeStamp
+							})
+
+							nextStartTimeStamp = nextEndTimeStamp.clone();
+							nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
+					}
+				});
+
+				let merged = [];
+				// Merge the Original Readings with 'hole' readings.
+				// While both arrays have values compare and push
+				while (allMeterThreeDReadings.length && missingReadings.length) {
+					if (allMeterThreeDReadings[0].start_timestamp.valueOf() < missingReadings[0].start_timestamp.valueOf()) {
+						merged.push(allMeterThreeDReadings.shift());
+					} else {
+						merged.push(missingReadings.shift());
+					}
+				}
+				// Push remaining values, if any
+				while (allMeterThreeDReadings.length) {
+					merged.push(allMeterThreeDReadings.shift());
+				}
+				// Push remaining values, if any
+				while (missingReadings.length) {
+					merged.push(missingReadings.shift());
+				}
+				readingsToReturn = merged;
+			}
+			// Format readings.
+			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				// Data data may need to be converted into 'moment' to save on network load

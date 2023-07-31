@@ -52,9 +52,11 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
 		const startTS = timeInterval.getStartTimestamp().clone();
 		const endTS = timeInterval.getEndTimestamp().clone();
 		startTS.startOf('day');
+		//subtract a millisecond in the case that the time is on an hour boundary
+		endTS.add(-1, 'millisecond');
 		endTS.endOf('day');
-		endTS.add(1,'millisecond');
-		return new TimeInterval(startTS,endTS);
+		endTS.add(1, 'millisecond');
+		return new TimeInterval(startTS, endTS);
 	}
 	return TimeInterval.unbounded();
 }
@@ -73,5 +75,5 @@ export function toUTC(date: Date) {
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
 export function isValidThreeDInterval(timeInterval: TimeInterval): boolean {
-	return (timeInterval.getIsBounded() && timeInterval.duration('days') <= 365) ? true : false;
+	return (timeInterval.getIsBounded() && timeInterval.duration('days') <= 367) ? true : false;
 }
