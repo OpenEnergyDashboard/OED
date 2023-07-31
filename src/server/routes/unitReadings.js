@@ -267,7 +267,7 @@ function createRouter() {
 		// TODO Validate params & query params
 		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
 		// }
-		const meterID = req.params.meter_ids;
+		const meterID = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 		const graphicUnitID = req.query.graphicUnitId;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		const sequenceNumber = req.query.sequenceNumber;
