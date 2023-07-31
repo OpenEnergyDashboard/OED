@@ -80,7 +80,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		minDate: adminState.defaultMeterMinimumDate,
 		maxDate: adminState.defaultMeterMaximumDate,
 		maxError: adminState.defaultMeterMaximumErrors,
-		disableChecks: adminState.defaultMeterDisableChecks
+		disableChecks: false
 	}
 
 	const dropdownsStateDefaults = {
@@ -738,7 +738,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* maxError input */}
 						<FormGroup>
-							<Label for='minVal'>{translate('meter.maxError')}</Label>
+							<Label for='minError'>{translate('meter.maxError')}</Label>
 							<Input
 								id='maxError'
 								name='maxError'
@@ -810,9 +810,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='disableChecks'
 								name='disableChecks'
 								type='select'
-								value={state.disableChecks.toString()}
-								onChange={e => handleBooleanChange(e)}
-								invalid={state.disableChecks && state.unitId === -99}>
+								defaultValue={state.disableChecks.toString()}
+								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 								})}

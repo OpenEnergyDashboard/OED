@@ -63,7 +63,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		minDate: null,
 		maxDate: null,
 		maxError: null,
-		disableChecks: updateNonNullExpression
+		disableChecks: null,
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names

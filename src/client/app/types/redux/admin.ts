@@ -34,7 +34,6 @@ export type AdminAction =
 	| UpdateDefaultMeterReadingGapAction
 	| UpdateDefaultMeterDisableChecksAction;
 
-
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
 	meterID: number;

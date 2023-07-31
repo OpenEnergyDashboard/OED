@@ -146,7 +146,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMinimumValue: // TODO : ADD ACTIONTYPE FOR EACH CONDSET VALUE MINVAL,MAXVAL,MINDATE,MAXDATE,MAXERROR,READINGAP
+		// TODO : ADD ACTIONTYPE FOR EACH CONDSET VALUE MINVAL,MAXVAL,MINDATE,MAXDATE,MAXERROR,READINGAP,DISABLECHECKS
+		case ActionType.UpdateDefaultMeterMinimumValue:
 			return {
 				...state,
 				defaultMeterMinimumValue: action.defaultMeterMinimumValue,

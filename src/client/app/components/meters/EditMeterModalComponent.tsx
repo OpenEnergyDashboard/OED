@@ -658,42 +658,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>
 						</FormGroup></Col>
-						{/* minVal input */}
-						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
-							<Input
-								id='minVal'
-								name='minVal'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.minVal}
-								value={state.minVal} />
-						</FormGroup>
-						{/* maxVal input */}
-						<FormGroup>
-							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
-							<Input
-								id='maxVal'
-								name='maxVal'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxVal}
-								value={state.maxVal} />
-						</FormGroup></Col>
-						{/* maxError input */}
-						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.maxError')}</Label>
-							<Input
-								id='maxError'
-								name='maxError'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxError}
-								value={state.maxError} />
-						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
 						{/* readingVariation input */}
@@ -760,6 +724,42 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state?.reading} />
+						</FormGroup>
+						{/* minVal input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Input
+								id='minVal'
+								name='minVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.minVal}
+								value={state.minVal} />
+						</FormGroup>
+						{/* maxVal input */}
+						<FormGroup>
+							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Input
+								id='maxVal'
+								name='maxVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxVal}
+								value={state.maxVal} />
+						</FormGroup>
+						{/* maxError input */}
+						<FormGroup>
+							<Label for='maxError'>{translate('meter.maxError')}</Label>
+							<Input
+								id='maxError'
+								name='maxError'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min="0"
+								defaultValue={state.maxError}
+								value={state.maxError} />
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
@@ -828,9 +828,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='disableChecks'
 								name='disableChecks'
 								type='select'
-								value={state.disableChecks.toString()}
+								value={state?.disableChecks?.toString()}
 								onChange={e => handleBooleanChange(e)}
-								invalid={state.disableChecks && state.unitId === -99}>
+								invalid={state?.disableChecks && state.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 								})}

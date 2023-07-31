@@ -240,7 +240,8 @@ async function insertMeters(metersToInsert, conn) {
 					minDate: meter.minDate,
 					maxDate: meter.maxDate,
 					threshold: meter.readingGap,
-					maxError: meter.maxError
+					maxError: meter.maxError,
+					disableChecks: meter.disableChecks
 				}
 				await loadCsvInput(
 					filename, // filePath
