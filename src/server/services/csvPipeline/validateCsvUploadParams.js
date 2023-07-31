@@ -169,7 +169,6 @@ function validateRequestParams(body, schema) {
  */
 function validateReadingsCsvUploadParams(req, res, next) {
 	// Validate the parameters of the request. Failure out if there are any unintended mistakes such as additional parameters and typos.
-	console.log('validateMetersCsvUploadParams: ', req.body);
 	const { responseMessage, success } = validateRequestParams(req.body, VALIDATION.readings);
 	if (!success) {
 		failure(req, res, new CSVPipelineError(responseMessage));
