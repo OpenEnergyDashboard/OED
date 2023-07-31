@@ -114,10 +114,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				compareSortingOrder: action.compareSortingOrder
 			};
-		case ActionType.SetOptionsVisibility:
+		case ActionType.ToggleOptionsVisibility:
 			return {
 				...state,
-				optionsVisibility: action.visibility
+				optionsVisibility: !state.optionsVisibility
 			};
 		case ActionType.UpdateLineGraphRate:
 			return {

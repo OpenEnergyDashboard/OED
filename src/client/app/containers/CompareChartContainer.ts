@@ -207,7 +207,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			locales: Locales // makes locales available for use
 		}
 	};
-	props.config.locale = state.admin.defaultLanguage;
+	props.config.locale = state.options.selectedLanguage;
 	return props;
 }
 

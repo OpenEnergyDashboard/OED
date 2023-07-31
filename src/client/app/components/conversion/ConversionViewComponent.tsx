@@ -5,13 +5,13 @@
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import EditConversionModalComponent from './EditConversionModalComponent';
 import '../../styles/card-page.css';
 import { ConversionData } from 'types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import translate from '../../utils/translate';
+import { Button } from 'reactstrap';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
@@ -74,7 +74,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				<b><FormattedMessage id="conversion.note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
-				<Button variant="secondary" onClick={handleShow}>
+				<Button color='secondary' onClick={handleShow}>
 					<FormattedMessage id="conversion.edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}
