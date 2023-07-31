@@ -41,7 +41,7 @@ export type LineReadingsAction =
 	ReceiveMeterLineReadingsAction |
 	ReceiveGroupLineReadingsAction |
 	RequestMeterLineReadingsAction |
-	RequestGroupLineReadingsAction ;
+	RequestGroupLineReadingsAction;
 
 export interface LineReadingsState {
 	byMeterID: {
