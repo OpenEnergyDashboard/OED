@@ -97,9 +97,8 @@ export interface SetHotlinked {
 	hotlinked: boolean;
 }
 
-export interface SetOptionsVisibility {
-	type: ActionType.SetOptionsVisibility;
-	visibility: boolean;
+export interface ToggleOptionsVisibility {
+	type: ActionType.ToggleOptionsVisibility;
 }
 
 export interface UpdateLineGraphRate {
@@ -127,7 +126,7 @@ export type GraphAction =
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
-	| SetOptionsVisibility
+	| ToggleOptionsVisibility
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce;
 

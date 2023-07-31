@@ -32,12 +32,14 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
 	// The unit label depends on the unit which is in selectUnit state.
+	// Also need to determine if raw.
 	const graphingUnit = state.graph.selectedUnit;
+	// This container is not called if there is no data of there are not units so this is safe.
+	const selectUnitState = state.units.units[state.graph.selectedUnit];
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
-		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Quantity and flow units have different unit labels.
 			// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
@@ -136,37 +138,64 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			}
 		);
 	}
-	const layout: any = {
-		title: `<b>${changeSummary}</b>`,
-		titlefont: {
-			size: 10,
-			color: colorize(entity.change)
-		},
-		hovermode: 'closest',
-		autosize: true,
-		width: 370,
-		height: 450,
-		showlegend: false,
-		legend: {
-		},
-		yaxis: {
-			title: unitLabel,
-			showgrid: true,
-			gridcolor: '#ddd'
-		},
-		xaxis: {
-			title: `${xTitle}`,
-			showgrid: false,
-			gridcolor: '#ddd',
-			automargin: true
-		},
-		margin: {
-			t: 20,
-			b: 120,
-			l: 60,
-			r: 20
+
+	let layout: any;
+	// Customize the layout of the plot
+	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
+		// This is a raw type graphing unit so cannot plot
+		layout = {
+			'xaxis': {
+				'visible': false
+			},
+			'yaxis': {
+				'visible': false
+			},
+			'annotations': [
+				{
+					'text': `<b>${translate('compare.raw')}</b>`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 18
+					}
+				}
+			]
 		}
-	};
+	} else {
+		layout = {
+			title: `<b>${changeSummary}</b>`,
+			titlefont: {
+				size: 10,
+				color: colorize(entity.change)
+			},
+			hovermode: 'closest',
+			autosize: true,
+			width: 370,
+			height: 450,
+			showlegend: false,
+			legend: {
+			},
+			yaxis: {
+				title: unitLabel,
+				showgrid: true,
+				gridcolor: '#ddd'
+			},
+			xaxis: {
+				title: `${xTitle}`,
+				showgrid: false,
+				gridcolor: '#ddd',
+				automargin: true
+			},
+			margin: {
+				t: 20,
+				b: 120,
+				l: 60,
+				r: 20
+			}
+		};
+	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
@@ -178,7 +207,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			locales: Locales // makes locales available for use
 		}
 	};
-	props.config.locale = state.admin.defaultLanguage;
+	props.config.locale = state.options.selectedLanguage;
 	return props;
 }
 
