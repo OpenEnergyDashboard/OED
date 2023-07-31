@@ -27,7 +27,7 @@ const defaultState: GraphState = {
 	optionsVisibility: true,
 	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
-	showMinMax: false,
+	showMinMax: false
 };
 
 export default function graph(state = defaultState, action: GraphAction) {

@@ -14,31 +14,31 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Error Bar checkbox with tooltip and label
  */
 const ErrorBarComponent = () => {
-    const dispatch = useDispatch();
-    const graphState = useSelector((state: State) => state.graph);
+	const dispatch = useDispatch();
+	const graphState = useSelector((state: State) => state.graph);
 
-    /**
-     * Dispatches an action to toggle visibility of min/max lines on checkbox interaction
-     */
-    const handleToggleShowMinMax = () => {
-        dispatch(toggleShowMinMax());
-    }
+	/**
+	 * Dispatches an action to toggle visibility of min/max lines on checkbox interaction
+	 */
+	const handleToggleShowMinMax = () => {
+		dispatch(toggleShowMinMax());
+	}
 
-    return (
-        <div className='checkbox'>
-            <input
-                type='checkbox'
-                style={{ marginRight: '10px' }}
-                onChange={() => handleToggleShowMinMax()}
-                checked={graphState.showMinMax}
-                id='errorBar'
-            />
-            <label htmlFor='errorBar'>
-                {translate('error.bar')}
-            </label>
-            <TooltipMarkerComponent page='home' helpTextId='help.home.error.bar' />
-        </div>
-    );
+	return (
+		<div className='checkbox'>
+			<input
+				type='checkbox'
+				style={{ marginRight: '10px' }}
+				onChange={() => handleToggleShowMinMax()}
+				checked={graphState.showMinMax}
+				id='errorBar'
+			/>
+			<label htmlFor='errorBar'>
+				{translate('error.bar')}
+			</label>
+			<TooltipMarkerComponent page='home' helpTextId='help.home.error.bar' />
+		</div>
+	);
 };
 
 export default ErrorBarComponent;

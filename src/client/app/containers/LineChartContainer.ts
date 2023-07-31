@@ -117,7 +117,7 @@ function mapStateToProps(state: State) {
 							type: 'data',
 							symmetric: false,
 							array: yMaxData.map((maxValue, index) => (maxValue - yData[index])),
-							arrayminus: yData.map((value, index) => (value - yMinData[index])),
+							arrayminus: yData.map((value, index) => (value - yMinData[index]))
 						} : undefined,
 						text: hoverText,
 						hoverinfo: 'text',

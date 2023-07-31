@@ -10,7 +10,7 @@ const defaultState: LineReadingsState = {
 	byGroupID: {},
 	isFetching: false,
 	metersFetching: false,
-	groupsFetching: false,
+	groupsFetching: false
 };
 
 export default function readings(state = defaultState, action: LineReadingsAction) {
