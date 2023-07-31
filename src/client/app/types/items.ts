@@ -47,13 +47,14 @@ export interface PreferenceRequestItem {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors, DISABLECHECKS)
 	defaultMeterMinimumValue: number;
 	defaultMeterMaximumValue: number;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
-	defaultMeterMaximumErrors: number
+	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }
 
 /**

@@ -17,6 +17,7 @@ const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const _ = require('lodash');
 const { failure, success } = require('./response');
+const { updateNonNullExpression } = require('typescript');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -61,7 +62,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		maxVal: null,
 		minDate: null,
 		maxDate: null,
-		maxError: null
+		maxError: null,
+		disableChecks: updateNonNullExpression
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names

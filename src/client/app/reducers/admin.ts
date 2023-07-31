@@ -24,13 +24,14 @@ const defaultState: AdminState = {
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros)
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros, DisableChecks)
 	defaultMeterMinimumValue: 0,
 	defaultMeterMaximumValue: 0,
 	defaultMeterMinimumDate: '',
 	defaultMeterMaximumDate: '',
 	defaultMeterReadingGap: 0,
-	defaultMeterMaximumErrors: 0
+	defaultMeterMaximumErrors: 0,
+	defaultMeterDisableChecks: true
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -107,7 +108,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
 				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors
+				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -150,36 +152,42 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMaximumValue: 
+		case ActionType.UpdateDefaultMeterMaximumValue:
 			return {
 				...state,
 				defaultMeterMaximumValue: action.defaultMeterMaximumValue,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMinimumDate: 
+		case ActionType.UpdateDefaultMeterMinimumDate:
 			return {
 				...state,
 				defaultMeterMinimumDate: action.defaultMeterMinimumDate,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMaximumDate: 
+		case ActionType.UpdateDefaultMeterMaximumDate:
 			return {
 				...state,
 				defaultMeterMaximumDate: action.defaultMeterMaximumDate,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterReadingGap: 
+		case ActionType.UpdateDefaultMeterReadingGap:
 			return {
 				...state,
 				defaultMeterReadingGap: action.defaultMeterReadingGap,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultMeterMaximumErrors: 
+		case ActionType.UpdateDefaultMeterMaximumErrors:
 			return {
 				...state,
 				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
 				submitted: false
-			};
+			}
+		case ActionType.UpdateDefaultMeterDisableChecks:
+			return {
+				...state,
+				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
+				submitted: false
+			}
 		default:
 			return state;
 	}
