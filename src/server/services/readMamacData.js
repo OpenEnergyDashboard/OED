@@ -114,7 +114,7 @@ async function readMamacData(meter, conn) {
 		isEndOnly = false,
 		// Previous Mamac values should not change.
 		shouldUpdate = false,
-		conditionSet = undefined,
+		conditionSet,
 		conn = conn,
 		honorDst = false,
 		relaxedParsing = false

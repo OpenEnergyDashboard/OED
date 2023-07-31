@@ -101,7 +101,8 @@ async function getMeterInfo(url, ip, csvLine) {
 				undefined, // maxVal
 				undefined, // minDate
 				undefined, // maxDate
-				undefined  // maxError
+				undefined, // maxError
+				undefined  // disableChecks
 			);
 		});
 }
