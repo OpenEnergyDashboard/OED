@@ -96,7 +96,12 @@ async function getMeterInfo(url, ip, csvLine) {
 				unitId, // unit
 				unitId, // default graphic unit
 				undefined, // area unit
-				undefined // reading frequency
+				undefined, // reading frequency
+				undefined, // minVal
+				undefined, // maxVal
+				undefined, // minDate
+				undefined, // maxDate
+				undefined  // maxError
 			);
 		});
 }

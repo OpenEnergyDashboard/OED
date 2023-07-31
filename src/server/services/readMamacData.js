@@ -78,6 +78,15 @@ async function readMamacData(meter, conn) {
 		}
 		return [reading, startTs, endTs]
 	});
+	// setup conditionset variable
+	const conditionSet = {
+		minVal: meter.minVal,
+		maxVal: meter.maxVal,
+		minDate: meter.minDate,
+		maxDate: meter.maxDate,
+		threshold: 0,
+		maxError: meter.maxError
+	}
 	// Insert readings that were okay for this meter.
 	// The pipeline does it one meter at a time.
 	// Ignoring that loadArrayInput returns values
