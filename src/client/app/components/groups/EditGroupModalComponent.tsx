@@ -469,6 +469,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							{/* default graphic unit display for non-admin */}
 							<FormGroup>
 								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								{/* TODO: This component still displays a dropdown arrow, even though a user cannot use the dropdown */}
 								<Input
 									id='defaultGraphicUnit'
 									name='defaultGraphicUnit'

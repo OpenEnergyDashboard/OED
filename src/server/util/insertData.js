@@ -206,7 +206,8 @@ async function insertMeters(metersToInsert, conn) {
 				meterData.maxVal,
 				meterData.minDate,
 				meterData.maxDate,
-				meterData.maxError
+				meterData.maxError,
+				meterData.disableChecks
 			);
 
 			// This does not use Promise.all as units and conversions for two reasons. The primary one is that the current
@@ -239,7 +240,8 @@ async function insertMeters(metersToInsert, conn) {
 					minDate: meter.minDate,
 					maxDate: meter.maxDate,
 					threshold: meter.readingGap,
-					maxError: meter.maxError
+					maxError: meter.maxError,
+					disableChecks: meter.disableChecks
 				}
 				await loadCsvInput(
 					filename, // filePath

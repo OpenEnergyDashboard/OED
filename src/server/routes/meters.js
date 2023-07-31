@@ -17,6 +17,7 @@ const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const _ = require('lodash');
 const { failure, success } = require('./response');
+const { updateNonNullExpression } = require('typescript');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -61,7 +62,8 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		maxVal: null,
 		minDate: null,
 		maxDate: null,
-		maxError: null
+		maxError: null,
+		disableChecks: null,
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -92,6 +94,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.minDate = meter.minDate;
 		formattedMeter.maxDate = meter.maxDate;
 		formattedMeter.maxError = meter.maxError;
+		formattedMeter.disableChecks = meter.disableChecks;
 	}
 
 	return formattedMeter;
@@ -159,7 +162,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 33,
+		maxProperties: 34,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -243,6 +246,7 @@ function validateMeterParams(params) {
 			minDate: { type: 'string' },
 			maxDate: { type: 'string' },
 			minError: { type: 'number' },
+			disableChecks: { type: 'bool' },
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -291,7 +295,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.maxVal,
 				req.body.minDate,
 				req.body.maxDate,
-				req.body.maxError
+				req.body.maxError,
+				req.body.disableChecks
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
@@ -353,7 +358,8 @@ router.post('/addMeter', async (req, res) => {
 				req.body.maxVal,
 				req.body.minDate,
 				req.body.maxDate,
-				req.body.maxError
+				req.body.maxError,
+				req.body.disableChecks
 			);
 			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);

@@ -25,14 +25,14 @@ export type AdminAction =
 	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
 	| UpdateDefaultMeterReadingFrequencyAction
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, DISABLECHECKS)
 	| UpdateDefaultMeterMinimumValueAction
 	| UpdateDefaultMeterMaximumValueAction
 	| UpdateDefaultMeterMinimumDateAction
 	| UpdateDefaultMeterMaximumDateAction
 	| UpdateDefaultMeterMaximumErrorsAction
-	| UpdateDefaultMeterReadingGapAction;
-
+	| UpdateDefaultMeterReadingGapAction
+	| UpdateDefaultMeterDisableChecksAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -110,7 +110,7 @@ export interface UpdateDefaultMeterReadingFrequencyAction {
 }
 
 
-// TODO ADD ACTIONS FOR CONDSETS minval, maxval, mindate, maxdate, maxerrors, readinggap
+// TODO ADD ACTIONS FOR CONDSETS minval, maxval, mindate, maxdate, maxerrors, readinggap, disablechecks
 
 
 export interface UpdateDefaultMeterMinimumValueAction {
@@ -144,6 +144,11 @@ export interface UpdateDefaultMeterMaximumErrorsAction {
 	defaultMeterMaximumErrors: number;
 }
 
+export interface UpdateDefaultMeterDisableChecksAction {
+	type: ActionType.UpdateDefaultMeterDisableChecks;
+	defaultMeterDisableChecks: boolean;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -166,4 +171,5 @@ export interface AdminState {
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }

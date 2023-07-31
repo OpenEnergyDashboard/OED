@@ -146,6 +146,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			const shouldRefreshReadingViews = props.unit.unitRepresent !== state.unitRepresent
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
+			// set displayable to none if unit is meter
+			if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+				state.displayable = DisplayableType.none;
+			}
 			// Save our changes by dispatching the submitEditedUnit action
 			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
 			// The updated unit is not fetched to save time. However, the identifier might have been
@@ -234,7 +238,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
-
 						{/* Displayable type input */}
 						<Col><FormGroup>
 							<Label for='displayable'>{translate('unit.displayable')}</Label>
@@ -243,11 +246,16 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								name='displayable'
 								type='select'
 								value={state.displayable}
-								onChange={e => handleStringChange(e)}>
+								onChange={e => handleStringChange(e)}
+								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
 								{Object.keys(DisplayableType).map(key => {
-									return (<option value={key} key={key}>{translate(`DisplayableType.${key}`)}</option>)
+									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
+										{translate(`DisplayableType.${key}`)}</option>)
 								})}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id="error.displayable.meter" />
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* Preferred display input */}
 						<Col><FormGroup>

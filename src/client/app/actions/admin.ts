@@ -61,7 +61,7 @@ export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency:
 	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
 }
 
-// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS)
+// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS, DISABLECHECKS)
 export function updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): t.UpdateDefaultMeterMinimumValueAction {
 	return { type: ActionType.UpdateDefaultMeterMinimumValue, defaultMeterMinimumValue };
 }
@@ -84,6 +84,10 @@ export function updateDefaultMeterReadingGap(defaultMeterReadingGap: number): t.
 
 export function updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): t.UpdateDefaultMeterMaximumErrorsAction {
 	return { type: ActionType.UpdateDefaultMeterMaximumErrors, defaultMeterMaximumErrors };
+}
+
+export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): t.UpdateDefaultMeterDisableChecksAction {
+	return { type: ActionType.UpdateDefaultMeterDisableChecks, defaultMeterDisableChecks };
 }
 
 function requestPreferences(): t.RequestPreferencesAction {
@@ -147,13 +151,14 @@ export function submitPreferences() {
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
 				defaultAreaUnit: state.admin.defaultAreaUnit,
 				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
-				// TODO ADD CONDSET VALUES 
+				// TODO ADD CONDSET VALUES
 				defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue,
 				defaultMeterMaximumValue: state.admin.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: state.admin.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 				defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors
+				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

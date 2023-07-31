@@ -22,7 +22,8 @@ import {
 	UpdateDefaultMeterMinimumDateAction,
 	UpdateDefaultMeterMaximumDateAction,
 	UpdateDefaultMeterReadingGapAction,
-	UpdateDefaultMeterMaximumErrorsAction
+	UpdateDefaultMeterMaximumErrorsAction,
+	UpdateDefaultMeterDisableChecksAction
 
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
@@ -30,7 +31,7 @@ import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } f
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
-import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
+import { fetchPreferencesIfNeeded, submitPreferences} from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface PreferencesProps {
@@ -45,13 +46,14 @@ interface PreferencesProps {
 	defaultFileSizeLimit: number;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
+	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors, DisableChecks)
 	defaultMeterMinimumValue: number;
 	defaultMeterMaximumValue: number;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -63,13 +65,14 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	// TODO : ADD UPDATE TO CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
+	// TODO : ADD UPDATE TO CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors, Disablechecks)
 	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
 	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
 	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
 	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;
 	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): UpdateDefaultMeterReadingGapAction;
 	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): UpdateDefaultMeterMaximumErrorsAction;
+	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): UpdateDefaultMeterDisableChecksAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -95,7 +98,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultMeterMaximumDateChange = this.handleDefaultMeterMaximumDateChange.bind(this);
 		this.handleDefaultMeterReadingGapChange = this.handleDefaultMeterReadingGapChange.bind(this);
 		this.handleDefaultMeterMaximumErrorsChange = this.handleDefaultMeterMaximumErrorsChange.bind(this);
-
+		this.handleDisplayDefaultMeterDisableChecks = this.handleDisplayDefaultMeterDisableChecks.bind(this);
 	}
 
 	public render() {
@@ -503,12 +506,16 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.props.updateDefaultMeterReadingGap(parseFloat(e.target.value));
 		this.updateUnsavedChanges();
 	}
-	 
+
 	private handleDefaultMeterMaximumErrorsChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultMeterMaximumErrors(parseFloat(e.target.value));
 		this.updateUnsavedChanges();
 	}
 
+	private handleDisplayDefaultMeterDisableChecks(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterDisableChecks(e.target.value as unknown as boolean);
+		this.updateUnsavedChanges();
+	}
 
 }
 

@@ -36,6 +36,7 @@ export default function ChartSelectComponent() {
 		<div style={divBottomPadding}>
 			<p style={labelStyle}>
 				<FormattedMessage id='graph.type' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
 			</p>
 			<Dropdown isOpen={expand} toggle={() => setExpand(!expand)}>
 				<DropdownToggle outline caret>
@@ -70,9 +71,6 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 				</DropdownMenu>
 			</Dropdown>
-			<div>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
-			</div>
 		</div>
 	);
 }
