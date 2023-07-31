@@ -74,14 +74,14 @@ mocha.describe('unit readings routes', () => {
 				readingsStub = sinon.stub(Reading, 'getMeterLineReadings');
 				readingsStub.resolves({
 					1: [
-						{ reading_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
+						{ reading_rate: 1, min_rate: 1, max_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 					]
 				});
 				const response = await meterLineReadings([1], 99, timeInterval);
 
 				const expectedResponse = {
 					1: [
-						{ reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
+						{ reading: 1, min: 1, max: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 					]
 				};
 				expect(response).to.deep.equal(expectedResponse);
