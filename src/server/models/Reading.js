@@ -372,6 +372,32 @@ class Reading {
 		return compareReadingsByGroupID;
 	}
 
+	/**
+	 * Gets radar line readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param conn the connection to use.
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getMeterRadarReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
+		/**
+		 * @type {array<{meter_id: int, reading_rate: Number, max_rate: Number, min_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		const allMeterRadarReadings = await conn.func('meter_line_readings_unit',
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
+		);
+		const radarReadingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allMeterRadarReadings) {
+			radarReadingsByMeterID[row.meter_id].push(
+				{reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return radarReadingsByMeterID;
+	}
+
 	toString() {
 		return `Reading [id: ${this.meterID}, reading: ${this.reading}, startTimestamp: ${this.startTimestamp}, endTimestamp: ${this.endTimestamp}]`;
 	}
