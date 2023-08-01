@@ -70,6 +70,21 @@ router.post('/', async (req, res) => {
 				//TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 				defaultMeterMinimumValue: {
 					type: 'number'
+				},
+				defaultMeterMaximumValue: {
+					type: 'number'
+				},
+				defaultMeterMinimumDate: {
+					type: 'string'
+				},
+				defaultMeterMaximumDate: {
+					type: 'string'
+				},
+				defaultMeterThreshold: {
+					type: 'number'
+				},
+				defaultMeterMaximumErrors: {
+					type: 'number'
 				}
 			}
 		}
