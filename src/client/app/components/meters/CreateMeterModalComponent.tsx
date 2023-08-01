@@ -727,7 +727,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* maxVal input */}
 						<FormGroup>
-							<Label for='minVal'>{translate('meter.maxVal')}</Label>
+							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
 							<Input
 								id='maxVal'
 								name='maxVal'
@@ -738,7 +738,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* maxError input */}
 						<FormGroup>
-							<Label for='minError'>{translate('meter.maxError')}</Label>
+							<Label for='maxError'>{translate('meter.maxError')}</Label>
 							<Input
 								id='maxError'
 								name='maxError'
@@ -785,7 +785,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* minDate input */}
 						<FormGroup>
-							<Label for='minVal'>{translate('meter.minDate')}</Label>
+							<Label for='minDate'>{translate('meter.minDate')}</Label>
 							<Input
 								id='minDate'
 								name='minDate'
@@ -796,7 +796,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup>
 						{/* maxDate input */}
 						<FormGroup>
-							<Label for='minVal'>{translate('meter.maxDate')}</Label>
+							<Label for='maxDate'>{translate('meter.maxDate')}</Label>
 							<Input
 								id='maxDate'
 								name='maxDate'
