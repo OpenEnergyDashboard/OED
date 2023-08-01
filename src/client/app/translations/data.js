@@ -127,7 +127,7 @@ const localeData = {
 		"default.meter.maximum.value": "Default meter maximum reading value check",
 		"default.meter.minimum.date": "Default meter minimum reading date check",
 		"default.meter.maximum.date": "Default meter maximum reading date check",
-		"default.meter.maximum.error": "Default meter maximum reading number of errors",
+		"default.meter.maximum.errors": "Default meter maximum reading number of errors",
 		"default.meter.reading.gap": "Default meter reading gap", 
 		"delete.group": "Delete Group",
 		"delete.map": "Delete Map",
