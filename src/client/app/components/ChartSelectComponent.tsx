@@ -7,14 +7,11 @@ import * as _ from 'lodash';
 import { ChartTypes } from '../types/redux/graph';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import Dropdown from 'reactstrap/lib/Dropdown';
-import DropdownItem from 'reactstrap/lib/DropdownItem';
-import DropdownToggle from 'reactstrap/lib/DropdownToggle';
-import DropdownMenu from 'reactstrap/lib/DropdownMenu';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
+import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 /**
  *  A component that allows users to select which chart should be displayed.
@@ -39,6 +36,7 @@ export default function ChartSelectComponent() {
 		<div style={divBottomPadding}>
 			<p style={labelStyle}>
 				<FormattedMessage id='graph.type' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
 			</p>
 			<Dropdown isOpen={expand} toggle={() => setExpand(!expand)}>
 				<DropdownToggle outline caret>
@@ -73,9 +71,6 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 				</DropdownMenu>
 			</Dropdown>
-			<div>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
-			</div>
 		</div>
 	);
 }

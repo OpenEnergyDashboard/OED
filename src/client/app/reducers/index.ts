@@ -17,6 +17,7 @@ import currentUser from './currentUser';
 import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
+import options from './options';
 
 
 export default combineReducers({
@@ -35,5 +36,6 @@ export default combineReducers({
 	currentUser,
 	unsavedWarning,
 	units,
-	conversions
+	conversions,
+	options
 });

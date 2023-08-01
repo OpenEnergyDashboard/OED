@@ -5,7 +5,6 @@
 import * as React from 'react';
 import MetersCSVUploadComponent from '../../components/csv/MetersCSVUploadComponent';
 import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadComponent';
-import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanTypes } from '../../types/csvUploadForm';
@@ -14,6 +13,7 @@ import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../TooltipHelpContainer';
 import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
+import HeaderComponent from '../../components/HeaderComponent';
 
 export const enum MODE {
 	meters = 'meters',
@@ -269,8 +269,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 		return (
 			<div>
+				<HeaderComponent />
 				<TooltipHelpContainer page='csv' />
-				<HeaderContainer />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.readings)}>

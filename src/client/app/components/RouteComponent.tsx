@@ -37,7 +37,7 @@ import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
 	barStacking: boolean;
-	defaultLanguage: LanguageTypes;
+	selectedLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
 	role: UserRole;
 	renderOnce: boolean;
@@ -266,7 +266,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		const lang = this.props.defaultLanguage;
+		const lang = this.props.selectedLanguage;
 		const messages = (localeData as any)[lang];
 		return (
 			<div>

@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -20,6 +19,7 @@ import '../../styles/card-page.css';
 import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
+import HeaderComponent from '../../components/HeaderComponent';
 
 /**
  * Defines the meters page card view
@@ -90,7 +90,7 @@ export default function MetersDetailComponent() {
 
 	return (
 		<div>
-			<HeaderContainer />
+			<HeaderComponent />
 			<TooltipHelpContainer page='meters' />
 
 			<div className='container-fluid'>
