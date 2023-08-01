@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_meter_minimum_value INTEGER NULL DEFAULT NULL,
 	default_meter_maximum_value INTEGER NULL DEFAULT NULL,
 	default_meter_minimum_date TIMESTAMP NULL DEFAULT NULL,
-    default_maximum_date TIMESTAMP NULL DEFAULT NULL,
-	default_threshold REAL DEFAULT 0,
-    default_maximum_errors INTEGER NULL DEFAULT NULL
+    default_meter_maximum_date TIMESTAMP NULL DEFAULT NULL,
+	default_meter_threshold REAL DEFAULT 0,
+    default_meter_maximum_errors INTEGER NULL DEFAULT NULL
 );
