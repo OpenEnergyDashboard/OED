@@ -627,7 +627,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		prevEndTimestampTz = endTimestampTz;
 	}
 	// Validate data if conditions given
-	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
+	if (conditionSet !== undefined && !conditionSet['disableChecks'] && !validateReadings(result, conditionSet)) {
 		errMsg = `<h2>For meter ' + meterName + ': error when validating data so all reading are rejected</h2>`;
 		log.error(errMsg);
 		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
