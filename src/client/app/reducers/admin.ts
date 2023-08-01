@@ -25,13 +25,12 @@ const defaultState: AdminState = {
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
 	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros, DisableChecks)
-	defaultMeterMinimumValue: 0,
+	defaultMeterMinimumValue: 1,
 	defaultMeterMaximumValue: 100,
-	defaultMeterMinimumDate: '',
-	defaultMeterMaximumDate: '',
-	defaultMeterReadingGap: 0,
-	defaultMeterMaximumErrors: 100,
-	defaultMeterDisableChecks: true
+	defaultMeterMinimumDate: '2023-01-01',
+	defaultMeterMaximumDate: '2023-12-31',
+	defaultMeterReadingGap: 1,
+	defaultMeterMaximumErrors: 100
 };
 
 export default function admin(state = defaultState, action: AdminAction) {

@@ -86,7 +86,7 @@ class Preferences {
 			row.default_meter_minimum_date,
 			row.default_meter_maximum_date,
 			row.default_meter_threshold,
-			row.default_meter_maximum_date
+			row.default_meter_maximum_errors
 		);
 	}
 
