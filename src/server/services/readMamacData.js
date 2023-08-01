@@ -78,16 +78,6 @@ async function readMamacData(meter, conn) {
 		}
 		return [reading, startTs, endTs]
 	});
-	// setup conditionset variable
-	const conditionSet = {
-		minVal: meter.minVal,
-		maxVal: meter.maxVal,
-		minDate: meter.minDate,
-		maxDate: meter.maxDate,
-		threshold: 0,
-		maxError: meter.maxError,
-		disableChecks: meter.disableChecks
-	}
 	// Insert readings that were okay for this meter.
 	// The pipeline does it one meter at a time.
 	// Ignoring that loadArrayInput returns values
@@ -115,7 +105,15 @@ async function readMamacData(meter, conn) {
 		isEndOnly = false,
 		// Previous Mamac values should not change.
 		shouldUpdate = false,
-		conditionSet,
+		conditionSet = {
+			minVal: meter.minVal,
+			maxVal: meter.maxVal,
+			minDate: meter.minDate,
+			maxDate: meter.maxDate,
+			threshold: readingGap,
+			maxError: meter.maxError,
+			disableChecks: meter.disableChecks
+		},
 		conn = conn,
 		honorDst = false,
 		relaxedParsing = false

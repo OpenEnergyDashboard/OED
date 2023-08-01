@@ -86,16 +86,6 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 			index++;
 		}
 		try {
-			// setup conditionset variable
-			const conditionSet = {
-				minVal: meter.minVal,
-				maxVal: meter.maxVal,
-				minDate: meter.minDate,
-				maxDate: meter.maxDate,
-				threshold: meter.readingGap,
-				maxError: meter.maxError,
-				disableChecks: meter.disableChecks
-			}
 			// Ignoring that loadArrayInput returns values
 			// since this is only called by an automated process at this time.
 			// Issues from the pipeline will be logged by called functions.
@@ -120,7 +110,15 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				isEndOnly = meter.endOnlyTime,
 				// Unsure if previous values should not change but going to assume want the latest one sent.
 				shouldUpdate = true,
-				conditionSet,
+				conditionSet = {
+					minVal: meter.minVal,
+					maxVal: meter.maxVal,
+					minDate: meter.minDate,
+					maxDate: meter.maxDate,
+					threshold: readingGap,
+					maxError: meter.maxError,
+					disableChecks: meter.disableChecks
+				},
 				conn = conn,
 				honorDst = false,
 				relaxedParsing = false

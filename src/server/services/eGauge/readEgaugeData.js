@@ -18,16 +18,6 @@ async function readEgaugeData(meter, conn) {
 	await requestor.setRegisterId();
 	const meterReadings = await requestor.getMeterReadings();
 	await requestor.logout()
-	// setup conditionset variable
-	const conditionSet = {
-		minVal: meter.minVal,
-		maxVal: meter.maxVal,
-		minDate: meter.minDate,
-		maxDate: meter.maxDate,
-		threshold: 0,
-		maxError: meter.maxError,
-		disableChecks: meter.disableChecks
-	}
 	// Store the readings in the database.
 	await loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
@@ -51,7 +41,15 @@ async function readEgaugeData(meter, conn) {
 		readingLengthVariation = 0,
 		isEndOnly = false, //true
 		shouldUpdate = false,
-		conditionSet,
+		conditionSet = {
+			minVal: meter.minVal,
+			maxVal: meter.maxVal,
+			minDate: meter.minDate,
+			maxDate: meter.maxDate,
+			threshold: readingGap,
+			maxError: meter.maxError,
+			disableChecks: meter.disableChecks
+		},
 		conn = conn,
 		// eGauge uses Unix timestamps and deals with DST.
 		honorDst = true,
