@@ -107,8 +107,7 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
 				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
+				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -180,12 +179,6 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterDisableChecks:
-			return {
-				...state,
-				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
 				submitted: false
 			}
 		default:
