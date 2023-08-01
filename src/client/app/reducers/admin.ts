@@ -26,11 +26,11 @@ const defaultState: AdminState = {
 	defaultMeterReadingFrequency: '00:15:00',
 	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros, DisableChecks)
 	defaultMeterMinimumValue: 0,
-	defaultMeterMaximumValue: 0,
+	defaultMeterMaximumValue: 100,
 	defaultMeterMinimumDate: '',
 	defaultMeterMaximumDate: '',
 	defaultMeterReadingGap: 0,
-	defaultMeterMaximumErrors: 0,
+	defaultMeterMaximumErrors: 100,
 	defaultMeterDisableChecks: true
 };
 
