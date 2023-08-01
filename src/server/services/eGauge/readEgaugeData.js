@@ -25,7 +25,8 @@ async function readEgaugeData(meter, conn) {
 		minDate: meter.minDate,
 		maxDate: meter.maxDate,
 		threshold: 0,
-		maxError: meter.maxError
+		maxError: meter.maxError,
+		disableChecks: meter.disableChecks
 	}
 	// Store the readings in the database.
 	await loadArrayInput(dataRows = meterReadings,

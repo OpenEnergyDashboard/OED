@@ -93,7 +93,8 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				minDate: meter.minDate,
 				maxDate: meter.maxDate,
 				threshold: meter.readingGap,
-				maxError: meter.maxError
+				maxError: meter.maxError,
+				disableChecks: meter.disableChecks
 			}
 			// Ignoring that loadArrayInput returns values
 			// since this is only called by an automated process at this time.

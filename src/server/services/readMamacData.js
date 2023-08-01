@@ -85,7 +85,8 @@ async function readMamacData(meter, conn) {
 		minDate: meter.minDate,
 		maxDate: meter.maxDate,
 		threshold: 0,
-		maxError: meter.maxError
+		maxError: meter.maxError,
+		disableChecks: meter.disableChecks
 	}
 	// Insert readings that were okay for this meter.
 	// The pipeline does it one meter at a time.
