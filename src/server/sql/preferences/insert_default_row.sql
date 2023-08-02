@@ -17,11 +17,8 @@ IF NOT EXISTS(SELECT *
 	default_language, default_timezone, default_warning_file_size, default_file_size_limit,
 	default_area_normalization, default_area_unit, default_meter_reading_frequency, 
 	default_meter_minimum_value, default_meter_maximum_value, default_meter_minimum_date, 
-	default_meter_maximum_date, default_meter_threshold, default_meter_maximum_errors) 
+	default_meter_maximum_date, default_meter_reading_gap, default_meter_maximum_errors) 
 	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00', 1, 100, '2023-01-01', '2023-12-31', 1, 100);
-	-- ${default_meter_minimum_value}, ${default_meter_maximum_value}, ${default_meter_minimum_date}, 
-	-- ${default_meter_maximum_date}, ${default_meter_threshold}, ${default_meter_maximum_errors});
-	-- //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors) and assign value to them
     END IF ;
 
 END;

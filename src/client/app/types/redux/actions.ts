@@ -88,7 +88,7 @@ export enum ActionType {
 	UpdateDefaultMeterMaximumValue = 'UPDATE_DEFAULT_METER_MAXIMUM_VALUE',
 	UpdateDefaultMeterMinimumDate = 'UPDATE_DEFAULT_METER_MINIMUM_DATE',
 	UpdateDefaultMeterMaximumDate = 'UPDATE_DEFAULT_METER_MAXIMUM_DATE',
-	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_THRESHOLD',
+	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_READING_GAP',
 	UpdateDefaultMeterMaximumErrors = 'UPDATE_DEFAULT_METER_MAXIMUM_ERRORS',
 
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',

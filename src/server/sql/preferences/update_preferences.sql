@@ -19,6 +19,6 @@ SET
 	default_meter_maximum_value = ${defaultMeterMaximumValue},
 	default_meter_minimum_date = ${defaultMeterMinimumDate},
 	default_meter_maximum_date = ${defaultMeterMaximumDate},
-	default_meter_threshold = ${defaultMeterThreshold},
+	default_meter_reading_gap = ${defaultMeterReadingGap},
 	default_meter_maximum_errors = ${defaultMeterMaximumErrors}
 ;

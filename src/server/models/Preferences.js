@@ -24,13 +24,13 @@ class Preferences {
 	 * @param {Number} defaultMeterMaximumValue - Option to set the default meter maximum value
 	 * @param {String} defaultMeterMinimumDate - Option to set the default meter minimum date
 	 * @param {String} defaultMeterMaximumValue - Option to set the default meter maximum value
-	 * @param {Number} defaultMeterThreshold - Option to set the default meter reading gap
+	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
 		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency, 
 		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate, 
-		defaultMeterMaximumDate, defaultMeterThreshold, defaultMeterMaximumErrors) {
+		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -46,7 +46,7 @@ class Preferences {
 		this.defaultMeterMaximumValue = defaultMeterMaximumValue;
 		this.defaultMeterMinimumDate = defaultMeterMinimumDate;
 		this.defaultMeterMaximumDate = defaultMeterMaximumDate;
-		this.defaultMeterThreshold = defaultMeterThreshold;
+		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
 	}
 
@@ -85,7 +85,7 @@ class Preferences {
 			row.default_meter_maximum_value,
 			row.default_meter_minimum_date,
 			row.default_meter_maximum_date,
-			row.default_meter_threshold,
+			row.default_meter_reading_gap,
 			row.default_meter_maximum_errors
 		);
 	}
@@ -124,7 +124,7 @@ class Preferences {
 				defaultMeterMaximumValue: preferences.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: preferences.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
-				defaultMeterThreshold: preferences.defaultMeterThreshold,
+				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was

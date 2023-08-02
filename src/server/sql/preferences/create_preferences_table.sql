@@ -15,11 +15,10 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_area_normalization BOOLEAN NOT NULL,
 	default_area_unit area_unit_type NOT NULL,
 	default_meter_reading_frequency INTERVAL NOT NULL,
-	-- //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 	default_meter_minimum_value INTEGER NULL DEFAULT NULL,
 	default_meter_maximum_value INTEGER NULL DEFAULT NULL,
 	default_meter_minimum_date TEXT NULL DEFAULT NULL,
     default_meter_maximum_date TEXT NULL DEFAULT NULL,
-	default_meter_threshold REAL DEFAULT 0,
+	default_meter_reading_gap FLOAT DEFAULT 1,
     default_meter_maximum_errors INTEGER NULL DEFAULT NULL
 );

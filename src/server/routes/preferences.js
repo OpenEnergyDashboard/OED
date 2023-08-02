@@ -80,7 +80,7 @@ router.post('/', async (req, res) => {
 				defaultMeterMaximumDate: {
 					type: 'string'
 				},
-				defaultMeterThreshold: {
+				defaultMeterReadingGap: {
 					type: 'number'
 				},
 				defaultMeterMaximumErrors: {
