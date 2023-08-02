@@ -15,10 +15,10 @@ SET
 	default_area_unit = ${defaultAreaUnit},
 	default_meter_reading_frequency = ${defaultMeterReadingFrequency},
 	-- //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
-	default_meter_minimum_value = ${default_meter_minimum_value},
-	default_meter_maximum_value = ${default_meter_maximum_value},
-	default_meter_minimum_date = ${default_meter_minimum_date},
-	default_meter_maximum_date = ${default_meter_maximum_date},
-	default_meter_threshold = ${default_meter_threshold},
-	default_meter_maximum_errors = ${default_meter_maximum_errors}
+	default_meter_minimum_value = ${defaultMeterMinimumValue},
+	default_meter_maximum_value = ${defaultMeterMaximumValue},
+	default_meter_minimum_date = ${defaultMeterMinimumDate},
+	default_meter_maximum_date = ${defaultMeterMaximumDate},
+	default_meter_threshold = ${defaultMeterthreshold},
+	default_meter_maximum_errors = ${defaultMeterMaximumErrors}
 ;
