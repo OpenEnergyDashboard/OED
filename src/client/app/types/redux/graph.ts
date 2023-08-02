@@ -12,7 +12,8 @@ export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
 	compare = 'compare',
-	map = 'map'
+	map = 'map',
+	radar = 'radar'
 }
 
 // Rates that can be graphed, only relevant to line graphs.
