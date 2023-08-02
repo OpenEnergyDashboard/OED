@@ -19,7 +19,6 @@ class Preferences {
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 * @param {String} defaultAreaUnit - The default area unit to normalize by
 	 * @param {String} defaultMeterReadingFrequency - The default meter reading frequency if none is given
-	 * TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 	 * @param {Number} defaultMeterMinimumValue - Option to set the default meter minimum value
 	 * @param {Number} defaultMeterMaximumValue - Option to set the default meter maximum value
 	 * @param {String} defaultMeterMinimumDate - Option to set the default meter minimum date
@@ -41,7 +40,6 @@ class Preferences {
 		this.defaultAreaNormalization = defaultAreaNormalization;
 		this.defaultAreaUnit = defaultAreaUnit;
 		this.defaultMeterReadingFrequency = defaultMeterReadingFrequency;
-	    //TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 		this.defaultMeterMinimumValue = defaultMeterMinimumValue;
 		this.defaultMeterMaximumValue = defaultMeterMaximumValue;
 		this.defaultMeterMinimumDate = defaultMeterMinimumDate;
@@ -80,7 +78,6 @@ class Preferences {
 			row.default_area_normalization,
 			row.default_area_unit,
 			row.default_meter_reading_frequency,
-			//TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 			row.default_meter_minimum_value,
 			row.default_meter_maximum_value,
 			row.default_meter_minimum_date,
@@ -119,7 +116,6 @@ class Preferences {
 				defaultAreaNormalization: preferences.defaultAreaNormalization,
 				defaultAreaUnit: preferences.defaultAreaUnit,
 				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency,
-				//TODO : ADD PARAMS for condset vals (minval, maxVal, minDate, maxDate, readingGap, maxErrors)
 				defaultMeterMinimumValue: preferences.defaultMeterMinimumValue,
 				defaultMeterMaximumValue: preferences.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: preferences.defaultMeterMinimumDate,

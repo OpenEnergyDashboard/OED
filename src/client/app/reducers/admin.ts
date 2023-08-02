@@ -24,7 +24,6 @@ const defaultState: AdminState = {
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErros, DisableChecks)
 	defaultMeterMinimumValue: 1,
 	defaultMeterMaximumValue: 100,
 	defaultMeterMinimumDate: '2023-01-01',
@@ -101,7 +100,6 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
 				defaultAreaUnit: action.data.defaultAreaUnit,
 				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency),
-				// TODO ADD CONDSET VALUES TO RECIEVE PREFRERENCES
 				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue,
 				defaultMeterMaximumValue: action.data.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
@@ -144,7 +142,6 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
 				submitted: false
 			}
-		// TODO : ADD ACTIONTYPE FOR EACH CONDSET VALUE MINVAL,MAXVAL,MINDATE,MAXDATE,MAXERROR,READINGAP,DISABLECHECKS
 		case ActionType.UpdateDefaultMeterMinimumValue:
 			return {
 				...state,

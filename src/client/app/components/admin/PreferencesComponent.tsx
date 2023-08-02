@@ -16,7 +16,6 @@ import {
 	ToggleDefaultAreaNormalizationAction,
 	UpdateDefaultAreaUnitAction,
 	UpdateDefaultMeterReadingFrequencyAction,
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS)
 	UpdateDefaultMeterMinimumValueAction,
 	UpdateDefaultMeterMaximumValueAction,
 	UpdateDefaultMeterMinimumDateAction,
@@ -45,7 +44,6 @@ interface PreferencesProps {
 	defaultFileSizeLimit: number;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
 	defaultMeterMinimumValue: number;
 	defaultMeterMaximumValue: number;
 	defaultMeterMinimumDate: string;
@@ -63,7 +61,6 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	// TODO : ADD UPDATE TO CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
 	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
 	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
 	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
@@ -88,7 +85,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
 		this.handleDefaultMeterReadingFrequencyChange = this.handleDefaultMeterReadingFrequencyChange.bind(this);
-		// TODO ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors)
 		this.handleDefaultMeterMinimumValueChange = this.handleDefaultMeterMinimumValueChange.bind(this);
 		this.handleDefaultMeterMaximumValueChange = this.handleDefaultMeterMaximumValueChange.bind(this);
 		this.handleDefaultMeterMinimumDateChange = this.handleDefaultMeterMinimumDateChange.bind(this);
@@ -323,7 +319,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						onChange={this.handleDefaultMeterReadingFrequencyChange}
 					/>
 				</div>
-				{/* 	// TODO : ADD UPDATE TO CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MaxErrors) */}
 				<div style={bottomPaddingStyle}>
 					<p style={titleStyle}>
 						<FormattedMessage id='default.meter.minimum.value' />:
@@ -475,8 +470,6 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.props.updateDefaultMeterReadingFrequency(e.target.value);
 		this.updateUnsavedChanges();
 	}
-
-	// TODO ADD CONDSET VALUES HANDLE CHANGE  (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS)
 
 	private handleDefaultMeterMinimumValueChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultMeterMinimumValue(parseFloat(e.target.value));

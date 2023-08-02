@@ -61,7 +61,6 @@ export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency:
 	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
 }
 
-// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, MAXERRORS)
 export function updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): t.UpdateDefaultMeterMinimumValueAction {
 	return { type: ActionType.UpdateDefaultMeterMinimumValue, defaultMeterMinimumValue };
 }
@@ -147,7 +146,6 @@ export function submitPreferences() {
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
 				defaultAreaUnit: state.admin.defaultAreaUnit,
 				defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
-				// TODO ADD CONDSET VALUES
 				defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue,
 				defaultMeterMaximumValue: state.admin.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: state.admin.defaultMeterMinimumDate,

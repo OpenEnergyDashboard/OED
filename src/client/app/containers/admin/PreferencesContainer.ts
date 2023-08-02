@@ -16,7 +16,6 @@ import {
 	toggleDefaultAreaNormalization,
 	updateDefaultAreaUnit,
 	updateDefaultMeterReadingFrequency,
-	// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE)
 	updateDefaultMeterMinimumValue,
 	updateDefaultMeterMaximumValue,
 	updateDefaultMeterMinimumDate,
@@ -43,7 +42,6 @@ function mapStateToProps(state: State) {
 		defaultAreaNormalization: state.admin.defaultAreaNormalization,
 		defaultAreaUnit: state.admin.defaultAreaUnit,
 		defaultMeterReadingFrequency: state.admin.defaultMeterReadingFrequency,
-		// TODO : ADD CONDSET VALUES (MINVAL, MAXVAL, READING GAP, MINDATE, MAXDATE, )
 		defaultMeterMinimumValue: state.admin.defaultMeterMinimumValue,
 		defaultMeterMaximumValue: state.admin.defaultMeterMaximumValue,
 		defaultMeterMinimumDate: state.admin.defaultMeterMinimumDate,
