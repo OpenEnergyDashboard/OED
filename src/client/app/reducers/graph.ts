@@ -4,7 +4,7 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes, ThreeDReadingPrecision, MeterOrGroup } from '../types/redux/graph';
+import { GraphAction, GraphState, ChartTypes, ReadingsPerDay, MeterOrGroup } from '../types/redux/graph';
 import { ActionType } from '../types/redux/actions';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
@@ -30,7 +30,7 @@ const defaultState: GraphState = {
 	threeD: {
 		meterOrGroupID: null,
 		meterOrGroup: MeterOrGroup.meters,
-		xAxisPrecision: ThreeDReadingPrecision.hourly,
+		readingsPerDay: ReadingsPerDay.twentyFour,
 		timeInterval: null
 	}
 };
@@ -132,12 +132,12 @@ export default function graph(state = defaultState, action: GraphAction) {
 					timeInterval: action.dateRange
 				}
 			};
-		case ActionType.UpdateThreeDPrecision:
+		case ActionType.UpdateThreeDReadingsPerDay:
 			return {
 				...state,
 				threeD: {
 					...state.threeD,
-					xAxisPrecision: action.xAxisPrecision
+					readingsPerDay: action.readingsPerDay
 				}
 			};
 		case ActionType.UpdateThreeDMeterOrGroupInfo:

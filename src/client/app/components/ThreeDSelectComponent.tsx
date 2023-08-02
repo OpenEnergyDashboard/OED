@@ -7,7 +7,7 @@ import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { ChartTypes, ThreeDReadingPrecision } from '../types/redux/graph';
+import { ChartTypes, ReadingsPerDay } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
 import { updateThreeDPrecision } from '../actions/graph';
 
@@ -17,30 +17,34 @@ import { updateThreeDPrecision } from '../actions/graph';
  */
 export default function ThreeDSelectComponent() {
 	const dispatch: Dispatch = useDispatch();
-	const chartToRender = useSelector((state: State) => state.graph.chartToRender);
-	const xAxisPrecision = useSelector((state: State) => state.graph.threeD.xAxisPrecision);
-	// Iterate over ThreeDReadingPrecision enum to create select option
-	// Filter is required due to Typescript 'reverse mapping' of numeric Enums
-	const options: PrecisionSelectOption[] = Object.keys(ThreeDReadingPrecision)
-		.filter(key => isNaN(Number(key)))
-		.map(key => ({
-			label: key,
-			value: ThreeDReadingPrecision[key as keyof typeof ThreeDReadingPrecision]
-		}));
+	const graphState = useSelector((state: State) => state.graph);
+	const readingsPerDay = useSelector((state: State) => state.graph.threeD.readingsPerDay);
+	// Iterate over ReadingsPerDay enum to create select option
+	const options = Object.values(ReadingsPerDay)
+		// Filter strings as to only get integer values from typescript's reverse mapping of enums
+		.filter(value => !isNaN(Number(value)))
+		.map(value => {
+			// Length of interval readings in hours
+			const intervalLength = Number(value);
+			return {
+				// ReadingsPerDay Enum inversely corresponds to the hour interval for readings.
+				// (24 hours a day) / intervalLength, e.g, 1 hour intervals give 24 readings per day
+				label: String((24 / intervalLength)),
+				value: intervalLength
+			} as ReadingsPerDayOption
+		});
 
 	// Value currently being rendered
-	const value = { label: ThreeDReadingPrecision[xAxisPrecision], value: xAxisPrecision }
-
 	// Use the selectedOption as an enum key to update threeD State
-	const onSelectChange = (selectedOption: PrecisionSelectOption) => dispatch(updateThreeDPrecision(selectedOption.value));
+	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDPrecision(selectedOption.value));
 
-	console.log(ThreeDReadingPrecision[xAxisPrecision]);
-	if (chartToRender === ChartTypes.threeD) {
+	const value = { label: String(24 / readingsPerDay), value: readingsPerDay };
+	if (graphState.chartToRender === ChartTypes.threeD) {
 		return (
 			<div>
-				<p style={{ fontWeight: 'bold', margin: 0 }}>Select Precision</p>
+				<p style={{ fontWeight: 'bold', margin: 0 }}>{translate('readings.per.day')}</p>
 				<Select value={value} options={options} onChange={onSelectChange} />
-				<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
+				<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
 			</div>
 		)
 	} else {
@@ -48,7 +52,7 @@ export default function ThreeDSelectComponent() {
 	}
 }
 
-interface PrecisionSelectOption {
+interface ReadingsPerDayOption {
 	label: string;
-	value: ThreeDReadingPrecision;
+	value: ReadingsPerDay;
 }

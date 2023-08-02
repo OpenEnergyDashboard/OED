@@ -400,49 +400,43 @@ class Reading {
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', sequenceNumber]
 		);
+		// Initialize empty plotly data 
 		const xData = [];
 		const yData = [];
 		const zData = [];
 
 		const numOfReadings = allMeterThreeDReadings.length;
-		// If no readings, do nothing and return empty arrays
+		// If readings exist, find/replace missing readings if any, and format for plotly.
+		// Otherwise, return empty z,y,z data
 		if (numOfReadings > 0) {
-			const readingsPerDay = 24 / sequenceNumber;
+			// Assume no missing readings, replace if needed.
+			let readingsToReturn = allMeterThreeDReadings;
+
 			// get the number of days days between start and end timestamps * readings per day.
+			const readingsPerDay = 24 / sequenceNumber;
 			const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
 
-			let readingsToReturn = allMeterThreeDReadings;
 			// Run Fill holes algorithm if expected num of readings to not match received reading count.
 			if (allMeterThreeDReadings.length !== expectedNumOfReadings) {
-				console.log('Running!');
-				// Check if query returned data with the first or last values missing 
-				if (allMeterThreeDReadings[0].start_timestamp === fromTimestamp) {
+				const missingReadings = [];
 
-					// push null reading start timestamp to the front of array
-					allMeterThreeDReadings.unshift({
-						reading_rate: null,
-						start_timestamp_timestamp: fromTimestamp,
-						end_timestamp: fromTimestamp
-					})
-				}
-				if (allMeterThreeDReadings[0].end_timestamp === toTimestamp) {
-					// push null reading end timestamp to end of array
-					allMeterThreeDReadings.push({
-						reading_rate: null,
-						start_timestamp_timestamp: toTimestamp,
-						end_timestamp: toTimestamp
-					})
-				}
-
-				let missingReadings = [];
 				allMeterThreeDReadings.forEach((reading, index, arr) => {
-					// If the next index is defined, and current / next timestamps don't overlap fill the gap.
-					if (arr[index + 1] && arr[index].end_timestamp.valueOf() !== arr[index + 1].start_timestamp.valueOf()) {
-						const currEndTimestamp = arr[index].end_timestamp;
-						const targetStartTimestamp = arr[index + 1].start_timestamp;
-						let nextStartTimeStamp = currEndTimestamp.clone();
+					// The two values to compare, Current and next readings.
+					const currentReading = reading;
+					const nextReading = arr[index + 1];
+					// If a next exists, and current / next timestamps don't overlap, fill the gap with null readings.
+					if (nextReading && currentReading.end_timestamp.valueOf() !== nextReading.start_timestamp.valueOf()) {
+
+						// our null iteration target timestamp (push null until target reached.)
+						const targetStartTimestamp = nextReading.start_timestamp;
+
+						// set next timestamp to overlap with current endTS 
+						let nextStartTimeStamp = currentReading.end_timestamp.clone();
+						// gap to fill.
 						let nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
-						//Push missing null readings until the readings overlap
+
+						// Push missing null readings until the readings overlap
+						// do-while; a reading is missing, therefore must be executed at least once.
 						do {
 							missingReadings.push({
 								reading_rate: null,
@@ -450,16 +444,20 @@ class Reading {
 								end_timestamp: nextEndTimeStamp
 							})
 
+							// To make the readings overlap, next start time is current end time
 							nextStartTimeStamp = nextEndTimeStamp.clone();
 							nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+
+							// if nextStartTS and targetStartTS overlap, all gaps have been filled; break
 						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
 					}
 				});
 
-				let merged = [];
 				// Merge the Original Readings with 'hole' readings.
-				// While both arrays have values compare and push
+				let merged = [];
+				// While both arrays have values compare and push since both arrays are individually sorted, you can compare the first indexes of each
 				while (allMeterThreeDReadings.length && missingReadings.length) {
+					// array.shift() works similarly to dequeue() in that it pops off the front of the array
 					if (allMeterThreeDReadings[0].start_timestamp.valueOf() < missingReadings[0].start_timestamp.valueOf()) {
 						merged.push(allMeterThreeDReadings.shift());
 					} else {
@@ -474,14 +472,19 @@ class Reading {
 				while (missingReadings.length) {
 					merged.push(missingReadings.shift());
 				}
+
+				// Update the values to be formatted and returned.
 				readingsToReturn = merged;
 			}
+
 			// Format readings.
+			// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
 			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+
+			// get the hourly timestamp intervals from
+			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
-				// Data data may need to be converted into 'moment' to save on network load
 				yData.push(day[0].start_timestamp.valueOf());
 
 				day.forEach(hour => dayReadings.push(hour.reading_rate));

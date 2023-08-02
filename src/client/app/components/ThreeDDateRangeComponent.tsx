@@ -34,7 +34,7 @@ export default function ThreeDDateRangeComponent() {
 	if (chartToRender === ChartTypes.threeD)
 		return (
 			<div style={{ width: '100%' }}>
-				<p style={labelStyle}>{translate('select.dateRange')}:</p>
+				<p style={labelStyle}>{translate('date.range')}:</p>
 				<DateRangePicker
 					value={threeDTimeInterval}
 					onChange={onDatePickerChange}

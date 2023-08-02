@@ -23,7 +23,6 @@ import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
 export default function ThreeDComponent() {
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
-		//TODO ADD PRECISION BUTTON
 		// threeDState contains the currentMeterOrGroup to be fetched.
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
@@ -33,7 +32,7 @@ export default function ThreeDComponent() {
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
 		const unitID = state.graph.selectedUnit;
 		// Level of detail along the xAxis / Readings per day,
-		const precision = state.graph.threeD.xAxisPrecision;
+		const precision = state.graph.threeD.readingsPerDay;
 		let threeDData = null;
 		if (meterOrGroupID) {
 			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
@@ -129,7 +128,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		const date = moment.utc(data.yData[i]).format('LL');
 		const time = moment.utc(data.xData[j]).format('h:mm A');
 		// ThreeD graphic readings can be null. If not null round the precision.
-		const readingValue = readings ? readings.toPrecision(6) : null;
+		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `Date: ${date}<br>Time: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
 	// TODO find a better way to set the zAxis
@@ -191,7 +190,7 @@ const threeDLayout = {
 			title: { text: 'Hours of Day' }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year' }
+			title: { text: 'Days of Calendar Year', standoff: 40 }
 		},
 		zaxis: { title: 'Resource Usage' },
 		aspectratio: {
@@ -207,12 +206,6 @@ const threeDLayout = {
 				z: 0.8
 			}
 		}
-	},
-	margin: {
-		l: 50,
-		r: 50,
-		t: 50,
-		b: 50
 	}
 };
 const helpInfoLayout = {

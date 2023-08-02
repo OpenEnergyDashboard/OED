@@ -153,7 +153,6 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
-			//TODO Consolidate 3D Group and Meter 'fetchNeeded' to single dispatch
 			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
@@ -165,7 +164,6 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
-		//TODO Consolidate 3D Group and Meter 'fetchNeeded' to single dispatch
 		dispatch(fetchNeededThreeDReadings());
 		return Promise.resolve();
 	};
@@ -217,14 +215,14 @@ export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeIn
 }
 
 
-export function updateThreeDPrecision(xAxisPrecision: t.ThreeDReadingPrecision): Thunk {
+export function updateThreeDPrecision(readingsPerDay: t.ReadingsPerDay): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch({ type: ActionType.UpdateThreeDPrecision, xAxisPrecision });
+		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
 
 		return Promise.resolve();
 	};
-	// return { type: ActionType.UpdateThreeDPrecision, xAxisPrecision };
+	// return { type: ActionType.UpdateThreeDPrecision, readingsPerDay };
 }
 
 export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {

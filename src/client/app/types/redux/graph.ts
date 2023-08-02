@@ -25,13 +25,13 @@ export const LineGraphRates = {
 	'day': 24
 }
 
-export enum ThreeDReadingPrecision {
-	hourly = 1,
-	twoHour = 2,
-	threeHour = 3,
-	fourHour = 4,
-	sixHour = 6,
-	eightHour = 8,
+export enum ReadingsPerDay {
+	twentyFour = 1,
+	twelve = 2,
+	eight = 3,
+	six = 4,
+	four = 6,
+	three = 8,
 	twelveHour = 12
 }
 
@@ -121,9 +121,9 @@ export interface UpdateThreeDTimeInterval {
 	dateRange: Value;
 }
 
-export interface UpdateThreeDPrecision {
-	type: ActionType.UpdateThreeDPrecision;
-	xAxisPrecision: ThreeDReadingPrecision;
+export interface UpdateThreeDReadingsPerDay {
+	type: ActionType.UpdateThreeDReadingsPerDay;
+	readingsPerDay: ReadingsPerDay;
 }
 export interface UpdateThreeDMeterOrGroupInfo {
 	type: ActionType.UpdateThreeDMeterOrGroupInfo;
@@ -150,7 +150,7 @@ export type GraphAction =
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce
 	| UpdateThreeDTimeInterval
-	| UpdateThreeDPrecision
+	| UpdateThreeDReadingsPerDay
 	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
@@ -165,7 +165,7 @@ export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
 export interface ThreeDState {
 	meterOrGroupID: MeterOrGroupID;
 	meterOrGroup: MeterOrGroup;
-	xAxisPrecision: ThreeDReadingPrecision;
+	readingsPerDay: ReadingsPerDay;
 	timeInterval: Value;
 }
 
