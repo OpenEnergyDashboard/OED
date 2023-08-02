@@ -85,4 +85,23 @@ export default class ReadingsApi {
 			{ timeInterval: timeInterval.toString(), barWidthDays: barWidthDays.toString(), graphicUnitId: unitID.toString() }
 		);
 	}
+
+	/**
+	 * Gets radar readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns RadrReadings in sorted order
+	 */
+	public async meterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		const readings = await this.backend.doGetRequest<LineReadings>(
+			`/api/unitReadings/radar/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
+	}
 }

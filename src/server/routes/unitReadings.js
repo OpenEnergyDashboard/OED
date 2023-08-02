@@ -196,6 +196,27 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
+function formatRadarReadingRow(readingRow) {
+	return {
+		reading: readingRow.reading_rate,
+		startTimestamp: readingRow.start_timestamp.valueOf(),
+		endTimestamp: readingRow.end_timestamp.valueOf()
+	};
+}
+
+/**
+ * Gets radar readings for meters for the given time range
+ * @param meterIDs The meter IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function meterRadarReadings(meterIDs, graphicUnitId, timeInterval) {
+	const conn = getConnection();
+	const rawReadings = await Reading.getMeterRadarReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatRadarReadingRow));
+}
+
 function createRouter() {
 	const router = express.Router();
 	router.get('/line/meters/:meter_ids', async (req, res) => {
@@ -248,11 +269,24 @@ function createRouter() {
 		}
 	});
 
+	router.get('/radar/meters/:meter_ids', async (req, res) => {
+		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const forJson = await meterRadarReadings(meterIDs, graphicUnitID, timeInterval);
+			res.json(forJson);
+		}
+	});
+
 	return router;
 }
 
 module.exports = {
 	meterLineReadings,
+	meterRadarReadings,
 	validateLineReadingsParams: validateMeterLineReadingsParams,
 	validateLineReadingsQueryParams,
 	meterBarReadings,
