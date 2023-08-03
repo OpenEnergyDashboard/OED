@@ -134,6 +134,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		If displayable is true and unitId is set to -99, warn admin
 	*/
 	const [validMeter, setValidMeter] = useState(false);
+	const MIN_VAL = Number.MIN_SAFE_INTEGER;
+	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	useEffect(() => {
 		setValidMeter(
 			state.name !== '' &&
@@ -145,11 +147,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			state.unitId !== -999 &&
 			state.defaultGraphicUnit !== -999 &&
 			state.meterType !== '' &&
-			state.minVal !== null &&
-			state.maxVal !== null &&
+			state.minVal >= MIN_VAL && 
+			state.minVal <= state.maxVal &&
+			state.maxVal <= MAX_VAL &&
 			state.minDate !== '' &&
 			state.maxDate !== '' &&
-			state.maxError !== null
+			(state.maxError >=0  && state.maxError <= 75)
 		);
 	}, [
 		state.area,
@@ -732,9 +735,13 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								name='minVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.minVal}/>
-							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
+								min={MIN_VAL}
+								max={state.maxVal}
+								defaultValue={state.minVal}
+								invalid={state?.minVal < MIN_VAL  || state?.minVal > state?.maxVal}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal}}  />
+							</FormFeedback>
 						</FormGroup>
 						{/* maxVal input */}
 						<FormGroup>
@@ -744,9 +751,13 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								name='maxVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxVal}/>
-							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
+								min={state.minVal}
+								max={MAX_VAL}
+								defaultValue={state.maxVal}
+								invalid={state?.maxVal > MAX_VAL  || state?.minVal > state?.maxVal}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL}}/>
+							</FormFeedback>
 						</FormGroup>
 						{/* maxError input */}
 						<FormGroup>
@@ -756,9 +767,13 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								name='maxError'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxError}/>
-							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
+								min='0'
+								max='75'
+								defaultValue={state.maxError}
+								invalid={state?.maxError > 75 || state?.maxError < 0}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: 0, max: 75}}/>
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
