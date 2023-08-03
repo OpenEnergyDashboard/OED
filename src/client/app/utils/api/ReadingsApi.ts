@@ -91,7 +91,7 @@ export default class ReadingsApi {
 	 * @param meterIDs The meter IDs to get readings for
 	 * @param timeInterval The range of time to get readings for
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @returns RadrReadings in sorted order
+	 * @returns RadarReadings in sorted order
 	 */
 	public async meterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
 		const stringifiedIDs = meterIDs.join(',');

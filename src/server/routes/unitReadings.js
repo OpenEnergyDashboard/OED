@@ -270,6 +270,7 @@ function createRouter() {
 	});
 
 	router.get('/radar/meters/:meter_ids', async (req, res) => {
+		//Using line readings param because they are the same as radar.
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {

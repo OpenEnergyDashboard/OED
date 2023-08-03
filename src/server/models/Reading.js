@@ -386,6 +386,7 @@ class Reading {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, max_rate: Number, min_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
+		//Using the same data from meter line readings because they are identical to radar readings.
 		const allMeterRadarReadings = await conn.func('meter_line_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
 		);
@@ -396,6 +397,35 @@ class Reading {
 			);
 		}
 		return radarReadingsByMeterID;
+	}
+
+	/**
+	 * Gets radar readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param conn the connection to use.
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getGroupRadarReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
+		// maxRawPoints is not used for groups.
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
+		/**
+		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		//Using the same data from group line readings because they are identical to group radar readings.
+		const allGroupRadarReadings = await conn.func('group_line_readings_unit',
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, 'auto', maxHourlyPoints]
+		);
+
+		const radarReadingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allGroupRadarReadings) {
+			radarReadingsByGroupID[row.group_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return radarReadingsByGroupID;
 	}
 
 	toString() {
