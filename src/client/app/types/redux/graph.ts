@@ -56,9 +56,7 @@ export interface ChangeChartToRenderAction {
 export interface ToggleAreaNormalizationAction {
 	type: ActionType.ToggleAreaNormalization;
 }
-export interface ToggleShowMinMaxAction {
-	type: ActionType.ToggleShowMinMax;
-}
+
 export interface ToggleShowMinMaxAction {
 	type: ActionType.ToggleShowMinMax;
 }
