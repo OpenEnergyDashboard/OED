@@ -8,7 +8,9 @@ import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { durationFormat } from '../utils/durationFormat';
+import moment from 'moment';
 
+minimumDate = moment().utc().format('YYYY-MM-DD HH:mm:ssZ')
 const defaultState: AdminState = {
 	selectedMeter: null,
 	displayTitle: '',
@@ -24,12 +26,12 @@ const defaultState: AdminState = {
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
-	defaultMeterMinimumValue: 1,
-	defaultMeterMaximumValue: 100,
-	defaultMeterMinimumDate: '1970-01-01 00:00:00',
-	defaultMeterMaximumDate: '2023-12-31 00:00:00',
+	defaultMeterMinimumValue: Number.MIN_VALUE,
+	defaultMeterMaximumValue: Number.MAX_VALUE,
+	defaultMeterMinimumDate: moment().utc().format('YYYY-MM-DD HH:mm:ssZ'),
+	defaultMeterMaximumDate: moment().utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
-	defaultMeterMaximumErrors: 100
+	defaultMeterMaximumErrors: 75
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
