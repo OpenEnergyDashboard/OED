@@ -36,6 +36,13 @@ export interface ReceiveGroupRadarReadingAction {
 	readings: RadarReadings;
 }
 
+export type RadarReadingsAction =
+	RequestMeterRadarReadingAction |
+	RequestGroupRadarReadingAction |
+	ReceiveMeterRadarReadingAction |
+	ReceiveGroupRadarReadingAction;
+
+
 export type RadarReadingState =
     RequestMeterRadarReadingAction |
     RequestGroupRadarReadingAction |
