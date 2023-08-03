@@ -18,8 +18,6 @@ function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
-	const yMinData: number[] = [];
-	const yMaxData: number[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
@@ -70,6 +68,9 @@ function mapStateToProps(state: State) {
 					// Create two arrays for the x and y values. Fill the array with the data from the line readings
 					const xData: string[] = [];
 					const yData: number[] = [];
+					// Create two arrays to store the min and max values of y-axis data points
+					const yMinData: number[] = [];
+					const yMaxData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
 					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
@@ -82,11 +83,11 @@ function mapStateToProps(state: State) {
 						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 						const readingValue = reading.reading * scaling;
 						yData.push(readingValue);
-						const minValue = reading.min * scaling;
-						yMinData.push(minValue);
-						const maxValue = reading.max * scaling;
-						yMaxData.push(maxValue);
 						if (state.graph.showMinMax) {
+							const minValue = reading.min * scaling;
+							yMinData.push(minValue);
+							const maxValue = reading.max * scaling;
+							yMaxData.push(maxValue);
 							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)}` +
 								` ${unitLabel} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
 						} else {
@@ -129,7 +130,6 @@ function mapStateToProps(state: State) {
 							color: getGraphColor(colorID, DataType.Meter)
 						}
 					});
-
 				}
 			}
 		}

@@ -13,7 +13,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * React Component rendering an Error Bar checkbox for toggle operation.
  * @returns Error Bar checkbox with tooltip and label
  */
-const ErrorBarComponent = () => {
+export default function ErrorBarComponent() {
 	const dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
 
@@ -39,7 +39,4 @@ const ErrorBarComponent = () => {
 			<TooltipMarkerComponent page='home' helpTextId='help.home.error.bar' />
 		</div>
 	);
-};
-
-export default ErrorBarComponent;
-
+}
