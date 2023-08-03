@@ -749,9 +749,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='minVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.minVal}
-								value={state.minVal} />
+								min='Number.MIN_DATE'
+								max={state.maxVal}
+								defaultValue={state.minVal}/>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxVal input */}
@@ -762,9 +762,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='maxVal'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								defaultValue={state.maxVal}
-								value={state.maxVal} />
+								min={state.minVal}
+								max='Number.MAX_DATE'
+								defaultValue={state.maxVal}/>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxError input */}
@@ -776,8 +776,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								min="0"
-								defaultValue={state.maxError}
-								value={state.maxError} />
+								max="75"
+								defaultValue={state.maxError}/>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
