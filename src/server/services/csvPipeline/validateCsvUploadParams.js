@@ -37,8 +37,8 @@ MeterTimeSortTypesJS = Object.freeze({
  * @enum {string}
  */
 BooleanTypesJS = Object.freeze({
-	true: 'true',
-	false: 'false',
+	true: 'yes',
+	false: 'no',
 	// meter means to use value stored on meter or the default if not.
 	meter: 'meter value or default'
 });
