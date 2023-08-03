@@ -59,7 +59,8 @@ class Meter {
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = '00:15:00',
-		minVal = 0, maxVal = 100, minDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxError = 100, disableChecks = false) {
+		minVal = Number.MIN_VALUE, maxVal = Number.MAX_VALUE, minDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
+		maxDate = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'), maxError = 75, disableChecks = false) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
