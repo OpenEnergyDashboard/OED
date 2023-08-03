@@ -118,26 +118,26 @@ async function getUnitId(unitName) {
 // These units and conversions are used in many tests.
 // These are the 2D arrays for units, conversions to feed into the database
 // For kWh units.
-const unitDatakWh = [	
+const unitDatakWh = [
 	{
-	    name: 'kWh',
+		name: 'kWh',
 		identifier: '',
 		unitRepresent: Unit.unitRepresentType.QUANTITY,
-		secInRate:  3600,
-		typeOfUnit:  Unit.unitType.UNIT,
+		secInRate: 3600,
+		typeOfUnit: Unit.unitType.UNIT,
 		suffix: '',
-		displayable:  Unit.displayableType.ALL,
+		displayable: Unit.displayableType.ALL,
 		preferredDisplay: true,
 		note: 'OED created standard unit'
 	},
 	{
-	    name: 'Electric_Utility',
+		name: 'Electric_Utility',
 		identifier: '',
 		unitRepresent: Unit.unitRepresentType.QUANTITY,
-		secInRate:  3600,
-		typeOfUnit:  Unit.unitType.METER,
+		secInRate: 3600,
+		typeOfUnit: Unit.unitType.METER,
 		suffix: '',
-		displayable:  Unit.displayableType.NONE,
+		displayable: Unit.displayableType.NONE,
 		preferredDisplay: false,
 		note: 'special unit'
 	}
@@ -372,21 +372,21 @@ mocha.describe('readings API', () => {
 							name: 'kW',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'kilowatts'
 						},
-											{
+						{
 							name: 'Electric',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						}
@@ -432,21 +432,21 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						}
@@ -492,10 +492,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						}
@@ -541,10 +541,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						}
@@ -590,10 +590,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						},
@@ -601,10 +601,10 @@ mocha.describe('readings API', () => {
 							name: 'BTU',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'OED created standard unit'
 						}
@@ -659,10 +659,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						},
@@ -670,10 +670,10 @@ mocha.describe('readings API', () => {
 							name: 'BTU',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'OED created standard unit'
 						}
@@ -727,10 +727,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						}
@@ -855,10 +855,10 @@ mocha.describe('readings API', () => {
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'MJ'
 						}
@@ -904,32 +904,32 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						}
@@ -984,32 +984,32 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						}
@@ -1064,32 +1064,32 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						}
@@ -1145,21 +1145,21 @@ mocha.describe('readings API', () => {
 							name: 'Thing_36',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate:  36,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 36,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'thing unit',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'special unit'
 						}
@@ -1205,43 +1205,43 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						},
-											{
+						{
 							name: 'Widget',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'fake unit'
 						}
@@ -1303,43 +1303,43 @@ mocha.describe('readings API', () => {
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Celsius'
 						},
-											{
+						{
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.METER,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
-							displayable:  Unit.displayableType.NONE,
+							displayable: Unit.displayableType.NONE,
 							preferredDisplay: false,
 							note: 'special unit'
 						},
-											{
+						{
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'OED created standard unit'
 						},
-											{
+						{
 							name: 'Widget',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: false,
 							note: 'fake unit'
 						}
@@ -1397,15 +1397,76 @@ mocha.describe('readings API', () => {
 				});
 				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
 					const unitData = [
-						['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-						['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-						['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit'],
-						['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit']
+						{
+							name: 'Electric_Utility',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
+							suffix: '',
+							displayable: Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+						{
+							name: 'kg',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+						{
+							name: 'metric ton',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+						{
+							name: 'kg CO₂',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: 'CO₂',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
 					];
 					const conversionData = [
-						['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → kg CO₂'],
-						['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg'],
-						['kg', 'metric ton', true, 1e-3, 0, 'kg → Metric ton']
+						{
+							sourceId: 'Electric_Utility',
+							destinationId: 'kg CO₂',
+							bidirectional: false,
+							slope: 0.709,
+							intercept: 0,
+							note: 'Electric_Utility → kg CO₂'
+						},
+						{
+							sourceId: 'kg CO₂',
+							destinationId: 'kg',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'CO₂ → kg'
+						},
+						{
+							sourceId: 'kg',
+							destinationId: 'metric ton',
+							bidirectional: true,
+							slope: 1e-3,
+							intercept: 0,
+							note: 'kg → Metric ton'
+						}
 					];
 					const meterData = [
 						{
@@ -1438,21 +1499,21 @@ mocha.describe('readings API', () => {
 							name: 'kWh',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate:  3600,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'OED created standard unit'
 						},
-											{
+						{
 							name: 'invalidUnit',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.UNUSED,
-							secInRate:  1,
-							typeOfUnit:  Unit.unitType.UNIT,
+							secInRate: 1,
+							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
-							displayable:  Unit.displayableType.ALL,
+							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
 							note: 'Invalid Unit'
 						}
