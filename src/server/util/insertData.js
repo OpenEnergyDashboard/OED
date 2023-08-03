@@ -233,7 +233,6 @@ async function insertMeters(metersToInsert, conn) {
 					const query = `update meters set id = ${meterData.id} where name = '${meter.name}'`;
 					await conn.none(query);
 				}
-				// setup conditionset variable
 				const conditionSet = {
 					minVal: meter.minVal,
 					maxVal: meter.maxVal,

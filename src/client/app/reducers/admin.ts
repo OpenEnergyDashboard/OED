@@ -26,9 +26,9 @@ const defaultState: AdminState = {
 	defaultMeterReadingFrequency: '00:15:00',
 	defaultMeterMinimumValue: 1,
 	defaultMeterMaximumValue: 100,
-	defaultMeterMinimumDate: '2023-01-01',
-	defaultMeterMaximumDate: '2023-12-31',
-	defaultMeterReadingGap: 1,
+	defaultMeterMinimumDate: '1970-01-01 00:00:00',
+	defaultMeterMaximumDate: '2023-12-31 00:00:00',
+	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 100
 };
 
