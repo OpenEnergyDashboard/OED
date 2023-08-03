@@ -15,7 +15,7 @@ export interface RequestMeterRadarReadingAction {
 
 export interface RequestGroupRadarReadingAction {
 	type: ActionType.RequestGroupRadarReadings;
-	meterIDs: number[];
+	groupIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
 }
@@ -30,7 +30,7 @@ export interface ReceiveMeterRadarReadingAction {
 
 export interface ReceiveGroupRadarReadingAction {
 	type: ActionType.ReceiveGroupRadarReadings;
-	meterIDs: number[];
+	groupIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
 	readings: RadarReadings;
