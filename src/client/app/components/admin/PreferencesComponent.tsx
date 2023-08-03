@@ -349,7 +349,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						type='text'
 						value={this.props.defaultMeterMinimumDate}
 						onChange={this.handleDefaultMeterMinimumDateChange}
-						placeholder='YYYY-MM-DD'
+						placeholder='YYYY-MM-DD HH:MM:SS'
 					/>
 				</div>
 				<div style={bottomPaddingStyle}>
@@ -360,7 +360,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						type='text'
 						value={this.props.defaultMeterMaximumDate}
 						onChange={this.handleDefaultMeterMaximumDateChange}
-						placeholder='YYYY-MM-DD'
+						placeholder='YYYY-MM-DD HH:MM:SS'
 					/>
 				</div>
 				<div style={bottomPaddingStyle}>
