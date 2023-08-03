@@ -45,7 +45,6 @@ export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDe
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
-	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
@@ -85,7 +84,6 @@ function fetchPreferences(): Thunk {
 		dispatch(requestPreferences());
 		const preferences = await preferencesApi.getPreferences();
 		dispatch(receivePreferences(preferences));
-		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch) => {
 				const state = getState();
@@ -98,6 +96,9 @@ function fetchPreferences(): Thunk {
 				}
 				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
 					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
+					moment.locale(preferences.defaultLanguage);
+				} else {
+					moment.locale(getState().admin.defaultLanguage);
 				}
 			});
 		}
