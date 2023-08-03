@@ -39,12 +39,12 @@ class Meter {
 	 * @param defaultGraphicUnit The foreign key to the unit table represents the preferred unit to display this meter, default -99
 	 * @param areaUnit The meter's area unit, default 'none'
 	 * @param readingFrequency The time between readings for this meter with default of '00:15:00' but should not depend on that.
-	 * @param minVal
-	 * @param maxVal
-	 * @param minDate
-	 * @param maxDate
-	 * @param maxError
-	 * @param disableChecks
+	 * @param minVal inclusive minimum acceptable reading value (won't be rejected)
+	 * @param maxVal inclusive maximum acceptable reading value (won't be rejected)
+	 * @param minDate inclusive earliest acceptable date (won't be rejected)
+	 * @param maxDate inclusive latest acceptable date (won't be rejected)
+	 * @param maxError maximum number of errors to be reported, ignore the rest
+	 * @param disableChecks disable checks on meter for conditionSet 
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
@@ -59,7 +59,7 @@ class Meter {
 		readingGap = 0, readingVariation = 0, readingDuplication = 1, timeSort = 'increasing', endOnlyTime = false,
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = '00:15:00',
-		minVal = 0, maxVal = 0, minDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxError = 100, disableChecks = true) {
+		minVal = 0, maxVal = 100, minDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), maxError = 100, disableChecks = false) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
