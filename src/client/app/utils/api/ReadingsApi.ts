@@ -7,7 +7,7 @@
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { BarReadings, LineReading, LineReadings } from '../../types/readings';
+import { BarReadings, LineReading, LineReadings, RadarReading, RadarReadings } from '../../types/readings';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -93,15 +93,35 @@ export default class ReadingsApi {
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @returns RadarReadings in sorted order
 	 */
-	public async meterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
+	public async meterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<RadarReadings> {
 		const stringifiedIDs = meterIDs.join(',');
-		const readings = await this.backend.doGetRequest<LineReadings>(
+		const readings = await this.backend.doGetRequest<RadarReadings>(
 			`/api/unitReadings/radar/meters/${stringifiedIDs}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
 		);
 		// Ensure everything is sorted
 		_.values(readings)
-			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+			.forEach((value: RadarReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
 		return readings;
 	}
+
+	/**
+	 * Gets radar readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns RadarReadings in sorted order
+	 */
+	public async groupRadarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<RadarReadings> {
+		const stringifiedIDs = groupIDs.join(',');
+		const readings = await this.backend.doGetRequest<RadarReadings>(
+			`/api/unitReadings/radar/groups/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach((value: RadarReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
+	}
+
 }
