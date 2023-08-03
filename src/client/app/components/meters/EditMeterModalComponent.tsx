@@ -136,9 +136,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			state.readingGap >= 0 &&
 			state.readingVariation >= 0 &&
 			(state.readingDuplication >= 1 && state.readingDuplication <= 9) &&
-			state.readingFrequency !== ''
+			state.readingFrequency !== '' &&
+			state.minVal !== null &&
+			state.maxVal !== null &&
+			state.minDate !== '' &&
+			state.maxDate !== '' &&
+			state.maxError !== null
 		);
-	}, [state.area, state.name, state.readingGap, state.readingVariation, state.readingDuplication, state.areaUnit, state.readingFrequency]);
+	}, [state.area,
+		state.name,
+		state.readingGap,
+		state.readingVariation,
+		state.readingDuplication,
+		state.areaUnit,
+		state.readingFrequency,
+		state.minVal,
+		state.maxVal,
+		state.minDate,
+		state.maxDate,
+		state.maxError]);
 	/* End State */
 
 	// Reset the state to default values
@@ -736,6 +752,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								min="0"
 								defaultValue={state.minVal}
 								value={state.minVal} />
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxVal input */}
 						<FormGroup>
@@ -748,6 +765,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								min="0"
 								defaultValue={state.maxVal}
 								value={state.maxVal} />
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxError input */}
 						<FormGroup>
@@ -760,6 +778,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								min="0"
 								defaultValue={state.maxError}
 								value={state.maxError} />
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
@@ -804,10 +823,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='minDate'
 								name='minDate'
 								type='text'
+								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								min="0"
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								defaultValue={state.minDate}
-								value={state.minDate} />
+								required value={state.minDate}
+								invalid={state.minDate === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup>
 						{/* maxDate input */}
 						<FormGroup>
@@ -816,10 +840,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='maxDate'
 								name='maxDate'
 								type='text'
+								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								min="0"
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								defaultValue={state.maxDate}
-								value={state.maxDate} />
+								required value={state.maxDate}
+								invalid={state.maxDate === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* DisableChecks input */}
 						<FormGroup>

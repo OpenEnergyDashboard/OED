@@ -293,8 +293,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.readingFrequency,
 				req.body.minVal,
 				req.body.maxVal,
-				req.body.minDate,
-				req.body.maxDate,
+				req.body.minDate = moment(req.body.minDate), // = req.body.minDate
+				req.body.maxDate = moment(req.body.maxDate), // = req.body.maxDate
 				req.body.maxError,
 				req.body.disableChecks
 			);
@@ -356,8 +356,8 @@ router.post('/addMeter', async (req, res) => {
 				req.body.readingFrequency,
 				req.body.minVal,
 				req.body.maxVal,
-				req.body.minDate,
-				req.body.maxDate,
+				req.body.minDate = moment(req.body.minDate),// = req.body.minDate
+				req.body.maxDate = moment(req.body.maxDate),// = req.body.maxDate
 				req.body.maxError,
 				req.body.disableChecks
 			);

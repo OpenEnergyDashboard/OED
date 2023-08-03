@@ -144,7 +144,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			state.readingFrequency !== '' &&
 			state.unitId !== -999 &&
 			state.defaultGraphicUnit !== -999 &&
-			state.meterType !== ''
+			state.meterType !== '' &&
+			state.minVal !== null &&
+			state.maxVal !== null &&
+			state.minDate !== '' &&
+			state.maxDate !== '' &&
+			state.maxError !== null
 		);
 	}, [
 		state.area,
@@ -156,7 +161,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		state.readingFrequency,
 		state.unitId,
 		state.defaultGraphicUnit,
-		state.meterType
+		state.meterType,
+		state.minVal,
+		state.maxVal,
+		state.minDate,
+		state.maxDate,
+		state.maxError
 	]);
 	/* End State */
 
@@ -724,6 +734,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								onChange={e => handleNumberChange(e)}
 								min="0"
 								defaultValue={state.minVal}/>
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxVal input */}
 						<FormGroup>
@@ -735,6 +746,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								onChange={e => handleNumberChange(e)}
 								min="0"
 								defaultValue={state.maxVal}/>
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup>
 						{/* maxError input */}
 						<FormGroup>
@@ -746,6 +758,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								onChange={e => handleNumberChange(e)}
 								min="0"
 								defaultValue={state.maxError}/>
+							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
@@ -790,9 +803,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='minDate'
 								name='minDate'
 								type='text'
-								placeholder='YYYY-MM-DD'
+								autoComplete='on'
 								onChange={e => handleStringChange(e)}
-								defaultValue={state.minDate}/>
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								required value={state.minDate}
+								invalid={state.minDate === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup>
 						{/* maxDate input */}
 						<FormGroup>
@@ -801,9 +819,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='maxDate'
 								name='maxDate'
 								type='text'
-								placeholder='YYYY-MM-DD'
+								autoComplete='on'
+								placeholder='YYYY-MM-DD HH:MM:SS'
 								onChange={e => handleStringChange(e)}
-								defaultValue={state.maxDate}/>
+								defaultValue={state.maxDate}
+								invalid={state.maxDate === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup>
 						{/* DisableChecks input */}
 						<FormGroup>
