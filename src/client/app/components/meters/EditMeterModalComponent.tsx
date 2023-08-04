@@ -127,6 +127,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		Reading Duplication must be between 1 and 9
 		Reading frequency cannot be blank
 		If displayable is true and unitId is set to -99, warn admin
+		Mininum Value cannot bigger than Maximum Value
+		Minimum Value and Maximum Value must be between valid input
+		Minimum Date and Maximum cannot be blank
+		Maximum No of Error must be between 0 and 75
 	*/
 	const [validMeter, setValidMeter] = useState(false);
 	const MIN_VAL = Number.MIN_SAFE_INTEGER;
