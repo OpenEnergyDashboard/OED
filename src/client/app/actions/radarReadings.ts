@@ -122,7 +122,7 @@ function fetchMeterRadarReadings(meterIDs: number[], timeInterval: TimeInterval,
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
  */
-function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
+function fetchGroupRadarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupRadarReadings(groupIDs, timeInterval, unitID));
 		const groupLineReadings = await readingsApi.groupRadarReadings(groupIDs, timeInterval, unitID);
@@ -134,7 +134,7 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, 
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
  */
-export function fetchNeededLineReadings(timeInterval: TimeInterval, unitID: number): Thunk {
+export function fetchNeededRadarReadings(timeInterval: TimeInterval, unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		const promises: Array<Promise<any>> = [];
@@ -152,7 +152,7 @@ export function fetchNeededLineReadings(timeInterval: TimeInterval, unitID: numb
 			id => shouldFetchGroupRadarReadings(state, id, timeInterval, unitID)
 		);
 		if (groupIDsToFetchForLine.length > 0) {
-			promises.push(dispatch(fetchGroupLineReadings(groupIDsToFetchForLine, timeInterval, unitID)));
+			promises.push(dispatch(fetchGroupRadarReadings(groupIDsToFetchForLine, timeInterval, unitID)));
 		}
 
 		return Promise.all(promises);
