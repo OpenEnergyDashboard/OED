@@ -128,13 +128,37 @@ function fetchPreferences(): Thunk {
 	};
 }
 
+/* Validates preferences
+	Create Preferences Validation:
+	Mininum Value cannot bigger than Maximum Value
+	Minimum Value and Maximum Value must be between valid input
+	Minimum Date and Maximum cannot be blank
+	Maximum No of Error must be between 0 and 75
+*/
+
+function validPreferences(state: State) {
+	const MIN_VAL = Number.MIN_SAFE_INTEGER;
+	const MAX_VAL = Number.MAX_SAFE_INTEGER;
+	if (
+		state.admin.defaultMeterReadingGap >= 0 &&
+		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
+		state.admin.defaultMeterMinimumValue <= state.admin.defaultMeterMaximumValue &&
+		state.admin.defaultMeterMinimumValue <= MAX_VAL &&
+		state.admin.defaultMeterMaximumDate !== '' &&
+		state.admin.defaultMeterMaximumDate !== '' &&
+		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)
+	) return true;
+	return false;
+}
 /**
  * Submits preferences stored in the state to the API to be stored in the database
  */
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
+		console.log(validPreferences);
 		try {
+			if (!validPreferences(state)) throw new Error('invalid input');
 			const preferences = await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
