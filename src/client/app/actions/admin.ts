@@ -144,7 +144,7 @@ function validPreferences(state: State) {
 		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
 		state.admin.defaultMeterMinimumValue <= state.admin.defaultMeterMaximumValue &&
 		state.admin.defaultMeterMinimumValue <= MAX_VAL &&
-		state.admin.defaultMeterMaximumDate !== '' &&
+		state.admin.defaultMeterMinimumDate !== '' &&
 		state.admin.defaultMeterMaximumDate !== '' &&
 		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)
 	) return true;
@@ -156,7 +156,6 @@ function validPreferences(state: State) {
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
-		console.log(validPreferences);
 		try {
 			if (!validPreferences(state)) throw new Error('invalid input');
 			const preferences = await preferencesApi.submitPreferences({
