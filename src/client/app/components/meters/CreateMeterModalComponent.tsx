@@ -147,7 +147,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			state.unitId !== -999 &&
 			state.defaultGraphicUnit !== -999 &&
 			state.meterType !== '' &&
-			state.minVal >= MIN_VAL && 
+			state.minVal >= MIN_VAL &&
 			state.minVal <= state.maxVal &&
 			state.maxVal <= MAX_VAL &&
 			state.minDate !== '' &&
