@@ -263,18 +263,11 @@ function createRouter() {
 		}
 	});
 
-	// function validateMeterId(meter_id) {
-	// 	const isValidMeterId = typeof meter_id === 'string' && /^\d+$/.test(meter_id);
-	// 	console.log('Is valid id', isValidMeterId);
-	// 	return isValidMeterId;
-		
-	// } 
-
-	function validateMeterId(params) {
+	function validateMeterLineReadingsParams(params) {
 		const validParams = {
 			type: 'object',
-			maxProperties: 3,
-			required: ['meter_ids'], ['timeInterval'], ['sequence'],
+			maxProperties: 1,
+			required: ['meter_ids'],
 			properties: {
 				meter_ids: {
 					type: 'string',
@@ -285,45 +278,65 @@ function createRouter() {
 		const paramsValidationResult = validate(params, validParams);
 		return paramsValidationResult.valid;
 	}
-	
-	// function validateMeterId(params) {
-	// 	const isValidMeterId = {
+
+	// function validateThreeDMeterLineReadingsParams(params) {
+	// 	const validParams = {
 	// 		type: 'object',
 	// 		maxProperties: 1,
-	// 		required: [meterID],
+	// 		required: ['meter_ids'],
 	// 		properties: {
-	// 			meterID: {
+	// 			meter_ids: {
 	// 				type: 'string',
-	// 				pattern: '^\\d+$'
+	// 				pattern: '^\d+(,\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
 	// 			}
 	// 		}
 	// 	};
-	// 	const meterValidationResult = validate(meter_id, isValidMeterId);
-	// 	return meterValidationResult.valid; // || isValidMeterId;
+	// 	const paramsValidationResult = validate(params, validParams);
+	// 	return paramsValidationResult.valid;
 	// }
 
-	// If multiple integers -> multiple meter ids
-	// down the line send multi line readings
-	// once params are added Max Properties: 3
+	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
 
+
+	function validateMeterThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+		const validParams = {
+			type: 'object',
+			maxProperties: 3,
+			required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+			properties: {
+				timeInterval: {
+					type: 'string',
+				},
+				graphicUnitID: {
+					type: 'string',
+					pattern: '^\\d+$'
+				},
+				sequenceNumber: {
+					type: 'string',
+					pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				}
+			}
+		};
+		const paramsValidationResult = validate(queryParams, validParams);
+		return paramsValidationResult.valid;
+	}
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		// TODO Determine valid params and query params
-		// TODO Validate params & query params
-		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
-		// }
-		//const meterID = req.params.meter_ids; ARBITRARILY CHANGE VAL TO RAND #
-		console.log('meterID: ', meterID);
+		req.query.sequenceNumber = '12';
+		console.log(req.query);
 
-		if (!validateMeterId(meterID)) {
-			return res.status(400).json({ error: 'Invalid meter_ids parameter' });
-		  }
-		const meterID = req.params.meterID;  
-		const graphicUnitID = req.query.graphicUnitId;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const sequenceNumber = req.query.sequenceNumber;
-		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
-		res.json(forJson);
+		if (!(validateMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+			console.log('Error');
+			res.sendStatus(400);
+		} else {
+			console.log('Success');
+			const meterID = req.params.meter_ids;
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const sequenceNumber = req.query.sequenceNumber;
+			const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
+			res.json(forJson);
+		}
 	});
 
 	return router;
