@@ -59,6 +59,11 @@ export default function ChartSelectComponent() {
 						<FormattedMessage id='compare' />
 					</DropdownItem>
 					<DropdownItem
+						onClick={() => dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.radar})}
+					>
+						<FormattedMessage id='radar' />
+					</DropdownItem>
+					<DropdownItem
 						onClick={() => {
 							dispatch({type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map});
 							if (Object.keys(sortedMaps).length === 1) {
