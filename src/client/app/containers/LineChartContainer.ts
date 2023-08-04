@@ -83,15 +83,24 @@ function mapStateToProps(state: State) {
 						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 						const readingValue = reading.reading * scaling;
 						yData.push(readingValue);
+						// All hover have the date, meter name and value.
+						const hoverStart = `<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`;
 						if (state.graph.showMinMax) {
+							// We want to show min/max. Note if the data is raw for this meter then all the min/max values are null.
+							// In this case we still push the min/max but plotly will not show them. This is a little extra work
+							// but makes the code cleaner.
 							const minValue = reading.min * scaling;
 							yMinData.push(minValue);
 							const maxValue = reading.max * scaling;
 							yMaxData.push(maxValue);
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)}` +
-								` ${unitLabel} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
+							if (reading.min != null) {
+								// There are min/max values so put in hover.
+								hoverText.push(`${hoverStart} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
+							} else {
+								hoverText.push(hoverStart);
+							}
 						} else {
-							hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+							hoverText.push(hoverStart);
 						}
 					});
 
