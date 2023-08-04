@@ -8,6 +8,7 @@ import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 import { fetchNeededCompareReadings } from './compareReadings';
+import { fetchNeededRadarReadings } from './radarReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
@@ -124,6 +125,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -138,6 +140,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -151,6 +154,7 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, unitID));
 		});
 		return Promise.resolve();
 	}
@@ -161,6 +165,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
+		dispatch(fetchNeededRadarReadings(timeInterval, unitID));
 		return Promise.resolve();
 	};
 }
