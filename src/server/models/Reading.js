@@ -292,7 +292,7 @@ class Reading {
 			);
 		}
 		return readingsByGroupID;
-	
+
 	}
 
 	/**
@@ -541,25 +541,6 @@ class Reading {
 			let readingsToReturn = allGroupThreeDReadings;
 			// Run Fill holes algorithm if expected num of readings to not match received reading count.
 			if (allGroupThreeDReadings.length !== expectedNumOfReadings) {
-				console.log('Running!');
-				// Check if query returned data with the first or last values missing 
-				if (allGroupThreeDReadings[0].start_timestamp === fromTimestamp) {
-
-					// push null reading start timestamp to the front of array
-					allGroupThreeDReadings.unshift({
-						reading_rate: null,
-						start_timestamp_timestamp: fromTimestamp,
-						end_timestamp: fromTimestamp
-					})
-				}
-				if (allGroupThreeDReadings[0].end_timestamp === toTimestamp) {
-					// push null reading end timestamp to end of array
-					allGroupThreeDReadings.push({
-						reading_rate: null,
-						start_timestamp_timestamp: toTimestamp,
-						end_timestamp: toTimestamp
-					})
-				}
 
 				let missingReadings = [];
 				allGroupThreeDReadings.forEach((reading, index, arr) => {
@@ -595,7 +576,7 @@ class Reading {
 				}
 				// Push remaining values, if any
 				while (allGroupThreeDReadings.length) {
-					merged.push(allMeterThreeDReadings.shift());
+					merged.push(allGroupThreeDReadings.shift());
 				}
 				// Push remaining values, if any
 				while (missingReadings.length) {
@@ -625,7 +606,7 @@ class Reading {
 		//console.log(groupThreeDData);
 
 		return groupThreeDData;
-	
+
 	}
 
 	toString() {

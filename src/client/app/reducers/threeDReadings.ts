@@ -18,7 +18,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.readingsPerDay;
+			const readingsPerDay = action.readingsPerDay;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: true
@@ -38,14 +38,14 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 				newState.byMeterID[meterID][timeInterval][unitID] = {};
 			}
 
-			if (newState.byMeterID[meterID][timeInterval][unitID][readingCount] !== undefined) {
-				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = {
-					...newState.byMeterID[meterID][timeInterval][unitID][readingCount],
+			if (newState.byMeterID[meterID][timeInterval][unitID][readingsPerDay] !== undefined) {
+				newState.byMeterID[meterID][timeInterval][unitID][readingsPerDay] = {
+					...newState.byMeterID[meterID][timeInterval][unitID][readingsPerDay],
 					isFetching: true
 				};
 			}
 			else {
-				newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { isFetching: true };
+				newState.byMeterID[meterID][timeInterval][unitID][readingsPerDay] = { isFetching: true };
 			}
 			return newState;
 		}
@@ -53,21 +53,21 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const meterID = action.meterID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.readingsPerDay;
+			const readingsPerDay = action.readingsPerDay;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: false
 			};
 
 			const readingsForMeter = action.readings;
-			newState.byMeterID[meterID][timeInterval][unitID][readingCount] = { readings: readingsForMeter, isFetching: false };
+			newState.byMeterID[meterID][timeInterval][unitID][readingsPerDay] = { readings: readingsForMeter, isFetching: false };
 			return newState;
 		}
 		case ActionType.RequestGroupThreeDReadings: {
 			const groupID = action.groupID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.readingsPerDay;
+			const readingsPerDay = action.readingsPerDay;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: true
@@ -87,14 +87,14 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 				newState.byGroupID[groupID][timeInterval][unitID] = {};
 			}
 
-			if (newState.byGroupID[groupID][timeInterval][unitID][readingCount] !== undefined) {
-				newState.byGroupID[groupID][timeInterval][unitID][readingCount] = {
-					...newState.byGroupID[groupID][timeInterval][unitID][readingCount],
+			if (newState.byGroupID[groupID][timeInterval][unitID][readingsPerDay] !== undefined) {
+				newState.byGroupID[groupID][timeInterval][unitID][readingsPerDay] = {
+					...newState.byGroupID[groupID][timeInterval][unitID][readingsPerDay],
 					isFetching: true
 				};
 			}
 			else {
-				newState.byGroupID[groupID][timeInterval][unitID][readingCount] = { isFetching: true };
+				newState.byGroupID[groupID][timeInterval][unitID][readingsPerDay] = { isFetching: true };
 			}
 			return newState;
 		}
@@ -102,14 +102,14 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 			const groupID = action.groupID;
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
-			const readingCount = action.readingsPerDay;
+			const readingsPerDay = action.readingsPerDay;
 			const newState: ThreeDReadingsState = {
 				...state,
 				isFetching: false
 			};
 
 			const readingsForGroup = action.readings;
-			newState.byGroupID[groupID][timeInterval][unitID][readingCount] = { readings: readingsForGroup, isFetching: false };
+			newState.byGroupID[groupID][timeInterval][unitID][readingsPerDay] = { readings: readingsForGroup, isFetching: false };
 			return newState;
 		}
 
