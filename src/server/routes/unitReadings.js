@@ -199,6 +199,7 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
+ * @param sequenceNumber rate of hours per reading
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
 async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequenceNumber) {
@@ -208,6 +209,20 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequen
 	const conn = getConnection();
 	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
 	return hourlyReadings;
+}
+
+/**
+ * Gets line readings for groups for the given time range
+ * @param groupIDs The group IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @param sequenceNumber rate of hours per reading
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, sequenceNumber) {
+	const conn = getConnection();
+	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
+	return groupThreeDReadings;
 }
 
 function createRouter() {
@@ -267,12 +282,24 @@ function createRouter() {
 		// TODO Validate params & query params
 		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
 		// }
-		const meterID = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+		const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 		const graphicUnitID = req.query.graphicUnitId;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		const sequenceNumber = req.query.sequenceNumber;
-		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
+		const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, sequenceNumber);
 		res.json(forJson);
+	});
+
+	router.get('/threeD/groups/:group_id', async (req, res) => {
+		// TODO Determine valid params and query params
+		// TODO Validate params & query params
+		const groupID = req.params.group_id;
+		const graphicUnitID = req.query.graphicUnitId;
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const sequenceNumber = req.query.sequenceNumber;
+		const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, sequenceNumber);
+		res.json(forJson);
+
 	});
 
 	return router;

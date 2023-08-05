@@ -143,3 +143,45 @@ BEGIN
 	END LOOP;
 END;
 $$ LANGUAGE plpgsql;
+
+
+/*Gets group meters graphing data for 3D graphic by returning points that span the requested
+length of time over the days requested. 
+*/
+CREATE OR REPLACE FUNCTION group_3d_readings_unit (
+	--Desire group ID
+    --For 3D graphics, users will only be able to select 1 group to graph. 
+	group_id_requested INTEGER,
+	-- The desired graphic unit of the returned data
+	graphic_unit_id INTEGER,
+	-- The start and end time for the data to return
+	start_stamp TIMESTAMP,
+	end_stamp TIMESTAMP,
+	-- The number of hours in each reading returned
+    reading_length_hours INTEGER
+)
+	RETURNS TABLE(reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+AS $$
+DECLARE
+	--Holds the desired meter IDs in order to call meter_3d_readings_unit in the query below. 
+	meter_ids INTEGER[];
+BEGIN
+    --Get all the meter IDS that will be included in the group being requested. 
+	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
+	FROM groups_deep_meters gdm
+    WHERE group_id = group_id_requested; 
+
+	RETURN QUERY
+		SELECT
+            --Sum the reading rates of the meters. 
+			SUM(readings.reading_rate) AS reading_rate,
+			readings.start_timestamp,
+			readings.end_timestamp
+		-- Call meter_3d_readings_unit that will return the reading rate for the meters in the group that was requested. 
+		FROM meter_3d_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, reading_length_hours) readings
+        -- Group data by start timestamp and end timestamp.
+		GROUP BY readings.start_timestamp, readings.end_timestamp
+		-- Sort data by ascending order. 
+		ORDER BY readings.start_timestamp ASC;
+END;
+$$ LANGUAGE 'plpgsql';

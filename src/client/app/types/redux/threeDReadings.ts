@@ -52,7 +52,7 @@ export interface ThreeDReadingsState {
 		[meterID: number]: {
 			[timeInterval: string]: {
 				[unitID: number]: {
-					[precision: string]: {
+					[readingsPerDay: string]: {
 						isFetching: boolean;
 						readings?: ThreeDReading;
 					}
@@ -65,7 +65,7 @@ export interface ThreeDReadingsState {
 		[groupID: number]: {
 			[timeInterval: string]: {
 				[unitID: number]: {
-					[precision: string]: {
+					[readingsPerDay: string]: {
 						isFetching: boolean;
 						readings?: ThreeDReading;
 					}

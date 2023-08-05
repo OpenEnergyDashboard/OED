@@ -115,7 +115,7 @@ export default class ReadingsApi {
 		: Promise<ThreeDReading> {
 		// TODO update api endpoint to groups hardcoded to simulate data retrieval
 		return await this.backend.doGetRequest<ThreeDReading>(
-			`/api/unitReadings/threeD/meters/${21}`,
+			`/api/unitReadings/threeD/groups/${groupID}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: readingsPerDay.toString() }
 		);
 	}
