@@ -292,6 +292,7 @@ class Reading {
 			);
 		}
 		return readingsByGroupID;
+	
 	}
 
 	/**
@@ -390,6 +391,7 @@ class Reading {
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp An optional start point for the time range of readings returned
 	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param sequenceNumber rate of hours per reading
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
@@ -498,6 +500,132 @@ class Reading {
 			zData: zData
 		}
 		return threeDData;
+	}
+
+	/**
+	 * Gets hourly readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param sequenceNumber rate of hours per reading
+	 * @param conn the connection to use.
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getGroupThreeDReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber, conn) {
+		/**
+		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		console.log('test');
+
+		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit',
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber]
+		);
+
+		console.log('test', allGroupThreeDReadings);
+
+		//TODO I used the same algorithm that Chris updated in getThreeDReadings so we need to confirm that i will work for
+		// this function. 
+
+		const xData = [];
+		const yData = [];
+		const zData = [];
+
+		const numOfReadings = allGroupThreeDReadings.length;
+		// If no readings, do nothing and return empty arrays
+		if (numOfReadings > 0) {
+			const readingsPerDay = 24 / sequenceNumber;
+			// get the number of days days between start and end timestamps * readings per day.
+			const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
+
+			let readingsToReturn = allGroupThreeDReadings;
+			// Run Fill holes algorithm if expected num of readings to not match received reading count.
+			if (allGroupThreeDReadings.length !== expectedNumOfReadings) {
+				console.log('Running!');
+				// Check if query returned data with the first or last values missing 
+				if (allGroupThreeDReadings[0].start_timestamp === fromTimestamp) {
+
+					// push null reading start timestamp to the front of array
+					allGroupThreeDReadings.unshift({
+						reading_rate: null,
+						start_timestamp_timestamp: fromTimestamp,
+						end_timestamp: fromTimestamp
+					})
+				}
+				if (allGroupThreeDReadings[0].end_timestamp === toTimestamp) {
+					// push null reading end timestamp to end of array
+					allGroupThreeDReadings.push({
+						reading_rate: null,
+						start_timestamp_timestamp: toTimestamp,
+						end_timestamp: toTimestamp
+					})
+				}
+
+				let missingReadings = [];
+				allGroupThreeDReadings.forEach((reading, index, arr) => {
+					// If the next index is defined, and current / next timestamps don't overlap fill the gap.
+					if (arr[index + 1] && arr[index].end_timestamp.valueOf() !== arr[index + 1].start_timestamp.valueOf()) {
+						const currEndTimestamp = arr[index].end_timestamp;
+						const targetStartTimestamp = arr[index + 1].start_timestamp;
+						let nextStartTimeStamp = currEndTimestamp.clone();
+						let nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						//Push missing null readings until the readings overlap
+						do {
+							missingReadings.push({
+								reading_rate: null,
+								start_timestamp: nextStartTimeStamp,
+								end_timestamp: nextEndTimeStamp
+							})
+
+							nextStartTimeStamp = nextEndTimeStamp.clone();
+							nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
+					}
+				});
+
+				let merged = [];
+				// Merge the Original Readings with 'hole' readings.
+				// While both arrays have values compare and push
+				while (allGroupThreeDReadings.length && missingReadings.length) {
+					if (allGroupThreeDReadings[0].start_timestamp.valueOf() < missingReadings[0].start_timestamp.valueOf()) {
+						merged.push(allGroupThreeDReadings.shift());
+					} else {
+						merged.push(missingReadings.shift());
+					}
+				}
+				// Push remaining values, if any
+				while (allGroupThreeDReadings.length) {
+					merged.push(allMeterThreeDReadings.shift());
+				}
+				// Push remaining values, if any
+				while (missingReadings.length) {
+					merged.push(missingReadings.shift());
+				}
+				readingsToReturn = merged;
+			}
+			// Format readings.
+			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+			chunkedReadings.forEach(day => {
+				let dayReadings = [];
+				// Data data may need to be converted into 'moment' to save on network load
+				yData.push(day[0].start_timestamp.valueOf());
+
+				day.forEach(hour => dayReadings.push(hour.reading_rate));
+				zData.push(dayReadings);
+			});
+		}
+
+		const groupThreeDData = {
+			xData: xData,
+			yData: yData,
+			zData: zData
+		}
+
+		//console.log(groupThreeDData);
+
+		return groupThreeDData;
+	
 	}
 
 	toString() {
