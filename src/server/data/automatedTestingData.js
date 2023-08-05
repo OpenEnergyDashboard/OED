@@ -610,168 +610,168 @@ async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	const specialConversions = [
 		{
-			sourceId: 'kWh',
-			destinationId: '100 w bulb',
+			sourceName: 'kWh',
+			destinationName: '100 w bulb',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'kWh → 100 w bulb'
 		},
 		{
-			sourceId: 'kWh',
-			destinationId: 'MJ',
+			sourceName: 'kWh',
+			destinationName: 'MJ',
 			bidirectional: true,
 			slope: 3.6,
 			intercept: 0,
 			note: 'kWh → MJ'
 		},
 		{
-			sourceId: 'Electric_Utility',
-			destinationId: 'kWh',
+			sourceName: 'Electric_Utility',
+			destinationName: 'kWh',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Electric_Utility → kWh'
 		},
 		{
-			sourceId: 'Electric_Utility',
-			destinationId: 'US dollar',
+			sourceName: 'Electric_Utility',
+			destinationName: 'US dollar',
 			bidirectional: false,
 			slope: 0.115,
 			intercept: 0,
 			note: 'Electric_Utility → US dollar'
 		},
 		{
-			sourceId: 'Electric_Utility',
-			destinationId: 'kg CO₂',
+			sourceName: 'Electric_Utility',
+			destinationName: 'kg CO₂',
 			bidirectional: false,
 			slope: 0.709,
 			intercept: 0,
 			note: 'Electric_Utility → CO2'
 		},
 		{
-			sourceId: 'Natural_Gas_BTU',
-			destinationId: 'BTU',
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'BTU',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Natural_Gas_BTU → BTU'
 		},
 		{
-			sourceId: 'Natural_Gas_BTU',
-			destinationId: 'euro',
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'euro',
 			bidirectional: false,
 			slope: 2.6e-6,
 			intercept: 0,
 			note: 'Natural_Gas_BTU → euro'
 		},
 		{
-			sourceId: 'Natural_Gas_BTU',
-			destinationId: 'kg CO₂',
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'kg CO₂',
 			bidirectional: false,
 			slope: 5.28e-5,
 			intercept: 0,
 			note: 'Natural_Gas_BTU → CO2'
 		},
 		{
-			sourceId: 'Natural_Gas_M3',
-			destinationId: 'm³ gas',
+			sourceName: 'Natural_Gas_M3',
+			destinationName: 'm³ gas',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Natural_Gas_M3 → m3 of gas'
 		},
 		{
-			sourceId: 'Natural_Gas_M3',
-			destinationId: 'US dollar',
+			sourceName: 'Natural_Gas_M3',
+			destinationName: 'US dollar',
 			bidirectional: false,
 			slope: 0.11,
 			intercept: 0,
 			note: 'Natural_Gas_M3 → US dollar'
 		},
 		{
-			sourceId: 'Water_Gallon',
-			destinationId: 'gallon',
+			sourceName: 'Water_Gallon',
+			destinationName: 'gallon',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Water_Gallon → gallon'
 		},
 		{
-			sourceId: 'liter',
-			destinationId: 'gallon',
+			sourceName: 'liter',
+			destinationName: 'gallon',
 			bidirectional: true,
 			slope: 0.2641729,
 			intercept: 0,
 			note: 'liter → gallon'
 		},
 		{
-			sourceId: 'US dollar',
-			destinationId: 'euro',
+			sourceName: 'US dollar',
+			destinationName: 'euro',
 			bidirectional: true,
 			slope: 0.88,
 			intercept: 0,
 			note: 'US dollar → euro'
 		},
 		{
-			sourceId: 'Natural_Gas_Dollar',
-			destinationId: 'US dollar',
+			sourceName: 'Natural_Gas_Dollar',
+			destinationName: 'US dollar',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Natural_Gas_Dollar → US dollar'
 		},
 		{
-			sourceId: 'kg CO₂',
-			destinationId: 'kg',
+			sourceName: 'kg CO₂',
+			destinationName: 'kg',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'CO2 → kg'
 		},
 		{
-			sourceId: 'Trash',
-			destinationId: 'kg CO₂',
+			sourceName: 'Trash',
+			destinationName: 'kg CO₂',
 			bidirectional: false,
 			slope: 3.24e-6,
 			intercept: 0,
 			note: 'Trash → CO2'
 		},
 		{
-			sourceId: 'Trash',
-			destinationId: 'kg',
+			sourceName: 'Trash',
+			destinationName: 'kg',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Trash → kg'
 		},
 		{
-			sourceId: 'Temperature_Fahrenheit',
-			destinationId: 'Fahrenheit',
+			sourceName: 'Temperature_Fahrenheit',
+			destinationName: 'Fahrenheit',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Temperature_Fahrenheit → Fahrenheit'
 		},
 		{
-			sourceId: 'Electric_kW',
-			destinationId: 'kW',
+			sourceName: 'Electric_kW',
+			destinationName: 'kW',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Electric_kW → kW'
 		},
 		{
-			sourceId: 'Water_Gallon_Per_Minute',
-			destinationId: 'gallon per minute',
+			sourceName: 'Water_Gallon_Per_Minute',
+			destinationName: 'gallon per minute',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,
 			note: 'Water_Gallon_Per_Minute → gallon per minute'
 		},
 		{
-			sourceId: 'gallon per minute',
-			destinationId: 'liter per hour',
+			sourceName: 'gallon per minute',
+			destinationName: 'liter per hour',
 			bidirectional: true,
 			slope: 227.12398,
 			intercept: 0,

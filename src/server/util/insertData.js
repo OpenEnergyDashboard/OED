@@ -20,26 +20,51 @@ const fs = require('fs').promises;
 async function insertUnits(unitsToInsert, update = false, conn) {
 	await Promise.all(unitsToInsert.map(
 		async unitData => {
-			const dbUnit = await Unit.getByName(unitData.name, conn);
-			if (dbUnit === null) {
-				// The unit does not exist so add it.
-				await new Unit(undefined, unitData.name, unitData.identifier, unitData.unitRepresent, unitData.secInRate,
-					unitData.typeOfUnit, null, unitData.suffix, unitData.displayable, unitData.preferredDisplay, unitData.note).insert(conn);
-			} else if (update) {
-				// Asked to update so will. Does not bother to check if no changes.
-				dbUnit.name = unitData.name;
-				dbUnit.identifier = unitData.identifier;
-				dbUnit.unitRepresent = unitData.unitRepresent;
-				dbUnit.secInRate = unitData.secInRate;
-				dbUnit.typeOfUnit = unitData.typeOfUnit;
-				dbUnit.suffix = unitData.suffix;
-				dbUnit.displayable = unitData.displayable;
-				dbUnit.preferredDisplay = unitData.preferredDisplay;
-				dbUnit.note = unitData.note;
-				// Should update even though exists.
-				await dbUnit.update(conn);
+			let ok = true;
+			for (let i = 0; i < unitsToInsert.length; ++i) {
+				// Meter key/value pairs for the current meter.
+				const uData = unitsToInsert[i];
+		
+				// Check that needed keys are there.
+				const requiredKeys = ['name', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'];
+				ok = true;
+				requiredKeys.forEach(key => {
+					if ((key == 'name') && (typeof uData[key] !== 'string')){
+						console.log(`********key "${key}" is required but missing so unit number ${i} not processed`);
+						ok = false;
+					}
+					if (((key == 'unitRepresent') || (key == 'typeOfUnit') || (key == 'displayable')) && (typeof uData[key] !== 'string')){
+						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
+						ok = false;
+					}
+					if ((key == 'preferredDisplay') && (typeof uData[key] !== 'boolean')){
+						console.log(`********key "${key}" is required but missing so unit number ${i} not processed`);
+						ok = false;
+					}
+				})
 			}
-			// Otherwise do not update.
+			if (ok) {
+				const dbUnit = await Unit.getByName(unitData.name, conn);
+				if (dbUnit === null) {
+					// The unit does not exist so add it.
+					await new Unit(undefined, unitData.name, unitData.identifier, unitData.unitRepresent, unitData.secInRate,
+						unitData.typeOfUnit, null, unitData.suffix, unitData.displayable, unitData.preferredDisplay, unitData.note).insert(conn);
+				} else if (update) {
+					// Asked to update so will. Does not bother to check if no changes.
+					dbUnit.name = unitData.name;
+					dbUnit.identifier = unitData.identifier;
+					dbUnit.unitRepresent = unitData.unitRepresent;
+					dbUnit.secInRate = unitData.secInRate;
+					dbUnit.typeOfUnit = unitData.typeOfUnit;
+					dbUnit.suffix = unitData.suffix;
+					dbUnit.displayable = unitData.displayable;
+					dbUnit.preferredDisplay = unitData.preferredDisplay;
+					dbUnit.note = unitData.note;
+					// Should update even though exists.
+					await dbUnit.update(conn);
+					// Otherwise do not update.
+				}
+			}
 		}
 	));
 }
@@ -175,10 +200,35 @@ async function insertStandardUnits(conn) {
 async function insertConversions(conversionsToInsert, conn) {
 	await Promise.all(conversionsToInsert.map(
 		async conversionData => {
-			const sourceId = (await Unit.getByName(conversionData.sourceId, conn)).id;
-			const destinationId = (await Unit.getByName(conversionData.destinationId, conn)).id;
-			if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
-				await new Conversion(sourceId, destinationId, conversionData.bidirectional, conversionData.slope, conversionData.intercept, conversionData.note).insert(conn);
+			let ok = true;
+			for (let i = 0; i < conversionsToInsert.length; ++i) {
+				// Meter key/value pairs for the current meter.
+				const cData = conversionsToInsert[i];
+		
+				// Check that needed keys are there.
+				const requiredKeys = ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'];
+				ok = true;
+				requiredKeys.forEach(key => {
+					if (((key == 'sourceName') || (key == 'destinationName')) && (typeof cData[key] !== 'string')){
+						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
+						ok = false;
+					}
+					if ((key == 'bidirectional') && (typeof cData[key] !== 'boolean')){
+						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
+						ok = false;
+					}
+					if (((key == 'slope') || (key == 'intercept')) && (typeof cData[key] !== 'number')){
+						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
+						ok = false;
+					}
+				})
+			}
+			if (ok) {
+				const sourceName = (await Unit.getByName(conversionData.sourceName, conn)).id;
+				const destinationName = (await Unit.getByName(conversionData.destinationName, conn)).id;
+				if (await Conversion.getBySourceDestination(sourceName, destinationName, conn) === null) {
+					await new Conversion(sourceName, destinationName, conversionData.bidirectional, conversionData.slope, conversionData.intercept, conversionData.note).insert(conn);
+				}
 			}
 		}
 	));
@@ -192,48 +242,48 @@ async function insertStandardConversions(conn) {
 	// The table contains standard conversions' data.
 	const standardConversions = [
 		{
-			sourceId: 'kWh',
-			destinationId: 'BTU',
+			sourceName: 'kWh',
+			destinationName: 'BTU',
 			bidirectional: true,
 			slope: 3412.142,
 			intercept: 0,
 			note: 'OED created kWh → BTU'
 		},
 		{
-			sourceId: 'BTU',
-			destinationId: 'm³ gas',
+			sourceName: 'BTU',
+			destinationName: 'm³ gas',
 			bidirectional: true,
 			slope: 9.625,
 			intercept: 0,
 			note: 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'
 		},
 		{
-			sourceId: 'kg',
-			destinationId: 'metric ton',
+			sourceName: 'kg',
+			destinationName: 'metric ton',
 			bidirectional: true,
 			slope: 1e-3,
 			intercept: 0,
 			note: 'OED created kg → Metric ton'
 		},
 		{
-			sourceId: 'liter',
-			destinationId: 'gallon',
+			sourceName: 'liter',
+			destinationName: 'gallon',
 			bidirectional: true,
 			slope: 0.2641729,
 			intercept: 0,
 			note: 'OED created liter → gallon'
 		},
 		{
-			sourceId: 'Celsius',
-			destinationId: 'Fahrenheit',
+			sourceName: 'Celsius',
+			destinationName: 'Fahrenheit',
 			bidirectional: true,
 			slope: 1.8,
 			intercept: 32,
 			note: 'OED created Celsius → Fahrenheit'
 		},
 		{
-			sourceId: 'Electric_Utility',
-			destinationId: 'kWh',
+			sourceName: 'Electric_Utility',
+			destinationName: 'kWh',
 			bidirectional: false,
 			slope: 1,
 			intercept: 0,

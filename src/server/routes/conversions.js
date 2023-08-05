@@ -13,7 +13,7 @@ const router = express.Router();
 
 function formatConversionForResponse(item) {
 	return {
-		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, intercept: item.intercept, note: item.note
+		sourceName: item.sourceName, destinationName: item.destinationName, bidirectional: item.bidirectional, slope: item.slope, intercept: item.intercept, note: item.note
 	};
 }
 
@@ -36,14 +36,14 @@ router.get('/', async (req, res) => {
 router.post('/edit', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
+		required: ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'],
 		properties: {
-			sourceId: {
+			sourceName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
 			},
-			destinationId: {
+			destinationName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
@@ -73,7 +73,7 @@ router.post('/edit', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
-			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
+			const updatedConversion = new Conversion(req.body.sourceName, req.body.destinationName, req.body.bidirectional,
 				req.body.slope, req.body.intercept, req.body.note);
 			await updatedConversion.update(conn);
 		} catch (err) {
@@ -90,14 +90,14 @@ router.post('/edit', async (req, res) => {
 router.post('/addConversion', async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
+		required: ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'],
 		properties: {
-			sourceId: {
+			sourceName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
 			},
-			destinationId: {
+			destinationName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
@@ -128,8 +128,8 @@ router.post('/addConversion', async (req, res) => {
 		try {
 			await conn.tx(async t => {
 				const newConversion = new Conversion(
-					req.body.sourceId,
-					req.body.destinationId,
+					req.body.sourceName,
+					req.body.destinationName,
 					req.body.bidirectional,
 					req.body.slope,
 					req.body.intercept,
@@ -152,14 +152,14 @@ router.post('/delete', async (req, res) => {
 	// Only require a source and destination id
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId'],
+		required: ['sourceName', 'destinationName'],
 		properties: {
-			sourceId: {
+			sourceName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
 			},
-			destinationId: {
+			destinationName: {
 				type: 'number',
 				// Do not allow negatives for now
 				minimum: 0
@@ -177,12 +177,12 @@ router.post('/delete', async (req, res) => {
 		try {
 			// Don't worry about checking if the conversion already exists
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
+			await Conversion.delete(req.body.sourceName, req.body.destinationName, conn);
 		} catch (err) {
 			log.error(`Error while deleting conversion with error(s): ${err}`);
             failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
 		}
-		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
+		success(res, `Successfully deleted conversion ${req.body.sourceName} -> ${req.body.destinationName}`);
 	}
 });
 

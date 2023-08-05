@@ -88,9 +88,9 @@ async function pathConversion(path, conn) {
 	let intercept = 0;
 	let suffix = '';
 	for (let i = 0; i < path.length - 1; ++i) {
-		const sourceId = path[i].id;
-		const destinationId = path[i + 1].id;
-		const [newSlope, newIntercept, newSuffix] = await conversionValues(sourceId, destinationId, conn);
+		const sourceName = path[i].id;
+		const destinationName = path[i + 1].id;
+		const [newSlope, newIntercept, newSuffix] = await conversionValues(sourceName, destinationName, conn);
 		// Updates the path conversion for this new edge.
 		[slope, intercept] = updatedConversion(slope, intercept, newSlope, newIntercept);
 		// Updates the suffix for this new edge.

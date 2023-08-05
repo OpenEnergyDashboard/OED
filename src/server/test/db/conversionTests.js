@@ -12,8 +12,8 @@ const Unit = require('../../models/Unit');
  * @param {*} actual The actual conversion.
  */
 function expectConversionToBeEquivalent(expected, actual) {
-	expect(actual).to.have.property('sourceId', expected.sourceId);
-	expect(actual).to.have.property('destinationId', expected.destinationId);
+	expect(actual).to.have.property('sourceName', expected.sourceName);
+	expect(actual).to.have.property('destinationName', expected.destinationName);
 	expect(actual).to.have.property('bidirectional', expected.bidirectional);
 	expect(actual).to.have.property('slope', expected.slope);
 	expect(actual).to.have.property('intercept', expected.intercept);
@@ -49,7 +49,7 @@ mocha.describe('Conversions', () => {
 		const conversionPreInsert = new Conversion(unitAId, unitBId, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
 		
-		// Updates the conversion. Note that the sourceId and destinationId can't be changed.
+		// Updates the conversion. Note that the sourceName and destinationName can't be changed.
 		conversionPreInsert.bidirectional = false;
 		conversionPreInsert.intercept = 3.14;
 		conversionPreInsert.note = 'New note';

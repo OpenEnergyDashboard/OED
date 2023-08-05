@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 INSERT INTO conversions(source_id, destination_id, bidirectional, slope, intercept, note)
-VALUES (${sourceId}, ${destinationId}, ${bidirectional}, ${slope}, ${intercept}, ${note});
+VALUES (${sourceName}, ${destinationName}, ${bidirectional}, ${slope}, ${intercept}, ${note});

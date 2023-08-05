@@ -7,4 +7,4 @@ UPDATE conversions
         slope = ${slope},
         intercept = ${intercept},
         note = ${note}
-	WHERE source_id = ${sourceId} AND destination_id = ${destinationId};
+	WHERE source_id = ${sourceName} AND destination_id = ${destinationName};

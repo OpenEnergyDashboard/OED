@@ -144,8 +144,8 @@ const unitDatakWh = [
 ];
 const conversionDatakWh = [
 	{
-		sourceId: 'Electric_Utility',
-		destinationId: 'kWh',
+		sourceName: 'Electric_Utility',
+		destinationName: 'kWh',
 		bidirectional: false,
 		slope: 1,
 		intercept: 0,
@@ -393,8 +393,8 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Electric',
-							destinationId: 'kW',
+							sourceName: 'Electric',
+							destinationName: 'kW',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
@@ -453,8 +453,8 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
@@ -502,8 +502,8 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'kWh',
-							destinationId: 'MJ',
+							sourceName: 'kWh',
+							destinationName: 'MJ',
 							bidirectional: true,
 							slope: 3.6,
 							intercept: 0,
@@ -551,8 +551,8 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'MJ',
-							destinationId: 'kWh',
+							sourceName: 'MJ',
+							destinationName: 'kWh',
 							bidirectional: true,
 							slope: 1 / 3.6,
 							intercept: 0,
@@ -611,16 +611,16 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'kWh',
-							destinationId: 'MJ',
+							sourceName: 'kWh',
+							destinationName: 'MJ',
 							bidirectional: true,
 							slope: 3.6,
 							intercept: 0,
 							note: 'kWh → MJ'
 						},
 						{
-							sourceId: 'MJ',
-							destinationId: 'BTU',
+							sourceName: 'MJ',
+							destinationName: 'BTU',
 							bidirectional: true,
 							slope: 947.8,
 							intercept: 0,
@@ -680,16 +680,16 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'MJ',
-							destinationId: 'kWh',
+							sourceName: 'MJ',
+							destinationName: 'kWh',
 							bidirectional: true,
 							slope: 1 / 3.6,
 							intercept: 0,
 							note: 'MJ → KWh'
 						},
 						{
-							sourceId: 'MJ',
-							destinationId: 'BTU',
+							sourceName: 'MJ',
+							destinationName: 'BTU',
 							bidirectional: true,
 							slope: 947.8,
 							intercept: 0,
@@ -737,8 +737,8 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'kWh',
-							destinationId: 'MJ',
+							sourceName: 'kWh',
+							destinationName: 'MJ',
 							bidirectional: true,
 							slope: 3.6,
 							intercept: 0,
@@ -808,16 +808,16 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'C',
-							destinationId: 'F',
+							sourceName: 'C',
+							destinationName: 'F',
 							bidirectional: true,
 							slope: 1.8,
 							intercept: 32,
@@ -865,8 +865,8 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceId: 'kWh',
-							destinationId: 'MJ',
+							sourceName: 'kWh',
+							destinationName: 'MJ',
 							bidirectional: true,
 							slope: 3.6,
 							intercept: 0,
@@ -936,16 +936,16 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'C',
-							destinationId: 'F',
+							sourceName: 'C',
+							destinationName: 'F',
 							bidirectional: true,
 							slope: 1.8,
 							intercept: 32,
@@ -1016,16 +1016,16 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'C',
-							destinationId: 'F',
+							sourceName: 'C',
+							destinationName: 'F',
 							bidirectional: true,
 							slope: 1.8,
 							intercept: 32,
@@ -1096,16 +1096,16 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'F',
-							destinationId: 'C',
+							sourceName: 'F',
+							destinationName: 'C',
 							bidirectional: true,
 							slope: 1 / 1.8,
 							intercept: -32 / 1.8,
@@ -1166,8 +1166,8 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Thing_36',
-							destinationId: 'thing unit',
+							sourceName: 'Thing_36',
+							destinationName: 'thing unit',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
@@ -1248,24 +1248,24 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'C',
-							destinationId: 'F',
+							sourceName: 'C',
+							destinationName: 'F',
 							bidirectional: true,
 							slope: 1.8,
 							intercept: 32,
 							note: 'Celsius → Fahrenheit'
 						},
 						{
-							sourceId: 'F',
-							destinationId: 'Widget',
+							sourceName: 'F',
+							destinationName: 'Widget',
 							bidirectional: true,
 							slope: 5,
 							intercept: 3,
@@ -1346,24 +1346,24 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Degrees',
-							destinationId: 'C',
+							sourceName: 'Degrees',
+							destinationName: 'C',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'Degrees → C'
 						},
 						{
-							sourceId: 'F',
-							destinationId: 'C',
+							sourceName: 'F',
+							destinationName: 'C',
 							bidirectional: true,
 							slope: 1 / 1.8,
 							intercept: -32 / 1.8,
 							note: 'Fahrenheit → Celsius'
 						},
 						{
-							sourceId: 'Widget',
-							destinationId: 'F',
+							sourceName: 'Widget',
+							destinationName: 'F',
 							bidirectional: true,
 							slope: 0.2,
 							intercept: -3 / 5,
@@ -1444,24 +1444,24 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'Electric_Utility',
-							destinationId: 'kg CO₂',
+							sourceName: 'Electric_Utility',
+							destinationName: 'kg CO₂',
 							bidirectional: false,
 							slope: 0.709,
 							intercept: 0,
 							note: 'Electric_Utility → kg CO₂'
 						},
 						{
-							sourceId: 'kg CO₂',
-							destinationId: 'kg',
+							sourceName: 'kg CO₂',
+							destinationName: 'kg',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,
 							note: 'CO₂ → kg'
 						},
 						{
-							sourceId: 'kg',
-							destinationId: 'metric ton',
+							sourceName: 'kg',
+							destinationName: 'metric ton',
 							bidirectional: true,
 							slope: 1e-3,
 							intercept: 0,
@@ -1520,8 +1520,8 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
-							sourceId: 'invalidUnit',
-							destinationId: 'kWh',
+							sourceName: 'invalidUnit',
+							destinationName: 'kWh',
 							bidirectional: false,
 							slope: 1,
 							intercept: 0,

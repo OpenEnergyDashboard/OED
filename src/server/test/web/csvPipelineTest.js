@@ -499,8 +499,8 @@ for (let fileKey in testCases) {
 			// Create conversions from meter units to standard units.
 			const conversions = [
 				{
-					sourceId: 'Electric_Utility',
-					destinationId: 'kWh',
+					sourceName: 'Electric_Utility',
+					destinationName: 'kWh',
 					bidirectional: false,
 					slope: 1,
 					intercept: 0,
