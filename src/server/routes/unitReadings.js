@@ -308,6 +308,21 @@ function createRouter() {
 		const paramsValidationResult = validate(params, validParams);
 		return paramsValidationResult.valid;
 	}
+	function validateThreeDGroupLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['group_id'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
 
 	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
 
@@ -339,18 +354,17 @@ function createRouter() {
 		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			console.log('Success');
-			const meterID = req.params.meter_ids;
+			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const sequenceNumber = req.query.sequenceNumber;
-			const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
+			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, sequenceNumber);
 			res.json(forJson);
 		}
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
-		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+		if (!(validateThreeDGroupLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const groupID = req.params.group_id;
