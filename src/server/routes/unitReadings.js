@@ -7,10 +7,10 @@
 const express = require('express');
 const validate = require('jsonschema').validate;
 const _ = require('lodash');
-
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
+const { request } = require('chai');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -277,29 +277,89 @@ function createRouter() {
 		}
 	});
 
+	function validateMeterLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['meter_ids'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+
+	function validateThreeDMeterLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['meter_ids'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+
+	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
+
+
+	function validateMeterThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+		const validParams = {
+			type: 'object',
+			maxProperties: 3,
+			required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+			properties: {
+				timeInterval: {
+					type: 'string',
+				},
+				graphicUnitID: {
+					type: 'string',
+					pattern: '^\\d+$'
+				},
+				sequenceNumber: {
+					type: 'string',
+					pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				}
+			}
+		};
+		const paramsValidationResult = validate(queryParams, validParams);
+		return paramsValidationResult.valid;
+	}
+
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		// TODO Determine valid params and query params
-		// TODO Validate params & query params
-		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
-		// }
-		const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-		const graphicUnitID = req.query.graphicUnitId;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const sequenceNumber = req.query.sequenceNumber;
-		const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, sequenceNumber);
-		res.json(forJson);
+		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			console.log('Success');
+			const meterID = req.params.meter_ids;
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const sequenceNumber = req.query.sequenceNumber;
+			const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval, sequenceNumber);
+			res.json(forJson);
+		}
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
-		// TODO Determine valid params and query params
-		// TODO Validate params & query params
-		const groupID = req.params.group_id;
-		const graphicUnitID = req.query.graphicUnitId;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const sequenceNumber = req.query.sequenceNumber;
-		const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, sequenceNumber);
-		res.json(forJson);
-
+		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const groupID = req.params.group_id;
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const sequenceNumber = req.query.sequenceNumber;
+			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, sequenceNumber);
+			res.json(forJson);
+		}
 	});
 
 	return router;
