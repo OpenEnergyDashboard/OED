@@ -416,8 +416,7 @@ class Reading {
 
 			// get the number of days days between start and end timestamps * readings per day.
 			const readingsPerDay = 24 / sequenceNumber;
-			const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
-
+			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
 			// Run Fill holes algorithm if expected num of readings to not match received reading count.
 			if (allMeterThreeDReadings.length !== expectedNumOfReadings) {
 				const missingReadings = [];
@@ -536,7 +535,7 @@ class Reading {
 		if (numOfReadings > 0) {
 			const readingsPerDay = 24 / sequenceNumber;
 			// get the number of days days between start and end timestamps * readings per day.
-			const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
+			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
 
 			let readingsToReturn = allGroupThreeDReadings;
 			// Run Fill holes algorithm if expected num of readings to not match received reading count.
