@@ -440,7 +440,7 @@ class Reading {
 		else{
 			sortedReadings = _.sortBy(allMeterThreeDReadings, meter_reading => meter_reading.start_timestamp, 'asc');
 		}
-		console.log(sortedReadings);
+		//console.log(sortedReadings);
 		// Using Lodash.chunk Not ideal, proof of concept only;
 		// makes 2d array by chunking 24 readings into individual arrays (each array is a day). Works only if 24 hourly readings perfectly
 		// ENUM
@@ -472,7 +472,7 @@ class Reading {
 			yData: yData,
 			zData: zData
 		}
-		console.log(zData);
+		//console.log(zData);
 		return threeDData;
 	}
 
