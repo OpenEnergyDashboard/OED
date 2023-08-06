@@ -279,21 +279,21 @@ function createRouter() {
 		return paramsValidationResult.valid;
 	}
 
-	// function validateThreeDMeterLineReadingsParams(params) {
-	// 	const validParams = {
-	// 		type: 'object',
-	// 		maxProperties: 1,
-	// 		required: ['meter_ids'],
-	// 		properties: {
-	// 			meter_ids: {
-	// 				type: 'string',
-	// 				pattern: '^\d+(,\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
-	// 			}
-	// 		}
-	// 	};
-	// 	const paramsValidationResult = validate(params, validParams);
-	// 	return paramsValidationResult.valid;
-	// }
+	function validateThreeDMeterLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['meter_ids'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
 
 	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
 
@@ -322,10 +322,9 @@ function createRouter() {
 	}
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		req.query.sequenceNumber = '12';
 		console.log(req.query);
 
-		if (!(validateMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
 			console.log('Error');
 			res.sendStatus(400);
 		} else {
