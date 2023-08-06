@@ -18,6 +18,9 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
+import { timeIntervalToDateRange } from '../utils/dateRangeCompatability';
+import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -70,8 +73,8 @@ export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	};
 }
 
-export function setOptionsVisibility(visibility: boolean): t.SetOptionsVisibility {
-	return { type: ActionType.SetOptionsVisibility, visibility };
+export function toggleOptionsVisibility(): t.ToggleOptionsVisibility {
+	return { type: ActionType.ToggleOptionsVisibility };
 }
 
 function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
@@ -121,6 +124,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -135,6 +139,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -148,6 +153,7 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	}
@@ -158,6 +164,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
+		dispatch(fetchNeededThreeDReadings());
 		return Promise.resolve();
 	};
 }
@@ -171,6 +178,7 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
+			dispatch(updateThreeDTimeInterval(timeIntervalToDateRange(timeInterval)));
 			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
 		}
 		return Promise.resolve();
@@ -202,6 +210,29 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
+export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeInterval {
+	return { type: ActionType.UpdateThreeDTimeInterval, dateRange };
+}
+
+
+export function updateThreeDPrecision(readingsPerDay: t.ReadingsPerDay): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
+		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
+
+		return Promise.resolve();
+	};
+	// return { type: ActionType.UpdateThreeDPrecision, readingsPerDay };
+}
+
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
+	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup });
+		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
+		return Promise.resolve();
+	};
+}
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
@@ -229,7 +260,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	// Visual Studio indents after the first line in autoformat but ESLint does not like that in this case so override.
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
-		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
+		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
 		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
 		t.UpdateSelectedAreaUnitAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
@@ -278,7 +309,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeCompareSortingOrder(options.compareSortingOrder));
 	}
 	if (options.optionsVisibility != null) {
-		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
+		dispatchSecond.push(toggleOptionsVisibility());
 	}
 	if (options.mapID) {
 		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.

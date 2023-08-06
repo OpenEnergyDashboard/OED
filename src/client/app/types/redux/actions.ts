@@ -39,6 +39,11 @@ export enum ActionType {
 
 	RequestMeterThreeDReadings = 'REQUEST_METER_THREED_READINGS',
 	ReceiveMeterThreeDReadings = 'RECEIVE_METER_THREED_READINGS',
+	RequestGroupThreeDReadings = 'REQUEST_GROUP`_THREED_READINGS',
+	ReceiveGroupThreeDReadings = 'RECEIVE_GROUP_THREED_READINGS',
+	UpdateThreeDTimeInterval = 'UPDATE_THREED_TIME_INTERVAL',
+	UpdateThreeDReadingsPerDay = 'UPDATE_THREED_READINGS_PER_DAY',
+	UpdateThreeDMeterOrGroupInfo = 'UPDATE_TREED_METER_OR_GROUP_INFO',
 
 	UpdateSelectedMeters = 'UPDATE_SELECTED_METERS',
 	UpdateSelectedGroups = 'UPDATE_SELECTED_GROUPS',
@@ -52,7 +57,7 @@ export enum ActionType {
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	ChangeSliderRange = 'CHANGE_SLIDER_RANGE',
 	ResetRangeSliderStack = 'RESET_RANGE_SLIDER_STACK',
-	SetOptionsVisibility = 'SET_OPTIONS_VISIBILITY',
+	ToggleOptionsVisibility = 'TOGGLE_OPTIONS_VISIBILITY',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
@@ -86,6 +91,7 @@ export enum ActionType {
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
+	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',

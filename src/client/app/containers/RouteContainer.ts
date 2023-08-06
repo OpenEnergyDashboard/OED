@@ -22,7 +22,7 @@ function mapStateToProps(state: State) {
 
 	return {
 		barStacking: state.graph.barStacking,
-		defaultLanguage: state.admin.defaultLanguage,
+		selectedLanguage: state.options.selectedLanguage,
 		loggedInAsAdmin,
 		role,
 		// true if the chartlink rendering has been done.

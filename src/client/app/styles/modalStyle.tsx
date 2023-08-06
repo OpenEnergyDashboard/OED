@@ -7,7 +7,8 @@ export const formInputStyle: React.CSSProperties = {
 };
 
 export const tableStyle: React.CSSProperties = {
-	width: '100%'
+	width: '90%',
+	margin: 'auto'
 };
 
 export const requiredStyle: React.CSSProperties = {

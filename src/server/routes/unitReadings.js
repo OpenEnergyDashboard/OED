@@ -7,10 +7,10 @@
 const express = require('express');
 const validate = require('jsonschema').validate;
 const _ = require('lodash');
-
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
+const { request } = require('chai');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -199,15 +199,30 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
+ * @param sequenceNumber rate of hours per reading
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval) {
+async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequenceNumber) {
 	// TODO Determine the proper format that should be returned
 	// TODO Determine proper logic and logic placement.
 	// TODO Proper JSDOC return Values
 	const conn = getConnection();
-	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
 	return hourlyReadings;
+}
+
+/**
+ * Gets line readings for groups for the given time range
+ * @param groupIDs The group IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @param sequenceNumber rate of hours per reading
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, sequenceNumber) {
+	const conn = getConnection();
+	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
+	return groupThreeDReadings;
 }
 
 function createRouter() {
@@ -262,16 +277,103 @@ function createRouter() {
 		}
 	});
 
+	function validateMeterLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['meter_ids'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+
+	function validateThreeDMeterLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['meter_ids'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+	function validateThreeDGroupLineReadingsParams(params) {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['group_id'],
+			properties: {
+				meter_ids: {
+					type: 'string',
+					pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				}
+			}
+		};
+		const paramsValidationResult = validate(params, validParams);
+		return paramsValidationResult.valid;
+	}
+
+	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
+
+
+	function validateMeterThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+		const validParams = {
+			type: 'object',
+			maxProperties: 3,
+			required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+			properties: {
+				timeInterval: {
+					type: 'string',
+				},
+				graphicUnitID: {
+					type: 'string',
+					pattern: '^\\d+$'
+				},
+				sequenceNumber: {
+					type: 'string',
+					pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				}
+			}
+		};
+		const paramsValidationResult = validate(queryParams, validParams);
+		return paramsValidationResult.valid;
+	}
+
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		// TODO Determine valid params and query params
-		// TODO Validate params & query params
-		// if (!(validateThreeDReadingsParams(req.params) && validateThreeDReadingsQueryParams(req.query))) {
-		// }
-		const meterID = req.params.meter_ids;
-		const graphicUnitID = req.query.graphicUnitId;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const forJson = await meterThreeDReadings(meterID, graphicUnitID, timeInterval);
-		res.json(forJson);
+		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const sequenceNumber = req.query.sequenceNumber;
+			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, sequenceNumber);
+			res.json(forJson);
+		}
+	});
+
+	router.get('/threeD/groups/:group_id', async (req, res) => {
+		if (!(validateThreeDGroupLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const groupID = req.params.group_id;
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const sequenceNumber = req.query.sequenceNumber;
+			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, sequenceNumber);
+			res.json(forJson);
+		}
 	});
 
 	return router;

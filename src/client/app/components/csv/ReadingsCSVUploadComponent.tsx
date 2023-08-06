@@ -328,7 +328,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.readings.param.relaxed.parsing' />
 						</Label>
 					</FormGroup>
-					<Button type='submit'>
+					<Button color='secondary' type='submit'>
 						<FormattedMessage id='csv.submit.button' />
 					</Button>
 				</Form>

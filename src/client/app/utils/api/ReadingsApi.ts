@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { BarReadings, LineReading, LineReadings, ThreeDReading } from '../../types/readings';
+import { ReadingsPerDay } from 'types/redux/graph';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -91,13 +92,31 @@ export default class ReadingsApi {
 	 * @param meterID Meter to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingsPerDay The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @returns ThreeDReadings in sorted order
 	 */
-	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number): Promise<ThreeDReading> {
-		// const stringifiedIDs = meterIDs.join(',');
+	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
+		: Promise<ThreeDReading> {
 		return await this.backend.doGetRequest<ThreeDReading>(
 			`/api/unitReadings/threeD/meters/${meterID}`,
-			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: readingsPerDay.toString() }
+		);
+	}
+
+	/**
+	 * Gets 3D readings for a single meter in the given time range.
+	 * @param groupID Meter to query
+	 * @param timeInterval Range of time to get readings from
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingsPerDay The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns ThreeDReadings in sorted order
+	 */
+	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
+		: Promise<ThreeDReading> {
+		// TODO update api endpoint to groups hardcoded to simulate data retrieval
+		return await this.backend.doGetRequest<ThreeDReading>(
+			`/api/unitReadings/threeD/groups/${groupID}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: readingsPerDay.toString() }
 		);
 	}
 
