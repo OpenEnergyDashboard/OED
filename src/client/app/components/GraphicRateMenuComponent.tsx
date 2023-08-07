@@ -62,7 +62,6 @@ export default function GraphicRateMenuComponent() {
 							}
 						}}
 					/>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.select.rates' />
 				</div>
 			}
 		</div>
