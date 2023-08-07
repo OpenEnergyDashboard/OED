@@ -29,7 +29,7 @@ import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } f
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
-import { fetchPreferencesIfNeeded, submitPreferences} from '../../actions/admin';
+import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 interface PreferencesProps {
