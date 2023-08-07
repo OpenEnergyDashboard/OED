@@ -37,7 +37,7 @@ function convertToCSV(readings: LineReading[] | BarReading[], meter: string, uni
 		const startTimeStamp = moment.utc(reading.startTimestamp).format('YYYY-MM-DD HH:mm:ss');
 		const endTimeStamp = moment.utc(reading.endTimestamp).format('YYYY-MM-DD HH:mm:ss');
 		csvOutput += `${value},${startTimeStamp},${endTimeStamp}`;
-		// Populate the min and max columns only for LineReading types.
+		// Include min and max in export if appropraite."
 		if (showMinMax) {
 			const min = reading.min * scaling;
 			const max = reading.max * scaling;
