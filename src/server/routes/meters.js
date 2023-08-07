@@ -245,7 +245,7 @@ function validateMeterParams(params) {
 			maxVal: { type: 'bigint' },
 			minDate: { type: 'string' },
 			maxDate: { type: 'string' },
-			minError: { type: 'number' },
+			maxError: { type: 'integer' },
 			disableChecks: { type: 'bool' },
 		}
 	}
@@ -293,8 +293,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.readingFrequency,
 				req.body.minVal,
 				req.body.maxVal,
-				req.body.minDate = moment(req.body.minDate), // = req.body.minDate
-				req.body.maxDate = moment(req.body.maxDate), // = req.body.maxDate
+				req.body.minDate = moment(req.body.minDate),
+				req.body.maxDate = moment(req.body.maxDate),
 				req.body.maxError,
 				req.body.disableChecks
 			);
