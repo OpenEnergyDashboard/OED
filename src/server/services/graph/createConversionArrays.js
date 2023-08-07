@@ -71,10 +71,10 @@ async function createCikArray(graph, conn) {
 	await assignIndex(destinations, conn);
 	for (const source of sources) {
 		for (const destination of destinations) {
-			const sourceName = source.id;
-			const destinationName = destination.id;
+			const sourceId = source.id;
+			const destinationId = destination.id;
 			// The shortest path from source to destination.
-			const path = getPath(graph, sourceName, destinationName);
+			const path = getPath(graph, sourceId, destinationId);
 			// Check if the path exists.
 			// If not, we will do nothing since the array has been initialized with [Nan, Nan, ''].
 			if (path !== null) {

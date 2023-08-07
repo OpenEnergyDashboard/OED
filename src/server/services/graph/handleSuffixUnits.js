@@ -9,17 +9,17 @@ const { getAllPaths } = require('./createConversionGraph');
 
 /**
  * Adds the new unit and conversions to the database and the conversion graph.
- * @param {*} sourceName The source unit's id.
- * @param {*} destinationName The destination unit's id.
+ * @param {*} sourceId The source unit's id.
+ * @param {*} destinationId The destination unit's id.
  * @param {*} slope The conversion's slope from source to destination.
  * @param {*} intercept The conversion's intercept from source to destination.
  * @param {*} unitName The new unit's name.
  * @param {*} unitIdentifier The new unit's identifier.
  * @param {*} conn The connection to use.
  */
-async function addNewUnitAndConversion(sourceName, destinationName, slope, intercept, unitName, unitIdentifier, graph, conn) {
-	const sourceUnit = await Unit.getById(sourceName, conn);
-	const destinationUnit = await Unit.getById(destinationName, conn);
+async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn) {
+	const sourceUnit = await Unit.getById(sourceId, conn);
+	const destinationUnit = await Unit.getById(destinationId, conn);
 	// Add a new units where: name is unitName, identifier is unitIdentifier, type_of_unit is Unit.type.suffix,
 	// displayable and preferredDisplay is the same as destination.
 	// Note a type_of_unit of suffix is different than a unit with a suffix string.
@@ -30,13 +30,13 @@ async function addNewUnitAndConversion(sourceName, destinationName, slope, inter
 	await newUnit.insert(conn);
 
 	// Create the conversion from the prefix unit to this new unit.
-	const newConversion = new Conversion(sourceName, newUnit.id, false, slope, intercept,
+	const newConversion = new Conversion(sourceId, newUnit.id, false, slope, intercept,
 		`${sourceUnit.name} → ${newUnit.name} (created by OED for unit with suffix)`);
 	await newConversion.insert(conn);
 
 	// Add the new node and conversion to the graph.
 	graph.addNode(newUnit.id, newUnit.name);
-	graph.addLink(sourceName, newUnit.id);
+	graph.addLink(sourceId, newUnit.id);
 }
 
 /**
@@ -49,17 +49,17 @@ async function addNewUnitAndConversion(sourceName, destinationName, slope, inter
  * @param {*} conn The connection to use.
  */
 async function verifyConversion(expectedSlope, expectedIntercept, source, destination, graph, conn) {
-	const sourceName = source.id;
-	const destinationName = destination.id;
-	const currentConversion = await Conversion.getBySourceDestination(sourceName, destinationName, conn);
+	const sourceId = source.id;
+	const destinationId = destination.id;
+	const currentConversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
 	if (!currentConversion) {
 		// The destination suffix unit exists but the conversion doesn't.
 		// Create a new conversion with desired values.
-		const newConversion = new Conversion(sourceName, destinationName, false, expectedSlope, expectedIntercept,
+		const newConversion = new Conversion(sourceId, destinationId, false, expectedSlope, expectedIntercept,
 			`${source.name} → ${destination.name} (created by OED for unit with suffix)`);
 		// Insert the new conversion to database and graph.
 		await newConversion.insert(conn);
-		graph.addLink(sourceName, destinationName);
+		graph.addLink(sourceId, destinationId);
 	} else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
 		// While unlikely, the conversion changed so update
 		currentConversion.slope = expectedSlope;
@@ -99,11 +99,11 @@ async function hideSuffixUnit(unit, paths, graph, conn) {
 /**
  * Check if the suffix unit's displayable is the same as the destination unit.
  * @param {*} suffixUnit The suffix unit to check.
- * @param {*} destinationName The destination unit's id
+ * @param {*} destinationId The destination unit's id
  * @param {*} conn The connection to use.
  */
-async function verifyUnit(suffixUnit, destinationName, conn) {
-	const destinationUnit = await Unit.getById(destinationName, conn);
+async function verifyUnit(suffixUnit, destinationId, conn) {
+	const destinationUnit = await Unit.getById(destinationId, conn);
 	if (suffixUnit.displayable !== destinationUnit.displayable) {
 		suffixUnit.displayable = destinationUnit.displayable;
 		await suffixUnit.update(conn);
@@ -124,10 +124,10 @@ async function handleSuffixUnits(graph, conn) {
 		const paths = getAllPaths(graph, unit.id);
 		// Analyze each path
 		for (const p of paths) {
-			const sourceName = p[0].id;
-			const destinationName = p[p.length - 1].id;
+			const sourceId = p[0].id;
+			const destinationId = p[p.length - 1].id;
 			// The destination unit.
-			const destinationUnit = await Unit.getById(destinationName, conn);
+			const destinationUnit = await Unit.getById(destinationId, conn);
 			// We don't need to create any new units/conversions if the destination unit has the type of suffix or it's not displayed.
 			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX || destinationUnit.displayable === Unit.displayableType.NONE) {
 				continue;
@@ -141,10 +141,10 @@ async function handleSuffixUnits(graph, conn) {
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
 				// If not then add the new unit and conversion.
-				await addNewUnitAndConversion(sourceName, destinationName, slope, intercept, unitName, unitIdentifier, graph, conn);
+				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn);
 			} else {
 				// If it already exists then check if the unit and conversion are correct.
-				await verifyUnit(neededSuffixUnit, destinationName, conn);
+				await verifyUnit(neededSuffixUnit, destinationId, conn);
 				await verifyConversion(slope, intercept, unit, neededSuffixUnit, graph, conn);
 			}
 		}
@@ -164,13 +164,13 @@ async function handleSuffixUnits(graph, conn) {
  */
 async function removeAdditionalConversionsAndUnits(suffixUnit, conn) {
 	// Get all conversions from this suffix unit.
-	const conversions = (await Conversion.getAll(conn)).filter((conversion) => conversion.sourceName === suffixUnit.id);
+	const conversions = (await Conversion.getAll(conn)).filter((conversion) => conversion.sourceId === suffixUnit.id);
 	conversions.forEach(async (conversion) => {
-		const destinationUnit = await Unit.getById(conversion.destinationName, conn);
+		const destinationUnit = await Unit.getById(conversion.destinationId, conn);
 		// The units that OED adds are suffix unit.
 		if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
 			// Delete the conversion.
-			await Conversion.delete(conversion.sourceName, conversion.destinationName, conn);
+			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
 			// Hide the destination unit.
 			destinationUnit.displayable = Unit.displayableType.NONE;
 			await destinationUnit.update(conn);

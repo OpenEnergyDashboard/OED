@@ -7,16 +7,16 @@ const sqlFile = database.sqlFile;
 
 class Conversion {
 	/**
-	 * @param {*} sourceName The unit id of the source.
-	 * @param {*} destinationName The unit id of the destination.
+	 * @param {*} sourceId The unit id of the source.
+	 * @param {*} destinationId The unit id of the destination.
 	 * @param {*} bidirectional Is this conversion bidirectional?
 	 * @param {*} slope The slope of the conversion.
 	 * @param {*} intercept The intercept of the conversion.
 	 * @param {*} note Comments by the admin or OED inserted.
 	 */
-	constructor(sourceName, destinationName, bidirectional, slope, intercept, note) {
-		this.sourceName = sourceName;
-		this.destinationName = destinationName;
+	constructor(sourceId, destinationId, bidirectional, slope, intercept, note) {
+		this.sourceId = sourceId;
+		this.destinationId = destinationId;
 		this.bidirectional = bidirectional;
 		this.slope = slope;
 		this.intercept = intercept;

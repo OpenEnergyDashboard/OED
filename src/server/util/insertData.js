@@ -24,20 +24,16 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 			for (let i = 0; i < unitsToInsert.length; ++i) {
 				// Meter key/value pairs for the current meter.
 				const uData = unitsToInsert[i];
-		
+
 				// Check that needed keys are there.
 				const requiredKeys = ['name', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'];
 				ok = true;
 				requiredKeys.forEach(key => {
-					if ((key == 'name') && (typeof uData[key] !== 'string')){
-						console.log(`********key "${key}" is required but missing so unit number ${i} not processed`);
-						ok = false;
-					}
-					if (((key == 'unitRepresent') || (key == 'typeOfUnit') || (key == 'displayable')) && (typeof uData[key] !== 'string')){
+					if (((key == 'name') || (key == 'unitRepresent') || (key == 'typeOfUnit') || (key == 'displayable')) && (typeof uData[key] !== 'string')) {
 						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
 						ok = false;
 					}
-					if ((key == 'preferredDisplay') && (typeof uData[key] !== 'boolean')){
+					if ((key == 'preferredDisplay') && (typeof uData[key] !== 'boolean')) {
 						console.log(`********key "${key}" is required but missing so unit number ${i} not processed`);
 						ok = false;
 					}
@@ -62,8 +58,8 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 					dbUnit.note = unitData.note;
 					// Should update even though exists.
 					await dbUnit.update(conn);
-					// Otherwise do not update.
 				}
+				// Otherwise do not update.
 			}
 		}
 	));
@@ -80,10 +76,10 @@ async function insertStandardUnits(conn) {
 			name: 'kWh',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.ALL,
+			displayable: Unit.displayableType.ALL,
 			preferredDisplay: true,
 			note: 'OED created standard unit'
 		},
@@ -91,10 +87,10 @@ async function insertStandardUnits(conn) {
 			name: 'BTU',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: true,
 			note: 'OED created standard unit'
 		},
@@ -102,10 +98,10 @@ async function insertStandardUnits(conn) {
 			name: 'm³ gas',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created standard unit'
 		},
@@ -113,10 +109,10 @@ async function insertStandardUnits(conn) {
 			name: 'kg',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created standard unit'
 		},
@@ -124,10 +120,10 @@ async function insertStandardUnits(conn) {
 			name: 'metric ton',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created standard unit'
 		},
@@ -135,10 +131,10 @@ async function insertStandardUnits(conn) {
 			name: 'gallon',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: true,
 			note: 'OED created standard unit'
 		},
@@ -146,10 +142,10 @@ async function insertStandardUnits(conn) {
 			name: 'liter',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: true,
 			note: 'OED created standard unit'
 		},
@@ -157,10 +153,10 @@ async function insertStandardUnits(conn) {
 			name: 'Fahrenheit',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.RAW,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created standard unit'
 		},
@@ -168,10 +164,10 @@ async function insertStandardUnits(conn) {
 			name: 'Celsius',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.RAW,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.UNIT,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created standard unit'
 		},
@@ -179,10 +175,10 @@ async function insertStandardUnits(conn) {
 			name: 'Electric_Utility',
 			identifier: '',
 			unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate:  3600,
-			typeOfUnit:  Unit.unitType.METER,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
 			suffix: '',
-			displayable:  Unit.displayableType.NONE,
+			displayable: Unit.displayableType.NONE,
 			preferredDisplay: false,
 			note: 'OED created meter unit'
 		},
@@ -204,20 +200,20 @@ async function insertConversions(conversionsToInsert, conn) {
 			for (let i = 0; i < conversionsToInsert.length; ++i) {
 				// Meter key/value pairs for the current meter.
 				const cData = conversionsToInsert[i];
-		
+
 				// Check that needed keys are there.
 				const requiredKeys = ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'];
 				ok = true;
 				requiredKeys.forEach(key => {
-					if (((key == 'sourceName') || (key == 'destinationName')) && (typeof cData[key] !== 'string')){
+					if (((key == 'sourceName') || (key == 'destinationName')) && (typeof cData[key] !== 'string')) {
 						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
 						ok = false;
 					}
-					if ((key == 'bidirectional') && (typeof cData[key] !== 'boolean')){
+					if ((key == 'bidirectional') && (typeof cData[key] !== 'boolean')) {
 						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
 						ok = false;
 					}
-					if (((key == 'slope') || (key == 'intercept')) && (typeof cData[key] !== 'number')){
+					if (((key == 'slope') || (key == 'intercept')) && (typeof cData[key] !== 'number')) {
 						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
 						ok = false;
 					}
