@@ -219,6 +219,37 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</div>
 				}
 
+				{this.props.chartToRender === ChartTypes.radar &&
+					<div>
+						<div key='side-options'>
+							<p style={labelStyle}>
+								<FormattedMessage id='radar.interval' />:
+							</p>
+							<ButtonGroup style={zIndexFix}>
+								<Button
+									outline={this.state.barDurationDays !== 1}
+									onClick={() => this.handleBarButton(1)}
+								>
+									<FormattedMessage id='day' />
+								</Button>
+								<Button
+									outline={this.state.barDurationDays !== 7}
+									onClick={() => this.handleBarButton(7)}
+								>
+									<FormattedMessage id='week' />
+								</Button>
+								<Button
+									outline={this.state.barDurationDays !== 28}
+									onClick={() => this.handleBarButton(28)}
+								>
+									<FormattedMessage id='4.weeks' />
+								</Button>
+							</ButtonGroup>
+							<TooltipMarkerComponent page='home' helpTextId='help.home.radar.interval.tip' />
+						</div>
+					</div>
+				}
+
 				{this.props.chartToRender === ChartTypes.map &&
 					<div>
 						<div key='side-options'>
