@@ -319,20 +319,18 @@ export default function ChartDataSelectComponent() {
 
 							// Do additional things relevant to 3D graphics
 							// This block is responsible for keeping 3D state in sync with meters and group menus
-							if (dataProps.chartToRender === ChartTypes.threeD) {
-								// Variables determine whether the component change added or removed a group.
-								const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
-								const groupRemoved = !groupAdded;
-								// Reference threeDState to check if the updated meter is actively selected
-								const isActive = (difference === dataProps.threeDState.meterOrGroupID) && (dataProps.threeDState.meterOrGroup === MeterOrGroup.groups);
-								if (groupAdded) {
-									// When a meter is added, update 3D MeterOrGroup state
-									const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
-									dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.groups));
-								} else if (groupRemoved && isActive) {
-									// When a meter is removed, and is the currently active graph to render. Update ThreeDState to reflect the change.
-									dispatch(changeMeterOrGroupInfo(null));
-								}
+							// Variables determine whether the component change added or removed a group.
+							const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
+							const groupRemoved = !groupAdded;
+							// Reference threeDState to check if the updated meter is actively selected
+							const isActive = (difference === dataProps.threeDState.meterOrGroupID) && (dataProps.threeDState.meterOrGroup === MeterOrGroup.groups);
+							if (groupAdded && dataProps.chartToRender === ChartTypes.threeD) {
+								// When a meter is added, update 3D MeterOrGroup state
+								const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
+								dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.groups));
+							} else if (groupRemoved && isActive) {
+								// When a meter is removed, and is the currently active graph to render. Update ThreeDState to reflect the change.
+								dispatch(changeMeterOrGroupInfo(null));
 							}
 						}
 					}}
@@ -371,17 +369,15 @@ export default function ChartDataSelectComponent() {
 
 							// Do additional things relevant to 3D graphics
 							// This block is responsible for keeping 3D state in sync with meters and group menus
-							if (dataProps.chartToRender === ChartTypes.threeD) {
-								// Logic mirrors the group multiselect onValuesChange()
-								const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
-								const meterRemoved = !meterAdded;
-								const meterIsSelected = difference === dataProps.threeDState.meterOrGroupID;
-								if (meterAdded) {
-									const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
-									dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.meters));
-								} else if (meterRemoved && meterIsSelected) {
-									dispatch(changeMeterOrGroupInfo(null));
-								}
+							// Logic mirrors the group multiselect onValuesChange()
+							const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
+							const meterRemoved = !meterAdded;
+							const meterIsSelected = difference === dataProps.threeDState.meterOrGroupID;
+							if (meterAdded && dataProps.chartToRender === ChartTypes.threeD) {
+								const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
+								dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.meters));
+							} else if (meterRemoved && meterIsSelected) {
+								dispatch(changeMeterOrGroupInfo(null));
 							}
 						}
 					}}

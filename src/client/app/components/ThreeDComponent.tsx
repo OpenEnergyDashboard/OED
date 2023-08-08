@@ -7,7 +7,7 @@ import Plot from 'react-plotly.js';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import SpinnerComponent from './SpinnerComponent';
 import { State } from '../types/redux/state';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
 import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
 import { lineUnitLabel } from '../utils/graphics';
@@ -15,17 +15,21 @@ import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConvers
 import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
 import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
+import { Dispatch } from '../types/redux/actions';
+import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const dispatch: Dispatch = useDispatch();
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
 		// threeDState contains the currentMeterOrGroup to be fetched.
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
+		const isFetching = state.readings.threeD.isFetching;
 		// meterOrGroup Determines wether to get readings from state .byMeterID or .byGroupID
 		const meterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
 		// 3D requires intervals to be rounded to a full day.
@@ -36,6 +40,10 @@ export default function ThreeDComponent() {
 		let threeDData = null;
 		if (meterOrGroupID) {
 			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+			// If a meter is selected and no data is in state, fetch it.
+			if (!threeDData && !isFetching) {
+				dispatch(fetchNeededThreeDReadings());
+			}
 		}
 
 		let layout = {};
@@ -192,20 +200,13 @@ const threeDLayout = {
 	connectgaps: false, //Leaves holes in graph for missing, undefined, NaN, or null values.
 	scene: {
 		xaxis: {
-			title: { text: 'Hours of Day' },
-			tickfont: { size: 11 },
-			titlefont: { size: 11 }
+			title: { text: 'Hours of Day' }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year', title_standoff: 40 },
-			tickfont: { size: 11 },
-			titlefont: { size: 11 },
-			title_standoff: 40
+			title: { text: 'Days of Calendar Year' }
 		},
 		zaxis: {
-			title: { text: 'Resource Usage' },
-			tickfont: { size: 11 },
-			titlefont: { size: 11 }
+			title: { text: 'Resource Usage' }
 		},
 		aspectratio: {
 			x: 1,
