@@ -42,9 +42,11 @@ export default function ThreeDSelectComponent() {
 	if (graphState.chartToRender === ChartTypes.threeD) {
 		return (
 			<div>
-				<p style={{ fontWeight: 'bold', margin: 0 }}>{translate('readings.per.day')}</p>
+				<p style={{ fontWeight: 'bold', margin: 0 }}>
+					{`${translate('readings.per.day')}:`}
+					<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
+				</p>
 				<Select value={value} options={options} onChange={onSelectChange} />
-				<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
 			</div>
 		)
 	} else {

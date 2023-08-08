@@ -34,7 +34,10 @@ export default function ThreeDDateRangeComponent() {
 	if (chartToRender === ChartTypes.threeD)
 		return (
 			<div style={{ width: '100%' }}>
-				<p style={labelStyle}>{translate('date.range')}:</p>
+				<p style={labelStyle}>
+					{translate('date.range')}:
+					<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
+				</p>
 				<DateRangePicker
 					value={threeDTimeInterval}
 					onChange={onDatePickerChange}
@@ -47,7 +50,6 @@ export default function ThreeDDateRangeComponent() {
 					maxDate={new Date()}
 					locale={locale} // Formats Dates, and Calendar months base on locale
 				/>
-				<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
 			</div>);
 	else
 		return null;
