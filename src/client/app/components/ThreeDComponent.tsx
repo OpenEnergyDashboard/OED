@@ -137,7 +137,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		const time = moment.utc(data.xData[j]).format('h:mm A');
 		// ThreeD graphic readings can be null. If not null round the precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
-		return `Date: ${date}<br>Time: ${time}<br>${unitLabel}: ${readingValue}`;
+		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
 	// TODO find a better way to set the zAxis
 	const formattedData = [{
@@ -187,6 +187,14 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 		...threeDLayout,
 		scene: {
 			...threeDLayout.scene,
+			xaxis: {
+				...threeDLayout.scene.zaxis,
+				title: { text: translate('threeD.xAxis.label') }
+			},
+			yaxis: {
+				...threeDLayout.scene.zaxis,
+				title: { text: translate('threeD.yAxis.label') }
+			},
 			zaxis: {
 				...threeDLayout.scene.zaxis,
 				title: { text: zLabelText }
