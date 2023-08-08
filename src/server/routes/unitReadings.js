@@ -277,7 +277,8 @@ function createRouter() {
 		}
 	});
 
-	function validateMeterLineReadingsParams(params) {
+
+	function validateThreeDMeterReadingsParams(params) {
 		const validParams = {
 			type: 'object',
 			maxProperties: 1,
@@ -285,7 +286,8 @@ function createRouter() {
 			properties: {
 				meter_ids: {
 					type: 'string',
-					pattern: '^\\d+$' // Matches 1 or 1,2 or 1,2,34 (for example)
+					pattern: '^\\d+$'		// Matches a single integer value
+					// pattern: '^\\d+(,\\d+)*$'		// 3d Does not support this Matches 1 or 1,2 or 1,2,34 
 				}
 			}
 		};
@@ -293,22 +295,7 @@ function createRouter() {
 		return paramsValidationResult.valid;
 	}
 
-	function validateThreeDMeterLineReadingsParams(params) {
-		const validParams = {
-			type: 'object',
-			maxProperties: 1,
-			required: ['meter_ids'],
-			properties: {
-				meter_ids: {
-					type: 'string',
-					pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
-				}
-			}
-		};
-		const paramsValidationResult = validate(params, validParams);
-		return paramsValidationResult.valid;
-	}
-	function validateThreeDGroupLineReadingsParams(params) {
+	function validateThreeDGroupReadingsParams(params) {
 		const validParams = {
 			type: 'object',
 			maxProperties: 1,
@@ -316,7 +303,9 @@ function createRouter() {
 			properties: {
 				meter_ids: {
 					type: 'string',
-					pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+					// 3d Does not support this. Matches 1 or 1,2 or 1,2,34 
+					// pattern: '^\\d+(,\\d+)*$'		
+					pattern: '^\\d+$'		// Matches a single integer value
 				}
 			}
 		};
@@ -324,10 +313,7 @@ function createRouter() {
 		return paramsValidationResult.valid;
 	}
 
-	// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
-
-
-	function validateMeterThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+	function validateThreeDQueryParams(queryParams) {
 		const validParams = {
 			type: 'object',
 			maxProperties: 3,
@@ -342,7 +328,9 @@ function createRouter() {
 				},
 				sequenceNumber: {
 					type: 'string',
-					pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+					//factors of 24 [timeInterval, graphicUnitID, sequence]
+					// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+					pattern: '^([123468]|[1][2])$'
 				}
 			}
 		};
@@ -351,7 +339,7 @@ function createRouter() {
 	}
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		if (!(validateThreeDMeterLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+		if (!(validateThreeDMeterReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -364,7 +352,7 @@ function createRouter() {
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
-		if (!(validateThreeDGroupLineReadingsParams(req.params) && validateMeterThreeDQueryParams(req.query))) {
+		if (!(validateThreeDGroupReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const groupID = req.params.group_id;
