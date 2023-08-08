@@ -408,6 +408,7 @@ class Reading {
 		const zData = [];
 
 		const numOfReadings = allMeterThreeDReadings.length;
+		// TODO duplicate code for hole algorithm here, and groups. Consolidate and export to a utils file.
 		// If readings exist, find/replace missing readings if any, and format for plotly.
 		// Otherwise, return empty z,y,z data
 		if (numOfReadings > 0) {
@@ -515,22 +516,16 @@ class Reading {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		console.log('test');
 
 		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit',
 			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber]
 		);
-
-		console.log('test', allGroupThreeDReadings);
-
-		//TODO I used the same algorithm that Chris updated in getThreeDReadings so we need to confirm that i will work for
-		// this function. 
-
 		const xData = [];
 		const yData = [];
 		const zData = [];
 
 		const numOfReadings = allGroupThreeDReadings.length;
+		// TODO duplicate code for hole algorithm here, and groups. Consolidate and export to a utils file.
 		// If no readings, do nothing and return empty arrays
 		if (numOfReadings > 0) {
 			const readingsPerDay = 24 / sequenceNumber;
@@ -601,8 +596,6 @@ class Reading {
 			yData: yData,
 			zData: zData
 		}
-
-		//console.log(groupThreeDData);
 
 		return groupThreeDData;
 
