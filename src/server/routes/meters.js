@@ -241,8 +241,8 @@ function validateMeterParams(params) {
 				enum: Object.values(Unit.areaUnitType)
 			},
 			readingFrequency: { type: 'string' },
-			minVal: { type: 'integer' },
-			maxVal: { type: 'integer' },
+			minVal: { type: 'bigint' },
+			maxVal: { type: 'bigint' },
 			minDate: { type: 'string' },
 			maxDate: { type: 'string' },
 			maxError: { type: 'integer' },
