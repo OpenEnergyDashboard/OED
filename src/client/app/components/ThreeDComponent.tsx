@@ -137,8 +137,13 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		showlegend: false,
 		showscale: false,
 		// zmin: 0,
-		x: data.xData.map(xData => moment.utc(xData).format('h:mm A')),
-		y: data.yData.map(yData => moment.utc(yData).format('L')),
+		x: data.xData.map(xData => moment.utc(xData).clone().format('h:mm A')),
+		y: data.yData.map(yData => {
+			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
+			// TODO find better approach as full year YYYY may be desired behavior for users.
+			const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
+			return moment.utc(yData).format(localeDateFormat);
+		}),
 		z: data.zData,
 		hoverinfo: 'text',
 		hovertext: hoverText
@@ -176,7 +181,7 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 			...threeDLayout.scene,
 			zaxis: {
 				...threeDLayout.scene.zaxis,
-				title: zLabelText
+				title: { text: zLabelText }
 			}
 		}
 	}
@@ -187,12 +192,21 @@ const threeDLayout = {
 	connectgaps: false, //Leaves holes in graph for missing, undefined, NaN, or null values.
 	scene: {
 		xaxis: {
-			title: { text: 'Hours of Day' }
+			title: { text: 'Hours of Day' },
+			tickfont: { size: 11 },
+			titlefont: { size: 11 }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year', standoff: 40 }
+			title: { text: 'Days of Calendar Year', title_standoff: 40 },
+			tickfont: { size: 11 },
+			titlefont: { size: 11 },
+			title_standoff: 40
 		},
-		zaxis: { title: 'Resource Usage' },
+		zaxis: {
+			title: { text: 'Resource Usage' },
+			tickfont: { size: 11 },
+			titlefont: { size: 11 }
+		},
 		aspectratio: {
 			x: 1,
 			y: 2.75,
