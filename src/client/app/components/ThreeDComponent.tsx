@@ -16,6 +16,7 @@ import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
 import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
+import { useEffect } from 'react';
 import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 
 /**
@@ -29,7 +30,6 @@ export default function ThreeDComponent() {
 		// threeDState contains the currentMeterOrGroup to be fetched.
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
-		const isFetching = state.readings.threeD.isFetching;
 		// meterOrGroup Determines wether to get readings from state .byMeterID or .byGroupID
 		const meterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
 		// 3D requires intervals to be rounded to a full day.
@@ -41,9 +41,6 @@ export default function ThreeDComponent() {
 		if (meterOrGroupID) {
 			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
 			// If a meter is selected and no data is in state, fetch it.
-			if (!threeDData && !isFetching) {
-				dispatch(fetchNeededThreeDReadings());
-			}
 		}
 
 		let layout = {};
@@ -65,6 +62,12 @@ export default function ThreeDComponent() {
 		}
 		return [dataToRender, layout]
 	});
+
+	// Necessary for the case when a meter/group is selected and time intervals get altered externally. (Line graphic slider, for example.)
+	useEffect(() => {
+		// Fetch on initial render only, all other fetch will be called from PillBadges, or meter/group menus
+		dispatch(fetchNeededThreeDReadings());
+	}, [])
 
 	return (
 		<div style={{ width: '100%', height: '75vh' }}>
