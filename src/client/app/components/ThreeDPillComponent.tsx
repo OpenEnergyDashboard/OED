@@ -71,18 +71,40 @@ export default function ThreeDPillComponent() {
 
 // Styling for the component, may need to be converted into .css files in the future.
 const pillContainer: React.CSSProperties = {
-	display: 'flex', justifyContent: 'space-between', margin: '0px', padding: '0px', minHeight: '100px', maxHeight: '200px'
+	display: 'flex',
+	justifyContent: 'space-between',
+	margin: '0px',
+	padding: '0px',
+	minHeight: '100px',
+	maxHeight: '200px'
+
 };
 const pillBoxLabel: React.CSSProperties = {
-	alignItems: 'start', textAlign: 'left', margin: '0px', padding: '0px'
+	alignItems: 'start',
+	textAlign: 'left',
+	margin: '0px',
+	padding: '0px'
 }
 const pillBox: React.CSSProperties = {
-	display: 'flex', flexDirection: 'column', justifyContent: 'left',
-	width: '45%', maxHeight: '100%', maxWidth: '45%', overflow: 'scroll', margin: '0px', padding: '0px'
+	display: 'flex',
+	flexDirection: 'column',
+	justifyContent: 'left',
+	width: '45%',
+	maxHeight: '100%',
+	maxWidth: '45%',
+	margin: '0px',
+	padding: '0px'
 };
 const pills: React.CSSProperties = {
-	display: 'flex', flexWrap: 'wrap', justifyContent: 'left', maxHeight: '100%', overflow: 'scroll', margin: '0px', padding: '0px'
+	display: 'flex',
+	flexWrap: 'wrap',
+	justifyContent: 'left',
+	maxHeight: '100%',
+	margin: '0px',
+	padding: '0px'
 };
 const pill: React.CSSProperties = {
-	margin: '2px', userSelect: 'none', cursor: 'pointer'
+	margin: '2px',
+	userSelect: 'none',
+	cursor: 'pointer'
 }
