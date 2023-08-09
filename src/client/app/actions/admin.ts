@@ -137,8 +137,8 @@ function fetchPreferences(): Thunk {
 */
 
 function validPreferences(state: State) {
-	const MIN_VAL = Number.MIN_SAFE_INTEGER;
-	const MAX_VAL = Number.MAX_SAFE_INTEGER;
+	const MIN_VAL = Number.MIN_VALUE;
+	const MAX_VAL = Number.MAX_VALUE;
 	if (
 		state.admin.defaultMeterReadingGap >= 0 &&
 		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
