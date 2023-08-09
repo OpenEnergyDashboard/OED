@@ -93,7 +93,7 @@ function mapStateToProps(state: State) {
 							yMinData.push(minValue);
 							const maxValue = reading.max * scaling;
 							yMaxData.push(maxValue);
-							hoverText.push(`${hoverStart} <br> min: ${minValue.toPrecision(6)} <br> max: ${maxValue.toPrecision(6)}`);
+							hoverText.push(`${hoverStart} <br> ${translate('min')}: ${minValue.toPrecision(6)} <br> ${translate('max')}: ${maxValue.toPrecision(6)}`);
 						} else {
 							hoverText.push(hoverStart);
 						}
