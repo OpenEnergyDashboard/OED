@@ -7,7 +7,6 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 
 export enum ChartTypes {
 	line = 'line',
@@ -116,11 +115,6 @@ export interface ConfirmGraphRenderOnce {
 	type: ActionType.ConfirmGraphRenderOnce;
 }
 
-export interface UpdateThreeDTimeInterval {
-	type: ActionType.UpdateThreeDTimeInterval;
-	dateRange: Value;
-}
-
 export interface UpdateThreeDReadingsPerDay {
 	type: ActionType.UpdateThreeDReadingsPerDay;
 	readingsPerDay: ReadingsPerDay;
@@ -149,7 +143,6 @@ export type GraphAction =
 	| ToggleOptionsVisibility
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce
-	| UpdateThreeDTimeInterval
 	| UpdateThreeDReadingsPerDay
 	| UpdateThreeDMeterOrGroupInfo;
 
@@ -166,7 +159,6 @@ export interface ThreeDState {
 	meterOrGroupID: MeterOrGroupID;
 	meterOrGroup: MeterOrGroup;
 	readingsPerDay: ReadingsPerDay;
-	timeInterval: Value;
 }
 
 export interface GraphState {

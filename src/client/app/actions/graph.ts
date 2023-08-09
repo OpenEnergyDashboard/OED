@@ -18,8 +18,6 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
-import { timeIntervalToDateRange } from '../utils/dateRangeCompatability';
 import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
@@ -178,7 +176,6 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
-			dispatch(updateThreeDTimeInterval(timeIntervalToDateRange(timeInterval)));
 			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
 		}
 		return Promise.resolve();
@@ -210,11 +207,6 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
-export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeInterval {
-	return { type: ActionType.UpdateThreeDTimeInterval, dateRange };
-}
-
-
 export function updateThreeDPrecision(readingsPerDay: t.ReadingsPerDay): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
@@ -222,7 +214,6 @@ export function updateThreeDPrecision(readingsPerDay: t.ReadingsPerDay): Thunk {
 
 		return Promise.resolve();
 	};
-	// return { type: ActionType.UpdateThreeDPrecision, readingsPerDay };
 }
 
 export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {

@@ -401,7 +401,7 @@ const localeData = {
 		"threeD.dateRange.too.long": 'Date Range Must be a year or less',
 		"threeD.rendering": "Rendering",
 		"threeD.noData": "No Data In Date Range",
-		"threeD.time": "time",
+		"threeD.time": "Time",
 		"threeD.xAxis.label": "Hours of Day",
 		"threeD.yAxis.label": "Days of Calendar Year",
 		"today": "Today",
