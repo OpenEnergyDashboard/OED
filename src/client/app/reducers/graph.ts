@@ -99,7 +99,6 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				showMinMax: !state.showMinMax
 			};
-
 		case ActionType.ChangeBarStacking:
 			return {
 				...state,
