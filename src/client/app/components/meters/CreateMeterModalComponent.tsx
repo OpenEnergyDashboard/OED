@@ -23,6 +23,7 @@ import { ConversionArray } from '../../types/conversionArray';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 
 // TODO Moved the possible meters/graphic units calculations up to the details component
@@ -39,7 +40,7 @@ interface CreateMeterModalComponentProps {
  */
 export default function CreateMeterModalComponent(props: CreateMeterModalComponentProps) {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Admin state so can get the default reading frequency.
 	const adminState = useSelector((state: State) => state.admin)

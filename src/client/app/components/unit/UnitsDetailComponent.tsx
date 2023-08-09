@@ -15,6 +15,7 @@ import CreateUnitModalComponent from './CreateUnitModalComponent';
 import { UnitData } from 'types/redux/units';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the units page card view
@@ -23,7 +24,7 @@ import HeaderComponent from '../../components/HeaderComponent';
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state

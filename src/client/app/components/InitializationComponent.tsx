@@ -17,6 +17,7 @@ import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Initializes OED redux with needed details
@@ -24,7 +25,7 @@ import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
  */
 export default function InitializationComponent() {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	let notificationSystem: NotificationSystem;
 
