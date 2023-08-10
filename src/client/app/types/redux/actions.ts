@@ -19,9 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	ShowNotification = 'SHOW_NOTIFICATION',
-	ClearNotifications = 'CLEAR_NOTIFICATIONS',
-
 	RequestGroupBarReadings = 'REQUEST_GROUP_BAR_READINGS',
 	ReceiveGroupBarReadings = 'RECEIVE_GROUP_BAR_READINGS',
 	RequestMeterBarReadings = 'REQUEST_METER_BAR_READINGS',
