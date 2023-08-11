@@ -141,8 +141,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		Maximum No of Error must be between 0 and 75
 	*/
 	const [validMeter, setValidMeter] = useState(false);
-	const MIN_VAL = Number.MIN_VALUE;
-	const MAX_VAL = Number.MAX_VALUE;
+	const MIN_VAL = Number.MIN_SAFE_INTEGER;
+	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	const MIN_DATE_MOMENT = moment(0).utc();
 	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
 	const MIN_DATE_STRING = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ');

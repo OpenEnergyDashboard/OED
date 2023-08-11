@@ -20,9 +20,7 @@ mocha.describe('Baselines', () => {
 		// TODO: If used note this does not have the more recent meter values.
 		// Meter(id: any, name: any, url: any, enabled: any, displayable: any, type: any, meterTimezone: any, 
 		// gps: undefined, identifier: any, note: any, area?: number, cumulative?: boolean, cumulativeReset?: boolean, cumulativeResetStart?: string, cumulativeResetEnd?: string, readingGap?: number, readingVariation?: number, readingDuplication?: number, timeSort?: string, endOnlyTime?: boolean, reading?: number, startTimestamp?: string, endTimestamp?: string, previousEnd?: moment.Moment, unitId?: number, defaultGraphicUnit?: number, areaUnit?: "none", readingFrequency?: string, minVal?: number, maxVal?: number, minDate?: string, maxDate?: string, maxError?: number, disableChecks?: boolean)
-		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps,
-		null, any, null, false, false, null, null, 1, 1, 1, null, true, 1, null, null, null, null, 
-		null, "none", null, 1, 100, moment.utc(), moment.utc().add(5000), 75, true);
+		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps);
 		console.log(meter);
 		await meter.insert(conn);
 		console.log('after meter.insert(conn)')

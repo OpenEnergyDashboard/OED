@@ -18,7 +18,7 @@ IF NOT EXISTS(SELECT *
 	default_area_normalization, default_area_unit, default_meter_reading_frequency, 
 	default_meter_minimum_value, default_meter_maximum_value, default_meter_minimum_date, 
 	default_meter_maximum_date, default_meter_reading_gap, default_meter_maximum_errors) 
-	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00', 5e-324, 1.7976931348623157e+308, '1970-01-01 00:00:00+00:00', '6970-01-01 00:00:00+00:00', 0, 75);
+	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00', -9007199254740991, 9007199254740991, '1970-01-01 00:00:00+00:00', '6970-01-01 00:00:00+00:00', 0, 75);
     END IF ;
 
 END;
