@@ -106,6 +106,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
+	let zDataToRender = data.zData;
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
@@ -131,7 +132,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 					meterArea * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				data.zData = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
+				zDataToRender = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
 	}
@@ -155,7 +156,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 			const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
 			return moment.utc(yData).format(localeDateFormat);
 		}),
-		z: data.zData,
+		z: zDataToRender,
 		hoverinfo: 'text',
 		hovertext: hoverText
 	}]
