@@ -12,11 +12,20 @@ const gps = new Point(90, 45);
 
 mocha.describe('Baselines', () => {
 	mocha.it('can be saved and retrieved', async () => {
+		console.log('start baselines');
 		conn = testDB.getConnection();
+		console.log('after testDB.getConnection()')
+		console.log(conn);
 		// Need a meter in the database
 		// TODO: If used note this does not have the more recent meter values.
-		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps);
+		// Meter(id: any, name: any, url: any, enabled: any, displayable: any, type: any, meterTimezone: any, 
+		// gps: undefined, identifier: any, note: any, area?: number, cumulative?: boolean, cumulativeReset?: boolean, cumulativeResetStart?: string, cumulativeResetEnd?: string, readingGap?: number, readingVariation?: number, readingDuplication?: number, timeSort?: string, endOnlyTime?: boolean, reading?: number, startTimestamp?: string, endTimestamp?: string, previousEnd?: moment.Moment, unitId?: number, defaultGraphicUnit?: number, areaUnit?: "none", readingFrequency?: string, minVal?: number, maxVal?: number, minDate?: string, maxDate?: string, maxError?: number, disableChecks?: boolean)
+		const meter = new Meter(undefined, 'Larry', null, false, true, Meter.type.MAMAC, null, gps,
+		null, any, null, false, false, null, null, 1, 1, 1, null, true, 1, null, null, null, null, 
+		null, "none", null, 1, 100, moment.utc(), moment.utc().add(5000), 75, true);
+		console.log(meter);
 		await meter.insert(conn);
+		console.log('after meter.insert(conn)')
 		const reading = new Reading(
 			meter.id,
 			1,
