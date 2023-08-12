@@ -481,9 +481,11 @@ class Reading {
 			// Format readings.
 			// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
 			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
+			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
 
 			// get the hourly timestamp intervals from
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
+			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				yData.push(day[0].start_timestamp.valueOf());
@@ -515,13 +517,13 @@ class Reading {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		console.log('test');
+		//console.log('test');
 
 		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit',
 			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber]
 		);
 
-		console.log('test', allGroupThreeDReadings);
+		//console.log('test', allGroupThreeDReadings);
 
 		//TODO I used the same algorithm that Chris updated in getThreeDReadings so we need to confirm that i will work for
 		// this function. 
