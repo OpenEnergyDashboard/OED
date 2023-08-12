@@ -582,7 +582,12 @@ class Reading {
 			}
 			// Format readings.
 			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+
+			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
+			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
+
+			// get the hourly timestamp intervals from
+			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				// Data data may need to be converted into 'moment' to save on network load

@@ -372,6 +372,7 @@ module.exports = {
 	validateMeterBarReadingsParams: validateMeterBarReadingsParams,
 	validateBarReadingsQueryParams,
 	meterThreeDReadings,
+	groupThreeDReadings,
 	validateMeterThreeDReadingsParams,
 	validateGroupThreeDReadingsParams,
 	validateThreeDQueryParams,
