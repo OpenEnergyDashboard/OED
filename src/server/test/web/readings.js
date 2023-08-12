@@ -33,7 +33,7 @@ const {prepareTest,
 	GROUP_ID,
 	HTTP_CODE,
     unitDatakWh,
-    conversionDatakWh} = require('../web/readingsHeader');
+    conversionDatakWh} = require('../web/readingsUtils');
 
 
 // TODO

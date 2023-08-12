@@ -28,6 +28,7 @@ function validateMeterLineReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
+
 function validateLineReadingsQueryParams(queryParams) {
 	const validQuery = {
 		type: 'object',
@@ -138,6 +139,63 @@ function validateBarReadingsQueryParams(queryParams) {
 	};
 	const queryValidationResult = validate(queryParams, validQuery);
 	return queryValidationResult.valid;
+}
+
+function validateMeterThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+function validateGroupThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
+
+
+function validateThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+	const validParams = {
+		type: 'object',
+		maxProperties: 3,
+		required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+		properties: {
+			timeInterval: {
+				type: 'string',
+			},
+			graphicUnitID: {
+				type: 'string',
+				pattern: '^\\d+$'
+			},
+			sequenceNumber: {
+				type: 'string',
+				pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+			}
+		}
+	};
+	const paramsValidationResult = validate(queryParams, validParams);
+	return paramsValidationResult.valid;
 }
 
 function formatBarReadingRow(readingRow) {
@@ -277,69 +335,8 @@ function createRouter() {
 		}
 	});
 
-
-	function validateThreeDMeterReadingsParams(params) {
-		const validParams = {
-			type: 'object',
-			maxProperties: 1,
-			required: ['meter_ids'],
-			properties: {
-				meter_ids: {
-					type: 'string',
-					pattern: '^\\d+$'		// Matches a single integer value
-					// pattern: '^\\d+(,\\d+)*$'		// 3d Does not support this Matches 1 or 1,2 or 1,2,34 
-				}
-			}
-		};
-		const paramsValidationResult = validate(params, validParams);
-		return paramsValidationResult.valid;
-	}
-
-	function validateThreeDGroupReadingsParams(params) {
-		const validParams = {
-			type: 'object',
-			maxProperties: 1,
-			required: ['group_id'],
-			properties: {
-				meter_ids: {
-					type: 'string',
-					// 3d Does not support this. Matches 1 or 1,2 or 1,2,34 
-					// pattern: '^\\d+(,\\d+)*$'		
-					pattern: '^\\d+$'		// Matches a single integer value
-				}
-			}
-		};
-		const paramsValidationResult = validate(params, validParams);
-		return paramsValidationResult.valid;
-	}
-
-	function validateThreeDQueryParams(queryParams) {
-		const validParams = {
-			type: 'object',
-			maxProperties: 3,
-			required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
-			properties: {
-				timeInterval: {
-					type: 'string',
-				},
-				graphicUnitID: {
-					type: 'string',
-					pattern: '^\\d+$'
-				},
-				sequenceNumber: {
-					type: 'string',
-					//factors of 24 [timeInterval, graphicUnitID, sequence]
-					// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
-					pattern: '^([123468]|[1][2])$'
-				}
-			}
-		};
-		const paramsValidationResult = validate(queryParams, validParams);
-		return paramsValidationResult.valid;
-	}
-
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		if (!(validateThreeDMeterReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
+		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -352,7 +349,7 @@ function createRouter() {
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
-		if (!(validateThreeDGroupReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
+		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
 			const groupID = req.params.group_id;
@@ -374,5 +371,9 @@ module.exports = {
 	meterBarReadings,
 	validateMeterBarReadingsParams: validateMeterBarReadingsParams,
 	validateBarReadingsQueryParams,
+	meterThreeDReadings,
+	validateMeterThreeDReadingsParams,
+	validateGroupThreeDReadingsParams,
+	validateThreeDQueryParams,
 	createRouter
 };
