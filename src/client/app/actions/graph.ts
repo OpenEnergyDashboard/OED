@@ -18,8 +18,6 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
-import { timeIntervalToDateRange } from '../utils/dateRangeCompatability';
 import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
@@ -178,7 +176,6 @@ export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
 		if (shouldChangeGraphZoom(getState(), timeInterval)) {
 			dispatch(resetRangeSliderStack());
 			dispatch(changeGraphZoom(timeInterval));
-			dispatch(updateThreeDTimeInterval(timeIntervalToDateRange(timeInterval)));
 			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
 		}
 		return Promise.resolve();
@@ -210,25 +207,23 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
-export function updateThreeDTimeInterval(dateRange: Value): t.UpdateThreeDTimeInterval {
-	return { type: ActionType.UpdateThreeDTimeInterval, dateRange };
-}
-
-
-export function updateThreeDPrecision(readingsPerDay: t.ReadingsPerDay): Thunk {
+export function updateThreeDReadingsPerDay(readingsPerDay: t.ReadingsPerDay): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
 
 		return Promise.resolve();
 	};
-	// return { type: ActionType.UpdateThreeDPrecision, readingsPerDay };
+}
+
+export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
+	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
 }
 
 export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
-		dispatch({ type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup });
+		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
 		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
 		return Promise.resolve();
 	};
@@ -249,6 +244,9 @@ export interface LinkOptions {
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
 	mapID?: number;
+	meterOrGroupID?: number;
+	meterOrGroup?: t.MeterOrGroup;
+	readingsPerDay?: t.ReadingsPerDay;
 }
 
 /**
@@ -262,7 +260,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
 		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
-		t.UpdateSelectedAreaUnitAction> = [];
+		t.UpdateSelectedAreaUnitAction | t.UpdateThreeDMeterOrGroupInfo> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -272,6 +270,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.groupIDs) {
 		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
+	}
+	if (options.meterOrGroupID && options.meterOrGroup) {
+		dispatchSecond.push(updateThreeDMeterOrGroupInfo(options.meterOrGroupID, options.meterOrGroup));
 	}
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
@@ -315,6 +316,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
+	}
+	if(options.readingsPerDay){
+		dispatchSecond.push(updateThreeDReadingsPerDay(options.readingsPerDay));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

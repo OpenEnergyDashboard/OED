@@ -30,8 +30,7 @@ const defaultState: GraphState = {
 	threeD: {
 		meterOrGroupID: null,
 		meterOrGroup: MeterOrGroup.meters,
-		readingsPerDay: ReadingsPerDay.twentyFour,
-		timeInterval: null
+		readingsPerDay: ReadingsPerDay.twentyFour
 	}
 };
 
@@ -123,14 +122,6 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				lineGraphRate: action.lineGraphRate
-			};
-		case ActionType.UpdateThreeDTimeInterval:
-			return {
-				...state,
-				threeD: {
-					...state.threeD,
-					timeInterval: action.dateRange
-				}
 			};
 		case ActionType.UpdateThreeDReadingsPerDay:
 			return {

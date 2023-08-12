@@ -9,7 +9,7 @@ import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes, ReadingsPerDay } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
-import { updateThreeDPrecision } from '../actions/graph';
+import { updateThreeDReadingsPerDay } from '../actions/graph';
 
 /**
  * A component which allows users to select date ranges for the graphic
@@ -36,15 +36,17 @@ export default function ThreeDSelectComponent() {
 
 	// Value currently being rendered
 	// Use the selectedOption as an enum key to update threeD State
-	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDPrecision(selectedOption.value));
+	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingsPerDay(selectedOption.value));
 
 	const value = { label: String(24 / readingsPerDay), value: readingsPerDay };
 	if (graphState.chartToRender === ChartTypes.threeD) {
 		return (
 			<div>
-				<p style={{ fontWeight: 'bold', margin: 0 }}>{translate('readings.per.day')}</p>
+				<p style={{ fontWeight: 'bold', margin: 0 }}>
+					{`${translate('readings.per.day')}:`}
+					<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
+				</p>
 				<Select value={value} options={options} onChange={onSelectChange} />
-				<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
 			</div>
 		)
 	} else {

@@ -41,7 +41,6 @@ export enum ActionType {
 	ReceiveMeterThreeDReadings = 'RECEIVE_METER_THREED_READINGS',
 	RequestGroupThreeDReadings = 'REQUEST_GROUP`_THREED_READINGS',
 	ReceiveGroupThreeDReadings = 'RECEIVE_GROUP_THREED_READINGS',
-	UpdateThreeDTimeInterval = 'UPDATE_THREED_TIME_INTERVAL',
 	UpdateThreeDReadingsPerDay = 'UPDATE_THREED_READINGS_PER_DAY',
 	UpdateThreeDMeterOrGroupInfo = 'UPDATE_TREED_METER_OR_GROUP_INFO',
 

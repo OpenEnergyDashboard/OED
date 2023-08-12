@@ -15,7 +15,7 @@ import AdminComponent from './admin/AdminComponent';
 import { LinkOptions } from '../actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes, LineGraphRate } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate, MeterOrGroup } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
@@ -242,6 +242,17 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								break;
 							case 'sliderRange':
 								options.sliderRange = TimeInterval.fromString(info);
+								break;
+							case 'meterOrGroupID':
+								options.meterOrGroupID = parseInt(info);
+								break;
+							case 'meterOrGroup':
+								//TODO VALIDATE
+								options.meterOrGroup = info as MeterOrGroup;
+								break;
+							case 'readingsPerDay':
+								//TODO VALIDATE
+								options.readingsPerDay = parseInt(info);
 								break;
 							default:
 								throw new Error('Unknown query parameter');

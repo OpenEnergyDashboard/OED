@@ -12,7 +12,7 @@ import { State } from '../types/redux/state';
 import { useState } from 'react';
 import { SelectOption } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
-import { changeMeterOrGroupInfo } from '../actions/graph'
+// import { changeMeterOrGroupInfo } from '../actions/graph'
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 
 /**
@@ -73,7 +73,6 @@ export default function ChartSelectComponent() {
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
-							dispatch(changeMeterOrGroupInfo(null));
 							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD });
 						}
 						}

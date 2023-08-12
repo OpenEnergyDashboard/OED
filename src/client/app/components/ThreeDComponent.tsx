@@ -7,7 +7,7 @@ import Plot from 'react-plotly.js';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import SpinnerComponent from './SpinnerComponent';
 import { State } from '../types/redux/state';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
 import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
 import { lineUnitLabel } from '../utils/graphics';
@@ -15,12 +15,16 @@ import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConvers
 import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
 import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
+import { Dispatch } from '../types/redux/actions';
+import { useEffect } from 'react';
+import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
 
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const dispatch: Dispatch = useDispatch();
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
 	const [dataToRender, layout] = useSelector((state: State) => {
 		// threeDState contains the currentMeterOrGroup to be fetched.
@@ -36,6 +40,7 @@ export default function ThreeDComponent() {
 		let threeDData = null;
 		if (meterOrGroupID) {
 			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+			// If a meter is selected and no data is in state, fetch it.
 		}
 
 		let layout = {};
@@ -57,6 +62,12 @@ export default function ThreeDComponent() {
 		}
 		return [dataToRender, layout]
 	});
+
+	// Necessary for the case when a meter/group is selected and time intervals get altered externally. (Line graphic slider, for example.)
+	useEffect(() => {
+		// Fetch on initial render only, all other fetch will be called from PillBadges, or meter/group menus
+		dispatch(fetchNeededThreeDReadings());
+	}, [])
 
 	return (
 		<div style={{ width: '100%', height: '75vh' }}>
@@ -95,6 +106,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
+	let zDataToRender = data.zData;
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
@@ -120,7 +132,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 					meterArea * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				data.zData = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
+				zDataToRender = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
 	}
@@ -129,7 +141,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		const time = moment.utc(data.xData[j]).format('h:mm A');
 		// ThreeD graphic readings can be null. If not null round the precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
-		return `Date: ${date}<br>Time: ${time}<br>${unitLabel}: ${readingValue}`;
+		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
 	// TODO find a better way to set the zAxis
 	const formattedData = [{
@@ -137,9 +149,14 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		showlegend: false,
 		showscale: false,
 		// zmin: 0,
-		x: data.xData.map(xData => moment.utc(xData).format('h:mm A')),
-		y: data.yData.map(yData => moment.utc(yData).format('L')),
-		z: data.zData,
+		x: data.xData.map(xData => moment.utc(xData).clone().format('h:mm A')),
+		y: data.yData.map(yData => {
+			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
+			// TODO find better approach as full year YYYY may be desired behavior for users.
+			const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
+			return moment.utc(yData).format(localeDateFormat);
+		}),
+		z: zDataToRender,
 		hoverinfo: 'text',
 		hovertext: hoverText
 	}]
@@ -174,9 +191,17 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 		...threeDLayout,
 		scene: {
 			...threeDLayout.scene,
+			xaxis: {
+				...threeDLayout.scene.zaxis,
+				title: { text: translate('threeD.xAxis.label') }
+			},
+			yaxis: {
+				...threeDLayout.scene.zaxis,
+				title: { text: translate('threeD.yAxis.label') }
+			},
 			zaxis: {
 				...threeDLayout.scene.zaxis,
-				title: zLabelText
+				title: { text: zLabelText }
 			}
 		}
 	}
@@ -190,9 +215,11 @@ const threeDLayout = {
 			title: { text: 'Hours of Day' }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year', standoff: 40 }
+			title: { text: 'Days of Calendar Year' }
 		},
-		zaxis: { title: 'Resource Usage' },
+		zaxis: {
+			title: { text: 'Resource Usage' }
+		},
 		aspectratio: {
 			x: 1,
 			y: 2.75,
