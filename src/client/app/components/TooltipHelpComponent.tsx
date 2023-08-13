@@ -69,7 +69,6 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.export.graph.data': { link: `${HELP_URL}/export.html` },
 			'help.home.hide.or.show.options': { link: `${HELP_URL}/hideOptions.html` },
 			'help.home.map.interval.tip': { link: `${HELP_URL}/mapGraphic.html#usage` },
-			'help.home.radar.interval.tip': { link: `${HELP_URL}/radarInterval.html#usage`},
 			'help.home.select.groups': { link: `${HELP_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${HELP_URL}/mapGraphic.html` },
 			'help.home.select.meters': { link: `${HELP_URL}/graphingMeters.html` },
