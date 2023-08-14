@@ -16,7 +16,6 @@ function validateReadings(arrayToValidate, conditionSet) {
 	/* tslint:disable:no-string-literal */
 	validDates = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2);
 	validValues = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2);
-	// validIntervals = checkIntervals(arrayToValidate, conditionSet['threshold']);
 	/* tslint:enable:no-string-literal */
 	return validDates && validValues;
 }
