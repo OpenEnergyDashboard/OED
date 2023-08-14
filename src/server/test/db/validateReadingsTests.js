@@ -92,7 +92,7 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 						new Reading(undefined, 20, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
 
-		expect(validateReadings(badIntervals, conditionSet)).to.equal(false);
+		expect(checkIntervals(badIntervals, conditionSet['threshold'])).to.equal(false);
 		expect(validateReadings(badDate, conditionSet)).to.equal(false);
 		expect(validateReadings(badValue, conditionSet)).to.equal(false);
 		expect(validateReadings(goodData, conditionSet)).to.equal(true);
