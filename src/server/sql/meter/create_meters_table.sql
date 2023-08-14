@@ -65,8 +65,6 @@ CREATE TABLE IF NOT EXISTS meters (
     default_graphic_unit INTEGER REFERENCES units(id),
     area_unit area_unit_type NOT NULL DEFAULT 'none',
     reading_frequency INTERVAL NOT NULL DEFAULT '00:15:00',
-    -- min_val and max_val use numberic because it only float type that can hold 
-    -- NUMBER.MIN_VALUE from JS and TS
     min_val DOUBLE PRECISION NOT NULL DEFAULT -9007199254740991 CHECK (min_val::DOUBLE PRECISION >= -9007199254740991),
     max_val DOUBLE PRECISION NOT NULL DEFAULT 9007199254740991 CHECK (max_val::DOUBLE PRECISION <= 9007199254740991),
     min_date TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:00+00:00',
