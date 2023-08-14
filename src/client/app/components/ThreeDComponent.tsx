@@ -31,24 +31,41 @@ export default function ThreeDComponent() {
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
 		// meterOrGroup Determines wether to get readings from state .byMeterID or .byGroupID
-		const meterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
+		const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
 		// 3D requires intervals to be rounded to a full day.
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
 		const unitID = state.graph.selectedUnit;
 		// Level of detail along the xAxis / Readings per day,
 		const precision = state.graph.threeD.readingsPerDay;
 		let threeDData = null;
+		let isAreaCompatible = true;
+		let name = 'Uknown Meter';
 		if (meterOrGroupID) {
-			threeDData = state.readings.threeD[meterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
-			// If a meter is selected and no data is in state, fetch it.
+			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+			const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?
+				state.meters.byMeterID[meterOrGroupID]
+				:
+				state.groups.byGroupID[meterOrGroupID];
+			const area = meterOrGroupInfo.area;
+			const areaUnit = meterOrGroupInfo.areaUnit;
+			name = threeDState.meterOrGroup === MeterOrGroup.meters ?
+				state.meters.byMeterID[meterOrGroupID].identifier
+				:
+				state.groups.byGroupID[meterOrGroupID].name;
+			isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		}
+		// const areaUnit = state.groups.byGroupID[selectOption.value].areaUnit;
+		// const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 
 		let layout = {};
 		let dataToRender = null;
 		if (!meterOrGroupID) {
 			// No selected Meters
 			layout = setLayout(translate('select.meter.group'));
-		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
+		} else if (state.graph.areaNormalization && !isAreaCompatible) {
+			layout = setLayout(`${name}<br>is incompatible<br>with area normalization`);
+		}
+		else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
 			// Not a valid time interval. ThreeD can only support up to 1 year of readings
 			layout = setLayout(translate('threeD.dateRange.too.long'));
 		} else if (!threeDData) {

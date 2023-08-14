@@ -90,8 +90,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartSelectComponent />
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
-				<ThreeDDateRangeComponent />
 				<ThreeDSelectComponent />
+				<ThreeDDateRangeComponent />
 				<AreaUnitSelectComponent />
 
 				{/* Controls specific to the bar chart. */}

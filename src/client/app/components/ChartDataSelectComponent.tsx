@@ -320,18 +320,7 @@ export default function ChartDataSelectComponent() {
 							// Do additional things relevant to 3D graphics
 							// This block is responsible for keeping 3D state in sync with meters and group menus
 							// Variables determine whether the component change added or removed a group.
-							const groupAdded = allSelectedGroupIDs.length > oldSelectedGroupIDs.length;
-							const groupRemoved = !groupAdded;
-							// Reference threeDState to check if the updated meter is actively selected
-							const isActive = (difference === dataProps.threeDState.meterOrGroupID) && (dataProps.threeDState.meterOrGroup === MeterOrGroup.groups);
-							if (groupAdded && dataProps.chartToRender === ChartTypes.threeD) {
-								// When a meter is added, update 3D MeterOrGroup state
-								const addedMeterID = allSelectedGroupIDs[allSelectedGroupIDs.length - 1];
-								dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.groups));
-							} else if (groupRemoved && isActive) {
-								// When a meter is removed, and is the currently active graph to render. Update ThreeDState to reflect the change.
-								dispatch(changeMeterOrGroupInfo(null));
-							}
+							syncThreeDState(dataProps, allSelectedGroupIDs, oldSelectedGroupIDs, difference, MeterOrGroup.groups, dispatch);
 						}
 					}}
 				/>
@@ -368,17 +357,10 @@ export default function ChartDataSelectComponent() {
 							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 
 							// Do additional things relevant to 3D graphics
-							// This block is responsible for keeping 3D state in sync with meters and group menus
 							// Logic mirrors the group multiselect onValuesChange()
-							const meterAdded = allSelectedMeterIDs.length > oldSelectedMeterIDs.length;
-							const meterRemoved = !meterAdded;
-							const meterIsSelected = difference === dataProps.threeDState.meterOrGroupID;
-							if (meterAdded && dataProps.chartToRender === ChartTypes.threeD) {
-								const addedMeterID = allSelectedMeterIDs[allSelectedMeterIDs.length - 1];
-								dispatch(changeMeterOrGroupInfo(addedMeterID, MeterOrGroup.meters));
-							} else if (meterRemoved && meterIsSelected) {
-								dispatch(changeMeterOrGroupInfo(null));
-							}
+							// This Method is responsible for keeping 3D state in sync with meters and group menus
+							syncThreeDState(dataProps, allSelectedMeterIDs, oldSelectedMeterIDs, difference, MeterOrGroup.meters, dispatch);
+
 						}
 					}}
 				/>
@@ -727,15 +709,44 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
  * @returns Whether or not this is a UnitsState
  */
 function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
+
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a MetersState
  */
 function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
+
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a GroupsState
  */
 function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }
+
+/**
+ * 3D helper function used to keep 3D redux state in sync with dropdown menus
+ * @param dataProps value derived from the multiselect component from which this method is called.
+ * @param allSelected value derived from the multiselect component from which this method is called.
+ * @param oldSelected value derived from the multiselect component from which this method is called.
+ * @param difference value derived from the multiselect component from which this method is called.
+ * @param meterOrGroup value derived from the multiselect component from which this method is called.
+ * @param dispatch instance of the dispatch for altering redux state.
+ */
+function syncThreeDState(
+	dataProps: any,
+	allSelected: number[],
+	oldSelected: number[],
+	difference: number,
+	meterOrGroup: MeterOrGroup,
+	dispatch: Dispatch): void {
+	const meterOrGroupAdded = allSelected.length > oldSelected.length;
+	const meterOrGroupRemoved = !meterOrGroupAdded;
+	const meterOrGroupIsSelected = difference === dataProps.threeDState.meterOrGroupID;
+	if (meterOrGroupAdded && dataProps.chartToRender === ChartTypes.threeD) {
+		const addedMeterOrGroup = allSelected[allSelected.length - 1];
+		dispatch(changeMeterOrGroupInfo(addedMeterOrGroup, meterOrGroup));
+	} else if (meterOrGroupRemoved && meterOrGroupIsSelected) {
+		dispatch(changeMeterOrGroupInfo(null));
+	}
+}

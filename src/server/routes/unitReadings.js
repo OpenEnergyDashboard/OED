@@ -149,7 +149,7 @@ function validateMeterThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(,\\d+)*$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				pattern: '^\\d+$'	
 			}
 		}
 	};
@@ -190,7 +190,7 @@ function validateThreeDQueryParams(queryParams) { //factors of 24 [timeInterval,
 			},
 			sequenceNumber: {
 				type: 'string',
-				pattern: '^([12468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				pattern: '^([123468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
 			}
 		}
 	};
