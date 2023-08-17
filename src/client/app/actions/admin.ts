@@ -128,17 +128,23 @@ function fetchPreferences(): Thunk {
 	};
 }
 
-/* Validates preferences
+/* Because there is no warn for invalid data in admin pannel, I use function validPreferences(state: State)
+only to prevent it before it submit to API
+	Validates preferences
 	Create Preferences Validation:
 	Mininum Value cannot bigger than Maximum Value
 	Minimum Value and Maximum Value must be between valid input
 	Minimum Date and Maximum cannot be blank
+	Minimum Date cannot be after Maximum Date
+	Minimum Date and Maximum Value must be between valid input
 	Maximum No of Error must be between 0 and 75
 */
 
 function validPreferences(state: State) {
 	const MIN_VAL = Number.MIN_SAFE_INTEGER;
 	const MAX_VAL = Number.MAX_SAFE_INTEGER;
+	const MIN_DATE_MOMENT = moment(0).utc();
+	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
 	if (
 		state.admin.defaultMeterReadingGap >= 0 &&
 		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
@@ -146,6 +152,9 @@ function validPreferences(state: State) {
 		state.admin.defaultMeterMinimumValue <= MAX_VAL &&
 		state.admin.defaultMeterMinimumDate !== '' &&
 		state.admin.defaultMeterMaximumDate !== '' &&
+		moment(state.admin.defaultMeterMinimumDate) >= MIN_DATE_MOMENT &&
+		moment(state.admin.defaultMeterMaximumDate) <= MAX_DATE_MOMENT &&
+		moment(state.admin.defaultMeterMinimumDate) <= moment(state.admin.defaultMeterMaximumDate) &&
 		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)
 	) return true;
 	return false;
