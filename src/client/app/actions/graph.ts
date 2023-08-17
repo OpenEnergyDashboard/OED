@@ -30,6 +30,9 @@ export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRen
 export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
 	return { type: ActionType.ToggleAreaNormalization };
 }
+export function toggleShowMinMax(): t.ToggleShowMinMaxAction {
+	return { type: ActionType.ToggleShowMinMax }
+}
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
 	return { type: ActionType.ChangeBarStacking };
@@ -213,6 +216,7 @@ export interface LinkOptions {
 	sliderRange?: TimeInterval;
 	toggleAreaNormalization?: boolean;
 	areaUnit?: string;
+	toggleMinMax?: boolean;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -231,7 +235,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
 		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
-		t.UpdateSelectedAreaUnitAction> = [];
+		t.UpdateSelectedAreaUnitAction | t.ToggleShowMinMaxAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -266,7 +270,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.areaUnit) {
 		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
-
+	}
+	if (options.toggleMinMax) {
+		dispatchSecond.push(toggleShowMinMax());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
