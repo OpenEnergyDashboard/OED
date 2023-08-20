@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import {LineReading, LineReadings} from '../readings';
+import { LineReading, LineReadings } from '../readings';
 
 export interface RequestMeterLineReadingsAction {
 	type: ActionType.RequestMeterLineReadings;
@@ -26,6 +26,7 @@ export interface ReceiveMeterLineReadingsAction {
 	unitID: number;
 	timeInterval: TimeInterval;
 	readings: LineReadings;
+
 }
 
 export interface ReceiveGroupLineReadingsAction {

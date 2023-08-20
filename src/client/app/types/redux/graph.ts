@@ -17,8 +17,8 @@ export enum ChartTypes {
 
 // Rates that can be graphed, only relevant to line graphs.
 export const LineGraphRates = {
-	'second': (1/3600),
-	'minute': (1/60),
+	'second': (1 / 3600),
+	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
 }
@@ -55,6 +55,10 @@ export interface ChangeChartToRenderAction {
 
 export interface ToggleAreaNormalizationAction {
 	type: ActionType.ToggleAreaNormalization;
+}
+
+export interface ToggleShowMinMaxAction {
+	type: ActionType.ToggleShowMinMax;
 }
 
 export interface ChangeBarStackingAction {
@@ -110,6 +114,7 @@ export type GraphAction =
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
 	| ToggleAreaNormalizationAction
+	| ToggleShowMinMaxAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
@@ -146,4 +151,5 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
+	showMinMax: boolean;
 }
