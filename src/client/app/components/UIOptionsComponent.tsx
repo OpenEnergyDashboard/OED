@@ -93,7 +93,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<GraphicRateMenuComponent />
 				<ThreeDSelectComponent />
 				<ThreeDDateRangeComponent />
-				<AreaUnitSelectComponent />
 
 				<AreaUnitSelectComponent />
 				{/* Controls error bar, specifically for the line chart. */}
