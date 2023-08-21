@@ -20,6 +20,7 @@ import MapChartSelectComponent from './MapChartSelectComponent';
 import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
+import ErrorBarComponent from './ErrorBarComponent';
 import ThreeDDateRangeComponent from './ThreeDDateRangeComponent';
 import ThreeDSelectComponent from './ThreeDSelectComponent';
 
@@ -94,6 +95,11 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ThreeDDateRangeComponent />
 				<AreaUnitSelectComponent />
 
+				<AreaUnitSelectComponent />
+				{/* Controls error bar, specifically for the line chart. */}
+				{this.props.chartToRender === ChartTypes.line &&
+					<ErrorBarComponent />
+				}
 				{/* Controls specific to the bar chart. */}
 				{this.props.chartToRender === ChartTypes.bar &&
 					<div>

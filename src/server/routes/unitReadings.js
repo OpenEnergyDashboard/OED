@@ -51,6 +51,8 @@ function validateLineReadingsQueryParams(queryParams) {
 function formatReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading_rate,
+		min: readingRow.min_rate,
+		max: readingRow.max_rate,
 		// This returns a Unix timestamp in milliseconds. This should be smaller in size when sent to the client
 		// compared to sending the formatted moment object. All values are sent as a string.
 		// The consequence of doing this is that when the client recreates this as a moment it will do it in

@@ -68,10 +68,12 @@ function mapStateToProps(state: State) {
 					// Create two arrays for the x and y values. Fill the array with the data from the line readings
 					const xData: string[] = [];
 					const yData: number[] = [];
+					// Create two arrays to store the min and max values of y-axis data points
+					const yMinData: number[] = [];
+					const yMaxData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
 					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
-					// const scaling = currentSelectedRate.rate / meterArea;
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
@@ -81,7 +83,20 @@ function mapStateToProps(state: State) {
 						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
 						const readingValue = reading.reading * scaling;
 						yData.push(readingValue);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+						// All hover have the date, meter name and value.
+						const hoverStart = `<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`;
+						if (state.graph.showMinMax && reading.max != null) {
+							// We want to show min/max. Note if the data is raw for this meter then all the min/max values are null.
+							// In this case we still push the min/max but plotly will not show them. This is a little extra work
+							// but makes the code cleaner.
+							const minValue = reading.min * scaling;
+							yMinData.push(minValue);
+							const maxValue = reading.max * scaling;
+							yMaxData.push(maxValue);
+							hoverText.push(`${hoverStart} <br> ${translate('min')}: ${minValue.toPrecision(6)} <br> ${translate('max')}: ${maxValue.toPrecision(6)}`);
+						} else {
+							hoverText.push(hoverStart);
+						}
 					});
 
 					/*
@@ -103,6 +118,13 @@ function mapStateToProps(state: State) {
 						name: label,
 						x: xData,
 						y: yData,
+						// only show error bars if enabled and there is data
+						error_y: state.graph.showMinMax && yMaxData.length > 0 ? {
+							type: 'data',
+							symmetric: false,
+							array: yMaxData.map((maxValue, index) => (maxValue - yData[index])),
+							arrayminus: yData.map((value, index) => (value - yMinData[index]))
+						} : undefined,
 						text: hoverText,
 						hoverinfo: 'text',
 						type: 'scatter',
