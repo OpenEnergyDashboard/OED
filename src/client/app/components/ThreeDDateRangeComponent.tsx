@@ -22,7 +22,7 @@ import { changeGraphZoomIfNeeded } from '../actions/graph';
  */
 export default function ThreeDDateRangeComponent() {
 	const timeInterval = useSelector((state: State) => state.graph.timeInterval);
-	const locale = useSelector((state: State) => state.admin.defaultLanguage);
+	const locale = useSelector((state: State) => state.options.selectedLanguage);
 	const chartToRender = useSelector((state: State) => state.graph.chartToRender);
 	const dispatch: Dispatch = useDispatch();
 
