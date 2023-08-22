@@ -127,10 +127,8 @@ function fetchPreferences(): Thunk {
 		}
 	};
 }
-
-/* Because there is no warn for invalid data in admin pannel, I use function validPreferences(state: State)
-only to prevent it before it submit to API
-	Validates preferences
+// TODO: Add warning for invalid data in admin panel src/client/app/components/admin/PreferencesComponent.tsx
+/*  Validates preferences
 	Create Preferences Validation:
 	Mininum Value cannot bigger than Maximum Value
 	Minimum Value and Maximum Value must be between valid input
@@ -145,8 +143,7 @@ function validPreferences(state: State) {
 	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	const MIN_DATE_MOMENT = moment(0).utc();
 	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
-	if (
-		state.admin.defaultMeterReadingGap >= 0 &&
+	if (state.admin.defaultMeterReadingGap >= 0 &&
 		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
 		state.admin.defaultMeterMinimumValue <= state.admin.defaultMeterMaximumValue &&
 		state.admin.defaultMeterMinimumValue <= MAX_VAL &&
@@ -155,9 +152,11 @@ function validPreferences(state: State) {
 		moment(state.admin.defaultMeterMinimumDate) >= MIN_DATE_MOMENT &&
 		moment(state.admin.defaultMeterMaximumDate) <= MAX_DATE_MOMENT &&
 		moment(state.admin.defaultMeterMinimumDate) <= moment(state.admin.defaultMeterMaximumDate) &&
-		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)
-	) return true;
-	return false;
+		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)) {
+		return true;
+	} else {
+		return false;
+	}
 }
 /**
  * Submits preferences stored in the state to the API to be stored in the database
@@ -166,7 +165,9 @@ export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
 		try {
-			if (!validPreferences(state)) throw new Error('invalid input');
+			if (!validPreferences(state)) {
+				throw new Error('invalid input');
+			}
 			const preferences = await preferencesApi.submitPreferences({
 				displayTitle: state.admin.displayTitle,
 				defaultChartToRender: state.admin.defaultChartToRender,
