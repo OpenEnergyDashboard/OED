@@ -251,7 +251,8 @@ class Meter {
 		readingDuplication = this.readingDuplication, timeSort = this.timeSort, endOnlyTime = this.endOnlyTime,
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
 		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.defaultGraphicUnit, areaUnit = this.areaUnit,
-		readingFrequency = this.readingFrequency, minVal = this.minVal, maxVal = this.maxVal, minDate = this.minDate, maxDate = this.maxDate, maxError = this.maxError, disableChecks = this.disableChecks) {
+		readingFrequency = this.readingFrequency, minVal = this.minVal, maxVal = this.maxVal, minDate = this.minDate,
+		maxDate = this.maxDate, maxError = this.maxError, disableChecks = this.disableChecks) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
