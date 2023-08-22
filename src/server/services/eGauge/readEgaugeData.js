@@ -18,7 +18,7 @@ async function readEgaugeData(meter, conn) {
 	await requestor.setRegisterId();
 	const meterReadings = await requestor.getMeterReadings();
 	await requestor.logout()
-	
+
 	// Store the readings in the database.
 	await loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
