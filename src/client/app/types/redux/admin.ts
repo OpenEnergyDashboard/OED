@@ -29,8 +29,8 @@ export type AdminAction =
 	| UpdateDefaultMeterMaximumValueAction
 	| UpdateDefaultMeterMinimumDateAction
 	| UpdateDefaultMeterMaximumDateAction
-	| UpdateDefaultMeterMaximumErrorsAction
-	| UpdateDefaultMeterReadingGapAction;
+	| UpdateDefaultMeterReadingGapAction
+	| UpdateDefaultMeterMaximumErrorsAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
