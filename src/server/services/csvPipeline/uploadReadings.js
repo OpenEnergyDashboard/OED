@@ -9,6 +9,7 @@ const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams')
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
 const moment = require('moment');
+const Preferences = require('../../models/Preferences');
 
 /**
  * Middleware that uploads readings via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -36,6 +37,7 @@ async function uploadReadings(req, res, filepath, conn) {
 					err.message
 				);
 			} else {
+				const preferences = await Preferences.get(conn);
 				// If createMeter is true, we will create the meter for the user.
 				// The meter type is unknown so set to other. Most parameters take on default values.
 				const tempMeter = new Meter(
@@ -54,7 +56,7 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // cumulativeReset
 					undefined, // cumulativeResetStart
 					undefined, // cumulativeResetEnd
-					undefined, // readingGap
+					preferences.defaultMeterReadingGap, // readingGap
 					undefined, // readingVariation
 					undefined, // readingDuplication
 					undefined, // timeSort
@@ -66,12 +68,12 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // unit
 					undefined, // default graphic unit
 					undefined, // area unit
-					undefined, // reading frequency
-					undefined, // minVal
-					undefined, // maxVal
-					undefined, // minDate
-					undefined, // maxDate
-					undefined, // maxError
+					preferences.defaultMeterReadingFrequency, // reading frequency
+					preferences.defaultMeterMinimumValue, // minVal
+					preferences.defaultMeterMaximumValue, // maxVal
+					preferences.defaultMeterMinimumDate, // minDate
+					preferences.defaultMeterMaximumDate, // maxDate
+					preferences.defaultMeterMaximumErrors, // maxError
 					undefined  // disableChecks
 				)
 				await tempMeter.insert(conn);

@@ -7,6 +7,7 @@ const Meter = require('../../models/Meter');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
 const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
+const Preferences = require('../../models/Preferences');
 
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 	// Get demultiplexed, parsed data from the CSV.
@@ -18,6 +19,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 		try {
 			meter = await Meter.getByName(`${serialNumber}.${i}`, conn);
 		} catch (v) {
+			const preferences = await Preferences.get(conn);
 			// For now, new Obvius meters collect data (enabled) but do not display (not displayable).
 			// Also, the identifier is similar to the meter name for now.
 			// end only time is true for Obvius meters.
@@ -40,7 +42,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				undefined, //cumulativeReset
 				undefined, // cumulativeResetStart
 				undefined, // cumulativeResetEnd
-				undefined, // readingGap
+				preferences.defaultMeterReadingGap, // readingGap
 				undefined, // readingVariation
 				undefined, //readingDuplication
 				undefined, // timeSort
@@ -52,12 +54,12 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				undefined, // unit
 				undefined, // default graphic unit
 				undefined, // area unit
-				undefined, // reading frequency
-				undefined, // minVal
-				undefined, // maxVal
-				undefined, // minDate
-				undefined, // maxDate
-				undefined, // maxError
+				preferences.defaultMeterReadingFrequency, // reading frequency
+				preferences.defaultMeterMinimumValue, // minVal
+				preferences.defaultMeterMaximumValue, // maxVal
+				preferences.defaultMeterMinimumDate, // minDate
+				preferences.defaultMeterMaximumDate, // maxDate
+				preferences.defaultMeterMaximumErrors, // maxError
 				undefined  // disableChecks
 			);
 			await meter.insert(conn);

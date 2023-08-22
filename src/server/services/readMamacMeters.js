@@ -12,7 +12,7 @@ const stopDB = require('../models/database').stopDB;
 const { log } = require('../log');
 const moment = require('moment');
 const Unit = require('../models/Unit');
-
+const Preferences = require('../../models/Preferences');
 const parseXMLPromisified = util.promisify(parseString);
 
 async function parseCSV(filename) {
@@ -62,6 +62,7 @@ async function getMeterInfo(url, ip, csvLine) {
 	} else {
 		unitId = kWhUnit.id;
 	}
+	const preferences = await Preferences.get(conn);
 	return reqWithTimeout(url, 5000, csvLine)
 		// Doing raw.data is untested since went to axios. If get access to MAMAC meter then should test.
 		.then(raw => parseXMLPromisified(raw.data))
@@ -96,12 +97,12 @@ async function getMeterInfo(url, ip, csvLine) {
 				unitId, // unit
 				unitId, // default graphic unit
 				undefined, // area unit
-				undefined, // reading frequency
-				undefined, // minVal
-				undefined, // maxVal
-				undefined, // minDate
-				undefined, // maxDate
-				undefined, // maxError
+				preferences.defaultMeterReadingFrequency, // reading frequency
+				preferences.defaultMeterMinimumValue, // minVal
+				preferences.defaultMeterMaximumValue, // maxVal
+				preferences.defaultMeterMinimumDate, // minDate
+				preferences.defaultMeterMaximumDate, // maxDate
+				preferences.defaultMeterMaximumErrors, // maxError
 				undefined  // disableChecks
 			);
 		});
