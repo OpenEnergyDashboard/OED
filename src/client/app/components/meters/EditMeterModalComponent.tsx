@@ -133,15 +133,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		Minimum Date and Maximum cannot be blank
 		Minimum Date cannot be after Maximum Date
 		Minimum Date and Maximum Value must be between valid input
-		Maximum No of Error must be between 0 and 75
+		Maximum No of Error must be between 0 and valid input
 	*/
 	const [validMeter, setValidMeter] = useState(false);
 	const MIN_VAL = Number.MIN_SAFE_INTEGER;
 	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	const MIN_DATE_MOMENT = moment(0).utc();
 	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
-	const MIN_DATE_STRING = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ');
-	const MAX_DATE_STRING = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ');
+	const MIN_DATE = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_DATE = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_ERRORS = 75;
 	useEffect(() => {
 		setValidMeter(
 			state.name !== '' &&
@@ -158,7 +159,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			moment(state.minDate) >= MIN_DATE_MOMENT &&
 			moment(state.maxDate) <= MAX_DATE_MOMENT &&
 			moment(state.minDate) <= moment(state.maxDate) &&
-			(state.maxError >=0  && state.maxError <= 75)
+			(state.maxError >=0  && state.maxError <= MAX_ERRORS)
 		);
 	}, [state.area,
 		state.name,
@@ -771,7 +772,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								required value ={state.minVal}
 								invalid={state?.minVal < MIN_VAL  || state?.minVal > state?.maxVal}/>
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal}}  />
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }}  />
 							</FormFeedback>
 						</FormGroup>
 						{/* maxVal input */}
@@ -787,7 +788,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								required value ={state.maxVal}
 								invalid={state?.maxVal > MAX_VAL  || state?.minVal > state?.maxVal}/>
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL}}/>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }}/>
 							</FormFeedback>
 						</FormGroup>
 						{/* maxError input */}
@@ -798,12 +799,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='maxError'
 								type='number'
 								onChange={e => handleNumberChange(e)}
-								min="0"
-								max="75"
+								min='0'
+								max={MAX_ERRORS}
 								required value={state.maxError}
-								invalid={state?.maxError > 75 || state?.maxError < 0}/>
+								invalid={state?.maxError > MAX_ERRORS || state?.maxError < 0}/>
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: 0, max: 75}}/>
+								<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_ERRORS }}/>
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
@@ -855,7 +856,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								required value={state.minDate}
 								invalid={state.minDate === '' || moment(state.minDate) < MIN_DATE_MOMENT || moment(state.minDate) > moment(state.maxDate)}/>
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: MIN_DATE_STRING, max: moment(state.maxDate).utc().format() }}/>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_DATE, max: moment(state.maxDate).utc().format() }}/>
 							</FormFeedback>
 						</FormGroup>
 						{/* maxDate input */}
@@ -871,7 +872,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								required value={state.maxDate}
 								invalid={state.maxDate === '' || moment(state.maxDate) > MAX_DATE_MOMENT || moment(state.minDate) > moment(state.maxDate)}/>
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: moment(state.minDate).utc().format(), max: MAX_DATE_STRING }} />
+								<FormattedMessage id="error.bounds" values={{ min: moment(state.minDate).utc().format(), max: MAX_DATE }} />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* DisableChecks input */}
