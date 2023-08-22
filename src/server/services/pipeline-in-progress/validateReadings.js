@@ -42,7 +42,7 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError) {
 			validDates = false;
 		}
 		if (reading.endTimestamp > maxDate) {
-			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.startTimestamp} is later than upper bound ${maxDate}`);
+			log.warn(`ERROR WHEN CHECKING READING TIME FROM METER ${reading.meterID}: Time ${reading.endTimestamp} is later than upper bound ${maxDate}`);
 			--maxError;
 			validDates = false;
 		}
