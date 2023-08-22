@@ -497,7 +497,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 	}
 
 	private handleDefaultMeterMaximumErrorsChange(e: { target: HTMLInputElement; }) {
-		this.props.updateDefaultMeterMaximumErrors(parseFloat(e.target.value));
+		this.props.updateDefaultMeterMaximumErrors(parseInt(e.target.value));
 		this.updateUnsavedChanges();
 	}
 
