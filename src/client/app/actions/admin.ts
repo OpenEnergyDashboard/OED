@@ -135,7 +135,7 @@ function fetchPreferences(): Thunk {
 	Minimum Date and Maximum cannot be blank
 	Minimum Date cannot be after Maximum Date
 	Minimum Date and Maximum Value must be between valid input
-	Maximum No of Error must be between 0 and 75
+	Maximum No of Error must be between 0 and valid input
 */
 
 function validPreferences(state: State) {
@@ -143,16 +143,19 @@ function validPreferences(state: State) {
 	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	const MIN_DATE_MOMENT = moment(0).utc();
 	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
+	const MAX_ERRORS = 75;
 	if (state.admin.defaultMeterReadingGap >= 0 &&
 		state.admin.defaultMeterMinimumValue >= MIN_VAL &&
 		state.admin.defaultMeterMinimumValue <= state.admin.defaultMeterMaximumValue &&
 		state.admin.defaultMeterMinimumValue <= MAX_VAL &&
 		state.admin.defaultMeterMinimumDate !== '' &&
 		state.admin.defaultMeterMaximumDate !== '' &&
-		moment(state.admin.defaultMeterMinimumDate) >= MIN_DATE_MOMENT &&
-		moment(state.admin.defaultMeterMaximumDate) <= MAX_DATE_MOMENT &&
-		moment(state.admin.defaultMeterMinimumDate) <= moment(state.admin.defaultMeterMaximumDate) &&
-		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= 75)) {
+		moment(state.admin.defaultMeterMinimumDate).isValid() &&
+		moment(state.admin.defaultMeterMaximumDate).isValid() &&
+		moment(state.admin.defaultMeterMinimumDate).isSameOrAfter(MIN_DATE_MOMENT) &&
+		moment(state.admin.defaultMeterMinimumDate).isSameOrBefore(moment(state.admin.defaultMeterMaximumDate)) &&
+		moment(state.admin.defaultMeterMaximumDate).isSameOrBefore(MAX_DATE_MOMENT) &&
+		(state.admin.defaultMeterMaximumErrors >= 0 && state.admin.defaultMeterMaximumErrors <= MAX_ERRORS)) {
 		return true;
 	} else {
 		return false;
