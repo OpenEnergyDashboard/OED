@@ -253,8 +253,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 
 
 				{/* We can't export compare data or map data */}
-				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
-					<div style={divTopPadding}>
+				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map && this.props.chartToRender !== ChartTypes.threeD &&
+					< div style={divTopPadding}>
 						<ExportComponent />
 					</div>
 				}
@@ -275,7 +275,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</Button>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.hide.or.show.options' />
 				</div>
-			</div>
+			</div >
 		);
 	}
 
