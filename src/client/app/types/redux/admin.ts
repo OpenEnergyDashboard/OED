@@ -30,7 +30,8 @@ export type AdminAction =
 	| UpdateDefaultMeterMinimumDateAction
 	| UpdateDefaultMeterMaximumDateAction
 	| UpdateDefaultMeterReadingGapAction
-	| UpdateDefaultMeterMaximumErrorsAction;
+	| UpdateDefaultMeterMaximumErrorsAction
+	| UpdateDefaultMeterDisableChecksAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -138,6 +139,11 @@ export interface UpdateDefaultMeterMaximumErrorsAction {
 	defaultMeterMaximumErrors: number;
 }
 
+export interface UpdateDefaultMeterDisableChecksAction {
+	type: ActionType.UpdateDefaultMeterDisableChecks;
+	defaultMeterDisableChecks: boolean;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -159,4 +165,5 @@ export interface AdminState {
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }

@@ -103,7 +103,7 @@ async function getMeterInfo(url, ip, csvLine) {
 				preferences.defaultMeterMinimumDate, // minDate
 				preferences.defaultMeterMaximumDate, // maxDate
 				preferences.defaultMeterMaximumErrors, // maxError
-				undefined  // disableChecks
+				preferences.defaultMeterDisableChecks  // disableChecks
 			);
 		});
 }

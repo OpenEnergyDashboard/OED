@@ -20,5 +20,6 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_meter_minimum_date TIMESTAMP NOT NULL,
     default_meter_maximum_date TIMESTAMP NOT NULL,
 	default_meter_reading_gap REAL NOT NULL,
-    default_meter_maximum_errors INTEGER NOT NULL
+    default_meter_maximum_errors INTEGER NOT NULL,
+	default_meter_disable_checks BOOLEAN NOT NULL
 );

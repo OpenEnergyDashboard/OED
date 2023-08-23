@@ -74,7 +74,7 @@ async function uploadReadings(req, res, filepath, conn) {
 					preferences.defaultMeterMinimumDate, // minDate
 					preferences.defaultMeterMaximumDate, // maxDate
 					preferences.defaultMeterMaximumErrors, // maxError
-					undefined  // disableChecks
+					preferences.defaultMeterDisableChecks // disableChecks
 				)
 				await tempMeter.insert(conn);
 				meterCreated = true;

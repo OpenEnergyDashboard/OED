@@ -84,6 +84,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultMeterMaximumErrors: {
 					type: 'number'
+				},
+				defaultMeterDisableChecks: {
+					type: 'boolean'
 				}
 			}
 		}

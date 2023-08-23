@@ -85,6 +85,10 @@ export function updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: numbe
 	return { type: ActionType.UpdateDefaultMeterMaximumErrors, defaultMeterMaximumErrors };
 }
 
+export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): t.UpdateDefaultMeterDisableChecksAction {
+	return { type: ActionType.UpdateDefaultMeterDisableChecks, defaultMeterDisableChecks };
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -187,7 +191,8 @@ export function submitPreferences() {
 				defaultMeterMinimumDate: state.admin.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 				defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors
+				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

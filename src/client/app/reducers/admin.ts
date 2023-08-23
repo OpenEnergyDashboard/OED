@@ -30,7 +30,8 @@ const defaultState: AdminState = {
 	defaultMeterMinimumDate: moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
-	defaultMeterMaximumErrors: 75
+	defaultMeterMaximumErrors: 75,
+	defaultMeterDisableChecks: false
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -106,7 +107,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
 				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors
+				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -177,6 +179,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterDisableChecks:
+			return {
+				...state,
+				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
 				submitted: false
 			}
 		default:
