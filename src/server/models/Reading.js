@@ -251,16 +251,15 @@ class Reading {
 	static async getMeterLineReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
 		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
 		/**
-		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 * @type {array<{meter_id: int, reading_rate: Number, max_rate: Number, min_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 		const allMeterLineReadings = await conn.func('meter_line_readings_unit',
 			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
 		);
-
 		const readingsByMeterID = mapToObject(meterIDs, () => []);
 		for (const row of allMeterLineReadings) {
 			readingsByMeterID[row.meter_id].push(
-				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+				{ reading_rate: row.reading_rate, min_rate: row.min_rate, max_rate: row.max_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
 			);
 		}
 		return readingsByMeterID;
@@ -482,9 +481,11 @@ class Reading {
 			// Format readings.
 			// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
 			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
+			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
 
 			// get the hourly timestamp intervals from
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
+			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				yData.push(day[0].start_timestamp.valueOf());
@@ -580,7 +581,12 @@ class Reading {
 			}
 			// Format readings.
 			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
-			chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.valueOf()));
+
+			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
+			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
+
+			// get the hourly timestamp intervals from
+			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
 			chunkedReadings.forEach(day => {
 				let dayReadings = [];
 				// Data data may need to be converted into 'moment' to save on network load

@@ -31,6 +31,9 @@ export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRen
 export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
 	return { type: ActionType.ToggleAreaNormalization };
 }
+export function toggleShowMinMax(): t.ToggleShowMinMaxAction {
+	return { type: ActionType.ToggleShowMinMax }
+}
 
 export function changeBarStacking(): t.ChangeBarStackingAction {
 	return { type: ActionType.ChangeBarStacking };
@@ -210,9 +213,7 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 export function updateThreeDReadingsPerDay(readingsPerDay: t.ReadingsPerDay): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
-		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
-
-		return Promise.resolve();
+		return dispatch(fetchNeededThreeDReadings());
 	};
 }
 
@@ -224,10 +225,10 @@ export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOr
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
 		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
-		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
-		return Promise.resolve();
+		return dispatch(fetchNeededThreeDReadings());
 	};
 }
+
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
@@ -239,6 +240,7 @@ export interface LinkOptions {
 	sliderRange?: TimeInterval;
 	toggleAreaNormalization?: boolean;
 	areaUnit?: string;
+	toggleMinMax?: boolean;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -260,7 +262,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
 		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
-		t.UpdateSelectedAreaUnitAction | t.UpdateThreeDMeterOrGroupInfo> = [];
+		t.UpdateSelectedAreaUnitAction | t.UpdateThreeDMeterOrGroupInfo |
+		t.ToggleShowMinMaxAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -298,7 +301,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.areaUnit) {
 		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
-
+	}
+	if (options.toggleMinMax) {
+		dispatchSecond.push(toggleShowMinMax());
 	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
@@ -317,7 +322,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
-	if(options.readingsPerDay){
+	if (options.readingsPerDay) {
 		dispatchSecond.push(updateThreeDReadingsPerDay(options.readingsPerDay));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))

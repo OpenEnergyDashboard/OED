@@ -77,15 +77,34 @@ function expectReadingToEqualExpected(res, expected) {
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
  */
-function expectThreeDReadingToEqualExpected(res, expected) {
+function expectThreeDReadingToEqualExpected(res, expected, readingsPerDay) {
+
+	const days = expected.length / readingsPerDay;
 	expect(res).to.be.json;
 	expect(res).to.have.status(HTTP_CODE.OK);
 	// Did the response have the correct number of readings.
 	expect(res.body).to.have.property('xData');
     expect(res.body).to.have.property('yData');
-    expect(res.body).to.have.property('zData');
+    expect(res.body).to.have.property('zData').to.have.lengthOf(days);
 
-    expect(res.body).to.have.property(`zData`).to.have.lengthOf(expected.length);
+    let k = 0;
+	let h = 0;
+    for (let i = 0; i < days; i++){
+        for (let j = 0; j < 24; j++){
+			if (i == 0) {
+				let hourTimeStamp = moment(expected[i][1]).add(j, 'h').add(30, 'm');
+				expect(res.body.xData[j]).to.be.equal(hourTimeStamp.valueOf());
+			}
+			if (readingsPerDay == 24){
+            	expect(res.body.zData[i][j]).to.be.closeTo(Number(expected[h][0]), DELTA);
+				h++;
+			}
+			expect(res.body.zData[i][j]).to.be.not.equal(null);
+        }
+		expect(res.body.yData[i]).to.be.equal(Date.parse(expected[k][1]));
+        k += readingsPerDay;
+    }
+
 }
 
 /**

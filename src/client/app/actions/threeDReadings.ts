@@ -58,13 +58,14 @@ export function fetchNeededThreeDReadings(): Thunk {
 		const selectedMeterOrGroupID = state.graph.threeD.meterOrGroupID;
 		const meterOrGroup = state.graph.threeD.meterOrGroup;
 		//3D Graphic currently only allows full days. Round start down && end up
-
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval);
 
-		if (state.graph.chartToRender !== ChartTypes.threeD || // only fetch if 3D Component
-			!isValidThreeDInterval(timeInterval) || // Time interval must be bounded, Infinite intervals not allowed
-			!selectedMeterOrGroupID)// no meter selected
-		{
+		// only fetch if on 3D page
+		// Time interval must be bounded, Infinite intervals not allowed
+		// Meter Must Be Selected.
+		if (state.graph.chartToRender !== ChartTypes.threeD ||
+			!isValidThreeDInterval(timeInterval) ||
+			!selectedMeterOrGroupID) {
 			return Promise.resolve();
 		}
 		if (meterOrGroup === 'meters') {
@@ -99,7 +100,6 @@ function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInter
 	return !hasReadings ? true : false;
 }
 
-//////////////
 /**
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check

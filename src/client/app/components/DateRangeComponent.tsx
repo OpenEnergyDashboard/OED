@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
@@ -17,12 +18,12 @@ import { Dispatch } from '../types/redux/actions';
 import { changeGraphZoomIfNeeded } from '../actions/graph';
 
 /**
- * A component which allows users to select date ranges in lieu of a slider like the line graphic..
+ * A component which allows users to select date ranges in lieu of a slider (line graphic)
  * @returns Date Range Calendar Picker
  */
-export default function ThreeDDateRangeComponent() {
+export default function DateRangeComponent() {
 	const timeInterval = useSelector((state: State) => state.graph.timeInterval);
-	const locale = useSelector((state: State) => state.admin.defaultLanguage);
+	const locale = useSelector((state: State) => state.options.selectedLanguage);
 	const chartToRender = useSelector((state: State) => state.graph.chartToRender);
 	const dispatch: Dispatch = useDispatch();
 

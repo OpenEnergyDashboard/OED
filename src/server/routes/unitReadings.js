@@ -28,6 +28,7 @@ function validateMeterLineReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
+
 function validateLineReadingsQueryParams(queryParams) {
 	const validQuery = {
 		type: 'object',
@@ -50,6 +51,8 @@ function validateLineReadingsQueryParams(queryParams) {
 function formatReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading_rate,
+		min: readingRow.min_rate,
+		max: readingRow.max_rate,
 		// This returns a Unix timestamp in milliseconds. This should be smaller in size when sent to the client
 		// compared to sending the formatted moment object. All values are sent as a string.
 		// The consequence of doing this is that when the client recreates this as a moment it will do it in
@@ -138,6 +141,63 @@ function validateBarReadingsQueryParams(queryParams) {
 	};
 	const queryValidationResult = validate(queryParams, validQuery);
 	return queryValidationResult.valid;
+}
+
+function validateMeterThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+$'	
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+function validateGroupThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
+
+
+function validateThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+	const validParams = {
+		type: 'object',
+		maxProperties: 3,
+		required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+		properties: {
+			timeInterval: {
+				type: 'string',
+			},
+			graphicUnitID: {
+				type: 'string',
+				pattern: '^\\d+$'
+			},
+			sequenceNumber: {
+				type: 'string',
+				pattern: '^([123468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+			}
+		}
+	};
+	const paramsValidationResult = validate(queryParams, validParams);
+	return paramsValidationResult.valid;
 }
 
 function formatBarReadingRow(readingRow) {
@@ -373,5 +433,10 @@ module.exports = {
 	meterBarReadings,
 	validateMeterBarReadingsParams: validateMeterBarReadingsParams,
 	validateBarReadingsQueryParams,
+	meterThreeDReadings,
+	groupThreeDReadings,
+	validateMeterThreeDReadingsParams,
+	validateGroupThreeDReadingsParams,
+	validateThreeDQueryParams,
 	createRouter
 };

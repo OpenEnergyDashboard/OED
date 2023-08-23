@@ -24,6 +24,10 @@ export const LineGraphRates = {
 	'day': 24
 }
 
+// Use to determine readings per day on 3D Graphs
+// 24 / ReadingsPerDay.twentyFour(1) = 24 readings per day @ 1 hour intervals
+// 24 / ReadingsPerDay.twelve(2) = 12 readings per day @ 2 hour intervals
+// and so on.
 export enum ReadingsPerDay {
 	twentyFour = 1,
 	twelve = 2,
@@ -66,6 +70,10 @@ export interface ChangeChartToRenderAction {
 
 export interface ToggleAreaNormalizationAction {
 	type: ActionType.ToggleAreaNormalization;
+}
+
+export interface ToggleShowMinMaxAction {
+	type: ActionType.ToggleShowMinMax;
 }
 
 export interface ChangeBarStackingAction {
@@ -119,6 +127,7 @@ export interface UpdateThreeDReadingsPerDay {
 	type: ActionType.UpdateThreeDReadingsPerDay;
 	readingsPerDay: ReadingsPerDay;
 }
+
 export interface UpdateThreeDMeterOrGroupInfo {
 	type: ActionType.UpdateThreeDMeterOrGroupInfo;
 	meterOrGroupID: MeterOrGroupID;
@@ -131,6 +140,7 @@ export type GraphAction =
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
 	| ToggleAreaNormalizationAction
+	| ToggleShowMinMaxAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
@@ -179,5 +189,6 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
+	showMinMax: boolean;
 	threeD: ThreeDState;
 }

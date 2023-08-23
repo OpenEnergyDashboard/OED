@@ -6,9 +6,35 @@ import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
 
+/**
+ * Converts from OED's TimeInterval into a DateRange for compatibility with @wojtekmaj's DateRangePicker
+ * Refer to https://github.com/wojtekmaj/react-calendar/issues/511#issuecomment-835333976 for an explanation behind the logic.
+ * @param timeInterval - current redux state
+ * @returns the converted DateRange [start, end] as Date() Objects.
+ */
+export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
+	if (timeInterval.getIsBounded()) {
+		const startTimeStamp = timeInterval.getStartTimestamp().toISOString().slice(0, -1);
+		const endTimeStamp = timeInterval.getEndTimestamp().toISOString().slice(0, -1);
+		const startDate = new Date(startTimeStamp);
+		const endDate = new Date(endTimeStamp);
+		return [startDate, endDate];
+	}
+	return null;
+}
 
 /**
- * Converts from DateRange for to OED's Time interval for compatibility with @wojtekmaj's DateRangePicker
+ * Handles Date Object locale stripping. Removes the timeZoneOffset from Date Object's UTC String.
+ * Refer to https://github.com/wojtekmaj/react-calendar/issues/511#issuecomment-835333976 for an explanation behind the logic.
+ * @param date - Date Object to be converted.
+ * @returns modified date to remove locale quirks with Moment.UTC
+ */
+export function toUTC(date: Date) {
+	return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+}
+
+/**
+ * Converts from DateRange to OED's TimeInterval for compatibility with @wojtekmaj's DateRangePicker
  * @param dateRange - DateRange to be converted
  * @returns the translated TimeInterval
  */
@@ -23,27 +49,13 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 		end = moment(toUTC(end));
 		return new TimeInterval(start, end);
 	}
+	// If start or end ts is missing, treat as unbounded interval
 	return TimeInterval.unbounded();
 }
 
 /**
- * Converts from OED's TimeInterval into a DateRange for compatibility with DateRangePicker
- * @param timeInterval - current redux state
- * @returns the converted DateRange [start, end] as Date() Objects.
- */
-export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
-	if (timeInterval.getIsBounded()) {
-		const startTimeStamp = timeInterval.getStartTimestamp().toISOString().slice(0, -1);
-		const endTimeStamp = timeInterval.getEndTimestamp().toISOString().slice(0, -1);
-		const startDate = new Date(startTimeStamp);
-		const endDate = new Date(endTimeStamp);
-		return [startDate, endDate];
-	}
-	return null;
-}
-/**
  * Rounds Time interval for a full day's worth of readings for use with 3d Graphics
- * @param timeInterval - DateRange to be converted
+ * @param timeInterval TimeInterval to be rounded to the full day(s)
  * @returns the a time interval into a dateRange compatible for 3d graphics
  */
 export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInterval {
@@ -59,14 +71,6 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
 		return new TimeInterval(startTS, endTS);
 	}
 	return TimeInterval.unbounded();
-}
-/**
- * Handles Date Object locale stripping. Removes the timeZoneOffset from Date Object's UTC String.
- * @param date - Date Object to be converted.
- * @returns modified date to remove locale quirks with Moment.UTC
- */
-export function toUTC(date: Date) {
-	return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 }
 
 /**

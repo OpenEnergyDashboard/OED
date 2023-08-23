@@ -27,6 +27,7 @@ const defaultState: GraphState = {
 	optionsVisibility: true,
 	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
+	showMinMax: false,
 	threeD: {
 		meterOrGroupID: null,
 		meterOrGroup: MeterOrGroup.meters,
@@ -97,6 +98,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 			return {
 				...state,
 				areaNormalization: !state.areaNormalization
+			};
+		case ActionType.ToggleShowMinMax:
+			return {
+				...state,
+				showMinMax: !state.showMinMax
 			};
 		case ActionType.ChangeBarStacking:
 			return {

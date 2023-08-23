@@ -25,6 +25,8 @@ export interface LineReading {
 	reading: number;
 	startTimestamp: number;
 	endTimestamp: number;
+	min: number;
+	max: number;
 }
 
 export interface LineReadings {
@@ -39,12 +41,6 @@ export interface BarReading {
 
 export interface BarReadings {
 	[id: number]: BarReading[];
-}
-
-export interface MeterReading {
-	reading: number;
-	startTimestamp: number;
-	endTimestamp: number;
 }
 
 export interface ThreeDReading {
