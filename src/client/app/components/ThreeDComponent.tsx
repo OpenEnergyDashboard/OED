@@ -80,13 +80,13 @@ export default function ThreeDComponent() {
 		}
 		else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
 			// Not a valid time interval. ThreeD can only support up to 1 year of readings
-			layout = setLayout(translate('threeD.dateRange.too.long'));
+			layout = setLayout(translate('threeD.date.range.too.long'));
 		} else if (!threeDData) {
 			// Not actually 'rendering', but from the user perspective should make sense.
 			layout = setLayout(translate('threeD.rendering'));
 		} else if (threeDData.zData.length === 0) {
 			// There is no data in the selected date range.
-			layout = setLayout(translate('threeD.noData'));
+			layout = setLayout(translate('threeD.no.data'));
 		} else {
 			[dataToRender, layout] = formatThreeDData(threeDData, state);
 		}
@@ -222,11 +222,11 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 			...threeDLayout.scene,
 			xaxis: {
 				...threeDLayout.scene.xaxis,
-				title: { text: translate('threeD.xAxis.label') }
+				title: { text: translate('threeD.x.axis.label') }
 			},
 			yaxis: {
 				...threeDLayout.scene.yaxis,
-				title: { text: translate('threeD.yAxis.label') }
+				title: { text: translate('threeD.y.axis.label') }
 			},
 			zaxis: {
 				...threeDLayout.scene.zaxis,
