@@ -68,6 +68,10 @@ export interface ToggleAreaNormalizationAction {
 	type: ActionType.ToggleAreaNormalization;
 }
 
+export interface ToggleShowMinMaxAction {
+	type: ActionType.ToggleShowMinMax;
+}
+
 export interface ChangeBarStackingAction {
 	type: ActionType.ChangeBarStacking;
 }
@@ -131,6 +135,7 @@ export type GraphAction =
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
 	| ToggleAreaNormalizationAction
+	| ToggleShowMinMaxAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
@@ -179,5 +184,6 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
+	showMinMax: boolean;
 	threeD: ThreeDState;
 }
