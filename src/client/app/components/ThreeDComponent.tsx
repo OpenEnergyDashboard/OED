@@ -153,7 +153,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 			}
 		}
 	}
-	const hoverText = data.zData.map((day, i) => day.map((readings, j) => {
+	const hoverText = zDataToRender.map((day, i) => day.map((readings, j) => {
 		const date = moment.utc(data.yData[i]).format('LL');
 		const time = moment.utc(data.xData[j]).format('h:mm A');
 		// ThreeD graphic readings can be null. If not null round the precision.
