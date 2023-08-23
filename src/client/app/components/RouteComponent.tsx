@@ -182,6 +182,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 						const info: string = fixTypeIssue.toString();
 						// ESLint does not want const params in the one case it is used so put here.
 						let params;
+						//TODO validation could be implemented across all cases similar to compare period and sorting order
 						switch (key) {
 							case 'meterIDs':
 								options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -253,11 +254,9 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								options.meterOrGroupID = parseInt(info);
 								break;
 							case 'meterOrGroup':
-								//TODO VALIDATE
 								options.meterOrGroup = info as MeterOrGroup;
 								break;
 							case 'readingsPerDay':
-								//TODO VALIDATE
 								options.readingsPerDay = parseInt(info);
 								break;
 							default:

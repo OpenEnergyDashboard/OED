@@ -24,6 +24,10 @@ export const LineGraphRates = {
 	'day': 24
 }
 
+// Use to determine readings per day on 3D Graphs
+// 24 / ReadingsPerDay.twentyFour(1) = 24 readings per day @ 1 hour intervals
+// 24 / ReadingsPerDay.twelve(2) = 12 readings per day @ 2 hour intervals
+// and so on.
 export enum ReadingsPerDay {
 	twentyFour = 1,
 	twelve = 2,
@@ -123,6 +127,7 @@ export interface UpdateThreeDReadingsPerDay {
 	type: ActionType.UpdateThreeDReadingsPerDay;
 	readingsPerDay: ReadingsPerDay;
 }
+
 export interface UpdateThreeDMeterOrGroupInfo {
 	type: ActionType.UpdateThreeDMeterOrGroupInfo;
 	meterOrGroupID: MeterOrGroupID;

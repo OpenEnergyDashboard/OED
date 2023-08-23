@@ -19,8 +19,8 @@ import { SelectOption } from 'types/items';
  * @returns List of selected groups and meters as reactstrap Badges.pills
  */
 export default function ThreeDPillComponent() {
-	const meters = useSelector((state: State) => state.meters);
-	const groups = useSelector((state: State) => state.groups);
+	const metersState = useSelector((state: State) => state.meters);
+	const groupsState = useSelector((state: State) => state.groups);
 	const threeDState = useSelector((state: State) => state.graph.threeD);
 
 	// TODO code nearly duplicates ChartDataSelectComponents useSelect. Better approach needed.
@@ -65,13 +65,25 @@ export default function ThreeDPillComponent() {
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupList: SelectOption[], meterOrGroup: MeterOrGroup) => {
 		return meterOrGroupList.map(meterOrGroupID => {
-			// Depending on passed meterOrGroup parameter, retrieve and validate data from appropriate state slice .meters .group
-			const meterOrGroupName = meterOrGroup === 'meters' ? meters.byMeterID[meterOrGroupID.value].identifier : groups.byGroupID[meterOrGroupID.value].name;
+			//retrieve data from appropriate state slice .meters or .group
+			const meterOrGroupName = meterOrGroup === 'meters' ?
+				metersState.byMeterID[meterOrGroupID.value].identifier
+				:
+				groupsState.byGroupID[meterOrGroupID.value].name;
+
+			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;
-			const meterOrGroupSelected = threeDState.meterOrGroup === MeterOrGroup.meters;
-			const isMeterOrGroup = meterOrGroup === MeterOrGroup.meters;
+
+			// meterOrGroup value in state
+			const meterOrGroupSelected = threeDState.meterOrGroup === MeterOrGroup.meters ? MeterOrGroup.meters : MeterOrGroup.groups;
+			// meterOrGroup value passed as function param
+			const isMeterOrGroup = meterOrGroup === MeterOrGroup.meters ? MeterOrGroup.meters : MeterOrGroup.groups;
+
 			// Determines if the current pill is the one being generated, and sets its color accordingly
+			// meters and groups can share id's so check for both: id match, and meter or group label match
 			const isCurrentlySelected = (meterOrGroupID.value === selectedMeterOrGroupID) && (meterOrGroupSelected === isMeterOrGroup);
+
+			//  highlight currently Selected  as primary
 			const colorToRender = isCurrentlySelected ? 'primary' : 'secondary';
 			return (
 				<Badge
@@ -109,7 +121,8 @@ export default function ThreeDPillComponent() {
 	)
 }
 
-// Styling for the component, may need to be converted into .css files in the future.
+// TODO Styling for the component, may need to be converted into .css files
+// TODO ISSUE when many meters selected they are cut off.
 const pillContainer: React.CSSProperties = {
 	display: 'flex',
 	justifyContent: 'space-between',

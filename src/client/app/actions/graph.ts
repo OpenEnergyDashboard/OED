@@ -213,9 +213,7 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 export function updateThreeDReadingsPerDay(readingsPerDay: t.ReadingsPerDay): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
-		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
-
-		return Promise.resolve();
+		return dispatch(fetchNeededThreeDReadings());
 	};
 }
 
@@ -227,10 +225,10 @@ export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOr
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
 		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
-		dispatch((dispatch2: Dispatch) => dispatch2(fetchNeededThreeDReadings()));
-		return Promise.resolve();
+		return dispatch(fetchNeededThreeDReadings());
 	};
 }
+
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
@@ -324,7 +322,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
-	if(options.readingsPerDay){
+	if (options.readingsPerDay) {
 		dispatchSecond.push(updateThreeDReadingsPerDay(options.readingsPerDay));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))

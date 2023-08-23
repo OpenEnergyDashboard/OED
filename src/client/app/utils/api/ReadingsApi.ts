@@ -92,7 +92,7 @@ export default class ReadingsApi {
 	 * @param meterID Meter to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @param readingsPerDay The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingsPerDay Determines the reading intervals for 3d graphs, 1hour, two hour, etc.
 	 * @returns ThreeDReadings in sorted order
 	 */
 	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
@@ -105,15 +105,14 @@ export default class ReadingsApi {
 
 	/**
 	 * Gets 3D readings for a single meter in the given time range.
-	 * @param groupID Meter to query
+	 * @param groupID groupID to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @param readingsPerDay The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingsPerDay Determines the reading intervals for 3d graphs, 1hour, two hour, etc.
 	 * @returns ThreeDReadings in sorted order
 	 */
 	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
 		: Promise<ThreeDReading> {
-		// TODO update api endpoint to groups hardcoded to simulate data retrieval
 		return await this.backend.doGetRequest<ThreeDReading>(
 			`/api/unitReadings/threeD/groups/${groupID}`,
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), sequenceNumber: readingsPerDay.toString() }

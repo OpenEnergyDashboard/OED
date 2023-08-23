@@ -43,12 +43,6 @@ export interface BarReadings {
 	[id: number]: BarReading[];
 }
 
-export interface MeterReading {
-	reading: number;
-	startTimestamp: number;
-	endTimestamp: number;
-}
-
 export interface ThreeDReading {
 	xData: number[];
 	yData: number[];

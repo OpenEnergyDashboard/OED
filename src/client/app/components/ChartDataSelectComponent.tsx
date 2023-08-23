@@ -318,8 +318,6 @@ export default function ChartDataSelectComponent() {
 							dispatch(changeSelectedGroups(allSelectedGroupIDs));
 
 							// Do additional things relevant to 3D graphics
-							// This block is responsible for keeping 3D state in sync with meters and group menus
-							// Variables determine whether the component change added or removed a group.
 							syncThreeDState(dataProps, allSelectedGroupIDs, oldSelectedGroupIDs, difference, MeterOrGroup.groups, dispatch);
 						}
 					}}
@@ -357,8 +355,6 @@ export default function ChartDataSelectComponent() {
 							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 
 							// Do additional things relevant to 3D graphics
-							// Logic mirrors the group multiselect onValuesChange()
-							// This Method is responsible for keeping 3D state in sync with meters and group menus
 							syncThreeDState(dataProps, allSelectedMeterIDs, oldSelectedMeterIDs, difference, MeterOrGroup.meters, dispatch);
 
 						}
@@ -726,11 +722,11 @@ function instanceOfGroupsState(state: any): state is GroupsState { return 'byGro
 
 /**
  * 3D helper function used to keep 3D redux state in sync with dropdown menus
- * @param dataProps value derived from the multiselect component from which this method is called.
- * @param allSelected value derived from the multiselect component from which this method is called.
- * @param oldSelected value derived from the multiselect component from which this method is called.
- * @param difference value derived from the multiselect component from which this method is called.
- * @param meterOrGroup value derived from the multiselect component from which this method is called.
+ * @param dataProps used to extract relevant useSelect state values
+ * @param allSelected all selected meters
+ * @param oldSelected previously selected meters
+ * @param difference integer value that represents the removed meter Or Group
+ * @param meterOrGroup used to set whether a meter or group is currently active.
  * @param dispatch instance of the dispatch for altering redux state.
  */
 function syncThreeDState(
@@ -740,13 +736,21 @@ function syncThreeDState(
 	difference: number,
 	meterOrGroup: MeterOrGroup,
 	dispatch: Dispatch): void {
+
+	// checks to see if meter has been removed
 	const meterOrGroupAdded = allSelected.length > oldSelected.length;
 	const meterOrGroupRemoved = !meterOrGroupAdded;
+
+	//Check to see if potentially removed meterOrGroup is currently active.
 	const meterOrGroupIsSelected = difference === dataProps.threeDState.meterOrGroupID;
+
 	if (meterOrGroupAdded && dataProps.chartToRender === ChartTypes.threeD) {
+		// when a meter or group is selected, make it the currently active in 3D state.
+		// only tracks when on 3d page.
 		const addedMeterOrGroup = allSelected[allSelected.length - 1];
 		dispatch(changeMeterOrGroupInfo(addedMeterOrGroup, meterOrGroup));
 	} else if (meterOrGroupRemoved && meterOrGroupIsSelected) {
+		// reset currently active threeD Meter or group when it is removed and is currently active.
 		dispatch(changeMeterOrGroupInfo(null));
 	}
 }

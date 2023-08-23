@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import * as moment from 'moment';
 import Plot from 'react-plotly.js';
@@ -30,40 +31,52 @@ export default function ThreeDComponent() {
 		// threeDState contains the currentMeterOrGroup to be fetched.
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
-		// meterOrGroup Determines wether to get readings from state .byMeterID or .byGroupID
+
+		// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
 		const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
+
 		// 3D requires intervals to be rounded to a full day.
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
 		const unitID = state.graph.selectedUnit;
-		// Level of detail along the xAxis / Readings per day,
-		const precision = state.graph.threeD.readingsPerDay;
+
+		// Level of detail along the xAxis / Readings per day
+		const readingsPerDay = state.graph.threeD.readingsPerDay;
+
+		// Initialize Default values
 		let threeDData = null;
 		let isAreaCompatible = true;
-		let name = 'Uknown Meter';
+		let meterOrGroupName = 'Unknown Meter or Group';
+		let layout = {};
+		let dataToRender = null;
+
+		// Meter Or Group is selected
 		if (meterOrGroupID) {
-			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[precision]?.readings;
+			// Get Reading data
+			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingsPerDay]?.readings;
+
+			// Get Meter or Group's info
 			const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?
 				state.meters.byMeterID[meterOrGroupID]
 				:
 				state.groups.byGroupID[meterOrGroupID];
+
+			// Use Meter or Group's info to determine whether it can be rendered with area normalization
 			const area = meterOrGroupInfo.area;
 			const areaUnit = meterOrGroupInfo.areaUnit;
-			name = threeDState.meterOrGroup === MeterOrGroup.meters ?
+			isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
+
+			// Get Meter Or Groups name/label
+			meterOrGroupName = threeDState.meterOrGroup === MeterOrGroup.meters ?
 				state.meters.byMeterID[meterOrGroupID].identifier
 				:
 				state.groups.byGroupID[meterOrGroupID].name;
-			isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		}
-		// const areaUnit = state.groups.byGroupID[selectOption.value].areaUnit;
-		// const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 
-		let layout = {};
-		let dataToRender = null;
 		if (!meterOrGroupID) {
 			// No selected Meters
 			layout = setLayout(translate('select.meter.group'));
 		} else if (state.graph.areaNormalization && !isAreaCompatible) {
-			layout = setLayout(`${name}<br>is incompatible<br>with area normalization`);
+			layout = setLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
 		}
 		else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
 			// Not a valid time interval. ThreeD can only support up to 1 year of readings
@@ -82,7 +95,7 @@ export default function ThreeDComponent() {
 
 	// Necessary for the case when a meter/group is selected and time intervals get altered externally. (Line graphic slider, for example.)
 	useEffect(() => {
-		// Fetch on initial render only, all other fetch will be called from PillBadges, or meter/group menus
+		// Fetch on initial render only, all other fetch will be called from PillBadges, or meter/group multiselect
 		dispatch(fetchNeededThreeDReadings());
 	}, [])
 
@@ -98,8 +111,6 @@ export default function ThreeDComponent() {
 					config={config}
 					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
-				// Camera Testing Config Purposes only.
-				// onUpdate={(figure: any) => console.log(figure.layout.scene.camera)}
 				/>
 			}
 		</div>
@@ -160,7 +171,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
-	// TODO find a better way to set the zAxis
+
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
@@ -182,7 +193,7 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 }
 
 /**
- * Utility to get plotlyLayout
+ * Utility to get/ set help text plotlyLayout
  * @param helpText 3D data to be formatted
  * @param fontSize current application state
  * @returns plotly layout object.
@@ -199,21 +210,22 @@ function setLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 
 }
 
 /**
- * Utility to get plotlyLayout
+ * Utility to get / set 3D graphic plotlyLayout
  * @param zLabelText 3D data to be formatted
  * @returns plotly layout object.
  */
 function setThreeDLayout(zLabelText: string = 'Resource Usage') {
+	// responsible for setting Labels
 	return {
 		...threeDLayout,
 		scene: {
 			...threeDLayout.scene,
 			xaxis: {
-				...threeDLayout.scene.zaxis,
+				...threeDLayout.scene.xaxis,
 				title: { text: translate('threeD.xAxis.label') }
 			},
 			yaxis: {
-				...threeDLayout.scene.zaxis,
+				...threeDLayout.scene.yaxis,
 				title: { text: translate('threeD.yAxis.label') }
 			},
 			zaxis: {
@@ -224,25 +236,28 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	}
 }
 
+// 3D Graphic Template used for setThreeDLayout() axis labels are overridden.
 const threeDLayout = {
 	autosize: true,
-	connectgaps: false, //Leaves holes in graph for missing, undefined, NaN, or null values.
+	//Leaves holes in graph for missing, undefined, NaN, or null values
+	connectgaps: false,
 	scene: {
 		xaxis: {
-			title: { text: 'Hours of Day' }
+			title: { text: 'xAxis Placeholder Text' }
 		},
 		yaxis: {
-			title: { text: 'Days of Calendar Year' }
+			title: { text: 'yAxis Placeholder Text' }
 		},
 		zaxis: {
-			title: { text: 'Resource Usage' }
+			title: { text: 'zAxis Placeholder Text' }
 		},
+		// Somewhat suitable aspect ratio values for 3D Graphs
 		aspectratio: {
 			x: 1,
 			y: 2.75,
 			z: 1
 		},
-		// Somewhat suitable camera eye values for data of zResource[day][hour]
+		// Somewhat suitable camera eye values for data of zResource[day][interval]
 		camera: {
 			eye: {
 				x: 2.5,
@@ -252,6 +267,8 @@ const threeDLayout = {
 		}
 	}
 };
+
+// Help Text Layout Template.
 const helpInfoLayout = {
 	'xaxis': {
 		'visible': false
