@@ -90,7 +90,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
 				<AreaUnitSelectComponent />
-				{/* Controls error bar, specifically for the line chart.  */}
+				{/* Controls error bar, specifically for the line chart. */}
 				{this.props.chartToRender === ChartTypes.line &&
 					<ErrorBarComponent />
 				}

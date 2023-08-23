@@ -130,6 +130,7 @@ function fetchGroupLineReadings(groupIDs: number[], timeInterval: TimeInterval, 
 		dispatch(receiveGroupLineReadings(groupIDs, timeInterval, unitID, groupLineReadings));
 	};
 }
+
 /**
  * Fetches readings for the line chart of all selected meters and groups, if needed.
  * @param timeInterval the interval over which to check
