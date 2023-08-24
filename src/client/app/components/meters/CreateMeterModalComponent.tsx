@@ -145,8 +145,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 	const MAX_VAL = Number.MAX_SAFE_INTEGER;
 	const MIN_DATE_MOMENT = moment(0).utc();
 	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
-	const MIN_DATE = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ');
-	const MAX_DATE = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ');
+	const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
 	const MAX_ERRORS = 75;
 	useEffect(() => {
 		setValidMeter(
