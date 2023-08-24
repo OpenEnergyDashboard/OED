@@ -45,14 +45,14 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterName) {
 		if (reading.startTimestamp < minDate) {
 			const newErrMsg = `error when checking reading time from meter ${meterName}: time ${reading.startTimestamp} is earlier than lower bound ${minDate}`;
 			log.error(newErrMsg);
-			errMsg += newErrMsg + '<br>';
+			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validDates = false;
 		}
 		if (reading.endTimestamp > maxDate) {
 			const newErrMsg = `error when checking reading time from meter ${meterName}: time ${reading.endTimestamp} is later than upper bound ${maxDate}`;
 			log.error(newErrMsg);
-			errMsg += newErrMsg + '<br>';
+			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validDates = false;
 		}
@@ -77,13 +77,13 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError, meterName) {
 		if (reading.reading < minVal) {
 			const newErrMsg = `error when checking reading value from meter ${meterName}: value ${reading.reading} is smaller than lower bound ${minVal}`;
 			log.error(newErrMsg);
-			errMsg += newErrMsg + '<br>';
+			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validValues = false;
 		} else if (reading.reading > maxVal) {
 			const newErrMsg = `error when checking reading value from meter ${meterName}: value ${reading.reading} is larger than upper bound ${maxVal}`;
 			log.error(newErrMsg);
-			errMsg += newErrMsg + '<br>';
+			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validValues = false;
 		}
@@ -118,7 +118,7 @@ function checkIntervals(arrayToValidate, threshold, meterName) {
 		if (Math.abs(currGap - interval) > threshold) {
 			const newErrMsg = `unequal interval is detected from meter ${meterName}: time gap between ${reading.startTimestamp} and ${lastTime} is too big`;
 			log.error(newErrMsg);
-			errMsg += newErrMsg + '<br>';
+			errMsg += '<br>' + newErrMsg + '<br>';
 			validIntervals = false;
 			break;
 		}
