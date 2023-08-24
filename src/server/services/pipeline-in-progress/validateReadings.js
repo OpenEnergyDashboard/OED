@@ -123,7 +123,7 @@ function checkIntervals(arrayToValidate, threshold, meterName) {
 		}
 		lastTime = reading.endTimestamp;
 	}
-	return { validIntervals, errMsg };  // Return both values in an object
+	return { validIntervals, errMsg };
 }
 
 
