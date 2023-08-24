@@ -11,6 +11,7 @@ const { log } = require('../../log');
  * Validate an array of Readings value according to certain criteria
  * @param {Reading[]} arrayToValidate
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
+ * @param {string} meterName name of meter being checked
  */
 function validateReadings(arrayToValidate, conditionSet, meterName = undefined) {
 	/* tslint:disable:no-string-literal */
