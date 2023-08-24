@@ -53,6 +53,7 @@ export interface PreferenceRequestItem {
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }
 
 /**

@@ -60,7 +60,7 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				preferences.defaultMeterMinimumDate, // minDate
 				preferences.defaultMeterMaximumDate, // maxDate
 				preferences.defaultMeterMaximumErrors, // maxError
-				undefined  // disableChecks
+				preferences.defaultMeterDisableChecks  // disableChecks
 			);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +

@@ -81,7 +81,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 		minDate: adminState.defaultMeterMinimumDate,
 		maxDate: adminState.defaultMeterMaximumDate,
 		maxError: adminState.defaultMeterMaximumErrors,
-		disableChecks: false
+		disableChecks: adminState.defaultMeterDisableChecks
 	}
 
 	const dropdownsStateDefaults = {
@@ -869,7 +869,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								id='disableChecks'
 								name='disableChecks'
 								type='select'
-								defaultValue={state.disableChecks.toString()}
+								defaultValue={state.disableChecks?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)

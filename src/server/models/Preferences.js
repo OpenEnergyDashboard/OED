@@ -25,11 +25,12 @@ class Preferences {
 	 * @param {String} defaultMeterMaximumValue - Option to set the default meter maximum value
 	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
+	 * @param {Boolean} defaultMeterDisableChecks - Option to set the default meter disable checks
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
 		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency, 
 		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate, 
-		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors) {
+		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultMeterDisableChecks) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -46,6 +47,7 @@ class Preferences {
 		this.defaultMeterMaximumDate = defaultMeterMaximumDate;
 		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
+		this.defaultMeterDisableChecks = defaultMeterDisableChecks;
 	}
 
 	/**
@@ -83,7 +85,8 @@ class Preferences {
 			row.default_meter_minimum_date,
 			row.default_meter_maximum_date,
 			row.default_meter_reading_gap,
-			row.default_meter_maximum_errors
+			row.default_meter_maximum_errors,
+			row.default_meter_disable_checks
 		);
 	}
 
@@ -121,7 +124,8 @@ class Preferences {
 				defaultMeterMinimumDate: preferences.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
 				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors
+				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: preferences.defaultMeterDisableChecks
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
 		// input so return the new preferences. Easier just to return them all and only
