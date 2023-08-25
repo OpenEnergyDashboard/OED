@@ -67,7 +67,7 @@ class Reading {
 	 * Returns a promise to create the 3D readings function
 	 * @param conn the database connection to use
 	 */
-	static create3dReadingsFunction(conn) {
+	static create3DReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_3d_readings.sql'));
 	}
 
