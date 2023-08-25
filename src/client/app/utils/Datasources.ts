@@ -11,10 +11,9 @@ export const DATA_TYPE_GROUP = DataType.Group;
 
 /**
  * Put item's id field in tgt if the item specifies a meter
- *
- * @param {number[]} tgt The array to perhaps insert an item into
- * @param {{String, number}} item The item being considered
- * @returns {Array} The modified tgt array
+ * @param tgt The array to perhaps insert an item into
+ * @param item The item being considered
+ * @returns The modified tgt array
  */
 export function metersFilterReduce(tgt: number[], item: DatasourceID) {
 	if (item.type === DATA_TYPE_METER) {
@@ -25,10 +24,9 @@ export function metersFilterReduce(tgt: number[], item: DatasourceID) {
 
 /**
  * Put item's id field in tgt if the item specifies a group
- *
- * @param {number[]} tgt The array to perhaps insert an item into
- * @param {{String, number}} item The item being considered
- * @returns {Array} The modified tgt array
+ * @param tgt The array to perhaps insert an item into
+ * @param item The item being considered
+ * @returns The modified tgt array
  */
 export function groupsFilterReduce(tgt: number[], item: DatasourceID) {
 	if (item.type === DATA_TYPE_GROUP) {

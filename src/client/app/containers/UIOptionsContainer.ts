@@ -10,12 +10,11 @@ import {
 	changeBarStacking,
 	changeCompareGraph,
 	changeCompareSortingOrder,
-	setOptionsVisibility
+	toggleOptionsVisibility
 } from '../actions/graph';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
-
 
 function mapStateToProps(state: State) {
 	return {
@@ -35,7 +34,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		changeBarStacking: () => dispatch(changeBarStacking()),
 		changeCompareGraph: (comparePeriod: ComparePeriod) => dispatch(changeCompareGraph(comparePeriod)),
 		changeCompareSortingOrder: (sortingOrder: SortingOrder) => dispatch(changeCompareSortingOrder(sortingOrder)),
-		setOptionsVisibility: (visibility: boolean) => dispatch(setOptionsVisibility(visibility))
+		toggleOptionsVisibility: () => dispatch(toggleOptionsVisibility())
 	};
 }
 

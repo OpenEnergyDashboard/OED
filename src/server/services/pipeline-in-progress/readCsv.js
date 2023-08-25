@@ -12,7 +12,7 @@ const parseCsv = util.promisify(csv.parse);
  * Returns a promise to read the given CSV file into an array of arrays.
  * @param fileName the filename to read from
  * @param headerRow true if file has a header row
- * @return {Promise.<array.<array>>}
+ * @returns {Promise.<array.<array>>}
  */
 async function readCsv(fileName, headerRow) {
 	const buffer = await fs.readFile(fileName);

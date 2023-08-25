@@ -374,8 +374,8 @@ async function insertWebsiteData() {
 	// It will skip ones that already there.
 	await insertStandardUnits(conn);
 	await insertStandardConversions(conn);
-	// Add desired units and conversions.
-	await insertUnits(units, conn);
+	// Add desired units and conversions where update as needed.
+	await insertUnits(units, true, conn);
 	await insertConversions(conversions, conn);
 	// Recreate the Cik entries since changed units/conversions.
 	// Do now since needed to insert meters with suffix units.

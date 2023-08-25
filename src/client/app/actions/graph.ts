@@ -70,8 +70,8 @@ export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	};
 }
 
-export function setOptionsVisibility(visibility: boolean): t.SetOptionsVisibility {
-	return { type: ActionType.SetOptionsVisibility, visibility };
+export function toggleOptionsVisibility(): t.ToggleOptionsVisibility {
+	return { type: ActionType.ToggleOptionsVisibility };
 }
 
 function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
@@ -212,6 +212,7 @@ export interface LinkOptions {
 	serverRange?: TimeInterval;
 	sliderRange?: TimeInterval;
 	toggleAreaNormalization?: boolean;
+	areaUnit?: string;
 	toggleBarStacking?: boolean;
 	comparePeriod?: ComparePeriod;
 	compareSortingOrder?: SortingOrder;
@@ -221,16 +222,16 @@ export interface LinkOptions {
 
 /**
  * Update graph options from a link
- * @param {LinkOptions} options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
- * @returns {function(*)}
+ * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	// Visual Studio indents after the first line in autoformat but ESLint does not like that in this case so override.
 	/* eslint-disable @typescript-eslint/indent */
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
-		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.SetOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction> = [];
+		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
+		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
+		t.UpdateSelectedAreaUnitAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -263,6 +264,10 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.toggleAreaNormalization) {
 		dispatchSecond.push(toggleAreaNormalization());
 	}
+	if (options.areaUnit) {
+		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
+
+	}
 	if (options.toggleBarStacking) {
 		dispatchSecond.push(changeBarStacking());
 	}
@@ -273,7 +278,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeCompareSortingOrder(options.compareSortingOrder));
 	}
 	if (options.optionsVisibility != null) {
-		dispatchSecond.push(setOptionsVisibility(options.optionsVisibility));
+		dispatchSecond.push(toggleOptionsVisibility());
 	}
 	if (options.mapID) {
 		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.

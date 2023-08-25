@@ -22,7 +22,7 @@ export function notifyUser(msg: string) {
 /**
  * get string value from GPSPoint or null.
  * @param gps GPS point to get value from and can be null
- * @returns string to represent the GPS value or empty string if null
+ * @returns to represent the GPS value or empty string if null
  */
 export function getGPSString(gps: GPSPoint | null) {
 	if (gps === null) {
@@ -59,6 +59,7 @@ export function nullToEmptyString(item: any) {
 /**
  * Calculates the set of all possible graphic units for a meter/group.
  * This is any unit that is of type unit or suffix.
+ * @param units candidate graphic units
  * @returns The set of all possible graphic units for a meter/group
  */
 export function potentialGraphicUnits(units: UnitDataById) {

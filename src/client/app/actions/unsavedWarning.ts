@@ -7,8 +7,8 @@ import * as t from '../types/redux/unsavedWarning';
 
 /**
  * Notify that there are unsaved changes
- * @param {*} removeFunction The function to remove local changes
- * @param {*} submitFunction The function to submit unsaved changes
+ * @param removeFunction The function to remove local changes
+ * @param submitFunction The function to submit unsaved changes
  */
 export function updateUnsavedChanges(removeFunction: any, submitFunction: any): t.UpdateUnsavedChangesAction {
 	return { type: ActionType.UpdateUnsavedChanges, removeFunction, submitFunction };

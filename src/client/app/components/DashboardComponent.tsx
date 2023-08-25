@@ -12,7 +12,7 @@ import SpinnerComponent from './SpinnerComponent';
 import {ChartTypes} from '../types/redux/graph';
 import * as moment from 'moment';
 import {TimeInterval} from '../../../common/TimeInterval';
-import Button from 'reactstrap/lib/Button';
+import { Button} from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -123,7 +123,7 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 
 /**
  * Determines the line graph's slider interval based after the slider is moved
- * @returns {string} The slider interval, either 'all' or a TimeInterval
+ * @returns The slider interval, either 'all' or a TimeInterval
  */
 export function getRangeSliderInterval(): string {
 	const sliderContainer: any = document.querySelector('.rangeslider-bg');

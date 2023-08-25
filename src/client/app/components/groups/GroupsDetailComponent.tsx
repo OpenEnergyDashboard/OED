@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
@@ -19,9 +18,15 @@ import GroupViewComponent from './GroupViewComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
+import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
+/**
+ * Defines the groups page card view
+ * @returns Groups page element
+ */
 export default function GroupsDetailComponent() {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Groups state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
@@ -84,7 +89,7 @@ export default function GroupsDetailComponent() {
 	return (
 		<div>
 			<div>
-				<HeaderContainer />
+				<HeaderComponent />
 				<TooltipHelpContainer page='groups' />
 
 				<div className='container-fluid'>

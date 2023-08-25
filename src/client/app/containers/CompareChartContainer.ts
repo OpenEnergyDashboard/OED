@@ -23,21 +23,23 @@ interface CompareChartContainerProps {
  * Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access
  * your reducer state objects from within your React components.
- * @param {State} state The redux state
- * @param {CompareChartContainerProps} ownProps Chart container props
- * @returns {*} The props object
+ * @param state The redux state
+ * @param ownProps Chart container props
+ * @returns The props object
  */
 function mapStateToProps(state: State, ownProps: CompareChartContainerProps): any {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
 	// The unit label depends on the unit which is in selectUnit state.
+	// Also need to determine if raw.
 	const graphingUnit = state.graph.selectedUnit;
+	// This container is not called if there is no data of there are not units so this is safe.
+	const selectUnitState = state.units.units[state.graph.selectedUnit];
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
-		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Quantity and flow units have different unit labels.
 			// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.
@@ -90,7 +92,9 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	const xTitle: string = `${lastStartTimeLabel} -<br> ${LastEndTimeLabel} (A) &<br>${thisStartTimeLabel} -<br> ${thisEndTimeLabel} (B)`;
 
 	const colorize = (changeForColorization: number) => {
-		if (changeForColorization < 0) {
+		if (isNaN(changeForColorization)) {
+			return 'black';
+		} else if (changeForColorization < 0) {
 			return 'green';
 		}
 		return 'red';
@@ -105,64 +109,93 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 
-	if (state.graph.areaNormalization) {
-		const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
-		const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
-		const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
-		previousPeriod /= normalization;
-		currentPeriod /= normalization;
+	// Check if there is data to graph.
+	if (previousPeriod !== null && currentPeriod !== null) {
+		if (state.graph.areaNormalization) {
+			const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
+			const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
+			const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
+			previousPeriod /= normalization;
+			currentPeriod /= normalization;
+		}
+
+		datasets.push(
+			{
+				x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
+				y: [previousPeriod, currentPeriod],
+				hovertext: [
+					`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
+					`<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
+				],
+				hoverinfo: 'text',
+				type: 'bar',
+				marker: { color: barColor },
+				text: [`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b>`, `<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b>`],
+				textposition: 'auto',
+				textfont: {
+					color: 'rgba(0,0,0,1)'
+				}
+			}
+		);
 	}
 
-	datasets.push(
-		{
-			x: [`${periodLabels.prev} (A)`, `${periodLabels.current} (B)`],
-			y: [previousPeriod, currentPeriod],
-			hovertext: [
-				`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.this.time')}<br>${periodLabels.prev.toLowerCase()}`,
-				`<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b> ${translate('used.so.far')}<br>${periodLabels.current.toLowerCase()}`
-			],
-			hoverinfo: 'text',
-			type: 'bar',
-			marker: { color: barColor },
-			text: [`<b>${previousPeriod.toPrecision(6)} ${unitLabel}</b>`, `<b>${currentPeriod.toPrecision(6)} ${unitLabel}</b>`],
-			textposition: 'auto',
-			textfont: {
-				color: 'rgba(0,0,0,1)'
+	let layout: any;
+	// Customize the layout of the plot
+	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
+		// This is a raw type graphing unit so cannot plot
+		layout = {
+			'xaxis': {
+				'visible': false
+			},
+			'yaxis': {
+				'visible': false
+			},
+			'annotations': [
+				{
+					'text': `<b>${translate('compare.raw')}</b>`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 18
+					}
+				}
+			]
+		}
+	} else {
+		layout = {
+			title: `<b>${changeSummary}</b>`,
+			titlefont: {
+				size: 10,
+				color: colorize(entity.change)
+			},
+			hovermode: 'closest',
+			autosize: true,
+			width: 370,
+			height: 450,
+			showlegend: false,
+			legend: {
+			},
+			yaxis: {
+				title: unitLabel,
+				showgrid: true,
+				gridcolor: '#ddd'
+			},
+			xaxis: {
+				title: `${xTitle}`,
+				showgrid: false,
+				gridcolor: '#ddd',
+				automargin: true
+			},
+			margin: {
+				t: 20,
+				b: 120,
+				l: 60,
+				r: 20
 			}
-		}
-	);
-
-	const layout: any = {
-		title: `<b>${changeSummary}</b>`,
-		titlefont: {
-			size: 10,
-			color: colorize(entity.change)
-		},
-		hovermode: 'closest',
-		autosize: true,
-		width: 370,
-		height: 450,
-		showlegend: false,
-		legend: {
-		},
-		yaxis: {
-			title: unitLabel,
-			showgrid: true,
-			gridcolor: '#ddd'
-		},
-		xaxis: {
-			title: `${xTitle}`,
-			showgrid: false,
-			gridcolor: '#ddd',
-			automargin: true
-		},
-		margin: {
-			t: 20,
-			b: 120,
-			l: 60,
-			r: 20
-		}
-	};
+		};
+	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true
@@ -174,7 +207,7 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 			locales: Locales // makes locales available for use
 		}
 	};
-	props.config.locale = state.admin.defaultLanguage;
+	props.config.locale = state.options.selectedLanguage;
 	return props;
 }
 

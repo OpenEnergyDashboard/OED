@@ -5,7 +5,10 @@
 import { Dispatch } from './types/redux/actions';
 import { fetchCurrentUserIfNeeded } from './actions/currentUser';
 
-// The purpose of this is to store the user's role or any other information that would rarely change just once into the store.
+/* eslint-disable jsdoc/require-returns */
+/**
+ * The purpose of this is to store the user's role or any other information that would rarely change just once into the store.
+ */
 export default function initScript() {
 	return (dispatch: Dispatch) => {
 		dispatch(fetchCurrentUserIfNeeded());

@@ -88,7 +88,7 @@ class Meter {
 	/**
 	 * Returns a promise to create the meters table.
 	 * @param conn the connection to use
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('meter/create_meters_table.sql'));
@@ -98,7 +98,7 @@ class Meter {
 	 * Returns a promise to create the meter_type type.
 	 * This needs to be run before Meter.createTable().
 	 * @param conn the connection to use
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static createMeterTypesEnum(conn) {
 		return conn.none(sqlFile('meter/create_meter_types_enum.sql'));
@@ -186,7 +186,7 @@ class Meter {
 	 * Then, returns the unitIndex (the row/column id in the Cik/Pik table) of that unitId.
 	 * @param {*} meterId The meter id.
 	 * @param {*} conn The connection to use.
-	 * @return {Promise.<Int>}
+	 * @returns {Promise.<Int>}
 	 */
 	static async getUnitIndex(meterId, conn) {
 		const resp = await conn.one(sqlFile('meter/get_unit_id.sql'), { meterId: meterId });

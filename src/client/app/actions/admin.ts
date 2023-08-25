@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-
+import { updateSelectedLanguage } from './options';
 
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
@@ -77,6 +77,9 @@ function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkP
 	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
 }
 
+/**
+ * Dispatches a fetch for admin preferences and sets the state based upon the result
+ */
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		dispatch(requestPreferences());
@@ -93,11 +96,17 @@ function fetchPreferences(): Thunk {
 				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
 					dispatch2(toggleAreaNormalization());
 				}
+				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
+					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
+				}
 			});
 		}
 	};
 }
 
+/**
+ * Submits preferences stored in the state to the API to be stored in the database
+ */
 export function submitPreferences() {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const state = getState();
@@ -126,16 +135,16 @@ export function submitPreferences() {
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether preferences are fetching
+ * @param state The redux state.
+ * @returns Whether preferences are fetching
  */
 function shouldFetchPreferenceData(state: State): boolean {
 	return !state.admin.isFetching;
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether preferences are submitted
+ * @param state The redux state.
+ * @returns Whether preferences are submitted
  */
 function shouldSubmitPreferenceData(state: State): boolean {
 	return !state.admin.submitted;
@@ -159,13 +168,13 @@ export function submitPreferencesIfNeeded(): Thunk {
 	};
 }
 
-function updateCikAndDBViews(): t.UpdateCikAndDBViews {
-	return { type: ActionType.UpdateCikAndDBViews };
+function toggleWaitForCikAndDB(): t.ToggleWaitForCikAndDB {
+	return { type: ActionType.ToggleWaitForCikAndDB };
 }
 
 /**
- * @param {State} state The redux state.
- * @returns {boolean} Whether or not the Cik and views are updating
+ * @param state The redux state.
+ * @returns Whether or not the Cik and views are updating
  */
 function shouldUpdateCikAndDBViews(state: State): boolean {
 	return !state.admin.isUpdatingCikAndDBViews;
@@ -174,15 +183,21 @@ function shouldUpdateCikAndDBViews(state: State): boolean {
 /**
  * Redo Cik and/or refresh reading views.
  * This function is called when some changes in units/conversions affect the Cik table or reading views.
- * @param {boolean} shouldRedoCik Whether to refresh Cik.
- * @param {boolean} shouldRefreshReadingViews Whether to refresh reading views.
+ * @param shouldRedoCik Whether to refresh Cik.
+ * @param shouldRefreshReadingViews Whether to refresh reading views.
  */
 export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		if (shouldUpdateCikAndDBViews(getState())) {
-			dispatch(updateCikAndDBViews());
+			// set the page to a loading state
+			dispatch(toggleWaitForCikAndDB());
 			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
-			window.location.reload();
+			// revert to normal state once refresh is complete
+			dispatch(toggleWaitForCikAndDB());
+			if (shouldRedoCik || shouldRefreshReadingViews) {
+				// Only reload window if redoCik and/or refresh reading views.
+				window.location.reload();
+			}
 		}
 		return Promise.resolve();
 	};

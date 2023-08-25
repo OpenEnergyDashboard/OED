@@ -19,9 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	ShowNotification = 'SHOW_NOTIFICATION',
-	ClearNotifications = 'CLEAR_NOTIFICATIONS',
-
 	RequestGroupBarReadings = 'REQUEST_GROUP_BAR_READINGS',
 	ReceiveGroupBarReadings = 'RECEIVE_GROUP_BAR_READINGS',
 	RequestMeterBarReadings = 'REQUEST_METER_BAR_READINGS',
@@ -49,7 +46,7 @@ export enum ActionType {
 	ChangeGraphZoom = 'CHANGE_GRAPH_ZOOM',
 	ChangeSliderRange = 'CHANGE_SLIDER_RANGE',
 	ResetRangeSliderStack = 'RESET_RANGE_SLIDER_STACK',
-	SetOptionsVisibility = 'SET_OPTIONS_VISIBILITY',
+	ToggleOptionsVisibility = 'TOGGLE_OPTIONS_VISIBILITY',
 	UpdateComparePeriod = 'UPDATE_COMPARE_PERIOD',
 	ChangeCompareSortingOrder = 'CHANGE_COMPARE_SORTING_ORDER',
 	SetHotlinked = 'SET_HOTLINKED',
@@ -81,8 +78,9 @@ export enum ActionType {
 	MarkPreferencesSubmitted = 'MARK_PREFERENCES_SUBMITTED',
 	UpdateDefaultWarningFileSize = 'UPDATE_DEFAULT_WARNING_FILE_SIZE',
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
-	UpdateCikAndDBViews = 'UPDATE_CIK_AND_DB_VIEWS',
+	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
+	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',
 	UpdateSelectedMap = 'UPDATE_SELECTED_MAPS',

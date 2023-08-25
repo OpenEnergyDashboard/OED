@@ -10,13 +10,13 @@ import compareReadings from './compareReadings';
 import graph from './graph';
 import groups from './groups';
 import maps from './maps';
-import notifications from './notifications';
 import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
 import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
+import options from './options';
 
 
 export default combineReducers({
@@ -29,11 +29,11 @@ export default combineReducers({
 	graph,
 	maps,
 	groups,
-	notifications,
 	admin,
 	version,
 	currentUser,
 	unsavedWarning,
 	units,
-	conversions
+	conversions,
+	options
 });

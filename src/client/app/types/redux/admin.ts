@@ -6,7 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
-import { AreaUnitType } from 'utils/getAreaUnitConversion';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -22,7 +22,7 @@ export type AdminAction =
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
-	| UpdateCikAndDBViews
+	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
 	| UpdateDefaultMeterReadingFrequencyAction;
 
@@ -92,8 +92,8 @@ export interface UpdateDefaultFileSizeLimit {
 	defaultFileSizeLimit: number;
 }
 
-export interface UpdateCikAndDBViews {
-	type: ActionType.UpdateCikAndDBViews;
+export interface ToggleWaitForCikAndDB {
+	type: ActionType.ToggleWaitForCikAndDB;
 }
 
 export interface UpdateDefaultMeterReadingFrequencyAction {

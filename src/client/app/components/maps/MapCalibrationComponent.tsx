@@ -7,8 +7,8 @@ import { CalibrationModeTypes } from '../../types/redux/map';
 import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
 import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibrationChartDisplayContainer';
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
-import HeaderContainer from '../../containers/HeaderContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import HeaderComponent from '../../components/HeaderComponent';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -26,7 +26,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer/>
+					<HeaderComponent/>
 					<MapCalibrationInitiateContainer />
 				</div>
 			);
@@ -34,7 +34,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer />
+					<HeaderComponent />
 					<div id={'MapCalibrationContainer'}>
 						<MapCalibrationChartDisplayContainer/>
 						<MapCalibrationInfoDisplayContainer/>
@@ -45,7 +45,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer/>
+					<HeaderComponent/>
 					<p/>
 				</div>
 			);

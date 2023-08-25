@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import HeaderContainer from '../HeaderContainer';
 import FooterContainer from '../FooterContainer';
 import CreateUserComponent from '../../components/admin/CreateUserComponent';
 import { UserRole } from '../../types/items';
@@ -11,6 +10,7 @@ import { usersApi } from '../../utils/api';
 import { browserHistory } from '../../utils/history';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
+import HeaderComponent from '../../components/HeaderComponent';
 
 export default class CreateUserFormContainer extends React.Component<{}>{
 	constructor(props: {}) {
@@ -61,7 +61,7 @@ export default class CreateUserFormContainer extends React.Component<{}>{
 	public render() {
 		return (
 			<div>
-				<HeaderContainer />
+				<HeaderComponent />
 				<CreateUserComponent
 					email={this.state.email}
 					password={this.state.password}

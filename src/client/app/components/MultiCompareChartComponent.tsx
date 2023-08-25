@@ -13,6 +13,11 @@ interface MultiCompareChartProps {
 	errorEntities: string[];
 }
 
+/**
+ * Component that defines compare chart
+ * @param props defined above
+ * @returns Multi Compare Chart element
+ */
 export default function MultiCompareChartComponent(props: MultiCompareChartProps) {
 	// Compute how much space should be used in the bootstrap grid system
 	let size = 3;
@@ -48,7 +53,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 			</div>
 			{props.selectedCompareEntities.length === 0 &&
 				<div className='text-center' style={centeredStyle}>
-					<FormattedMessage id='empty.compare' />
+					<FormattedMessage id='select.meter.group' />
 				</div>
 			}
 		</div>

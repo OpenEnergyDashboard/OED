@@ -4,7 +4,7 @@
 
 const pgp = require('pg-promise')({
 	// This sets the style of returned durations so that Moment can parse them
-	connect(client, dc, useCount) {
+	connect({ client, useCount }) {
 		// Only set the style on fresh connections
 		if (useCount === 0) {
 			client.query('SET intervalStyle = iso_8601');
@@ -21,7 +21,7 @@ patchPointType(pgp);
 
 /**
  * Create a new connection to the database.
- * @return {pgPromise.IDatabase}
+ * @returns {pgPromise.IDatabase}
  */
 function getDB(connectionParameters) {
 	return pgp(connectionParameters);
@@ -29,7 +29,7 @@ function getDB(connectionParameters) {
 
 /**
  * Get the name of the database current being worked on.
- * @return {string}
+ * @returns {string}
  */
 function getCurrentDB() {
 	return currentDB;
@@ -66,7 +66,7 @@ function sqlFile(filePath) {
 /**
  * Returns a promise to create the database schema.
  * @param conn the connection to be used.
- * @return {Promise<void>}
+ * @returns {Promise<void>}
  */
 async function createSchema(conn) {
 	// We need to require these here instead of at the top to prevent circular dependency issues.

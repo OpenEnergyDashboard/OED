@@ -11,12 +11,13 @@ import { GroupDefinition, GroupEditData } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
+import React from 'react';
 
 /**
  * The intersect operation of two sets.
- * @param {Set<number>} setA The first set.
- * @param {Set<number>} setB The second set.
- * @returns {Set<number>} The intersection of two sets.
+ * @param setA The first set.
+ * @param setB The second set.
+ * @returns The intersection of two sets.
  */
 export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> {
 	return new Set(Array.from(setA).filter(i => setB.has(i)));
@@ -24,9 +25,8 @@ export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> 
 
 /**
  * Takes a set of meter ids and returns the set of compatible unit ids.
- *
- * @param {Set<number>} meters The set of meter ids.
- * @returns {Set<number>} Set of compatible unit ids.
+ * @param meters The set of meter ids.
+ * @returns Set of compatible unit ids.
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	const state = store.getState();
@@ -62,9 +62,8 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 
 /**
  * Returns a set of units ids that are compatible with a specific unit id.
- *
- * @param {number} unitId The unit id.
- * @returns {Set<number>} Set of units ids that are compatible with specified unit id.
+ * @param unitId The unit id.
+ * @returns Set of units ids that are compatible with specified unit id.
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// unitSet starts as an empty set.
@@ -92,9 +91,8 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 
 /**
  * Returns the row index in Pik for a meter unit.
- *
- * @param {number} unitId The unit id.
- * @returns {number} The row index in Pik for given meter unit.
+ * @param unitId The unit id.
+ * @returns The row index in Pik for given meter unit.
  */
 export function pRowFromUnit(unitId: number): number {
 	const state = store.getState();
@@ -107,9 +105,8 @@ export function pRowFromUnit(unitId: number): number {
 
 /**
  * Returns the unit id given the row in Pik.
- *
- * @param {number} row The row to find the associated unit.
- * @returns {number} The unit id given the row in Pik units.
+ * @param row The row to find the associated unit.
+ * @returns The unit id given the row in Pik units.
  */
 export function unitFromPRow(row: number): number {
 	const state = store.getState();
@@ -122,9 +119,8 @@ export function unitFromPRow(row: number): number {
 
 /**
  * Returns the unit id given the column in Pik.
- *
- * @param {number} column The column to find the associated unit.
- * @returns {number} The unit id given the column in Pik.
+ * @param column The column to find the associated unit.
+ * @returns The unit id given the column in Pik.
  */
 export function unitFromPColumn(column: number): number {
 	const state = store.getState();
@@ -138,9 +134,8 @@ export function unitFromPColumn(column: number): number {
 /**
  * Returns the set of meters's ids associated with the groupId used where Redux
  * state is accurate for all groups.
- *
- * @param {number} groupId The groupId.
- * @returns {Set<number>} The set of deep children of this group.
+ * @param groupId The groupId.
+ * @returns The set of deep children of this group.
  */
 export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();
@@ -154,8 +149,8 @@ export function metersInGroup(groupId: number): Set<number> {
 /**
  * Returns array of deep meter ids of the changed group. This only works if all other groups in state
  * do not include this group.
- * @param {GroupEditData} changedGroupState The state for the changed group
- * @returns {number[]} returns array of deep meter ids of the changed group considering possible changes
+ * @param changedGroupState The state for the changed group
+ * @returns array of deep meter ids of the changed group considering possible changes
  */
 export function metersInChangedGroup(changedGroupState: GroupEditData): number[] {
 	const state = store.getState();
@@ -183,7 +178,7 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
  * Get options for the meter menu on the group page.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
- * @return The current meter options for this group.
+ * @returns The current meter options for this group.
  */
 export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
@@ -227,8 +222,8 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
  * @param groupId The id of the group being worked on.
  * @param defaultGraphicUnit The group's current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The group's current deep meters (all recursively) which may have been updated from what is in Redux state.
- * @return The current group options for this group.
-*/
+ * @returns The current group options for this group.
+ */
 export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState() as State;
@@ -289,7 +284,7 @@ export const enum GroupCase {
  * @param type Can be METER or GROUP.
  * @param currentDefaultGraphicUnit The default graphic unit for group changing
  * @param deepMeters The deep meters for the group, ignored if meter
- * @returns GroupCase the type of change this involves.
+ * @returns the type of change this involves.
  */
 export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: number, type: DataType,
 	currentDefaultGraphicUnit: number, deepMeters: number[]): GroupCase {
@@ -324,7 +319,7 @@ function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): S
  * @param currentUnits The current compatible units set.
  * @param newUnits The new compatible units set.
  * @param defaultGraphicUnit The default graphic unit.
- * @returns GroupCase of impact on units from current to new unit sets.
+ * @returns of impact on units from current to new unit sets.
  */
 function groupCase(currentUnits: Set<number>, newUnits: Set<number>, defaultGraphicUnit: number): GroupCase {
 	// The compatible units of a set of meters or groups is the intersection of the compatible units for each.

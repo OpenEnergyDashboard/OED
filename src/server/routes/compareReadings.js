@@ -75,7 +75,7 @@ function validateQueryParams(queryParams) {
  * @param currStart  start of current/this compare period
  * @param currEnd  end of current/this compare period
  * @param shift how far to shift back in time from current period to previous period
- * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
  async function meterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();
@@ -89,7 +89,7 @@ function validateQueryParams(queryParams) {
  * @param currStart  start of current/this compare period
  * @param currEnd  end of current/this compare period
  * @param shift how far to shift back in time from current period to previous period
- * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
  async function groupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();

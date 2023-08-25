@@ -68,11 +68,11 @@ export interface Dimensions {
 
 /**
  * Returns true if item (meter or group) and map and reasonably defined and false otherwise.
- * @param {number} itemID ID to be used for logging errors
- * @param {DataType} type DataType to distinguish between meter and group
- * @param {MapMetadata} map map info to check
- * @param {GPSPoint} gps GPS Point to check
- * @returns {boolean} True if map is defined with origin & opposite and meter with valid GPS
+ * @param itemID ID to be used for logging errors
+ * @param type DataType to distinguish between meter and group
+ * @param map map info to check
+ * @param gps GPS Point to check
+ * @returns True if map is defined with origin & opposite and meter with valid GPS
  */
 export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
@@ -86,9 +86,9 @@ export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, 
 
 /**
  * Returns true if point lies within the map to display on.
- * @param {Dimensions} size The map size that is being used.
- * @param {CartesianPoint} point The point being considered for display in user map grid coordinates.
- * @returns {boolean} true if within map and false otherwise.
+ * @param size The map size that is being used.
+ * @param point The point being considered for display in user map grid coordinates.
+ * @returns true if within map and false otherwise.
  */
 export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): boolean {
 	// The user map is a rectangle that is parallel to the Plotly grid. Thus, the point
@@ -102,8 +102,8 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * Checks if the string is a valid GPS representation. This requires it to be two numbers
  * separated by a comma and the GPS values to be within allowed values.
  * Note it causes a popup if the GPS values are not valid.
- * @param {string} input The string to check for GPS values
- * @returns {boolean} true if string is GPS and false otherwise.
+ * @param input The string to check for GPS values
+ * @returns true if string is GPS and false otherwise.
  */
 export function isValidGPSInput(input: string): boolean {
 	if (input.indexOf(',') === -1) { // if there is no comma
@@ -128,13 +128,13 @@ export function isValidGPSInput(input: string): boolean {
 
 /**
  * Calculates the GPS unit per coordinate unit.
- * @param {GPSPoint} origin The GPS value for the origin that was computed during calibration.
+ * @param origin The GPS value for the origin that was computed during calibration.
  * 	This is the bottom, left corner of the user map.
- * @param {GPSPoint} opposite The GPS value for the opposite that was computed during calibration.
+ * @param opposite The GPS value for the opposite that was computed during calibration.
  * 	This is the top, right corner of the user map.
- * @param {Dimensions} size This is the size of the normalized map image.
- * @param {number} northAngle The angle between true north and straight up on the map image.
- * @returns {MapScale} a pair {deltaX, deltaY} representing the GPS degree per unit (x, y)
+ * @param size This is the size of the normalized map image.
+ * @param northAngle The angle between true north and straight up on the map image.
+ * @returns a pair {deltaX, deltaY} representing the GPS degree per unit (x, y)
  * 	on true north map grid.
  */
 export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint, size: Dimensions, northAngle: number): MapScale {
@@ -148,12 +148,12 @@ export function calculateScaleFromEndpoints(origin: GPSPoint, opposite: GPSPoint
 
 /**
  * Convert the gps value to the equivalent Plotly grid coordinates on user map.
- * @param {Dimensions} size The normalized size of the map
- * @param {GPSPoint} gps The GPS coordinate to convert
- * @param {GPSPoint} originGPS The GPS value of the origin on the true north map.
- * @param {MapScale} scaleOfMap The GPS degree per unit x, y on the true north map.
- * @param {number} northAngle The angle between true north and straight up on the map image.
- * @returns {CartesianPoint} x, y value of the gps point on the user map.
+ * @param size The normalized size of the map
+ * @param gps The GPS coordinate to convert
+ * @param originGPS The GPS value of the origin on the true north map.
+ * @param scaleOfMap The GPS degree per unit x, y on the true north map.
+ * @param northAngle The angle between true north and straight up on the map image.
+ * @returns x, y value of the gps point on the user map.
  */
 export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoint, scaleOfMap: MapScale, northAngle: number): CartesianPoint {
 	// We need the origin x, y value by starting from 0, 0 on the user map and
@@ -176,10 +176,10 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
  * origin and opposite points. It also calculates the relative error for this
  * scale by finding the maximum difference between the calculated scale and the
  * one from each pair of calibration points. It returns all three of these values.
- * @param {CalibratedPoint[]} calibrationSet All the points clicked by the user for calibration.
- * @param {Dimensions} imageDimensions The dimensions of the original map to use from the user.
- * @param {number} northAngle The angle between true north and straight up on the map image.
- * @returns {CalibrationResult} The error and the origin & opposite point in GPS to use for mapping.
+ * @param calibrationSet All the points clicked by the user for calibration.
+ * @param imageDimensions The dimensions of the original map to use from the user.
+ * @param northAngle The angle between true north and straight up on the map image.
+ * @returns The error and the origin & opposite point in GPS to use for mapping.
  */
 export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions, northAngle: number): CalibrationResult {
 	// Normalize dimensions to grid used in Plotly
@@ -291,9 +291,9 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 
 /**
  * Return the change in GPS degree per unit on map grid.
- * @param {CalibratedPoint} p1 First point to use in calculation.
- * @param {CalibratedPoint} p2 Second point to use in calculation.
- * @returns {{number, number}} a pair {deltaX, deltaY} representing the GPS degree per unit (x, y) on map grid.
+ * @param p1 First point to use in calculation.
+ * @param p2 Second point to use in calculation.
+ * @returns a pair {deltaX, deltaY} representing the GPS degree per unit (x, y) on map grid.
  */
 function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
 	// Calculate the change in GPS longitude and x point and then use to get the GPS degree
@@ -313,8 +313,8 @@ function calculateScale(p1: CalibratedPoint, p2: CalibratedPoint) {
 
 /**
  * Normalize image dimensions to fit within the default 500*500 pixel-sized graph.
- * @param {Dimensions} dimensions The size (width, height) of the map loaded into OED
- * @returns {Dimensions} Normalized size of map so no more than 500 on either side.
+ * @param dimensions The size (width, height) of the map loaded into OED
+ * @returns Normalized size of map so no more than 500 on either side.
  */
 export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 	let width;
@@ -337,10 +337,10 @@ export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 
 /**
  * Shifts point by 1/2 size dimensions.
- * @param {Dimensions} size The size of the image (normally normalized map size)
- * @param {CartesianPoint} point The (x,y) pair for the point to be shifted
- * @param {number} direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
- * @returns {CartesianPoint} (x,y) pair shifted by 1/2 the width and height of map image
+ * @param size The size of the image (normally normalized map size)
+ * @param point The (x,y) pair for the point to be shifted
+ * @param direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
+ * @returns (x,y) pair shifted by 1/2 the width and height of map image
  */
 export function shift(size: Dimensions, point: CartesianPoint, direction: number): CartesianPoint {
 	// 1/2 the image sizes that will be used in shift.
@@ -356,9 +356,9 @@ export function shift(size: Dimensions, point: CartesianPoint, direction: number
 
 /**
  * Rotates point counterclockwise through angle.
- * @param {number} angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
- * @param {CartesianPoint} point (x,y) pair to rotate.
- * @returns {CartesianPoint} Rotated (x,y) pair.
+ * @param angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
+ * @param point (x,y) pair to rotate.
+ * @returns Rotated (x,y) pair.
  */
 export function rotate(angleDeg: number, point: CartesianPoint): CartesianPoint {
 	// Convert angle to radians.
@@ -373,11 +373,11 @@ export function rotate(angleDeg: number, point: CartesianPoint): CartesianPoint 
 
 /**
  * This shifts the point and then rotates by the angle. Typically used to go from user map to true north.
- * @param {Dimensions} size The size of the image (normally normalized map size)
- * @param {CartesianPoint} point The (x,y) pair for the point to be shifted & rotated
- * @param {number} direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
- * @param {number} angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
- * @returns {CartesianPoint} (x,y) pair shifted by 1/2 the width and height of map image and rotated by angleDeg
+ * @param size The size of the image (normally normalized map size)
+ * @param point The (x,y) pair for the point to be shifted & rotated
+ * @param direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
+ * @param angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
+ * @returns (x,y) pair shifted by 1/2 the width and height of map image and rotated by angleDeg
  */
 export function shiftRotate(size: Dimensions, point: CartesianPoint, direction: number, angleDeg: number): CartesianPoint {
 	// Note you typically shift because the rotation must occur around the center of the map but the plotly coordinates
@@ -390,11 +390,11 @@ export function shiftRotate(size: Dimensions, point: CartesianPoint, direction: 
 
 /**
  * This rotates the point by the angle and then shifts. Typically used to go from true north to user map.
- * @param {Dimensions} size The size of the image (normally normalized map size)
- * @param {CartesianPoint} point The (x,y) pair for the point to be rotated & shifted
- * @param {number} direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
- * @param {number} angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
- * @returns {CartesianPoint} (x,y) pair shifted by 1/2 the width and height of map image
+ * @param size The size of the image (normally normalized map size)
+ * @param point The (x,y) pair for the point to be rotated & shifted
+ * @param direction The factor to scale the shift by. Normally either +1 to add the shift or -1 to subtract.
+ * @param angleDeg Angle in degrees to rotate by. Note that positive means counterclockwise.
+ * @returns (x,y) pair shifted by 1/2 the width and height of map image
  */
 export function rotateShift(size: Dimensions, point: CartesianPoint, direction: number, angleDeg: number): CartesianPoint {
 	// Now rotate the centered image by the angle given.
@@ -409,9 +409,9 @@ export function rotateShift(size: Dimensions, point: CartesianPoint, direction: 
 /**
  * Returns the origin of the user map converted to the true north map. Note that it is in
  * in the bottom, left on the user map but in the center on the true north map.
- * @param {Dimensions} size the normalized map dimensions
- * @param {number} northAngle The angle between true north and straight up on the map image.
- * @returns {CartesianPoint} The origin coordinates on the true north map
+ * @param size the normalized map dimensions
+ * @param northAngle The angle between true north and straight up on the map image.
+ * @returns The origin coordinates on the true north map
  */
 export function trueNorthOrigin(size: Dimensions, northAngle: number): CartesianPoint {
 	// Origin coordinate on user map is (0, 0).
@@ -424,9 +424,9 @@ export function trueNorthOrigin(size: Dimensions, northAngle: number): Cartesian
  * Similar to trueNorthOrigin function but returns the opposite corner of the user map converted
  * to the true north map. Note that it is in the top, right of the user map but
  * relative to the center on the true north map.
- * @param {Dimensions} size the normalized map dimensions
- * @param {number} northAngle The angle between true north and straight up on the map image.
- * @returns {CartesianPoint} The opposite coordinates on the true north map
+ * @param size the normalized map dimensions
+ * @param northAngle The angle between true north and straight up on the map image.
+ * @returns The opposite coordinates on the true north map
  */
 export function trueNorthOpposite(size: Dimensions, northAngle: number): CartesianPoint {
 	// The opposite coordinate is the size since it is in the top, right corner

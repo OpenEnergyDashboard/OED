@@ -21,7 +21,6 @@ const defaultState: GroupsState = {
 	displayMode: DisplayMode.View
 };
 
-
 export default function groups(state = defaultState, action: GroupsAction) {
 	switch (action.type) {
 		// Records if group details have been fetched at least once

@@ -22,7 +22,7 @@ jobs:
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
-    container: node:16.13.2
+    container: node:18.17.0
 
     services:
       postgres:
