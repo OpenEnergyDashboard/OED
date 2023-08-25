@@ -410,7 +410,7 @@ function createRouter() {
 		else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
-			const readingsPerDay = req.query.readingsPerDay;
+			const readingsPerDay = req.query.sequenceNumber;
 			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingsPerDay);
 			res.json(forJson);
 		}
@@ -430,7 +430,7 @@ function createRouter() {
 		else {
 			const groupID = req.params.group_id;
 			const graphicUnitID = req.query.graphicUnitId;
-			const readingsPerDay = req.query.readingsPerDay;
+			const readingsPerDay = req.query.sequenceNumber;
 			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingsPerDay);
 			res.json(forJson);
 		}
