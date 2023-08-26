@@ -26,6 +26,7 @@ import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '.
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { UnitRepresentType } from '../../types/redux/units';
 import { Dispatch } from 'types/redux/actions';
+import * as moment from 'moment';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -75,9 +76,14 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
 		areaUnit: props.meter.areaUnit,
-		readingFrequency: props.meter.readingFrequency
+		readingFrequency: props.meter.readingFrequency,
+		minVal: props.meter.minVal,
+		maxVal: props.meter.maxVal,
+		minDate: props.meter.minDate,
+		maxDate: props.meter.maxDate,
+		maxError: props.meter.maxError,
+		disableChecks: props.meter.disableChecks
 	}
-
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
@@ -123,8 +129,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		Reading Duplication must be between 1 and 9
 		Reading frequency cannot be blank
 		If displayable is true and unitId is set to -99, warn admin
+		Mininum Value cannot bigger than Maximum Value
+		Minimum Value and Maximum Value must be between valid input
+		Minimum Date and Maximum cannot be blank
+		Minimum Date cannot be after Maximum Date
+		Minimum Date and Maximum Value must be between valid input
+		Maximum No of Error must be between 0 and valid input
 	*/
 	const [validMeter, setValidMeter] = useState(false);
+	const MIN_VAL = Number.MIN_SAFE_INTEGER;
+	const MAX_VAL = Number.MAX_SAFE_INTEGER;
+	const MIN_DATE_MOMENT = moment(0).utc();
+	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
+	const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_ERRORS = 75;
 	useEffect(() => {
 		setValidMeter(
 			state.name !== '' &&
@@ -132,9 +151,29 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			state.readingGap >= 0 &&
 			state.readingVariation >= 0 &&
 			(state.readingDuplication >= 1 && state.readingDuplication <= 9) &&
-			state.readingFrequency !== ''
+			state.readingFrequency !== '' &&
+			state.minVal >= MIN_VAL &&
+			state.minVal <= state.maxVal &&
+			state.maxVal <= MAX_VAL &&
+			moment(state.minDate).isValid() &&
+			moment(state.maxDate).isValid() &&
+			moment(state.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
+			moment(state.minDate).isSameOrBefore(moment(state.maxDate)) &&
+			moment(state.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
+			(state.maxError >=0  && state.maxError <= MAX_ERRORS)
 		);
-	}, [state.area, state.name, state.readingGap, state.readingVariation, state.readingDuplication, state.areaUnit, state.readingFrequency]);
+	}, [state.area,
+		state.name,
+		state.readingGap,
+		state.readingVariation,
+		state.readingDuplication,
+		state.areaUnit,
+		state.readingFrequency,
+		state.minVal,
+		state.maxVal,
+		state.minDate,
+		state.maxDate,
+		state.maxError]);
 	/* End State */
 
 	// Reset the state to default values
@@ -191,7 +230,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.endTimestamp != state.endTimestamp ||
 				props.meter.previousEnd != state.previousEnd ||
 				props.meter.areaUnit != state.areaUnit ||
-				props.meter.readingFrequency != state.readingFrequency
+				props.meter.readingFrequency != state.readingFrequency ||
+				props.meter.minVal != state.minVal ||
+				props.meter.maxVal != state.maxVal ||
+				props.meter.minDate != state.minDate ||
+				props.meter.maxDate != state.maxDate ||
+				props.meter.maxError != state.maxError ||
+				props.meter.disableChecks != state.disableChecks
 			);
 
 		// Only validate and store if any changes.
@@ -714,6 +759,54 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={state?.reading} />
+						</FormGroup>
+						{/* minVal input */}
+						<FormGroup>
+							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Input
+								id='minVal'
+								name='minVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min={MIN_VAL}
+								max={state.maxVal}
+								required value ={state.minVal}
+								invalid={state?.minVal < MIN_VAL  || state?.minVal > state?.maxVal}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }}  />
+							</FormFeedback>
+						</FormGroup>
+						{/* maxVal input */}
+						<FormGroup>
+							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Input
+								id='maxVal'
+								name='maxVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min={state.minVal}
+								max={MAX_VAL}
+								required value ={state.maxVal}
+								invalid={state?.maxVal > MAX_VAL  || state?.minVal > state?.maxVal}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }}/>
+							</FormFeedback>
+						</FormGroup>
+						{/* maxError input */}
+						<FormGroup>
+							<Label for='maxError'>{translate('meter.maxError')}</Label>
+							<Input
+								id='maxError'
+								name='maxError'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min='0'
+								max={MAX_ERRORS}
+								required value={state.maxError}
+								invalid={state?.maxError > MAX_ERRORS || state?.maxError < 0}/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_ERRORS }}/>
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
@@ -750,7 +843,59 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state?.previousEnd} />
+						</FormGroup>
+						{/* minDate input */}
+						<Col><FormGroup>
+							<Label for='minDate'>{translate('meter.minDate')}</Label>
+							<Input
+								id='minDate'
+								name='minDate'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								required value={state.minDate}
+								invalid={!moment(state.minDate).isValid()
+									|| !moment(state.minDate).isSameOrAfter(MIN_DATE_MOMENT)
+									|| !moment(state.minDate).isSameOrBefore(moment(state.maxDate))} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_DATE, max: moment(state.maxDate).utc().format() }}/>
+							</FormFeedback>
+						</FormGroup>
+						{/* maxDate input */}
+						<FormGroup>
+							<Label for='maxDate'>{translate('meter.maxDate')}</Label>
+							<Input
+								id='maxDate'
+								name='maxDate'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								required value={state.maxDate}
+								invalid={!moment(state.maxDate).isValid()
+										|| !moment(state.maxDate).isSameOrBefore(MAX_DATE_MOMENT)
+										|| !moment(state.maxDate).isSameOrAfter(moment(state.minDate))} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: moment(state.minDate).utc().format(), max: MAX_DATE }} />
+							</FormFeedback>
 						</FormGroup></Col>
+						{/* DisableChecks input */}
+						<FormGroup>
+							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
+							<Input
+								id='disableChecks'
+								name='disableChecks'
+								type='select'
+								value={state?.disableChecks?.toString()}
+								onChange={e => handleBooleanChange(e)}
+								invalid={state?.disableChecks && state.unitId === -99}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						</Col>
 					</Row>
 				</Container></ModalBody>
 				<ModalFooter>
