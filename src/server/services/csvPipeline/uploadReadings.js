@@ -9,6 +9,7 @@ const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams')
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
 const moment = require('moment');
+const Preferences = require('../../models/Preferences');
 
 /**
  * Middleware that uploads readings via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -36,6 +37,7 @@ async function uploadReadings(req, res, filepath, conn) {
 					err.message
 				);
 			} else {
+				const preferences = await Preferences.get(conn);
 				// If createMeter is true, we will create the meter for the user.
 				// The meter type is unknown so set to other. Most parameters take on default values.
 				const tempMeter = new Meter(
@@ -54,7 +56,7 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // cumulativeReset
 					undefined, // cumulativeResetStart
 					undefined, // cumulativeResetEnd
-					undefined, // readingGap
+					preferences.defaultMeterReadingGap, // readingGap
 					undefined, // readingVariation
 					undefined, // readingDuplication
 					undefined, // timeSort
@@ -66,7 +68,13 @@ async function uploadReadings(req, res, filepath, conn) {
 					undefined, // unit
 					undefined, // default graphic unit
 					undefined, // area unit
-					undefined // reading frequency
+					preferences.defaultMeterReadingFrequency, // reading frequency
+					preferences.defaultMeterMinimumValue, // minVal
+					preferences.defaultMeterMaximumValue, // maxVal
+					preferences.defaultMeterMinimumDate, // minDate
+					preferences.defaultMeterMaximumDate, // maxDate
+					preferences.defaultMeterMaximumErrors, // maxError
+					preferences.defaultMeterDisableChecks // disableChecks
 				)
 				await tempMeter.insert(conn);
 				meterCreated = true;
@@ -219,6 +227,17 @@ async function uploadReadings(req, res, filepath, conn) {
 	const areReadingsEndOnly = (readingEndOnly === BooleanTypesJS.true);
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
+
+	const conditionSet = {
+		minVal: meter.minVal,
+		maxVal: meter.maxVal,
+		minDate: meter.minDate,
+		maxDate: meter.maxDate,
+		threshold: meter.readingGap,
+		maxError: meter.maxError,
+		disableChecks: meter.disableChecks
+	}
+	
 	return await loadCsvInput(
 		filepath,
 		meter.id,
@@ -234,7 +253,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		areReadingsEndOnly,
 		hasHeaderRow,
 		shouldUpdate,
-		undefined,
+		conditionSet,
 		conn,
 		shouldHonorDst,
 		shouldRelaxedParsing

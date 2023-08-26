@@ -14,5 +14,12 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_file_size_limit FLOAT NOT NULL,
 	default_area_normalization BOOLEAN NOT NULL,
 	default_area_unit area_unit_type NOT NULL,
-	default_meter_reading_frequency INTERVAL NOT NULL
+	default_meter_reading_frequency INTERVAL NOT NULL,
+	default_meter_minimum_value FLOAT NOT NULL,
+	default_meter_maximum_value FLOAT NOT NULL,
+	default_meter_minimum_date TIMESTAMP NOT NULL,
+    default_meter_maximum_date TIMESTAMP NOT NULL,
+	default_meter_reading_gap REAL NOT NULL,
+    default_meter_maximum_errors INTEGER NOT NULL,
+	default_meter_disable_checks BOOLEAN NOT NULL
 );

@@ -8,6 +8,7 @@ import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { durationFormat } from '../utils/durationFormat';
+import * as moment from 'moment';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -23,7 +24,14 @@ const defaultState: AdminState = {
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
-	defaultMeterReadingFrequency: '00:15:00'
+	defaultMeterReadingFrequency: '00:15:00',
+	defaultMeterMinimumValue: Number.MIN_SAFE_INTEGER,
+	defaultMeterMaximumValue: Number.MAX_SAFE_INTEGER,
+	defaultMeterMinimumDate: moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
+	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
+	defaultMeterReadingGap: 0,
+	defaultMeterMaximumErrors: 75,
+	defaultMeterDisableChecks: false
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -93,7 +101,14 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
 				defaultAreaNormalization: action.data.defaultAreaNormalization,
 				defaultAreaUnit: action.data.defaultAreaUnit,
-				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency)
+				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency),
+				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue,
+				defaultMeterMaximumValue: action.data.defaultMeterMaximumValue,
+				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
+				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
+				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
+				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
+				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -129,7 +144,49 @@ export default function admin(state = defaultState, action: AdminAction) {
 				...state,
 				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
 				submitted: false
-			};
+			}
+		case ActionType.UpdateDefaultMeterMinimumValue:
+			return {
+				...state,
+				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumValue:
+			return {
+				...state,
+				defaultMeterMaximumValue: action.defaultMeterMaximumValue,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMinimumDate:
+			return {
+				...state,
+				defaultMeterMinimumDate: action.defaultMeterMinimumDate,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumDate:
+			return {
+				...state,
+				defaultMeterMaximumDate: action.defaultMeterMaximumDate,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterReadingGap:
+			return {
+				...state,
+				defaultMeterReadingGap: action.defaultMeterReadingGap,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterMaximumErrors:
+			return {
+				...state,
+				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultMeterDisableChecks:
+			return {
+				...state,
+				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
+				submitted: false
+			}
 		default:
 			return state;
 	}

@@ -98,6 +98,12 @@ export interface MeterData {
 	previousEnd: string;
 	areaUnit: AreaUnitType;
 	readingFrequency: string;
+	minVal: number;
+	maxVal: number;
+	minDate: string;
+	maxDate: string;
+	maxError: number;
+	disableChecks: boolean;
 }
 
 export interface MeterEditData {
@@ -129,6 +135,12 @@ export interface MeterEditData {
 	previousEnd: string | undefined;
 	areaUnit: AreaUnitType;
 	readingFrequency: string;
+	minVal: number;
+	maxVal: number;
+	minDate: string;
+	maxDate: string;
+	maxError: number;
+	disableChecks: boolean;
 }
 
 export interface MeterDataByID {

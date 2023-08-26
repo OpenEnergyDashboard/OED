@@ -66,6 +66,27 @@ router.post('/', async (req, res) => {
 				},
 				defaultMeterReadingFrequency: {
 					type: 'string'
+				},
+				defaultMeterMinimumValue: {
+					type: 'number'
+				},
+				defaultMeterMaximumValue: {
+					type: 'number'
+				},
+				defaultMeterMinimumDate: {
+					type: 'string'
+				},
+				defaultMeterMaximumDate: {
+					type: 'string'
+				},
+				defaultMeterReadingGap: {
+					type: 'number'
+				},
+				defaultMeterMaximumErrors: {
+					type: 'number'
+				},
+				defaultMeterDisableChecks: {
+					type: 'boolean'
 				}
 			}
 		}
