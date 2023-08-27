@@ -397,11 +397,13 @@ function createRouter() {
 	});
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
+		const durationInYears = duration.years();
 
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} 
-		else if(durationInYears >= 1){
+		} else if (durationInYears >= 1) {
 			res.sendStatus(400);
 		}
 		else {
@@ -420,8 +422,7 @@ function createRouter() {
 
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} 
-		else if(durationInYears >= 1){
+		} else if (durationInYears >= 1) {
 			res.sendStatus(400);
 		}
 		else {
