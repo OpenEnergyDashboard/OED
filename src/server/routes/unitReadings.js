@@ -11,6 +11,7 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const { request } = require('chai');
+const moment = require('moment');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -27,7 +28,6 @@ function validateMeterLineReadingsParams(params) {
 	const paramsValidationResult = validate(params, validParams);
 	return paramsValidationResult.valid;
 }
-
 
 function validateLineReadingsQueryParams(queryParams) {
 	const validQuery = {
@@ -135,7 +135,7 @@ function validateBarReadingsQueryParams(queryParams) {
 			},
 			graphicUnitId: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$' // Matches 1 or 45 or 133 (for example)
 			}
 		}
 	};
@@ -151,7 +151,8 @@ function validateMeterThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+$'	
+				// Matches 1 or 45 or 133 (for example)
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -166,7 +167,8 @@ function validateGroupThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+$'		// Matches 1 or 1,2 or 1,2,34 (for example)
+				// Matches 1 or 45 or 133 (for example)
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -174,25 +176,25 @@ function validateGroupThreeDReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
-// The commented code above was intended for passing in multiple meters for the 3D graph component of OED
-
-
-function validateThreeDQueryParams(queryParams) { //factors of 24 [timeInterval, graphicUnitID, sequence]
+function validateThreeDQueryParams(queryParams) { 
+	//factors of 24 [timeInterval, graphicUnitID, sequence]
 	const validParams = {
 		type: 'object',
 		maxProperties: 3,
-		required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+		required: ['timeInterval', 'graphicUnitId', 'readingsPerDay'],
 		properties: {
 			timeInterval: {
 				type: 'string',
 			},
 			graphicUnitID: {
 				type: 'string',
-				pattern: '^\\d+$'
+				// Matches 1 or 45 or 133 (for example)
+				pattern: '^\\d+$' 
 			},
-			sequenceNumber: {
+			readingsPerDay: {
 				type: 'string',
-				pattern: '^([123468]|[1][2])$' // for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				pattern: '^([123468]|[1][2])$' 
 			}
 		}
 	};
@@ -259,15 +261,12 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @param sequenceNumber rate of hours per reading
+ * @param readingsPerDay rate of hours per reading
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequenceNumber) {
-	// TODO Determine the proper format that should be returned
-	// TODO Determine proper logic and logic placement.
-	// TODO Proper JSDOC return Values
+async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readingsPerDay) {
 	const conn = getConnection();
-	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
+	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingsPerDay, conn);
 	return hourlyReadings;
 }
 
@@ -276,13 +275,73 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, sequen
  * @param groupIDs The group IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @param sequenceNumber rate of hours per reading
+ * @param readingsPerDay rate of hours per reading
  * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, sequenceNumber) {
+async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, readingsPerDay) {
 	const conn = getConnection();
-	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, sequenceNumber, conn);
+	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingsPerDay, conn);
 	return groupThreeDReadings;
+}
+
+function validateMeterThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+$'		// Matches a single integer value
+				// pattern: '^\\d+(,\\d+)*$'		// 3d Does not support this Matches 1 or 1,2 or 1,2,34 
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+function validateGroupThreeDReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_id'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				// 3d Does not support this. Matches 1 or 1,2 or 1,2,34 
+				// pattern: '^\\d+(,\\d+)*$'		
+				pattern: '^\\d+$'		// Matches a single integer value
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+function validateThreeDQueryParams(queryParams) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 3,
+		required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+		properties: {
+			timeInterval: {
+				type: 'string',
+			},
+			graphicUnitID: {
+				type: 'string',
+				pattern: '^\\d+$'
+			},
+			sequenceNumber: {
+				type: 'string',
+				//factors of 24 [timeInterval, graphicUnitID, sequence]
+				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				pattern: '^([123468]|[1][2])$'
+			}
+		}
+	};
+	const paramsValidationResult = validate(queryParams, validParams);
+	return paramsValidationResult.valid;
 }
 
 function createRouter() {
@@ -338,27 +397,41 @@ function createRouter() {
 	});
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
+		const durationInYears = duration.years();
+
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else {
+		} 
+		else if(durationInYears >= 1){
+			res.sendStatus(400);
+		}
+		else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const sequenceNumber = req.query.sequenceNumber;
-			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, sequenceNumber);
+			const readingsPerDay = req.query.sequenceNumber;
+			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingsPerDay);
 			res.json(forJson);
 		}
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
+		const durationInYears = duration.years();
+
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else {
+		} 
+		else if(durationInYears >= 1){
+			res.sendStatus(400);
+		}
+		else {
 			const groupID = req.params.group_id;
 			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const sequenceNumber = req.query.sequenceNumber;
-			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, sequenceNumber);
+			const readingsPerDay = req.query.sequenceNumber;
+			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingsPerDay);
 			res.json(forJson);
 		}
 	});
