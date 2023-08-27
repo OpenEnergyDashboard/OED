@@ -25,17 +25,17 @@ export const LineGraphRates = {
 }
 
 // Use to determine readings per day on 3D Graphs
-// 24 / ReadingsPerDay.twentyFour(1) = 24 readings per day @ 1 hour intervals
-// 24 / ReadingsPerDay.twelve(2) = 12 readings per day @ 2 hour intervals
+// 24 / ReadingInterval.Hourly(1) = 24 readings per day @ 1 hour intervals
+// 24 / ReadingInterval.TwoHour(2) = 12 readings per day @ 2 hour intervals
 // and so on.
-export enum ReadingsPerDay {
-	twentyFour = 1,
-	twelve = 2,
-	eight = 3,
-	six = 4,
-	four = 6,
-	three = 8,
-	twelveHour = 12
+export enum ReadingInterval {
+	Hourly = 1,
+	TwoHour = 2,
+	ThreeHour = 3,
+	FourHour = 4,
+	SixHour = 6,
+	EightHour = 8,
+	TwelveHour = 12
 }
 
 export interface UpdateSelectedMetersAction {
@@ -123,9 +123,9 @@ export interface ConfirmGraphRenderOnce {
 	type: ActionType.ConfirmGraphRenderOnce;
 }
 
-export interface UpdateThreeDReadingsPerDay {
-	type: ActionType.UpdateThreeDReadingsPerDay;
-	readingsPerDay: ReadingsPerDay;
+export interface UpdateThreeDReadingInterval {
+	type: ActionType.UpdateThreeDReadingInterval;
+	readingInterval: ReadingInterval;
 }
 
 export interface UpdateThreeDMeterOrGroupInfo {
@@ -153,7 +153,7 @@ export type GraphAction =
 	| ToggleOptionsVisibility
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce
-	| UpdateThreeDReadingsPerDay
+	| UpdateThreeDReadingInterval
 	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
@@ -168,7 +168,7 @@ export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
 export interface ThreeDState {
 	meterOrGroupID: MeterOrGroupID;
 	meterOrGroup: MeterOrGroup;
-	readingsPerDay: ReadingsPerDay;
+	readingInterval: ReadingInterval;
 }
 
 export interface GraphState {

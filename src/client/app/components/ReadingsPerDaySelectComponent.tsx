@@ -8,27 +8,27 @@ import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { ChartTypes, ReadingsPerDay } from '../types/redux/graph';
+import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
-import { updateThreeDReadingsPerDay } from '../actions/graph';
+import { updateThreeDReadingInterval } from '../actions/graph';
 
 /**
  * A component which allows users to select date ranges for the graphic
- * @returns Chart data select element
+ * @returns A Select menu with Readings per day options.
  */
-export default function ThreeDSelectComponent() {
+export default function ReadingsPerDaySelect() {
 	const dispatch: Dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
-	const readingsPerDay = useSelector((state: State) => state.graph.threeD.readingsPerDay);
-	// Iterate over ReadingsPerDay enum to create select option
-	const options = Object.values(ReadingsPerDay)
+	const readingInterval = useSelector((state: State) => state.graph.threeD.readingInterval);
+	// Iterate over readingInterval enum to create select option
+	const options = Object.values(ReadingInterval)
 		// Filter strings as to only get integer values from typescript's reverse mapping of enums
 		.filter(value => !isNaN(Number(value)))
 		.map(value => {
 			// Length of interval readings in hours
 			const intervalLength = Number(value);
 			return {
-				// ReadingsPerDay Enum inversely corresponds to the hour interval for readings.
+				// readingInterval Enum inversely corresponds to the hour interval for readings.
 				// (24 hours a day) / intervalLength, e.g, 1 hour intervals give 24 readings per day
 				label: String((24 / intervalLength)),
 				value: intervalLength
@@ -37,9 +37,9 @@ export default function ThreeDSelectComponent() {
 
 	// Value currently being rendered
 	// Use the selectedOption as an enum key to update threeD State
-	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingsPerDay(selectedOption.value));
+	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingInterval(selectedOption.value));
 
-	const value = { label: String(24 / readingsPerDay), value: readingsPerDay };
+	const value = { label: String(24 / readingInterval), value: readingInterval };
 	if (graphState.chartToRender === ChartTypes.threeD) {
 		return (
 			<div>
@@ -57,5 +57,5 @@ export default function ThreeDSelectComponent() {
 
 interface ReadingsPerDayOption {
 	label: string;
-	value: ReadingsPerDay;
+	value: ReadingInterval;
 }

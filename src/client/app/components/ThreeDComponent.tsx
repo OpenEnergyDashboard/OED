@@ -40,7 +40,7 @@ export default function ThreeDComponent() {
 		const unitID = state.graph.selectedUnit;
 
 		// Level of detail along the xAxis / Readings per day
-		const readingsPerDay = state.graph.threeD.readingsPerDay;
+		const readingInterval = state.graph.threeD.readingInterval;
 
 		// Initialize Default values
 		let threeDData = null;
@@ -52,7 +52,7 @@ export default function ThreeDComponent() {
 		// Meter Or Group is selected
 		if (meterOrGroupID) {
 			// Get Reading data
-			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingsPerDay]?.readings;
+			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
 
 			// Get Meter or Group's info
 			const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?

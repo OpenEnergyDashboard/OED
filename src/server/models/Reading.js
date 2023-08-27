@@ -390,17 +390,15 @@ class Reading {
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp An optional start point for the time range of readings returned
 	 * @param toTimestamp An optional end point for the time range of readings returned
-	 * @param sequenceNumber rate of hours per reading
+	 * @param readingInterval rate of hours per reading
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, sequenceNumber, conn) {
+	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, readingInterval, conn) {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		*/
-		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit',
-			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', sequenceNumber]
-		);
+		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit', [meterIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
 		// Initialize empty plotly data 
 		const xData = [];
 		const yData = [];
@@ -415,7 +413,7 @@ class Reading {
 			let readingsToReturn = allMeterThreeDReadings;
 
 			// get the number of days days between start and end timestamps * readings per day.
-			const readingsPerDay = 24 / sequenceNumber;
+			const readingsPerDay = 24 / readingInterval;
 			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
 			// Run Fill holes algorithm if expected num of readings to not match received reading count.
 			if (allMeterThreeDReadings.length !== expectedNumOfReadings) {
@@ -434,7 +432,7 @@ class Reading {
 						// set next timestamp to overlap with current endTS 
 						let nextStartTimeStamp = currentReading.end_timestamp.clone();
 						// gap to fill.
-						let nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						let nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
 
 						// Push missing null readings until the readings overlap
 						// do-while; a reading is missing, therefore must be executed at least once.
@@ -447,7 +445,7 @@ class Reading {
 
 							// To make the readings overlap, next start time is current end time
 							nextStartTimeStamp = nextEndTimeStamp.clone();
-							nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+							nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
 
 							// if nextStartTS and targetStartTS overlap, all gaps have been filled; break
 						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
@@ -480,7 +478,7 @@ class Reading {
 
 			// Format readings.
 			// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
-			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			const chunkedReadings = _.chunk(readingsToReturn, 24 / readingInterval);
 			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
 			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
 
@@ -509,18 +507,16 @@ class Reading {
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp An optional start point for the time range of readings returned
 	 * @param toTimestamp An optional end point for the time range of readings returned
-	 * @param sequenceNumber rate of hours per reading
+	 * @param readingInterval rate of hours per reading
 	 * @param conn the connection to use.
 	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getGroupThreeDReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber, conn) {
+	static async getGroupThreeDReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
 
-		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit',
-			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, sequenceNumber]
-		);
+		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
 		const xData = [];
 		const yData = [];
 		const zData = [];
@@ -529,7 +525,7 @@ class Reading {
 		// TODO duplicate code for hole algorithm here, and groups. Consolidate and export to a utils file.
 		// If no readings, do nothing and return empty arrays
 		if (numOfReadings > 0) {
-			const readingsPerDay = 24 / sequenceNumber;
+			const readingsPerDay = 24 / readingInterval;
 			// get the number of days days between start and end timestamps * readings per day.
 			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
 
@@ -544,7 +540,7 @@ class Reading {
 						const currEndTimestamp = arr[index].end_timestamp;
 						const targetStartTimestamp = arr[index + 1].start_timestamp;
 						let nextStartTimeStamp = currEndTimestamp.clone();
-						let nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+						let nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
 						//Push missing null readings until the readings overlap
 						do {
 							missingReadings.push({
@@ -554,7 +550,7 @@ class Reading {
 							})
 
 							nextStartTimeStamp = nextEndTimeStamp.clone();
-							nextEndTimeStamp = nextStartTimeStamp.clone().add(sequenceNumber, 'hour');
+							nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
 						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
 					}
 				});
@@ -580,7 +576,7 @@ class Reading {
 				readingsToReturn = merged;
 			}
 			// Format readings.
-			const chunkedReadings = _.chunk(readingsToReturn, 24 / sequenceNumber);
+			const chunkedReadings = _.chunk(readingsToReturn, 24 / readingInterval);
 
 			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
 			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);

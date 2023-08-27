@@ -5,14 +5,14 @@
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { ThreeDReading } from '../readings';
-import { ReadingsPerDay } from './graph';
+import { ReadingInterval } from './graph';
 
 export interface RequestMeterThreeDReadingsAction {
 	type: ActionType.RequestMeterThreeDReadings;
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	readingsPerDay: ReadingsPerDay;
+	readingInterval: ReadingInterval;
 }
 
 export interface ReceiveMeterThreeDReadingsAction {
@@ -20,7 +20,7 @@ export interface ReceiveMeterThreeDReadingsAction {
 	meterID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	readingsPerDay: ReadingsPerDay;
+	readingInterval: ReadingInterval;
 	readings: ThreeDReading;
 }
 export interface RequestGroupThreeDReadingsAction {
@@ -28,7 +28,7 @@ export interface RequestGroupThreeDReadingsAction {
 	groupID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	readingsPerDay: ReadingsPerDay;
+	readingInterval: ReadingInterval;
 }
 
 export interface ReceiveGroupThreeDReadingsAction {
@@ -36,7 +36,7 @@ export interface ReceiveGroupThreeDReadingsAction {
 	groupID: number;
 	unitID: number;
 	timeInterval: TimeInterval;
-	readingsPerDay: ReadingsPerDay;
+	readingInterval: ReadingInterval;
 	readings: ThreeDReading;
 }
 
@@ -52,7 +52,7 @@ export interface ThreeDReadingsState {
 		[meterID: number]: {
 			[timeInterval: string]: {
 				[unitID: number]: {
-					[readingsPerDay: string]: {
+					[readingInterval: string]: {
 						isFetching: boolean;
 						readings?: ThreeDReading;
 					}
@@ -65,7 +65,7 @@ export interface ThreeDReadingsState {
 		[groupID: number]: {
 			[timeInterval: string]: {
 				[unitID: number]: {
-					[readingsPerDay: string]: {
+					[readingInterval: string]: {
 						isFetching: boolean;
 						readings?: ThreeDReading;
 					}

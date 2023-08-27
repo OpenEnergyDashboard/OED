@@ -58,7 +58,7 @@ function mapStateToProps(state: State) {
 		case ChartTypes.threeD:
 			linkText += `&meterOrGroup=${state.graph.threeD.meterOrGroup}`;
 			linkText += `&meterOrGroupID=${state.graph.threeD.meterOrGroupID}`;
-			linkText += `&readingsPerDay=${state.graph.threeD.readingsPerDay}`;
+			linkText += `&readingInterval=${state.graph.threeD.readingInterval}`;
 			break;
 		default:
 			break;

@@ -210,9 +210,9 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
-export function updateThreeDReadingsPerDay(readingsPerDay: t.ReadingsPerDay): Thunk {
+export function updateThreeDReadingInterval(readingInterval: t.ReadingInterval): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch({ type: ActionType.UpdateThreeDReadingsPerDay, readingsPerDay });
+		dispatch({ type: ActionType.UpdateThreeDReadingInterval, readingInterval });
 		return dispatch(fetchNeededThreeDReadings());
 	};
 }
@@ -248,7 +248,7 @@ export interface LinkOptions {
 	mapID?: number;
 	meterOrGroupID?: number;
 	meterOrGroup?: t.MeterOrGroup;
-	readingsPerDay?: t.ReadingsPerDay;
+	readingInterval?: t.ReadingInterval;
 }
 
 /**
@@ -322,8 +322,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
-	if (options.readingsPerDay) {
-		dispatchSecond.push(updateThreeDReadingsPerDay(options.readingsPerDay));
+	if (options.readingInterval) {
+		dispatchSecond.push(updateThreeDReadingInterval(options.readingInterval));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

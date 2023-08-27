@@ -256,8 +256,8 @@ export default class RouteComponent extends React.Component<RouteProps> {
 							case 'meterOrGroup':
 								options.meterOrGroup = info as MeterOrGroup;
 								break;
-							case 'readingsPerDay':
-								options.readingsPerDay = parseInt(info);
+							case 'readingInterval':
+								options.readingInterval = parseInt(info);
 								break;
 							default:
 								throw new Error('Unknown query parameter');

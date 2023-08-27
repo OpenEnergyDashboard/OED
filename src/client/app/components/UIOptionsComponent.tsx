@@ -22,7 +22,7 @@ import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import DateRangeComponent from './DateRangeComponent';
-import ThreeDSelectComponent from './ThreeDSelectComponent';
+import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 

@@ -6,7 +6,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/threeDReadings';
-import { ChartTypes, ReadingsPerDay } from '../types/redux/graph'
+import { ChartTypes, ReadingInterval } from '../types/redux/graph'
 import { readingsApi } from '../utils/api';
 import { ThreeDReading } from '../types/readings';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
@@ -15,37 +15,37 @@ import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateR
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
+function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
 	: t.RequestMeterThreeDReadingsAction {
-	return { type: ActionType.RequestMeterThreeDReadings, meterID, timeInterval, unitID, readingsPerDay };
+	return { type: ActionType.RequestMeterThreeDReadings, meterID, timeInterval, unitID, readingInterval };
 }
 
 /**
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @param readings the readings for the given meters
  */
 function receiveMeterThreeDReadings(
-	meterID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay, readings: ThreeDReading)
+	meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval, readings: ThreeDReading)
 	: t.ReceiveMeterThreeDReadingsAction {
-	return { type: ActionType.ReceiveMeterThreeDReadings, meterID, timeInterval, unitID, readingsPerDay, readings };
+	return { type: ActionType.ReceiveMeterThreeDReadings, meterID, timeInterval, unitID, readingInterval, readings };
 }
 
 /**
  * @param meterID the IDs of the meters to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay): Thunk {
+function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestMeterThreeDReadings(meterID, timeInterval, unitID, readingsPerDay));
-		const meterThreeDReadings = await readingsApi.meterThreeDReadings(meterID, timeInterval, unitID, readingsPerDay);
-		dispatch(receiveMeterThreeDReadings(meterID, timeInterval, unitID, readingsPerDay, meterThreeDReadings));
+		dispatch(requestMeterThreeDReadings(meterID, timeInterval, unitID, readingInterval));
+		const meterThreeDReadings = await readingsApi.meterThreeDReadings(meterID, timeInterval, unitID, readingInterval);
+		dispatch(receiveMeterThreeDReadings(meterID, timeInterval, unitID, readingInterval, meterThreeDReadings));
 	};
 }
 
@@ -69,12 +69,12 @@ export function fetchNeededThreeDReadings(): Thunk {
 			return Promise.resolve();
 		}
 		if (meterOrGroup === 'meters') {
-			if (shouldFetchMeterThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingsPerDay)) {
-				return dispatch(fetchMeterThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingsPerDay));
+			if (shouldFetchMeterThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingInterval)) {
+				return dispatch(fetchMeterThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingInterval));
 			}
 		} else {
-			if (shouldFetchGroupThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingsPerDay)) {
-				return dispatch(fetchGroupThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingsPerDay));
+			if (shouldFetchGroupThreeDReadings(state, selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingInterval)) {
+				return dispatch(fetchGroupThreeDReadings(selectedMeterOrGroupID, timeInterval, state.graph.selectedUnit, state.graph.threeD.readingInterval));
 			}
 		}
 
@@ -91,7 +91,7 @@ export function fetchNeededThreeDReadings(): Thunk {
  * @returns True if the readings for the given meter, time duration and unit are missing; false otherwise.
  */
 // function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number): boolean {
-function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number, precision: ReadingsPerDay)
+function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number, precision: ReadingInterval)
 	: boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	// Optional chaining returns undefined if any of the properties in the chain aren't present
@@ -104,37 +104,37 @@ function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInter
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay)
+function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
 	: t.RequestGroupThreeDReadingsAction {
-	return { type: ActionType.RequestGroupThreeDReadings, groupID, timeInterval, unitID, readingsPerDay };
+	return { type: ActionType.RequestGroupThreeDReadings, groupID, timeInterval, unitID, readingInterval };
 }
 
 /**
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @param readings the readings for the given groups
  */
 function receiveGroupThreeDReadings(
-	groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay, readings: ThreeDReading)
+	groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval, readings: ThreeDReading)
 	: t.ReceiveGroupThreeDReadingsAction {
-	return { type: ActionType.ReceiveGroupThreeDReadings, groupID, timeInterval, unitID, readingsPerDay, readings };
+	return { type: ActionType.ReceiveGroupThreeDReadings, groupID, timeInterval, unitID, readingInterval, readings };
 }
 
 /**
  * @param groupID the IDs of the groups to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
-function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay): Thunk {
+function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestGroupThreeDReadings(groupID, timeInterval, unitID, readingsPerDay));
-		const groupThreeDReadings = await readingsApi.groupThreeDReadings(groupID, timeInterval, unitID, readingsPerDay);
-		dispatch(receiveGroupThreeDReadings(groupID, timeInterval, unitID, readingsPerDay, groupThreeDReadings));
+		dispatch(requestGroupThreeDReadings(groupID, timeInterval, unitID, readingInterval));
+		const groupThreeDReadings = await readingsApi.groupThreeDReadings(groupID, timeInterval, unitID, readingInterval);
+		dispatch(receiveGroupThreeDReadings(groupID, timeInterval, unitID, readingInterval, groupThreeDReadings));
 	};
 }
 
@@ -143,14 +143,14 @@ function fetchGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, u
  * @param groupID the ID of the group to check
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param readingsPerDay number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @returns True if the readings for the given group, time duration and unit are missing; false otherwise.
  */
 function shouldFetchGroupThreeDReadings(
-	state: State, groupID: number, timeInterval: TimeInterval, unitID: number, readingsPerDay: ReadingsPerDay): boolean {
+	state: State, groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	// Optional chaining returns undefined if any of the properties in the chain aren't present
-	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[readingsPerDay]?.readings;
+	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[readingInterval]?.readings;
 	// return true if readings aren't present.
 	return !hasReadings ? true : false;
 }

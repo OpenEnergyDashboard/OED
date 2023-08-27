@@ -181,7 +181,7 @@ function validateThreeDQueryParams(queryParams) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 3,
-		required: ['timeInterval', 'graphicUnitId', 'readingsPerDay'],
+		required: ['timeInterval', 'graphicUnitId', 'readingInterval'],
 		properties: {
 			timeInterval: {
 				type: 'string',
@@ -191,7 +191,7 @@ function validateThreeDQueryParams(queryParams) {
 				// Matches 1 or 45 or 133 (for example)
 				pattern: '^\\d+$' 
 			},
-			readingsPerDay: {
+			readingInterval: {
 				type: 'string',
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
 				pattern: '^([123468]|[1][2])$' 
@@ -264,9 +264,9 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param readingsPerDay rate of hours per reading
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readingsPerDay) {
+async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readingInterval) {
 	const conn = getConnection();
-	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingsPerDay, conn);
+	const hourlyReadings = await Reading.getThreeDReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingInterval, conn);
 	return hourlyReadings;
 }
 
@@ -278,9 +278,9 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readin
  * @param readingsPerDay rate of hours per reading
  * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
-async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, readingsPerDay) {
+async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, readingInterval) {
 	const conn = getConnection();
-	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingsPerDay, conn);
+	const groupThreeDReadings = await Reading.getGroupThreeDReadings(groupID, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, readingInterval, conn);
 	return groupThreeDReadings;
 }
 
@@ -323,7 +323,7 @@ function validateThreeDQueryParams(queryParams) {
 	const validParams = {
 		type: 'object',
 		maxProperties: 3,
-		required: ['timeInterval', 'graphicUnitId', 'sequenceNumber'],
+		required: ['timeInterval', 'graphicUnitId', 'readingInterval'],
 		properties: {
 			timeInterval: {
 				type: 'string',
@@ -332,7 +332,7 @@ function validateThreeDQueryParams(queryParams) {
 				type: 'string',
 				pattern: '^\\d+$'
 			},
-			sequenceNumber: {
+			readingInterval: {
 				type: 'string',
 				//factors of 24 [timeInterval, graphicUnitID, sequence]
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
@@ -410,8 +410,8 @@ function createRouter() {
 		else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
-			const readingsPerDay = req.query.sequenceNumber;
-			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingsPerDay);
+			const readingInterval = req.query.readingInterval;
+			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
 			res.json(forJson);
 		}
 	});
@@ -430,8 +430,8 @@ function createRouter() {
 		else {
 			const groupID = req.params.group_id;
 			const graphicUnitID = req.query.graphicUnitId;
-			const readingsPerDay = req.query.sequenceNumber;
-			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingsPerDay);
+			const readingInterval = req.query.readingInterval;
+			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
 			res.json(forJson);
 		}
 	});
