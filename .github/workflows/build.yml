@@ -22,7 +22,7 @@ jobs:
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
-    container: node:18.17.0
+    container: node:18.17.1
 
     services:
       postgres:
@@ -59,7 +59,16 @@ jobs:
           chmod 777 src/server/tmp/uploads
 
       - name: Install dependencies
-        run: npm ci
+        # version before the patch
+        # run: npm ci
+        run: |
+          npm ci
+          // This is a hack/fix from https://github.com/actions/runner/issues/2033 that (hopefully) fixes
+          # fatal: detected dubious ownership in repository at '/__w/OED/OED'
+          # Other refs: https://github.com/crytic/slither-action/pull/50, https://github.com/actions/checkout/issues/1169,
+          # https://github.com/actions/checkout/issues/1048
+          # TODO Remove once final fix is in for GitHub workflows.
+          mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\n\tdirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
 
       - name: Connect to PostgreSQL
         run: node client.js
