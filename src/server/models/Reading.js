@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const database = require('./database');
-const { mapToObject } = require('../util');
+const { mapToObject, threeDHoleAlgorithm } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
 const moment = require('moment');
 const _ = require('lodash');
@@ -291,7 +291,6 @@ class Reading {
 			);
 		}
 		return readingsByGroupID;
-
 	}
 
 	/**
@@ -394,111 +393,13 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, readingInterval, conn) {
+	static async getThreeDReadings(meterIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
 		/**
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		*/
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit', [meterIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
-		// Initialize empty plotly data 
-		const xData = [];
-		const yData = [];
-		const zData = [];
-
-		const numOfReadings = allMeterThreeDReadings.length;
-		// TODO duplicate code for hole algorithm here, and groups. Consolidate and export to a utils file.
-		// If readings exist, find/replace missing readings if any, and format for plotly.
-		// Otherwise, return empty z,y,z data
-		if (numOfReadings > 0) {
-			// Assume no missing readings, replace if needed.
-			let readingsToReturn = allMeterThreeDReadings;
-
-			// get the number of days days between start and end timestamps * readings per day.
-			const readingsPerDay = 24 / readingInterval;
-			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
-			// Run Fill holes algorithm if expected num of readings to not match received reading count.
-			if (allMeterThreeDReadings.length !== expectedNumOfReadings) {
-				const missingReadings = [];
-
-				allMeterThreeDReadings.forEach((reading, index, arr) => {
-					// The two values to compare, Current and next readings.
-					const currentReading = reading;
-					const nextReading = arr[index + 1];
-					// If a next exists, and current / next timestamps don't overlap, fill the gap with null readings.
-					if (nextReading && currentReading.end_timestamp.valueOf() !== nextReading.start_timestamp.valueOf()) {
-
-						// our null iteration target timestamp (push null until target reached.)
-						const targetStartTimestamp = nextReading.start_timestamp;
-
-						// set next timestamp to overlap with current endTS 
-						let nextStartTimeStamp = currentReading.end_timestamp.clone();
-						// gap to fill.
-						let nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
-
-						// Push missing null readings until the readings overlap
-						// do-while; a reading is missing, therefore must be executed at least once.
-						do {
-							missingReadings.push({
-								reading_rate: null,
-								start_timestamp: nextStartTimeStamp,
-								end_timestamp: nextEndTimeStamp
-							})
-
-							// To make the readings overlap, next start time is current end time
-							nextStartTimeStamp = nextEndTimeStamp.clone();
-							nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
-
-							// if nextStartTS and targetStartTS overlap, all gaps have been filled; break
-						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
-					}
-				});
-
-				// Merge the Original Readings with 'hole' readings.
-				let merged = [];
-				// While both arrays have values compare and push since both arrays are individually sorted, you can compare the first indexes of each
-				while (allMeterThreeDReadings.length && missingReadings.length) {
-					// array.shift() works similarly to dequeue() in that it pops off the front of the array
-					if (allMeterThreeDReadings[0].start_timestamp.valueOf() < missingReadings[0].start_timestamp.valueOf()) {
-						merged.push(allMeterThreeDReadings.shift());
-					} else {
-						merged.push(missingReadings.shift());
-					}
-				}
-				// Push remaining values, if any
-				while (allMeterThreeDReadings.length) {
-					merged.push(allMeterThreeDReadings.shift());
-				}
-				// Push remaining values, if any
-				while (missingReadings.length) {
-					merged.push(missingReadings.shift());
-				}
-
-				// Update the values to be formatted and returned.
-				readingsToReturn = merged;
-			}
-
-			// Format readings.
-			// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
-			const chunkedReadings = _.chunk(readingsToReturn, 24 / readingInterval);
-			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
-			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
-
-			// get the hourly timestamp intervals from
-			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
-			chunkedReadings.forEach(day => {
-				let dayReadings = [];
-				yData.push(day[0].start_timestamp.valueOf());
-
-				day.forEach(hour => dayReadings.push(hour.reading_rate));
-				zData.push(dayReadings);
-			});
-		}
-
-		const threeDData = {
-			xData: xData,
-			yData: yData,
-			zData: zData
-		}
-		return threeDData;
+		const meterThreeDData = threeDHoleAlgorithm(allMeterThreeDReadings, toTimestamp, fromTimestamp, readingInterval);
+		return meterThreeDData;
 	}
 
 	/**
@@ -517,90 +418,8 @@ class Reading {
 		 */
 
 		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
-		const xData = [];
-		const yData = [];
-		const zData = [];
-
-		const numOfReadings = allGroupThreeDReadings.length;
-		// TODO duplicate code for hole algorithm here, and groups. Consolidate and export to a utils file.
-		// If no readings, do nothing and return empty arrays
-		if (numOfReadings > 0) {
-			const readingsPerDay = 24 / readingInterval;
-			// get the number of days days between start and end timestamps * readings per day.
-			const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
-
-			let readingsToReturn = allGroupThreeDReadings;
-			// Run Fill holes algorithm if expected num of readings to not match received reading count.
-			if (allGroupThreeDReadings.length !== expectedNumOfReadings) {
-
-				let missingReadings = [];
-				allGroupThreeDReadings.forEach((reading, index, arr) => {
-					// If the next index is defined, and current / next timestamps don't overlap fill the gap.
-					if (arr[index + 1] && arr[index].end_timestamp.valueOf() !== arr[index + 1].start_timestamp.valueOf()) {
-						const currEndTimestamp = arr[index].end_timestamp;
-						const targetStartTimestamp = arr[index + 1].start_timestamp;
-						let nextStartTimeStamp = currEndTimestamp.clone();
-						let nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
-						//Push missing null readings until the readings overlap
-						do {
-							missingReadings.push({
-								reading_rate: null,
-								start_timestamp: nextStartTimeStamp,
-								end_timestamp: nextEndTimeStamp
-							})
-
-							nextStartTimeStamp = nextEndTimeStamp.clone();
-							nextEndTimeStamp = nextStartTimeStamp.clone().add(readingInterval, 'hour');
-						} while (nextStartTimeStamp.valueOf() !== targetStartTimestamp.valueOf());
-					}
-				});
-
-				let merged = [];
-				// Merge the Original Readings with 'hole' readings.
-				// While both arrays have values compare and push
-				while (allGroupThreeDReadings.length && missingReadings.length) {
-					if (allGroupThreeDReadings[0].start_timestamp.valueOf() < missingReadings[0].start_timestamp.valueOf()) {
-						merged.push(allGroupThreeDReadings.shift());
-					} else {
-						merged.push(missingReadings.shift());
-					}
-				}
-				// Push remaining values, if any
-				while (allGroupThreeDReadings.length) {
-					merged.push(allGroupThreeDReadings.shift());
-				}
-				// Push remaining values, if any
-				while (missingReadings.length) {
-					merged.push(missingReadings.shift());
-				}
-				readingsToReturn = merged;
-			}
-			// Format readings.
-			const chunkedReadings = _.chunk(readingsToReturn, 24 / readingInterval);
-
-			// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
-			const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
-
-			// get the hourly timestamp intervals from
-			chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
-			chunkedReadings.forEach(day => {
-				let dayReadings = [];
-				// Data data may need to be converted into 'moment' to save on network load
-				yData.push(day[0].start_timestamp.valueOf());
-
-				day.forEach(hour => dayReadings.push(hour.reading_rate));
-				zData.push(dayReadings);
-			});
-		}
-
-		const groupThreeDData = {
-			xData: xData,
-			yData: yData,
-			zData: zData
-		}
-
+		const groupThreeDData = threeDHoleAlgorithm(allGroupThreeDReadings, toTimestamp, fromTimestamp, readingInterval);
 		return groupThreeDData;
-
 	}
 
 	toString() {

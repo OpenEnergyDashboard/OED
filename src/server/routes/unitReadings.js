@@ -176,7 +176,7 @@ function validateGroupThreeDReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
-function validateThreeDQueryParams(queryParams) { 
+function validateThreeDQueryParams(queryParams) {
 	//factors of 24 [timeInterval, graphicUnitID, sequence]
 	const validParams = {
 		type: 'object',
@@ -189,12 +189,12 @@ function validateThreeDQueryParams(queryParams) {
 			graphicUnitID: {
 				type: 'string',
 				// Matches 1 or 45 or 133 (for example)
-				pattern: '^\\d+$' 
+				pattern: '^\\d+$'
 			},
 			readingInterval: {
 				type: 'string',
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
-				pattern: '^([123468]|[1][2])$' 
+				pattern: '^([123468]|[1][2])$'
 			}
 		}
 	};
@@ -397,9 +397,6 @@ function createRouter() {
 	});
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-		const durationInYears = duration.years();
 
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
