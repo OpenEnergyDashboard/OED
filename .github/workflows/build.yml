@@ -64,7 +64,8 @@ jobs:
       # https://github.com/actions/checkout/issues/1048
       # TODO Remove once final fix is in for GitHub workflows.
       - name: make git permissions ok
-        run: mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\n\tdirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
+        # run: mkdir -p /home/runner/work/_temp/_github_home && printf "[safe]\n\tdirectory = /github/workspace" > /home/runner/work/_temp/_github_home/.gitconfig
+        run: chown -R $(id -u):$(id -g) $PWD
 
       - name: Install dependencies
         run: npm ci
