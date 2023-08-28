@@ -10,7 +10,6 @@ const _ = require('lodash');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
-const { request } = require('chai');
 const moment = require('moment');
 
 function validateMeterLineReadingsParams(params) {
@@ -21,7 +20,8 @@ function validateMeterLineReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				 // Matches 1 or more integers separated by commas
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -40,6 +40,7 @@ function validateLineReadingsQueryParams(queryParams) {
 			},
 			graphicUnitId: {
 				type: 'string',
+				// Matches a single integer value
 				pattern: '^\\d+$'
 			}
 		}
@@ -83,7 +84,8 @@ function validateGroupLineReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				 // Matches 1 or more integers separated by commas
+				 pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -112,7 +114,8 @@ function validateMeterBarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				 // Matches 1 or more integers separated by commas
+				 pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -135,7 +138,8 @@ function validateBarReadingsQueryParams(queryParams) {
 			},
 			graphicUnitId: {
 				type: 'string',
-				pattern: '^\\d+$' // Matches 1 or 45 or 133 (for example)
+				// Matches a single integer value
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -151,7 +155,7 @@ function validateMeterThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				// Matches 1 or 45 or 133 (for example)
+				// Matches a single integer value
 				pattern: '^\\d+$'
 			}
 		}
@@ -167,7 +171,7 @@ function validateGroupThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				// Matches 1 or 45 or 133 (for example)
+				// Matches a single integer value
 				pattern: '^\\d+$'
 			}
 		}
@@ -188,12 +192,13 @@ function validateThreeDQueryParams(queryParams) {
 			},
 			graphicUnitID: {
 				type: 'string',
-				// Matches 1 or 45 or 133 (for example)
+				// Matches a single integer value
 				pattern: '^\\d+$'
 			},
 			readingInterval: {
 				type: 'string',
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				// Matches divisors of 24: 1, 2, 3, 4, 6, 8 or 12 but not 24
 				pattern: '^([123468]|[1][2])$'
 			}
 		}
@@ -233,7 +238,8 @@ function validateGroupBarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				 // Matches 1 or more integers separated by commas
+				 pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -292,8 +298,8 @@ function validateMeterThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+$'		// Matches a single integer value
-				// pattern: '^\\d+(,\\d+)*$'		// 3d Does not support this Matches 1 or 1,2 or 1,2,34 
+				// Matches a single integer value
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -309,9 +315,8 @@ function validateGroupThreeDReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				// 3d Does not support this. Matches 1 or 1,2 or 1,2,34 
-				// pattern: '^\\d+(,\\d+)*$'		
-				pattern: '^\\d+$'		// Matches a single integer value
+				// Matches a single integer value
+				pattern: '^\\d+$'
 			}
 		}
 	};
@@ -330,12 +335,13 @@ function validateThreeDQueryParams(queryParams) {
 			},
 			graphicUnitID: {
 				type: 'string',
+				// Matches a single integer value
 				pattern: '^\\d+$'
 			},
 			readingInterval: {
 				type: 'string',
-				//factors of 24 [timeInterval, graphicUnitID, sequence]
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
+				// Matches divisors of 24: 1, 2, 3, 4, 6, 8 or 12 but not 24
 				pattern: '^([123468]|[1][2])$'
 			}
 		}
@@ -416,6 +422,7 @@ function createRouter() {
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
+		// Get time range to validate 1 year or less.
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 		const durationInYears = duration.years();
