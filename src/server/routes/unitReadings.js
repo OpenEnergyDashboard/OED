@@ -343,6 +343,7 @@ function createRouter() {
 	});
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
+		// Get time range to validate 1 year or less.
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 		const durationInYears = duration.years();
