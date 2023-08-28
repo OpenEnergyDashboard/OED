@@ -147,66 +147,6 @@ function validateBarReadingsQueryParams(queryParams) {
 	return queryValidationResult.valid;
 }
 
-function validateMeterThreeDReadingsParams(params) {
-	const validParams = {
-		type: 'object',
-		maxProperties: 1,
-		required: ['meter_ids'],
-		properties: {
-			meter_ids: {
-				type: 'string',
-				// Matches a single integer value
-				pattern: '^\\d+$'
-			}
-		}
-	};
-	const paramsValidationResult = validate(params, validParams);
-	return paramsValidationResult.valid;
-}
-function validateGroupThreeDReadingsParams(params) {
-	const validParams = {
-		type: 'object',
-		maxProperties: 1,
-		required: ['group_id'],
-		properties: {
-			meter_ids: {
-				type: 'string',
-				// Matches a single integer value
-				pattern: '^\\d+$'
-			}
-		}
-	};
-	const paramsValidationResult = validate(params, validParams);
-	return paramsValidationResult.valid;
-}
-
-function validateThreeDQueryParams(queryParams) {
-	//factors of 24 [timeInterval, graphicUnitID, sequence]
-	const validParams = {
-		type: 'object',
-		maxProperties: 3,
-		required: ['timeInterval', 'graphicUnitId', 'readingInterval'],
-		properties: {
-			timeInterval: {
-				type: 'string',
-			},
-			graphicUnitID: {
-				type: 'string',
-				// Matches a single integer value
-				pattern: '^\\d+$'
-			},
-			readingInterval: {
-				type: 'string',
-				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
-				// Matches divisors of 24: 1, 2, 3, 4, 6, 8 or 12 but not 24
-				pattern: '^([123468]|[1][2])$'
-			}
-		}
-	};
-	const paramsValidationResult = validate(queryParams, validParams);
-	return paramsValidationResult.valid;
-}
-
 function formatBarReadingRow(readingRow) {
 	return {
 		reading: readingRow.reading,
