@@ -350,7 +350,7 @@ function createRouter() {
 
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else if (durationInYears >= 1) {
+		} else if (durationInYears > 1) {
 			res.sendStatus(400);
 		}
 		else {
@@ -370,7 +370,7 @@ function createRouter() {
 
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else if (durationInYears >= 1) {
+		} else if (durationInYears > 1) {
 			res.sendStatus(400);
 		}
 		else {
