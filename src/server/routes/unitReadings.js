@@ -207,7 +207,7 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @param readingsPerDay rate of hours per reading
+ * @param readingInterval rate of hours per reading
  * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
 async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readingInterval) {
@@ -221,7 +221,7 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readin
  * @param groupIDs The group IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
- * @param readingsPerDay rate of hours per reading
+ * @param readingInterval rate of hours per reading
  * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
 async function groupThreeDReadings(groupID, graphicUnitId, timeInterval, readingInterval) {
