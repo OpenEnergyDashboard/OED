@@ -16,6 +16,7 @@ import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { ConversionData } from 'types/redux/conversions';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the conversions page card view
@@ -24,7 +25,7 @@ import HeaderComponent from '../../components/HeaderComponent';
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to conversions API for conversions details if one has not already been made somewhere else, stores conversion by ids in state

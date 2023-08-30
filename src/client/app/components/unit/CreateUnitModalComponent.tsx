@@ -14,13 +14,14 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 import { addUnit } from '../../actions/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the create unit modal form
  * @returns Unit create element
  */
 export default function CreateUnitModalComponent() {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	const defaultValues = {
 		name: '',

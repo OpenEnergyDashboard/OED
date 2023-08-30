@@ -28,6 +28,7 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
+import { Dispatch } from 'types/redux/actions';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -39,7 +40,7 @@ interface CreateGroupModalComponentProps {
  * @returns Group create element
  */
 export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);

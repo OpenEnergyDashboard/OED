@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import thunkMiddleware from 'redux-thunk';
-import { render } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -36,11 +36,13 @@ store.dispatch<any>(initScript());
 
 // Renders the entire application, starting with RouteComponent, into the root div
 // Provides the Redux store to all child components
-render(
+const container = document.getElementById('root');
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+const root = createRoot(container!);
+root.render(
 	<Provider store={store}>
 		<RouteContainer />
-	</Provider>,
-	document.getElementById('root')
+	</Provider>
 );
 
 export default store;

@@ -25,6 +25,7 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { UnitRepresentType } from '../../types/redux/units';
+import { Dispatch } from 'types/redux/actions';
 import * as moment from 'moment';
 
 interface EditMeterModalComponentProps {
@@ -41,7 +42,7 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useSelector((state: State) => state.meters.byMeterID[props.meter.id]);
