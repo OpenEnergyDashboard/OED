@@ -387,8 +387,8 @@ class Reading {
 	 * Gets hourly line readings for a meter for the given time range
 	 * @param meterIDs The meter IDs to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @param fromTimestamp An optional start point for the time range of readings returned
-	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param fromTimestamp Start point for the time range of readings returned
+	 * @param toTimestamp End point for the time range of readings returned
 	 * @param readingInterval rate of hours per reading
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
@@ -406,8 +406,8 @@ class Reading {
 	 * Gets hourly readings for groups for the given time range
 	 * @param groupIDs The group IDs to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
-	 * @param fromTimestamp An optional start point for the time range of readings returned
-	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param fromTimestamp Start point for the time range of readings returned
+	 * @param toTimestamp End point for the time range of readings returned
 	 * @param readingInterval rate of hours per reading
 	 * @param conn the connection to use.
 	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
