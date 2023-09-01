@@ -25,8 +25,9 @@ const defaultState: GraphState = {
 	areaNormalization: false,
 	hotlinked: false,
 	optionsVisibility: true,
-	lineGraphRate: {label: 'hour', rate: 1},
-	renderOnce: false
+	lineGraphRate: { label: 'hour', rate: 1 },
+	renderOnce: false,
+	showMinMax: false
 };
 
 export default function graph(state = defaultState, action: GraphAction) {
@@ -93,6 +94,11 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				areaNormalization: !state.areaNormalization
 			};
+		case ActionType.ToggleShowMinMax:
+			return {
+				...state,
+				showMinMax: !state.showMinMax
+			};
 		case ActionType.ChangeBarStacking:
 			return {
 				...state,
@@ -108,10 +114,10 @@ export default function graph(state = defaultState, action: GraphAction) {
 				...state,
 				compareSortingOrder: action.compareSortingOrder
 			};
-		case ActionType.SetOptionsVisibility:
+		case ActionType.ToggleOptionsVisibility:
 			return {
 				...state,
-				optionsVisibility: action.visibility
+				optionsVisibility: !state.optionsVisibility
 			};
 		case ActionType.UpdateLineGraphRate:
 			return {

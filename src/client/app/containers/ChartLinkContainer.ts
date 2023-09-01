@@ -61,6 +61,7 @@ function mapStateToProps(state: State) {
 	linkText += `&unitID=${unitID.toString()}`;
 	linkText += `&rate=${state.graph.lineGraphRate.label.toString()},${state.graph.lineGraphRate.rate.toString()}`;
 	linkText += `&areaUnit=${state.graph.selectedAreaUnit}&areaNormalization=${state.graph.areaNormalization}`;
+	linkText += `&minMax=${state.graph.showMinMax}`;
 	return {
 		linkText,
 		chartType

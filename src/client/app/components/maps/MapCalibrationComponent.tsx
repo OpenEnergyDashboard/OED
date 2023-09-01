@@ -7,8 +7,8 @@ import { CalibrationModeTypes } from '../../types/redux/map';
 import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
 import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibrationChartDisplayContainer';
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
-import HeaderContainer from '../../containers/HeaderContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import HeaderComponent from '../../components/HeaderComponent';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -26,7 +26,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer/>
+					<HeaderComponent />
 					<MapCalibrationInitiateContainer />
 				</div>
 			);
@@ -34,10 +34,16 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer />
+					<HeaderComponent />
 					<div id={'MapCalibrationContainer'}>
-						<MapCalibrationChartDisplayContainer/>
-						<MapCalibrationInfoDisplayContainer/>
+						{/* TODO These types of plotly containers expect a lot of passed
+						values and it gives a TS error. Given we plan to  replace this
+						with the react hooks version and it does not seem to cause any
+						issues, this TS error is being suppressed for now.
+						eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						@ts-ignore */}
+						<MapCalibrationChartDisplayContainer />
+						<MapCalibrationInfoDisplayContainer />
 					</div>
 				</div>
 			);
@@ -45,8 +51,8 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderContainer/>
-					<p/>
+					<HeaderComponent />
+					<p />
 				</div>
 			);
 		}

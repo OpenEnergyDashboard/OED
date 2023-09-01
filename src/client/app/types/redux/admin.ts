@@ -24,7 +24,14 @@ export type AdminAction =
 	| MarkPreferencesSubmittedAction
 	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
-	| UpdateDefaultMeterReadingFrequencyAction;
+	| UpdateDefaultMeterReadingFrequencyAction
+	| UpdateDefaultMeterMinimumValueAction
+	| UpdateDefaultMeterMaximumValueAction
+	| UpdateDefaultMeterMinimumDateAction
+	| UpdateDefaultMeterMaximumDateAction
+	| UpdateDefaultMeterReadingGapAction
+	| UpdateDefaultMeterMaximumErrorsAction
+	| UpdateDefaultMeterDisableChecksAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -101,6 +108,42 @@ export interface UpdateDefaultMeterReadingFrequencyAction {
 	defaultMeterReadingFrequency: string;
 }
 
+export interface UpdateDefaultMeterMinimumValueAction {
+	type: ActionType.UpdateDefaultMeterMinimumValue;
+	defaultMeterMinimumValue: number;
+}
+
+export interface UpdateDefaultMeterMaximumValueAction {
+	type: ActionType.UpdateDefaultMeterMaximumValue;
+	defaultMeterMaximumValue: number;
+}
+
+
+export interface UpdateDefaultMeterMinimumDateAction {
+	type: ActionType.UpdateDefaultMeterMinimumDate;
+	defaultMeterMinimumDate: string;
+}
+
+export interface UpdateDefaultMeterMaximumDateAction {
+	type: ActionType.UpdateDefaultMeterMaximumDate;
+	defaultMeterMaximumDate: string;
+}
+
+export interface UpdateDefaultMeterReadingGapAction {
+	type: ActionType.UpdateDefaultMeterReadingGap;
+	defaultMeterReadingGap: number;
+}
+
+export interface UpdateDefaultMeterMaximumErrorsAction {
+	type: ActionType.UpdateDefaultMeterMaximumErrors;
+	defaultMeterMaximumErrors: number;
+}
+
+export interface UpdateDefaultMeterDisableChecksAction {
+	type: ActionType.UpdateDefaultMeterDisableChecks;
+	defaultMeterDisableChecks: boolean;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -116,4 +159,11 @@ export interface AdminState {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
+	defaultMeterMaximumValue: number;
+	defaultMeterMinimumDate: string;
+	defaultMeterMaximumDate: string;
+	defaultMeterReadingGap: number;
+	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }

@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -20,6 +19,8 @@ import '../../styles/card-page.css';
 import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
+import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the meters page card view
@@ -27,7 +28,7 @@ import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
  */
 export default function MetersDetailComponent() {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to Meters API for Meters details if one has not already been made somewhere else, stores Meter ids in state
@@ -90,7 +91,7 @@ export default function MetersDetailComponent() {
 
 	return (
 		<div>
-			<HeaderContainer />
+			<HeaderComponent />
 			<TooltipHelpContainer page='meters' />
 
 			<div className='container-fluid'>

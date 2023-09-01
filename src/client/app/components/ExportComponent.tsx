@@ -39,6 +39,8 @@ export default function ExportComponent() {
 	const adminState = useSelector((state: State) => state.admin);
 	// readings state
 	const readingsState = useSelector((state: State) => state.readings);
+	// error bar state
+	const errorBarState = useSelector((state: State) => state.graph.showMinMax);
 	// Time range of graphic
 	const timeInterval = graphState.timeInterval;
 
@@ -84,7 +86,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current meter.
 								const meterIdentifier = metersState[meterId].identifier;
-								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
+								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, errorBarState);
 							}
 						}
 					}
@@ -311,14 +313,14 @@ export default function ExportComponent() {
 	return (
 		<>
 			<div>
-				<Button outline onClick={exportGraphReading}>
+				<Button color='secondary' outline onClick={exportGraphReading}>
 					<FormattedMessage id='export.graph.data' />
 				</Button>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
 			</div>
 			{/* Only raw export if a line graph */}
 			{graphState.chartToRender === 'line' ? <div style={{ paddingTop: '10px' }}>
-				<Button outline onClick={exportRawReadings}>
+				<Button color='secondary' outline onClick={exportRawReadings}>
 					<FormattedMessage id='export.raw.graph.data' />
 				</Button>
 			</div> : ''}

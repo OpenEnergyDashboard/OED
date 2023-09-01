@@ -37,11 +37,12 @@ import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
 	barStacking: boolean;
-	defaultLanguage: LanguageTypes;
+	selectedLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
 	role: UserRole;
 	renderOnce: boolean;
 	areaNormalization: boolean;
+	minMax: boolean;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 	clearCurrentUser(): any;
 	changeRenderOnce(): any;
@@ -214,6 +215,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 							case 'areaUnit':
 								options.areaUnit = info;
 								break;
+							case 'minMax':
+								if (this.props.minMax.toString() !== info) {
+									options.toggleMinMax = true;
+								}
+								break;
 							case 'comparePeriod':
 								options.comparePeriod = validateComparePeriod(info);
 								break;
@@ -266,7 +272,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		const lang = this.props.defaultLanguage;
+		const lang = this.props.selectedLanguage;
 		const messages = (localeData as any)[lang];
 		return (
 			<div>

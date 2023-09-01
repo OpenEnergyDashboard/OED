@@ -27,9 +27,9 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		)).map(reading => checkDate([reading], minDate, maxDate, Number.MAX_VALUE));
 		for (let i = 0; i < 4; ++i) {
 			if (i % 2 === 0) {
-				expect(results[i]).to.equal(true);
+				expect(results[i].validDates).to.equal(true);
 			} else {
-				expect(results[i]).to.equal(false);
+				expect(results[i].validDates).to.equal(false);
 			}
 		}
 	});
@@ -46,9 +46,9 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		)).map(reading => checkValue([reading], minVal, maxVal, Number.MAX_VALUE));
 		for (let i = 0; i < 7; ++i) {
 			if (i % 2 === 0) {
-				expect(results[i]).to.equal(false);
+				expect(results[i].validValues).to.equal(false);
 			} else {
-				expect(results[i]).to.equal(true);
+				expect(results[i].validValues).to.equal(true);
 			}
 		}
 	});
@@ -57,14 +57,14 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:04:00'), moment('1970-01-01 00:04:01'))];
 		let result = checkIntervals(testing, 119);
-		expect(result).to.equal(false);
+		expect(result.validIntervals).to.equal(false);
 	});
 	mocha.it('detects equal intervals', async () => {
 		let testing = [ new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:01:00')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
 		let result = checkIntervals(testing, 29);
-		expect(result).to.equal(true);
+		expect(result.validIntervals).to.equal(true);
 	});
 	mocha.it('reject data with any type of error', async () => {
 		let conditionSet = {
@@ -92,10 +92,10 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 						new Reading(undefined, 20, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
 
-		expect(validateReadings(badIntervals, conditionSet)).to.equal(false);
-		expect(validateReadings(badDate, conditionSet)).to.equal(false);
-		expect(validateReadings(badValue, conditionSet)).to.equal(false);
-		expect(validateReadings(goodData, conditionSet)).to.equal(true);
+		expect(checkIntervals(badIntervals, conditionSet['threshold']).validIntervals).to.equal(false);
+		expect(validateReadings(badDate, conditionSet).validReadings).to.equal(false);
+		expect(validateReadings(badValue, conditionSet).validReadings).to.equal(false);
+		expect(validateReadings(goodData, conditionSet).validReadings).to.equal(true);
 
 	});
 });
