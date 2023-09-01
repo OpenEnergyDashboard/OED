@@ -194,31 +194,18 @@ async function insertStandardUnits(conn) {
  * @param {*} conn database connection to use.
  */
 async function insertConversions(conversionsToInsert, conn) {
-	await Promise.all(conversionsToInsert.map(
-		async conversionData => {
-			let ok = true;
-			for (let i = 0; i < conversionsToInsert.length; ++i) {
-				// Meter key/value pairs for the current meter.
-				const cData = conversionsToInsert[i];
-
-				// Check that needed keys are there.
-				const requiredKeys = ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'];
-				ok = true;
-				requiredKeys.forEach(key => {
-					if (((key == 'sourceName') || (key == 'destinationName')) && (typeof cData[key] !== 'string')) {
-						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
-						ok = false;
-					}
-					if ((key == 'bidirectional') && (typeof cData[key] !== 'boolean')) {
-						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
-						ok = false;
-					}
-					if (((key == 'slope') || (key == 'intercept')) && (typeof cData[key] !== 'number')) {
-						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
-						ok = false;
-					}
-				})
-			}
+	await Promise.all(await Promise.all(conversionsToInsert.map(
+		async (conversionData, index) => {
+			// Check that needed keys are there.
+			const requiredKeys = ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'];
+			ok = true;
+			requiredKeys.forEach(key => {
+				if (!conversionData.hasOwnProperty(key)) {
+					console.log(`********key "${key}" is required but missing so conversion number ${index} not processed with values:`, conversionData);
+					// Don't insert
+					ok = false;
+				}
+			})
 			if (ok) {
 				const sourceName = (await Unit.getByName(conversionData.sourceName, conn)).id;
 				const destinationName = (await Unit.getByName(conversionData.destinationName, conn)).id;
@@ -227,7 +214,7 @@ async function insertConversions(conversionsToInsert, conn) {
 				}
 			}
 		}
-	));
+	)))
 }
 
 /**
