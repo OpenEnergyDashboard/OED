@@ -55,11 +55,38 @@ DECLARE
 	current_meter_index INTEGER := 1;
 	-- The id of the meter index working on
 	current_meter_id INTEGER;
+    -- The meter frequency from all meters.
+ 	meter_frequency INTERVAL;
+    -- The meter frequency rounded up to a whole number of hours.
+   	meter_frequency_hour_up INTEGER;
+    -- The larger of the meter value and the argument sent.
+    max_frequency INTEGER;
+    -- The actual number of hours in a reading to use.
+    reading_length_hours_use INTEGER;
 BEGIN
     -- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
     SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
-    --Requested hours per reading returned as an interval
-    reading_length_interval := (reading_length_hours::TEXT || ' hour')::INTERVAL;
+
+    -- Get the smallest reading frequency for all meters requested.
+    SELECT min(reading_frequency) INTO meter_frequency
+	FROM (meters m
+	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id);
+  	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
+    meter_frequency_hour_up := CEIL((SELECT * FROM EXTRACT(EPOCH FROM meter_frequency)) / 3600);
+    -- Use the hours that is the largest of the request and the meter values.
+    max_frequency := GREATEST(meter_frequency_hour_up, reading_length_hours);
+    -- The value used must be a divisor of 24 or greater than 12.
+    IF (max_frequency = 5) THEN
+        reading_length_hours_use := 6;
+    ELSIF (max_frequency = 7) THEN
+        reading_length_hours_use := 8;
+    ELSIF (max_frequency > 8 AND max_frequency < 11) THEN
+        reading_length_hours_use := 12;
+    ELSE
+        reading_length_hours_use := max_frequency;
+    END IF;
+    -- Hours per reading determined returned as an interval.
+    reading_length_interval := (reading_length_hours_use::TEXT || ' hour')::INTERVAL;
 
 	-- Loop over all meters.
 	WHILE current_meter_index <= cardinality(meter_ids_requested) LOOP
@@ -82,7 +109,7 @@ BEGIN
         -- do the generate_series since that case aligns with the hourly table.
         -- The more general code is currently slower than desired so doing this.
         -- TODO Can we optimize the code so this is not needed or the slowdown is less?
-        IF (reading_length_hours = 1) THEN
+        IF (reading_length_hours_use = 1) THEN
             -- If want every hour then can just return the items in the hourly table in the desired range of time.
             -- Note could do outside the meter loop as is done for line readings and use the DB to do all the
             -- meters but this makes both cases parallel and is still fast enough.
@@ -97,8 +124,8 @@ BEGIN
                 WHERE hr.meter_id = current_meter_id and requested_range @> hr.time_interval
                  -- Time sort by which metrer and the start time for graphing.
                 ORDER BY meter_id, start_timestamp
-            ;      
-        ELSE
+            ;
+        ELSIF (reading_length_hours_use <= 12) THEN
             -- Need to generate_series to group the desired hours together
             RETURN QUERY
                 -- The readings are rates in the hourly table so want to average not sum.
@@ -136,6 +163,7 @@ BEGIN
                 -- Time sort by the meter and start time for graphing.
                 ORDER BY hr.meter_id, hours.hour
             ;
+            -- The reading frequency is too high so return no data if > 12.
         END IF;
 
         -- Go to the next meter

@@ -398,7 +398,7 @@ class Reading {
 		 * @type {array<{meter_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		*/
 		const allMeterThreeDReadings = await conn.func('meter_3d_readings_unit', [meterIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
-		const meterThreeDData = threeDHoleAlgorithm(allMeterThreeDReadings, toTimestamp, fromTimestamp, readingInterval);
+		const meterThreeDData = threeDHoleAlgorithm(allMeterThreeDReadings, toTimestamp, fromTimestamp);
 		return meterThreeDData;
 	}
 
