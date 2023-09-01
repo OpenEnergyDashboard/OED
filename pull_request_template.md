@@ -19,6 +19,7 @@ Fixes #[issue]
 
 - [ ] I have followed the [OED pull request](https://openenergydashboard.github.io/developer/pr.html) ideas
 - [ ] I have removed text in ( ) from the issue request
+- [ ] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](./CONTRIBUTING.md) and each author is listed in the Description section.
 
 ## Limitations
 
