@@ -7,7 +7,7 @@
 const _ = require('lodash');
 const moment = require('moment');
 
-function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp, readingInterval) {
+function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 	// Initialize empty plotly data 
 	const xData = [];
 	const yData = [];
@@ -17,12 +17,18 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp, r
 	// If readings exist, find/replace missing readings if any, and format for plotly.
 	// Otherwise, return empty z,y,z data
 	if (numOfReadings > 0) {
+		// If the meter is low frequency then the DB may return readings with larger time ranges than requested.
+		// All readings have same range so use the first one to determine the range. diff gives milliseconds
+		// so divide by 1000 to sec and 3600 to hours.
+		// Note the returned points per day might be less than requested but still stored in the requested number in
+		// Redux state. This is not common so just do that since much easier.
+		const readingIntervalUse = meterOrGroupReadings[0].end_timestamp.diff(meterOrGroupReadings[0].start_timestamp) / 3600000;
 		// Assume no missing readings, replace if needed.
 		let readingsToReturn = meterOrGroupReadings;
 
 		// get the number of days days between start and end timestamps * readings per day.
-		const readingsPerDay = 24 / readingInterval;
-		const intervalDuration = moment.duration({ 'hour': readingInterval });
+		const readingsPerDay = 24 / readingIntervalUse;
+		const intervalDuration = moment.duration({ 'hour': readingIntervalUse });
 		const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
 		// Run Fill holes algorithm if expected num of readings to not match received reading count.
 		if (meterOrGroupReadings.length !== expectedNumOfReadings) {

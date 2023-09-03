@@ -45,7 +45,7 @@ export default function ReadingsPerDaySelect() {
 			<div>
 				<p style={{ fontWeight: 'bold', margin: 0 }}>
 					{`${translate('readings.per.day')}:`}
-					<TooltipMarkerComponent page='home' helpTextId={translate('readings.per.day')} />
+					<TooltipMarkerComponent page='home' helpTextId={'help.home.readings.per.day'} />
 				</p>
 				<Select value={value} options={options} onChange={onSelectChange} />
 			</div>
