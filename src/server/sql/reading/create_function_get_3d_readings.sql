@@ -80,7 +80,7 @@ BEGIN
         reading_length_hours_use := 6;
     ELSIF (max_frequency = 7) THEN
         reading_length_hours_use := 8;
-    ELSIF (max_frequency > 8 AND max_frequency < 11) THEN
+    ELSIF (max_frequency > 8 AND max_frequency < 12) THEN
         reading_length_hours_use := 12;
     ELSE
         reading_length_hours_use := max_frequency;
@@ -163,7 +163,13 @@ BEGIN
                 -- Time sort by the meter and start time for graphing.
                 ORDER BY hr.meter_id, hours.hour
             ;
-            -- The reading frequency is too high so return no data if > 12.
+        ELSE
+            -- The reading rate is more than 12 so return a single row with dummy values that easy to detect.
+            -- The end time differs from the start time by the meter reading frequency or min one for groups.
+            -- This means the meter reading frequency is too long for a 3D graphic.
+            RETURN QUERY
+                SELECT -999, -999::FLOAT, '1900-01-01 00:00:00'::TIMESTAMP, '1900-01-01 00:00:00'::TIMESTAMP + reading_length_interval
+            ;
         END IF;
 
         -- Go to the next meter
