@@ -19,26 +19,17 @@ const fs = require('fs').promises;
  */
 async function insertUnits(unitsToInsert, update = false, conn) {
 	await Promise.all(unitsToInsert.map(
-		async unitData => {
+		async (unitData, index) => {
+			// Check that needed keys are there.
+			const requiredKeys = ['name', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'];
 			let ok = true;
-			for (let i = 0; i < unitsToInsert.length; ++i) {
-				// Meter key/value pairs for the current meter.
-				const uData = unitsToInsert[i];
-
-				// Check that needed keys are there.
-				const requiredKeys = ['name', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'];
-				ok = true;
-				requiredKeys.forEach(key => {
-					if (((key == 'name') || (key == 'unitRepresent') || (key == 'typeOfUnit') || (key == 'displayable')) && (typeof uData[key] !== 'string')) {
-						console.log(`********key "${key}" is required but missing so conversion number ${i} not processed`);
-						ok = false;
-					}
-					if ((key == 'preferredDisplay') && (typeof uData[key] !== 'boolean')) {
-						console.log(`********key "${key}" is required but missing so unit number ${i} not processed`);
-						ok = false;
-					}
-				})
-			}
+			requiredKeys.forEach(key => {
+				if (!unitData.hasOwnProperty(key)) {
+					console.log(`********key "${key}" is required but missing so unit number ${index} not processed with values:`, unitData);
+					// Don't insert
+					ok = false;
+				}
+			})
 			if (ok) {
 				const dbUnit = await Unit.getByName(unitData.name, conn);
 				if (dbUnit === null) {
@@ -62,7 +53,7 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 				// Otherwise do not update.
 			}
 		}
-	));
+	))
 }
 
 /**
@@ -194,11 +185,11 @@ async function insertStandardUnits(conn) {
  * @param {*} conn database connection to use.
  */
 async function insertConversions(conversionsToInsert, conn) {
-	await Promise.all(await Promise.all(conversionsToInsert.map(
+	await Promise.all(conversionsToInsert.map(
 		async (conversionData, index) => {
 			// Check that needed keys are there.
 			const requiredKeys = ['sourceName', 'destinationName', 'bidirectional', 'slope', 'intercept'];
-			ok = true;
+			let ok = true;
 			requiredKeys.forEach(key => {
 				if (!conversionData.hasOwnProperty(key)) {
 					console.log(`********key "${key}" is required but missing so conversion number ${index} not processed with values:`, conversionData);
@@ -214,7 +205,7 @@ async function insertConversions(conversionsToInsert, conn) {
 				}
 			}
 		}
-	)))
+	))
 }
 
 /**
