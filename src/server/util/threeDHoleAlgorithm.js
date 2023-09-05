@@ -14,8 +14,10 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 	const zData = [];
 
 	const numOfReadings = meterOrGroupReadings.length;
-	// If readings exist, find/replace missing readings if any, and format for plotly.
+	// If readings exist, and first index is not the 'special case'(requested frequency exceeds meter reading frequency)
+	// find/replace missing readings if any, and format for plotly,
 	// Otherwise, return empty z,y,z data
+	// if (numOfReadings > 0 && meterOrGroupReadings[0].reading_rate !== -999) {
 	if (numOfReadings > 0) {
 		// If the meter is low frequency then the DB may return readings with larger time ranges than requested.
 		// All readings have same range so use the first one to determine the range. diff gives milliseconds
@@ -91,14 +93,18 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 			readingsToReturn = merged;
 		}
 
+		// in rare cases, there's a chance that readings per day returns a fraction(eg. 0.25 when meter reads @ 4 day intervals) which in the 'special case'
+		const chunkSize = readingsPerDay >= 1 ? readingsPerDay : 1;
 		// Format readings.
 		// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
-		const chunkedReadings = _.chunk(readingsToReturn, readingsPerDay);
-		// This variable corresponds to the first day's readings, to get the hourly timestamps for xData.
-		const chunkedReadingsHour = _.cloneDeep(chunkedReadings[0]);
-
+		const chunkedReadings = _.chunk(readingsToReturn, chunkSize);
 		// get the hourly timestamp intervals from
-		chunkedReadingsHour.forEach(hour => xData.push(hour.start_timestamp.add(hour.end_timestamp.diff(hour.start_timestamp) / 2).valueOf()));
+		// chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.clone().add(hour.end_timestamp.clone().diff(hour.start_timestamp) / 2).valueOf()));
+		chunkedReadings[0].forEach(hour => xData.push({
+			startTimestamp: hour.start_timestamp.valueOf(),
+			endTimestamp: hour.end_timestamp.valueOf()
+		}))
+
 		chunkedReadings.forEach(day => {
 			let dayReadings = [];
 			yData.push(day[0].start_timestamp.valueOf());

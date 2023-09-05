@@ -43,8 +43,12 @@ export interface BarReadings {
 	[id: number]: BarReading[];
 }
 
+interface ReadingInterval {
+	startTimestamp: number;
+	endTimestamp: number;
+}
 export interface ThreeDReading {
-	xData: number[];
+	xData: ReadingInterval[];
 	yData: number[];
 	zData: (number | null)[][];
 }

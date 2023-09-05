@@ -77,8 +77,7 @@ export default function ThreeDComponent() {
 			layout = setLayout(translate('select.meter.group'));
 		} else if (state.graph.areaNormalization && !isAreaCompatible) {
 			layout = setLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-		}
-		else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
+		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
 			// Not a valid time interval. ThreeD can only support up to 1 year of readings
 			layout = setLayout(translate('threeD.date.range.too.long'));
 		} else if (!threeDData) {
@@ -87,6 +86,9 @@ export default function ThreeDComponent() {
 		} else if (threeDData.zData.length === 0) {
 			// There is no data in the selected date range.
 			layout = setLayout(translate('threeD.no.data'));
+		} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
+			///   Special Case where meter frequency is greater than 12 hour intervals
+			layout = setLayout('Meter not compatible with 3D');
 		} else {
 			[dataToRender, layout] = formatThreeDData(threeDData, state);
 		}
@@ -164,26 +166,40 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 			}
 		}
 	}
+
 	const hoverText = zDataToRender.map((day, i) => day.map((readings, j) => {
+		const startTS = moment.utc(data.xData[j].startTimestamp);
+		const endTS = moment.utc(data.xData[j].endTimestamp);
+		// const midTimestamp = startTS.add(endTS.diff(startTS) / 2).valueOf();
+		// xData.push(hour.start_timestamp.clone().add(hour.end_timestamp.clone().diff(hour.start_timestamp) / 2).valueOf()));
+		const time = moment.utc(startTS.add(endTS.diff(startTS) / 2)).format('h:mm A');
 		const date = moment.utc(data.yData[i]).format('LL');
-		const time = moment.utc(data.xData[j]).format('h:mm A');
 		// ThreeD graphic readings can be null. If not null round the precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
+
+	const xDataToRender = data.xData.map(xData => {
+		const startTS = moment.utc(xData.startTimestamp);
+		const endTS = moment.utc(xData.endTimestamp);
+		return startTS.add(endTS.diff(startTS) / 2).format('h:mm A');
+		// return moment.utc(midTimestamp).clone().format('h:mm A');
+	})
+
+	const yDataToRender = data.yData.map(yData => {
+		// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
+		// TODO find better approach as full year YYYY may be desired behavior for users.
+		const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
+		return moment.utc(yData).format(localeDateFormat);
+	});
 
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
 		showscale: false,
 		// zmin: 0,
-		x: data.xData.map(xData => moment.utc(xData).clone().format('h:mm A')),
-		y: data.yData.map(yData => {
-			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
-			// TODO find better approach as full year YYYY may be desired behavior for users.
-			const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
-			return moment.utc(yData).format(localeDateFormat);
-		}),
+		x: xDataToRender,
+		y: yDataToRender,
 		z: zDataToRender,
 		hoverinfo: 'text',
 		hovertext: hoverText
