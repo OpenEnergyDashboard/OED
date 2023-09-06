@@ -16,11 +16,10 @@ interface TooltipHelpProps {
 
 // Normal/live URL for OED help pages
 // Exported to HeaderButtonsComponent and LanguageSelectorComponent
-// export const BASE_URL = 'https://openenergydashboard.github.io/help/'
+export const BASE_URL = 'https://openenergydashboard.github.io/help/'
 // Debug URL where need to put own GitHub ID before .github.io.
 // This works if you have a fork of the web pages and setup your GitHub account to serve them up.
 // export const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io/help/';
-export const BASE_URL = 'https://huss.github.io/OpenEnergyDashboard.github.io/help/'
 
 export default class TooltipHelpComponent extends React.Component<TooltipHelpProps> {
 	constructor(props: TooltipHelpProps) {
