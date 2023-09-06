@@ -250,6 +250,7 @@ export default function HeaderButtonsComponent() {
 							<LanguageSelectorComponent />
 							<DropdownItem
 								style={state.showOptionsStyle}
+								className='d-none d-lg-block'
 								onClick={() => dispatch(toggleOptionsVisibility())}>
 								<FormattedMessage id={optionsVisibility ? 'hide.options' : 'show.options'} />
 							</DropdownItem>
