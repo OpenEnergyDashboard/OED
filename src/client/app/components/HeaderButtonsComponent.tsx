@@ -35,9 +35,9 @@ export default function HeaderButtonsComponent() {
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
 	// Help URL location
-	const HELP_URL = BASE_URL + version;
+	let helpUrl = BASE_URL + version;
 	// options help
-	const optionsHelp = HELP_URL + '/optionsMenu.html';
+	const optionsHelp = helpUrl + '/optionsMenu.html';
 
 	// This is the state model for rendering this page.
 	const defaultState = {
@@ -71,7 +71,7 @@ export default function HeaderButtonsComponent() {
 		// Translated menu title that depend on whether logged in.
 		menuTitle: '',
 		// link to help page for page choices. Should not see default but use general help URL.
-		pageChoicesHelp: HELP_URL
+		pageChoicesHelp: helpUrl
 	};
 
 	// Local state for rendering.
@@ -82,6 +82,15 @@ export default function HeaderButtonsComponent() {
 	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
+
+	// Must update in case the version was not set when the page was loaded.
+	useEffect(() => {
+		helpUrl = BASE_URL + version;
+		setState(prevState => ({
+			...prevState,
+			pageChoicesHelp: helpUrl
+		}));
+	}, [version]);
 
 	// This updates which page is disabled because it is the one you are on.
 	useEffect(() => {
@@ -143,7 +152,7 @@ export default function HeaderButtonsComponent() {
 		}
 		// Admin help or regular user page
 		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
-		const currentPageChoicesHelp = HELP_URL + neededPage;
+		const currentPageChoicesHelp = helpUrl + neededPage;
 
 		setState(prevState => ({
 			...prevState,
@@ -155,7 +164,7 @@ export default function HeaderButtonsComponent() {
 			pageChoicesHelp: currentPageChoicesHelp,
 			showOptionsStyle: currentShowOptionsStyle
 		}));
-	}, [currentUser]);
+	}, [currentUser, helpUrl]);
 
 	// Handle actions on logout.
 	const handleLogOut = () => {
@@ -276,7 +285,7 @@ export default function HeaderButtonsComponent() {
 						</DropdownMenu>
 					</UncontrolledDropdown>
 					<NavLink
-						href={HELP_URL}>
+						href={helpUrl}>
 						<FormattedMessage id='help' />
 					</NavLink>
 				</Nav>
