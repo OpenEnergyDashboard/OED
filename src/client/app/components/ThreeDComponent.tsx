@@ -182,7 +182,7 @@ function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, s
 
 		// Use first day's values to populate xData Labels
 		if (i === 0) {
-			xDataToRender.push(startTS.clone().add(endTS.clone().diff(startTS) / 2).format('h:mm A'));
+			xDataToRender.push(midpointTS.format('h:mm A'));
 		}
 
 		// Use the first index of each row/day to extract the dates for the yLabels
