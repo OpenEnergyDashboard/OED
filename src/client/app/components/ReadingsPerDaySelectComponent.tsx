@@ -23,7 +23,7 @@ export default function ReadingsPerDaySelect() {
 	const dispatch: Dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
 	const readingInterval = useSelector((state: State) => state.graph.threeD.readingInterval);
-	const actualInterval = useSelector((state: State) => {
+	const actualReadingInterval = useSelector((state: State) => {
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
 		// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
@@ -34,30 +34,30 @@ export default function ReadingsPerDaySelect() {
 		// Level of detail along the xAxis / Readings per day
 		const readingInterval = state.graph.threeD.readingInterval;
 
-		// If Meter doesn't exist return null, else return whether data exists or not.
+		// If Meter not selected return null data, else return  data if any.
 		const data = !meterOrGroupID ? null : state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
+
 		if (data && data.zData.length) {
+			// Special Case:  When no compatible data available, data returned is from api is -999
+			if (data.zData[0][0] && data.zData[0][0] < 0) {
+				return ReadingInterval.Incompatible;
+			}
+
+			// Calculate the actual time interval based on the xLabel values
 			const startTS = moment.utc(data.xData[0].startTimestamp);
 			const endTS = moment.utc(data.xData[0].endTimestamp);
 			const actualReadingInterval = endTS.diff(startTS) / 3600000;
-			// Special Cases, no compatible data available, or data was 'mucked' with to
-			if (data.zData[0][0] && data.zData[0][0] < 0) {
-				// Calculate the actual time interval based on the xlabel values
-				// This value may differ from expected readings per day due to incompatible meter reading frequencies
-				return -999;
-			} else if (readingInterval !== actualReadingInterval) {
-				return actualReadingInterval
-			}
+			return actualReadingInterval
 		}
 
-		//Assume Hourly intervals if no data yet.
-		return null;
+		// Return normal interval
+		return readingInterval;
 	})
 
 	// Iterate over readingInterval enum to create select option
 	const options = Object.values(ReadingInterval)
 		// Filter strings as to only get integer values from typescript's reverse mapping of enums
-		.filter(value => !isNaN(Number(value)))
+		.filter(value => !isNaN(Number(value)) && value !== ReadingInterval.Incompatible)
 		.map(value => {
 			// Length of interval readings in hours
 			const intervalLength = Number(value);
@@ -69,19 +69,18 @@ export default function ReadingsPerDaySelect() {
 			} as ReadingsPerDayOption
 		});
 
-	// Value currently being rendered
-	// Use the selectedOption as an enum key to update threeD State
+	// Use the selectedOption enum value to update threeD State
 	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingInterval(selectedOption.value));
+
 	// Default Display Value && Disabled Status
 	let displayValue = `${24 / readingInterval}`;
 	let isDisabled = false;
 
 	// Modify Display Value if needed.
-	if (actualInterval && actualInterval > readingInterval) {
-		displayValue += ` -> ${24 / actualInterval}`
-	} else if (actualInterval && actualInterval < 0) {
-		displayValue = ''
+	if (actualReadingInterval === ReadingInterval.Incompatible) {
 		isDisabled = true;
+	} else if (actualReadingInterval !== readingInterval) {
+		displayValue += ` -> ${24 / actualReadingInterval}`;
 	}
 
 	const value = {

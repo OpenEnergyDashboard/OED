@@ -35,7 +35,8 @@ export enum ReadingInterval {
 	FourHour = 4,
 	SixHour = 6,
 	EightHour = 8,
-	TwelveHour = 12
+	TwelveHour = 12,
+	Incompatible = -999
 }
 
 export interface UpdateSelectedMetersAction {

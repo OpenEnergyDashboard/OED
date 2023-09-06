@@ -31,7 +31,7 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 		// get the number of days days between start and end timestamps * readings per day.
 		const readingsPerDay = 24 / readingIntervalUse;
 		const intervalDuration = moment.duration({ 'hour': readingIntervalUse });
-		const expectedNumOfReadings = toTimestamp && fromTimestamp ? toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay : -1;
+		const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
 		// Run Fill holes algorithm if expected num of readings to not match received reading count.
 		if (meterOrGroupReadings.length !== expectedNumOfReadings) {
 			const missingReadings = [];
@@ -93,24 +93,29 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 			readingsToReturn = merged;
 		}
 
-		// in rare cases, there's a chance that readings per day returns a fraction(eg. 0.25 when meter reads @ 4 day intervals) which in the 'special case'
+		// In rare cases, there's a chance that readings per day returns a fraction(eg. 0.25 when meter reads @ 4 day intervals) which breaks _.chunk()
 		const chunkSize = readingsPerDay >= 1 ? readingsPerDay : 1;
-		// Format readings.
+
 		// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
 		const chunkedReadings = _.chunk(readingsToReturn, chunkSize);
-		// get the hourly timestamp intervals from
-		// chunkedReadings[0].forEach(hour => xData.push(hour.start_timestamp.clone().add(hour.end_timestamp.clone().diff(hour.start_timestamp) / 2).valueOf()));
-		chunkedReadings[0].forEach(hour => xData.push({
-			startTimestamp: hour.start_timestamp.valueOf(),
-			endTimestamp: hour.end_timestamp.valueOf()
-		}))
 
-		chunkedReadings.forEach(day => {
-			let dayReadings = [];
+		// Format xData and yData  for plotly
+		chunkedReadings.forEach((day, i) => {
+			// Populate xData hourly timestamp intervals from the first day only.
+			if (i === 0) {
+				day.forEach(hour => xData.push(
+					{
+						startTimestamp: hour.start_timestamp.valueOf(),
+						endTimestamp: hour.end_timestamp.valueOf()
+					}
+				))
+			}
+
+			// Populate yData based on first index of each day
 			yData.push(day[0].start_timestamp.valueOf());
 
-			day.forEach(hour => dayReadings.push(hour.reading_rate));
-			zData.push(dayReadings);
+			// Populate a zData row then append to the zData 2D Array
+			zData.push(day.map(hour => hour.reading_rate));
 		})
 	}
 

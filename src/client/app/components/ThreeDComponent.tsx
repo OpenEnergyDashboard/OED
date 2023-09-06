@@ -87,10 +87,10 @@ export default function ThreeDComponent() {
 			// There is no data in the selected date range.
 			layout = setLayout(translate('threeD.no.data'));
 		} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
-			///   Special Case where meter frequency is greater than 12 hour intervals
-			layout = setLayout('Meter not compatible with 3D');
+			// Special Case where meter frequency is greater than 12 hour intervals
+			layout = setLayout(translate('threeD.incompatible'));
 		} else {
-			[dataToRender, layout] = formatThreeDData(threeDData, state);
+			[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, state);
 		}
 		return [dataToRender, layout]
 	});
@@ -122,13 +122,18 @@ export default function ThreeDComponent() {
 /**
  * Formats Readings for plotly 3d surface
  * @param data 3D data to be formatted
+ * @param selectedMeterOrGroupID meter or group id to lookup data for
  * @param state current application meter state
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
-function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[], object] {
-	const selectedMeterOrGroupID = state.graph.selectedMeters[0] ? state.graph.selectedMeters[0] : state.graph.selectedGroups[0];
-	// This variable helps when looking into state readings....byMeterID or readings...byGroupID
-	const meterOrGroup = state.graph.selectedMeters[0] ? 'meter' : 'group';
+function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, state: State): [ThreeDPlotlyData[], object] {
+	// Initialize Plotly Data
+	const xDataToRender: string[] = [];
+	const yDataToRender: string[] = [];
+	let zDataToRender = data.zData;
+
+	// Variable helps when looking into state readings....byMeterID or readings...byGroupID
+	const meterOrGroup = state.graph.threeD.meterOrGroup;
 
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
@@ -136,7 +141,6 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 	const currentSelectedRate = state.graph.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
-	let zDataToRender = data.zData;
 	if (graphingUnit !== -99) {
 		const selectUnitState = state.units.units[state.graph.selectedUnit];
 		if (selectUnitState !== undefined) {
@@ -147,12 +151,14 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
-			const meterArea = meterOrGroup === 'meter' ?
-				state.meters.byMeterID[selectedMeterOrGroupID].area :
+			const meterArea = meterOrGroup === MeterOrGroup.meters ?
+				state.meters.byMeterID[selectedMeterOrGroupID].area
+				:
 				state.groups.byGroupID[selectedMeterOrGroupID].area;
 
-			const areaUnit = meterOrGroup === 'meter' ?
-				state.meters.byMeterID[selectedMeterOrGroupID].areaUnit :
+			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
+				state.meters.byMeterID[selectedMeterOrGroupID].areaUnit
+				:
 				state.groups.byGroupID[selectedMeterOrGroupID].areaUnit;
 
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
@@ -167,31 +173,31 @@ function formatThreeDData(data: ThreeDReading, state: State): [ThreeDPlotlyData[
 		}
 	}
 
+	// Calculate Hover Text, and populate xLabels/yLabels
 	const hoverText = zDataToRender.map((day, i) => day.map((readings, j) => {
 		const startTS = moment.utc(data.xData[j].startTimestamp);
 		const endTS = moment.utc(data.xData[j].endTimestamp);
-		// const midTimestamp = startTS.add(endTS.diff(startTS) / 2).valueOf();
-		// xData.push(hour.start_timestamp.clone().add(hour.end_timestamp.clone().diff(hour.start_timestamp) / 2).valueOf()));
-		const time = moment.utc(startTS.add(endTS.diff(startTS) / 2)).format('h:mm A');
-		const date = moment.utc(data.yData[i]).format('LL');
-		// ThreeD graphic readings can be null. If not null round the precision.
+		const midpointTS = moment.utc(startTS.clone().add(endTS.clone().diff(startTS) / 2));
+		const dateTS = moment.utc(data.yData[i])
+
+		// Use first day's values to populate xData Labels
+		if (i === 0) {
+			xDataToRender.push(startTS.clone().add(endTS.clone().diff(startTS) / 2).format('h:mm A'));
+		}
+
+		// Use the first index of each row/day to extract the dates for the yLabels
+		if (j === 0) {
+			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
+			// TODO find better approach as full year YYYY may be desired behavior for users.
+			yDataToRender.push(dateTS.format(moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY')));
+		}
+
+		const time = midpointTS.format('h:mm A');
+		const date = dateTS.format('LL');
+		// ThreeD graphic readings can be null. If not null round to a precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
-
-	const xDataToRender = data.xData.map(xData => {
-		const startTS = moment.utc(xData.startTimestamp);
-		const endTS = moment.utc(xData.endTimestamp);
-		return startTS.add(endTS.diff(startTS) / 2).format('h:mm A');
-		// return moment.utc(midTimestamp).clone().format('h:mm A');
-	})
-
-	const yDataToRender = data.yData.map(yData => {
-		// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
-		// TODO find better approach as full year YYYY may be desired behavior for users.
-		const localeDateFormat = moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY');
-		return moment.utc(yData).format(localeDateFormat);
-	});
 
 	const formattedData = [{
 		type: 'surface',
