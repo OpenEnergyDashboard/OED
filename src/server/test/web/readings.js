@@ -13,15 +13,8 @@
 		4) write your test using expectReadingToEqualExpected to check the values and createTimeString
 */
 
-const { chai, mocha, expect, app, testDB } = require('../common');
-const { TimeInterval } = require('../../../common/TimeInterval');
-const { insertUnits, insertConversions, insertMeters, insertGroups } = require('../../util/insertData');
+const { chai, mocha, expect, app } = require('../common');
 const Unit = require('../../models/Unit');
-const { redoCik } = require('../../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
-const readCsv = require('../../services/pipeline-in-progress/readCsv');
-const moment = require('moment');
-const { ModuleResolutionKind } = require('typescript');
 
 const {prepareTest,
 	parseExpectedCsv,
@@ -33,7 +26,7 @@ const {prepareTest,
 	GROUP_ID,
 	HTTP_CODE,
     unitDatakWh,
-    conversionDatakWh} = require('../web/readingsUtils');
+    conversionDatakWh} = require('../../util/readingsUtils');
 
 
 // TODO
@@ -1052,4 +1045,3 @@ mocha.describe('readings API', () => {
 		});
 	});
 });
-

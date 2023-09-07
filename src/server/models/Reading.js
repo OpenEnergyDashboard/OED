@@ -389,7 +389,7 @@ class Reading {
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp Start point for the time range of readings returned
 	 * @param toTimestamp End point for the time range of readings returned
-	 * @param readingInterval rate of hours per reading
+	 * @param readingInterval number of hours per reading
 	 * @param conn the connection to use.
 	 * @return {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */

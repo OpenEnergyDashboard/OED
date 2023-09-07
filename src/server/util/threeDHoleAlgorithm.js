@@ -93,7 +93,7 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 			readingsToReturn = merged;
 		}
 
-		// In rare cases, there's a chance that readings per day returns a fraction(eg. 0.25 when meter reads @ 4 day intervals) which breaks _.chunk()
+		// In rare cases, there's a chance that readings per day returns a fraction (eg. 0.25 when meter reads @ 4 day intervals) which breaks _.chunk()
 		const chunkSize = readingsPerDay >= 1 ? readingsPerDay : 1;
 
 		// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.

@@ -20,7 +20,7 @@ function validateMeterLineReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				 // Matches 1 or more integers separated by commas
+				// Matches 1 or more integers separated by commas
 				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
@@ -84,8 +84,8 @@ function validateGroupLineReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				 // Matches 1 or more integers separated by commas
-				 pattern: '^\\d+(?:,\\d+)*$'
+				// Matches 1 or more integers separated by commas
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -114,8 +114,8 @@ function validateMeterBarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				 // Matches 1 or more integers separated by commas
-				 pattern: '^\\d+(?:,\\d+)*$'
+				// Matches 1 or more integers separated by commas
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -178,8 +178,8 @@ function validateGroupBarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				 // Matches 1 or more integers separated by commas
-				 pattern: '^\\d+(?:,\\d+)*$'
+				// Matches 1 or more integers separated by commas
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -343,42 +343,56 @@ function createRouter() {
 	});
 
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
-		// Get time range to validate 1 year or less.
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-		const durationInYears = duration.years();
-
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else if (durationInYears > 1) {
-			res.sendStatus(400);
-		}
-		else {
-			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-			const graphicUnitID = req.query.graphicUnitId;
-			const readingInterval = req.query.readingInterval;
-			const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
-			res.json(forJson);
+		} else {
+			// Get time range to validate 1 year or less.
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			if (!timeInterval.getIsBounded()) {
+				// Cannot do if not bounded.
+				res.sendStatus(400);
+			} else {
+				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
+				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
+				const durationInYears = duration.years();
+				if (durationInYears >= 1) {
+					// Limit 3D to one year of data.
+					res.sendStatus(400);
+				} else {
+					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+					const graphicUnitID = req.query.graphicUnitId;
+					const readingInterval = req.query.readingInterval;
+					const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
+					res.json(forJson);
+				}
+			}
 		}
 	});
 
 	router.get('/threeD/groups/:group_id', async (req, res) => {
-		// Get time range to validate 1 year or less.
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-		const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-		const durationInYears = duration.years();
-
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
-		} else if (durationInYears > 1) {
-			res.sendStatus(400);
-		}
-		else {
-			const groupID = req.params.group_id;
-			const graphicUnitID = req.query.graphicUnitId;
-			const readingInterval = req.query.readingInterval;
-			const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
-			res.json(forJson);
+		} else {
+			// Get time range to validate 1 year or less.
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			if (!timeInterval.getIsBounded()) {
+				// Cannot do if not bounded.
+				res.sendStatus(400);
+			} else {
+				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
+				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
+				const durationInYears = duration.years();
+				if (durationInYears >= 1) {
+					// Limit 3D to one year of data.
+					res.sendStatus(400);
+				} else {
+					const groupID = req.params.group_id;
+					const graphicUnitID = req.query.graphicUnitId;
+					const readingInterval = req.query.readingInterval;
+					const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
+					res.json(forJson);
+				}
+			}
 		}
 	});
 

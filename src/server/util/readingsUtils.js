@@ -1,12 +1,15 @@
-const { chai, mocha, expect, app, testDB } = require('../common');
-const { TimeInterval } = require('../../../common/TimeInterval');
-const { insertUnits, insertConversions, insertMeters, insertGroups } = require('../../util/insertData');
-const Unit = require('../../models/Unit');
-const { redoCik } = require('../../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
-const readCsv = require('../../services/pipeline-in-progress/readCsv');
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+const { expect, testDB } = require('../test/common');
+const { TimeInterval } = require('../../common/TimeInterval');
+const { insertUnits, insertConversions, insertMeters, insertGroups } = require('./insertData');
+const Unit = require('../models/Unit');
+const { redoCik } = require('../services/graph/redoCik');
+const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const readCsv = require('../services/pipeline-in-progress/readCsv');
 const moment = require('moment');
-const { ModuleResolutionKind } = require('typescript');
 
 const ETERNITY = TimeInterval.unbounded();
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
@@ -75,36 +78,50 @@ function expectReadingToEqualExpected(res, expected) {
 /**
  * Compares readings from api call against the expected readings csv
  * @param {request.Response} res the response to the HTTP GET request from Chai
- * @param {array} expected the returned array from parseExpectedCsv
+ * @param {array} expected the returned array from parseExpectedCsv of expected values
+ * @param {integer} timePerReading hours each reading covers
+ * @param {boolean} noData true if 3D request cannot return data so special values, false by default
  */
-function expectThreeDReadingToEqualExpected(res, expected, readingsPerDay) {
-
-	const days = expected.length / readingsPerDay;
+function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noData = false) {
+	let readingsPerDay = 24 / timePerReading;
+	// Number of days expected to be returned. Special of only 1 value if 3D cannot return data so special value.
+	let days = noData ? 1 : expected.length / readingsPerDay;
 	expect(res).to.be.json;
 	expect(res).to.have.status(HTTP_CODE.OK);
-	// Did the response have the correct number of readings.
+	// Did the response have the correct type of properties.
 	expect(res.body).to.have.property('xData');
-    expect(res.body).to.have.property('yData');
-    expect(res.body).to.have.property('zData').to.have.lengthOf(days);
+	expect(res.body).to.have.property('yData');
+	expect(res.body).to.have.property('zData').to.have.lengthOf(days);
+	// The lengths should be correct.
+	expect(res.body, 'xData length').to.have.property(`xData`).to.have.lengthOf(readingsPerDay);
+	expect(res.body, 'yData length').to.have.property(`yData`).to.have.lengthOf(days);
+	expect(res.body, 'zData length').to.have.property(`zData`).to.have.lengthOf(days);
+	expect(res.body.zData[0], 'zData[0] length').to.have.lengthOf(readingsPerDay);
 
-    let k = 0;
-	let h = 0;
-    for (let i = 0; i < days; i++){
-        for (let j = 0; j < 24; j++){
-			if (i == 0) {
-				let hourTimeStamp = moment(expected[i][1]).add(j, 'h').add(30, 'm');
-				expect(res.body.xData[j]).to.be.equal(hourTimeStamp.valueOf());
-			}
-			if (readingsPerDay == 24){
-            	expect(res.body.zData[i][j]).to.be.closeTo(Number(expected[h][0]), DELTA);
-				h++;
-			}
-			expect(res.body.zData[i][j]).to.be.not.equal(null);
-        }
-		expect(res.body.yData[i]).to.be.equal(Date.parse(expected[k][1]));
-        k += readingsPerDay;
-    }
+	// xData should have readingsPerDay values with the start/end time of each point in the day.
+	for (let hourIndex = 0; hourIndex < readingsPerDay; hourIndex++) {
+		expect(res.body.xData[hourIndex]).to.have.property('startTimestamp').to.be.equal(Date.parse(expected[hourIndex][1]));
+		expect(res.body.xData[hourIndex]).to.have.property('endTimestamp').to.be.equal(Date.parse(expected[hourIndex][2]));
+	}
 
+	// yData should have days values with the each day start time.
+	// The index in expected which is first reading of each day.
+	let expectedIndex = 0;
+	for (let dayIndex = 0; dayIndex < days; dayIndex++) {
+		expect(res.body.yData[dayIndex]).to.be.equal(Date.parse(expected[expectedIndex][1]));
+		expectedIndex += readingsPerDay;
+	}
+
+	// zData should be a 2D array where the first index has days values and the second has readingsPerDay
+	// and each value is the reading at that day and time.
+	// The index in expected which goes by 1.
+	expectedIndex = 0;
+	for (let dayIndex = 0; dayIndex < days; dayIndex++) {
+		for (let hourIndex = 0; hourIndex < readingsPerDay; hourIndex++) {
+			expect(res.body.zData[dayIndex][hourIndex]).to.be.closeTo(Number(expected[expectedIndex][0]), DELTA);
+			expectedIndex++;
+		}
+	}
 }
 
 /**
@@ -148,8 +165,8 @@ const conversionDatakWh = [['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Ut
 module.exports = {
 	prepareTest,
 	parseExpectedCsv,
-    expectReadingToEqualExpected,
-    expectThreeDReadingToEqualExpected,
+	expectReadingToEqualExpected,
+	expectThreeDReadingToEqualExpected,
 	createTimeString,
 	getUnitId,
 	ETERNITY,
@@ -157,6 +174,6 @@ module.exports = {
 	METER_ID,
 	GROUP_ID,
 	HTTP_CODE,
-    unitDatakWh,
-    conversionDatakWh
+	unitDatakWh,
+	conversionDatakWh
 };
