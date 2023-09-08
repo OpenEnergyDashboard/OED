@@ -32,7 +32,7 @@ mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {
 		mocha.describe('for threeD graphs', () => {
 			mocha.describe('for meters', () => {
-				/*
+				// /*
 				mocha.it('response should be invalid if unbounded time', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
@@ -191,15 +191,49 @@ mocha.describe('readings API', () => {
 						});
 					expectThreeDReadingToEqualExpected(res, expected, 3);
 				});
-				*/
+				// */
 				mocha.it('correct 3D data for 15 minute readings, 6 readings/day, full time range and quantity units of kWh as BTU', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
-						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						},
+						{
+							name: 'BTU',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+						{
+							sourceName: 'kWh',
+							destinationName: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						},
+						{
+							sourceName: 'MJ',
+							destinationName: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
+						}
 					]);
 					const meterData = [
 						{
@@ -232,7 +266,7 @@ mocha.describe('readings API', () => {
 						});
 					expectThreeDReadingToEqualExpected(res, expected, 4);
 				});
-				/*
+				// /*
 				mocha.it(`correct 3D data for 4 hour readings, 3 point/day returns 4, full time range and quantity units of kWh as kWh`, async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
@@ -299,15 +333,14 @@ mocha.describe('readings API', () => {
 							timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'),
 							graphicUnitId: unitId, readingInterval: 12
 						});
-						console.log(res.body);
 					// Use 24 for timePerReading since unusual return data.
 					expectThreeDReadingToEqualExpected(res, expected, 24, true);
 				});
-				*/
+				// */
 				// TODO test flow/raw units, holes, only few/no days & groups
 			});
 			mocha.describe('for groups', () => {
-				/*
+				// /*
 				mocha.it('response should be invalid if unbounded time', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
@@ -483,6 +516,7 @@ mocha.describe('readings API', () => {
 							});
 						expectThreeDReadingToEqualExpected(res, expected, currentTimePerReading);
 					});
+				}
 				mocha.it('correct 3D data for 15 minute readings, 8 readings/day, partial time range and quantity units of kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
@@ -530,15 +564,49 @@ mocha.describe('readings API', () => {
 						});
 					expectThreeDReadingToEqualExpected(res, expected, 3);
 				});
-					*/
+				// */
 				mocha.it('correct 3D data for 15 minute readings, 6 readings/day, full time range and quantity units of kWh as BTU', async () => {
 					const unitData = unitDatakWh.concat([
-						['MJ', 'megaJoules', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'MJ'],
-						['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit']
+						{
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						},
+						{
+							name: 'BTU',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						}
 					]);
 					const conversionData = conversionDatakWh.concat([
-						['kWh', 'MJ', true, 3.6, 0, 'kWh → MJ'],
-						['MJ', 'BTU', true, 947.8, 0, 'MJ → BTU']
+						{
+							sourceName: 'kWh',
+							destinationName: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						},
+						{
+							sourceName: 'MJ',
+							destinationName: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
+						}
 					]);
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -584,110 +652,109 @@ mocha.describe('readings API', () => {
 						});
 					expectThreeDReadingToEqualExpected(res, expected, 4);
 				});
-				/*
-		mocha.it(`correct 3D data for 4 & 6 hour readings, 8 point/day returns 6, full time range and quantity units of kWh as kWh`, async () => {
-			// Create 2D array for meter to feed into the database
-			// Note the meter ID is set so we know what to expect when a query is made.
-			const meterData = [
-				{
-					name: 'Electric Utility kWh',
-					unit: 'Electric_Utility',
-					defaultGraphicUnit: 'kWh',
-					displayable: true,
-					gps: undefined,
-					note: 'special meter',
-					file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-					deleteFile: false,
-					// Make it 4 hours but ok since using hour table.
-					readingFrequency: '4 hours',
-					id: METER_ID
-				},
-				{
-					name: 'Electric Utility kWh 2-6',
-					unit: 'Electric_Utility',
-					defaultGraphicUnit: 'kWh',
-					displayable: true,
-					gps: undefined,
-					note: 'special meter',
-					file: 'test/web/readingsData/readings_ri_20_days_75.csv',
-					deleteFile: false,
-					// Make it 6 hours but ok since using hour table.
-					readingFrequency: '6 hours',
-					id: (METER_ID + 1)
-				}
-			];
-			const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
-			// Load the data into the database
-			await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);
-			// Get the unit ID since the DB could use any value.
-			const unitId = await getUnitId('kWh');
-			// Load and parse the corresponding expected values from csv. 4 hours not 3.
-			const expected = await parseExpectedCsv(
-				`src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv`);
-			// hourly readings
-			// Create a request to the API for the date range specified using createTimeString and save the response
-			const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
-				.query({
-					timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'),
-					graphicUnitId: unitId, readingInterval: 3
+				// /*
+				mocha.it(`correct 3D data for 4 & 6 hour readings, 8 point/day returns 6, full time range and quantity units of kWh as kWh`, async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							// Make it 4 hours but ok since using hour table.
+							readingFrequency: '4 hours',
+							id: METER_ID
+						},
+						{
+							name: 'Electric Utility kWh 2-6',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+							deleteFile: false,
+							// Make it 6 hours but ok since using hour table.
+							readingFrequency: '6 hours',
+							id: (METER_ID + 1)
+						}
+					];
+					const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					// Load and parse the corresponding expected values from csv. 4 hours not 3.
+					const expected = await parseExpectedCsv(
+						`src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv`);
+					// hourly readings
+					// Create a request to the API for the date range specified using createTimeString and save the response
+					const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
+						.query({
+							timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'),
+							graphicUnitId: unitId, readingInterval: 3
+						});
+					expectThreeDReadingToEqualExpected(res, expected, 4);
 				});
-			expectThreeDReadingToEqualExpected(res, expected, 4);
-		});
-		mocha.it(`special return data for 12.5 hour readings, 2 point/day, full time range and quantity units of kWh as kWh`, async () => {
-		// Create 2D array for meter to feed into the database
-			// Note the meter ID is set so we know what to expect when a query is made.
-			const meterData = [
-				{
-					name: 'Electric Utility kWh',
-					unit: 'Electric_Utility',
-					defaultGraphicUnit: 'kWh',
-					displayable: true,
-					gps: undefined,
-					note: 'special meter',
-					file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-					deleteFile: false,
-					// Make it a way too big.
-					readingFrequency: '4 days',
-					id: METER_ID
-				},
-				{
-					name: 'Electric Utility kWh 2-6',
-					unit: 'Electric_Utility',
-					defaultGraphicUnit: 'kWh',
-					displayable: true,
-					gps: undefined,
-					note: 'special meter',
-					file: 'test/web/readingsData/readings_ri_20_days_75.csv',
-					deleteFile: false,
-					// Make it a little too big.
-					readingFrequency: '12.5 hours',
-					id: (METER_ID + 1)
-				}
-			];
-			const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
-			// Load the data into the database
-			await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);
-			// Get the unit ID since the DB could use any value.
-			const unitId = await getUnitId('kWh');
-			// Load and parse the corresponding expected values from csv. 4 hours not 3.
-			const expected = await parseExpectedCsv(
-				`src/server/test/web/readingsData/expected_3d_groupFrequencyTooLong.csv`);
-			// hourly readings
-			// Create a request to the API for the date range specified using createTimeString and save the response
-			const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
-				.query({
-					timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'),
-					graphicUnitId: unitId, readingInterval: 12
+				mocha.it(`special return data for 12.5 hour readings, 2 point/day, full time range and quantity units of kWh as kWh`, async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							// Make it a way too big.
+							readingFrequency: '4 days',
+							id: METER_ID
+						},
+						{
+							name: 'Electric Utility kWh 2-6',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+							deleteFile: false,
+							// Make it a little too big.
+							readingFrequency: '12.5 hours',
+							id: (METER_ID + 1)
+						}
+					];
+					const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					// Load and parse the corresponding expected values from csv. 4 hours not 3.
+					const expected = await parseExpectedCsv(
+						`src/server/test/web/readingsData/expected_3d_groupFrequencyTooLong.csv`);
+					// hourly readings
+					// Create a request to the API for the date range specified using createTimeString and save the response
+					const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
+						.query({
+							timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'),
+							graphicUnitId: unitId, readingInterval: 12
+						});
+					// Use 24 for timePerReading since unusual return data.
+					expectThreeDReadingToEqualExpected(res, expected, 24, true);
 				});
-				console.log(res.body);
-			// Use 24 for timePerReading since unusual return data.
-			expectThreeDReadingToEqualExpected(res, expected, 24, true);
-		});
-		*/
+				// */
 			});
 		});
 	});
-	/*
+	// /*
 	// These tests check the API behavior when improper calls are made, typically with incomplete parameters
 	// The API should return status code 400 regardless of what is in the database, so no data is loaded.
 	mocha.describe('rejection tests, test behavior with invalid api calls', () => {
@@ -750,9 +817,9 @@ mocha.describe('readings API', () => {
 							expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
 						});
 					}
-					});
+				});
 			});
 		});
 	});
-	*/
+	// */
 });

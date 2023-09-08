@@ -157,10 +157,39 @@ async function getUnitId(unitName) {
 // These are the 2D arrays for units, conversions to feed into the database
 // For kWh units.
 const unitDatakWh = [
-	['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-	['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+	{
+		name: 'kWh',
+		identifier: '',
+		unitRepresent: Unit.unitRepresentType.QUANTITY,
+		secInRate: 3600,
+		typeOfUnit: Unit.unitType.UNIT,
+		suffix: '',
+		displayable: Unit.displayableType.ALL,
+		preferredDisplay: true,
+		note: 'OED created standard unit'
+	},
+	{
+		name: 'Electric_Utility',
+		identifier: '',
+		unitRepresent: Unit.unitRepresentType.QUANTITY,
+		secInRate: 3600,
+		typeOfUnit: Unit.unitType.METER,
+		suffix: '',
+		displayable: Unit.displayableType.NONE,
+		preferredDisplay: false,
+		note: 'special unit'
+	}
 ];
-const conversionDatakWh = [['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh']];
+const conversionDatakWh = [
+	{
+		sourceName: 'Electric_Utility',
+		destinationName: 'kWh',
+		bidirectional: false,
+		slope: 1,
+		intercept: 0,
+		note: 'Electric_Utility → kWh'
+	}
+];
 
 module.exports = {
 	prepareTest,
