@@ -19,13 +19,14 @@ import CreateGroupModalComponent from './CreateGroupModalComponent';
 import { GroupDefinition } from 'types/redux/groups';
 import * as _ from 'lodash';
 import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the groups page card view
  * @returns Groups page element
  */
 export default function GroupsDetailComponent() {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Groups state
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);

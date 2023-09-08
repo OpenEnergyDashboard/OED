@@ -119,7 +119,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 }
 
 // Add conversion to database
-export function addConversion(conversion: t.ConversionData): Thunk {
+export function addConversion(conversion: t.ConversionData): Dispatch {
 	return async (dispatch: Dispatch) => {
 		try {
 			// Attempt to add conversion to database
@@ -138,7 +138,7 @@ export function addConversion(conversion: t.ConversionData): Thunk {
 }
 
 // Delete conversion from database
-export function deleteConversion(conversion: t.ConversionData): Thunk {
+export function deleteConversion(conversion: t.ConversionData): (dispatch: Dispatch, getState: GetState) => Promise<void> {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// Ensure the conversion is not already being worked on
 		// Search the array of ConversionData in submitting for an object with source/destination ids matching that conversion

@@ -19,6 +19,7 @@ import { UnitType } from '../../types/redux/units';
 import { notifyUser } from '../../utils/input'
 import * as _ from 'lodash';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -31,7 +32,7 @@ interface CreateConversionModalComponentProps {
  */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	const defaultValues = {
 		// Invalid source/destination ids arbitrarily set to -999.

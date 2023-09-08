@@ -33,7 +33,7 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 	return (
 		<div>
 			<div className='row'>
-				{props.errorEntities.map( name =>
+				{props.errorEntities.map(name =>
 					<div className='col-12 clearfix' key={name}>
 						<UncontrolledAlert color='danger' className='float-right text-right'>
 							<FormattedMessage id='insufficient.readings' /> {name}
@@ -44,6 +44,12 @@ export default function MultiCompareChartComponent(props: MultiCompareChartProps
 			<div className='row'>
 				{props.selectedCompareEntities.map(compareEntity =>
 					<div className={childClassName} key={compareEntity.id + compareEntity.name}>
+						{/* TODO These types of plotly containers expect a lot of passed
+						values and it gives a TS error. Given we plan to  replace this
+						with the react hooks version and it does not seem to cause any
+						issues, this TS error is being suppressed for now.
+						eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						@ts-ignore */}
 						<CompareChartContainer
 							key={compareEntity.id + compareEntity.name}
 							entity={compareEntity}

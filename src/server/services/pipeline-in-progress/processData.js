@@ -627,14 +627,18 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		prevEndTimestampTz = endTimestampTz;
 	}
 	// Validate data if conditions given
-	if (conditionSet !== undefined && !validateReadings(result, conditionSet)) {
-		errMsg = `<h2>For meter ' + meterName + ': error when validating data so all reading are rejected</h2>`;
-		log.error(errMsg);
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
-		// This empties the result array. Should be fast and okay with const.
-		result.splice(0, result.length);
-		isAllReadingsOk = false;
-		return { result, isAllReadingsOk, msgTotal };
+	if (conditionSet !== undefined && !conditionSet['disableChecks']) {
+		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
+		if (!validReadings) {
+			errMsg = `<h2>For meter ${meterName}: error when validating data so all reading are rejected</h2>`;
+			log.error(errMsg);
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+			// This empties the result array. Should be fast and okay with const.
+			result.splice(0, result.length);
+			isAllReadingsOk = false;
+			return { result, isAllReadingsOk, msgTotal };
+		}
 	}
 	// Update the meter to contain information for the last reading in the data file.
 	// Note this means that even if the last value was rejected we still store it as

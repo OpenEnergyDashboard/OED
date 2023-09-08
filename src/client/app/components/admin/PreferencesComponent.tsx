@@ -15,7 +15,15 @@ import {
 	UpdateDefaultFileSizeLimit,
 	ToggleDefaultAreaNormalizationAction,
 	UpdateDefaultAreaUnitAction,
-	UpdateDefaultMeterReadingFrequencyAction
+	UpdateDefaultMeterReadingFrequencyAction,
+	UpdateDefaultMeterMinimumValueAction,
+	UpdateDefaultMeterMaximumValueAction,
+	UpdateDefaultMeterMinimumDateAction,
+	UpdateDefaultMeterMaximumDateAction,
+	UpdateDefaultMeterReadingGapAction,
+	UpdateDefaultMeterMaximumErrorsAction,
+	UpdateDefaultMeterDisableChecksAction
+
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
@@ -24,6 +32,8 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import store from '../../index';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import translate from '../../utils/translate';
+import { TrueFalseType } from '../../types/items';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -37,6 +47,13 @@ interface PreferencesProps {
 	defaultFileSizeLimit: number;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
+	defaultMeterMaximumValue: number;
+	defaultMeterMinimumDate: string;
+	defaultMeterMaximumDate: string;
+	defaultMeterReadingGap: number;
+	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -48,10 +65,18 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
+	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
+	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
+	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;
+	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): UpdateDefaultMeterReadingGapAction;
+	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): UpdateDefaultMeterMaximumErrorsAction;
+	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): UpdateDefaultMeterDisableChecksAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
 
+// TODO: Add warning for invalid data
 class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 	constructor(props: PreferencesPropsWithIntl) {
 		super(props);
@@ -66,6 +91,13 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultAreaNormalizationChange = this.handleDefaultAreaNormalizationChange.bind(this);
 		this.handleDefaultAreaUnitChange = this.handleDefaultAreaUnitChange.bind(this);
 		this.handleDefaultMeterReadingFrequencyChange = this.handleDefaultMeterReadingFrequencyChange.bind(this);
+		this.handleDefaultMeterMinimumValueChange = this.handleDefaultMeterMinimumValueChange.bind(this);
+		this.handleDefaultMeterMaximumValueChange = this.handleDefaultMeterMaximumValueChange.bind(this);
+		this.handleDefaultMeterMinimumDateChange = this.handleDefaultMeterMinimumDateChange.bind(this);
+		this.handleDefaultMeterMaximumDateChange = this.handleDefaultMeterMaximumDateChange.bind(this);
+		this.handleDefaultMeterReadingGapChange = this.handleDefaultMeterReadingGapChange.bind(this);
+		this.handleDefaultMeterMaximumErrorsChange = this.handleDefaultMeterMaximumErrorsChange.bind(this);
+		this.handleDefaultMeterDisableChecksChange = this.handleDefaultMeterDisableChecksChange.bind(this);
 	}
 
 	public render() {
@@ -294,6 +326,85 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						onChange={this.handleDefaultMeterReadingFrequencyChange}
 					/>
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.minimum.value' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultMeterMinimumValue}
+						onChange={this.handleDefaultMeterMinimumValueChange}
+						maxLength={50}
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.maximum.value' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultMeterMaximumValue}
+						onChange={this.handleDefaultMeterMaximumValueChange}
+						maxLength={50}
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.minimum.date' />:
+					</p>
+					<Input
+						type='text'
+						value={this.props.defaultMeterMinimumDate}
+						onChange={this.handleDefaultMeterMinimumDateChange}
+						placeholder='YYYY-MM-DD HH:MM:SS'
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.maximum.date' />:
+					</p>
+					<Input
+						type='text'
+						value={this.props.defaultMeterMaximumDate}
+						onChange={this.handleDefaultMeterMaximumDateChange}
+						placeholder='YYYY-MM-DD HH:MM:SS'
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.reading.gap' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultMeterReadingGap}
+						onChange={this.handleDefaultMeterReadingGapChange}
+						maxLength={50}
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.maximum.errors' />:
+					</p>
+					<Input
+						type='number'
+						value={this.props.defaultMeterMaximumErrors}
+						onChange={this.handleDefaultMeterMaximumErrorsChange}
+						maxLength={50}
+					/>
+				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.meter.disable.checks' />:
+					</p>
+					<Input
+						type='select'
+						value={this.props.defaultMeterDisableChecks?.toString()}
+						onChange={this.handleDefaultMeterDisableChecksChange}>
+						{Object.keys(TrueFalseType).map(key => {
+							return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+						})}
+					</Input>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -379,6 +490,42 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.props.updateDefaultMeterReadingFrequency(e.target.value);
 		this.updateUnsavedChanges();
 	}
+
+	private handleDefaultMeterMinimumValueChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMinimumValue(parseFloat(e.target.value));
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterMaximumValueChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMaximumValue(parseFloat(e.target.value));
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterMinimumDateChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMinimumDate(e.target.value);
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterMaximumDateChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMaximumDate(e.target.value);
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterReadingGapChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterReadingGap(parseFloat(e.target.value));
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterMaximumErrorsChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterMaximumErrors(parseInt(e.target.value));
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultMeterDisableChecksChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterDisableChecks(JSON.parse(e.target.value))
+		this.updateUnsavedChanges();
+	}
+
 }
 
 export default injectIntl(PreferencesComponent);

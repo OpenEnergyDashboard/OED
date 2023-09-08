@@ -13,7 +13,7 @@ import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Button} from 'reactstrap';
+import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -93,6 +93,12 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 						{showSpinner ? (
 							<SpinnerComponent loading width={50} height={50} />
 						) : (
+							// TODO These types of plotly containers expect a lot of passed
+							// values and it gives a TS error. Given we plan to  replace this
+							// with the react hooks version and it does not seem to cause any
+							// issues, this TS error is being suppressed for now.
+							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+							// @ts-ignore
 							<ChartToRender />
 						)}
 						{(this.props.chartToRender === ChartTypes.line) ? (

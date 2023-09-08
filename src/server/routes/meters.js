@@ -17,6 +17,7 @@ const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const _ = require('lodash');
 const { failure, success } = require('./response');
+const { updateNonNullExpression } = require('typescript');
 
 const router = express.Router();
 router.use(optionalAuthenticator);
@@ -56,7 +57,13 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		unitId: meter.unitId,
 		defaultGraphicUnit: meter.defaultGraphicUnit,
 		areaUnit: meter.areaUnit,
-		readingFrequency: null
+		readingFrequency: null,
+		minVal: null,
+		maxVal: null,
+		minDate: null,
+		maxDate: null,
+		maxError: null,
+		disableChecks: null,
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -82,6 +89,12 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 		formattedMeter.endTimestamp = meter.endTimestamp;
 		formattedMeter.previousEnd = meter.previousEnd;
 		formattedMeter.readingFrequency = meter.readingFrequency;
+		formattedMeter.minVal = meter.minVal;
+		formattedMeter.maxVal = meter.maxVal;
+		formattedMeter.minDate = meter.minDate;
+		formattedMeter.maxDate = meter.maxDate;
+		formattedMeter.maxError = meter.maxError;
+		formattedMeter.disableChecks = meter.disableChecks;
 	}
 
 	return formattedMeter;
@@ -149,7 +162,7 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 28,
+		maxProperties: 34,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
@@ -228,6 +241,12 @@ function validateMeterParams(params) {
 				enum: Object.values(Unit.areaUnitType)
 			},
 			readingFrequency: { type: 'string' },
+			minVal: { type: 'number' },
+			maxVal: { type: 'number' },
+			minDate: { type: 'string' },
+			maxDate: { type: 'string' },
+			maxError: { type: 'integer' },
+			disableChecks: { type: 'bool' },
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -271,7 +290,13 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.unitId,
 				req.body.defaultGraphicUnit,
 				req.body.areaUnit,
-				req.body.readingFrequency
+				req.body.readingFrequency,
+				req.body.minVal,
+				req.body.maxVal,
+				moment(req.body.minDate),
+				moment(req.body.maxDate),
+				req.body.maxError,
+				req.body.disableChecks
 			);
 			// Put any changed values from updatedMeter into meter.
 			_.merge(meter, updatedMeter);
@@ -328,7 +353,13 @@ router.post('/addMeter', async (req, res) => {
 				req.body.unitId,
 				req.body.defaultGraphicUnit,
 				req.body.areaUnit,
-				req.body.readingFrequency
+				req.body.readingFrequency,
+				req.body.minVal,
+				req.body.maxVal,
+				moment(req.body.minDate),
+				moment(req.body.maxDate),
+				req.body.maxError,
+				req.body.disableChecks
 			);
 			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);
