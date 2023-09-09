@@ -118,7 +118,12 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 	expectedIndex = 0;
 	for (let dayIndex = 0; dayIndex < days; dayIndex++) {
 		for (let hourIndex = 0; hourIndex < readingsPerDay; hourIndex++) {
-			expect(res.body.zData[dayIndex][hourIndex]).to.be.closeTo(Number(expected[expectedIndex][0]), DELTA);
+			// When there are holes in the data that are filled the expected value is 'null' and requires a special check.
+			if (expected[expectedIndex][0] === 'null') {
+				expect(res.body.zData[dayIndex][hourIndex]).to.equal(null);
+			} else {
+				expect(res.body.zData[dayIndex][hourIndex]).to.be.closeTo(Number(expected[expectedIndex][0]), DELTA);
+			}
 			expectedIndex++;
 		}
 	}

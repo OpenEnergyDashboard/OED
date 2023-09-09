@@ -326,7 +326,7 @@ async function insertMeters(metersToInsert, conn) {
 		})
 
 		if (ok) {
-			console.log(`    loading meter ${meterData.name} from file ${meterData.file}`);
+			console.log(`              loading meter ${meterData.name} from file ${meterData.file}`);
 			// Get the unit by name if provided or -99 if not
 			meterData.unit = meterData.unit ? (await Unit.getByName(meterData.unit, conn)).id : -99;
 			meterData.defaultGraphicUnit = meterData.defaultGraphicUnit ? (await Unit.getByName(meterData.defaultGraphicUnit, conn)).id : -99;
@@ -386,7 +386,7 @@ async function insertMeters(metersToInsert, conn) {
 
 			let filename = `src/server/${meterData.file}`;
 			if (await meter.existsByName(conn)) {
-				console.log(`        Warning: meter '${meter.name}' existed so not changed.`);
+				console.log(`                Warning: meter '${meter.name}' existed so not changed.`);
 			} else {
 				// Only insert the meter and its readings if the meter did not already exist.
 				await meter.insert(conn);
@@ -394,7 +394,7 @@ async function insertMeters(metersToInsert, conn) {
 				// This is normally only done for the website data.
 				// It is best/easiest to do this before there is any readings for this meter or used in a group.
 				if (meterData.id) {
-					console.log('        meter id set to ', meterData.id);
+					console.log('                meter id set to ', meterData.id);
 					meter.id = meterData.id;
 					const query = `update meters set id = ${meterData.id} where name = '${meter.name}'`;
 					await conn.none(query);
@@ -456,7 +456,7 @@ async function insertGroups(groupsToInsert, conn) {
 		// Group values from above.
 		const groupData = groupsToInsert[i];
 		const groupName = groupData[0];
-		console.log(`    creating group ${groupName}`);
+		console.log(`              creating group ${groupName}`);
 		// We get the needed unit id from the name given.
 		let groupDefaultGraphicUnit;
 		if (groupData[1] === '') {
@@ -476,7 +476,7 @@ async function insertGroups(groupsToInsert, conn) {
 			undefined // area unit
 		);
 		if (await group.existsByName(conn)) {
-			console.log(`        Warning: group '${group.name}' existed so not changed.`);
+			console.log(`                Warning: group '${group.name}' existed so not changed.`);
 		} else {
 			// Only insert the group and its children if the group did not already exist.
 			await group.insert(conn);
@@ -486,7 +486,7 @@ async function insertGroups(groupsToInsert, conn) {
 			const newId = groupData[7];
 			let parent;
 			if (newId != undefined) {
-				console.log('         group id set to ', newId);
+				console.log('                group id set to ', newId);
 				group.id = newId;
 				const query = `update groups set id = ${group.id} where name = '${groupName}'`;
 				await conn.none(query);
@@ -498,7 +498,7 @@ async function insertGroups(groupsToInsert, conn) {
 			// Now add the meter children.
 			for (let k = 0; k < groupData[5].length; ++k) {
 				const childMeter = groupData[5][k];
-				console.log(`        adding child meter ${childMeter}`);
+				console.log(`                adding child meter ${childMeter}`);
 				// Use meter id to add to group.
 				const childId = (await Meter.getByName(childMeter, conn)).id;
 				await parent.adoptMeter(childId, conn);
@@ -506,7 +506,7 @@ async function insertGroups(groupsToInsert, conn) {
 			// Now add the group children.
 			for (let k = 0; k < groupData[6].length; ++k) {
 				const childGroup = groupData[6][k];
-				console.log(`        adding child group ${childGroup}`);
+				console.log(`                adding child group ${childGroup}`);
 				// Use group id to add to group.
 				const childId = (await Group.getByName(childGroup, conn)).id;
 				await parent.adoptGroup(childId, conn);
