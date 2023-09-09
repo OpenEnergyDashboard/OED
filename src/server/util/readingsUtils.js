@@ -96,6 +96,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 	expect(res.body, 'xData length').to.have.property(`xData`).to.have.lengthOf(readingsPerDay);
 	expect(res.body, 'yData length').to.have.property(`yData`).to.have.lengthOf(days);
 	expect(res.body, 'zData length').to.have.property(`zData`).to.have.lengthOf(days);
+	// Only check the first one but the others have checked in the loop for value.
 	expect(res.body.zData[0], 'zData[0] length').to.have.lengthOf(readingsPerDay);
 
 	// xData should have readingsPerDay values with the start/end time of each point in the day.
@@ -104,7 +105,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 		expect(res.body.xData[hourIndex]).to.have.property('endTimestamp').to.be.equal(Date.parse(expected[hourIndex][2]));
 	}
 
-	// yData should have days values with the each day start time.
+	// yData should have days values with each day start time.
 	// The index in expected which is first reading of each day.
 	let expectedIndex = 0;
 	for (let dayIndex = 0; dayIndex < days; dayIndex++) {
@@ -114,7 +115,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 
 	// zData should be a 2D array where the first index has days values and the second has readingsPerDay
 	// and each value is the reading at that day and time.
-	// The index in expected which goes by 1.
+	// The index in expected which increases by 1.
 	expectedIndex = 0;
 	for (let dayIndex = 0; dayIndex < days; dayIndex++) {
 		for (let hourIndex = 0; hourIndex < readingsPerDay; hourIndex++) {
