@@ -22,13 +22,9 @@
         "noImplicitAny": true,
         "strictNullChecks": true,
         "noUnusedLocals": true,
-        "typeRoots": [
-            "./node_modules/@types",
-            "./src/client/app/types"
-        ]
     },
     "include": [
-        "./src/client/app/**/*", "desc.d.ts"
+        "./src/client/app/**/*"
     ],
     "exclude": [
         "node_modules"

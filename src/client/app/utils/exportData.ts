@@ -39,9 +39,11 @@ function convertToCSV(readings: LineReading[] | BarReading[], meter: string, uni
 		csvOutput += `${value},${startTimeStamp},${endTimeStamp}`;
 		// Include min and max in export if appropriate."
 		if (showMinMax) {
-			const min = reading.min * scaling;
-			const max = reading.max * scaling;
-			csvOutput += `,${min},${max}`
+			if ('min' in reading && 'max' in reading) {
+				const min = reading.min * scaling;
+				const max = reading.max * scaling;
+				csvOutput += `,${min},${max}`
+			}
 		}
 		csvOutput += '\n';
 	});

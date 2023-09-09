@@ -36,6 +36,7 @@ import { DataType } from '../../types/Datasources';
 import { groupsApi } from '../../utils/api';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
+import { Dispatch } from 'types/redux/actions';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -53,7 +54,7 @@ interface EditGroupModalComponentProps {
  * @returns Group edit element
  */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);

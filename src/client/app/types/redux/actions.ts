@@ -19,9 +19,6 @@ export enum ActionType {
 	RemoveUnsavedChanges = 'REMOVE_UNSAVED_CHANGES',
 	FlipLogOutState = 'FLIP_LOG_OUT_STATE',
 
-	ShowNotification = 'SHOW_NOTIFICATION',
-	ClearNotifications = 'CLEAR_NOTIFICATIONS',
-
 	RequestGroupBarReadings = 'REQUEST_GROUP_BAR_READINGS',
 	ReceiveGroupBarReadings = 'RECEIVE_GROUP_BAR_READINGS',
 	RequestMeterBarReadings = 'REQUEST_METER_BAR_READINGS',
@@ -89,6 +86,14 @@ export enum ActionType {
 	UpdateDefaultFileSizeLimit = 'UPDATE_DEFAULT_FILE_SIZE_LIMIT',
 	ToggleWaitForCikAndDB = 'TOGGLE_WAIT_FOR_CIK_AND_DB',
 	UpdateDefaultMeterReadingFrequency = 'UPDATE_DEFAULT_METER_READING_FREQUENCY',
+	UpdateDefaultMeterMinimumValue = 'UPDATE_DEFAULT_METER_MINIMUM_VALUE',
+	UpdateDefaultMeterMaximumValue = 'UPDATE_DEFAULT_METER_MAXIMUM_VALUE',
+	UpdateDefaultMeterMinimumDate = 'UPDATE_DEFAULT_METER_MINIMUM_DATE',
+	UpdateDefaultMeterMaximumDate = 'UPDATE_DEFAULT_METER_MAXIMUM_DATE',
+	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_READING_GAP',
+	UpdateDefaultMeterMaximumErrors = 'UPDATE_DEFAULT_METER_MAXIMUM_ERRORS',
+	UpdateDefaultMeterDisableChecks = 'UPDATE_DEFAULT_METER_DISABLE_CHECKS',
+
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
 	UpdateCalibrationMode = 'UPDATE_MAP_MODE',

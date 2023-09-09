@@ -11,7 +11,6 @@ import radarReadings from './radarReadings';
 import graph from './graph';
 import groups from './groups';
 import maps from './maps';
-import notifications from './notifications';
 import admin from './admin';
 import version from './version';
 import currentUser from './currentUser';
@@ -32,7 +31,6 @@ export default combineReducers({
 	graph,
 	maps,
 	groups,
-	notifications,
 	admin,
 	version,
 	currentUser,

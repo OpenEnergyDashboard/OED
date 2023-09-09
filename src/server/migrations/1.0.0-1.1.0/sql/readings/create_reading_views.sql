@@ -4,7 +4,7 @@
 
 
 -- Drop view since exists and only create
-DROP VIEW IF EXISTS daily_readings_unit;
+DROP MATERIALIZED VIEW IF EXISTS daily_readings_unit;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS
 daily_readings_unit
@@ -133,7 +133,7 @@ daily_readings_unit
 
 
 -- Drop view since exists and only create
-DROP VIEW IF EXISTS hourly_readings_unit;
+DROP MATERIALIZED VIEW IF EXISTS hourly_readings_unit;
 
 CREATE MATERIALIZED VIEW IF NOT EXISTS
 hourly_readings_unit

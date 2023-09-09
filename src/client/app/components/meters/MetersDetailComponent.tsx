@@ -20,6 +20,7 @@ import { UnitData, UnitType } from '../../types/redux/units';
 import * as _ from 'lodash';
 import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
 import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
 /**
  * Defines the meters page card view
@@ -27,7 +28,7 @@ import HeaderComponent from '../../components/HeaderComponent';
  */
 export default function MetersDetailComponent() {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to Meters API for Meters details if one has not already been made somewhere else, stores Meter ids in state

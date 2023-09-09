@@ -18,6 +18,7 @@ import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../ty
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -32,7 +33,7 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Set existing unit values
 	const values = {
