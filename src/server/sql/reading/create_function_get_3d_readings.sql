@@ -128,7 +128,8 @@ BEGIN
         ELSIF (reading_length_hours_use <= 12) THEN
             -- Need to generate_series to group the desired hours together
             RETURN QUERY
-                -- The readings are rates in the hourly table so want to average not sum.
+                -- The readings are rates in the hourly table so want to average not sum so
+                -- work for quantity, flow & raw.
                 -- The time starts at the time of the generated sequence and ends at the length
                 -- of each block later. This is the same as the start time of the next value
                 -- in the sequence (except last one).
