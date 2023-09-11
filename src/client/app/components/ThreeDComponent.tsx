@@ -74,21 +74,21 @@ export default function ThreeDComponent() {
 
 		if (!meterOrGroupID) {
 			// No selected Meters
-			layout = setLayout(translate('select.meter.group'));
+			layout = setHelpLayout(translate('select.meter.group'));
 		} else if (state.graph.areaNormalization && !isAreaCompatible) {
-			layout = setLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
+			layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
 		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
 			// Not a valid time interval. ThreeD can only support up to 1 year of readings
-			layout = setLayout(translate('threeD.date.range.too.long'));
+			layout = setHelpLayout(translate('threeD.date.range.too.long'));
 		} else if (!threeDData) {
 			// Not actually 'rendering', but from the user perspective should make sense.
-			layout = setLayout(translate('threeD.rendering'));
+			layout = setHelpLayout(translate('threeD.rendering'));
 		} else if (threeDData.zData.length === 0) {
 			// There is no data in the selected date range.
-			layout = setLayout(translate('threeD.no.data'));
+			layout = setHelpLayout(translate('threeD.no.data'));
 		} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
 			// Special Case where meter frequency is greater than 12 hour intervals
-			layout = setLayout(translate('threeD.incompatible'));
+			layout = setHelpLayout(translate('threeD.incompatible'));
 		} else {
 			[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, state);
 		}
@@ -124,7 +124,7 @@ export default function ThreeDComponent() {
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
  * @param state current application meter state
- * @returns the a time interval into a dateRange compatible for a date-picker.
+ * @returns Data, and Layout objects for a 3D Plotly Graph
  */
 function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, state: State) {
 	// Initialize Plotly Data
@@ -220,7 +220,7 @@ function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, s
  * @param fontSize current application state
  * @returns plotly layout object.
  */
-function setLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
+function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
 	return {
 		'xaxis': {
 			'visible': false
