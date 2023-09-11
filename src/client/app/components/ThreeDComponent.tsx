@@ -108,8 +108,8 @@ export default function ThreeDComponent() {
 				<SpinnerComponent loading width={50} height={50} />
 				:
 				<Plot
-					data={dataToRender}
-					layout={layout}
+					data={dataToRender as Plotly.Data[]}
+					layout={layout as Plotly.Layout}
 					config={config}
 					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
@@ -126,7 +126,7 @@ export default function ThreeDComponent() {
  * @param state current application meter state
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
-function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, state: State): [ThreeDPlotlyData[], object] {
+function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, state: State) {
 	// Initialize Plotly Data
 	const xDataToRender: string[] = [];
 	const yDataToRender: string[] = [];
@@ -222,12 +222,21 @@ function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, s
  */
 function setLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
 	return {
-		...helpInfoLayout,
-		annotations: [{
-			...helpInfoLayout.annotations[0],
-			'text': helpText,
-			'fontsize': fontSize
-		}]
+		'xaxis': {
+			'visible': false
+		},
+		'yaxis': {
+			'visible': false
+		},
+		'annotations': [
+			{
+				'text': helpText,
+				'xref': 'paper',
+				'yref': 'paper',
+				'showarrow': false,
+				'font': { 'size': fontSize }
+			}
+		]
 	}
 }
 
@@ -239,90 +248,37 @@ function setLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 
 function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	// responsible for setting Labels
 	return {
-		...threeDLayout,
+		autosize: true,
+		//Leaves holes in graph for missing, undefined, NaN, or null values
+		connectgaps: false,
 		scene: {
-			...threeDLayout.scene,
 			xaxis: {
-				...threeDLayout.scene.xaxis,
 				title: { text: translate('threeD.x.axis.label') }
 			},
 			yaxis: {
-				...threeDLayout.scene.yaxis,
 				title: { text: translate('threeD.y.axis.label') }
 			},
 			zaxis: {
-				...threeDLayout.scene.zaxis,
 				title: { text: zLabelText }
+			},
+			// Somewhat suitable aspect ratio values for 3D Graphs
+			aspectratio: {
+				x: 1,
+				y: 2.75,
+				z: 1
+			},
+			// Somewhat suitable camera eye values for data of zResource[day][interval]
+			camera: {
+				eye: {
+					x: 2.5,
+					y: -1.6,
+					z: 0.8
+				}
 			}
 		}
 	}
 }
-
-// 3D Graphic Template used for setThreeDLayout() axis labels are overridden.
-const threeDLayout = {
-	autosize: true,
-	//Leaves holes in graph for missing, undefined, NaN, or null values
-	connectgaps: false,
-	scene: {
-		xaxis: {
-			title: { text: 'xAxis Placeholder Text' }
-		},
-		yaxis: {
-			title: { text: 'yAxis Placeholder Text' }
-		},
-		zaxis: {
-			title: { text: 'zAxis Placeholder Text' }
-		},
-		// Somewhat suitable aspect ratio values for 3D Graphs
-		aspectratio: {
-			x: 1,
-			y: 2.75,
-			z: 1
-		},
-		// Somewhat suitable camera eye values for data of zResource[day][interval]
-		camera: {
-			eye: {
-				x: 2.5,
-				y: -1.6,
-				z: 0.8
-			}
-		}
-	}
-};
-
-// Help Text Layout Template.
-const helpInfoLayout = {
-	'xaxis': {
-		'visible': false
-	},
-	'yaxis': {
-		'visible': false
-	},
-	'annotations': [
-		{
-			'text': 'Help Text Goes here',
-			'xref': 'paper',
-			'yref': 'paper',
-			'showarrow': false,
-			'font': {
-				'size': 28
-			}
-		}
-	]
-};
 
 const config = {
 	responsive: true
 };
-
-type ThreeDPlotlyData = {
-	type: 'surface' | string;
-	showlegend: boolean;
-	showscale: boolean;
-	x: string[];
-	y: string[];
-	z: (number | null | undefined)[][];
-	hoverinfo: string;
-	hovertext: string[][];
-	[key: string]: any;
-}
