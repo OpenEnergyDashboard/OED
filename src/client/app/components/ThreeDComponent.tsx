@@ -15,10 +15,13 @@ import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
-import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
+import { ByMeterOrGroup, GraphState, MeterOrGroup } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
 import { useEffect } from 'react';
 import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
+import { UnitsState } from 'types/redux/units';
+import { MetersState } from 'types/redux/meters';
+import { GroupsState } from 'types/redux/groups';
 
 /**
  * Component used to render 3D graphics
@@ -26,74 +29,76 @@ import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
  */
 export default function ThreeDComponent() {
 	const dispatch: Dispatch = useDispatch();
+	const metersState = useSelector((state: State) => state.meters);
+	const groupsState = useSelector((state: State) => state.groups);
+	const graphState = useSelector((state: State) => state.graph);
+	const unitState = useSelector((state: State) => state.units);
+	const threeDReadings = useSelector((state: State) => state.readings.threeD);
 	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
-	const [dataToRender, layout] = useSelector((state: State) => {
-		// threeDState contains the currentMeterOrGroup to be fetched.
-		const threeDState = state.graph.threeD;
-		const meterOrGroupID = threeDState.meterOrGroupID;
 
-		// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
-		const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
+	const threeDState = graphState.threeD;
+	const meterOrGroupID = threeDState.meterOrGroupID;
 
-		// 3D requires intervals to be rounded to a full day.
-		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
-		const unitID = state.graph.selectedUnit;
+	// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
+	const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
 
-		// Level of detail along the xAxis / Readings per day
-		const readingInterval = state.graph.threeD.readingInterval;
+	// 3D requires intervals to be rounded to a full day.
+	const timeInterval = roundTimeIntervalForFetch(graphState.timeInterval).toString();
+	const unitID = graphState.selectedUnit;
 
-		// Initialize Default values
-		let threeDData = null;
-		let isAreaCompatible = true;
-		let meterOrGroupName = 'Unknown Meter or Group';
-		let layout = {};
-		let dataToRender = null;
+	// Level of detail along the xAxis / Readings per day
+	const readingInterval = threeDState.readingInterval;
 
-		// Meter Or Group is selected
-		if (meterOrGroupID) {
-			// Get Reading data
-			threeDData = state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
+	// Initialize Default values
+	let threeDData = null;
+	let isAreaCompatible = true;
+	let meterOrGroupName = 'Unknown Meter or Group';
+	let layout = {};
+	let dataToRender = null;
 
-			// Get Meter or Group's info
-			const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?
-				state.meters.byMeterID[meterOrGroupID]
-				:
-				state.groups.byGroupID[meterOrGroupID];
+	// Meter Or Group is selected
+	if (meterOrGroupID) {
+		// Get Reading data, if any
+		threeDData = threeDReadings[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
 
-			// Use Meter or Group's info to determine whether it can be rendered with area normalization
-			const area = meterOrGroupInfo.area;
-			const areaUnit = meterOrGroupInfo.areaUnit;
-			isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
+		// Get Meter or Group's info
+		const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?
+			metersState.byMeterID[meterOrGroupID]
+			:
+			groupsState.byGroupID[meterOrGroupID];
 
-			// Get Meter Or Groups name/label
-			meterOrGroupName = threeDState.meterOrGroup === MeterOrGroup.meters ?
-				state.meters.byMeterID[meterOrGroupID].identifier
-				:
-				state.groups.byGroupID[meterOrGroupID].name;
-		}
+		// Use Meter or Group's info to determine whether it can be rendered with area normalization
+		const area = meterOrGroupInfo.area;
+		const areaUnit = meterOrGroupInfo.areaUnit;
+		isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 
-		if (!meterOrGroupID) {
-			// No selected Meters
-			layout = setHelpLayout(translate('select.meter.group'));
-		} else if (state.graph.areaNormalization && !isAreaCompatible) {
-			layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-		} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(state.graph.timeInterval))) {
-			// Not a valid time interval. ThreeD can only support up to 1 year of readings
-			layout = setHelpLayout(translate('threeD.date.range.too.long'));
-		} else if (!threeDData) {
-			// Not actually 'rendering', but from the user perspective should make sense.
-			layout = setHelpLayout(translate('threeD.rendering'));
-		} else if (threeDData.zData.length === 0) {
-			// There is no data in the selected date range.
-			layout = setHelpLayout(translate('threeD.no.data'));
-		} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
-			// Special Case where meter frequency is greater than 12 hour intervals
-			layout = setHelpLayout(translate('threeD.incompatible'));
-		} else {
-			[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, state);
-		}
-		return [dataToRender, layout]
-	});
+		// Get Meter Or Groups name/label
+		meterOrGroupName = threeDState.meterOrGroup === MeterOrGroup.meters ?
+			metersState.byMeterID[meterOrGroupID].identifier
+			:
+			groupsState.byGroupID[meterOrGroupID].name;
+	}
+
+	if (!meterOrGroupID) {
+		// No selected Meters
+		layout = setHelpLayout(translate('select.meter.group'));
+	} else if (graphState.areaNormalization && !isAreaCompatible) {
+		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
+	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.timeInterval))) {
+		// Not a valid time interval. ThreeD can only support up to 1 year of readings
+		layout = setHelpLayout(translate('threeD.date.range.too.long'));
+	} else if (!threeDData) {
+		// Not actually 'rendering', but from the user perspective should make sense.
+		layout = setHelpLayout(translate('threeD.rendering'));
+	} else if (threeDData.zData.length === 0) {
+		// There is no data in the selected date range.
+		layout = setHelpLayout(translate('threeD.no.data'));
+	} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
+		// Special Case where meter frequency is greater than 12 hour intervals
+		layout = setHelpLayout(translate('threeD.incompatible'));
+	} else {
+		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, metersState, groupsState, graphState, unitState);
+	}
 
 	// Necessary for the case when a meter/group is selected and time intervals get altered externally. (Line graphic slider, for example.)
 	useEffect(() => {
@@ -116,56 +121,66 @@ export default function ThreeDComponent() {
 				/>
 			}
 		</div>
-	);
+	)
 }
 
 /**
  * Formats Readings for plotly 3d surface
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
- * @param state current application meter state
+ * @param meters redux meters state
+ * @param groups redux groups state
+ * @param graphState redux graph state
+ * @param unitsState redux units state
  * @returns Data, and Layout objects for a 3D Plotly Graph
  */
-function formatThreeDData(data: ThreeDReading, selectedMeterOrGroupID: number, state: State) {
+function formatThreeDData(
+	data: ThreeDReading,
+	selectedMeterOrGroupID: number,
+	meters: MetersState,
+	groups: GroupsState,
+	graphState: GraphState,
+	unitsState: UnitsState
+) {
 	// Initialize Plotly Data
 	const xDataToRender: string[] = [];
 	const yDataToRender: string[] = [];
 	let zDataToRender = data.zData;
 
 	// Variable helps when looking into state readings....byMeterID or readings...byGroupID
-	const meterOrGroup = state.graph.threeD.meterOrGroup;
+	const meterOrGroup = graphState.threeD.meterOrGroup;
 
 	// The unit label depends on the unit which is in selectUnit state.
-	const graphingUnit = state.graph.selectedUnit;
+	const graphingUnit = graphState.selectedUnit;
 	// The current selected rate
-	const currentSelectedRate = state.graph.lineGraphRate;
+	const currentSelectedRate = graphState.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
 	if (graphingUnit !== -99) {
-		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		const selectUnitState = unitsState.units[graphState.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
+			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, graphState.areaNormalization, graphState.selectedAreaUnit);
 			unitLabel = returned.unitLabel
 			needsRateScaling = returned.needsRateScaling;
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
 			const meterArea = meterOrGroup === MeterOrGroup.meters ?
-				state.meters.byMeterID[selectedMeterOrGroupID].area
+				meters.byMeterID[selectedMeterOrGroupID].area
 				:
-				state.groups.byGroupID[selectedMeterOrGroupID].area;
+				groups.byGroupID[selectedMeterOrGroupID].area;
 
 			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
-				state.meters.byMeterID[selectedMeterOrGroupID].areaUnit
+				meters.byMeterID[selectedMeterOrGroupID].areaUnit
 				:
-				state.groups.byGroupID[selectedMeterOrGroupID].areaUnit;
+				groups.byGroupID[selectedMeterOrGroupID].areaUnit;
 
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!state.graph.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
+			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
 				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = state.graph.areaNormalization ?
-					meterArea * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit) : 1;
+				const areaScaling = graphState.areaNormalization ?
+					meterArea * getAreaUnitConversion(areaUnit, graphState.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
 				zDataToRender = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
