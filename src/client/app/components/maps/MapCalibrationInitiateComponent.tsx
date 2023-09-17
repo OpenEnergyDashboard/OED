@@ -31,9 +31,6 @@ type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
 
 class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
 	private readonly fileInput: any;
-	private notifyLoadComplete() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.load.complete'})} ${this.state.filename}.`);
-	}
 	private notifyBadNumber() {
 		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
 	}
@@ -60,7 +57,6 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 		this.fileInput = React.createRef();
 		this.handleInput = this.handleInput.bind(this);
 		this.confirmUpload = this.confirmUpload.bind(this);
-		this.notifyLoadComplete = this.notifyLoadComplete.bind(this);
 		this.handleNameInput = this.handleNameInput.bind(this);
 		this.handleAngleInput = this.handleAngleInput.bind(this);
 		this.handleAngle = this.handleAngle.bind(this);
@@ -98,6 +94,7 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 			</form>
 		);
 	}
+
 	private async confirmUpload(event: any) {
 		const bcheck = this.handleAngle(event);
 		if (bcheck) {
