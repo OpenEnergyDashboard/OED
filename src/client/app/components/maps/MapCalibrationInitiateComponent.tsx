@@ -43,6 +43,12 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 	private notifyBadDigit0() {
 		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
 	}
+	private notifyBadMapLoad() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.load'})}`);
+	}
+	private notifyBadName() {
+		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.name'})}`);
+	}
 
 	constructor(props: MapInitiatePropsWithIntl) {
 		super(props);
@@ -61,6 +67,8 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 		this.notifyBadNumber = this.notifyBadNumber.bind(this);
 		this.notifyBadDigit360 = this.notifyBadDigit360.bind(this);
 		this.notifyBadDigit0 = this.notifyBadDigit0.bind(this);
+		this.notifyBadMapLoad = this.notifyBadMapLoad.bind(this);
+		this.notifyBadName = this.notifyBadName.bind(this);
 	}
 
 	public render() {
@@ -90,13 +98,19 @@ class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWi
 			</form>
 		);
 	}
-
 	private async confirmUpload(event: any) {
 		const bcheck = this.handleAngle(event);
 		if (bcheck) {
-			await this.handleInput(event);
-			await this.notifyLoadComplete();
-			this.props.updateMapMode(CalibrationModeTypes.calibrate);
+			if (this.fileInput.current.files.length === 0) {
+				this.notifyBadMapLoad();
+			}
+			else if (this.state.mapName.trim() === '')	{
+				this.notifyBadName();
+			}
+			else {
+				await this.handleInput(event);
+				this.props.updateMapMode(CalibrationModeTypes.calibrate);
+			}
 		}
 	}
 

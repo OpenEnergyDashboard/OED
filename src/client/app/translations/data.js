@@ -297,6 +297,8 @@ const localeData = {
 		"map.is.not.calibrated": "Calibration Needed",
 		"map.is.not.displayable": "Display Disabled",
 		"map.load.complete": "Map load complete from",
+		"map.bad.load": "Map image needed",
+		"map.bad.name": "Map name needed",
 		"map.modified.date": "Last Modified",
 		"map.name": "Map Name",
 		"map.new.angle": "List the angle with respect to true north (0 to 360)",
