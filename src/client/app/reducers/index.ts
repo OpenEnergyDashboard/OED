@@ -7,36 +7,35 @@ import { metersSlice } from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
-import groups from './groups';
+import { groupsSlice } from './groups';
 import maps from './maps';
-import admin from './admin';
+import { adminSlice } from './admin';
 import { versionSlice } from './version';
 import { currentUserSlice } from './currentUser';
 import { unsavedWarningSlice } from './unsavedWarning';
-import units from './units';
-import conversions from './conversions';
+import { unitsSlice } from './units';
+import { conversionsSlice } from './conversions';
 import { optionsSlice } from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
 
 
-export default combineReducers({
+export const rootReducer = combineReducers({
 	meters: metersSlice.reducer,
 	readings: combineReducers({
 		line: lineReadings,
 		bar: barReadings,
 		compare: compareReadings
 	}),
-	// graph,
 	graph: graphSlice.reducer,
 	maps,
-	groups,
-	admin,
+	groups: groupsSlice.reducer,
+	admin: adminSlice.reducer,
 	version: versionSlice.reducer,
 	currentUser: currentUserSlice.reducer,
 	unsavedWarning: unsavedWarningSlice.reducer,
-	units,
-	conversions,
+	units: unitsSlice.reducer,
+	conversions: conversionsSlice.reducer,
 	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers
 	[baseApi.reducerPath]: baseApi.reducer

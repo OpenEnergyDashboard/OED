@@ -5,26 +5,6 @@
 import * as React from 'react';
 import { Input, Button } from 'reactstrap';
 import { ChartTypes } from '../../types/redux/graph';
-import {
-	ToggleDefaultBarStackingAction,
-	UpdateDefaultChartToRenderAction,
-	UpdateDefaultLanguageAction,
-	UpdateDefaultTimeZone,
-	UpdateDisplayTitleAction,
-	UpdateDefaultWarningFileSize,
-	UpdateDefaultFileSizeLimit,
-	ToggleDefaultAreaNormalizationAction,
-	UpdateDefaultAreaUnitAction,
-	UpdateDefaultMeterReadingFrequencyAction,
-	UpdateDefaultMeterMinimumValueAction,
-	UpdateDefaultMeterMaximumValueAction,
-	UpdateDefaultMeterMinimumDateAction,
-	UpdateDefaultMeterMaximumDateAction,
-	UpdateDefaultMeterReadingGapAction,
-	UpdateDefaultMeterMaximumErrorsAction,
-	UpdateDefaultMeterDisableChecksAction
-
-} from '../../types/redux/admin';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
@@ -34,6 +14,7 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import translate from '../../utils/translate';
 import { TrueFalseType } from '../../types/items';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+import { adminSlice } from '../../reducers/admin';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -54,24 +35,24 @@ interface PreferencesProps {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
-	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
-	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
-	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
-	toggleDefaultAreaNormalization(): ToggleDefaultAreaNormalizationAction;
-	updateDefaultLanguage(defaultLanguage: LanguageTypes): UpdateDefaultLanguageAction;
+	updateDisplayTitle(title: string): ReturnType<typeof adminSlice.actions.updateDisplayTitle>;
+	updateDefaultChartType(defaultChartToRender: ChartTypes): ReturnType<typeof adminSlice.actions.updateDefaultChartToRender>;
+	toggleDefaultBarStacking(): ReturnType<typeof adminSlice.actions.toggleDefaultBarStacking>;
+	toggleDefaultAreaNormalization(): ReturnType<typeof adminSlice.actions.toggleDefaultAreaNormalization>;
+	updateDefaultLanguage(defaultLanguage: LanguageTypes): ReturnType<typeof adminSlice.actions.updateDefaultLanguage>;
 	submitPreferences(): Promise<void>;
-	updateDefaultTimeZone(timeZone: string): UpdateDefaultTimeZone;
-	updateDefaultWarningFileSize(defaultWarningFileSize: number): UpdateDefaultWarningFileSize;
-	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
-	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
-	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): UpdateDefaultMeterMinimumValueAction;
-	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
-	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
-	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;
-	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): UpdateDefaultMeterReadingGapAction;
-	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): UpdateDefaultMeterMaximumErrorsAction;
-	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): UpdateDefaultMeterDisableChecksAction;
+	updateDefaultTimeZone(timeZone: string): ReturnType<typeof adminSlice.actions.updateDefaultTimeZone>;
+	updateDefaultWarningFileSize(defaultWarningFileSize: number): ReturnType<typeof adminSlice.actions.updateDefaultWarningFileSize>;
+	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): ReturnType<typeof adminSlice.actions.updateDefaultFileSizeLimit>;
+	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): ReturnType<typeof adminSlice.actions.updateDefaultAreaUnit>;
+	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): ReturnType<typeof adminSlice.actions.updateDefaultMeterReadingFrequency>;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterMinimumValue>;
+	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterMaximumValue>;
+	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): ReturnType<typeof adminSlice.actions.updateDefaultMeterMinimumDate>;
+	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): ReturnType<typeof adminSlice.actions.updateDefaultMeterMaximumDate>;
+	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterReadingGap>;
+	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterMaximumErrors>;
+	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): ReturnType<typeof adminSlice.actions.updateDefaultMeterDisableChecks>;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;

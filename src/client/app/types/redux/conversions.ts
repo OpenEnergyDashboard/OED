@@ -2,55 +2,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from './actions';
-
-export interface RequestConversionsDetailsAction {
-	type: ActionType.RequestConversionsDetails;
-}
-
-export interface ReceiveConversionsDetailsAction {
-	type: ActionType.ReceiveConversionsDetails;
-	data: ConversionData[];
-}
-
-export interface ChangeDisplayedConversionsAction {
-	type: ActionType.ChangeDisplayedConversions;
-	selectedConversions: number[];
-}
-
-export interface ConfirmEditedConversionAction {
-	type: ActionType.ConfirmEditedConversion;
-	editedConversion: ConversionData;
-}
-
-export interface DeleteSubmittedConversionAction {
-	type: ActionType.DeleteSubmittedConversion;
-	conversionData: ConversionData;
-}
-
-export interface SubmitEditedConversionAction {
-	type: ActionType.SubmitEditedConversion;
-	conversionData: ConversionData;
-}
-
-export interface ConfirmConversionsFetchedOnceAction {
-	type: ActionType.ConfirmConversionsFetchedOnce;
-}
-
-export interface DeleteConversionAction {
-	type: ActionType.DeleteConversion;
-	conversionData: ConversionData;
-}
-
-export type ConversionsAction = RequestConversionsDetailsAction
-| ReceiveConversionsDetailsAction
-| ChangeDisplayedConversionsAction
-| ConfirmEditedConversionAction
-| DeleteSubmittedConversionAction
-| SubmitEditedConversionAction
-| ConfirmConversionsFetchedOnceAction
-| DeleteConversionAction;
-
 export interface ConversionData {
 	sourceId: number;
 	destinationId: number;

@@ -2,72 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from './actions';
 import { GPSPoint } from 'utils/calibration';
 import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
 export enum DisplayMode { View = 'view', Edit = 'edit', Create = 'create' }
-
-export type GroupsAction =
-	| RequestGroupsDetailsAction
-	| ReceiveGroupsDetailsAction
-	| RequestGroupChildrenAction
-	| ReceiveGroupChildrenAction
-	| RequestAllGroupsChildrenAction
-	| ReceiveAllGroupsChildrenAction
-	| ChangeDisplayedGroupsAction
-	| ConfirmEditedGroupAction
-	| ConfirmGroupsFetchedOnceAction
-	| ConfirmAllGroupsChildrenFetchedOnceAction
-	;
-
-export interface RequestGroupsDetailsAction {
-	type: ActionType.RequestGroupsDetails;
-}
-
-export interface ReceiveGroupsDetailsAction {
-	type: ActionType.ReceiveGroupsDetails;
-	data: GroupDetailsData[];
-}
-
-export interface RequestGroupChildrenAction {
-	type: ActionType.RequestGroupChildren;
-	groupID: number;
-}
-
-export interface ReceiveGroupChildrenAction {
-	type: ActionType.ReceiveGroupChildren;
-	groupID: number;
-	data: { meters: number[], groups: number[], deepMeters: number[] };
-}
-
-export interface RequestAllGroupsChildrenAction {
-	type: ActionType.RequestAllGroupsChildren;
-}
-
-export interface ReceiveAllGroupsChildrenAction {
-	type: ActionType.ReceiveAllGroupsChildren;
-	data: GroupChildren[];
-}
-
-export interface ConfirmEditedGroupAction {
-	type: ActionType.ConfirmEditedGroup;
-	editedGroup: GroupEditData;
-}
-
-export interface ChangeDisplayedGroupsAction {
-	type: ActionType.ChangeDisplayedGroups;
-	groupIDs: number[];
-}
-
-export interface ConfirmGroupsFetchedOnceAction {
-	type: ActionType.ConfirmGroupsFetchedOnce;
-}
-
-export interface ConfirmAllGroupsChildrenFetchedOnceAction {
-	type: ActionType.ConfirmAllGroupsChildrenFetchedOnce
-}
-
 export interface GroupMetadata {
 	isFetching: boolean;
 	selectedGroups: number[];

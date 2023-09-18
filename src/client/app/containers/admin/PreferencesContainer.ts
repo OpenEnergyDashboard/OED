@@ -4,31 +4,13 @@
 
 import { connect } from 'react-redux';
 import PreferencesComponent from '../../components/admin/PreferencesComponent';
-import {
-	updateDisplayTitle,
-	updateDefaultChartToRender,
-	toggleDefaultBarStacking,
-	updateTimeZone,
-	updateDefaultLanguage,
-	submitPreferencesIfNeeded,
-	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit,
-	toggleDefaultAreaNormalization,
-	updateDefaultAreaUnit,
-	updateDefaultMeterReadingFrequency,
-	updateDefaultMeterMinimumValue,
-	updateDefaultMeterMaximumValue,
-	updateDefaultMeterMinimumDate,
-	updateDefaultMeterMaximumDate,
-	updateDefaultMeterReadingGap,
-	updateDefaultMeterMaximumErrors,
-	updateDefaultMeterDisableChecks
-} from '../../actions/admin';
+import { submitPreferencesIfNeeded } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { adminSlice } from '../../reducers/admin';
 
 function mapStateToProps(state: State) {
 	return {
@@ -55,25 +37,49 @@ function mapStateToProps(state: State) {
 
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		updateDisplayTitle: (displayTitle: string) => dispatch(updateDisplayTitle(displayTitle)),
-		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(updateDefaultChartToRender(defaultChartToRender)),
-		updateDefaultTimeZone: (timeZone: string) => dispatch(updateTimeZone(timeZone)),
-		toggleDefaultBarStacking: () => dispatch(toggleDefaultBarStacking()),
-		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(updateDefaultLanguage(defaultLanguage)),
+		updateDisplayTitle: (displayTitle: string) => dispatch(adminSlice.actions.updateDisplayTitle(displayTitle)),
+
+		updateDefaultChartType: (defaultChartToRender: ChartTypes) => dispatch(adminSlice.actions.updateDefaultChartToRender(defaultChartToRender)),
+
+		updateDefaultTimeZone: (timeZone: string) => dispatch(adminSlice.actions.updateDefaultTimeZone(timeZone)),
+
+		toggleDefaultBarStacking: () => dispatch(adminSlice.actions.toggleDefaultBarStacking()),
+
+		updateDefaultLanguage: (defaultLanguage: LanguageTypes) => dispatch(adminSlice.actions.updateDefaultLanguage(defaultLanguage)),
+
 		submitPreferences: () => dispatch(submitPreferencesIfNeeded()),
-		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(updateDefaultWarningFileSize(defaultWarningFileSize)),
-		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(updateDefaultFileSizeLimit(defaultFileSizeLimit)),
-		toggleDefaultAreaNormalization: () => dispatch(toggleDefaultAreaNormalization()),
-		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(updateDefaultAreaUnit(defaultAreaUnit)),
+
+		updateDefaultWarningFileSize: (defaultWarningFileSize: number) => dispatch(adminSlice.actions.updateDefaultWarningFileSize(defaultWarningFileSize)),
+
+		updateDefaultFileSizeLimit: (defaultFileSizeLimit: number) => dispatch(adminSlice.actions.updateDefaultFileSizeLimit(defaultFileSizeLimit)),
+
+		toggleDefaultAreaNormalization: () => dispatch(adminSlice.actions.toggleDefaultAreaNormalization()),
+
+		updateDefaultAreaUnit: (defaultAreaUnit: AreaUnitType) => dispatch(adminSlice.actions.updateDefaultAreaUnit(defaultAreaUnit)),
+
 		updateDefaultMeterReadingFrequency: (defaultMeterReadingFrequency: string) =>
-			dispatch(updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency)),
-		updateDefaultMeterMinimumValue: (defaultMeterMinimumValue: number) => dispatch(updateDefaultMeterMinimumValue(defaultMeterMinimumValue)),
-		updateDefaultMeterMaximumValue: (defaultMeterMaximumValue: number) => dispatch(updateDefaultMeterMaximumValue(defaultMeterMaximumValue)),
-		updateDefaultMeterMinimumDate: (defaultMeterMinimumDate: string) => dispatch(updateDefaultMeterMinimumDate(defaultMeterMinimumDate)),
-		updateDefaultMeterMaximumDate: (defaultMeterMaximumDate: string) => dispatch(updateDefaultMeterMaximumDate(defaultMeterMaximumDate)),
-		updateDefaultMeterReadingGap: (defaultMeterReadingGap: number) => dispatch(updateDefaultMeterReadingGap(defaultMeterReadingGap)),
-		updateDefaultMeterMaximumErrors: (defaultMeterMaximumErrors: number) => dispatch(updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
-		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) => dispatch(updateDefaultMeterDisableChecks(defaultMeterDisableChecks))
+			dispatch(adminSlice.actions.updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency)),
+
+		updateDefaultMeterMinimumValue: (defaultMeterMinimumValue: number) =>
+			dispatch(adminSlice.actions.updateDefaultMeterMinimumValue(defaultMeterMinimumValue)),
+
+		updateDefaultMeterMaximumValue: (defaultMeterMaximumValue: number) =>
+			dispatch(adminSlice.actions.updateDefaultMeterMaximumValue(defaultMeterMaximumValue)),
+
+		updateDefaultMeterMinimumDate: (defaultMeterMinimumDate: string) =>
+			dispatch(adminSlice.actions.updateDefaultMeterMinimumDate(defaultMeterMinimumDate)),
+
+		updateDefaultMeterMaximumDate: (defaultMeterMaximumDate: string) =>
+			dispatch(adminSlice.actions.updateDefaultMeterMaximumDate(defaultMeterMaximumDate)),
+
+		updateDefaultMeterReadingGap: (defaultMeterReadingGap: number) =>
+			dispatch(adminSlice.actions.updateDefaultMeterReadingGap(defaultMeterReadingGap)),
+
+		updateDefaultMeterMaximumErrors: (defaultMeterMaximumErrors: number) =>
+			dispatch(adminSlice.actions.updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
+
+		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) =>
+			dispatch(adminSlice.actions.updateDefaultMeterDisableChecks(defaultMeterDisableChecks))
 	};
 }
 

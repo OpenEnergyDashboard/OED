@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { configureStore } from '@reduxjs/toolkit'
-import reducers from './reducers';
+import { rootReducer } from './reducers';
 import { baseApi } from './redux/api/baseApi';
 
 
 export const store = configureStore({
-	reducer: reducers,
+	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
-		immutableCheck: false,
+		// immutableCheck: false,
 		serializableCheck: false
 	}).concat(baseApi.middleware)
 });

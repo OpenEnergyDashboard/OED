@@ -2,74 +2,33 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
+import { Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import * as t from '../types/redux/conversions';
 import { conversionsApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
+import { conversionsSlice } from '../reducers/conversions';
 
-export function requestConversionsDetails(): t.RequestConversionsDetailsAction {
-	return { type: ActionType.RequestConversionsDetails };
-}
-
-export function receiveConversionsDetails(data: t.ConversionData[]): t.ReceiveConversionsDetailsAction {
-	return { type: ActionType.ReceiveConversionsDetails, data };
-}
 
 export function fetchConversionsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
 		if (!getState().conversions.isFetching) {
 			// set isFetching to true
-			dispatch(requestConversionsDetails());
+			dispatch(conversionsSlice.actions.requestConversionsDetails());
 			// attempt to retrieve conversions details from database
 			const conversions = await conversionsApi.getConversionsDetails();
 			// update the state with the conversions details and set isFetching to false
-			dispatch(receiveConversionsDetails(conversions));
+			dispatch(conversionsSlice.actions.receiveConversionsDetails(conversions));
 			// If this is the first fetch, inform the store that the first fetch has been made
 			if (!getState().conversions.hasBeenFetchedOnce) {
-				dispatch(confirmConversionsFetchedOnce());
+				dispatch(conversionsSlice.actions.conversionsFetchedOnce());
 			}
 		}
 	}
 }
 
-export function changeDisplayedConversions(conversions: number[]): t.ChangeDisplayedConversionsAction {
-	return { type: ActionType.ChangeDisplayedConversions, selectedConversions: conversions };
-}
-
-/**
- * Pushes ConversionData onto submitting conversions state array
- * @param conversionData data to push
- */
-export function submitConversionEdits(conversionData: t.ConversionData): t.SubmitEditedConversionAction {
-	return { type: ActionType.SubmitEditedConversion, conversionData};
-}
-
-export function confirmConversionEdits(editedConversion: t.ConversionData): t.ConfirmEditedConversionAction {
-	return { type: ActionType.ConfirmEditedConversion, editedConversion };
-}
-
-/**
- * Removes ConversionData from submitting state array
- * @param conversionData data to remove
- */
-export function deleteSubmittedConversion(conversionData: t.ConversionData): t.DeleteSubmittedConversionAction {
-	return {type: ActionType.DeleteSubmittedConversion, conversionData}
-}
-
-export function confirmConversionsFetchedOnce(): t.ConfirmConversionsFetchedOnceAction {
-	return { type: ActionType.ConfirmConversionsFetchedOnce };
-}
-
-/**
- * Removes the passed ConversionData from the store
- * @param conversionData data to remove
- */
-export function confirmDeletedConversion(conversionData: t.ConversionData): t.DeleteConversionAction {
-	return { type: ActionType.DeleteConversion, conversionData }
-}
 
 /**
  * Fetch the conversions details from the database if they have not already been fetched once
@@ -98,14 +57,14 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 		if (conversionDataIndex === -1) {
 			// Inform the store we are about to edit the passed in conversion
 			// Pushes edited conversionData to submit onto the submitting state array
-			dispatch(submitConversionEdits(editedConversion));
+			dispatch(conversionsSlice.actions.submitEditedConversion(editedConversion));
 			// Attempt to edit the conversion in the database
 			try {
 				// posts the edited conversionData to the conversions API
 				await conversionsApi.edit(editedConversion);
 				dispatch(updateCikAndDBViewsIfNeeded(shouldRedoCik, false));
 				// Update the store with our new edits
-				dispatch(confirmConversionEdits(editedConversion));
+				dispatch(conversionsSlice.actions.confirmEditedConversion(editedConversion));
 				// Success!
 				showSuccessNotification(translate('conversion.successfully.edited.conversion'));
 			} catch (err) {
@@ -113,7 +72,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 				showErrorNotification(translate('conversion.failed.to.edit.conversion') + ' "' + err.response.data as string + '"');
 			}
 			// Clear conversionData object from submitting state array
-			dispatch(deleteSubmittedConversion(editedConversion));
+			dispatch(conversionsSlice.actions.deleteSubmittedConversion(editedConversion));
 		}
 	};
 }
@@ -150,7 +109,7 @@ export function deleteConversion(conversion: t.ConversionData): (dispatch: Dispa
 		if (conversionDataIndex === -1) {
 			// Inform the store we are about to work on this conversion
 			// Update the submitting state array
-			dispatch(submitConversionEdits(conversion));
+			dispatch(conversionsSlice.actions.submitEditedConversion(conversion));
 			try {
 				// Attempt to delete the conversion from the database
 				await conversionsApi.delete(conversion);
@@ -158,13 +117,13 @@ export function deleteConversion(conversion: t.ConversionData): (dispatch: Dispa
 				dispatch(updateCikAndDBViewsIfNeeded(true, false));
 				// Delete was successful
 				// Update the store to match
-				dispatch(confirmDeletedConversion(conversion));
+				dispatch(conversionsSlice.actions.confirmEditedConversion(conversion));
 				showSuccessNotification(translate('conversion.successfully.delete.conversion'));
 			} catch (err) {
 				showErrorNotification(translate('conversion.failed.to.delete.conversion') + ' "' + err.response.data as string + '"');
 			}
 			// Inform the store we are done working with the conversion
-			dispatch(deleteSubmittedConversion(conversion));
+			dispatch(conversionsSlice.actions.deleteSubmittedConversion(conversion));
 		}
 	}
 }

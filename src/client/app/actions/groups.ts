@@ -2,57 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Dispatch, GetState, Thunk, ActionType } from '../types/redux/actions';
+import { Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import * as t from '../types/redux/groups';
 import { groupsApi } from '../utils/api';
 import translate from '../utils/translate';
-
-function requestGroupsDetails(): t.RequestGroupsDetailsAction {
-	return { type: ActionType.RequestGroupsDetails };
-}
-
-function receiveGroupsDetails(data: t.GroupDetailsData[]): t.ReceiveGroupsDetailsAction {
-	return { type: ActionType.ReceiveGroupsDetails, data };
-}
-
-function requestGroupChildren(groupID: number): t.RequestGroupChildrenAction {
-	return { type: ActionType.RequestGroupChildren, groupID };
-}
-
-function receiveGroupChildren(groupID: number, data: { meters: number[], groups: number[], deepMeters: number[] }): t.ReceiveGroupChildrenAction {
-	return { type: ActionType.ReceiveGroupChildren, groupID, data };
-}
-
-function requestAllGroupsChildren(): t.RequestAllGroupsChildrenAction {
-	return { type: ActionType.RequestAllGroupsChildren };
-}
-
-function receiveAllGroupsChildren(data: t.GroupChildren[]): t.ReceiveAllGroupsChildrenAction {
-	return { type: ActionType.ReceiveAllGroupsChildren, data };
-}
-
-export function changeDisplayedGroups(groupIDs: number[]): t.ChangeDisplayedGroupsAction {
-	return { type: ActionType.ChangeDisplayedGroups, groupIDs };
-}
+import { groupsSlice } from '../reducers/groups';
 
 export function fetchGroupsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		dispatch(requestGroupsDetails());
+		dispatch(groupsSlice.actions.requestGroupsDetails());
 		// Returns the names, IDs and most info of all groups in the groups table.
 		const groupsDetails = await groupsApi.details();
-		dispatch(receiveGroupsDetails(groupsDetails));
+		dispatch(groupsSlice.actions.receiveGroupsDetails(groupsDetails));
 		// If this is the first fetch, inform the store that the first fetch has been made
 		if (!getState().groups.hasBeenFetchedOnce) {
-			dispatch(confirmGroupsFetchedOnce());
+			dispatch(groupsSlice.actions.confirmGroupsFetchedOnce());
 		}
 	};
 }
 
-export function confirmGroupsFetchedOnce(): t.ConfirmGroupsFetchedOnceAction {
-	return { type: ActionType.ConfirmGroupsFetchedOnce };
-}
 
 function shouldFetchGroupsDetails(state: State): boolean {
 	// If isFetching then don't do this. If already fetched then don't do this.
@@ -80,9 +50,9 @@ function shouldFetchGroupChildren(state: State, groupID: number) {
 
 function fetchGroupChildren(groupID: number) {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestGroupChildren(groupID));
+		dispatch(groupsSlice.actions.requestGroupChildren(groupID));
 		const childGroupIDs = await groupsApi.children(groupID);
-		dispatch(receiveGroupChildren(groupID, childGroupIDs));
+		dispatch(groupsSlice.actions.receiveGroupChildren({ groupID, data: childGroupIDs }));
 	};
 }
 
@@ -103,22 +73,19 @@ function fetchAllGroupChildren(): Thunk {
 		// ensure a fetch is not currently happening
 		if (!getState().groups.isFetchingAllChildren) {
 			// set isFetching to true
-			dispatch(requestAllGroupsChildren());
+			dispatch(groupsSlice.actions.requestAllGroupsChildren());
 			// Retrieve all groups children from database
 			const groupsChildren = await groupsApi.getAllGroupsChildren();
 			// update the state with all groups children
-			dispatch(receiveAllGroupsChildren(groupsChildren));
+			dispatch(groupsSlice.actions.receiveAllGroupsChildren(groupsChildren));
 			// If this is the first fetch, inform the store that the first fetch has been made
 			if (!getState().groups.hasChildrenBeenFetchedOnce) {
-				dispatch(confirmAllGroupsChildrenFetchedOnce());
+				dispatch(groupsSlice.actions.confirmAllGroupsChildrenFetchedOnce());
 			}
 		}
 	}
 }
 
-export function confirmAllGroupsChildrenFetchedOnce(): t.ConfirmAllGroupsChildrenFetchedOnceAction {
-	return { type: ActionType.ConfirmAllGroupsChildrenFetchedOnce };
-}
 
 export function fetchAllGroupChildrenIfNeeded(): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
@@ -156,10 +123,6 @@ export function submitNewGroup(group: t.GroupData): Dispatch {
 	};
 }
 
-export function confirmGroupEdits(editedGroup: t.GroupEditData): t.ConfirmEditedGroupAction {
-	return { type: ActionType.ConfirmEditedGroup, editedGroup };
-}
-
 /**
  * Pushes group changes out to DB.
  * @param group The group to update
@@ -182,7 +145,7 @@ export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true)
 				window.location.reload();
 			} else {
 				// If we did not reload then we need to refresh the edited group's state with:
-				dispatch(confirmGroupEdits(group));
+				dispatch(groupsSlice.actions.confirmEditedGroup(group));
 				// An then we need to fix up any other groups impacted.
 				// This is removed since you won't see it.
 				// Success!

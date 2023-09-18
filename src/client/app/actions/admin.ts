@@ -3,115 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import { ChartTypes } from '../types/redux/graph';
-import { PreferenceRequestItem } from '../types/items';
-import * as t from '../types/redux/admin';
-import { ActionType, Dispatch, GetState, Thunk } from '../types/redux/actions';
+import { Dispatch, GetState, Thunk } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import { conversionArrayApi, preferencesApi } from '../utils/api';
 import translate from '../utils/translate';
-import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { updateSelectedLanguage } from './options';
 import { graphSlice } from '../reducers/graph';
-export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
-	return { type: ActionType.UpdateImportMeter, meterID };
-}
-
-export function updateDisplayTitle(displayTitle: string): t.UpdateDisplayTitleAction {
-	return { type: ActionType.UpdateDisplayTitle, displayTitle };
-}
-
-export function updateTimeZone(timeZone: string): t.UpdateDefaultTimeZone {
-	return { type: ActionType.UpdateDefaultTimeZone, timeZone };
-}
-
-export function updateDefaultChartToRender(defaultChartToRender: ChartTypes): t.UpdateDefaultChartToRenderAction {
-	return { type: ActionType.UpdateDefaultChartToRender, defaultChartToRender };
-}
-
-export function toggleDefaultBarStacking(): t.ToggleDefaultBarStackingAction {
-	return { type: ActionType.ToggleDefaultBarStacking };
-}
-
-export function toggleDefaultAreaNormalization(): t.ToggleDefaultAreaNormalizationAction {
-	return { type: ActionType.ToggleDefaultAreaNormalization };
-}
-
-export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDefaultAreaUnitAction {
-	return { type: ActionType.UpdateDefaultAreaUnit, defaultAreaUnit };
-}
-
-export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
-	moment.locale(defaultLanguage);
-	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
-}
-
-export function updateDefaultWarningFileSize(defaultWarningFileSize: number): t.UpdateDefaultWarningFileSize {
-	return { type: ActionType.UpdateDefaultWarningFileSize, defaultWarningFileSize };
-}
-
-export function updateDefaultFileSizeLimit(defaultFileSizeLimit: number): t.UpdateDefaultFileSizeLimit {
-	return { type: ActionType.UpdateDefaultFileSizeLimit, defaultFileSizeLimit };
-}
-
-export function updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): t.UpdateDefaultMeterReadingFrequencyAction {
-	return { type: ActionType.UpdateDefaultMeterReadingFrequency, defaultMeterReadingFrequency };
-}
-
-export function updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): t.UpdateDefaultMeterMinimumValueAction {
-	return { type: ActionType.UpdateDefaultMeterMinimumValue, defaultMeterMinimumValue };
-}
-
-export function updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): t.UpdateDefaultMeterMaximumValueAction {
-	return { type: ActionType.UpdateDefaultMeterMaximumValue, defaultMeterMaximumValue };
-}
-
-export function updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): t.UpdateDefaultMeterMinimumDateAction {
-	return { type: ActionType.UpdateDefaultMeterMinimumDate, defaultMeterMinimumDate };
-}
-
-export function updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): t.UpdateDefaultMeterMaximumDateAction {
-	return { type: ActionType.UpdateDefaultMeterMaximumDate, defaultMeterMaximumDate };
-}
-
-export function updateDefaultMeterReadingGap(defaultMeterReadingGap: number): t.UpdateDefaultMeterReadingGapAction {
-	return { type: ActionType.UpdateDefaultMeterReadingGap, defaultMeterReadingGap };
-}
-
-export function updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): t.UpdateDefaultMeterMaximumErrorsAction {
-	return { type: ActionType.UpdateDefaultMeterMaximumErrors, defaultMeterMaximumErrors };
-}
-
-export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): t.UpdateDefaultMeterDisableChecksAction {
-	return { type: ActionType.UpdateDefaultMeterDisableChecks, defaultMeterDisableChecks };
-}
-
-function requestPreferences(): t.RequestPreferencesAction {
-	return { type: ActionType.RequestPreferences };
-}
-
-function receivePreferences(data: PreferenceRequestItem): t.ReceivePreferencesAction {
-	return { type: ActionType.ReceivePreferences, data };
-}
-
-function markPreferencesNotSubmitted(): t.MarkPreferencesNotSubmittedAction {
-	return { type: ActionType.MarkPreferencesNotSubmitted };
-}
-
-function markPreferencesSubmitted(defaultMeterReadingFrequency: string): t.MarkPreferencesSubmittedAction {
-	return { type: ActionType.MarkPreferencesSubmitted, defaultMeterReadingFrequency };
-}
+import { adminSlice } from '../reducers/admin';
 
 /**
  * Dispatches a fetch for admin preferences and sets the state based upon the result
  */
 function fetchPreferences(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
-		dispatch(requestPreferences());
+		dispatch(adminSlice.actions.requestPreferences());
 		const preferences = await preferencesApi.getPreferences();
-		dispatch(receivePreferences(preferences));
+		dispatch(adminSlice.actions.receivePreferences(preferences));
 		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch) => {
@@ -195,10 +103,10 @@ export function submitPreferences() {
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.
-			dispatch(markPreferencesSubmitted(preferences.defaultMeterReadingFrequency));
+			dispatch(adminSlice.actions.markPreferencesSubmitted(preferences.defaultMeterReadingFrequency));
 			showSuccessNotification(translate('updated.preferences'));
 		} catch (e) {
-			dispatch(markPreferencesNotSubmitted());
+			dispatch(adminSlice.actions.markPreferencesNotSubmitted());
 			showErrorNotification(translate('failed.to.submit.changes'));
 		}
 	};
@@ -238,9 +146,6 @@ export function submitPreferencesIfNeeded(): Thunk {
 	};
 }
 
-function toggleWaitForCikAndDB(): t.ToggleWaitForCikAndDB {
-	return { type: ActionType.ToggleWaitForCikAndDB };
-}
 
 /**
  * @param state The redux state.
@@ -260,10 +165,10 @@ export function updateCikAndDBViewsIfNeeded(shouldRedoCik: boolean, shouldRefres
 	return async (dispatch: Dispatch, getState: GetState) => {
 		if (shouldUpdateCikAndDBViews(getState())) {
 			// set the page to a loading state
-			dispatch(toggleWaitForCikAndDB());
+			dispatch(adminSlice.actions.toggleWaitForCikAndDB());
 			await conversionArrayApi.refresh(shouldRedoCik, shouldRefreshReadingViews);
 			// revert to normal state once refresh is complete
-			dispatch(toggleWaitForCikAndDB());
+			dispatch(adminSlice.actions.toggleWaitForCikAndDB());
 			if (shouldRedoCik || shouldRefreshReadingViews) {
 				// Only reload window if redoCik and/or refresh reading views.
 				window.location.reload();

@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ConversionsAction, ConversionsState } from '../types/redux/conversions';
-import { ActionType } from '../types/redux/actions';
+import { ConversionsState } from '../types/redux/conversions';
+import * as t from '../types/redux/conversions';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const defaultState: ConversionsState = {
 	hasBeenFetchedOnce: false,
@@ -13,84 +14,62 @@ const defaultState: ConversionsState = {
 	conversions: []
 };
 
-export default function conversions(state = defaultState, action: ConversionsAction) {
-	switch (action.type) {
-		case ActionType.ConfirmConversionsFetchedOnce:
-			return {
-				...state,
-				hasBeenFetchedOnce: true
-			};
-		case ActionType.RequestConversionsDetails:
-			return {
-				...state,
-				isFetching: true
-			};
-		case ActionType.ReceiveConversionsDetails:
-			return {
-				...state,
-				isFetching: false,
-				conversions: action.data
-			};
-		case ActionType.ChangeDisplayedConversions:
-			return {
-				...state,
-				selectedConversions: action.selectedConversions
-			};
-		case ActionType.SubmitEditedConversion: {
-			const submitting = state.submitting;
-			submitting.push(action.conversionData);
-			return {
-				...state,
-				submitting: [...submitting]
-			};
-		}
-		case ActionType.ConfirmEditedConversion: {
+
+export const conversionsSlice = createSlice({
+	name: 'conversions',
+	initialState: defaultState,
+	reducers: {
+		conversionsFetchedOnce: state => {
+			state.hasBeenFetchedOnce = true;
+		},
+		requestConversionsDetails: state => {
+			state.isFetching = true;
+		},
+		receiveConversionsDetails: (state, action: PayloadAction<t.ConversionData[]>) => {
+			state.isFetching = false;
+			state.conversions = action.payload;
+		},
+		changeDisplayedConversions: (state, action: PayloadAction<number[]>) => {
+			state.selectedConversions = action.payload;
+		},
+		submitEditedConversion: (state, action: PayloadAction<t.ConversionData>) => {
+			state.submitting.push(action.payload);
+		},
+		confirmEditedConversion: (state, action: PayloadAction<t.ConversionData>) => {
 			// Overwrite the conversion data at the edited conversion's index with the edited conversion's conversion data
 			// The passed in id should be correct as it is inherited from the pre-edited conversion
 			// See EditConversionModalComponent line 134 for details (starts with if(conversionHasChanges))
 			const conversions = state.conversions;
-			// Search the array of ConversionData in conversions for an object with source/destination ids matching that of the action payload
-			const conversionDataIndex = conversions.findIndex(conversionData => ((
-				conversionData.sourceId === action.editedConversion.sourceId) &&
-				conversionData.destinationId === action.editedConversion.destinationId));
-			// Overwrite ConversionData at index with edited ConversionData
-			conversions[conversionDataIndex] = action.editedConversion;
-			return {
-				...state,
-				// React expects us to return an immutable object in order to invoke a rerender, so we must use spread notation here
-				conversions: [...conversions]
-			};
-		}
-		case ActionType.DeleteSubmittedConversion: {
+			const conversionDataIndex = conversions.findIndex(conversionData => (
+				conversionData.sourceId === action.payload.sourceId
+				&&
+				conversionData.destinationId === action.payload.destinationId
+			));
+			conversions[conversionDataIndex] = action.payload;
+		},
+		deleteSubmittedConversion: (state, action: PayloadAction<t.ConversionData>) => {
 			// Remove the current submitting conversion from the submitting state
 			const submitting = state.submitting;
 			// Search the array of ConversionData in submitting for an object with source/destination ids matching that of the action payload
-			const conversionDataIndex = submitting.findIndex(conversionData => ((
-				conversionData.sourceId === action.conversionData.sourceId) &&
-				conversionData.destinationId === action.conversionData.destinationId));
+			const conversionDataIndex = submitting.findIndex(conversionData => (
+				conversionData.sourceId === action.payload.sourceId
+				&&
+				conversionData.destinationId === action.payload.destinationId
+			));
 			// Remove the object from the submitting array
-			submitting.splice(conversionDataIndex);
-			return {
-				...state,
-				submitting: [...submitting]
-			};
-		}
-		case ActionType.DeleteConversion: {
+			submitting.splice(conversionDataIndex, 1);
+		},
+		deleteConversion: (state, action: PayloadAction<t.ConversionData>) => {
 			// Retrieve conversions state
 			const conversions = state.conversions;
 			// Search the array of ConversionData in conversions for an object with source/destination ids matching that of the action payload
-			const conversionDataIndex = conversions.findIndex(conversionData => ((
-				conversionData.sourceId === action.conversionData.sourceId) &&
-				conversionData.destinationId === action.conversionData.destinationId));
+			const conversionDataIndex = conversions.findIndex(conversionData => (
+				conversionData.sourceId === action.payload.sourceId
+				&&
+				conversionData.destinationId === action.payload.destinationId
+			));
 			// Remove the ConversionData from the conversions array
-			conversions.splice(conversionDataIndex);
-			// Return a new array of ConversionData without the deleted conversion
-			return {
-				...state,
-				conversions: [...conversions]
-			}
+			conversions.splice(conversionDataIndex, 1);
 		}
-		default:
-			return state;
 	}
-}
+});

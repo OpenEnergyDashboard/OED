@@ -4,10 +4,10 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
-import { updateSelectedMeter } from '../actions/admin';
 import MeterDropdownComponent from '../components/MeterDropDownComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
+import { adminSlice } from '../reducers/admin';
 
 function mapStateToProps(state: State) {
 	return {
@@ -16,7 +16,7 @@ function mapStateToProps(state: State) {
 }
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		updateSelectedMeter: (meterID: number) => dispatch(updateSelectedMeter(meterID))
+		updateSelectedMeter: (meterID: number) => dispatch(adminSlice.actions.updateImportMeter(meterID))
 	};
 }
 

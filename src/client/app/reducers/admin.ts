@@ -3,12 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ChartTypes } from '../types/redux/graph';
-import { ActionType } from '../types/redux/actions';
-import { AdminState, AdminAction } from '../types/redux/admin';
+import { AdminState } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { durationFormat } from '../utils/durationFormat';
 import * as moment from 'moment';
+import { PreferenceRequestItem } from '../types/items';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -34,160 +35,101 @@ const defaultState: AdminState = {
 	defaultMeterDisableChecks: false
 };
 
-export default function admin(state = defaultState, action: AdminAction) {
-	switch (action.type) {
-		case ActionType.UpdateImportMeter:
-			return {
-				...state,
-				selectedMeter: action.meterID
-			};
-		case ActionType.UpdateDisplayTitle:
-			return {
-				...state,
-				displayTitle: action.displayTitle,
-				submitted: false
-			};
-		case ActionType.UpdateDefaultChartToRender:
-			return {
-				...state,
-				defaultChartToRender: action.defaultChartToRender,
-				submitted: false
-			};
-		case ActionType.ToggleDefaultBarStacking:
-			return {
-				...state,
-				defaultBarStacking: !state.defaultBarStacking,
-				submitted: false
-			};
-		case ActionType.ToggleDefaultAreaNormalization:
-			return {
-				...state,
-				defaultAreaNormalization: !state.defaultAreaNormalization,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultAreaUnit:
-			return {
-				...state,
-				defaultAreaUnit: action.defaultAreaUnit,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultTimeZone:
-			return {
-				...state,
-				defaultTimeZone: action.timeZone,
-				submitted: false
-			};
-		case ActionType.UpdateDefaultLanguage:
-			return {
-				...state,
-				defaultLanguage: action.defaultLanguage,
-				submitted: false
-			};
-		case ActionType.RequestPreferences:
-			return {
-				...state,
-				isFetching: true
-			};
-		case ActionType.ReceivePreferences:
-			return {
+export const adminSlice = createSlice({
+	name: 'admin',
+	initialState: defaultState,
+	reducers: {
+		updateImportMeter: (state, action: PayloadAction<number>) => {
+			state.selectedMeter = action.payload;
+		},
+		updateDisplayTitle: (state, action: PayloadAction<string>) => {
+			state.displayTitle = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultChartToRender: (state, action: PayloadAction<ChartTypes>) => {
+			state.defaultChartToRender = action.payload;
+			state.submitted = false;
+		},
+		toggleDefaultBarStacking: state => {
+			state.defaultBarStacking = !state.defaultBarStacking;
+			state.submitted = false;
+		},
+		toggleDefaultAreaNormalization: state => {
+			state.defaultAreaNormalization = !state.defaultAreaNormalization;
+			state.submitted = false;
+		},
+		updateDefaultAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
+			state.defaultAreaUnit = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultTimeZone: (state, action: PayloadAction<string>) => {
+			state.defaultTimeZone = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultLanguage: (state, action: PayloadAction<LanguageTypes>) => {
+			state.defaultLanguage = action.payload;
+			state.submitted = false;
+		},
+		requestPreferences: state => {
+			state.isFetching = true;
+		},
+		receivePreferences: (state, action: PayloadAction<PreferenceRequestItem>) => {
+			state = {
 				...state,
 				isFetching: false,
-				displayTitle: action.data.displayTitle,
-				defaultChartToRender: action.data.defaultChartToRender,
-				defaultBarStacking: action.data.defaultBarStacking,
-				defaultLanguage: action.data.defaultLanguage,
-				defaultTimeZone: action.data.defaultTimezone,
-				defaultWarningFileSize: action.data.defaultWarningFileSize,
-				defaultFileSizeLimit: action.data.defaultFileSizeLimit,
-				defaultAreaNormalization: action.data.defaultAreaNormalization,
-				defaultAreaUnit: action.data.defaultAreaUnit,
-				defaultMeterReadingFrequency: durationFormat(action.data.defaultMeterReadingFrequency),
-				defaultMeterMinimumValue: action.data.defaultMeterMinimumValue,
-				defaultMeterMaximumValue: action.data.defaultMeterMaximumValue,
-				defaultMeterMinimumDate: action.data.defaultMeterMinimumDate,
-				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
-				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
-				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
-			};
-		case ActionType.MarkPreferencesNotSubmitted:
-			return {
-				...state,
-				submitted: false
-			};
-		case ActionType.MarkPreferencesSubmitted:
-			return {
-				...state,
-				// Convert the duration returned from Postgres into more human format.
-				defaultMeterReadingFrequency: durationFormat(action.defaultMeterReadingFrequency),
-				submitted: true
-			};
-		case ActionType.UpdateDefaultWarningFileSize:
-			return {
-				...state,
-				defaultWarningFileSize: action.defaultWarningFileSize,
-				submitted: false
+				...action.payload,
+				defaultMeterReadingFrequency: durationFormat(action.payload.defaultMeterReadingFrequency)
 			}
-		case ActionType.UpdateDefaultFileSizeLimit:
-			return {
-				...state,
-				defaultFileSizeLimit: action.defaultFileSizeLimit,
-				submitted: false
-			}
-		case ActionType.ToggleWaitForCikAndDB:
-			return {
-				...state,
-				isUpdatingCikAndDBViews: !state.isUpdatingCikAndDBViews
-			}
-		case ActionType.UpdateDefaultMeterReadingFrequency:
-			return {
-				...state,
-				defaultMeterReadingFrequency: action.defaultMeterReadingFrequency,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterMinimumValue:
-			return {
-				...state,
-				defaultMeterMinimumValue: action.defaultMeterMinimumValue,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterMaximumValue:
-			return {
-				...state,
-				defaultMeterMaximumValue: action.defaultMeterMaximumValue,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterMinimumDate:
-			return {
-				...state,
-				defaultMeterMinimumDate: action.defaultMeterMinimumDate,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterMaximumDate:
-			return {
-				...state,
-				defaultMeterMaximumDate: action.defaultMeterMaximumDate,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterReadingGap:
-			return {
-				...state,
-				defaultMeterReadingGap: action.defaultMeterReadingGap,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterMaximumErrors:
-			return {
-				...state,
-				defaultMeterMaximumErrors: action.defaultMeterMaximumErrors,
-				submitted: false
-			}
-		case ActionType.UpdateDefaultMeterDisableChecks:
-			return {
-				...state,
-				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
-				submitted: false
-			}
-		default:
-			return state;
+		},
+		markPreferencesNotSubmitted: state => {
+			state.submitted = false;
+		},
+		markPreferencesSubmitted: (state, action: PayloadAction<string>) => {
+			state.defaultMeterReadingFrequency = durationFormat(action.payload);
+			state.submitted = true;
+		},
+		updateDefaultWarningFileSize: (state, action: PayloadAction<number>) => {
+			state.defaultWarningFileSize = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultFileSizeLimit: (state, action: PayloadAction<number>) => {
+			state.defaultFileSizeLimit = action.payload;
+			state.submitted = false;
+		},
+		toggleWaitForCikAndDB: state => {
+			state.isUpdatingCikAndDBViews = !state.isUpdatingCikAndDBViews;
+		},
+		updateDefaultMeterReadingFrequency: (state, action: PayloadAction<string>) => {
+			state.defaultMeterReadingFrequency = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterMinimumValue: (state, action: PayloadAction<number>) => {
+			state.defaultMeterMinimumValue = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterMaximumValue: (state, action: PayloadAction<number>) => {
+			state.defaultMeterMaximumValue = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterMinimumDate: (state, action: PayloadAction<string>) => {
+			state.defaultMeterMinimumDate = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterMaximumDate: (state, action: PayloadAction<string>) => {
+			state.defaultMeterMaximumDate = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterReadingGap: (state, action: PayloadAction<number>) => {
+			state.defaultMeterReadingGap = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterMaximumErrors: (state, action: PayloadAction<number>) => {
+			state.defaultMeterMaximumErrors = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultMeterDisableChecks: (state, action: PayloadAction<boolean>) => {
+			state.defaultMeterDisableChecks = action.payload;
+			state.submitted = false;
+		}
 	}
-}
+});

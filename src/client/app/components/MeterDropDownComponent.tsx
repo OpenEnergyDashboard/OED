@@ -3,12 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { UpdateImportMeterAction } from '../types/redux/admin';
 import { NamedIDItem } from '../types/items';
+import { adminSlice } from '../reducers/admin';
 
 export interface MeterDropDownProps {
 	meters: NamedIDItem[];
-	updateSelectedMeter(meterID: number): UpdateImportMeterAction;
+	updateSelectedMeter(meterID: number): ReturnType<typeof adminSlice.actions.updateImportMeter>
 }
 
 export default class MeterDropDownComponent extends React.Component<MeterDropDownProps> {
