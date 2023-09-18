@@ -5,19 +5,19 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
-import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 import { deleteToken } from '../utils/token';
 import store from '../index';
 import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { currentUserSlice } from '../reducers/currentUser';
+import { unsavedWarningSlice } from '../reducers/unsavedWarning';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
 	hasUnsavedChanges: boolean;
 	isLogOutClicked: boolean;
 	removeFunction: (callback: () => void) => any;
 	submitFunction: (successCallback: () => void, failureCallback: () => void) => any;
-	removeUnsavedChanges(): RemoveUnsavedChangesAction;
-	flipLogOutState(): FlipLogOutStateAction;
+	removeUnsavedChanges(): ReturnType<typeof unsavedWarningSlice.actions.removeUnsavedChanges>;
+	flipLogOutState(): ReturnType<typeof unsavedWarningSlice.actions.flipLogOutState>;
 }
 
 class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
@@ -49,7 +49,7 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 			<>
 				<Prompt
 					when={this.props.hasUnsavedChanges}
-					message={ nextLocation => {
+					message={nextLocation => {
 						const { confirmedToLeave } = this.state;
 						const { hasUnsavedChanges } = this.props;
 						if (!confirmedToLeave && hasUnsavedChanges) {

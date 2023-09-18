@@ -11,7 +11,6 @@ import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
@@ -19,6 +18,8 @@ import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -131,7 +132,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
 			dispatch(submitEditedConversion(state, shouldRedoCik));
-			dispatch(removeUnsavedChanges());
+			dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 		}
 	}
 

@@ -12,7 +12,7 @@ import maps from './maps';
 import admin from './admin';
 import version from './version';
 import { currentUserSlice } from './currentUser';
-import unsavedWarning from './unsavedWarning';
+import { unsavedWarningSlice } from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
 import { optionsSlice } from './options';
@@ -34,7 +34,7 @@ export default combineReducers({
 	admin,
 	version,
 	currentUser: currentUserSlice.reducer,
-	unsavedWarning,
+	unsavedWarning: unsavedWarningSlice.reducer,
 	units,
 	conversions,
 	options: optionsSlice.reducer,

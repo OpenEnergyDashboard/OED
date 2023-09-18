@@ -11,10 +11,11 @@ import MapViewContainer from '../../containers/maps/MapViewContainer';
 import {Link} from 'react-router-dom';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderComponent from '../../components/HeaderComponent';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+
 
 interface MapsDetailProps {
 	maps: number[];
@@ -114,7 +115,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	private removeUnsavedChanges() {
-		store.dispatch(removeUnsavedChanges());
+		store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 	}
 
 	private handleSubmitClicked() {

@@ -25,7 +25,6 @@ import {
 	UpdateDefaultMeterDisableChecksAction
 
 } from '../../types/redux/admin';
-import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
@@ -34,6 +33,7 @@ import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import translate from '../../utils/translate';
 import { TrueFalseType } from '../../types/items';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface PreferencesProps {
 	displayTitle: string;
@@ -65,7 +65,7 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): UpdateDefaultMeterMinimumValueAction;
 	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
 	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
 	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;
@@ -428,12 +428,15 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private updateUnsavedChanges() {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
+		store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+			removeFunction: this.removeUnsavedChangesFunction,
+			submitFunction: this.submitUnsavedChangesFunction
+		}));
 	}
 
 	private removeUnsavedChanges() {
 		// Notify that there are no unsaved changes
-		store.dispatch(removeUnsavedChanges());
+		store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 	}
 
 	private handleDisplayTitleChange(e: { target: HTMLInputElement; }) {

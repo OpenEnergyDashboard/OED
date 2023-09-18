@@ -12,7 +12,6 @@ import { State } from 'types/redux/state';
 import '../../styles/modal.css';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { TrueFalseType } from '../../types/items';
@@ -27,6 +26,7 @@ import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { UnitRepresentType } from '../../types/redux/units';
 import { Dispatch } from 'types/redux/actions';
 import * as moment from 'moment';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -288,7 +288,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							&& unitState[state.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
 				dispatch(submitEditedMeter(submitState, shouldRefreshReadingViews));
-				dispatch(removeUnsavedChanges());
+				dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 			} else {
 				// Tell user that not going to update due to input issues.
 				notifyUser(translate('meter.input.error'));

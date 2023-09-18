@@ -10,8 +10,8 @@ import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl'
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
 import store from '../../index';
-import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -107,7 +107,10 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	private updateUnsavedChanges() {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
+		store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+			removeFunction: this.removeUnsavedChangesFunction,
+			submitFunction: this.submitUnsavedChangesFunction
+		}));
 	}
 
 	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {

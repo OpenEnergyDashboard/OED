@@ -12,13 +12,13 @@ import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -148,7 +148,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 			// set displayable to none if unit is meter
-			if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+			if (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
 				state.displayable = DisplayableType.none;
 			}
 			// Save our changes by dispatching the submitEditedUnit action
@@ -158,7 +158,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			if (state.identifier === '') {
 				state.identifier = state.name;
 			}
-			dispatch(removeUnsavedChanges());
+			dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 		}
 	}
 
@@ -202,7 +202,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.name}
-								invalid={state.name === ''}/>
+								invalid={state.name === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -288,7 +288,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0' }} />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}

@@ -10,8 +10,8 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
 import store from '../../index'
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface UserDisplayComponentProps {
 	users: User[];
@@ -59,12 +59,15 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 
 	const addUnsavedChanges = () => {
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(removeUnsavedChangesFunction, submitUnsavedChangesFunction));
+		store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+			removeFunction: removeUnsavedChangesFunction,
+			submitFunction: submitUnsavedChangesFunction
+		}));
 	}
 
 	const clearUnsavedChanges = () => {
 		// Notify that there are no unsaved changes
-		store.dispatch(removeUnsavedChanges());
+		store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 	}
 
 	return (
@@ -73,7 +76,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 			<TooltipHelpContainer page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					<FormattedMessage id='users'/>
+					<FormattedMessage id='users' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
 					</div>
@@ -82,9 +85,9 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					<Table striped bordered hover>
 						<thead>
 							<tr>
-								<th> <FormattedMessage id='email'/> </th>
-								<th> <FormattedMessage id='role'/> </th>
-								<th> <FormattedMessage id='action'/> </th>
+								<th> <FormattedMessage id='email' /> </th>
+								<th> <FormattedMessage id='role' /> </th>
+								<th> <FormattedMessage id='action' /> </th>
 							</tr>
 						</thead>
 						<tbody>
@@ -107,7 +110,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 									</td>
 									<td>
 										<Button color='danger' onClick={() => { props.deleteUser(user.email); }}>
-											<FormattedMessage id='delete.user'/>
+											<FormattedMessage id='delete.user' />
 										</Button>
 									</td>
 								</tr>
@@ -124,7 +127,7 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 								clearUnsavedChanges();
 							}}
 						>
-							<FormattedMessage id='save.role.changes'/>
+							<FormattedMessage id='save.role.changes' />
 						</Button>
 					</div>
 				</div>
