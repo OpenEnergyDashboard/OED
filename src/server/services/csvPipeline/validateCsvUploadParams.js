@@ -200,10 +200,10 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		req.body.update = DEFAULTS.common.update;
 	}
 	if (!honorDst) {
-		req.body.honorDst = DEFAULTS.common.honorDst;
+		req.body.honorDst = DEFAULTS.readings.honorDst;
 	}
 	if (!relaxedParsing) {
-		req.body.relaxedParsing = DEFAULTS.common.relaxedParsing;
+		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
 	}
 	next();
 }
