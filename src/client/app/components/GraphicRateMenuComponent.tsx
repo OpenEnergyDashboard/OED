@@ -30,14 +30,19 @@ export default function GraphicRateMenuComponent() {
 	// Unit data by Id
 	const selectedUnitData = unitDataById[graphState.selectedUnit];
 
+	// Should the rate drop down menu be rendered.
+	let shouldRender = true;
 	// Compare the value of name to be 'kW' or 'kWh' or unitRepresent type to be 'raw' and update the visibility of the Rate menu
 	if (selectedUnitData) {
 		const { name, unitRepresent } = selectedUnitData;
-		if(unitRepresent === UnitRepresentType.raw || name === 'kW' || name === 'kWh'){
-			return null;
+		if (unitRepresent === UnitRepresentType.raw || name === 'kW' || name === 'kWh') {
+			shouldRender = false;
 		}
 	}
-
+	// Also don't show if not the line graphic.
+	if (graphState.chartToRender !== 'line'){
+		shouldRender = false;
+	}
 	// Array of select options created from the rates
 	const rateOptions: SelectOption[] = [];
 
@@ -58,7 +63,7 @@ export default function GraphicRateMenuComponent() {
 	return (
 		<div>
 			{
-				graphState.chartToRender == 'line' &&
+				shouldRender &&
 				<div>
 					<p style={labelStyle}>
 						<FormattedMessage id='rate' />:
