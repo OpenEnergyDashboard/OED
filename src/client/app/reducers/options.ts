@@ -2,22 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from '../types/redux/actions';
 import { LanguageTypes } from '../types/redux/i18n';
-import { OptionsAction, OptionsState } from '../types/redux/options';
+import { OptionsState } from '../types/redux/options';
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 
 const defaultState: OptionsState = {
 	selectedLanguage: LanguageTypes.en
 };
 
-export default function options(state = defaultState, action: OptionsAction) {
-	switch (action.type) {
-		case ActionType.UpdateSelectedLanguage:
-			return {
-				...state,
-				selectedLanguage: action.selectedLanguage
-			};
-		default:
-			return state;
+export const optionsSlice = createSlice({
+	name: 'options',
+	initialState: defaultState,
+	reducers: {
+		updateSelectedLanguage: (state, action: PayloadAction<LanguageTypes>) => {
+			state.selectedLanguage = action.payload
+		}
 	}
-}
+});

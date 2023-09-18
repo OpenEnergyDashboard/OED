@@ -2,12 +2,11 @@
 	* License, v. 2.0. If a copy of the MPL was not distributed with this
 	* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from '../types/redux/actions';
 import { LanguageTypes } from '../types/redux/i18n';
-import * as t from '../types/redux/options';
 import * as moment from 'moment';
+import { optionsSlice } from '../reducers/options';
 
-export function updateSelectedLanguage(selectedLanguage: LanguageTypes): t.UpdateSelectedLanguageAction {
+export function updateSelectedLanguage(selectedLanguage: LanguageTypes) {
 	moment.locale(selectedLanguage);
-	return { type: ActionType.UpdateSelectedLanguage, selectedLanguage };
+	return optionsSlice.actions.updateSelectedLanguage(selectedLanguage);
 }

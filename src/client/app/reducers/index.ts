@@ -15,7 +15,7 @@ import currentUser from './currentUser';
 import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
-import options from './options';
+import {optionsSlice} from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
 
@@ -37,7 +37,7 @@ export default combineReducers({
 	unsavedWarning,
 	units,
 	conversions,
-	options,
+	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers
 	[baseApi.reducerPath]: baseApi.reducer
 });
