@@ -6,13 +6,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { toggleAreaNormalization, updateSelectedAreaUnit } from '../actions/graph';
 import { StringSelectOption } from '../types/items';
 import { State } from '../types/redux/state';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
 import { UnitRepresentType } from '../types/redux/units';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { graphSlice } from '../reducers/graph';
 
 /**
  * React Component that creates the area unit selector dropdown
@@ -38,7 +38,7 @@ export default function AreaUnitSelectComponent() {
 	});
 
 	const handleToggleAreaNormalization = () => {
-		dispatch(toggleAreaNormalization());
+		dispatch(graphSlice.actions.toggleAreaNormalization());
 	}
 
 	const labelStyle: React.CSSProperties = {
@@ -76,7 +76,7 @@ export default function AreaUnitSelectComponent() {
 						value={{ label: translate(`AreaUnitType.${graphState.selectedAreaUnit}`), value: graphState.selectedAreaUnit} as StringSelectOption}
 						onChange={newSelectedUnit => {
 							if (newSelectedUnit) {
-								dispatch(updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType))
+								dispatch(graphSlice.actions.updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType))
 							}
 						}}
 					/>

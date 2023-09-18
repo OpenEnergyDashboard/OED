@@ -7,7 +7,6 @@ import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
-import graph from './graph';
 import groups from './groups';
 import maps from './maps';
 import admin from './admin';
@@ -28,7 +27,8 @@ export default combineReducers({
 		bar: barReadings,
 		compare: compareReadings
 	}),
-	graph,
+	// graph,
+	graph: graphSlice.reducer,
 	maps,
 	groups,
 	admin,

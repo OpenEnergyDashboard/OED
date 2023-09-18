@@ -4,7 +4,6 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
@@ -39,123 +38,6 @@ export enum ReadingInterval {
 	Incompatible = -999
 }
 
-export interface UpdateSelectedMetersAction {
-	type: ActionType.UpdateSelectedMeters;
-	meterIDs: number[];
-}
-
-export interface UpdateSelectedGroupsAction {
-	type: ActionType.UpdateSelectedGroups;
-	groupIDs: number[];
-}
-
-export interface UpdateSelectedUnitAction {
-	type: ActionType.UpdateSelectedUnit;
-	unitID: number;
-}
-
-export interface UpdateSelectedAreaUnitAction {
-	type: ActionType.UpdateSelectedAreaUnit;
-	areaUnit: AreaUnitType;
-}
-
-export interface UpdateBarDurationAction {
-	type: ActionType.UpdateBarDuration;
-	barDuration: moment.Duration;
-}
-
-export interface ChangeChartToRenderAction {
-	type: ActionType.ChangeChartToRender;
-	chartType: ChartTypes;
-}
-
-export interface ToggleAreaNormalizationAction {
-	type: ActionType.ToggleAreaNormalization;
-}
-
-export interface ToggleShowMinMaxAction {
-	type: ActionType.ToggleShowMinMax;
-}
-
-export interface ChangeBarStackingAction {
-	type: ActionType.ChangeBarStacking;
-}
-
-export interface ChangeGraphZoomAction {
-	type: ActionType.ChangeGraphZoom;
-	timeInterval: TimeInterval;
-}
-
-export interface ChangeSliderRangeAction {
-	type: ActionType.ChangeSliderRange;
-	sliderInterval: TimeInterval;
-}
-
-export interface ResetRangeSliderStackAction {
-	type: ActionType.ResetRangeSliderStack;
-}
-
-export interface UpdateComparePeriodAction {
-	type: ActionType.UpdateComparePeriod;
-	comparePeriod: ComparePeriod;
-	currentTime: moment.Moment;
-}
-
-export interface ChangeCompareSortingOrderAction {
-	type: ActionType.ChangeCompareSortingOrder;
-	compareSortingOrder: SortingOrder;
-}
-
-export interface SetHotlinked {
-	type: ActionType.SetHotlinked;
-	hotlinked: boolean;
-}
-
-export interface ToggleOptionsVisibility {
-	type: ActionType.ToggleOptionsVisibility;
-}
-
-export interface UpdateLineGraphRate {
-	type: ActionType.UpdateLineGraphRate;
-	lineGraphRate: LineGraphRate;
-}
-
-export interface ConfirmGraphRenderOnce {
-	type: ActionType.ConfirmGraphRenderOnce;
-}
-
-export interface UpdateThreeDReadingInterval {
-	type: ActionType.UpdateThreeDReadingInterval;
-	readingInterval: ReadingInterval;
-}
-
-export interface UpdateThreeDMeterOrGroupInfo {
-	type: ActionType.UpdateThreeDMeterOrGroupInfo;
-	meterOrGroupID: MeterOrGroupID;
-	meterOrGroup: MeterOrGroup;
-}
-
-export type GraphAction =
-	| ChangeGraphZoomAction
-	| ChangeSliderRangeAction
-	| ResetRangeSliderStackAction
-	| ChangeBarStackingAction
-	| ToggleAreaNormalizationAction
-	| ToggleShowMinMaxAction
-	| ChangeChartToRenderAction
-	| UpdateBarDurationAction
-	| UpdateSelectedGroupsAction
-	| UpdateSelectedMetersAction
-	| UpdateSelectedUnitAction
-	| UpdateSelectedAreaUnitAction
-	| UpdateComparePeriodAction
-	| SetHotlinked
-	| ChangeCompareSortingOrderAction
-	| ToggleOptionsVisibility
-	| UpdateLineGraphRate
-	| ConfirmGraphRenderOnce
-	| UpdateThreeDReadingInterval
-	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
 	label: string,

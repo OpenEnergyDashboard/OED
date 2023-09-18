@@ -4,10 +4,11 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphAction, GraphState, ChartTypes, ReadingInterval, MeterOrGroup } from '../types/redux/graph';
-import { ActionType } from '../types/redux/actions';
+import { GraphState, ChartTypes, ReadingInterval, MeterOrGroup, LineGraphRate } from '../types/redux/graph';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { createSlice } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit'
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -35,118 +36,72 @@ const defaultState: GraphState = {
 	}
 };
 
-export default function graph(state = defaultState, action: GraphAction) {
-	switch (action.type) {
-		case ActionType.ConfirmGraphRenderOnce: {
-			return {
-				...state,
-				renderOnce: true
-			};
+export const graphSlice = createSlice({
+	name: 'graph',
+	initialState: defaultState,
+	reducers: {
+		confirmGraphRenderOnce: state => {
+			state.renderOnce = true
+		},
+		updateSelectedMeters: (state, action: PayloadAction<number[]>) => {
+			state.selectedMeters = action.payload
+		},
+		updateSelectedGroups: (state, action: PayloadAction<number[]>) => {
+			state.selectedGroups = action.payload
+		},
+		updateSelectedUnit: (state, action: PayloadAction<number>) => {
+			state.selectedUnit = action.payload
+		},
+		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
+			state.selectedAreaUnit = action.payload
+		},
+		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
+			state.barDuration = action.payload
+		},
+		changeGraphZoom: (state, action: PayloadAction<TimeInterval>) => {
+			state.timeInterval = action.payload
+		},
+		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.rangeSliderInterval = action.payload
+		},
+		resetRangeSliderStack: state => {
+			state.rangeSliderInterval = TimeInterval.unbounded()
+		},
+		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
+			state.comparePeriod = action.payload.comparePeriod
+			state.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime)
+		},
+		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
+			state.chartToRender = action.payload
+		},
+		toggleAreaNormalization: state => {
+			state.areaNormalization = !state.areaNormalization
+		},
+		toggleShowMinMax: state => {
+			state.showMinMax = !state.showMinMax
+		},
+		changeBarStacking: state => {
+			state.barStacking = !state.barStacking
+		},
+		setHotlinked: (state, action: PayloadAction<boolean>) => {
+			state.hotlinked = action.payload
+		},
+		changeCompareSortingOrder: (state, action: PayloadAction<SortingOrder>) => {
+			state.compareSortingOrder = action.payload
+		},
+		toggleOptionsVisibility: state => {
+			state.optionsVisibility = !state.optionsVisibility
+		},
+		updateLineGraphRate: (state, action: PayloadAction<LineGraphRate>) => {
+			state.lineGraphRate = action.payload
+		},
+
+		updateThreeDReadingInterval: (state, action: PayloadAction<ReadingInterval>) => {
+			state.threeD.readingInterval = action.payload
+		},
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | null, meterOrGroup: MeterOrGroup }>) => {
+			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
+			state.threeD.meterOrGroup = action.payload.meterOrGroup
 		}
-		case ActionType.UpdateSelectedMeters:
-			return {
-				...state,
-				selectedMeters: action.meterIDs
-			};
-		case ActionType.UpdateSelectedGroups:
-			return {
-				...state,
-				selectedGroups: action.groupIDs
-			};
-		case ActionType.UpdateSelectedUnit:
-			return {
-				...state,
-				selectedUnit: action.unitID
-			}
-		case ActionType.UpdateSelectedAreaUnit:
-			return {
-				...state,
-				selectedAreaUnit: action.areaUnit
-			}
-		case ActionType.UpdateBarDuration:
-			return {
-				...state,
-				barDuration: action.barDuration
-			};
-		case ActionType.ChangeGraphZoom:
-			return {
-				...state,
-				timeInterval: action.timeInterval
-			};
-		case ActionType.ChangeSliderRange:
-			return {
-				...state,
-				rangeSliderInterval: action.sliderInterval
-			};
-		case ActionType.ResetRangeSliderStack:
-			return {
-				...state,
-				rangeSliderInterval: TimeInterval.unbounded()
-			};
-		case ActionType.UpdateComparePeriod:
-			return {
-				...state,
-				comparePeriod: action.comparePeriod,
-				compareTimeInterval: calculateCompareTimeInterval(action.comparePeriod, action.currentTime)
-			};
-		case ActionType.ChangeChartToRender:
-			return {
-				...state,
-				chartToRender: action.chartType
-			};
-		case ActionType.ToggleAreaNormalization:
-			return {
-				...state,
-				areaNormalization: !state.areaNormalization
-			};
-		case ActionType.ToggleShowMinMax:
-			return {
-				...state,
-				showMinMax: !state.showMinMax
-			};
-		case ActionType.ChangeBarStacking:
-			return {
-				...state,
-				barStacking: !state.barStacking
-			};
-		case ActionType.SetHotlinked:
-			return {
-				...state,
-				hotlinked: action.hotlinked
-			};
-		case ActionType.ChangeCompareSortingOrder:
-			return {
-				...state,
-				compareSortingOrder: action.compareSortingOrder
-			};
-		case ActionType.ToggleOptionsVisibility:
-			return {
-				...state,
-				optionsVisibility: !state.optionsVisibility
-			};
-		case ActionType.UpdateLineGraphRate:
-			return {
-				...state,
-				lineGraphRate: action.lineGraphRate
-			};
-		case ActionType.UpdateThreeDReadingInterval:
-			return {
-				...state,
-				threeD: {
-					...state.threeD,
-					readingInterval: action.readingInterval
-				}
-			};
-		case ActionType.UpdateThreeDMeterOrGroupInfo:
-			return {
-				...state,
-				threeD: {
-					...state.threeD,
-					meterOrGroupID: action.meterOrGroupID,
-					meterOrGroup: action.meterOrGroup
-				}
-			};
-		default:
-			return state;
 	}
-}
+})

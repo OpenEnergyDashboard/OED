@@ -10,7 +10,6 @@ import { Button, ButtonGroup, Dropdown, DropdownToggle, DropdownMenu, DropdownIt
 import ExportComponent from '../components/ExportComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
-import { ChangeBarStackingAction, ChangeCompareSortingOrderAction, ToggleOptionsVisibility } from '../types/redux/graph';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
@@ -23,6 +22,7 @@ import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import DateRangeComponent from './DateRangeComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
+import { graphSlice } from '../reducers/graph';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -34,10 +34,10 @@ export interface UIOptionsProps {
 	compareSortingOrder: SortingOrder;
 	optionsVisibility: boolean;
 	changeDuration(duration: moment.Duration): Promise<any>;
-	changeBarStacking(): ChangeBarStackingAction;
-	toggleOptionsVisibility(): ToggleOptionsVisibility;
+	changeBarStacking(): ReturnType<typeof graphSlice.actions.changeBarStacking>;
+	toggleOptionsVisibility(): ReturnType<typeof graphSlice.actions.toggleOptionsVisibility>;
 	changeCompareGraph(comparePeriod: ComparePeriod): Promise<any>;
-	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ChangeCompareSortingOrderAction;
+	changeCompareSortingOrder(compareSortingOrder: SortingOrder): ReturnType<typeof graphSlice.actions.changeCompareSortingOrder>;
 }
 
 type UIOptionsPropsWithIntl = UIOptionsProps & WrappedComponentProps;

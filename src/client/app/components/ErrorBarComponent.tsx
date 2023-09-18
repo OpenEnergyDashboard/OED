@@ -5,9 +5,9 @@
 import * as React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
-import { toggleShowMinMax } from '../actions/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { graphSlice } from '../reducers/graph';
 
 /**
  * React Component rendering an Error Bar checkbox for toggle operation.
@@ -21,7 +21,7 @@ export default function ErrorBarComponent() {
 	 * Dispatches an action to toggle visibility of min/max lines on checkbox interaction
 	 */
 	const handleToggleShowMinMax = () => {
-		dispatch(toggleShowMinMax());
+		dispatch(graphSlice.actions.toggleShowMinMax());
 	}
 
 	return (

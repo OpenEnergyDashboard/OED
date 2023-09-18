@@ -9,7 +9,7 @@ import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 import { fetchNeededCompareReadings } from './compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
+import { Dispatch, Thunk, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
@@ -18,83 +18,33 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-
-export function changeRenderOnce() {
-	return { type: ActionType.ConfirmGraphRenderOnce };
-}
-
-export function changeChartToRender(chartType: t.ChartTypes): t.ChangeChartToRenderAction {
-	return { type: ActionType.ChangeChartToRender, chartType };
-}
-
-export function toggleAreaNormalization(): t.ToggleAreaNormalizationAction {
-	return { type: ActionType.ToggleAreaNormalization };
-}
-export function toggleShowMinMax(): t.ToggleShowMinMaxAction {
-	return { type: ActionType.ToggleShowMinMax }
-}
-
-export function changeBarStacking(): t.ChangeBarStackingAction {
-	return { type: ActionType.ChangeBarStacking };
-}
-
-export function updateSelectedMeters(meterIDs: number[]): t.UpdateSelectedMetersAction {
-	return { type: ActionType.UpdateSelectedMeters, meterIDs };
-}
-
-export function updateSelectedGroups(groupIDs: number[]): t.UpdateSelectedGroupsAction {
-	return { type: ActionType.UpdateSelectedGroups, groupIDs };
-}
-
-export function updateSelectedUnit(unitID: number): t.UpdateSelectedUnitAction {
-	return { type: ActionType.UpdateSelectedUnit, unitID };
-}
-
-export function updateSelectedAreaUnit(areaUnit: AreaUnitType): t.UpdateSelectedAreaUnitAction {
-	return { type: ActionType.UpdateSelectedAreaUnit, areaUnit };
-}
-
-export function updateBarDuration(barDuration: moment.Duration): t.UpdateBarDurationAction {
-	return { type: ActionType.UpdateBarDuration, barDuration };
-}
-
-export function updateLineGraphRate(lineGraphRate: t.LineGraphRate): t.UpdateLineGraphRate {
-	return { type: ActionType.UpdateLineGraphRate, lineGraphRate }
-}
-
-export function setHotlinked(hotlinked: boolean): t.SetHotlinked {
-	return { type: ActionType.SetHotlinked, hotlinked };
-}
+import { graphSlice } from '../reducers/graph';
 
 export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch(setHotlinked(hotlinked));
+		dispatch(graphSlice.actions.setHotlinked(hotlinked));
 		return Promise.resolve();
 	};
 }
 
-export function toggleOptionsVisibility(): t.ToggleOptionsVisibility {
-	return { type: ActionType.ToggleOptionsVisibility };
+export function toggleOptionsVisibility() {
+	return graphSlice.actions.toggleOptionsVisibility();
 }
 
-function changeGraphZoom(timeInterval: TimeInterval): t.ChangeGraphZoomAction {
-	return { type: ActionType.ChangeGraphZoom, timeInterval };
+function changeGraphZoom(timeInterval: TimeInterval) {
+	return graphSlice.actions.changeGraphZoom(timeInterval);
 }
 
 export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(updateBarDuration(barDuration));
+		dispatch(graphSlice.actions.updateBarDuration(barDuration));
 		dispatch(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 		return Promise.resolve();
 	};
 }
 
-function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.Moment): t.UpdateComparePeriodAction {
-	return {
-		type: ActionType.UpdateComparePeriod,
-		comparePeriod,
-		currentTime
-	};
+function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.Moment) {
+	return graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime });
 }
 
 export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
@@ -111,13 +61,13 @@ export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
 	};
 }
 
-export function changeCompareSortingOrder(compareSortingOrder: SortingOrder): t.ChangeCompareSortingOrderAction {
-	return { type: ActionType.ChangeCompareSortingOrder, compareSortingOrder };
+export function changeCompareSortingOrder(compareSortingOrder: SortingOrder) {
+	return graphSlice.actions.changeCompareSortingOrder(compareSortingOrder);
 }
 
 export function changeSelectedMeters(meterIDs: number[]): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(updateSelectedMeters(meterIDs));
+		dispatch(graphSlice.actions.updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
@@ -131,7 +81,7 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 
 export function changeSelectedGroups(groupIDs: number[]): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(updateSelectedGroups(groupIDs));
+		dispatch(graphSlice.actions.updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
 			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
@@ -145,7 +95,7 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 
 export function changeSelectedUnit(unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(updateSelectedUnit(unitID));
+		dispatch(graphSlice.actions.updateSelectedUnit(unitID));
 		dispatch((dispatch2: Dispatch) => {
 			dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
@@ -184,16 +134,16 @@ function shouldChangeRangeSlider(range: TimeInterval): boolean {
 	return range !== TimeInterval.unbounded();
 }
 
-function changeRangeSlider(sliderInterval: TimeInterval): t.ChangeSliderRangeAction {
-	return { type: ActionType.ChangeSliderRange, sliderInterval };
+function changeRangeSlider(sliderInterval: TimeInterval) {
+	return graphSlice.actions.changeSliderRange(sliderInterval);
 }
 
 /**
  * remove constraints for rangeslider after user clicked redraw or restore
  * by setting sliderRange to an empty string
  */
-function resetRangeSliderStack(): t.ResetRangeSliderStackAction {
-	return { type: ActionType.ResetRangeSliderStack };
+function resetRangeSliderStack() {
+	return graphSlice.actions.resetRangeSliderStack();
 }
 
 function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
@@ -207,13 +157,13 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 
 export function updateThreeDReadingInterval(readingInterval: t.ReadingInterval): Thunk {
 	return (dispatch: Dispatch) => {
-		dispatch({ type: ActionType.UpdateThreeDReadingInterval, readingInterval });
+		dispatch(graphSlice.actions.updateThreeDReadingInterval(readingInterval));
 		return Promise.resolve();
 	};
 }
 
-export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
-	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
+export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup) {
+	return graphSlice.actions.updateThreeDMeterOrGroupInfo({ meterOrGroupID, meterOrGroup });
 }
 
 export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
@@ -252,15 +202,7 @@ export interface LinkOptions {
  */
 export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	// Visual Studio indents after the first line in autoformat but ESLint does not like that in this case so override.
-	/* eslint-disable @typescript-eslint/indent */
-	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
-		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
-		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
-		t.UpdateSelectedAreaUnitAction | t.UpdateThreeDMeterOrGroupInfo |
-		t.ToggleShowMinMaxAction> = [];
-	/* eslint-enable @typescript-eslint/indent */
-
+	const dispatchSecond: Array<Thunk | m.UpdateSelectedMapAction | ReturnType<typeof graphSlice.actions[keyof typeof graphSlice.actions]>> = [];
 	if (options.meterIDs) {
 		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
@@ -273,14 +215,14 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(updateThreeDMeterOrGroupInfo(options.meterOrGroupID, options.meterOrGroup));
 	}
 	if (options.chartType) {
-		dispatchSecond.push(changeChartToRender(options.chartType));
+		dispatchSecond.push(graphSlice.actions.changeChartToRender(options.chartType));
 	}
 	if (options.unitID) {
 		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedUnit(options.unitID));
 	}
 	if (options.rate) {
-		dispatchSecond.push(updateLineGraphRate(options.rate));
+		dispatchSecond.push(graphSlice.actions.updateLineGraphRate(options.rate));
 	}
 	if (options.barDuration) {
 		dispatchFirst.push(changeBarDuration(options.barDuration));
@@ -292,16 +234,16 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
 	}
 	if (options.toggleAreaNormalization) {
-		dispatchSecond.push(toggleAreaNormalization());
+		dispatchSecond.push(graphSlice.actions.toggleAreaNormalization());
 	}
 	if (options.areaUnit) {
-		dispatchSecond.push(updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
+		dispatchSecond.push(graphSlice.actions.updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
 	}
 	if (options.toggleMinMax) {
-		dispatchSecond.push(toggleShowMinMax());
+		dispatchSecond.push(graphSlice.actions.toggleShowMinMax());
 	}
 	if (options.toggleBarStacking) {
-		dispatchSecond.push(changeBarStacking());
+		dispatchSecond.push(graphSlice.actions.changeBarStacking());
 	}
 	if (options.comparePeriod) {
 		dispatchSecond.push(changeCompareGraph(options.comparePeriod));

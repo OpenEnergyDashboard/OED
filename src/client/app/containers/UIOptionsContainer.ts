@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import UIOptionsComponent from '../components/UIOptionsComponent';
 import {
 	changeBarDuration,
-	changeBarStacking,
 	changeCompareGraph,
 	changeCompareSortingOrder,
 	toggleOptionsVisibility
@@ -15,6 +14,7 @@ import {
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import {ComparePeriod, SortingOrder} from '../utils/calculateCompare';
+import { graphSlice } from '../reducers/graph';
 
 function mapStateToProps(state: State) {
 	return {
@@ -31,7 +31,7 @@ function mapStateToProps(state: State) {
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
 		changeDuration: (barDuration: moment.Duration) => dispatch(changeBarDuration(barDuration)),
-		changeBarStacking: () => dispatch(changeBarStacking()),
+		changeBarStacking: () => dispatch(graphSlice.actions.changeBarStacking()),
 		changeCompareGraph: (comparePeriod: ComparePeriod) => dispatch(changeCompareGraph(comparePeriod)),
 		changeCompareSortingOrder: (sortingOrder: SortingOrder) => dispatch(changeCompareSortingOrder(sortingOrder)),
 		toggleOptionsVisibility: () => dispatch(toggleOptionsVisibility())

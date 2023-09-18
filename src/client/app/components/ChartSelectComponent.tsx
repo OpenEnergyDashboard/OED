@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { SelectOption } from '../types/items';
 import { Dispatch } from '../types/redux/actions';
 import { Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { graphSlice } from '../reducers/graph';
 
 /**
  *  A component that allows users to select which chart should be displayed.
@@ -45,23 +46,23 @@ export default function ChartSelectComponent() {
 				</DropdownToggle>
 				<DropdownMenu>
 					<DropdownItem
-						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.line })}
+						onClick={() => dispatch(graphSlice.actions.changeChartToRender(ChartTypes.line))}
 					>
 						<FormattedMessage id='line' />
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.bar })}
+						onClick={() => dispatch(graphSlice.actions.changeChartToRender(ChartTypes.bar))}
 					>
 						<FormattedMessage id='bar' />
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.compare })}
+						onClick={() => dispatch(graphSlice.actions.changeChartToRender(ChartTypes.compare))}
 					>
 						<FormattedMessage id='compare' />
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
-							dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.map });
+							dispatch(graphSlice.actions.changeChartToRender(ChartTypes.map));
 							if (Object.keys(sortedMaps).length === 1) {
 								// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
 								dispatch({ type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value });
@@ -71,7 +72,7 @@ export default function ChartSelectComponent() {
 						<FormattedMessage id='map' />
 					</DropdownItem>
 					<DropdownItem
-						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD })}
+						onClick={() => dispatch(graphSlice.actions.changeChartToRender(ChartTypes.threeD))}
 					>
 						<FormattedMessage id='3D' />
 					</DropdownItem>

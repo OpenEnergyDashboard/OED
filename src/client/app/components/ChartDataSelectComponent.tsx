@@ -16,10 +16,7 @@ import {
 	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
 	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
-import {
-	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit, changeMeterOrGroupInfo
-} from '../actions/graph';
+import { changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, changeMeterOrGroupInfo } from '../actions/graph';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { Dispatch } from '../types/redux/actions';
@@ -27,6 +24,7 @@ import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { graphSlice } from '../reducers/graph';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -213,7 +211,7 @@ export default function ChartDataSelectComponent() {
 					// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
 					// those groups should not have been visible. The only exception is if there are no selected groups but
 					// then this loop does not run. The loop is assumed to only run once in this case.
-					state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
+					// state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
 				}
 				compatibleSelectedGroups.push({
 					// For groups we display the name since no identifier.
@@ -264,10 +262,10 @@ export default function ChartDataSelectComponent() {
 			);
 		}
 
-		// if no area unit selected, set the default area as selected.
-		if (state.graph.selectedAreaUnit == AreaUnitType.none) {
-			state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
-		}
+		// // if no area unit selected, set the default area as selected.
+		// if (state.graph.selectedAreaUnit == AreaUnitType.none) {
+		// 	state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
+		// }
 
 		return {
 			// all items, sorted alphabetically and by compatibility
@@ -378,9 +376,9 @@ export default function ChartDataSelectComponent() {
 							// Update the selected meters and groups to empty to avoid graphing errors
 							// The update selected meters/groups functions are essentially the same as the change functions
 							// However, they do not attempt to graph.
-							dispatch(updateSelectedGroups([]));
-							dispatch(updateSelectedMeters([]));
-							dispatch(updateSelectedUnit(-99));
+							dispatch(graphSlice.actions.updateSelectedGroups([]));
+							dispatch(graphSlice.actions.updateSelectedMeters([]));
+							dispatch(graphSlice.actions.updateSelectedUnit(-99));
 							// Sync threeD state.
 							dispatch(changeMeterOrGroupInfo(null));
 						}

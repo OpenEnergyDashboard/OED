@@ -9,9 +9,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { SelectOption } from '../types/items';
 import Select from 'react-select';
 import translate from '../utils/translate';
-import { updateLineGraphRate } from '../actions/graph'
 import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { graphSlice } from '../reducers/graph';
 
 /**
  * React component that controls the line graph rate menu
@@ -55,7 +55,7 @@ export default function GraphicRateMenuComponent() {
 						value={{ label: translate(graphState.lineGraphRate.label), value: graphState.lineGraphRate.rate } as SelectOption}
 						onChange={newSelectedRate => {
 							if (newSelectedRate) {
-								dispatch(updateLineGraphRate({
+								dispatch(graphSlice.actions.updateLineGraphRate({
 									label: newSelectedRate.labelIdForTranslate,
 									rate: Number(newSelectedRate.value)
 								} as LineGraphRate))

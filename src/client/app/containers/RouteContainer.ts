@@ -6,10 +6,11 @@ import { connect } from 'react-redux';
 import RouteComponent from '../components/RouteComponent';
 import { Dispatch } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import { changeOptionsFromLink, LinkOptions, changeRenderOnce } from '../actions/graph';
+import { changeOptionsFromLink, LinkOptions } from '../actions/graph';
 import { clearCurrentUser } from '../actions/currentUser';
 import { isRoleAdmin } from '../utils/hasPermissions';
 import { UserRole } from '../types/items';
+import { graphSlice } from '../reducers/graph';
 
 function mapStateToProps(state: State) {
 	const currentUser = state.currentUser.profile;
@@ -37,7 +38,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		changeOptionsFromLink: (options: LinkOptions) => dispatch(changeOptionsFromLink(options)),
 		clearCurrentUser: () => dispatch(clearCurrentUser()),
 		// Set the state to indicate chartlinks have been rendered.
-		changeRenderOnce: () => dispatch(changeRenderOnce())
+		changeRenderOnce: () => dispatch(graphSlice.actions.confirmGraphRenderOnce())
 	};
 }
 

@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { toggleAreaNormalization, changeBarStacking, changeChartToRender } from './graph';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { ChartTypes } from '../types/redux/graph';
 import { PreferenceRequestItem } from '../types/items';
@@ -15,7 +14,7 @@ import { LanguageTypes } from '../types/redux/i18n';
 import * as moment from 'moment';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { updateSelectedLanguage } from './options';
-
+import { graphSlice } from '../reducers/graph';
 export function updateSelectedMeter(meterID: number): t.UpdateImportMeterAction {
 	return { type: ActionType.UpdateImportMeter, meterID };
 }
@@ -117,12 +116,12 @@ function fetchPreferences(): Thunk {
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch) => {
 				const state = getState();
-				dispatch2(changeChartToRender(state.admin.defaultChartToRender));
+				dispatch2(graphSlice.actions.changeChartToRender(state.admin.defaultChartToRender));
 				if (preferences.defaultBarStacking !== state.graph.barStacking) {
-					dispatch2(changeBarStacking());
+					dispatch2(graphSlice.actions.changeBarStacking());
 				}
 				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
-					dispatch2(toggleAreaNormalization());
+					dispatch2(graphSlice.actions.toggleAreaNormalization());
 				}
 				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
 					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
