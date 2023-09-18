@@ -11,11 +11,11 @@ import groups from './groups';
 import maps from './maps';
 import admin from './admin';
 import version from './version';
-import currentUser from './currentUser';
+import { currentUserSlice } from './currentUser';
 import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
-import {optionsSlice} from './options';
+import { optionsSlice } from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
 
@@ -33,7 +33,7 @@ export default combineReducers({
 	groups,
 	admin,
 	version,
-	currentUser,
+	currentUser: currentUserSlice.reducer,
 	unsavedWarning,
 	units,
 	conversions,

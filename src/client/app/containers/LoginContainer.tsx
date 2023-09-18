@@ -4,16 +4,16 @@
 
 import { connect } from 'react-redux';
 import { User } from '../types/items';
-import { receiveCurrentUser } from '../actions/currentUser'
 import LoginComponent from '../components/LoginComponent';
 import { Dispatch } from '../types/redux/actions';
+import { currentUserSlice } from '../reducers/currentUser';
 
 /**
  * A container that does data fetching for FooterComponent and connects it to the redux store.
  */
 function mapDispatchToProps(dispatch: Dispatch) {
 	return {
-		saveCurrentUser: (profile: User) => dispatch(receiveCurrentUser(profile))
+		saveCurrentUser: (profile: User) => dispatch(currentUserSlice.actions.receiveCurrentUser(profile))
 	};
 }
 

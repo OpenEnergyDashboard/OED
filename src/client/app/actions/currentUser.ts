@@ -3,19 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { usersApi, verificationApi } from '../utils/api';
-import { Thunk, ActionType, Dispatch, GetState } from '../types/redux/actions';
+import { Thunk,  Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
-import * as t from '../types/redux/currentUser';
-import { User } from '../types/items';
 import { deleteToken, hasToken } from '../utils/token';
+import { currentUserSlice } from '../reducers/currentUser';
 
-export function requestCurrentUser(): t.RequestCurrentUser {
-	return { type: ActionType.RequestCurrentUser };
-}
-
-export function receiveCurrentUser(data: User): t.ReceiveCurrentUser {
-	return { type: ActionType.ReceiveCurrentUser, data };
-}
 
 /**
  * Check if we should fetch the current user's data. This function has the side effect of deleting an invalid token from local storage.
@@ -44,9 +36,9 @@ async function shouldFetchCurrentUser(state: State): Promise<boolean> {
 
 export function fetchCurrentUser(): Thunk {
 	return async (dispatch: Dispatch) => {
-		dispatch(requestCurrentUser());
+		dispatch(currentUserSlice.actions.requestCurrentUser());
 		const user = await usersApi.getCurrentUser();
-		return dispatch(receiveCurrentUser(user));
+		return dispatch(currentUserSlice.actions.receiveCurrentUser(user));
 	};
 }
 
@@ -57,8 +49,4 @@ export function fetchCurrentUserIfNeeded(): Thunk {
 		}
 		return Promise.resolve();
 	};
-}
-
-export function clearCurrentUser(): t.ClearCurrentUser {
-	return { type: ActionType.ClearCurrentUser };
 }

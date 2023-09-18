@@ -7,9 +7,9 @@ import { FormattedMessage } from 'react-intl';
 import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
 import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 import { deleteToken } from '../utils/token';
-import { clearCurrentUser } from '../actions/currentUser';
 import store from '../index';
 import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
+import { currentUserSlice } from '../reducers/currentUser';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
 	hasUnsavedChanges: boolean;
@@ -161,7 +161,7 @@ class UnsavedWarningComponent extends React.Component<UnsavedWarningProps> {
 
 	private handleLogOut() {
 		deleteToken();
-		store.dispatch(clearCurrentUser());
+		store.dispatch(currentUserSlice.actions.clearCurrentUser());
 	}
 }
 

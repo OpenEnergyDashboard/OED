@@ -12,13 +12,13 @@ import { UserRole } from '../types/items';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import { flipLogOutState } from '../actions/unsavedWarning';
 import { deleteToken } from '../utils/token';
-import { clearCurrentUser } from '../actions/currentUser';
 import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
 import { BASE_URL } from './TooltipHelpComponent';
+import {currentUserSlice} from '../reducers/currentUser';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -153,7 +153,7 @@ export default function HeaderButtonsComponent() {
 			// Remove token so has no role.
 			deleteToken();
 			// Clean up state since lost your role.
-			dispatch(clearCurrentUser());
+			dispatch(currentUserSlice.actions.clearCurrentUser());
 		}
 	};
 
