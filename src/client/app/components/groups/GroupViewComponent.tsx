@@ -72,7 +72,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 			{loggedInAsAdmin &&
 				<div className="item-container">
-					<b><FormattedMessage id="group.note" /></b> {props.group.note?.slice(0, 29)}
+					<b><FormattedMessage id="note" />: </b> {props.group.note?.slice(0, 29)}
 				</div>
 			}
 			<div className="edit-btn">

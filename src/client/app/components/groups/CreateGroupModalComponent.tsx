@@ -8,8 +8,10 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
-	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import {
+	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
+	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
+} from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -411,7 +413,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row>
 					{/* Note input */}
 					<FormGroup>
-						<Label for='note'>{translate('group.note')}</Label>
+						<Label for='note'>{translate('note')}: </Label>
 						<Input
 							id='note'
 							name='note'
