@@ -7,7 +7,6 @@ import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
-import threeDReadings from './threeDReadings';
 import graph from './graph';
 import groups from './groups';
 import maps from './maps';
@@ -18,6 +17,8 @@ import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
 import options from './options';
+import { baseApi } from '../redux/api/baseApi';
+import { graphSlice } from './graph';
 
 
 export default combineReducers({
@@ -25,8 +26,7 @@ export default combineReducers({
 	readings: combineReducers({
 		line: lineReadings,
 		bar: barReadings,
-		compare: compareReadings,
-		threeD: threeDReadings
+		compare: compareReadings
 	}),
 	graph,
 	maps,
@@ -37,5 +37,7 @@ export default combineReducers({
 	unsavedWarning,
 	units,
 	conversions,
-	options
+	options,
+	// RTK Query's Derived Reducers
+	[baseApi.reducerPath]: baseApi.reducer
 });

@@ -6,13 +6,16 @@ import * as React from 'react';
 import Select from 'react-select';
 import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
+import { useAppSelector } from '../redux/hooks';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
 import { updateThreeDReadingInterval } from '../actions/graph';
-import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
-import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
+import { selectThreeDQueryArgs, selectThreeDSkip } from '../redux/selectors/threeDSelectors'
+import { readingsApi } from '../redux/api/readingsApi'
+
+
 import * as moment from 'moment';
 
 /**
@@ -23,36 +26,26 @@ export default function ReadingsPerDaySelect() {
 	const dispatch: Dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
 	const readingInterval = useSelector((state: State) => state.graph.threeD.readingInterval);
-	const actualReadingInterval = useSelector((state: State) => {
-		const threeDState = state.graph.threeD;
-		const meterOrGroupID = threeDState.meterOrGroupID;
-		// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
-		const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
-		// 3D requires intervals to be rounded to a full day.
-		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
-		const unitID = state.graph.selectedUnit;
-		// Level of detail along the xAxis / Readings per day
-		const readingInterval = state.graph.threeD.readingInterval;
+	const queryArgs = useAppSelector(selectThreeDQueryArgs);
+	const shouldSkip = useAppSelector(selectThreeDSkip);
 
-		// If Meter not selected return null data, else return  data if any.
-		const data = !meterOrGroupID ? null : state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(queryArgs, { skip: shouldSkip });
 
-		if (data && data.zData.length) {
-			// Special Case:  When no compatible data available, data returned is from api is -999
-			if (data.zData[0][0] && data.zData[0][0] < 0) {
-				return ReadingInterval.Incompatible;
-			}
-
-			// Calculate the actual time interval based on the xLabel values
+	let actualReadingInterval = ReadingInterval.Hourly
+	if (data && data.zData[0][0]) {
+		// Special Case:  When no compatible data available, data returned is from api is -999
+		if (data.zData[0][0] < 0) {
+			actualReadingInterval = ReadingInterval.Incompatible;
+		} else {
 			const startTS = moment.utc(data.xData[0].startTimestamp);
 			const endTS = moment.utc(data.xData[0].endTimestamp);
-			const actualReadingInterval = endTS.diff(startTS) / 3600000;
-			return actualReadingInterval
+			actualReadingInterval = endTS.diff(startTS) / 3600000;
 		}
 
-		// Return normal interval
-		return readingInterval;
-	})
+	}
+
+	// Return normal interval
+	// return readingInterval;
 
 	// Iterate over readingInterval enum to create select option
 	const options = Object.values(ReadingInterval)
@@ -95,7 +88,7 @@ export default function ReadingsPerDaySelect() {
 					{`${translate('readings.per.day')}:`}
 					<TooltipMarkerComponent page='home' helpTextId={'help.home.readings.per.day'} />
 				</p>
-				<Select value={value} options={options} isDisabled={isDisabled} onChange={onSelectChange} />
+				<Select value={value} options={options} isLoading={isFetching} isDisabled={isDisabled} onChange={onSelectChange} />
 			</div>
 		)
 	} else {

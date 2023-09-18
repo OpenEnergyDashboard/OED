@@ -18,7 +18,6 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -125,7 +124,6 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -140,7 +138,6 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -154,7 +151,6 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
-			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	}
@@ -165,7 +161,6 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
-		dispatch(fetchNeededThreeDReadings());
 		return Promise.resolve();
 	};
 }
@@ -213,7 +208,7 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 export function updateThreeDReadingInterval(readingInterval: t.ReadingInterval): Thunk {
 	return (dispatch: Dispatch) => {
 		dispatch({ type: ActionType.UpdateThreeDReadingInterval, readingInterval });
-		return dispatch(fetchNeededThreeDReadings());
+		return Promise.resolve();
 	};
 }
 
@@ -225,7 +220,7 @@ export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOr
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
 		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
-		return dispatch(fetchNeededThreeDReadings());
+		return Promise.resolve();
 	};
 }
 

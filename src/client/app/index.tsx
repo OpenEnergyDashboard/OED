@@ -3,22 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import thunkMiddleware from 'redux-thunk';
 import { createRoot } from 'react-dom/client';
-import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import { store } from './store'
 import 'bootstrap/dist/css/bootstrap.css';
 import RouteContainer from './containers/RouteContainer';
-import reducers from './reducers';
 import './styles/index.css';
-import { composeWithDevTools } from '@redux-devtools/extension';
 import initScript from './initScript';
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers.
 // For now we are enabling Redux debug tools on production builds. If had a good way to only do this
 // when not in production mode then maybe we should remove this but it does allow for debugging.
 // Comment this out if enabling traces below.
-const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMiddleware)));
+// const store = createStore(reducers, composeWithDevTools(applyMiddleware(thunkMiddleware)));
+
 
 // Creates and applies thunk middleware to the Redux store, which is defined from the Redux reducers.
 // It would be nice to enable this automatically if not in production mode. Unfortunately, the client
