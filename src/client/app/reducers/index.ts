@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { combineReducers } from 'redux';
-import meters from './meters';
+import { metersSlice } from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
 import groups from './groups';
 import maps from './maps';
 import admin from './admin';
-import version from './version';
+import { versionSlice } from './version';
 import { currentUserSlice } from './currentUser';
 import { unsavedWarningSlice } from './unsavedWarning';
 import units from './units';
@@ -21,7 +21,7 @@ import { graphSlice } from './graph';
 
 
 export default combineReducers({
-	meters,
+	meters: metersSlice.reducer,
 	readings: combineReducers({
 		line: lineReadings,
 		bar: barReadings,
@@ -32,7 +32,7 @@ export default combineReducers({
 	maps,
 	groups,
 	admin,
-	version,
+	version: versionSlice.reducer,
 	currentUser: currentUserSlice.reducer,
 	unsavedWarning: unsavedWarningSlice.reducer,
 	units,
