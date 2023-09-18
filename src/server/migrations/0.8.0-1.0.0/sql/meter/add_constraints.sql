@@ -5,3 +5,4 @@
 ALTER TABLE meters ADD CONSTRAINT default_timezone_meter CHECK (default_timezone_meter IS NULL OR check_timezone(default_timezone_meter::TEXT) = true);
 ALTER TABLE meters ADD CONSTRAINT reading_duplication CHECK (reading_duplication::INTEGER >= 1 AND reading_duplication::INTEGER <= 9);
 ALTER TABLE meters ADD CONSTRAINT time_sort CHECK (time_sort::TEXT = 'increasing' OR time_sort::TEXT = 'decreasing');
+ALTER TABLE meters ADD CONSTRAINT meter_cumulative_reset CHECK (cumulative_reset_end > cumulative_reset_start);
