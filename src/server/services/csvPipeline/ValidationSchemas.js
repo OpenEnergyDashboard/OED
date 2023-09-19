@@ -34,7 +34,7 @@ class BooleanParam extends EnumParam {
 	 * @param {string} paramName - The name of the parameter.
 	 */
 	constructor(paramName) {
-		super(paramName, ['true', 'false']);
+		super(paramName, ['yes', 'no']);
 	}
 }
 

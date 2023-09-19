@@ -891,7 +891,7 @@ mocha.describe('readings API', () => {
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [
 						['kWh', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-						['invalidUnit', '', Unit.unitRepresentType.UNUSED, 1, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Invalid Unit']
+						['invalidUnit', '', Unit.unitRepresentType.QUANTITY, 1, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Invalid Unit']
 					];
 					const conversionData = [
 						['invalidUnit', 'kWh', false, 1, 0, 'invalidUnit → kWh']

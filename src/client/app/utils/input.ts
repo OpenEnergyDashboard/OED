@@ -85,7 +85,7 @@ export const NoUnit: UnitData = {
 	id: -99,
 	name: '',
 	identifier: 'no unit',
-	unitRepresent: UnitRepresentType.unused,
+	unitRepresent: UnitRepresentType.quantity,
 	secInRate: 99,
 	typeOfUnit: UnitType.unit,
 	unitIndex: -99,

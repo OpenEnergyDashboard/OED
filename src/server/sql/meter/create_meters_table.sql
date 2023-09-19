@@ -64,6 +64,5 @@ CREATE TABLE IF NOT EXISTS meters (
     unit_id INTEGER REFERENCES units(id),
     default_graphic_unit INTEGER REFERENCES units(id),
     area_unit area_unit_type NOT NULL DEFAULT 'none',
-    reading_frequency INTERVAL NOT NULL DEFAULT '00:15:00',
-    CONSTRAINT meter_cumulative_reset CHECK (cumulative_reset_end > cumulative_reset_start)
+    reading_frequency INTERVAL NOT NULL DEFAULT '00:15:00'
 );
