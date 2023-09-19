@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import ReactTooltip from 'react-tooltip';
 
 interface TooltipMarker {
 	page: string; // Specifies page the marker is in.
@@ -15,7 +16,15 @@ interface TooltipMarker {
  * @returns Tooltip Marker element
  */
 export default function TooltipMarkerComponent(props: TooltipMarker) {
+
+	// Handle click event after the component is toggled between hidden and visible (e.g GraphicRateMenuComponent)
+	const handleClick = () => {
+		ReactTooltip.rebuild();
+	};
+
 	return (
-		<i data-for={props.page} data-tip={props.helpTextId} className='fa fa-question-circle' />
+		<i data-for={props.page} data-tip={props.helpTextId} className='fa fa-question-circle' onClick={handleClick}/>
 	);
 }
+
+
