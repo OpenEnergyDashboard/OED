@@ -32,9 +32,9 @@ export default function ReadingsPerDaySelect() {
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(queryArgs, { skip: shouldSkip });
 
 	let actualReadingInterval = ReadingInterval.Hourly
-	if (data && data.zData[0][0]) {
+	if (data && data.zData.length) {
 		// Special Case:  When no compatible data available, data returned is from api is -999
-		if (data.zData[0][0] < 0) {
+		if (data.zData[0][0] && data.zData[0][0] < 0) {
 			actualReadingInterval = ReadingInterval.Incompatible;
 		} else {
 			const startTS = moment.utc(data.xData[0].startTimestamp);
