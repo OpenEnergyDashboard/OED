@@ -26,5 +26,3 @@ export default function TooltipMarkerComponent(props: TooltipMarker) {
 		<i data-for={props.page} data-tip={props.helpTextId} className='fa fa-question-circle' onClick={handleClick}/>
 	);
 }
-
-
