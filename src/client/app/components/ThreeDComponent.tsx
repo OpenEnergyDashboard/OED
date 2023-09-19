@@ -10,11 +10,11 @@ import SpinnerComponent from './SpinnerComponent';
 import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
 import { ThreeDReading } from '../types/readings'
-import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
+import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
-import { isValidThreeDInterval } from '../utils/dateRangeCompatability';
+import { isValidThreeDInterval } from '../utils/dateRangeCompatibility';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { UnitsState } from '../types/redux/units';
 import { MetersState } from '../types/redux/meters';

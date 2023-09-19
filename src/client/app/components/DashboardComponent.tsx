@@ -9,134 +9,90 @@ import BarChartContainer from '../containers/BarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
 import MapChartContainer from '../containers/MapChartContainer';
 import ThreeDComponent from './ThreeDComponent';
-import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-
-interface DashboardProps {
-	chartToRender: ChartTypes;
-	optionsVisibility: boolean;
-	lineLoading: false;
-	barLoading: false;
-	compareLoading: false;
-	mapLoading: false;
-	selectedTimeInterval: TimeInterval;
-	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
-}
-
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { changeGraphZoomIfNeeded } from '../actions/graph';
+import { Dispatch } from '../types/redux/actions';
 
 /**
  * React component that controls the dashboard
+ * @returns the Primary Dashboard Component comprising of Ui Controls, and
  */
-export default class DashboardComponent extends React.Component<DashboardProps> {
-	constructor(props: DashboardProps) {
-		super(props);
-		this.handleTimeIntervalChange = this.handleTimeIntervalChange.bind(this);
-	}
+export default function DashboardComponent() {
+	const dispatch: Dispatch = useAppDispatch();
+	const chartToRender = useAppSelector(state => state.graph.chartToRender);
+	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
 
-	public render() {
-		let ChartToRender:
-			typeof LineChartContainer |
-			typeof MultiCompareChartContainer |
-			typeof BarChartContainer |
-			typeof MapChartContainer |
-			typeof ThreeDComponent;
+	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
+	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
-		let showSpinner = false;
-		if (this.props.chartToRender === ChartTypes.line) {
-			if (this.props.lineLoading) {
-				showSpinner = true;
-			}
-			ChartToRender = LineChartContainer;
-		} else if (this.props.chartToRender === ChartTypes.bar) {
-			if (this.props.barLoading) {
-				showSpinner = true;
-			}
-			ChartToRender = BarChartContainer;
-		} else if (this.props.chartToRender === ChartTypes.compare) {
-			if (this.props.compareLoading) {
-				showSpinner = true;
-			}
-			ChartToRender = MultiCompareChartContainer;
-		} else if (this.props.chartToRender === ChartTypes.map) {
-			if (this.props.mapLoading) {
-				showSpinner = true;
-			}
-			ChartToRender = MapChartContainer;
-		} else if (this.props.chartToRender === ChartTypes.threeD) {
-			/* To avoid the spinner rendering over UI elements (PillBadges) in the 3d component,
-			the spinner and logic now lives inside the 3dComponent instead. 'showSpinner' is hardcoded to false here.*/
-			showSpinner = false;
-			ChartToRender = ThreeDComponent;
-		} else {
-			throw new Error('unrecognized type of chart');
-		}
+	const buttonMargin: React.CSSProperties = {
+		marginRight: '10px'
+	};
 
-		const optionsClassName = this.props.optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
-		const chartClassName = this.props.optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
+	return (
+		<div className='container-fluid'>
+			<div className='row'>
+				<div className={optionsClassName}>
+					<UIOptionsContainer />
+				</div>
+				<div className={`${chartClassName} align-self-auto text-center`}>
+					{
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						chartToRender === ChartTypes.line && <LineChartContainer />
+					}
+					{
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						chartToRender === ChartTypes.bar && <BarChartContainer />
+					}
+					{
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						chartToRender === ChartTypes.compare && <MultiCompareChartContainer />
+					}
+					{
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore
+						chartToRender === ChartTypes.map && <MapChartContainer />
+					}
+					{
+						chartToRender === ChartTypes.threeD && <ThreeDComponent />
+					}
 
-		const buttonMargin: React.CSSProperties = {
-			marginRight: '10px'
-		};
+					{(chartToRender === ChartTypes.line) ? (
+						[<Button
+							key={1}
+							style={buttonMargin}
+							onClick={() => dispatch(changeGraphZoomIfNeeded(TimeInterval.fromString(getRangeSliderInterval())))}
 
-		return (
-			<div className='container-fluid'>
-				<div className='row'>
-					<div className={optionsClassName}>
-						<UIOptionsContainer />
-					</div>
-					<div className={`${chartClassName} align-self-auto text-center`}>
-						{showSpinner ? (
-							<SpinnerComponent loading width={50} height={50} />
-						) : (
-							// TODO These types of plotly containers expect a lot of passed
-							// values and it gives a TS error. Given we plan to  replace this
-							// with the react hooks version and it does not seem to cause any
-							// issues, this TS error is being suppressed for now.
-							// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-							// @ts-ignore
-							<ChartToRender />
-						)}
-						{(this.props.chartToRender === ChartTypes.line) ? (
-							[<Button
-								key={1}
-								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange('range')}
-							> <FormattedMessage id='redraw' />
-							</Button>,
-							<Button
-								key={2}
-								style={buttonMargin}
-								onClick={() => this.handleTimeIntervalChange('all')}
-							> <FormattedMessage id='restore' />
-							</Button>,
-							<TooltipMarkerComponent
-								key={3}
-								page='home'
-								helpTextId='help.home.chart.redraw.restore'
-							/>
-							]
-						) : (
-							null
-						)}
-					</div>
+						> <FormattedMessage id='redraw' />
+						</Button>,
+						<Button
+							key={2}
+							style={buttonMargin}
+							onClick={() => dispatch(changeGraphZoomIfNeeded(TimeInterval.unbounded()))}
+						> <FormattedMessage id='restore' />
+						</Button>,
+						<TooltipMarkerComponent
+							key={3}
+							page='home'
+							helpTextId='help.home.chart.redraw.restore'
+						/>
+						]
+					) : (
+						null
+					)}
 				</div>
 			</div>
-		);
-	}
-
-	private handleTimeIntervalChange(mode: string) {
-		if (mode === 'all') {
-			this.props.changeTimeInterval(TimeInterval.unbounded());
-		} else if (mode === 'range') {
-			const timeInterval = TimeInterval.fromString(getRangeSliderInterval());
-			this.props.changeTimeInterval(timeInterval);
-		}
-	}
+		</div>
+	);
 }
 
 /**

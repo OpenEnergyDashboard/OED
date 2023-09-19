@@ -7,8 +7,8 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { GraphState, ChartTypes, ReadingInterval, MeterOrGroup, LineGraphRate } from '../types/redux/graph';
 import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { adminSlice } from './admin';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -103,5 +103,14 @@ export const graphSlice = createSlice({
 			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
 			state.threeD.meterOrGroup = action.payload.meterOrGroup
 		}
+	},
+	extraReducers: builder => {
+		builder.addCase(adminSlice.actions.receivePreferences,
+			(state, action) => {
+				if (state.selectedAreaUnit == AreaUnitType.none) {
+					state.selectedAreaUnit = action.payload.defaultAreaUnit
+
+				}
+			})
 	}
 })

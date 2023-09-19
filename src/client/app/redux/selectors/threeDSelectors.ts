@@ -4,22 +4,19 @@ import { selectGroupInfo } from '../../redux/api/groupsApi';
 import { RootState } from '../../store'
 import { MeterOrGroup } from '../../types/redux/graph'
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatability';
+import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { ThreeDReadingApiParams } from '../api/readingsApi'
+import { selectGraphUnitID, selectGraphTimeInterval } from '../selectors/uiSelectors'
 
 // Common Fine Grained selectors
 const selectThreeDMeterOrGroupID = (state: RootState) => state.graph.threeD.meterOrGroupID;
 const selectThreeDMeterOrGroup = (state: RootState) => state.graph.threeD.meterOrGroup;
-const selectGraphTimeInterval = (state: RootState) => state.graph.timeInterval;
-const selectGraphUnitID = (state: RootState) => state.graph.selectedUnit;
-const selectThreeDReadingInterval = (state: RootState) => state.graph.threeD.readingInterval;
-const selectMeterData = (state: RootState) => selectMeterInfo(state).data
-const selectGroupData = (state: RootState) => selectGroupInfo(state).data
+export const selectThreeDReadingInterval = (state: RootState) => state.graph.threeD.readingInterval;
 
 // Memoized Selectors
 export const selectThreeDComponentInfo = createSelector(
-	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterData, selectGroupData],
-	(id, meterOrGroup, meterData, groupData) => {
+	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterInfo, selectGroupInfo],
+	(id, meterOrGroup, { data: meterData }, { data: groupData }) => {
 		//Default Values
 		let meterOrGroupName = 'Unselected Meter or Group'
 		let isAreaCompatible = true;

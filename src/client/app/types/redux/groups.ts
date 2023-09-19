@@ -81,7 +81,10 @@ export interface StatefulEditable {
 	dirty: boolean;
 	submitted?: boolean;
 }
+export interface GroupDataByID {
+	[groupID: number]: GroupDefinition;
 
+}
 export interface GroupsState {
 	hasBeenFetchedOnce: boolean;
 	// If all groups child meters/groups are in state.
@@ -89,9 +92,7 @@ export interface GroupsState {
 	isFetching: boolean;
 	// If fetching all groups child meters/groups.
 	isFetchingAllChildren: boolean;
-	byGroupID: {
-		[groupID: number]: GroupDefinition;
-	};
+	byGroupID: GroupDataByID
 	selectedGroups: number[];
 	// TODO groupInEditing: GroupDefinition & StatefulEditable | StatefulEditable;
 	displayMode: DisplayMode;

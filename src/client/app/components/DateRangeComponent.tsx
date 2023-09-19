@@ -9,7 +9,7 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import { CloseReason, Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import 'react-calendar/dist/Calendar.css';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
-import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatability';
+import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import translate from '../utils/translate';
 import { State } from '../types/redux/state';

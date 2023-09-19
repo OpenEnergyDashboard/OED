@@ -25,29 +25,21 @@ import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { graphSlice } from '../reducers/graph';
-
+// import { selectMetersAndGroupsCompatibility, selectVisibleMetersAndGroups } from '../redux/selectors/uiSelectors'
+// import { useAppSelector } from '../redux/hooks';
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  * @returns Chart data select element
  */
 export default function ChartDataSelectComponent() {
-	const divBottomPadding: React.CSSProperties = {
-		paddingBottom: '15px'
-	};
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
-	const messages = defineMessages({
-		selectGroups: { id: 'select.groups' },
-		selectMeters: { id: 'select.meters' },
-		selectUnit: { id: 'select.unit' },
-		helpSelectGroups: { id: 'help.home.select.groups' },
-		helpSelectMeters: { id: 'help.home.select.meters' }
-	});
-
+	// Must specify type if using ThunkDispatch
+	const dispatch: Dispatch = useDispatch();
 	const intl = useIntl();
-
+	// TESTING SELECTORS
+	// const visibleMetersAndGroups = useAppSelector(state => selectVisibleMetersAndGroups(state))
+	// const meterNGroupCompat = useAppSelector(state => selectMetersAndGroupsCompatibility(state))
+	// console.log('visibleMetersAndGroups', visibleMetersAndGroups)
+	// console.log('meterNGroupCompat', meterNGroupCompat)
 	const dataProps = useSelector((state: State) => {
 		const allMeters = state.meters.byMeterID;
 		const allGroups = state.groups.byGroupID;
@@ -211,7 +203,9 @@ export default function ChartDataSelectComponent() {
 					// The selectedUnit becomes the unit of the group selected. Note is should always be set (not -99) since
 					// those groups should not have been visible. The only exception is if there are no selected groups but
 					// then this loop does not run. The loop is assumed to only run once in this case.
-					// state.graph.selectedUnit = state.groups.byGroupID[groupID].defaultGraphicUnit;
+					// dispatch(changeSelectedUnit(state.groups.byGroupID[groupID].defaultGraphicUnit));
+
+
 				}
 				compatibleSelectedGroups.push({
 					// For groups we display the name since no identifier.
@@ -262,11 +256,6 @@ export default function ChartDataSelectComponent() {
 			);
 		}
 
-		// // if no area unit selected, set the default area as selected.
-		// if (state.graph.selectedAreaUnit == AreaUnitType.none) {
-		// 	state.graph.selectedAreaUnit = state.admin.defaultAreaUnit;
-		// }
-
 		return {
 			// all items, sorted alphabetically and by compatibility
 			sortedMeters,
@@ -287,8 +276,6 @@ export default function ChartDataSelectComponent() {
 		}
 	});
 
-	// Must specify type if using ThunkDispatch
-	const dispatch: Dispatch = useDispatch();
 
 	return (
 		<div>
@@ -752,3 +739,18 @@ function syncThreeDState(
 		dispatch(changeMeterOrGroupInfo(null));
 	}
 }
+
+const divBottomPadding: React.CSSProperties = {
+	paddingBottom: '15px'
+};
+const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};
+const messages = defineMessages({
+	selectGroups: { id: 'select.groups' },
+	selectMeters: { id: 'select.meters' },
+	selectUnit: { id: 'select.unit' },
+	helpSelectGroups: { id: 'help.home.select.groups' },
+	helpSelectMeters: { id: 'help.home.select.meters' }
+});

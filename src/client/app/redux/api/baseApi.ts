@@ -5,5 +5,7 @@ export const baseApi = createApi({
 	reducerPath: 'api',
 	baseQuery: fetchBaseQuery({ baseUrl: baseHref }),
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
-	endpoints: () => ({})
+	endpoints: () => ({}),
+	// Keed Data in Cache for 10 Minutes
+	keepUnusedDataFor: 600
 })

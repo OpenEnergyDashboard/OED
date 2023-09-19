@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 import { ConversionArray } from '../types/conversionArray';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
@@ -15,7 +14,10 @@ import { fetchUnitsDetailsIfNeeded } from '../actions/units';
 import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { Dispatch } from 'types/redux/actions';
 import { Slide, ToastContainer } from 'react-toastify';
+import { metersApi } from '../redux/api/metersApi';
+import { groupsApi } from '../redux/api/groupsApi';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 
 /**
  * Initializes OED redux with needed details
@@ -24,10 +26,11 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function InitializationComponent() {
 
 	const dispatch: Dispatch = useDispatch();
-
+	metersApi.endpoints.getMeters.useQuery();
+	groupsApi.endpoints.getGroups.useQuery();
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
-		dispatch(fetchMetersDetailsIfNeeded());
+		// dispatch(fetchMetersDetailsIfNeeded());
 		dispatch(fetchGroupsDetailsIfNeeded());
 		dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());

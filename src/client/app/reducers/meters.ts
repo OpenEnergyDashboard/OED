@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import { MetersState } from '../types/redux/meters';
 import { durationFormat } from '../utils/durationFormat';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { metersApi } from '../redux/api/metersApi';
 import * as t from '../types/redux/meters'
 
 const defaultState: MetersState = {
@@ -47,5 +48,13 @@ export const metersSlice = createSlice({
 		deleteSubmittedMeter: (state, action: PayloadAction<number>) => {
 			state.submitting.splice(state.submitting.indexOf(action.payload));
 		}
+	},
+	extraReducers: builder => {
+		builder.addMatcher(
+			metersApi.endpoints.getMeters.matchFulfilled,
+			(state, { payload }) => {
+				state.byMeterID = payload
+			}
+		)
 	}
 });

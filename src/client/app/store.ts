@@ -10,7 +10,7 @@ import { baseApi } from './redux/api/baseApi';
 export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
-		// immutableCheck: false,
+		immutableCheck: false,
 		serializableCheck: false
 	}).concat(baseApi.middleware)
 });
