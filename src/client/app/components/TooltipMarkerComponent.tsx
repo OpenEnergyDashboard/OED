@@ -17,7 +17,11 @@ interface TooltipMarker {
  */
 export default function TooltipMarkerComponent(props: TooltipMarker) {
 
-	// Handle click event after the component is toggled between hidden and visible (e.g GraphicRateMenuComponent)
+	// TODO This is trying to fix the fact that when the rate menu appears and disappears and you don't go to a new page
+	// then the help pop up does not occur. This works reasonably well but you have to click the help icon twice
+	// to see the pop up in this case. A better fix would be desirable in the long term since there have been issues with
+	// tooltips in multiple places.
+	// Handle click event after the component is toggled between hidden and visible (e.g GraphicRateMenuComponent).
 	const handleClick = () => {
 		ReactTooltip.rebuild();
 	};
