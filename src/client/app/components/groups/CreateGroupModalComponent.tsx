@@ -148,7 +148,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				translate('group.area.calculate.header')
 				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${state.areaUnit}`);
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
