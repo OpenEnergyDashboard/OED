@@ -2,14 +2,20 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { RootState } from '../../store';
-import { UnitRepresentType } from '../../types/redux/units'
-import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
-import { getSelectOptionsByItem } from '../../components/ChartDataSelectComponent'
-
-
 import { createSelector } from '@reduxjs/toolkit';
-import { SelectOption } from '../../types/items';
+import * as _ from 'lodash';
+import { getSelectOptionsByItem } from '../../components/ChartDataSelectComponent';
+import { RootState } from '../../store';
+import { DataType } from '../../types/Datasources';
+import { ChartTypes } from '../../types/redux/graph';
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import {
+	CartesianPoint, Dimensions, calculateScaleFromEndpoints, gpsToUserGrid,
+	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
+} from '../../utils/calibration';
+import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+
 
 export const selectSelectedMeters = (state: RootState) => state.graph.selectedMeters;
 export const selectSelectedGroups = (state: RootState) => state.graph.selectedGroups;
@@ -17,9 +23,12 @@ export const selectCurrentUser = (state: RootState) => state.currentUser;
 export const selectGraphTimeInterval = (state: RootState) => state.graph.timeInterval;
 export const selectGraphUnitID = (state: RootState) => state.graph.selectedUnit;
 export const selectGraphAreaNormalization = (state: RootState) => state.graph.areaNormalization;
+export const selectChartToRender = (state: RootState) => state.graph.chartToRender;
+
 export const selectMeterState = (state: RootState) => state.meters;
 export const selectGroupState = (state: RootState) => state.groups;
 export const selectUnitState = (state: RootState) => state.units;
+export const selectMapState = (state: RootState) => state.maps;
 
 export const selectVisibleMetersAndGroups = createSelector(
 	[selectMeterState, selectGroupState, selectCurrentUser],
@@ -55,7 +64,7 @@ export const selectVisibleMetersAndGroups = createSelector(
 	}
 );
 
-export const selectMetersAndGroupsCompatibilityWithCurrentUnit = createSelector(
+export const selectMeterGroupUnitCompatibility = createSelector(
 	[selectVisibleMetersAndGroups, selectMeterState, selectGroupState, selectUnitState, selectGraphUnitID, selectGraphAreaNormalization],
 	(visible, meterState, groupState, unitState, graphUnitID, graphAreaNorm) => {
 		// meters and groups that can graph
@@ -133,18 +142,244 @@ export const selectMetersAndGroupsCompatibilityWithCurrentUnit = createSelector(
 				}
 			});
 		}
-		const meterSelectOptions = { compatibleMeters, incompatibleMeters };
-		const groupSelectOptions = { compatibleGroups, incompatibleGroups };
-		return { meterSelectOptions, groupSelectOptions }
+
+		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
 	}
 )
 
-export const selectCompatibleSelectedMetersAndGroups = createSelector(
-	[selectSelectedMeters, selectSelectedGroups],
-	(selectedMeters, selectedGroups) => {
-		const compatibleSelectedMeters: SelectOption[] = [];
+export const selectMeterGroupAreaAndMapCompatibility = createSelector(
+	selectMeterGroupUnitCompatibility,
+	selectGraphAreaNormalization,
+	selectChartToRender,
+	selectMeterState,
+	selectGroupState,
+	selectMapState,
+	(unitCompat, areaNormalization, chartToRender, meterState, groupState, mapState) => {
+		// store meters which are found to be incompatible.
+		const incompatibleMeters = new Set<number>();
+		const incompatibleGroups = new Set<number>();
 
+		const compatibleMeters = new Set<number>();
+		const compatibleGroups = new Set<number>();
 
+		// only run this check if area normalization is on
+		if (areaNormalization) {
+			// filter out any meter or group that is area incompatible.
+			unitCompat.compatibleMeters.forEach(meterID => {
+				// do not allow meter to be selected if it has zero area or no area unit
+				if (meterState.byMeterID[meterID].area === 0 || meterState.byMeterID[meterID].areaUnit === AreaUnitType.none) {
+					incompatibleMeters.add(meterID);
+				} else {
+					compatibleMeters.add(meterID);
+				}
+			});
+			unitCompat.compatibleGroups.forEach(groupID => {
+				// do not allow group to be selected if it has zero area or no area unit
+				if (groupState.byGroupID[groupID].area === 0 || groupState.byGroupID[groupID].areaUnit === AreaUnitType.none) {
+					incompatibleGroups.add(groupID);
+				} else {
+					compatibleGroups.add(groupID);
+				}
+			});
+		}
+
+		if (chartToRender === ChartTypes.map && mapState.selectedMap !== 0) {
+			const mp = mapState.byMapID[mapState.selectedMap];
+			// filter meters;
+			const image = mp.image;
+			// The size of the original map loaded into OED.
+			const imageDimensions: Dimensions = {
+				width: image.width,
+				height: image.height
+			};
+			// Determine the dimensions so within the Plotly coordinates on the user map.
+			const imageDimensionNormalized = normalizeImageDimensions(imageDimensions);
+			// The following is needed to get the map scale. Now that the system accepts maps that are not
+			// pointed north, it would be better to store the origin GPS and the scale factor instead of
+			// the origin and opposite GPS. For now, not going to change but could if redo DB and interface
+			// for maps.
+			// Convert the gps value to the equivalent Plotly grid coordinates on user map.
+			// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
+			// It must be on true north map since only there are the GPS axes parallel to the map axes.
+			// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
+			// it coordinates on the true north map and then rotating/shifting to the user map.
+			// This is the origin & opposite from the calibration. It is the lower, left
+			// and upper, right corners of the user map.
+			// The gps value can be null from the database. Note using gps !== null to check for both null and undefined
+			// causes TS to complain about the unknown case so not used.
+			const origin = mp.origin;
+			const opposite = mp.opposite;
+			unitCompat.compatibleMeters.forEach(meterID => {
+				// This meter's GPS value.
+				const gps = meterState.byMeterID[meterID].gps;
+				if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+					// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
+					// (or really any two distinct points) you can calculate this by the change in GPS over the
+					// change in x or y which is the map's width & height in this case.
+					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
+					// Convert GPS of meter to grid on user map. See calibration.ts for more info on this.
+					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
+					if (!(itemMapInfoOk(meterID, DataType.Meter, mp, gps) &&
+						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
+						incompatibleMeters.add(meterID);
+					} else {
+						compatibleMeters.add(meterID);
+					}
+				} else {
+					// Lack info on this map so skip. This is mostly done since TS complains about the undefined possibility.
+					incompatibleMeters.add(meterID);
+				}
+			});
+			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
+			unitCompat.compatibleGroups.forEach(groupID => {
+				const gps = groupState.byGroupID[groupID].gps;
+				if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
+					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
+					if (!(itemMapInfoOk(groupID, DataType.Group, mp, gps) &&
+						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
+						incompatibleGroups.add(groupID);
+					} else {
+						compatibleGroups.add(groupID);
+					}
+				} else {
+					incompatibleGroups.add(groupID);
+				}
+			});
+		}
+		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
+	}
+)
+
+export const selectMeterGroupSelectData = createSelector(
+	selectMeterGroupAreaAndMapCompatibility,
+	selectMeterState,
+	selectGroupState,
+	(stateCompatibility, meterState, groupState) => {
+		// Retrieve select options from meter sets
+		const meterSelectOption = getSelectOptionsByItem(stateCompatibility.compatibleMeters, stateCompatibility.incompatibleMeters, meterState);
+		// Retrieve select options from group sets
+		const groupSelectOption = getSelectOptionsByItem(stateCompatibility.compatibleGroups, stateCompatibility.incompatibleGroups, groupState);
+
+		return { meterSelectOption, groupSelectOption }
+	}
+)
+/**
+ * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
+ * @param state - current redux state
+ * @returns an array of UnitData
+ */
+export const selectVisibleUnitOrSuffixState = createSelector(
+	selectUnitState,
+	selectCurrentUser,
+	(unitState, currentUser) => {
+		let visibleUnitsOrSuffixes;
+		if (currentUser.profile?.role === 'admin') {
+			// User is an admin, allow all units to be seen
+			visibleUnitsOrSuffixes = _.filter(unitState.units, (o: UnitData) => {
+				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable != DisplayableType.none;
+			});
+		}
+		else {
+			// User is not an admin, do not allow for admin units to be seen
+			visibleUnitsOrSuffixes = _.filter(unitState.units, (o: UnitData) => {
+				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable == DisplayableType.all;
+			});
+		}
+		return visibleUnitsOrSuffixes;
+	}
+)
+
+export const selectUnitSelectData = createSelector(
+	selectUnitState,
+	selectVisibleUnitOrSuffixState,
+	selectSelectedMeters,
+	selectSelectedGroups,
+	selectGraphAreaNormalization,
+	(unitState, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
+		// Holds all units that are compatible with selected meters/groups
+		const compatibleUnits = new Set<number>();
+		// Holds all units that are not compatible with selected meters/groups
+		const incompatibleUnits = new Set<number>();
+
+		// Holds all selected meters, including those retrieved from groups
+		const allSelectedMeters = new Set<number>();
+
+		// Get for all meters
+		selectedMeters.forEach(meter => {
+			allSelectedMeters.add(meter);
+		});
+		// Get for all groups
+		selectedGroups.forEach(group => {
+			// Get for all deep meters in group
+			metersInGroup(group).forEach(meter => {
+				allSelectedMeters.add(meter);
+			});
+		});
+
+		if (allSelectedMeters.size == 0) {
+			// No meters/groups are selected. This includes the case where the selectedUnit is -99.
+			// Every unit is okay/compatible in this case so skip the work needed below.
+			// Filter the units to be displayed by user status and displayable type
+			visibleUnitsOrSuffixes.forEach(unit => {
+				if (areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
+					incompatibleUnits.add(unit.id);
+				} else {
+					compatibleUnits.add(unit.id);
+				}
+			});
+		} else {
+			// Some meter or group is selected
+			// Retrieve set of units compatible with list of selected meters and/or groups
+			const units = unitsCompatibleWithMeters(allSelectedMeters);
+
+			// Loop over all units (they must be of type unit or suffix - case 1)
+			visibleUnitsOrSuffixes.forEach(o => {
+				// Control displayable ones (case 2)
+				if (units.has(o.id)) {
+					// Should show as compatible (case 3)
+					compatibleUnits.add(o.id);
+				} else {
+					// Should show as incompatible (case 4)
+					incompatibleUnits.add(o.id);
+				}
+			});
+		}
+		// Ready to display unit. Put selectable ones before non-selectable ones.
+		const finalUnits = getSelectOptionsByItem(compatibleUnits, incompatibleUnits, unitState);
+		return finalUnits;
+	}
+)
+
+export const selectMeterGroupAreaCompatibility = createSelector(
+	selectMeterState,
+	selectGroupState,
+	(meterState, groupState) => {
+		// store meters which are found to be incompatible.
+		const incompatibleMeters = new Set<number>();
+		const incompatibleGroups = new Set<number>();
+		const compatibleMeters = new Set<number>();
+		const compatibleGroups = new Set<number>();
+
+		Object.values(meterState.byMeterID).forEach(meter => {
+			// do not allow meter to be selected if it has zero area or no area unit
+			if (meterState.byMeterID[meter.id].area === 0 || meterState.byMeterID[meter.id].areaUnit === AreaUnitType.none) {
+				incompatibleMeters.add(meter.id);
+			} else {
+				compatibleMeters.add(meter.id);
+			}
+		});
+
+		Object.values(groupState.byGroupID).forEach(group => {
+			// do not allow group to be selected if it has zero area or no area unit
+			if (groupState.byGroupID[group.id].area === 0 || groupState.byGroupID[group.id].areaUnit === AreaUnitType.none) {
+				incompatibleGroups.add(group.id);
+			} else {
+				compatibleGroups.add(group.id);
+			}
+		});
+
+		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
 	}
 )
 

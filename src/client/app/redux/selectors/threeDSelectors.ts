@@ -27,7 +27,7 @@ export const selectThreeDComponentInfo = createSelector(
 				const meterInfo = meterData[id]
 				meterOrGroupName = meterInfo.identifier;
 				isAreaCompatible = meterInfo.area !== 0 && meterInfo.areaUnit !== AreaUnitType.none;
-			} else if (meterOrGroup === MeterOrGroup.meters && groupData) {
+			} else if (meterOrGroup === MeterOrGroup.groups && groupData) {
 				const groupInfo = groupData[id];
 				meterOrGroupName = groupInfo.name;
 				isAreaCompatible = groupInfo.area !== 0 && groupInfo.areaUnit !== AreaUnitType.none;
@@ -36,7 +36,7 @@ export const selectThreeDComponentInfo = createSelector(
 		}
 		return {
 			meterOrGroupID: id,
-			// meterOrGroup: meterOrGroup,
+			meterOrGroup: meterOrGroup,
 			meterOrGroupName: meterOrGroupName,
 			isAreaCompatible: isAreaCompatible
 		}

@@ -25,8 +25,7 @@ import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { graphSlice } from '../reducers/graph';
-import { selectMetersAndGroupsCompatibilityWithCurrentUnit, selectVisibleMetersAndGroups } from '../redux/selectors/uiSelectors'
-import { useAppSelector } from '../redux/hooks';
+
 /**
  * A component which allows the user to select which data should be displayed on the chart.
  * @returns Chart data select element
@@ -35,10 +34,6 @@ export default function ChartDataSelectComponent() {
 	// Must specify type if using ThunkDispatch
 	const dispatch: Dispatch = useDispatch();
 	const intl = useIntl();
-	const visibleMetersAndGroups = useAppSelector(state => selectVisibleMetersAndGroups(state))
-	const meterNGroupCompat = useAppSelector(state => selectMetersAndGroupsCompatibilityWithCurrentUnit(state))
-	console.log('visibleMetersAndGroups', visibleMetersAndGroups)
-	console.log('meterNGroupCompat', meterNGroupCompat)
 	const dataProps = useSelector((state: State) => {
 		const allMeters = state.meters.byMeterID;
 		const allGroups = state.groups.byGroupID;
