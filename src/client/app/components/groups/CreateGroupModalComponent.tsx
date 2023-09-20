@@ -358,7 +358,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
-							<Label for='gps'>{translate('group.gps')}</Label>
+							<Label for='gps'>{translate('gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'

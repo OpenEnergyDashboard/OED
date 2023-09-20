@@ -502,7 +502,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
-							<Label for='gps'>{translate('meter.gps')}</Label>
+							<Label for='gps'>{translate('gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'

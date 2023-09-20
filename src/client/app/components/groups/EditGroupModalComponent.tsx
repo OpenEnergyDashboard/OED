@@ -505,7 +505,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col>
 								{/* GPS input, only for admin. */}
 								<FormGroup>
-									<Label for='gps'>{translate('group.gps')}</Label>
+									<Label for='gps'>{translate('gps')}</Label>
 									<Input
 										id='gps'
 										name='gps'
