@@ -9,6 +9,7 @@ import { getSelectOptionsByItem } from '../../components/ChartDataSelectComponen
 
 
 import { createSelector } from '@reduxjs/toolkit';
+import { SelectOption } from '../../types/items';
 
 export const selectSelectedMeters = (state: RootState) => state.graph.selectedMeters;
 export const selectSelectedGroups = (state: RootState) => state.graph.selectedGroups;
@@ -54,7 +55,7 @@ export const selectVisibleMetersAndGroups = createSelector(
 	}
 );
 
-export const selectMetersAndGroupsCompatibility = createSelector(
+export const selectMetersAndGroupsCompatibilityWithCurrentUnit = createSelector(
 	[selectVisibleMetersAndGroups, selectMeterState, selectGroupState, selectUnitState, selectGraphUnitID, selectGraphAreaNormalization],
 	(visible, meterState, groupState, unitState, graphUnitID, graphAreaNorm) => {
 		// meters and groups that can graph
@@ -132,9 +133,18 @@ export const selectMetersAndGroupsCompatibility = createSelector(
 				}
 			});
 		}
-		const finalMeters = getSelectOptionsByItem(compatibleMeters, incompatibleMeters, meterState);
-		const finalGroups = getSelectOptionsByItem(compatibleGroups, incompatibleGroups, groupState);
-		return { finalMeters, finalGroups }
+		const meterSelectOptions = { compatibleMeters, incompatibleMeters };
+		const groupSelectOptions = { compatibleGroups, incompatibleGroups };
+		return { meterSelectOptions, groupSelectOptions }
+	}
+)
+
+export const selectCompatibleSelectedMetersAndGroups = createSelector(
+	[selectSelectedMeters, selectSelectedGroups],
+	(selectedMeters, selectedGroups) => {
+		const compatibleSelectedMeters: SelectOption[] = [];
+
+
 	}
 )
 

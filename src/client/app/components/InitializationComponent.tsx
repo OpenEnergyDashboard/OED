@@ -6,7 +6,6 @@ import * as React from 'react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
-import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { ConversionArray } from '../types/conversionArray';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
@@ -17,7 +16,6 @@ import { Slide, ToastContainer } from 'react-toastify';
 import { metersApi } from '../redux/api/metersApi';
 import { groupsApi } from '../redux/api/groupsApi';
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 
 /**
  * Initializes OED redux with needed details
@@ -26,12 +24,10 @@ import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
 export default function InitializationComponent() {
 
 	const dispatch: Dispatch = useDispatch();
-	metersApi.endpoints.getMeters.useQuery();
+	const { refetch: refetchMeters } = metersApi.endpoints.getMeters.useQuery();
 	groupsApi.endpoints.getGroups.useQuery();
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
-		// dispatch(fetchMetersDetailsIfNeeded());
-		dispatch(fetchGroupsDetailsIfNeeded());
 		dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
@@ -45,7 +41,9 @@ export default function InitializationComponent() {
 	// Because of this must re-fetch the entire meters table if the user changes
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	useEffect(() => {
-		dispatch(fetchMetersDetails());
+		// TODO REDO WITH TAG INVALIDATION AND PROPER AUTH HEADERS
+		refetchMeters()
+		// dispatch(fetchMetersDetails());
 	}, [currentUser]);
 
 	return (
