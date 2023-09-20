@@ -66,7 +66,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			</div>
 			{loggedInAsAdmin &&
 				<div className={props.group.displayable.toString()}>
-					<b><FormattedMessage id="group.displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
+					<b><FormattedMessage id="displayable" /></b> {translate(`TrueFalseType.${props.group.displayable.toString()}`)}
 				</div>
 			}
 			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}

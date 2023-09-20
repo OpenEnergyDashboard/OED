@@ -310,7 +310,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					<Row xs='1' lg='2'>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('group.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -344,7 +344,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row><Row xs='1' lg='2'>
 						{/* Displayable input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('group.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -370,7 +370,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row><Row xs='1' lg='2'>
 						{/* Area input */}
 						<Col><FormGroup>
-							<Label for='area'>{translate('group.area')}</Label>
+							<Label for='area'>{translate('area')}</Label>
 							<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
 							<InputGroup>
 								<Input
@@ -394,7 +394,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						</FormGroup></Col>
 						{/* meter area unit input */}
 						<Col><FormGroup>
-							<Label for='areaUnit'>{translate('group.area.unit')}</Label>
+							<Label for='areaUnit'>{translate('area.unit')}</Label>
 							<Input
 								id='areaUnit'
 								name='areaUnit'
