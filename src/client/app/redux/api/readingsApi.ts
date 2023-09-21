@@ -4,7 +4,7 @@ import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 
 
 export type ThreeDReadingApiParams = {
-	meterID: number;
+	meterOrGroupID: number;
 	timeInterval: string;
 	unitID: number;
 	readingInterval: ReadingInterval;
@@ -14,9 +14,9 @@ export type ThreeDReadingApiParams = {
 export const readingsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		threeD: builder.query<ThreeDReading, ThreeDReadingApiParams>({
-			query: ({ meterID, timeInterval, unitID, readingInterval, meterOrGroup }) => {
+			query: ({ meterOrGroupID, timeInterval, unitID, readingInterval, meterOrGroup }) => {
 				const endpoint = `/api/unitReadings/threeD/${meterOrGroup}/`
-				const args = `${meterID}?timeInterval=${timeInterval.toString()}&graphicUnitId=${unitID}&readingInterval=${readingInterval}`
+				const args = `${meterOrGroupID}?timeInterval=${timeInterval.toString()}&graphicUnitId=${unitID}&readingInterval=${readingInterval}`
 				return `${endpoint}${args}`
 			}
 		})

@@ -1,12 +1,10 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { selectMeterInfo } from '../../redux/api/metersApi';
-import { selectGroupInfo } from '../../redux/api/groupsApi';
 import { RootState } from '../../store'
 import { MeterOrGroup } from '../../types/redux/graph'
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { ThreeDReadingApiParams } from '../api/readingsApi'
-import { selectGraphUnitID, selectGraphTimeInterval } from '../selectors/uiSelectors'
+import { selectGraphUnitID, selectGraphTimeInterval, selectMeterState, selectGroupState } from '../selectors/uiSelectors'
 
 // Common Fine Grained selectors
 const selectThreeDMeterOrGroupID = (state: RootState) => state.graph.threeD.meterOrGroupID;
@@ -15,8 +13,8 @@ export const selectThreeDReadingInterval = (state: RootState) => state.graph.thr
 
 // Memoized Selectors
 export const selectThreeDComponentInfo = createSelector(
-	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterInfo, selectGroupInfo],
-	(id, meterOrGroup, { data: meterData }, { data: groupData }) => {
+	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterState, selectGroupState],
+	(id, meterOrGroup, meterData, groupData) => {
 		//Default Values
 		let meterOrGroupName = 'Unselected Meter or Group'
 		let isAreaCompatible = true;
@@ -24,11 +22,11 @@ export const selectThreeDComponentInfo = createSelector(
 		if (id) {
 			// Get Meter or Group's info
 			if (meterOrGroup === MeterOrGroup.meters && meterData) {
-				const meterInfo = meterData[id]
+				const meterInfo = meterData.byMeterID[id]
 				meterOrGroupName = meterInfo.identifier;
 				isAreaCompatible = meterInfo.area !== 0 && meterInfo.areaUnit !== AreaUnitType.none;
 			} else if (meterOrGroup === MeterOrGroup.groups && groupData) {
-				const groupInfo = groupData[id];
+				const groupInfo = groupData.byGroupID[id];
 				meterOrGroupName = groupInfo.name;
 				isAreaCompatible = groupInfo.area !== 0 && groupInfo.areaUnit !== AreaUnitType.none;
 			}
@@ -52,7 +50,7 @@ export const selectThreeDQueryArgs = createSelector(
 	selectThreeDMeterOrGroup,
 	(id, timeInterval, unitID, readingInterval, meterOrGroup) => {
 		return {
-			meterID: id,
+			meterOrGroupID: id,
 			timeInterval: roundTimeIntervalForFetch(timeInterval).toString(),
 			unitID: unitID,
 			readingInterval: readingInterval,

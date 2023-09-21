@@ -25,6 +25,10 @@ import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { graphSlice } from '../reducers/graph';
+import UnitSelectComponent from './UnitSelectComponent';
+import MeterAndGroupSelectComponent from './MeterAndGroupSelectComponent';
+import { useAppSelector } from '../redux/hooks';
+import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -34,6 +38,7 @@ export default function ChartDataSelectComponent() {
 	// Must specify type if using ThunkDispatch
 	const dispatch: Dispatch = useDispatch();
 	const intl = useIntl();
+	const selectTestOpts = useAppSelector(state => selectMeterGroupSelectData(state))
 	const dataProps = useSelector((state: State) => {
 		const allMeters = state.meters.byMeterID;
 		const allGroups = state.groups.byGroupID;
@@ -267,11 +272,14 @@ export default function ChartDataSelectComponent() {
 			threeDState
 		}
 	});
-
-
+	console.log('HERE WE ARE')
+	console.log(dataProps.sortedGroups)
+	console.log(dataProps.compatibleSelectedGroups)
+	console.log(selectTestOpts)
 	return (
 		<div>
 			<p style={labelStyle}>
+				<span>Ref: </span>
 				<FormattedMessage id='groups' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</p>
@@ -300,7 +308,11 @@ export default function ChartDataSelectComponent() {
 					}}
 				/>
 			</div>
+			<div style={divBottomPadding}>
+				<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.groups} />
+			</div>
 			<p style={labelStyle}>
+				<span>Ref: </span>
 				<FormattedMessage id='meters' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</p>
@@ -338,7 +350,11 @@ export default function ChartDataSelectComponent() {
 					}}
 				/>
 			</div>
+			<div style={divBottomPadding}>
+				<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.meters} />
+			</div>
 			<p style={labelStyle}>
+				<span>Ref: </span>
 				<FormattedMessage id='units' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</p>
@@ -359,7 +375,7 @@ export default function ChartDataSelectComponent() {
 							dispatch(graphSlice.actions.updateSelectedMeters([]));
 							dispatch(graphSlice.actions.updateSelectedUnit(-99));
 							// Sync threeD state.
-							dispatch(changeMeterOrGroupInfo(null));
+							dispatch(changeMeterOrGroupInfo(undefined));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
 						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
@@ -367,6 +383,9 @@ export default function ChartDataSelectComponent() {
 						else { dispatch(changeSelectedUnit(-99)); }
 					}}
 				/>
+			</div>
+			<div style={divBottomPadding}>
+				<UnitSelectComponent />
 			</div>
 		</div>
 	);
@@ -681,21 +700,21 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
  * @param state The state to check
  * @returns Whether or not this is a UnitsState
  */
-function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
+export function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
 
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a MetersState
  */
-function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
+export function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
 
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a GroupsState
  */
-function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }
+export function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }
 
 /**
  * 3D helper function used to keep 3D redux state in sync with dropdown menus
@@ -728,7 +747,7 @@ function syncThreeDState(
 		dispatch(changeMeterOrGroupInfo(addedMeterOrGroup, meterOrGroup));
 	} else if (meterOrGroupRemoved && meterOrGroupIsSelected) {
 		// reset currently active threeD Meter or group when it is removed and is currently active.
-		dispatch(changeMeterOrGroupInfo(null));
+		dispatch(changeMeterOrGroupInfo(undefined));
 	}
 }
 

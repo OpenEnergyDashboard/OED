@@ -162,11 +162,11 @@ export function updateThreeDReadingInterval(readingInterval: t.ReadingInterval):
 	};
 }
 
-export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup) {
+export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID | undefined, meterOrGroup: t.MeterOrGroup) {
 	return graphSlice.actions.updateThreeDMeterOrGroupInfo({ meterOrGroupID, meterOrGroup });
 }
 
-export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID | undefined, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
 	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
 	return (dispatch: Dispatch) => {
 		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));

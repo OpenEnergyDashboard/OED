@@ -9,6 +9,8 @@ import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../ut
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { adminSlice } from './admin';
+import { ActionMeta } from 'react-select';
+import { SelectOption } from '../types/items';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -30,8 +32,8 @@ const defaultState: GraphState = {
 	renderOnce: false,
 	showMinMax: false,
 	threeD: {
-		meterOrGroupID: null,
-		meterOrGroup: MeterOrGroup.meters,
+		meterOrGroupID: undefined,
+		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
 	}
 };
@@ -95,13 +97,72 @@ export const graphSlice = createSlice({
 		updateLineGraphRate: (state, action: PayloadAction<LineGraphRate>) => {
 			state.lineGraphRate = action.payload
 		},
-
 		updateThreeDReadingInterval: (state, action: PayloadAction<ReadingInterval>) => {
 			state.threeD.readingInterval = action.payload
 		},
-		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | null, meterOrGroup: MeterOrGroup }>) => {
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
 			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
 			state.threeD.meterOrGroup = action.payload.meterOrGroup
+		},
+		updateSelectedMetersFromSelect: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+			// Destructure payload
+			const { newMetersOrGroups, meta } = action.payload;
+
+			// Used to check if value has been added or removed
+			const addedMeterOrGroupID = meta.option?.value;
+			const addedMeterOrGroup = meta.option?.meterOrGroup;
+
+			const removedMeterOrGroupID = meta.removedValue?.value;
+			const removedMeterOrGroup = meta.removedValue?.meterOrGroup;
+			const clearedMeterOrGroups = meta.removedValues;
+			console.log('METAAAAAAAAAAA', meta)
+
+			// If no meters selected, and no area unit, we should update unit to default graphic unit
+			// const shouldUpdateUnit = !state.selectedGroups.length && !state.selectedMeters.length && state.selectedUnit === -99
+			// If meterMeter added then and should update unit, update unit.
+			// TODO graphic unit is currently snuck into the select option, find an alternative pattern
+			// state.selectedUnit = addedMeterOrGroupID && !shouldUpdateUnit ? state.selectedUnit : meta.
+
+			// TODO SELECT bug in reducer
+			// Determine If meter or group was modified then update appropriately
+			const meterOrGroup = addedMeterOrGroup ? addedMeterOrGroup : removedMeterOrGroup;
+			if (clearedMeterOrGroups) {
+				const isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters
+				isAMeter ?
+					state.selectedMeters = []
+					:
+					state.selectedGroups = []
+			} else if (meterOrGroup && meterOrGroup === MeterOrGroup.meters) {
+				state.selectedMeters = newMetersOrGroups
+			} else {
+				state.selectedGroups = newMetersOrGroups
+			}
+
+			// When a meter or group is selected/added, make it the currently active in 3D state.
+			if (addedMeterOrGroupID && addedMeterOrGroup && state.chartToRender === ChartTypes.threeD) {
+				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
+				state.threeD.meterOrGroupID = addedMeterOrGroupID;
+				state.threeD.meterOrGroup = addedMeterOrGroup;
+				addedMeterOrGroup === MeterOrGroup.meters ?
+					state.selectedMeters = newMetersOrGroups
+					:
+					state.selectedGroups = newMetersOrGroups
+			}
+
+			// Reset Currently Selected 3D Meter Or Group if it has been removed from any page
+			if (
+				// meterOrGroup was removed
+				removedMeterOrGroupID && removedMeterOrGroup &&
+				// Removed meterOrGroup is the currently active on the 3D page
+				removedMeterOrGroupID === state.threeD.meterOrGroupID && removedMeterOrGroup === state.threeD.meterOrGroup
+			) {
+				state.threeD.meterOrGroupID = undefined
+				state.threeD.meterOrGroup = undefined
+
+			}
+		},
+		updateSelectedGroupsFromSelect: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+			state.selectedGroups = action.payload.newMetersOrGroups
 		}
 	},
 	extraReducers: builder => {

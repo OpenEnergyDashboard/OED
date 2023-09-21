@@ -44,14 +44,14 @@ export interface LineGraphRate {
 	rate: number
 }
 
-export type MeterOrGroupID = number | null;
+export type MeterOrGroupID = number;
 export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
 export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
-export type MeterOrGroupPill = {meterOrGroupID: number, isDisabled: boolean, meterOrGroup: MeterOrGroup}
+export type MeterOrGroupPill = { meterOrGroupID: number, isDisabled: boolean, meterOrGroup: MeterOrGroup }
 
 export interface ThreeDState {
-	meterOrGroupID: MeterOrGroupID;
-	meterOrGroup: MeterOrGroup;
+	meterOrGroupID: MeterOrGroupID | undefined;
+	meterOrGroup: MeterOrGroup | undefined;
 	readingInterval: ReadingInterval;
 }
 
