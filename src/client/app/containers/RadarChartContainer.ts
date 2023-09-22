@@ -176,6 +176,24 @@ function mapStateToProps(state: State) {
 				b: 10
 			}
 		};
+
+		// Calculate the interval for displaying date labels based on the number of data points
+		const dataPointCount = tickTex.length;
+		// Default to displaying every tick
+		let labelInterval = 1;
+		if (dataPointCount > 30) {
+		// If there are more than 10 data points, adjust the interval based on the count
+			labelInterval = Math.ceil(dataPointCount / 30);
+		}
+
+		// Modify ticktext to display labels with the calculated interval
+		layout.polar.angularaxis.ticktext = tickTex.map((text, index) => {
+			if (index % labelInterval === 0) {
+				return text;
+			} else {
+				return '';
+			}
+		});
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
