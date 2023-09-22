@@ -183,12 +183,17 @@ function mapStateToProps(state: State) {
 		let labelInterval = 1;
 		if (dataPointCount > 30) {
 		// If there are more than 10 data points, adjust the interval based on the count
-			labelInterval = Math.ceil(dataPointCount / 30);
+			labelInterval = Math.ceil(dataPointCount / 30); // Adjust the divisor as needed
 		}
 
-		// Modify ticktext to display labels with the calculated interval
+		// Modify ticktext to display labels with the calculated interval, skipping labels in the same month as the previous one
+		let prevMonth = '';
 		layout.polar.angularaxis.ticktext = tickTex.map((text, index) => {
-			if (index % labelInterval === 0) {
+			const currentMonth = moment(text, 'll LTS').format('MMM YYYY');
+			if (index % labelInterval === 0 && currentMonth !== prevMonth) {
+				// Update the previous month
+				prevMonth = currentMonth;
+				// Display labels with the calculated interval
 				return text;
 			} else {
 				return '';
