@@ -150,7 +150,7 @@ function mapStateToProps(state: State) {
 		layout = {
 			autosize: true,
 			showlegend: true,
-			height: 700,
+			height: 800,
 			legend: {
 				x: 0,
 				y: 1.1,
@@ -166,39 +166,16 @@ function mapStateToProps(state: State) {
 					gridcolor: '#ddd'
 				},
 				angularaxis: {
-					tickvals: tickVal,
-					ticktext: tickTex,
+					tickvals: tickTex.length < 30 ? tickVal : tickVal.filter((_, index) => index % 20 === 0),
+					ticktext: tickTex.length < 30 ? tickTex : tickTex.filter((_, index) => index % 20 === 0),
 					tickmode: 'array'
 				}
 			},
 			margin: {
 				t: 10,
-				b: 10
+				b: -20
 			}
 		};
-
-		// Calculate the interval for displaying date labels based on the number of data points
-		const dataPointCount = tickTex.length;
-		// Default to displaying every tick
-		let labelInterval = 1;
-		if (dataPointCount > 30) {
-		// If there are more than 10 data points, adjust the interval based on the count
-			labelInterval = Math.ceil(dataPointCount / 30); // Adjust the divisor as needed
-		}
-
-		// Modify ticktext to display labels with the calculated interval, skipping labels in the same month as the previous one
-		let prevMonth = '';
-		layout.polar.angularaxis.ticktext = tickTex.map((text, index) => {
-			const currentMonth = moment(text, 'll LTS').format('MMM YYYY');
-			if (index % labelInterval === 0 && currentMonth !== prevMonth) {
-				// Update the previous month
-				prevMonth = currentMonth;
-				// Display labels with the calculated interval
-				return text;
-			} else {
-				return '';
-			}
-		});
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
