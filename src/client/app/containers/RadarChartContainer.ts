@@ -112,6 +112,71 @@ function mapStateToProps(state: State) {
 	}
 
 	// TODO Add groups for radar chart.
+	// Add all valid data from existing groups to the radar plot
+	for (const groupID of state.graph.selectedGroups) {
+		const byGroupID = state.readings.line.byGroupID[groupID];
+		if (byGroupID !== undefined && byGroupID[timeInterval.toString()] !== undefined) {
+			const groupArea = state.groups.byGroupID[groupID].area;
+			// We either don't care about area, or we do in which case there needs to be a nonzero area.
+			if (!state.graph.areaNormalization || (groupArea > 0 && state.groups.byGroupID[groupID].areaUnit != AreaUnitType.none)) {
+				// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
+				const areaScaling = state.graph.areaNormalization ?
+					groupArea * getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit) : 1;
+				// Divide areaScaling into the rate so have complete scaling factor for readings.
+				const scaling = rateScaling / areaScaling;
+				const readingsData = byGroupID[timeInterval.toString()][unitID];
+				if (readingsData !== undefined && !readingsData.isFetching) {
+					const label = state.groups.byGroupID[groupID].name;
+					const colorID = groupID;
+					if (readingsData.readings === undefined) {
+						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+					}
+
+					// Create two arrays for the x and y values. Fill the array with the data from the line readings
+					const thetaData: string[] = [];
+					const rData: number[] = [];
+					const hoverText: string[] = [];
+					const readings = _.values(readingsData.readings);
+					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
+					readings.forEach(reading => {
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// are equivalent to Unix timestamp in milliseconds.
+						const st = moment.utc(reading.startTimestamp);
+						// Time reading is in the middle of the start and end timestamp
+						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						thetaData.push(timeReading.format('ddd, ll LTS'));
+						// Label each theta axis
+						tickTex.push(timeReading.format('ll'));
+						tickVal.push(tickPosition);
+						tickPosition += 1;
+						const readingValue = reading.reading * scaling;
+						rData.push(readingValue);
+						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+					});
+
+					//Find the largest and smallest usage in rData.
+					minR = Math.min(...rData);
+					maxR = Math.max(...rData);
+
+					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
+					datasets.push({
+						name: label,
+						theta: thetaData,
+						r: rData,
+						text: hoverText,
+						hoverinfo: 'text',
+						type: 'scatterpolar',
+						mode: 'lines',
+						line: {
+							shape: 'spline',
+							width: 2,
+							color: getGraphColor(colorID, DataType.Meter)
+						}
+					});
+				}
+			}
+		}
+	}
 
 	// No range if minR or maxR is undefined.
 	if (minR == undefined || maxR == undefined) {
@@ -147,6 +212,22 @@ function mapStateToProps(state: State) {
 	} else {
 		// Data available so plot.
 		// TODO the theta labels at the bottom of the radar chart get cut off.
+		const maxTicks = 12; // Maximum number of ticks, represent 12 months
+		const numDataPoints = tickTex.length;
+
+		let tickVals;
+		let tickTexts;
+
+		if (numDataPoints <= maxTicks) {
+		// If there are 12 or fewer data points, use the original tick values and text
+			tickVals = tickVal;
+			tickTexts = tickTex;
+		} else {
+		// If there are more than 12 data points which represent 12 months, divide into intervals
+			const interval = Math.ceil(numDataPoints / maxTicks); // Calculate the interval size
+			tickVals = tickVal.filter((_, index) => index % interval === 0);
+			tickTexts = tickTex.filter((_, index) => index % interval === 0);
+		}
 		layout = {
 			autosize: true,
 			showlegend: true,
@@ -167,8 +248,8 @@ function mapStateToProps(state: State) {
 				},
 				angularaxis: {
 					direction: 'clockwise',
-					tickvals: tickTex.length < 30 ? tickVal : tickVal.filter((_, index) => index % 20 === 0),
-					ticktext: tickTex.length < 30 ? tickTex : tickTex.filter((_, index) => index % 20 === 0),
+					tickvals: tickVals,
+					ticktext: tickTexts,
 					tickmode: 'array'
 				}
 			},
