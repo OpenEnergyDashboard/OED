@@ -360,7 +360,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('meter.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -371,7 +371,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('meter.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -405,7 +405,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* default graphic unit input */}
 						<Col><FormGroup>
-							<Label for='defaultGraphicUnit'>{translate('meter.defaultGraphicUnit')}</Label>
+							<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 							<Input
 								id='defaultGraphicUnit'
 								name='defaultGraphicUnit'
@@ -444,7 +444,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* Displayable input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('meter.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -554,7 +554,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					</Row>
 					{/* note input */}
 					<FormGroup>
-						<Label for='note'>{translate('meter.note')}</Label>
+						<Label for='note'>{translate('note')}</Label>
 						<Input
 							id='note'
 							name='note'
@@ -709,7 +709,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							</FormGroup>
 							{/* reading input */}
 							<FormGroup>
-								<Label for='reading'>{translate('meter.reading')}</Label>
+								<Label for='reading'>{translate('reading')}</Label>
 								<Input
 									id='reading'
 									name='reading'

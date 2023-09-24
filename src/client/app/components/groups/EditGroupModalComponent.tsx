@@ -438,7 +438,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							</FormGroup></Col>
 							{/* default graphic unit input for admin */}
 							<Col><FormGroup>
-								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 								<Input
 									id='defaultGraphicUnit'
 									name='defaultGraphicUnit'
@@ -469,7 +469,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							</FormGroup>
 							{/* default graphic unit display for non-admin */}
 							<FormGroup>
-								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 								{/* TODO: This component still displays a dropdown arrow, even though a user cannot use the dropdown */}
 								<Input
 									id='defaultGraphicUnit'
@@ -565,7 +565,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</Row>
 						{/* Note input, only for admin. */}
 						<FormGroup>
-							<Label for='note'>{translate('note')}: </Label>
+							<Label for='note'>{translate('note')} </Label>
 							<Input
 								id='note'
 								name='note'

@@ -60,7 +60,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			</div>
 			<div className="item-container">
 				{/* Use meter translation id string since same one wanted. */}
-				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b>
+				<b><FormattedMessage id="defaultGraphicUnit" /></b>
 				{/* This is the default graphic unit associated with the group or no unit if none. */}
 				{props.group.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[props.group.defaultGraphicUnit].identifier}
 			</div>
@@ -72,7 +72,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 			{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 			{loggedInAsAdmin &&
 				<div className="item-container">
-					<b><FormattedMessage id="note" />: </b> {props.group.note?.slice(0, 29)}
+					<b><FormattedMessage id="note" /> </b> {props.group.note?.slice(0, 29)}
 				</div>
 			}
 			<div className="edit-btn">

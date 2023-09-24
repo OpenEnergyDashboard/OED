@@ -296,7 +296,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 						</Row>
 						{/* Note input*/}
 						<FormGroup>
-							<Label for='note'>{translate('conversion.note')}</Label>
+							<Label for='note'>{translate('note')}</Label>
 							<Input
 								id='note'
 								name='note'

@@ -122,7 +122,7 @@ export default function CreateUnitModalComponent() {
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('unit.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -133,7 +133,7 @@ export default function CreateUnitModalComponent() {
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('unit.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -180,7 +180,7 @@ export default function CreateUnitModalComponent() {
 					<Row xs='1' lg='2'>
 						{/* Displayable type input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('unit.dropdown.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -242,7 +242,7 @@ export default function CreateUnitModalComponent() {
 					</Row>
 					{/* Note input */}
 					<FormGroup>
-						<Label for='note'>{translate('unit.note')}</Label>
+						<Label for='note'>{translate('note')}</Label>
 						<Input
 							id='note'
 							name='note'
