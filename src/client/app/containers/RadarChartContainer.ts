@@ -166,6 +166,7 @@ function mapStateToProps(state: State) {
 					gridcolor: '#ddd'
 				},
 				angularaxis: {
+					direction: 'clockwise',
 					tickvals: tickTex.length < 30 ? tickVal : tickVal.filter((_, index) => index % 20 === 0),
 					ticktext: tickTex.length < 30 ? tickTex : tickTex.filter((_, index) => index % 20 === 0),
 					tickmode: 'array'
