@@ -4,7 +4,7 @@
 
 import { LineReading, RawReadings } from '../types/readings';
 import * as moment from 'moment';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
@@ -12,10 +12,18 @@ import { ChartTypes } from '../types/redux/graph';
  * @param meter the meter identifier for data being exported
  * @param unitLabel the full y-axis label on the graphic
  * @param scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param meterGroup tells if this is a meter or group export
  * @returns A string containing the CSV formatted meter readings.
  */
-function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number) {
-	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unitLabel}\n`;
+function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number, meterGroup: MeterOrGroup) {
+	// TODO should be internationalized
+	let meterOrGroupString = '';
+	if (meterGroup === MeterOrGroup.meter) {
+		meterOrGroupString = 'Meter'
+	} else {
+		meterOrGroupString = 'Group'
+	}
+	let csvOutput = `Readings, Start Timestamp, End Timestamp, ${meterOrGroupString} name, ${meter}, Unit, ${unitLabel}\n`;
 	readings.forEach(reading => {
 		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
@@ -55,12 +63,13 @@ function downloadCSV(inputCSV: string, fileName: string) {
  * @param unitIdentifier the unit identifier for data being exported
  * @param chartName the name of the chart/graphic being exported
  * @param scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param meterGroup tells if this is a meter or group export
  */
 export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string,
-	chartName: ChartTypes, scaling: number) {
+	chartName: ChartTypes, scaling: number, meterGroup: MeterOrGroup) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		const dataToExport = convertToCSV(readings, meter, unitLabel, scaling);
+		const dataToExport = convertToCSV(readings, meter, unitLabel, scaling, meterGroup);
 
 		// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 		// As usual, maintain UTC.
@@ -87,7 +96,7 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 export function downloadRawCSV(readings: RawReadings[], meter: string, unit: string) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${meter}, Unit, ${unit} \n`;
+		let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unit} \n`;
 		readings.forEach(ele => {
 			// As elsewhere, preserve the UTC time that comes from the DB.
 			// See above for why formatted this way.
@@ -100,7 +109,7 @@ export function downloadRawCSV(readings: RawReadings[], meter: string, unit: str
 		// Easy to get since the data is sorted.
 		const startTime = moment.utc(readings[0].s).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTime = moment.utc(readings[readings.length - 1].e).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-		const filename = `oedRawExport_line_${startTime}_to_${endTime}_for_${meter}.csv`;
+		const filename = `oedRawExport_line_${startTime}_to_${endTime}_${meter}.csv`;
 		downloadCSV(csvOutput, filename);
 	}
 }
