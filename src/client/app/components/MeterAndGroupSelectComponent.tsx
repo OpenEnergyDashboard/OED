@@ -35,9 +35,9 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		graphSlice.actions.updateSelectedGroupsFromSelect
 
 	const value = meterOrGroup === MeterOrGroup.meters ?
-		meterAndGroupSelectOptions.compatibleSelectedMeters
+		meterAndGroupSelectOptions.selectedMeterValues
 		:
-		meterAndGroupSelectOptions.compatibleSelectedGroups
+		meterAndGroupSelectOptions.selectedGroupValues
 
 	// Set the current component's appropriate meter or group SelectOption
 	const options = meterOrGroup === MeterOrGroup.meters ?
@@ -46,13 +46,12 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		meterAndGroupSelectOptions.groupsGroupedOptions
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
-		console.log('newValues', newValues, 'meta', meta);
 		const newMetersOrGroups = newValues.map((option: SelectOption) => option.value);
 		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }))
 	}
 
 	return (
-		<Select
+		<Select<SelectOption, true, GroupedOption>
 			isMulti
 			placeholder={meterOrGroup === MeterOrGroup.meters ? translate('select.meters') : translate('select.groups')}
 			options={options}
@@ -74,7 +73,6 @@ const groupStyles: React.CSSProperties = {
 };
 
 const formatGroupLabel = (data: GroupedOption) => {
-	console.log(data)
 	return (
 		< div style={groupStyles} >
 			<span>{data.label}</span>

@@ -4,31 +4,31 @@
 
 import * as _ from 'lodash';
 import * as React from 'react';
-import MultiSelectComponent from './MultiSelectComponent';
-import { SelectOption } from '../types/items';
 import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../types/redux/state';
-import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
-import { DataType } from '../types/Datasources';
-import {
-	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
-	itemDisplayableOnMap, itemMapInfoOk, gpsToUserGrid
-} from '../utils/calibration';
-import { changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, changeMeterOrGroupInfo } from '../actions/graph';
-import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
-import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
-import { Dispatch } from '../types/redux/actions';
-import { UnitsState } from '../types/redux/units';
-import { MetersState } from 'types/redux/meters';
+import { useDispatch, useSelector } from 'react-redux';
 import { GroupsState } from 'types/redux/groups';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { MetersState } from 'types/redux/meters';
+import { changeMeterOrGroupInfo, changeSelectedGroups, changeSelectedMeters, changeSelectedUnit } from '../actions/graph';
 import { graphSlice } from '../reducers/graph';
-import UnitSelectComponent from './UnitSelectComponent';
+import { DataType } from '../types/Datasources';
+import { SelectOption } from '../types/items';
+import { Dispatch } from '../types/redux/actions';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import { DisplayableType, UnitData, UnitRepresentType, UnitsState, UnitType } from '../types/redux/units';
+import {
+	calculateScaleFromEndpoints,
+	CartesianPoint, Dimensions,
+	gpsToUserGrid,
+	itemDisplayableOnMap, itemMapInfoOk,
+	normalizeImageDimensions
+} from '../utils/calibration';
+import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import MeterAndGroupSelectComponent from './MeterAndGroupSelectComponent';
-import { useAppSelector } from '../redux/hooks';
-import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import MultiSelectComponent from './MultiSelectComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import UnitSelectComponent from './UnitSelectComponent';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -38,7 +38,6 @@ export default function ChartDataSelectComponent() {
 	// Must specify type if using ThunkDispatch
 	const dispatch: Dispatch = useDispatch();
 	const intl = useIntl();
-	const selectTestOpts = useAppSelector(state => selectMeterGroupSelectData(state))
 	const dataProps = useSelector((state: State) => {
 		const allMeters = state.meters.byMeterID;
 		const allGroups = state.groups.byGroupID;
@@ -272,10 +271,7 @@ export default function ChartDataSelectComponent() {
 			threeDState
 		}
 	});
-	console.log('HERE WE ARE')
-	console.log(dataProps.sortedGroups)
-	console.log(dataProps.compatibleSelectedGroups)
-	console.log(selectTestOpts)
+
 	return (
 		<div>
 			<p style={labelStyle}>

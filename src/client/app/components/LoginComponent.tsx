@@ -3,137 +3,83 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { browserHistory } from '../utils/history';
-import { injectIntl, FormattedMessage, WrappedComponentProps } from 'react-intl';
-import { Input, Button, Form, Label, FormGroup } from 'reactstrap';
+import { useRef, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import FooterContainer from '../containers/FooterContainer';
+import { authApi } from '../redux/api/authApi';
 import { showErrorNotification } from '../utils/notifications';
-import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
-import { User } from '../types/items';
 import HeaderComponent from './HeaderComponent';
+import { useNavigate } from 'react-router-dom-v5-compat';
 
-interface LoginState {
-	email: string;
-	password: string;
+/**
+ * @returns The login page for users or admins.
+ */
+export default function LoginComponent() {
+	const navigate = useNavigate();
+
+	// Local State
+	const [email, setEmail] = useState<string>('');
+	const [password, setPassword] = useState<string>('');
+
+	// Html Element Reference used for focus()
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	// Grab the derived loginMutation from the API
+	// The naming of the returned objects is arbitrary
+	const [login] = authApi.useLoginMutation()
+
+	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+		event.preventDefault();
+		const response = await login({ email: 'test@example.com', password: 'password' }).unwrap()
+		console.log('response ', response)
+		inputRef.current?.focus()
+		showErrorNotification(translate('failed.logging.in'));
+		navigate('/')
+	}
+
+	return (
+		<div>
+			<HeaderComponent />
+			<Form style={formStyle}>
+				<FormGroup>
+					<Label for='email'>{translate('email')}</Label>
+					<Input
+						id='email'
+						type='text'
+						autoComplete='email'
+						value={email}
+						onChange={e => setEmail(e.target.value)}
+					/>
+				</FormGroup>
+				<FormGroup>
+					<Label for='password'>{translate('password')}</Label>
+					<Input
+						id='password'
+						type='password'
+						autoComplete='current-password'
+						value={password}
+						onChange={e => setPassword(e.target.value)}
+						innerRef={inputRef}
+					/>
+				</FormGroup>
+				<Button
+					outline
+					type='submit'
+					onClick={handleSubmit}
+					disabled={!email.length || !password.length}
+				>
+					<FormattedMessage id='submit' />
+				</Button>
+			</Form>
+			<FooterContainer />
+		</div >
+	)
 }
 
-interface LoginProps {
-	saveCurrentUser(profile: User): any;
+const formStyle = {
+	maxWidth: '500px',
+	margin: 'auto',
+	width: '50%'
 }
-
-type LoginPropsWithIntl = LoginProps & WrappedComponentProps;
-
-class LoginComponent extends React.Component<LoginPropsWithIntl, LoginState> {
-	private inputEmail: HTMLInputElement | HTMLTextAreaElement | null;
-
-	constructor(props: LoginPropsWithIntl) {
-		super(props);
-		this.state = { email: '', password: '' };
-		this.handleEmailChange = this.handleEmailChange.bind(this);
-		this.handlePasswordChange = this.handlePasswordChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.saveCurrentUser = this.saveCurrentUser.bind(this);
-	}
-
-	/**
-	 * @returns JSX to create the login panel
-	 */
-	public render() {
-		const formStyle = {
-			maxWidth: '500px',
-			margin: 'auto',
-			width: '50%'
-		};
-
-		return (
-			<div>
-				<HeaderComponent />
-				<Form style={formStyle}>
-					<FormGroup>
-						<Label for='email'>{translate('email')}</Label>
-						<Input
-							id='email'
-							type='text'
-							autoComplete='email'
-							innerRef={c => { this.inputEmail = c; }}
-							value={this.state.email}
-							onChange={this.handleEmailChange}
-						/>
-					</FormGroup>
-					<FormGroup>
-						<Label for='password'>{translate('password')}</Label>
-						<Input
-							id='password'
-							type='password'
-							autoComplete='current-password'
-							value={this.state.password}
-							onChange={this.handlePasswordChange}
-						/>
-					</FormGroup>
-					<Button
-						outline
-						type='submit'
-						onClick={this.handleSubmit}
-						disabled={this.state.email.length === 0 || this.state.password.length === 0}
-					>
-						<FormattedMessage id='submit' />
-					</Button>
-				</Form>
-				<FooterContainer />
-			</div>
-		);
-	}
-
-	/**
-	 * Sets the email state whenever the user changes the email input field
-	 * @param e The event fired
-	 */
-	private handleEmailChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ email: e.target.value });
-	}
-
-	/**
-	 * Sets the password state whenever the user changes the password input field
-	 * @param e The event fired
-	 */
-	private handlePasswordChange(e: React.ChangeEvent<HTMLInputElement>) {
-		this.setState({ password: e.target.value });
-	}
-
-	private saveCurrentUser(profile: User) {
-		this.props.saveCurrentUser(profile);
-	}
-
-	/**
-	 * Makes a GET request to the login api whenever the user click the submit button, then clears the state
-	 * If the request is successful, the JWT auth token is stored in local storage and the app routes to the admin page
-	 * @param e The event fired
-	 */
-	private handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-		e.preventDefault();
-		(async () => {
-			try {
-				const loginResponse = await verificationApi.login(this.state.email, this.state.password);
-				localStorage.setItem('token', loginResponse.token);
-				this.saveCurrentUser({ email: loginResponse.email, role: loginResponse.role });
-				browserHistory.push('/');
-			} catch (err) {
-				if (err.response && err.response.status === 401) {
-					showErrorNotification(translate('invalid.email.password'));
-				} else {
-					// If there was a problem other than a lack of authorization, the user can't fix it.
-					// This is an irrecoverable state, so just throw an error and let the user know something went wrong
-					showErrorNotification(translate('failed.logging.in'));
-					throw err;
-				}
-				if (this.inputEmail !== null) {
-					this.inputEmail.focus();
-				}
-			}
-		})();
-		this.setState({ email: '', password: '' });
-	}
-}
-
-export default injectIntl(LoginComponent);

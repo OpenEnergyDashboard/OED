@@ -4,12 +4,12 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
-import store from '../../index';
+import { store } from '../../store';
 import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 

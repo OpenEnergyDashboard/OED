@@ -4,9 +4,10 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+// TODO migrate ReactRouterv6 & hooks
 import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
 import { deleteToken } from '../utils/token';
-import store from '../index';
+import {store} from '../store';
 import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
 import { currentUserSlice } from '../reducers/currentUser';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';

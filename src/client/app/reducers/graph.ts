@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { GraphState, ChartTypes, ReadingInterval, MeterOrGroup, LineGraphRate } from '../types/redux/graph';
-import { calculateCompareTimeInterval, ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { adminSlice } from './admin';
 import { ActionMeta } from 'react-select';
+import { TimeInterval } from '../../../common/TimeInterval';
 import { SelectOption } from '../types/items';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
+import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { adminSlice } from './admin';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -52,7 +52,16 @@ export const graphSlice = createSlice({
 			state.selectedGroups = action.payload
 		},
 		updateSelectedUnit: (state, action: PayloadAction<number>) => {
-			state.selectedUnit = action.payload
+			// If Payload is defined, update selectedUnit
+			if (action.payload) {
+				state.selectedUnit = action.payload
+			} else {
+				// If NewValue is undefined, the current Unit has been cleared
+				// Reset groups and meters, and selected unit
+				state.selectedUnit = -99
+				state.selectedMeters = []
+				state.selectedGroups = []
+			}
 		},
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.selectedAreaUnit = action.payload
@@ -115,7 +124,6 @@ export const graphSlice = createSlice({
 			const removedMeterOrGroupID = meta.removedValue?.value;
 			const removedMeterOrGroup = meta.removedValue?.meterOrGroup;
 			const clearedMeterOrGroups = meta.removedValues;
-			console.log('METAAAAAAAAAAA', meta)
 
 			// If no meters selected, and no area unit, we should update unit to default graphic unit
 			// const shouldUpdateUnit = !state.selectedGroups.length && !state.selectedMeters.length && state.selectedUnit === -99
@@ -123,15 +131,13 @@ export const graphSlice = createSlice({
 			// TODO graphic unit is currently snuck into the select option, find an alternative pattern
 			// state.selectedUnit = addedMeterOrGroupID && !shouldUpdateUnit ? state.selectedUnit : meta.
 
-			// TODO SELECT bug in reducer
 			// Determine If meter or group was modified then update appropriately
 			const meterOrGroup = addedMeterOrGroup ? addedMeterOrGroup : removedMeterOrGroup;
 			if (clearedMeterOrGroups) {
+				// use the first index of cleared items to check for meter or group
 				const isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters
-				isAMeter ?
-					state.selectedMeters = []
-					:
-					state.selectedGroups = []
+				// if a meter clear meters, else clear groups
+				isAMeter ? state.selectedMeters = [] : state.selectedGroups = []
 			} else if (meterOrGroup && meterOrGroup === MeterOrGroup.meters) {
 				state.selectedMeters = newMetersOrGroups
 			} else {

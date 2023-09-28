@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom-v5-compat';
 import { FormattedMessage } from 'react-intl';
 import getPage from '../utils/getPage';
 import translate from '../utils/translate';

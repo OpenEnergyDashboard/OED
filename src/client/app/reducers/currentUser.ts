@@ -2,16 +2,22 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { CurrentUserState } from '../types/redux/currentUser';
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { User } from '../types/items';
-
+import { CurrentUserState } from '../types/redux/currentUser';
+import { userApi } from '../redux/api/userApi';
+import { authApi } from '../redux/api/authApi';
+import { setToken } from '../utils/token';
 
 /*
 * Defines store interactions when version related actions are dispatched to the store.
 */
-const defaultState: CurrentUserState = { isFetching: false, profile: null };
+const defaultState: CurrentUserState = {
+	isFetching: false,
+	profile: null,
+	token: null
+};
 
 export const currentUserSlice = createSlice({
 	name: 'currentUser',
@@ -26,31 +32,27 @@ export const currentUserSlice = createSlice({
 		},
 		clearCurrentUser: state => {
 			state.profile = null
+		},
+		setUserToken: (state, action: PayloadAction<string | null>) => {
+			state.token = action.payload
 		}
+	},
+	extraReducers: builder => {
+		builder
+			.addMatcher(
+				userApi.endpoints.getUserDetails.matchFulfilled,
+				(state, api) => {
+					state.profile = api.payload
+				}
+			)
+			.addMatcher(
+				authApi.endpoints.login.matchFulfilled,
+				(state, api) => {
+					// User has logged in update state, and write to local storage
+					state.profile = { email: api.payload.email, role: api.payload.role }
+					state.token = api.payload.token
+					setToken(state.token)
+				}
+			)
 	}
 })
-// export default function profile(state = defaultState, action: CurrentUserAction): CurrentUserState {
-// 	switch (action.type) {
-// 		case ActionType.RequestCurrentUser:
-// 			// When the current user's profile is requested, indicate app is fetching data from API
-// 			return {
-// 				...state,
-// 				isFetching: true
-// 			};
-// 		case ActionType.ReceiveCurrentUser:
-// 			// When the current user's profile is received, update the store with result from API
-// 			return {
-// 				...state,
-// 				isFetching: false,
-// 				profile: action.data
-// 			};
-// 		case ActionType.ClearCurrentUser:
-// 			// Removes the current user from the redux store.
-// 			return {
-// 				...state,
-// 				profile: null
-// 			}
-// 		default:
-// 			return state;
-// 	}
-// }

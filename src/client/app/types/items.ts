@@ -15,7 +15,8 @@ export interface SelectOption {
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
 	style?: React.CSSProperties;
-	meterOrGroup?: MeterOrGroup
+	meterOrGroup?: MeterOrGroup;
+	defaultGraphicUnit?: number;
 }
 export interface GroupedOption {
 	label: string;

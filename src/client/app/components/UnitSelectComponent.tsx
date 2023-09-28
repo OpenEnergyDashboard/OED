@@ -3,12 +3,13 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import Select, { ActionMeta } from 'react-select';
+import Select from 'react-select';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { selectUnitSelectData } from '../redux/selectors/uiSelectors';
-import { SelectOption } from '../types/items';
+import { GroupedOption, SelectOption } from '../types/items';
 // import TooltipMarkerComponent from './TooltipMarkerComponent';
 // import { FormattedMessage } from 'react-intl';
+import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
 
 /**
@@ -30,18 +31,7 @@ export default function UnitSelectComponent() {
 			isDisabled: false
 		} as SelectOption;
 	}
-	const onChange = (newValue: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
-		console.log('newValue', newValue, 'actionMeta', actionMeta);
-		if (newValue) {
-			// New value selected Update
-			dispatch(graphSlice.actions.updateSelectedUnit(newValue.value))
-		} else {
-			// Select cleared, therefore, clear meters and groups.
-			dispatch(graphSlice.actions.updateSelectedGroups([]));
-			dispatch(graphSlice.actions.updateSelectedMeters([]));
-			dispatch(graphSlice.actions.updateSelectedUnit(-99));
-		}
-	}
+	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value))
 
 	return (
 		<>
@@ -49,13 +39,29 @@ export default function UnitSelectComponent() {
 				<FormattedMessage id='units' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</p> */}
-			<Select
+			<Select<SelectOption, false, GroupedOption>
 				value={selectedUnitOption}
 				options={unitSelectOptions}
 				onChange={onChange}
-				isClearable={true}
+				formatGroupLabel={formatGroupLabel}
+				isClearable
 			/>
 		</>
+	)
+}
+const groupStyles: React.CSSProperties = {
+	display: 'flex',
+	alignItems: 'center',
+	justifyContent: 'space-between'
+};
+
+const formatGroupLabel = (data: GroupedOption) => {
+	return (
+		< div style={groupStyles} >
+			<span>{data.label}</span>
+			<Badge pill color="primary">{data.options.length}</Badge>
+		</div >
+
 	)
 }
 

@@ -111,6 +111,7 @@ export const groupsSlice = createSlice({
 					selectedGroups: [],
 					selectedMeters: [],
 
+					// TODO Verify this reducer.
 					// line added due to conflicting typing. TS Warns about potential undefined deepMeters
 					deepMeters: group.deepMeters ? group.deepMeters : []
 				}));

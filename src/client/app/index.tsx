@@ -7,24 +7,20 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store'
 import 'bootstrap/dist/css/bootstrap.css';
-import RouteContainer from './containers/RouteContainer';
+// import RouteContainer from './containers/RouteContainer';
+import RouteComponent from './components/RouteComponentWIP';
 import './styles/index.css';
-import initScript from './initScript';
-
-// Store information that would rarely change throughout using OED into the Redux store when the application first mounts.
-store.dispatch<any>(initScript());
 
 // Renders the entire application, starting with RouteComponent, into the root div
-// Provides the Redux store to all child components
 const container = document.getElementById('root');
+
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const root = createRoot(container!);
 root.render(
-
-	// <Provider store={store} stabilityCheck='always' >
+	// Provides the Redux store to all child components
 	<Provider store={store}  >
-		<RouteContainer />
+		{/* <RouteContainer /> */}
+		<RouteComponent />
 	</Provider>
 );
 
-export default store;

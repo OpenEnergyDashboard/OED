@@ -10,7 +10,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import store from '../../index'
+import { store } from '../../store'
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface UserDisplayComponentProps {

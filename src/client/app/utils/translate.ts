@@ -4,7 +4,7 @@
 
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import localeData from '../translations/data';
-import store from '../index';
+import { store } from '../store';
 
 // TODO This used to be multiple types of:
 // const enum AsTranslated {}
@@ -25,8 +25,7 @@ export default function translate(messageID: string): TranslatedString {
 	// My guess is that the call to store.getState() was too early as the store hadn't finished loading completely
 	// For now, set the default language to english and any component subscribed to the language state should properly re-render if the language changes
 	let lang = 'en';
-	if (store)
-	{
+	if (store) {
 		lang = store.getState().options.selectedLanguage;
 	}
 	/*
@@ -37,5 +36,5 @@ export default function translate(messageID: string): TranslatedString {
 	const messages = (localeData as any)[lang];
 	const cache = createIntlCache();
 	const intl = createIntl({ locale: lang, messages }, cache);
-	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID }})[messageID]) as TranslatedString;
+	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID } })[messageID]) as TranslatedString;
 }

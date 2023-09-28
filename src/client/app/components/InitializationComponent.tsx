@@ -4,30 +4,45 @@
 
 import * as React from 'react';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../types/redux/state';
-import { ConversionArray } from '../types/conversionArray';
+import { useDispatch } from 'react-redux';
+import { Slide, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Dispatch } from 'types/redux/actions';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
+import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
-import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
-import { Dispatch } from 'types/redux/actions';
-import { Slide, ToastContainer } from 'react-toastify';
-import { metersApi } from '../redux/api/metersApi';
 import { groupsApi } from '../redux/api/groupsApi';
-import 'react-toastify/dist/ReactToastify.css';
+import { metersApi } from '../redux/api/metersApi';
+// import { userApi } from '../redux/api/userApi';
+import { authApi } from '../redux/api/authApi';
+import { ConversionArray } from '../types/conversionArray';
+import { getToken, hasToken } from '../utils/token';
 
 /**
  * Initializes OED redux with needed details
  * @returns Initialization JSX element
  */
 export default function InitializationComponent() {
-
 	const dispatch: Dispatch = useDispatch();
-	const { refetch: refetchMeters } = metersApi.endpoints.getMeters.useQuery();
-	groupsApi.endpoints.getGroups.useQuery();
+	// QueryHooks derived by api endpoint definitions
+	// These useQuery hooks subscribe to the store, and automatically fetch and cache data to the store.
+	metersApi.useGetMetersQuery();
+	// metersApi.endpoints.getMeters.useQuery(); Another way to access the same hooks
+	groupsApi.useGetGroupsQuery();
+	// groupsApi.endpoints.getGroups.useQuery(); Another way to access the same hook
+	const [verifyTokenTrigger] = authApi.useVerifyTokenMutation()
+
+	// There are many derived hooks each with different use cases. Read More @ https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#hooks-overview
+
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
+		// If user has token from prior logins verify, and fetch user details if valid.
+		if (hasToken()) {
+			// use the verify token mutation,
+			verifyTokenTrigger(getToken())
+		}
+
 		dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
@@ -35,20 +50,8 @@ export default function InitializationComponent() {
 		ConversionArray.fetchPik();
 	}, []);
 
-	// Rerender the route component if the user state changes
-	// This is necessary because of how the meters route works
-	// If the user is not an admin, the formatMeterForResponse function sets many of the fetched values to null
-	// Because of this must re-fetch the entire meters table if the user changes
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	useEffect(() => {
-		// TODO REDO WITH TAG INVALIDATION AND PROPER AUTH HEADERS
-		refetchMeters()
-		// dispatch(fetchMetersDetails());
-	}, [currentUser]);
-
 	return (
 		<div>
-			{/* <NotificationSystem ref={(c: NotificationSystem) => { notificationSystem = c; }} /> */}
 			<ToastContainer transition={Slide} />
 		</div>
 	);
