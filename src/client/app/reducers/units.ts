@@ -1,10 +1,12 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as _ from 'lodash';
-import { UnitsState } from '../types/redux/units';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import * as _ from 'lodash';
+import { unitsApi } from '../redux/api/unitsApi';
 import * as t from '../types/redux/units';
+import { UnitsState } from '../types/redux/units';
+
 const defaultState: UnitsState = {
 	hasBeenFetchedOnce: false,
 	isFetching: false,
@@ -39,5 +41,10 @@ export const unitsSlice = createSlice({
 		confirmUnitEdits: (state, action: PayloadAction<number>) => {
 			state.submitting.splice(state.submitting.indexOf(action.payload), 1);
 		}
+	},
+	extraReducers: builder => {
+		builder.addMatcher(unitsApi.endpoints.getUnitsDetails.matchFulfilled,
+			(state, action) => { state.units = _.keyBy(action.payload, unit => unit.id) }
+		)
 	}
 });

@@ -10,7 +10,7 @@ import { SelectOption } from '../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { adminSlice } from './admin';
+import { preferencesApi } from '../redux/api/preferencesApi';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -88,11 +88,17 @@ export const graphSlice = createSlice({
 		toggleAreaNormalization: state => {
 			state.areaNormalization = !state.areaNormalization
 		},
+		setAreaNormalization: (state, action: PayloadAction<boolean>) => {
+			state.areaNormalization = action.payload
+		},
 		toggleShowMinMax: state => {
 			state.showMinMax = !state.showMinMax
 		},
 		changeBarStacking: state => {
 			state.barStacking = !state.barStacking
+		},
+		setBarStacking: (state, action: PayloadAction<boolean>) => {
+			state.barStacking = action.payload
 		},
 		setHotlinked: (state, action: PayloadAction<boolean>) => {
 			state.hotlinked = action.payload
@@ -113,7 +119,7 @@ export const graphSlice = createSlice({
 			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
 			state.threeD.meterOrGroup = action.payload.meterOrGroup
 		},
-		updateSelectedMetersFromSelect: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
 			// Destructure payload
 			const { newMetersOrGroups, meta } = action.payload;
 
@@ -166,17 +172,13 @@ export const graphSlice = createSlice({
 				state.threeD.meterOrGroup = undefined
 
 			}
-		},
-		updateSelectedGroupsFromSelect: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
-			state.selectedGroups = action.payload.newMetersOrGroups
 		}
 	},
 	extraReducers: builder => {
-		builder.addCase(adminSlice.actions.receivePreferences,
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled,
 			(state, action) => {
 				if (state.selectedAreaUnit == AreaUnitType.none) {
 					state.selectedAreaUnit = action.payload.defaultAreaUnit
-
 				}
 			})
 	}

@@ -23,16 +23,9 @@ const animatedComponents = makeAnimated();
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
 	const meterAndGroupSelectOptions = useAppSelector(state => selectMeterGroupSelectData(state));
-	// const selectedMeters = useAppSelector(state => selectSelectedMeters(state))
-	// const selectedGroups = useAppSelector(state => selectSelectedGroups(state))
-	// console.log(meterAndGroupSelectOptions)
 	const { meterOrGroup } = props;
 
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
-	const updateSelectedMetersOrGroups = meterOrGroup === MeterOrGroup.meters ?
-		graphSlice.actions.updateSelectedMetersFromSelect
-		:
-		graphSlice.actions.updateSelectedGroupsFromSelect
 
 	const value = meterOrGroup === MeterOrGroup.meters ?
 		meterAndGroupSelectOptions.selectedMeterValues
@@ -47,7 +40,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMetersOrGroups = newValues.map((option: SelectOption) => option.value);
-		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }))
+		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }))
 	}
 
 	return (

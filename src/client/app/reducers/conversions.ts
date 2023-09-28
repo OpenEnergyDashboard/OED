@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ConversionsState } from '../types/redux/conversions';
-import * as t from '../types/redux/conversions';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { conversionsApi } from '../redux/api/conversionsApi';
+import * as t from '../types/redux/conversions';
+import { ConversionsState } from '../types/redux/conversions';
 
 const defaultState: ConversionsState = {
 	hasBeenFetchedOnce: false,
@@ -71,5 +72,11 @@ export const conversionsSlice = createSlice({
 			// Remove the ConversionData from the conversions array
 			conversions.splice(conversionDataIndex, 1);
 		}
+	},
+	extraReducers: builder => {
+		builder.addMatcher(conversionsApi.endpoints.getConversionsDetails.matchFulfilled,
+			(state, action) => {
+				state.conversions = action.payload
+			})
 	}
 });

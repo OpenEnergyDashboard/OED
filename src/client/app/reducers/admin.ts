@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from '../types/redux/graph';
-import { AdminState } from '../types/redux/admin';
-import { LanguageTypes } from '../types/redux/i18n';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { durationFormat } from '../utils/durationFormat';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { PreferenceRequestItem } from '../types/items';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AdminState } from '../types/redux/admin';
+import { ChartTypes } from '../types/redux/graph';
+import { LanguageTypes } from '../types/redux/i18n';
+import { durationFormat } from '../utils/durationFormat';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
 const defaultState: AdminState = {
 	selectedMeter: null,

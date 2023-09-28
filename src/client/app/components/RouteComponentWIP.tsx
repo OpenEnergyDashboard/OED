@@ -8,7 +8,7 @@ import * as queryString from 'query-string';
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { useDispatch } from 'react-redux';
-import { Redirect, BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Redirect } from 'react-router-dom';
 import { CompatRouter, Route, Routes } from 'react-router-dom-v5-compat';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { LinkOptions, changeOptionsFromLink } from '../actions/graph';
@@ -28,7 +28,6 @@ import { hasPermissions } from '../utils/hasPermissions';
 import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import HomeComponent from './HomeComponent';
-import InitializationComponent from './InitializationComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
@@ -176,7 +175,6 @@ export default function RouteComponent() {
 	const messages = (localeData as any)[lang];
 	return (
 		<>
-			<InitializationComponent />
 			<IntlProvider locale={lang} messages={messages} key={lang}>
 				<BrowserRouter  >
 					{/* Compatibility layer for transitioning to react-router 6.X

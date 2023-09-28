@@ -10,6 +10,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 // import RouteContainer from './containers/RouteContainer';
 import RouteComponent from './components/RouteComponentWIP';
 import './styles/index.css';
+import InitializationComponent from './components/InitializationComponent';
 
 // Renders the entire application, starting with RouteComponent, into the root div
 const container = document.getElementById('root');
@@ -19,8 +20,7 @@ const root = createRoot(container!);
 root.render(
 	// Provides the Redux store to all child components
 	<Provider store={store}  >
-		{/* <RouteContainer /> */}
+		<InitializationComponent />
 		<RouteComponent />
 	</Provider>
 );
-

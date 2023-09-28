@@ -15,7 +15,7 @@ export const baseApi = createApi({
 			}
 		}
 	}),
-	tagTypes: ['MeterData', 'GroupData'],
+	tagTypes: ['MeterData', 'GroupData', 'Preferences'],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({}),
 	// Keep Data in Cache for 10 Minutes (600 seconds)

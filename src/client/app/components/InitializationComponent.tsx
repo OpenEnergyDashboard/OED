@@ -8,32 +8,40 @@ import { useDispatch } from 'react-redux';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Dispatch } from 'types/redux/actions';
-import { fetchPreferencesIfNeeded } from '../actions/admin';
-import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { fetchMapsDetails } from '../actions/map';
-import { fetchUnitsDetailsIfNeeded } from '../actions/units';
+import { authApi } from '../redux/api/authApi';
+import { conversionsApi } from '../redux/api/conversionsApi';
 import { groupsApi } from '../redux/api/groupsApi';
 import { metersApi } from '../redux/api/metersApi';
-// import { userApi } from '../redux/api/userApi';
-import { authApi } from '../redux/api/authApi';
+import { preferencesApi } from '../redux/api/preferencesApi';
+import { unitsApi } from '../redux/api/unitsApi';
 import { ConversionArray } from '../types/conversionArray';
 import { getToken, hasToken } from '../utils/token';
 
 /**
- * Initializes OED redux with needed details
+ * Initializes the app by fetching and subscribing to the store with various queries
  * @returns Initialization JSX element
  */
 export default function InitializationComponent() {
-	const dispatch: Dispatch = useDispatch();
 	// QueryHooks derived by api endpoint definitions
-	// These useQuery hooks subscribe to the store, and automatically fetch and cache data to the store.
+	// These useQuery hooks fetch and cache data to the store as soon the component mounts.
+	// They maintain an active subscription to the store so long as the component remains mounted.
+	// Since this component lives up near the root of the DOM, these queries will remain subscribed indefinitely
+	preferencesApi.useGetPreferencesQuery();
+	unitsApi.useGetUnitsDetailsQuery();
+	conversionsApi.useGetConversionsDetailsQuery();
+	conversionsApi.useGetConversionArrayQuery();
 	metersApi.useGetMetersQuery();
-	// metersApi.endpoints.getMeters.useQuery(); Another way to access the same hooks
 	groupsApi.useGetGroupsQuery();
-	// groupsApi.endpoints.getGroups.useQuery(); Another way to access the same hook
+
+	// With RTKQuery, Mutations are used for POST, PUT, PATCH, etc.
+	// The useMutation() hooks return a triggerFunction that can be called to initiate the request.
 	const [verifyTokenTrigger] = authApi.useVerifyTokenMutation()
 
-	// There are many derived hooks each with different use cases. Read More @ https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#hooks-overview
+	// There are many derived hooks each with different use cases
+	// Read More @ https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#hooks-overview
+
+	const dispatch: Dispatch = useDispatch();
 
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {
@@ -43,10 +51,10 @@ export default function InitializationComponent() {
 			verifyTokenTrigger(getToken())
 		}
 
-		dispatch(fetchPreferencesIfNeeded());
+		// dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());
-		dispatch(fetchUnitsDetailsIfNeeded());
-		dispatch(fetchConversionsDetailsIfNeeded());
+		// dispatch(fetchUnitsDetailsIfNeeded());
+		// dispatch(fetchConversionsDetailsIfNeeded());
 		ConversionArray.fetchPik();
 	}, []);
 
