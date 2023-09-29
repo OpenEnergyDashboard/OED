@@ -520,7 +520,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								{/* Area input, only for admin. */}
 								<FormGroup>
 									<Label for='area'>{translate('area')}</Label>
-									<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 									<InputGroup>
 										<Input
 											id='area'
@@ -536,6 +535,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<Button color='secondary' onClick={handleAutoCalculateArea}>
 											<FormattedMessage id="area.calculate.auto" />
 										</Button>
+										<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										<FormFeedback>
 											<FormattedMessage id="error.negative" />
 										</FormFeedback>
