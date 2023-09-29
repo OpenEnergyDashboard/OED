@@ -10,8 +10,10 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
-	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import {
+	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
+	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
+} from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -430,7 +432,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									autoComplete='on'
 									onChange={e => handleStringChange(e)}
 									required value={groupState.name}
-									invalid={groupState.name === ''}/>
+									invalid={groupState.name === ''} />
 								<FormFeedback>
 									<FormattedMessage id="error.required" />
 								</FormFeedback>
@@ -464,7 +466,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									type='text'
 									autoComplete='on'
 									value={groupState.name}
-									disabled/>
+									disabled />
 							</FormGroup>
 							{/* default graphic unit display for non-admin */}
 							<FormGroup>
@@ -519,7 +521,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								{/* Area input, only for admin. */}
 								<FormGroup>
 									<Label for='area'>{translate('group.area')}</Label>
-									<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 									<InputGroup>
 										<Input
 											id='area'
@@ -535,6 +536,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										<Button color='secondary' onClick={handleAutoCalculateArea}>
 											<FormattedMessage id="group.area.calculate" />
 										</Button>
+										<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										<FormFeedback>
 											<FormattedMessage id="error.negative" />
 										</FormFeedback>

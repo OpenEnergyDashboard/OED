@@ -47,7 +47,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.admin.groupedit': { link: `${HELP_URL}/adminGroupEditing.html` },
 			'help.admin.groupview': { link: `${HELP_URL}/adminGroupViewing.html` },
 			'help.admin.header': { link: `${HELP_URL}/adminPreferences.html` },
-			'help.admin.mapview': { link: `${HELP_URL}/adminMap.html` },
+			'help.admin.mapview': { link: `${HELP_URL}/adminMapViewing.html` },
 			'help.admin.metercreate': { link: `${HELP_URL}/adminMeterCreating.html` },
 			'help.admin.meteredit': { link: `${HELP_URL}/adminMeterEditing.html` },
 			'help.admin.meterview': { link: `${HELP_URL}/adminMeterViewing.html` },
@@ -76,7 +76,6 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.toggle.chart.link': { link: `${HELP_URL}/chartLink.html` },
 			'help.groups.groupdetails': { link: `${HELP_URL}/groupViewing.html#groupDetails` },
 			'help.groups.groupview': { link: `${HELP_URL}/groupViewing.html` },
-			'help.maps.mapview': { link: `${HELP_URL}/mapGraphic.html` },
 			'help.meters.meterview': { link: `${HELP_URL}/meterViewing.html` }
 		};
 
