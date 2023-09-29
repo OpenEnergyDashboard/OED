@@ -181,7 +181,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('unit.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -193,7 +193,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('unit.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -240,7 +240,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					<Row xs='1' lg='2'>
 						{/* Displayable type input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('unit.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -304,7 +304,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</Row>
 					{/* Note input */}
 					<FormGroup>
-						<Label for='note'>{translate('unit.note')}</Label>
+						<Label for='note'>{translate('unit')}</Label>
 						<Input
 							id='note'
 							name='note'

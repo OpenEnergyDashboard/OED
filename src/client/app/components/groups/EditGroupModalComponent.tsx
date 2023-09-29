@@ -191,7 +191,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				translate('group.area.calculate.header')
 				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${groupState.areaUnit}`);
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
@@ -424,7 +423,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						<Row xs='1' lg='2'>
 							{/* Name input for admin*/}
 							<Col><FormGroup>
-								<Label for='name'>{translate('group.name')}</Label>
+								<Label for='name'>{translate('name')}</Label>
 								<Input
 									id='name'
 									name='name'
@@ -439,7 +438,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							</FormGroup></Col>
 							{/* default graphic unit input for admin */}
 							<Col><FormGroup>
-								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 								<Input
 									id='defaultGraphicUnit'
 									name='defaultGraphicUnit'
@@ -459,7 +458,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						: <>
 							{/* Name display for non-admin */}
 							<FormGroup>
-								<Label for='name'>{translate('group.name')}</Label>
+								<Label for='name'>{translate('name')}</Label>
 								<Input
 									id='name'
 									name='name'
@@ -470,7 +469,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							</FormGroup>
 							{/* default graphic unit display for non-admin */}
 							<FormGroup>
-								<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+								<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 								{/* TODO: This component still displays a dropdown arrow, even though a user cannot use the dropdown */}
 								<Input
 									id='defaultGraphicUnit'
@@ -489,7 +488,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col>
 								{/* Displayable input, only for admin. */}
 								<FormGroup>
-									<Label for='displayable'>{translate('group.displayable')}</Label>
+									<Label for='displayable'>{translate('displayable')}</Label>
 									<Input
 										id='displayable'
 										name='displayable'
@@ -505,7 +504,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col>
 								{/* GPS input, only for admin. */}
 								<FormGroup>
-									<Label for='gps'>{translate('group.gps')}</Label>
+									<Label for='gps'>{translate('gps')}</Label>
 									<Input
 										id='gps'
 										name='gps'
@@ -520,7 +519,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col>
 								{/* Area input, only for admin. */}
 								<FormGroup>
-									<Label for='area'>{translate('group.area')}</Label>
+									<Label for='area'>{translate('area')}</Label>
 									<InputGroup>
 										<Input
 											id='area'
@@ -534,7 +533,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											invalid={groupState.area < 0} />
 										{/* Calculate sum of meter areas */}
 										<Button color='secondary' onClick={handleAutoCalculateArea}>
-											<FormattedMessage id="group.area.calculate" />
+											<FormattedMessage id="area.calculate.auto" />
 										</Button>
 										<TooltipMarkerComponent page='groups-edit' helpTextId='help.groups.area.calculate' />
 										<FormFeedback>
@@ -546,7 +545,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 							<Col>
 								{/* meter area unit input */}
 								<FormGroup>
-									<Label for='areaUnit'>{translate('group.area.unit')}</Label>
+									<Label for='areaUnit'>{translate('area.unit')}</Label>
 									<Input
 										id='areaUnit'
 										name='areaUnit'
@@ -566,7 +565,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						</Row>
 						{/* Note input, only for admin. */}
 						<FormGroup>
-							<Label for='note'>{translate('group.note')}</Label>
+							<Label for='note'>{translate('note')} </Label>
 							<Input
 								id='note'
 								name='note'

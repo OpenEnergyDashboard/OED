@@ -9,6 +9,7 @@ import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibr
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderComponent from '../../components/HeaderComponent';
+import MapsDetailContainer from '../../containers/maps/MapsDetailContainer';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -26,7 +27,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderComponent/>
+					<HeaderComponent />
 					<MapCalibrationInitiateContainer />
 				</div>
 			);
@@ -36,17 +37,15 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 					<UnsavedWarningContainer />
 					<HeaderComponent />
 					<div id={'MapCalibrationContainer'}>
-						<MapCalibrationChartDisplayContainer/>
-						<MapCalibrationInfoDisplayContainer/>
+						<MapCalibrationChartDisplayContainer />
+						<MapCalibrationInfoDisplayContainer />
 					</div>
 				</div>
 			);
 		} else { // preview mode containers
 			return (
 				<div className='container-fluid'>
-					<UnsavedWarningContainer />
-					<HeaderComponent/>
-					<p/>
+					<MapsDetailContainer />
 				</div>
 			);
 		}

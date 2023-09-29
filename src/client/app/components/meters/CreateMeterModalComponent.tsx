@@ -333,7 +333,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('meter.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -344,7 +344,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('meter.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -387,7 +387,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* default graphic unit input */}
 						<Col><FormGroup>
-							<Label for='defaultGraphicUnit'>{translate('meter.defaultGraphicUnit')}</Label>
+							<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 							<Input
 								id='defaultGraphicUnit'
 								name='defaultGraphicUnit'
@@ -429,7 +429,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* Displayable input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('meter.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -482,7 +482,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.readingFrequency}
-								invalid={state.readingFrequency === ''}/>
+								invalid={state.readingFrequency === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -502,7 +502,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
-							<Label for='gps'>{translate('meter.gps')}</Label>
+							<Label for='gps'>{translate('gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'
@@ -514,7 +514,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 					<Row xs='1' lg='2'>
 						{/* Area input */}
 						<Col><FormGroup>
-							<Label for='area'>{translate('meter.area')}</Label>
+							<Label for='area'>{translate('area')}</Label>
 							<Input
 								id='area'
 								name='area'
@@ -529,7 +529,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 						</FormGroup></Col>
 						{/* meter area unit input */}
 						<Col><FormGroup>
-							<Label for='areaUnit'>{translate('meter.area.unit')}</Label>
+							<Label for='areaUnit'>{translate('area.unit')}</Label>
 							<Input
 								id='areaUnit'
 								name='areaUnit'
@@ -548,7 +548,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 					</Row>
 					{/* note input */}
 					<FormGroup>
-						<Label for='note'>{translate('meter.note')}</Label>
+						<Label for='note'>{translate('note')}</Label>
 						<Input
 							id='note'
 							name='note'
@@ -559,57 +559,61 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 					</FormGroup>
 					<Row xs='1' lg='2'>
 						{/* cumulative input */}
-						<Col><FormGroup>
-							<Label for='cumulative'>{translate('meter.cumulative')}</Label>
-							<Input
-								id='cumulative'
-								name='cumulative'
-								type='select'
-								value={state.cumulative.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-								})}
-							</Input>
-						</FormGroup>
-						{/* cumulativeReset input */}
-						<FormGroup>
-							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
-							<Input
-								id='cumulativeReset'
-								name='cumulativeReset'
-								type='select'
-								value={state.cumulativeReset.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-								})}
-							</Input>
-						</FormGroup></Col>
+						<Col>
+							<FormGroup>
+								<Label for='cumulative'>{translate('meter.cumulative')}</Label>
+								<Input
+									id='cumulative'
+									name='cumulative'
+									type='select'
+									value={state.cumulative.toString()}
+									onChange={e => handleBooleanChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									})}
+								</Input>
+							</FormGroup>
+							{/* cumulativeReset input */}
+							<FormGroup>
+								<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
+								<Input
+									id='cumulativeReset'
+									name='cumulativeReset'
+									type='select'
+									value={state.cumulativeReset.toString()}
+									onChange={e => handleBooleanChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									})}
+								</Input>
+							</FormGroup>
+						</Col>
 						{/* cumulativeResetStart input */}
-						<Col><FormGroup>
-							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
-							<Input
-								id='cumulativeResetStart'
-								name='cumulativeResetStart'
-								type='text'
-								autoComplete='off'
-								onChange={e => handleStringChange(e)}
-								value={state.cumulativeResetStart}
-								placeholder='HH:MM:SS' />
-						</FormGroup>
-						{/* cumulativeResetEnd input */}
-						<FormGroup>
-							<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
-							<Input
-								id='cumulativeResetEnd'
-								name='cumulativeResetEnd'
-								type='text'
-								autoComplete='off'
-								onChange={e => handleStringChange(e)}
-								value={state.cumulativeResetEnd}
-								placeholder='HH:MM:SS' />
-						</FormGroup></Col>
+						<Col>
+							<FormGroup>
+								<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
+								<Input
+									id='cumulativeResetStart'
+									name='cumulativeResetStart'
+									type='text'
+									autoComplete='off'
+									onChange={e => handleStringChange(e)}
+									value={state.cumulativeResetStart}
+									placeholder='HH:MM:SS' />
+							</FormGroup>
+							{/* cumulativeResetEnd input */}
+							<FormGroup>
+								<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
+								<Input
+									id='cumulativeResetEnd'
+									name='cumulativeResetEnd'
+									type='text'
+									autoComplete='off'
+									onChange={e => handleStringChange(e)}
+									value={state.cumulativeResetEnd}
+									placeholder='HH:MM:SS' />
+							</FormGroup>
+						</Col>
 					</Row>
 					<Row xs='1' lg='2'>
 						{/* endOnlyTime input */}
@@ -636,7 +640,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								onChange={e => handleNumberChange(e)}
 								min='0'
 								defaultValue={state.readingGap}
-								invalid={state?.readingGap < 0}/>
+								invalid={state?.readingGap < 0} />
 							<FormFeedback>
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>
@@ -670,80 +674,84 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 								min='1'
 								max='9'
 								defaultValue={state.readingDuplication}
-								invalid={state?.readingDuplication < 1 || state?.readingDuplication > 9}/>
+								invalid={state?.readingDuplication < 1 || state?.readingDuplication > 9} />
 							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9'}}  />
+								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
 						{/* timeSort input */}
-						<Col><FormGroup>
-							<Label for='timeSort'>{translate('meter.timeSort')}</Label>
-							<Input
-								id='timeSort'
-								name='timeSort'
-								type='select'
-								value={state.timeSort}
-								onChange={e => handleStringChange(e)}>
-								{Object.keys(MeterTimeSortType).map(key => {
-									// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
-									// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
-									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
-								})}
-							</Input>
-						</FormGroup>
-						{/* Timezone input */}
-						<FormGroup>
-							<Label>{translate('meter.time.zone')}</Label>
-							<TimeZoneSelect current={timeZoneValue} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-						</FormGroup>
-						{/* reading input */}
-						<FormGroup>
-							<Label for='reading'>{translate('meter.reading')}</Label>
-							<Input
-								id='reading'
-								name='reading'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								defaultValue={state.reading} />
-						</FormGroup></Col>
+						<Col>
+							<FormGroup>
+								<Label for='timeSort'>{translate('meter.timeSort')}</Label>
+								<Input
+									id='timeSort'
+									name='timeSort'
+									type='select'
+									value={state.timeSort}
+									onChange={e => handleStringChange(e)}>
+									{Object.keys(MeterTimeSortType).map(key => {
+										// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
+										// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
+										return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
+									})}
+								</Input>
+							</FormGroup>
+							{/* Timezone input */}
+							<FormGroup>
+								<Label>{translate('meter.time.zone')}</Label>
+								<TimeZoneSelect current={timeZoneValue} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+							</FormGroup>
+							{/* reading input */}
+							<FormGroup>
+								<Label for='reading'>{translate('reading')}</Label>
+								<Input
+									id='reading'
+									name='reading'
+									type='number'
+									onChange={e => handleNumberChange(e)}
+									defaultValue={state.reading} />
+							</FormGroup>
+						</Col>
 						{/* startTimestamp input */}
-						<Col><FormGroup>
-							<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
-							<Input
-								id='startTimestamp'
-								name='startTimestamp'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								placeholder='YYYY-MM-DD HH:MM:SS'
-								value={state.startTimestamp} />
-						</FormGroup>
-						{/* endTimestamp input */}
-						<FormGroup>
-							<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
-							<Input
-								id='endTimestamp'
-								name='endTimestamp'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								placeholder='YYYY-MM-DD HH:MM:SS'
-								value={state.endTimestamp} />
-						</FormGroup>
-						{/* endTimestamp input */}
-						<FormGroup>
-							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
-							<Input
-								id='previousEnd'
-								name='previousEnd'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								placeholder='YYYY-MM-DD HH:MM:SS'
-								value={state.previousEnd} />
-						</FormGroup></Col>
+						<Col>
+							<FormGroup>
+								<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
+								<Input
+									id='startTimestamp'
+									name='startTimestamp'
+									type='text'
+									autoComplete='on'
+									onChange={e => handleStringChange(e)}
+									placeholder='YYYY-MM-DD HH:MM:SS'
+									value={state.startTimestamp} />
+							</FormGroup>
+							{/* endTimestamp input */}
+							<FormGroup>
+								<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
+								<Input
+									id='endTimestamp'
+									name='endTimestamp'
+									type='text'
+									autoComplete='on'
+									onChange={e => handleStringChange(e)}
+									placeholder='YYYY-MM-DD HH:MM:SS'
+									value={state.endTimestamp} />
+							</FormGroup>
+							{/* endTimestamp input */}
+							<FormGroup>
+								<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
+								<Input
+									id='previousEnd'
+									name='previousEnd'
+									type='text'
+									autoComplete='on'
+									onChange={e => handleStringChange(e)}
+									placeholder='YYYY-MM-DD HH:MM:SS'
+									value={state.previousEnd} />
+							</FormGroup>
+						</Col>
 					</Row>
 				</Container></ModalBody>
 				<ModalFooter>
