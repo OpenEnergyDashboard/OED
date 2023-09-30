@@ -8,14 +8,14 @@ import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
- * @param readings The meter readings.
- * @param meter the meter identifier for data being exported
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
  * @param unitLabel the full y-axis label on the graphic
  * @param scaling factor to scale readings by, normally the rate factor for line or 1
  * @param meterGroup tells if this is a meter or group export
  * @returns A string containing the CSV formatted meter readings.
  */
-function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number, meterGroup: MeterOrGroup) {
+function convertToCSV(readings: LineReading[], name: string, unitLabel: string, scaling: number, meterGroup: MeterOrGroup) {
 	// TODO should be internationalized
 	let meterOrGroupString = '';
 	if (meterGroup === MeterOrGroup.meter) {
@@ -23,7 +23,7 @@ function convertToCSV(readings: LineReading[], meter: string, unitLabel: string,
 	} else {
 		meterOrGroupString = 'Group'
 	}
-	let csvOutput = `Readings, Start Timestamp, End Timestamp, ${meterOrGroupString} name, ${meter}, Unit, ${unitLabel}\n`;
+	let csvOutput = `Readings, Start Timestamp, End Timestamp, ${meterOrGroupString} name, ${name}, Unit, ${unitLabel}\n`;
 	readings.forEach(reading => {
 		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
@@ -57,19 +57,19 @@ function downloadCSV(inputCSV: string, fileName: string) {
 
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
- * @param readings The readings from the meter to export the graphic points.
- * @param meter the meter identifier for data being exported
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
  * @param unitLabel the full y-axis label on the graphic
  * @param unitIdentifier the unit identifier for data being exported
  * @param chartName the name of the chart/graphic being exported
  * @param scaling factor to scale readings by, normally the rate factor for line or 1
  * @param meterGroup tells if this is a meter or group export
  */
-export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string,
+export default function graphExport(readings: LineReading[], name: string, unitLabel: string, unitIdentifier: string,
 	chartName: ChartTypes, scaling: number, meterGroup: MeterOrGroup) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		const dataToExport = convertToCSV(readings, meter, unitLabel, scaling, meterGroup);
+		const dataToExport = convertToCSV(readings, name, unitLabel, scaling, meterGroup);
 
 		// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 		// As usual, maintain UTC.
@@ -82,7 +82,7 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 
 		// This is the file name with all the above info so unique.
 		// Note it only uses the unit identifier not with the rate because that has funny characters.
-		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meter}_${unitIdentifier}.csv`;
+		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${name}_${unitIdentifier}.csv`;
 		downloadCSV(dataToExport, filename);
 	}
 }
