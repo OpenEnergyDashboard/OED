@@ -40,8 +40,8 @@ export default function RouteComponentWIP() {
 						Compatibility layer for transitioning to react-router 6	Checkout https://github.com/remix-run/react-router/discussions/8753 for details
 					*/}
 					{/*
-						The largest barrier to completely transitioning is Reworking the Unsaved warning container/component.
-						<Prompt/> is not compatible with react-router v6, and will need to be completely reworked if this migration goes moves forward.
+						The largest barrier to completely transitioning is Reworking the UnsavedWarningComponent.
+						<Prompt/> is not compatible with react-router v6, and will need to be completely reworked if router-migration goes moves forward.
 						The UnsavedWarningComponent is use in many of the admin routes, so it is likely that they will also need to be reworked.
 					*/}
 					<CompatRouter >
@@ -98,17 +98,6 @@ const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
 const NotFound = () => {
 	return <Navigate to='/' />
 }
-
-
-// const requireRole = (requiredRole: UserRole, component: JSX.Element) => {
-// 	//user is authenticated if token and role in state.
-// 	if (currentUser.token && currentUser.profile?.role && hasPermissions(currentUser.profile.role, requiredRole)) {
-// 		// If authenticated, and role requires matched return requested component.
-// 		return component
-// 	}
-// 	return <Redirect to='/' />
-// }
-
 
 
 //  FIX ME

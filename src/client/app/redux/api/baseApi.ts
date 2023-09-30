@@ -17,7 +17,7 @@ export const baseApi = createApi({
 		}
 	}),
 	// The types of tags that any injected endpoint may, provide, or invalidate.
-	tagTypes: ['MeterData', 'GroupData', 'Preferences'],
+	tagTypes: ['MeterData', 'GroupData', 'GroupChildrenData', 'Preferences'],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({}),
 	// Keep Data in Cache for 10 Minutes (600 seconds)

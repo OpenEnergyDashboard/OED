@@ -18,19 +18,17 @@ import {
 } from '../../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { selectCurrentUser } from './authSelectors';
+import { selectGroupState, selectMapState, selectMeterState, selectUnitState } from './dataSelectors';
 
 
 export const selectSelectedMeters = (state: RootState) => state.graph.selectedMeters;
 export const selectSelectedGroups = (state: RootState) => state.graph.selectedGroups;
-export const selectCurrentUser = (state: RootState) => state.currentUser;
 export const selectGraphTimeInterval = (state: RootState) => state.graph.timeInterval;
 export const selectGraphUnitID = (state: RootState) => state.graph.selectedUnit;
 export const selectGraphAreaNormalization = (state: RootState) => state.graph.areaNormalization;
 export const selectChartToRender = (state: RootState) => state.graph.chartToRender;
-export const selectMeterState = (state: RootState) => state.meters;
-export const selectGroupState = (state: RootState) => state.groups;
-export const selectUnitState = (state: RootState) => state.units;
-export const selectMapState = (state: RootState) => state.maps;
+
 
 export const selectVisibleMetersAndGroups = createSelector(
 	[selectMeterState, selectGroupState, selectCurrentUser],

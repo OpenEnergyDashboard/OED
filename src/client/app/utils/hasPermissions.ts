@@ -21,5 +21,7 @@ export function hasPermissions(user: UserRole, compareTo: UserRole): boolean {
  * @returns Whether or not user is an admin
  */
 export function isRoleAdmin(user: UserRole): boolean {
+	// TODO Already Converted to a selector
+	// migrate all references to this method to use selectIsLoggedInAsAdmin from authSelectors.ts
 	return user === UserRole.ADMIN;
 }

@@ -1,10 +1,11 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../../store'
-import { MeterOrGroup } from '../../types/redux/graph'
-import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { RootState } from '../../store';
+import { MeterOrGroup } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
-import { ThreeDReadingApiParams } from '../api/readingsApi'
-import { selectGraphUnitID, selectGraphTimeInterval, selectMeterState, selectGroupState } from '../selectors/uiSelectors'
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { ThreeDReadingApiParams } from '../api/readingsApi';
+import { selectGraphTimeInterval, selectGraphUnitID } from '../selectors/uiSelectors';
+import { selectGroupState, selectMeterState } from './dataSelectors';
 
 // Common Fine Grained selectors
 const selectThreeDMeterOrGroupID = (state: RootState) => state.graph.threeD.meterOrGroupID;

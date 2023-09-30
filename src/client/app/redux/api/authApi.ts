@@ -24,7 +24,7 @@ export const authApi = baseApi.injectEndpoints({
 			// Listeners (ExtraReducers) for this query:
 			//	currentUserSlice->MatchFulfilled
 		}),
-		verifyToken: builder.mutation<boolean, string>({
+		verifyToken: builder.mutation<{ success: boolean }, string>({
 			query: queryArgs => ({
 				url: 'api/verification',
 				method: 'POST',

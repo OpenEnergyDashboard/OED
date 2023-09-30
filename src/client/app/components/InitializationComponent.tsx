@@ -15,6 +15,8 @@ import { groupsApi } from '../redux/api/groupsApi';
 import { metersApi } from '../redux/api/metersApi';
 import { preferencesApi } from '../redux/api/preferencesApi';
 import { unitsApi } from '../redux/api/unitsApi';
+import { useAppSelector } from '../redux/hooks';
+import { selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
 import { ConversionArray } from '../types/conversionArray';
 import { getToken, hasToken } from '../utils/token';
 
@@ -23,25 +25,36 @@ import { getToken, hasToken } from '../utils/token';
  * @returns Initialization JSX element
  */
 export default function InitializationComponent() {
-	// QueryHooks derived by api endpoint definitions
-	// These useQuery hooks fetch and cache data to the store as soon the component mounts.
+	const dispatch: Dispatch = useDispatch();
+	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
+
+	// With RTKQuery, Mutations are used for POST, PUT, PATCH, etc.
+	// The useMutation() hooks returns a tuple containing triggerFunction that can be called to initiate the request
+	// and an optional results object containing derived data related the the executed query.
+	const [verifyTokenTrigger] = authApi.useVerifyTokenMutation()
+
+	// useQueryHooks derived by api endpoint definitions fetch and cache data to the store as soon the component mounts.
 	// They maintain an active subscription to the store so long as the component remains mounted.
-	// Since this component lives up near the root of the DOM, these queries will remain subscribed indefinitely
+	// Since this component lives up near the root of the DOM, these queries will remain subscribed indefinitely by default
 	preferencesApi.useGetPreferencesQuery();
 	unitsApi.useGetUnitsDetailsQuery();
 	conversionsApi.useGetConversionsDetailsQuery();
 	conversionsApi.useGetConversionArrayQuery();
 	metersApi.useGetMetersQuery();
-	groupsApi.useGetGroupsQuery();
 
-	// With RTKQuery, Mutations are used for POST, PUT, PATCH, etc.
-	// The useMutation() hooks return a triggerFunction that can be called to initiate the request.
-	const [verifyTokenTrigger] = authApi.useVerifyTokenMutation()
+	// Use Query hooks return an object with various derived values related to the query's status which can be destructured as flows
+	const { data: groupData, isFetching: groupDataIsFetching } = groupsApi.useGetGroupsQuery();
+
+	// Queries can be conditionally fetched based if optional parameter skip is true;
+	// Skip this query if user is not admin
+	// When user is an admin, ensure that the initial Group data exists and is not currently fetching
+	groupsApi.useGetAllGroupsChildrenQuery(undefined, { skip: (!isAdmin || !groupData || groupDataIsFetching) });
+
+
 
 	// There are many derived hooks each with different use cases
 	// Read More @ https://redux-toolkit.js.org/rtk-query/api/created-api/hooks#hooks-overview
 
-	const dispatch: Dispatch = useDispatch();
 
 	// Only run once by making it depend on an empty array.
 	useEffect(() => {

@@ -2,70 +2,46 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+import HeaderComponent from '../../components/HeaderComponent';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { State } from '../../types/redux/state';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
-import { fetchMetersDetailsIfNeeded } from '../../actions/meters';
-import { isRoleAdmin } from '../../utils/hasPermissions';
-import MeterViewComponent from './MeterViewComponent';
-import CreateMeterModalComponent from './CreateMeterModalComponent';
-import { MeterData } from 'types/redux/meters';
+import { useAppSelector } from '../../redux/hooks';
+import { selectCurrentUser, selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
+import { selectUnitDataById, selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
 import '../../styles/card-page.css';
+import { MeterData } from '../../types/redux/meters';
 import { UnitData, UnitType } from '../../types/redux/units';
-import * as _ from 'lodash';
-import { potentialGraphicUnits, noUnitTranslated } from '../../utils/input';
-import HeaderComponent from '../../components/HeaderComponent';
-import { Dispatch } from 'types/redux/actions';
+import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import CreateMeterModalComponent from './CreateMeterModalComponent';
+import MeterViewComponent from './MeterViewComponent';
 
 /**
  * Defines the meters page card view
  * @returns Meters page element
  */
 export default function MetersDetailComponent() {
-
-	const dispatch: Dispatch = useDispatch();
-
-	useEffect(() => {
-		// Makes async call to Meters API for Meters details if one has not already been made somewhere else, stores Meter ids in state
-		dispatch(fetchMetersDetailsIfNeeded());
-	}, []);
-
-	// Meters state
-	const MetersState = useSelector((state: State) => state.meters.byMeterID);
-	// Meters state loaded status
-	const metersStateLoaded = useSelector((state: State) => state.meters.hasBeenFetchedOnce);
 	// current user state
-	const currentUserState = useSelector((state: State) => state.currentUser);
+	const currentUserState = useAppSelector(state => selectCurrentUser(state));
 
 	// Check for admin status
-	const currentUser = currentUserState.profile;
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	let visibleMeters;
-	if (loggedInAsAdmin) {
-		visibleMeters = MetersState;
-	} else {
-		visibleMeters = _.filter(MetersState, (meter: MeterData) => {
-			return meter.displayable === true
-		});
-	}
+	const { visibleMeters } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const units = useSelector((state: State) => state.units.units);
-	// Units state loaded status
-	const unitsStateLoaded = useSelector((state: State) => state.units.hasBeenFetchedOnce);
+	const unitDataById = useAppSelector(state => selectUnitDataById(state));
 
+	// TODO? Convert into Selector?
 	// Possible Meter Units to use
 	let possibleMeterUnits = new Set<UnitData>();
 	// The meter unit can be any unit of type meter.
-	Object.values(units).forEach(unit => {
+	Object.values(unitDataById).forEach(unit => {
 		if (unit.typeOfUnit == UnitType.meter) {
 			possibleMeterUnits.add(unit);
 		}
@@ -76,7 +52,7 @@ export default function MetersDetailComponent() {
 	possibleMeterUnits.add(noUnitTranslated());
 
 	// Possible graphic units to use
-	const possibleGraphicUnits = potentialGraphicUnits(units);
+	const possibleGraphicUnits = potentialGraphicUnits(unitDataById);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -86,7 +62,7 @@ export default function MetersDetailComponent() {
 		display: 'inline-block',
 		fontSize: '50%',
 		// Switch help depending if admin or not.
-		tooltipMeterView: loggedInAsAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
+		tooltipMeterView: isAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
 	};
 
 	return (
@@ -101,7 +77,7 @@ export default function MetersDetailComponent() {
 						<TooltipMarkerComponent page='meters' helpTextId={tooltipStyle.tooltipMeterView} />
 					</div>
 				</h2>
-				{loggedInAsAdmin && metersStateLoaded && unitsStateLoaded &&
+				{isAdmin &&
 					<div className="edit-btn">
 						{/* The actual button for create is inside this component. */}
 						<CreateMeterModalComponent
@@ -110,7 +86,7 @@ export default function MetersDetailComponent() {
 						/>
 					</div>
 				}
-				{metersStateLoaded && unitsStateLoaded &&
+				{
 					<div className="card-container">
 						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
 						{Object.values(visibleMeters)
@@ -127,6 +103,6 @@ export default function MetersDetailComponent() {
 				}
 			</div>
 			<FooterContainer />
-		</div>
+		</div >
 	);
 }

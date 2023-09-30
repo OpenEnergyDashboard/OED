@@ -97,6 +97,8 @@ export const groupsSlice = createSlice({
 			};
 		}
 	},
+	// TODO Much of this logic is duplicated due to migration trying not to change too much at once.
+	// When no longer needed remove base reducers if applicable, or delete slice entirely and rely solely on api cache
 	extraReducers: builder => {
 		builder.addMatcher(groupsApi.endpoints.getGroups.matchFulfilled,
 			(state, { payload }) => {
@@ -120,7 +122,18 @@ export const groupsSlice = createSlice({
 				state.isFetching = false;
 				// TODO FIX TYPES HERE Weird interaction here
 				state.byGroupID = _.keyBy(newGroups, 'id');
-			}
-		)
+			})
+			.addMatcher(groupsApi.endpoints.getAllGroupsChildren.matchFulfilled,
+				(state, action) => {
+					// For each group that received data, set the children meters and groups.
+					for (const groupInfo of action.payload) {
+						// Group id of the current item
+						const groupId = groupInfo.groupId;
+						// Reset the newState for this group to have child meters/groups.
+						state.byGroupID[groupId].childMeters = groupInfo.childMeters;
+						state.byGroupID[groupId].childGroups = groupInfo.childGroups;
+					}
+				})
+
 	}
 });
