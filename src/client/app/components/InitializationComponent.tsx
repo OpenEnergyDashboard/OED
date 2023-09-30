@@ -50,12 +50,16 @@ export default function InitializationComponent() {
 			// use the verify token mutation,
 			verifyTokenTrigger(getToken())
 		}
-
-		// dispatch(fetchPreferencesIfNeeded());
 		dispatch(fetchMapsDetails());
+		ConversionArray.fetchPik();
+
+
+		// Converted to useHooks()
+		// dispatch(fetchMetersDetailsIfNeeded());
+		// dispatch(fetchGroupsDetailsIfNeeded());
+		// dispatch(fetchPreferencesIfNeeded());
 		// dispatch(fetchUnitsDetailsIfNeeded());
 		// dispatch(fetchConversionsDetailsIfNeeded());
-		ConversionArray.fetchPik();
 	}, []);
 
 	return (

@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import { store } from './store'
 import 'bootstrap/dist/css/bootstrap.css';
 // import RouteContainer from './containers/RouteContainer';
-import RouteComponent from './components/RouteComponentWIP';
+import RouteComponentWIP from './components/RouteComponentWIP';
 import './styles/index.css';
 import InitializationComponent from './components/InitializationComponent';
 
@@ -21,6 +21,9 @@ root.render(
 	// Provides the Redux store to all child components
 	<Provider store={store}  >
 		<InitializationComponent />
-		<RouteComponent />
+		{/* Route container is a test of react-router-dom v6
+		This update introduces many useful routing hooks which can potentially be useful when migrating the codebase to hooks from Class components.
+		Very much experimental/ Work in Progress */}
+		<RouteComponentWIP />
 	</Provider>
 );

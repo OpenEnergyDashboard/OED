@@ -8,13 +8,15 @@ export const baseApi = createApi({
 	baseQuery: fetchBaseQuery({
 		baseUrl: baseHref,
 		prepareHeaders: (headers, { getState }) => {
-			// For each api call attempt to set the JWT token in the request header
 			const state = getState() as RootState;
+			// For each api call attempt to set the JWT token in the request header
+			// Token placed in store either on startup after validation, or via credentialed login
 			if (state.currentUser.token) {
 				headers.set('token', state.currentUser.token)
 			}
 		}
 	}),
+	// The types of tags that any injected endpoint may, provide, or invalidate.
 	tagTypes: ['MeterData', 'GroupData', 'Preferences'],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({}),

@@ -38,21 +38,18 @@ export const currentUserSlice = createSlice({
 		}
 	},
 	extraReducers: builder => {
+		// Extra Reducers that listen for actions or endpoints and execute accordingly to update this slice's state.
 		builder
-			.addMatcher(
-				userApi.endpoints.getUserDetails.matchFulfilled,
+			.addMatcher(userApi.endpoints.getUserDetails.matchFulfilled,
 				(state, api) => {
 					state.profile = api.payload
-				}
-			)
-			.addMatcher(
-				authApi.endpoints.login.matchFulfilled,
+				})
+			.addMatcher(authApi.endpoints.login.matchFulfilled,
 				(state, api) => {
 					// User has logged in update state, and write to local storage
 					state.profile = { email: api.payload.email, role: api.payload.role }
 					state.token = api.payload.token
 					setToken(state.token)
-				}
-			)
+				})
 	}
 })

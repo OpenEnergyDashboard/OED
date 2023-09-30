@@ -8,35 +8,44 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import FooterContainer from '../containers/FooterContainer';
 import { authApi } from '../redux/api/authApi';
-import { showErrorNotification } from '../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import HeaderComponent from './HeaderComponent';
 import { useNavigate } from 'react-router-dom-v5-compat';
+
 
 /**
  * @returns The login page for users or admins.
  */
 export default function LoginComponent() {
-	const navigate = useNavigate();
-
 	// Local State
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	// Html Element Reference used for focus()
 	const inputRef = useRef<HTMLInputElement>(null);
+	const navigate = useNavigate();
 
 	// Grab the derived loginMutation from the API
 	// The naming of the returned objects is arbitrary
-	const [login] = authApi.useLoginMutation()
+	// Equivalent Auto-Derived Method
+	const [login] = authApi.endpoints.login.useMutation(); // authApi.useLoginMutation()
 
 	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-		const response = await login({ email: 'test@example.com', password: 'password' }).unwrap()
-		console.log('response ', response)
-		inputRef.current?.focus()
-		showErrorNotification(translate('failed.logging.in'));
-		navigate('/')
+		await login({ email: email, password: password })
+			.unwrap()
+			.then(() => {
+				// No error, success!
+				// TODO Translate
+				showSuccessNotification('Login Successful')
+				navigate('/')
+			})
+			.catch(() => {
+				// Error on login Mutation
+				inputRef.current?.focus()
+				showErrorNotification(translate('failed.logging.in'));
+			})
 	}
 
 	return (

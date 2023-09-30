@@ -17,7 +17,7 @@ import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMen
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
 import { BASE_URL } from './TooltipHelpComponent';
-import {currentUserSlice} from '../reducers/currentUser';
+import { currentUserSlice } from '../reducers/currentUser';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';
 
 /**
@@ -26,9 +26,13 @@ import { unsavedWarningSlice } from '../reducers/unsavedWarning';
  */
 export default function HeaderButtonsComponent() {
 	const dispatch = useDispatch();
-
 	// Get the current page so know which one should not be shown in menu.
 	const currentPage = getPage();
+
+	// React router 6 baked in equivalent hook,
+	// const currentPage = useLocation();
+
+
 
 	// This is the state model for rendering this page.
 	const defaultState = {

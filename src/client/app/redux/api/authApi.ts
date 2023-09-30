@@ -21,6 +21,8 @@ export const authApi = baseApi.injectEndpoints({
 			// in this case, a user logged in which means that some info for ADMIN meters groups etc.
 			// invalidate forces a refetch to any subscribed components or the next query.
 			invalidatesTags: ['MeterData', 'GroupData']
+			// Listeners (ExtraReducers) for this query:
+			//	currentUserSlice->MatchFulfilled
 		}),
 		verifyToken: builder.mutation<boolean, string>({
 			query: queryArgs => ({
