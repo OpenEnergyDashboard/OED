@@ -8,7 +8,7 @@ const Unit = require('../../models/Unit');
 
 /**
  * Compares the expected and actual conversions.
- * @param {*} expected The exepected conversion.
+ * @param {*} expected The expected conversion.
  * @param {*} actual The actual conversion.
  */
 function expectConversionToBeEquivalent(expected, actual) {
@@ -23,14 +23,14 @@ function expectConversionToBeEquivalent(expected, actual) {
 mocha.describe('Conversions', () => {
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.UNUSED, 1000, 
-								Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
-		const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.UNUSED, 2000, 
-								Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
+		const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.QUANTITY, 1000,
+			Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
+		const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.QUANTITY, 2000,
+			Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
 		await unitA.insert(conn);
 		await unitB.insert(conn);
 	});
-	
+
 	mocha.it('can be saved and retrived', async () => {
 		const conn = testDB.getConnection();
 		const unitAId = (await Unit.getByName('Unit A', conn)).id;
@@ -48,15 +48,15 @@ mocha.describe('Conversions', () => {
 		const unitBId = (await Unit.getByName('Unit B', conn)).id;
 		const conversionPreInsert = new Conversion(unitAId, unitBId, true, 1.23, 4.56, 'Note');
 		await conversionPreInsert.insert(conn);
-		
+
 		// Updates the conversion. Note that the sourceId and destinationId can't be changed.
 		conversionPreInsert.bidirectional = false;
 		conversionPreInsert.intercept = 3.14;
 		conversionPreInsert.note = 'New note';
 		await conversionPreInsert.update(conn);
-		
+
 		const covnersionPostInsert = await Conversion.getBySourceDestination(unitAId, unitBId, conn);
-		expectConversionToBeEquivalent(conversionPreInsert, covnersionPostInsert); 
+		expectConversionToBeEquivalent(conversionPreInsert, covnersionPostInsert);
 	});
 
 	mocha.it('can be deleted', async () => {

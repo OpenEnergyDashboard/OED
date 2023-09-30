@@ -1509,7 +1509,7 @@ mocha.describe('readings API', () => {
 						{
 							name: 'invalidUnit',
 							identifier: '',
-							unitRepresent: Unit.unitRepresentType.UNUSED,
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
 							secInRate: 1,
 							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
