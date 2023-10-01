@@ -3,22 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import { fetchMetersDetailsIfNeeded } from './meters';
-import { fetchGroupsDetailsIfNeeded } from './groups';
-import { fetchNeededLineReadings } from './lineReadings';
-import { fetchNeededBarReadings } from './barReadings';
-import { fetchNeededCompareReadings } from './compareReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { Dispatch, Thunk, GetState } from '../types/redux/actions';
-import { State } from '../types/redux/state';
+import { graphSlice } from '../reducers/graph';
+import { Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/graph';
 import * as m from '../types/redux/map';
+import { State } from '../types/redux/state';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import { fetchNeededMapReadings } from './mapReadings';
-import { changeSelectedMap, fetchMapsDetails } from './map';
-import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { graphSlice } from '../reducers/graph';
+import { fetchNeededBarReadings } from './barReadings';
+import { fetchNeededCompareReadings } from './compareReadings';
+import { fetchGroupsDetailsIfNeeded } from './groups';
+import { fetchNeededLineReadings } from './lineReadings';
+import { changeSelectedMap } from './map';
+import { fetchNeededMapReadings } from './mapReadings';
+import { fetchMetersDetailsIfNeeded } from './meters';
+import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	return (dispatch: Dispatch) => {
@@ -256,7 +256,7 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	}
 	if (options.mapID) {
 		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
-		dispatchFirst.push(fetchMapsDetails());
+		// TODO Not currently working with RTK migration
 		dispatchSecond.push(changeSelectedMap(options.mapID));
 	}
 	if (options.readingInterval) {

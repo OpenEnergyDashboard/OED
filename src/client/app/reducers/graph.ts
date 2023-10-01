@@ -94,6 +94,9 @@ export const graphSlice = createSlice({
 		toggleShowMinMax: state => {
 			state.showMinMax = !state.showMinMax
 		},
+		setShowMinMax: (state, action: PayloadAction<boolean>) => {
+			state.showMinMax = action.payload
+		},
 		changeBarStacking: state => {
 			state.barStacking = !state.barStacking
 		},
@@ -109,6 +112,9 @@ export const graphSlice = createSlice({
 		toggleOptionsVisibility: state => {
 			state.optionsVisibility = !state.optionsVisibility
 		},
+		setOptionsVisibility: (state, action: PayloadAction<boolean>) => {
+			state.optionsVisibility = action.payload
+		},
 		updateLineGraphRate: (state, action: PayloadAction<LineGraphRate>) => {
 			state.lineGraphRate = action.payload
 		},
@@ -118,6 +124,12 @@ export const graphSlice = createSlice({
 		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
 			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
 			state.threeD.meterOrGroup = action.payload.meterOrGroup
+		},
+		updateThreeDMeterOrGroupID: (state, action: PayloadAction<number>) => {
+			state.threeD.meterOrGroupID = action.payload
+		},
+		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
+			state.threeD.meterOrGroup = action.payload
 		},
 		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
 			// Destructure payload
