@@ -8,8 +8,8 @@ import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
- * @param readings The meter readings.
- * @param meter the meter identifier for data being exported
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
  * @param unitLabel the full y-axis label on the graphic
  * @param chartName the name of the chart/graphic being exported
  * @param scaling factor to scale readings by, normally the rate factor for line or 1
@@ -17,7 +17,7 @@ import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
  * @param errorBarState This indicate if the error bars are on. Automatically false if no argument is given.
  * @returns A string containing the CSV formatted meter readings.
  */
-function convertToCSV(readings: LineReading[] | BarReading[], meter: string, unitLabel: string, chartName: ChartTypes,
+function convertToCSV(readings: LineReading[] | BarReading[], name: string, unitLabel: string, chartName: ChartTypes,
 	scaling: number, meterGroup: MeterOrGroup, errorBarState: boolean = false) {
 	let csvOutput = 'Readings, Start Timestamp, End Timestamp';
 	// Check if readings is of LineReading type and if error bars are turned on.
@@ -35,7 +35,7 @@ function convertToCSV(readings: LineReading[] | BarReading[], meter: string, uni
 	} else {
 		meterOrGroupString = 'Group'
 	}
-	csvOutput += `, ${meterOrGroupString} name, ${meter}, Unit, ${unitLabel}\n`
+	csvOutput += `, ${meterOrGroupString} name, ${name}, Unit, ${unitLabel}\n`
 	readings.forEach(reading => {
 		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
@@ -83,8 +83,8 @@ function downloadCSV(inputCSV: string, fileName: string) {
 
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
- * @param readings The readings from the meter to export the graphic points.
- * @param meter the meter identifier for data being exported
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
  * @param unitLabel the full y-axis label on the graphic
  * @param unitIdentifier the unit identifier for data being exported
  * @param chartName the name of the chart/graphic being exported
@@ -92,11 +92,11 @@ function downloadCSV(inputCSV: string, fileName: string) {
  * @param meterGroup tells if this is a meter or group export
  * @param errorBarState This indicate if the error bars are on. Automatically false if no argument is given.
  */
-export default function graphExport(readings: LineReading[] | BarReading[], meter: string, unitLabel: string, unitIdentifier: string,
+export default function graphExport(readings: LineReading[] | BarReading[], name: string, unitLabel: string, unitIdentifier: string,
 	chartName: ChartTypes, scaling: number, meterGroup: MeterOrGroup, errorBarState: boolean = false) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		const dataToExport = convertToCSV(readings, meter, unitLabel, chartName, scaling, meterGroup, errorBarState);
+		const dataToExport = convertToCSV(readings, name, unitLabel, chartName, scaling, meterGroup, errorBarState);
 
 		// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 		// As usual, maintain UTC.
@@ -109,7 +109,7 @@ export default function graphExport(readings: LineReading[] | BarReading[], mete
 
 		// This is the file name with all the above info so unique.
 		// Note it only uses the unit identifier not with the rate because that has funny characters.
-		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meter}_${unitIdentifier}.csv`;
+		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${name}_${unitIdentifier}.csv`;
 		downloadCSV(dataToExport, filename);
 	}
 }

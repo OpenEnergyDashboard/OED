@@ -897,8 +897,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state?.endTimestamp} />
 						</FormGroup></Col>
+						{/* previousEnd input */}
 						<Col><FormGroup>
-							{/* previousEnd input */}
 							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
 							<Input
 								id='previousEnd'
