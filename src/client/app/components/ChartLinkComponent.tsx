@@ -5,8 +5,8 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import {ChartTypes} from '../types/redux/graph';
-import {getRangeSliderInterval} from './DashboardComponent';
+import { ChartTypes } from '../types/redux/graph';
+import { getRangeSliderInterval } from './LineChartComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 interface ChartLinkProps {
@@ -50,14 +50,14 @@ export default class ChartLinkComponent extends React.Component<ChartLinkProps, 
 		};
 		return (
 			<div>
-				<Button	outline	onClick={this.toggleLink}>
+				<Button outline onClick={this.toggleLink}>
 					<FormattedMessage id='toggle.link' />
 				</Button>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link'/>
+				<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link' />
 				{this.state.showLink &&
 					<>
 						<div className='checkbox'>
-							<label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptionsInLinkedPage}/>
+							<label><input type='checkbox' onChange={this.handleOptionsVisibility} checked={this.state.hideOptionsInLinkedPage} />
 								<FormattedMessage id='hide.options.in.link' />
 							</label>
 						</div>

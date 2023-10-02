@@ -25,10 +25,8 @@ import {
 } from '../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import MeterAndGroupSelectComponent from './MeterAndGroupSelectComponent';
 import MultiSelectComponent from './MultiSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import UnitSelectComponent from './UnitSelectComponent';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -275,7 +273,6 @@ export default function ChartDataSelectComponent() {
 	return (
 		<div>
 			<p style={labelStyle}>
-				<span>Ref: </span>
 				<FormattedMessage id='groups' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</p>
@@ -304,11 +301,7 @@ export default function ChartDataSelectComponent() {
 					}}
 				/>
 			</div>
-			<div style={divBottomPadding}>
-				<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.groups} />
-			</div>
 			<p style={labelStyle}>
-				<span>Ref: </span>
 				<FormattedMessage id='meters' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</p>
@@ -346,11 +339,7 @@ export default function ChartDataSelectComponent() {
 					}}
 				/>
 			</div>
-			<div style={divBottomPadding}>
-				<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.meters} />
-			</div>
 			<p style={labelStyle}>
-				<span>Ref: </span>
 				<FormattedMessage id='units' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</p>
@@ -379,9 +368,6 @@ export default function ChartDataSelectComponent() {
 						else { dispatch(changeSelectedUnit(-99)); }
 					}}
 				/>
-			</div>
-			<div style={divBottomPadding}>
-				<UnitSelectComponent />
 			</div>
 		</div>
 	);

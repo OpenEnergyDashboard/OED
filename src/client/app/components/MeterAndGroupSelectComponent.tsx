@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 const animatedComponents = makeAnimated();
 
@@ -44,18 +45,24 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 	}
 
 	return (
-		<Select<SelectOption, true, GroupedOption>
-			isMulti
-			placeholder={meterOrGroup === MeterOrGroup.meters ? translate('select.meters') : translate('select.groups')}
-			options={options}
-			value={value}
-			onChange={onChange}
-			closeMenuOnSelect={false}
-			// Customize Labeling for Grouped Labels
-			formatGroupLabel={formatGroupLabel}
-			// Included React-Select Animations
-			components={animatedComponents}
-		/>
+		<div style={divBottomPadding}>
+			<p style={labelStyle}>
+				{translate(`${meterOrGroup}`)}:
+				<TooltipMarkerComponent page='home' helpTextId={`help.home.select.${meterOrGroup}`} />
+			</p>
+			<Select<SelectOption, true, GroupedOption>
+				isMulti
+				placeholder={translate(`select.${meterOrGroup}`)}
+				options={options}
+				value={value}
+				onChange={onChange}
+				closeMenuOnSelect={false}
+				// Customize Labeling for Grouped Labels
+				formatGroupLabel={formatGroupLabel}
+				// Included React-Select Animations
+				components={animatedComponents}
+			/>
+		</div>
 	)
 }
 
@@ -78,3 +85,10 @@ const formatGroupLabel = (data: GroupedOption) => {
 interface MeterAndGroupSelectProps {
 	meterOrGroup: MeterOrGroup;
 }
+const divBottomPadding: React.CSSProperties = {
+	paddingBottom: '15px'
+};
+const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};

@@ -2,20 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import DateRangePicker from '@wojtekmaj/react-daterange-picker';
+import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
+import { CloseReason, Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux'
-import DateRangePicker from '@wojtekmaj/react-daterange-picker';
-import { CloseReason, Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import 'react-calendar/dist/Calendar.css';
-import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
-import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import translate from '../utils/translate';
-import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
+import { useDispatch, useSelector } from 'react-redux';
+import { graphSlice } from '../reducers/graph';
 import { Dispatch } from '../types/redux/actions';
-import { changeGraphZoomIfNeeded } from '../actions/graph';
+import { ChartTypes } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
+import translate from '../utils/translate';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
@@ -34,7 +34,7 @@ export default function DateRangeComponent() {
 	// Don't Close Calendar when selecting dates.
 	// This allows the value to update before calling the onCalClose() method to fetch data if needed.
 	const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
-	const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
+	const onCalClose = () => { dispatch(graphSlice.actions.changeGraphZoom(dateRangeToTimeInterval(dateRange))) };
 
 	// Only Render if a 3D Graphic Type Selected.
 	if (chartToRender === ChartTypes.threeD)

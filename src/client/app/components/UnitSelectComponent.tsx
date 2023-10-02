@@ -11,6 +11,8 @@ import { GroupedOption, SelectOption } from '../types/items';
 // import { FormattedMessage } from 'react-intl';
 import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
+import translate from '../utils/translate';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * @returns A React-Select component for UI Options Panel
@@ -34,19 +36,20 @@ export default function UnitSelectComponent() {
 	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value))
 
 	return (
-		<>
-			{/* <p style={labelStyle}>
-				<FormattedMessage id='units' />:
+		<div style={divBottomPadding}>
+			<p style={labelStyle}>
+				{translate('units')}
 				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
-			</p> */}
+			</p>
 			<Select<SelectOption, false, GroupedOption>
 				value={selectedUnitOption}
 				options={unitSelectOptions}
+				placeholder={translate('select.unit')}
 				onChange={onChange}
 				formatGroupLabel={formatGroupLabel}
 				isClearable
 			/>
-		</>
+		</div>
 	)
 }
 const groupStyles: React.CSSProperties = {
@@ -65,31 +68,10 @@ const formatGroupLabel = (data: GroupedOption) => {
 	)
 }
 
-{/* <MultiSelectComponent
-options={dataProps.sortedUnits}
-selectedOptions={dataProps.selectedUnit}
-placeholder={intl.formatMessage(messages.selectUnit)}
-onValuesChange={(newSelectedUnitOptions: SelectOption[]) => {
-	// TODO I don't quite understand why the component results in an array of size 2 when updating state
-	// For now I have hardcoded a fix that allows units to be selected over other units without clicking the x button
-	if (newSelectedUnitOptions.length === 0) {
-		// Update the selected meters and groups to empty to avoid graphing errors
-		// The update selected meters/groups functions are essentially the same as the change functions
-		// However, they do not attempt to graph.
-		dispatch(graphSlice.actions.updateSelectedGroups([]));
-		dispatch(graphSlice.actions.updateSelectedMeters([]));
-		dispatch(graphSlice.actions.updateSelectedUnit(-99));
-		// Sync threeD state.
-		dispatch(changeMeterOrGroupInfo(null));
-	}
-	else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
-	else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
-	// This should not happen
-	else { dispatch(changeSelectedUnit(-99)); }
-}}
-/> */}
-
-// const labelStyle: React.CSSProperties = {
-// 	fontWeight: 'bold',
-// 	margin: 0
-// };
+const divBottomPadding: React.CSSProperties = {
+	paddingBottom: '15px'
+};
+const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};
