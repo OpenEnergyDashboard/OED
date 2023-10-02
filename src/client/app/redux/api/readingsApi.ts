@@ -1,6 +1,7 @@
-import { baseApi } from './baseApi'
-import { ThreeDReading } from '../../types/readings'
+import { BarReadingApiArgs, LineReadingApiArgs } from '../../redux/selectors/dataSelectors';
+import { BarReadings, LineReadings, ThreeDReading } from '../../types/readings';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { baseApi } from './baseApi';
 
 
 export type ThreeDReadingApiParams = {
@@ -11,15 +12,29 @@ export type ThreeDReadingApiParams = {
 	meterOrGroup: MeterOrGroup;
 };
 
+
 export const readingsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		threeD: builder.query<ThreeDReading, ThreeDReadingApiParams>({
 			query: ({ meterOrGroupID, timeInterval, unitID, readingInterval, meterOrGroup }) => {
-				const endpoint = `/api/unitReadings/threeD/${meterOrGroup}/`
+				const endpoint = `api/unitReadings/threeD/${meterOrGroup}/`
 				const args = `${meterOrGroupID}?timeInterval=${timeInterval.toString()}&graphicUnitId=${unitID}&readingInterval=${readingInterval}`
+				return `${endpoint}${args}`
+			}
+		}),
+		line: builder.query<LineReadings, LineReadingApiArgs>({
+			query: ({ selectedMeters, selectedGroups, timeInterval, graphicUnitID, meterOrGroup }) => {
+				const stringifiedIDs = meterOrGroup === MeterOrGroup.meters ? selectedMeters.join(',') : selectedGroups.join(',')
+				return `api/unitReadings/line/${meterOrGroup}/${stringifiedIDs}?timeInterval=${timeInterval}&graphicUnitId=${graphicUnitID}`
+			}
+		}),
+		bar: builder.query<BarReadings, BarReadingApiArgs>({
+			query: ({ selectedMeters, selectedGroups, timeInterval, graphicUnitID, meterOrGroup, barWidthDays }) => {
+				const stringifiedIDs = meterOrGroup === MeterOrGroup.meters ? selectedMeters.join(',') : selectedGroups.join(',')
+				const endpoint = `api/unitReadings/bar/${meterOrGroup}/${stringifiedIDs}`
+				const args = `?timeInterval=${timeInterval}&barWidthDays=${barWidthDays}&graphicUnitId=${graphicUnitID}`
 				return `${endpoint}${args}`
 			}
 		})
 	})
 })
-export const selectThreeDReadingData = readingsApi.endpoints.threeD.select

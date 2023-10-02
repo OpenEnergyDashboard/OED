@@ -132,36 +132,63 @@ export const graphSlice = createSlice({
 			state.threeD.meterOrGroup = action.payload
 		},
 		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+			// This reducer handles the addition and subtraction values for both the meter and group select components.
+			// The 'MeterOrGroup' type is heavily utilized in the reducer and other parts of the code.
+			// Note that this option is binary, if it's not a meter, then it's a group.
+
 			// Destructure payload
 			const { newMetersOrGroups, meta } = action.payload;
 
 			// Used to check if value has been added or removed
+			// If 'meta.option' is defined, it indicates that a single value has been added or selected.
 			const addedMeterOrGroupID = meta.option?.value;
 			const addedMeterOrGroup = meta.option?.meterOrGroup;
+			const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
 
+			//  If 'meta.removedValue' is defined, it indicates that a single value has been removed or deselected.
 			const removedMeterOrGroupID = meta.removedValue?.value;
 			const removedMeterOrGroup = meta.removedValue?.meterOrGroup;
+
+			// If meta.removedValues is defined, it indicates that all values have been cleared.
 			const clearedMeterOrGroups = meta.removedValues;
 
-			// If no meters selected, and no area unit, we should update unit to default graphic unit
-			// const shouldUpdateUnit = !state.selectedGroups.length && !state.selectedMeters.length && state.selectedUnit === -99
-			// If meterMeter added then and should update unit, update unit.
-			// TODO graphic unit is currently snuck into the select option, find an alternative pattern
-			// state.selectedUnit = addedMeterOrGroupID && !shouldUpdateUnit ? state.selectedUnit : meta.
-
-			// Determine If meter or group was modified then update appropriately
-			const meterOrGroup = addedMeterOrGroup ? addedMeterOrGroup : removedMeterOrGroup;
+			// Generic if else block pertaining to all graph types
+			// Check for the three possible scenarios of a change in the meters
 			if (clearedMeterOrGroups) {
+				// A Select has been cleared(all values removed with clear)
 				// use the first index of cleared items to check for meter or group
 				const isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters
 				// if a meter clear meters, else clear groups
 				isAMeter ? state.selectedMeters = [] : state.selectedGroups = []
-			} else if (meterOrGroup && meterOrGroup === MeterOrGroup.meters) {
-				state.selectedMeters = newMetersOrGroups
-			} else {
-				state.selectedGroups = newMetersOrGroups
+
+			} else if (removedMeterOrGroup) {
+				// An entry was deleted.
+				// Update either selected meters or groups
+
+				removedMeterOrGroup === MeterOrGroup.meters ?
+					state.selectedMeters = newMetersOrGroups
+					:
+					state.selectedGroups = newMetersOrGroups
+
+			} else if (addedMeterOrGroup) {
+				// An entry was added,
+				// Update either selected meters or groups
+				addedMeterOrGroup === MeterOrGroup.meters ?
+					state.selectedMeters = newMetersOrGroups
+					:
+					state.selectedGroups = newMetersOrGroups
+
+				// If the current unit is -99, there is not yet a graphic unit
+				// Set the newly added meterOrGroup's default graphic unit as the current selected unit.
+				if (state.selectedUnit === -99 && addedMeterOrGroupUnit) {
+					state.selectedUnit = addedMeterOrGroupUnit;
+				}
 			}
 
+
+			// Blocks Pertaining to behaviors of specific pages
+
+			// Additional 3d logic
 			// When a meter or group is selected/added, make it the currently active in 3D state.
 			if (addedMeterOrGroupID && addedMeterOrGroup && state.chartToRender === ChartTypes.threeD) {
 				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior

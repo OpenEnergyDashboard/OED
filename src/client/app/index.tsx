@@ -19,7 +19,7 @@ const container = document.getElementById('root');
 const root = createRoot(container!);
 root.render(
 	// Provides the Redux store to all child components
-	<Provider store={store}  >
+	<Provider store={store} stabilityCheck='always' >
 		<InitializationComponent />
 		{/* Route container is a test of react-router-dom v6
 		This update introduces many useful routing hooks which can potentially be useful when migrating the codebase to hooks from Class components.

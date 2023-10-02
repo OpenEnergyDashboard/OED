@@ -2,40 +2,43 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
 import * as moment from 'moment';
+import * as React from 'react';
 import Plot from 'react-plotly.js';
-import ThreeDPillComponent from './ThreeDPillComponent';
-import SpinnerComponent from './SpinnerComponent';
-import { State } from '../types/redux/state';
 import { useSelector } from 'react-redux';
-import { ThreeDReading } from '../types/readings'
-import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
-import { lineUnitLabel } from '../utils/graphics';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-import translate from '../utils/translate';
-import { isValidThreeDInterval } from '../utils/dateRangeCompatibility';
-import { GraphState, MeterOrGroup } from '../types/redux/graph';
-import { UnitsState } from '../types/redux/units';
-import { MetersState } from '../types/redux/meters';
-import { GroupsState } from '../types/redux/groups';
-import { readingsApi } from '../redux/api/readingsApi'
+import { ThreeDReadingApiParams, readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
-import { selectThreeDComponentInfo, selectThreeDQueryArgs, selectThreeDSkip } from '../redux/selectors/threeDSelectors'
+import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
+import { ThreeDReading } from '../types/readings';
+import { GraphState, MeterOrGroup } from '../types/redux/graph';
+import { GroupsState } from '../types/redux/groups';
+import { MetersState } from '../types/redux/meters';
+import { State } from '../types/redux/state';
+import { UnitsState } from '../types/redux/units';
+import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { lineUnitLabel } from '../utils/graphics';
+import translate from '../utils/translate';
+import SpinnerComponent from './SpinnerComponent';
+import ThreeDPillComponent from './ThreeDPillComponent';
 
+interface ThreeDChartProps {
+	queryArgs: ThreeDReadingApiParams,
+	skip: boolean
+}
 /**
  * Component used to render 3D graphics
+ * @param props query args for the useQueryDataFetching hooks
  * @returns 3D Plotly 3D Surface Graph
  */
-export default function ThreeDComponent() {
+export default function ThreeDComponent(props: ThreeDChartProps) {
+	const { queryArgs, skip } = props;
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(queryArgs, { skip: skip });
 	const metersState = useSelector((state: State) => state.meters);
 	const groupsState = useSelector((state: State) => state.groups);
 	const graphState = useSelector((state: State) => state.graph);
 	const unitState = useSelector((state: State) => state.units);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
-	const queryArgs = useAppSelector(selectThreeDQueryArgs);
-	const shouldSkip = useAppSelector(selectThreeDSkip);
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(queryArgs, { skip: shouldSkip });
 
 
 	// Initialize Default values
