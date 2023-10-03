@@ -80,6 +80,9 @@ export interface User {
 	email: string;
 	role: UserRole;
 }
+export interface NewUser extends User {
+	password: string;
+}
 
 /**
  * The values of this enum that needs to match the keys of User.role in src/server/models/User

@@ -10,7 +10,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { CompatRouter, Navigate, Outlet, Route, Routes, useSearchParams } from 'react-router-dom-v5-compat';
 import { TimeInterval } from '../../../common/TimeInterval';
 import CreateUserContainer from '../containers/admin/CreateUserContainer';
-import UsersDetailContainer from '../containers/admin/UsersDetailContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
@@ -29,6 +28,7 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import SpinnerComponent from './SpinnerComponent';
 import AdminComponent from './admin/AdminComponent';
+import UsersDetailComponentWIP from './admin/UsersDetailComponentWIP';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
@@ -67,7 +67,7 @@ export default function RouteComponentWIP() {
 								<Route path='/conversions' element={<ConversionsDetailComponent />} />
 								<Route path='/groups' element={<GroupsDetailComponent />} />
 								<Route path='/meters' element={<MetersDetailComponent />} />
-								<Route path='/users' element={<UsersDetailContainer />} />
+								<Route path='/users' element={<UsersDetailComponentWIP />} />
 							</Route>
 							<Route path='/' element={<RoleOutlet UserRole={UserRole.CSV} />}>
 								<Route path='/csv' element={<UploadCSVContainer />} />

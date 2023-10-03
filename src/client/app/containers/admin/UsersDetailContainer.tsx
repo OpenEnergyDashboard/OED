@@ -2,15 +2,15 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
 import * as _ from 'lodash';
-import { User, UserRole } from '../../types/items';
-import UserDetailComponent from '../../components/admin/UsersDetailComponent';
-import FooterContainer from '../FooterContainer';
-import { usersApi } from '../../utils/api';
-import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import * as React from 'react';
 import HeaderComponent from '../../components/HeaderComponent';
+import UserDetailComponent from '../../components/admin/UsersDetailComponent';
+import { User, UserRole } from '../../types/items';
+import { usersApi } from '../../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import FooterContainer from '../FooterContainer';
 
 interface UsersDisplayContainerProps {
 	fetchUsers: () => User[];

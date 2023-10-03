@@ -1,0 +1,136 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import * as _ from 'lodash';
+import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Button, Input, Table } from 'reactstrap';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
+import { userApi } from '../../redux/api/userApi';
+import { User, UserRole } from '../../types/items';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
+import FooterContainer from '../../containers/FooterContainer';
+import HeaderComponent from '../HeaderComponent';
+
+/**
+ * Component which shows user details
+ * @returns User Detail element
+ */
+export default function UserDetailComponentWIP() {
+	const { data: users = [] } = userApi.useGetUsersQuery(undefined);
+	const [submitUserEdits] = userApi.useEditUsersMutation();
+	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
+
+	// keep history in sync whenever query data changes
+	React.useEffect(() => { setLocalUsersChanges(users) }, [users])
+
+	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
+		// copy user, and update role
+		const updatedUser: User = { ...targetUser, role: e.target.value as UserRole }
+		// make new list from existing local user state
+		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user)
+		setLocalUsersChanges(updatedList)
+		// editUser(user.email, target.value as UserRole);
+	}
+	const submitChanges = async () => {
+		submitUserEdits(localUsersChanges)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.edit.users'));
+			})
+			.catch((e) => {
+				console.log(e)
+				showErrorNotification(translate('users.failed.to.edit.users'))
+			})
+	}
+
+	const deleteUser = (email: string) => {
+		setLocalUsersChanges(localUsersChanges.filter(user => user.email !== email))
+	}
+
+
+	return (
+		<div>
+			<UnsavedWarningContainer />
+			<HeaderComponent />
+			<TooltipHelpContainer page='users' />
+			<div className='container-fluid'>
+				<h2 style={titleStyle}>
+					<FormattedMessage id='users' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
+					</div>
+				</h2>
+				<div style={tableStyle}>
+					<Table striped bordered hover>
+						<thead>
+							<tr>
+								<th> <FormattedMessage id='email' /> </th>
+								<th> <FormattedMessage id='role' /> </th>
+								<th> <FormattedMessage id='action' /> </th>
+							</tr>
+						</thead>
+						<tbody>
+							{localUsersChanges.map(user => (
+								<tr key={user.email}>
+									<td>{user.email}</td>
+									<td>
+										<Input
+											type='select'
+											value={user.role}
+											onChange={e => editUser(e, user)}
+										>
+											{Object.entries(UserRole).map(([role, val]) => (
+												<option value={val} key={role}> {role} </option>
+											))}
+										</Input>
+									</td>
+									<td>
+										<Button color='danger' onClick={() => { deleteUser(user.email); }}>
+											<FormattedMessage id='delete.user' />
+										</Button>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</Table>
+					<div style={buttonsStyle}>
+						<CreateUserLinkButtonComponent />
+						<Button
+							color='success'
+							disabled={_.isEqual(users, localUsersChanges)}
+							onClick={submitChanges}
+						>
+							<FormattedMessage id='save.role.changes' />
+						</Button>
+					</div>
+				</div>
+			</div>
+			<FooterContainer />
+		</div>
+	)
+}
+
+const titleStyle: React.CSSProperties = {
+	textAlign: 'center'
+};
+
+const tableStyle: React.CSSProperties = {
+	marginLeft: '10%',
+	marginRight: '10%'
+};
+
+const buttonsStyle: React.CSSProperties = {
+	display: 'flex',
+	justifyContent: 'space-between'
+}
+
+const tooltipStyle = {
+	display: 'inline-block',
+	fontSize: '50%'
+};
