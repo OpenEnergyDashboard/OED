@@ -4,14 +4,15 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { State } from '../types/redux/state';
 import { useDispatch, useSelector } from 'react-redux';
-import { SelectOption } from '../types/items';
 import Select from 'react-select';
-import translate from '../utils/translate';
-import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { graphSlice } from '../reducers/graph';
+import { SelectOption } from '../types/items';
+import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { State } from '../types/redux/state';
+import { UnitRepresentType } from '../types/redux/units';
+import translate from '../utils/translate';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React component that controls the line graph rate menu
@@ -23,6 +24,25 @@ export default function GraphicRateMenuComponent() {
 	// Graph state
 	const graphState = useSelector((state: State) => state.graph);
 
+	// Unit state
+	const unitDataById = useSelector((state: State) => state.units.units);
+
+	// Unit data by Id
+	const selectedUnitData = unitDataById[graphState.selectedUnit];
+
+	// Should the rate drop down menu be rendered.
+	let shouldRender = true;
+	// Compare the value of name to be 'kW' or 'kWh' or unitRepresent type to be 'raw' and update the visibility of the Rate menu
+	if (selectedUnitData) {
+		const { name, unitRepresent } = selectedUnitData;
+		if (unitRepresent === UnitRepresentType.raw || name === 'kW' || name === 'kWh') {
+			shouldRender = false;
+		}
+	}
+	// Also don't show if not the line graphic.
+	if (graphState.chartToRender !== 'line'){
+		shouldRender = false;
+	}
 	// Array of select options created from the rates
 	const rateOptions: SelectOption[] = [];
 
@@ -43,7 +63,7 @@ export default function GraphicRateMenuComponent() {
 	return (
 		<div>
 			{
-				(graphState.chartToRender === ChartTypes.line || graphState.chartToRender === ChartTypes.threeD) &&
+				shouldRender &&
 				<div>
 					<p style={labelStyle}>
 						<FormattedMessage id='rate' />:

@@ -4,6 +4,7 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { Datum, PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Button } from 'reactstrap';
@@ -23,7 +24,7 @@ import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConvers
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
-import SpinnerComponent from './SpinnerComponent';
+import LogoSpinner from './LogoSpinner';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 
@@ -33,6 +34,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function LineChartComponent(props: ChartQueryProps<LineReadingApiArgs>) {
 	const { meterArgs, groupsArgs } = props.queryProps;
+	const dispatch = useAppDispatch();
 	const {
 		data: meterReadings,
 		isFetching: meterIsFetching
@@ -49,6 +51,7 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(state => state.graph.lineGraphRate);
+	const timeInterval = useAppSelector(state => state.graph.timeInterval);
 	const unitDataByID = useAppSelector(state => selectUnitDataById(state));
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
@@ -57,9 +60,36 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	const metersState = useAppSelector(state => selectMeterState(state));
 	const meterDataByID = useAppSelector(state => selectMeterDataByID(state));
 	const groupDataByID = useAppSelector(state => selectGroupDataByID(state));
+	// Keeps Track of the Slider Values
+	const startTsRef = React.useRef<Datum>(null);
+	const endTsRef = React.useRef<Datum>(null);
 
 	if (meterIsFetching || groupIsFetching) {
-		return <SpinnerComponent loading width={50} height={50} />
+		return <LogoSpinner />
+		// return <SpinnerComponent loading width={50} height={50} />
+	}
+
+	const handleRelayout = (e: PlotRelayoutEvent) => {
+		// Relayout emits many kinds of events listen for the two that give the slider range changes.
+		if (e['xaxis.range']) {
+			startTsRef.current = e['xaxis.range'][0];
+			endTsRef.current = e['xaxis.range'][1];
+		} else if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
+			startTsRef.current = e['xaxis.range[0]'];
+			endTsRef.current = e['xaxis.range[1]'];
+		}
+	}
+
+
+	const getTimeIntervalFromRefs = () => {
+		if (!startTsRef.current && !endTsRef.current) {
+			return TimeInterval.unbounded();
+		} else {
+			return new TimeInterval(
+				moment.utc(startTsRef.current),
+				moment.utc(endTsRef.current)
+			)
+		}
 	}
 	// The unit label depends on the unit which is in selectUnit state.
 	// The current selected rate
@@ -305,48 +335,42 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 		locales: Locales // makes locales available for use
 	}
 	return (
-		<>
+		<div>
 			<Plot
 				data={datasets as Plotly.Data[]}
 				layout={layout as Plotly.Layout}
+				onRelayout={handleRelayout}
 				config={config}
 				style={{ width: '100%', height: '80%' }}
 				useResizeHandler={true}
 			/>
 			{/*  Only Show if there's data */
-				(datasets.length !== 0) && <SliderControls />}
-		</>
-	)
-}
+				(datasets.length !== 0) &&
+				<>
+					<Button
+						key={1}
+						style={buttonMargin}
+						onClick={() => dispatch(graphSlice.actions.changeGraphZoom(getTimeIntervalFromRefs()))}
 
-const SliderControls = () => {
-	const dispatch = useAppDispatch();
-	const timeInterval = useAppSelector(state => state.graph.timeInterval);
-	return (
-		<>
-			<Button
-				key={1}
-				style={buttonMargin}
-				onClick={() => dispatch(graphSlice.actions.changeGraphZoom(TimeInterval.fromString(getRangeSliderInterval())))}
-
-			> {translate('redraw')}
-			</Button>
-			<Button
-				key={2}
-				style={buttonMargin}
-				onClick={() => {
-					if (!timeInterval.equals(TimeInterval.unbounded())) {
-						dispatch(graphSlice.actions.changeGraphZoom(TimeInterval.unbounded()))
-					}
-				}}
-			> {translate('restore')}
-			</Button>
-			<TooltipMarkerComponent
-				key={3}
-				page='home'
-				helpTextId='help.home.chart.redraw.restore'
-			/>
-		</>
+					> {translate('redraw')}
+					</Button>
+					<Button
+						key={2}
+						style={buttonMargin}
+						onClick={() => {
+							if (!timeInterval.equals(TimeInterval.unbounded())) {
+								dispatch(graphSlice.actions.changeGraphZoom(TimeInterval.unbounded()))
+							}
+						}}
+					> {translate('restore')}
+					</Button>
+					<TooltipMarkerComponent
+						key={3}
+						page='home'
+						helpTextId='help.home.chart.redraw.restore'
+					/>
+				</>}
+		</div>
 	)
 }
 

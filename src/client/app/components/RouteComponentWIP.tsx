@@ -10,6 +10,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { CompatRouter, Navigate, Outlet, Route, Routes, useSearchParams } from 'react-router-dom-v5-compat';
 import { TimeInterval } from '../../../common/TimeInterval';
 import CreateUserContainer from '../containers/admin/CreateUserContainer';
+import UsersDetailContainer from '../containers/admin/UsersDetailContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
@@ -66,7 +67,7 @@ export default function RouteComponentWIP() {
 								<Route path='/conversions' element={<ConversionsDetailComponent />} />
 								<Route path='/groups' element={<GroupsDetailComponent />} />
 								<Route path='/meters' element={<MetersDetailComponent />} />
-								{/* <Route path='/users' element={<UsersDetailContainer />} /> */}
+								<Route path='/users' element={<UsersDetailContainer />} />
 							</Route>
 							<Route path='/' element={<RoleOutlet UserRole={UserRole.CSV} />}>
 								<Route path='/csv' element={<UploadCSVContainer />} />
@@ -144,6 +145,9 @@ const GraphLink = () => {
 	const [URLSearchParams] = useSearchParams();
 	const { initComplete } = useWaitForInit();
 	const dispatchQueue: PayloadAction<any>[] = [];
+	if (!initComplete) {
+		return <SpinnerComponent loading width={50} height={50} />
+	}
 	try {
 		URLSearchParams.forEach((value, key) => {
 			//TODO validation could be implemented across all cases similar to compare period and sorting order
@@ -224,20 +228,14 @@ const GraphLink = () => {
 				default:
 					throw new Error('Unknown query parameter');
 			}
-
 		})
-
 	} catch (err) {
 		showErrorNotification(translate('failed.to.link.graph'));
 	}
+	dispatchQueue.forEach(dispatch)
 	// All appropriate state updates should've been executed
 	// redirect to clear the link
-	if (!initComplete) {
-		return <SpinnerComponent loading width={50} height={50} />
-	} else {
-		dispatchQueue.forEach(action => {
-			dispatch(action)
-		})
-		return <Navigate to='/' />
-	}
+
+	return <Navigate to='/' />
+
 }

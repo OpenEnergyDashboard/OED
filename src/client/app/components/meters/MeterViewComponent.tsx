@@ -14,7 +14,7 @@ import { FormattedMessage } from 'react-intl';
 import { isRoleAdmin } from '../../utils/hasPermissions';
 import { CurrentUserState } from 'types/redux/currentUser';
 import '../../styles/card-page.css';
-import { UnitData} from '../../types/redux/units';
+import { UnitData } from '../../types/redux/units';
 import { noUnitTranslated } from '../../utils/input';
 
 interface MeterViewComponentProps {
@@ -67,14 +67,14 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 			</div>
 			{loggedInAsAdmin &&
 				<div className="item-container">
-					<b><FormattedMessage id="meter.name" /></b> {props.meter.name}
+					<b><FormattedMessage id="name" /></b> {props.meter.name}
 				</div>
 			}
 			<div className="item-container">
 				<b><FormattedMessage id="meter.unitName" /></b> {unitName}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="meter.defaultGraphicUnit" /></b> {graphicName}
+				<b><FormattedMessage id="defaultGraphicUnit" /></b> {graphicName}
 			</div>
 			{loggedInAsAdmin &&
 				<div className="item-container">
@@ -83,13 +83,13 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 			}
 			{loggedInAsAdmin &&
 				<div className={props.meter.displayable.toString()}>
-					<b><FormattedMessage id="meter.displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
+					<b><FormattedMessage id="displayable" /></b> {translate(`TrueFalseType.${props.meter.displayable.toString()}`)}
 				</div>
 			}
 			{loggedInAsAdmin &&
 				<div className="item-container">
 					{/* Only show first 30 characters so card does not get too big. Should limit to one line. Check in case null. */}
-					<b><FormattedMessage id="meter.note" /></b> {props.meter.note?.slice(0, 29)}
+					<b><FormattedMessage id="note" /></b> {props.meter.note?.slice(0, 29)}
 				</div>
 			}
 			{loggedInAsAdmin &&

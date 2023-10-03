@@ -47,15 +47,18 @@ because infinity is used to indicate to graph all readings. This version does it
 day by using the day reading view since bars use to the nearest day and this should be faster.
 This should be fine since bar uses the same view to get data.
  */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings_by_day(tsrange_to_shrink TSRANGE)
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_meters_by_day(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
 	RETURNS TSRANGE
 AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
 	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM daily_readings_unit;
-	RETURN tsrange_to_shrink * readings_max_tsrange;
+	FROM daily_readings_unit dr
+	-- Get all the meter_ids in the passed array of meters.
+	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id;
+	-- Make the original range be to the day by dropping parts of days at start/end.
+	RETURN tsrange(date_trunc_up('day', lower(tsrange_to_shrink)), date_trunc('day', upper(tsrange_to_shrink))) * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -658,7 +661,7 @@ BEGIN
 	This rounds to the day for the start and end times requested. It then shrinks in case the actual readings span
 	less time than the request. This can commonly happen when you get +/-infinity for all readings available.
 	It uses the day reading view because that is faster than using all the readings.
-	This has a few issues associated with it:
+	This has an issue associated with it:
 
 	1) If the readings at the start/end have a partial day then it shows up as a day. The original code did:
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
@@ -666,14 +669,8 @@ BEGIN
 	A more general solution would be to change the daily (and hourly) view so it does not include partial ones at start/end.
 	This would fix this case and also impact other uses in what seems a positive way.
 	Note this does not address that missing days in a bar width get no value so the bar will likely read low.
-
-	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separately is that if
-	they have different end times then the bars may not align. For example, if you have 7 day bars and the end time of one meter is two days
-	earlier than the global max then all of its bars will be shifted two days. Since people want to compare among bars in a group, this
-	was undesirable so the global values are used. It means the shifted meters may have missing days that make them smaller than the others.
-	It also is needed for group bars that sum these results so they must align.
 	*/
-	real_tsrange := shrink_tsrange_to_real_readings_by_day(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_tsrange := shrink_tsrange_to_meters_by_day(tsrange(start_stamp, end_stamp), meter_ids);
 	-- Get the actual start/end time rounded to the nearest day from the range.
 	real_start_stamp := lower(real_tsrange);
 	real_end_stamp := upper(real_tsrange);

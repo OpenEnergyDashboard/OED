@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
-import { ReadingsCSVUploadProps, TimeSortTypes, BooleanTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadProps, TimeSortTypes, BooleanMeterTypes } from '../../types/csvUploadForm';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
@@ -90,12 +90,12 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 
 	private handleSetCumulative(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
-		this.props.selectCumulative(target.value as BooleanTypes);
+		this.props.selectCumulative(target.value as BooleanMeterTypes);
 	}
 
 	private handleSetCumulativeReset(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
-		this.props.selectCumulativeReset(target.value as BooleanTypes);
+		this.props.selectCumulativeReset(target.value as BooleanMeterTypes);
 	}
 
 	private handleSetCumulativeResetStart(e: React.ChangeEvent<HTMLInputElement>) {
@@ -120,7 +120,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 
 	private handleSetEndOnly(e: React.ChangeEvent<HTMLInputElement>) {
 		const target = e.target;
-		this.props.selectEndOnly(target.value as BooleanTypes);
+		this.props.selectEndOnly(target.value as BooleanMeterTypes);
 	}
 
 	private handleSetHonorDst() {
@@ -194,9 +194,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								</Label>
 								<Col sm={12}>
 									<Input type='select' name='cumulative' onChange={this.handleSetCumulative}>
-										<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-										<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
+										<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+										<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+										<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
 									</Input>
 								</Col>
 							</FormGroup>
@@ -206,9 +206,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 								</Label>
 								<Col sm={12}>
 									<Input type='select' name='cumulativeReset' onChange={this.handleSetCumulativeReset}>
-										<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-										<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
+										<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+										<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+										<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
 									</Input>
 								</Col>
 							</FormGroup>
@@ -269,9 +269,9 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 						</Label>
 						<Col sm={8}>
 							<Input type='select' name='endOnly' onChange={this.handleSetEndOnly}>
-								<option value={BooleanTypes.meter}> {translate('BooleanTypes.meter')} </option>
-								<option value={BooleanTypes.true}> {translate('BooleanTypes.true')} </option>
-								<option value={BooleanTypes.false}> {translate('BooleanTypes.false')} </option>
+								<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+								<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+								<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
 							</Input>
 						</Col>
 					</FormGroup>

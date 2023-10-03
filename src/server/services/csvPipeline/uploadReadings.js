@@ -5,7 +5,7 @@
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
-const { TimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
+const { TimeSortTypesJS, BooleanMeterTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 const { log } = require('../../log');
 const moment = require('moment');
@@ -22,15 +22,15 @@ const Preferences = require('../../models/Preferences');
 async function uploadReadings(req, res, filepath, conn) {
 	const { meterName, createMeter, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
 	// The next few have no value in the DB for a meter so always use the value passed.
-	const hasHeaderRow = (headerRow === 'true');
-	const shouldUpdate = (update === 'true');
-	let shouldHonorDst = (honorDst === 'true');
-	let shouldRelaxedParsing = (relaxedParsing === 'true');
+	const hasHeaderRow = (headerRow ===  BooleanTypesJS.true);
+	const shouldUpdate = (update ===  BooleanTypesJS.true);
+	let shouldHonorDst = (honorDst ===  BooleanTypesJS.true);
+	let shouldRelaxedParsing = (relaxedParsing ===  BooleanTypesJS.true);
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
 			// Meter#getByNames throws an error when no meter is found. We need the catch clause to account for this error.
-			if (createMeter !== 'true') {
+			if (createMeter !==  BooleanTypesJS.true) {
 				// If createMeter is not set to true, we do not know what to do with the readings so we error out.
 				throw new CSVPipelineError(
 					`User Error: Meter with name '${meterName}' not found. createMeter needs to be set true in order to automatically create meter.`,
@@ -137,31 +137,31 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingTimeSort = timeSort;
 	}
 
-	if (cumulative === undefined || cumulative === BooleanTypesJS.meter) {
+	if (cumulative === undefined || cumulative === BooleanMeterTypesJS.meter) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingsCumulative = BooleanTypesJS.false;
+			readingsCumulative = BooleanMeterTypesJS.false;
 		} else {
-			readingsCumulative = BooleanTypesJS[meter.cumulative];
+			readingsCumulative = BooleanMeterTypesJS[meter.cumulative];
 		}
 	} else {
 		readingsCumulative = cumulative;
 	}
-	const areReadingsCumulative = (readingsCumulative === BooleanTypesJS.true);
+	const areReadingsCumulative = (readingsCumulative === BooleanMeterTypesJS.true);
 
-	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
+	if (cumulativeReset === undefined || cumulativeReset === BooleanMeterTypesJS.meter) {
 		if (meter.cumulativeReset === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingsReset = BooleanTypesJS.false;
+			readingsReset = BooleanMeterTypesJS.false;
 		} else {
-			readingsReset = BooleanTypesJS[meter.cumulativeReset];
+			readingsReset = BooleanMeterTypesJS[meter.cumulativeReset];
 		}
 	} else {
 		readingsReset = cumulativeReset;
 	}
-	const doReadingsReset = (readingsReset === BooleanTypesJS.true);
+	const doReadingsReset = (readingsReset === BooleanMeterTypesJS.true);
 
 	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
@@ -213,18 +213,18 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
 
-	if (endOnly === undefined || endOnly === BooleanTypesJS.meter) {
+	if (endOnly === undefined || endOnly === BooleanMeterTypesJS.meter) {
 		if (meter.endOnlyTime === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingEndOnly = BooleanTypesJS.false;
+			readingEndOnly = BooleanMeterTypesJS.false;
 		} else {
-			readingEndOnly = BooleanTypesJS[meter.endOnlyTime];
+			readingEndOnly = BooleanMeterTypesJS[meter.endOnlyTime];
 		}
 	} else {
 		readingEndOnly = endOnly;
 	}
-	const areReadingsEndOnly = (readingEndOnly === BooleanTypesJS.true);
+	const areReadingsEndOnly = (readingEndOnly === BooleanMeterTypesJS.true);
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 

@@ -61,11 +61,11 @@ function expectMetersToBeEquivalent(expected, actual) {
 mocha.describe('Meters', () => {
 	let unitA, unitB;
 	mocha.beforeEach(async () => {
-		unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000,
+		unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.QUANTITY, 1000,
 			Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
-		unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000,
+		unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.QUANTITY, 2000,
 			Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
-		const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000,
+		const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.QUANTITY, 3000,
 			Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
 		await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
 	});

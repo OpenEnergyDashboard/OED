@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button } from 'reactstrap';
+import ReactTooltip from 'react-tooltip';
 import ExportComponent from '../components/ExportComponent';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
-import { graphSlice } from '../reducers/graph';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/hooks';
 import { selectChartToRender } from '../redux/selectors/uiSelectors';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
@@ -21,16 +19,12 @@ import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import ReactTooltip from 'react-tooltip';
 
 /**
  * @returns the Ui Control panel
  */
 export default function UIOptionsComponent() {
-	const dispatch = useAppDispatch()
 	const chartToRender = useAppSelector(state => selectChartToRender(state));
-	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
 	ReactTooltip.rebuild();
 	return (
 		<div>
@@ -58,24 +52,10 @@ export default function UIOptionsComponent() {
 				chartToRender !== ChartTypes.compare && chartToRender !== ChartTypes.map && chartToRender !== ChartTypes.threeD &&
 				< div style={divTopPadding}>
 					<ExportComponent />
-				</div>
-			}
+				</div>}
+
 			<div style={divTopPadding}>
 				<ChartLinkContainer />
-			</div>
-
-			<div style={divTopPadding} className='d-none d-lg-block'>
-				<Button
-					onClick={() => dispatch(graphSlice.actions.toggleOptionsVisibility())}
-					outline
-				>
-					{optionsVisibility ?
-						<FormattedMessage id='hide.options' />
-						:
-						<FormattedMessage id='show.options' />
-					}
-				</Button>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.hide.or.show.options' />
 			</div>
 		</div >
 	);
