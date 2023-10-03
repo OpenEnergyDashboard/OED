@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { hasToken } from '../../utils/token';
 import FooterContainer from '../../containers/FooterContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
@@ -76,17 +76,17 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 									<th> <FormattedMessage id='map.id' /> </th>
 									<th> <FormattedMessage id='map.name' /> </th>
 									{hasToken() && <th> <FormattedMessage id='map.displayable' /> </th>}
-									{hasToken() && <th> <FormattedMessage id='map.circle.size'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.circle.size' /> </th>}
 									{hasToken() && <th> <FormattedMessage id='map.modified.date' /> </th>}
-									{hasToken() && <th> <FormattedMessage id='map.filename'/> </th>}
-									{hasToken() && <th> <FormattedMessage id='note'/> </th>}
-									{hasToken() && <th> <FormattedMessage id='map.calibration'/> </th>}
-									{hasToken() && <th> <FormattedMessage id='remove'/> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.filename' /> </th>}
+									{hasToken() && <th> <FormattedMessage id='note' /> </th>}
+									{hasToken() && <th> <FormattedMessage id='map.calibration' /> </th>}
+									{hasToken() && <th> <FormattedMessage id='remove' /> </th>}
 								</tr>
 							</thead>
 							<tbody>
-								{ this.props.maps.map(mapID =>
-									( <MapViewContainer key={mapID} id={mapID} /> ))}
+								{this.props.maps.map(mapID =>
+									(<MapViewContainer key={mapID} id={mapID} />))}
 								<tr>
 									<td colSpan={8}>
 										<Link to='/calibration' onClick={() => this.props.createNewMap()}>
@@ -99,14 +99,14 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 							</tbody>
 						</Table>
 					</div>
-					{ hasToken() && <Button
+					{hasToken() && <Button
 						color='success'
 						style={buttonContainerStyle}
 						disabled={!this.props.unsavedChanges}
 						onClick={this.handleSubmitClicked}
 					>
 						<FormattedMessage id='save.map.edits' />
-					</Button> }
+					</Button>}
 				</div>
 				<FooterContainer />
 			</div>

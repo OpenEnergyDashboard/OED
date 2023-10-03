@@ -27,6 +27,11 @@ private
 !/src/server/test/**/*.csv
 !/src/server/data/unit/*.csv
 
+# CSV gz files (except ones needed for database tests)
+*.csv.gz
+!/src/server/test/**/*.csv.gz
+!/src/server/data/unit/*.csv.gz
+
 # Database
 postgres-data
 

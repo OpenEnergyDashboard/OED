@@ -60,8 +60,7 @@ export enum DisplayableType {
 export enum UnitRepresentType {
 	quantity = 'quantity',
 	flow = 'flow',
-	raw = 'raw',
-	unused = 'unused'
+	raw = 'raw'
 }
 
 export interface UnitData {

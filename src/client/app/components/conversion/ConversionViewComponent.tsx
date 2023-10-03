@@ -71,7 +71,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 			</div>
 			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-				<b><FormattedMessage id="conversion.note" /></b> {props.conversion.note.slice(0, 29)}
+				<b><FormattedMessage id="note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
 				<Button color='secondary' onClick={handleShow}>
