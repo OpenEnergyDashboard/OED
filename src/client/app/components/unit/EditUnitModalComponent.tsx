@@ -14,6 +14,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
+import { State } from '../types/redux/state';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
@@ -63,6 +64,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
+	}
+
+	const handleDeleteUnit = () => {
+		// Closes the warning modal
+		// Do not call the handler function because we do not want to open the parent modal
+		// Delete the conversion using the state object, it should only require the source and destination ids set
 	}
 
 	/* Edit Unit Validation:
@@ -315,6 +322,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</FormGroup>
 				</Container></ModalBody>
 				<ModalFooter>
+					<Button variant="warning" color='danger' onClick={handleDeleteUnit}>
+						<FormattedMessage id="discard.changes" />
+					</Button>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
