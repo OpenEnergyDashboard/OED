@@ -69,11 +69,13 @@ export default function CreateUnitModalComponent() {
 	/* Create Unit Validation:
 		Name cannot be blank
 		Sec in Rate must be greater than zero
+		If Unit is type Suffix a suffix their must be a suffix
 	*/
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.name !== '' && state.secInRate > 0);
-	}, [state.name, state.secInRate]);
+		setValidUnit(state.name !== '' && state.secInRate > 0 &&
+		(state.typeOfUnit !== UnitType.suffix || (state.typeOfUnit === UnitType.suffix && state.suffix !== '')));
+	}, [state.name, state.secInRate, state.typeOfUnit, state.suffix]);
 	/* End State */
 
 	// Reset the state to default values
@@ -238,7 +240,11 @@ export default function CreateUnitModalComponent() {
 								type='text'
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
-								value={state.suffix} />
+								value={state.suffix}
+								invalid={state.typeOfUnit===UnitType.suffix && state.suffix === ''}/>
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
 					{/* Note input */}
