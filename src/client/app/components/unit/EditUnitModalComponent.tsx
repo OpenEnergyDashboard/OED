@@ -5,7 +5,7 @@ import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
@@ -14,7 +14,7 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
-import { State } from '../types/redux/state';
+import { State } from 'types/redux/state';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
@@ -66,12 +66,33 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	}
 
+
+
+	// Log the Redux state to the console
+	const meterState = useSelector((state: State) => state.meters.byMeterID);
+	const groups = useSelector((state: State) => state.groups.byGroupID);
+
 	const handleDeleteUnit = () => {
-		// Closes the warning modal
+		// Access the Redux store state
+		for (const [key, value] of Object.entries(groups)) {
+			for(let i = 0;i<value.deepMeters.length;i++)
+			{
+				if(meterState[value.deepMeters[i]].unitId == state.id)
+				{
+					console.log('WARNING: unit ', state.id,  'is being used in meter',  meterState[value.deepMeters[i]].name);
+				}
+			}
+		}
+
+
+		//	object[1]
+		//  object.1
+		//
+		//
+		// Close the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		// Delete the conversion using the state object, it should only require the source and destination ids set
-	}
-
+	};
 	/* Edit Unit Validation:
 		Name cannot be blank
 		Sec in Rate must be greater than zero
@@ -154,7 +175,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 			// set displayable to none if unit is meter
-			if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+			if (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
 				state.displayable = DisplayableType.none;
 			}
 			// Save our changes by dispatching the submitEditedUnit action
@@ -208,7 +229,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.name}
-								invalid={state.name === ''}/>
+								invalid={state.name === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -294,7 +315,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0' }} />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}

@@ -129,7 +129,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		Group must have at least one child (i.e has deep child meters)
 	*/
 	const [validGroup, setValidGroup] = useState(false);
-	useEffect(() => {
+	useEffect(() => {deleteConfirmText
 		setValidGroup(
 			groupState.name !== '' &&
 			(groupState.area === 0 || (groupState.area > 0 && groupState.areaUnit !== AreaUnitType.none)) &&
