@@ -227,7 +227,7 @@ async function insertStandardConversions(conn) {
 			sourceName: 'BTU',
 			destinationName: 'm³ gas',
 			bidirectional: true,
-			slope: 9.625,
+			slope: 2.73e-5,
 			intercept: 0,
 			note: 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'
 		},
