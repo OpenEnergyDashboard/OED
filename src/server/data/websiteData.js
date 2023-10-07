@@ -347,24 +347,193 @@ async function insertWebsiteData() {
 	// since it goes backward through the color array.
 	// TODO: When this is converted to key/value pairs, the area should be set to the comparable meter(s) and campus is the sum of all 121,000.
 	const groups = [
-		['Dining Hall Energy', 'kWh', true, '-87.99913, 40.002', 'Dining Hall Electric and Gas', ['Dining Hall Electric', 'Dining Hall Gas'], [], 10012],
-		['Dining Hall All', 'short ton of CO₂', true, '-87.99913, 40.002', 'Dining Hall All', ['Dining Hall Water'], ['Dining Hall Energy'], 10013],
-		['Theater Energy', 'kWh', true, ' -87.9975, 40.0027', 'Theater Electric and Gas', ['Theater Electric', 'Theater Gas'], [], 10014],
-		['Theater All', 'short ton of CO₂', true, ' -87.9975, 40.0027', 'Theater All', [], ['Theater Energy'], 10015],
-		['Dining & Theater Electric Power', 'kW', true, undefined, 'Dining & Theater Electric Power', ['Dining Hall Electric Power', 'Theater Electric Power'], [], 10016],
-		['Library Energy', 'kWh', true, '-87.99916, 40.00419', 'Library Electric', ['Library Electric'], [], 10017],
+		{
+			name: 'Dining Hall Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: 'Dining Hall Electric and Gas',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric', 'Dining Hall Gas'],
+			childGroups: [],
+			id: 10012
+		},
+		{
+			name: 'Dining Hall All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: 'Dining Hall All',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Water'],
+			childGroups: ['Dining Hall Energy'],
+			id: 10013
+		},
+		{
+			name: 'Theater Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: ' -87.9975, 40.0027',
+			note: 'Theater Electric and Gas',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Theater Electric', 'Theater Gas'],
+			childGroups: [],
+			id: 10014
+		},
+		{
+			name: 'Theater All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: ' -87.9975, 40.0027',
+			note: 'Theater All',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [],
+			childGroups: ['Theater Energy'],
+			id: 10015
+		},
+		{
+			name: 'Dining & Theater Electric Power',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			note: 'Dining & Theater Electric Power',
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric Power', 'Theater Electric Power'],
+			childGroups: [],
+			id: 10016
+		},
+		{
+			name: 'Library Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99916, 40.00419',
+			note: 'Library Electric',
+			area: 100000,
+			areaUnit: 'meters',
+			childMeters: ['Library Electric'],
+			childGroups: [],
+			id: 10017
+		},
 		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric
-		[compareGroups[0], 'kWh', true, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareMeters[3], compareMeters[4]], [], 10018],
-		[compareName(compareGroups[0]), 'kWh', false, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareName(compareMeters[3]), compareName(compareMeters[4])], [], compareId(10018)],
-		['Great Dorm Energy', 'kWh', true, '-87.99817, 40.00057', 'Great Dorm Electric and Gas', ['Great Dorm Gas'], ['Great Dorm Electric'], 10019],
-		['Great Dorm All', 'short ton of CO₂', true, '-87.99817, 40.00057', 'Great Dorm All', ['Great Dorm Water'], ['Great Dorm Energy'], 10020],
-		['Campus Electric', 'kWh', true, undefined, 'Campus Electric', ['Dining Hall Electric', 'Theater Electric', 'Library Electric'], ['Great Dorm Electric'], 10021],
-		['Campus Gas', 'BTU', true, undefined, 'Campus Gas', ['Dining Hall Gas', 'Theater Gas', 'Great Dorm Gas'], [], 10022],
-		['Campus Energy', 'kWh', true, undefined, 'Campus Energy', [], ['Campus Electric', 'Campus Gas'], 10023],
-		['Campus All', 'short ton of CO₂', true, undefined, 'Campus All', ['Dining Hall Water', 'Great Dorm Water'], ['Campus Energy'], 10024],
-		['Campus All - Another', 'short ton of CO₂', true, undefined, 'Campus All done another way with duplicate meter', ['Library Electric', 'Dining Hall Electric'], ['Dining Hall All', 'Theater All', 'Great Dorm All'], 10025],
+		{
+			name: compareGroups[0],
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm 1st & 2nd Electric',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareMeters[3], compareMeters[4]],
+			childGroups: [],
+			id: 10018
+		},
+		{
+			name: compareName(compareGroups[0]),
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm 1st & 2nd Electric',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareName(compareMeters[3]), compareName(compareMeters[4])],
+			childGroups: [],
+			id: compareId(10018)
+		},
+		{
+			name: 'Great Dorm Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm Electric and Gas',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Great Dorm Gas'],
+			childGroups: ['Great Dorm Electric'],
+			id: 10019
+		},
+		{
+			name: 'Great Dorm All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm All',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Great Dorm Water'],
+			childGroups: ['Great Dorm Energy'],
+			id: 10020
+		},
+		{
+			name: 'Campus Electric',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'Campus Electric',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric', 'Theater Electric', 'Library Electric'],
+			childGroups: ['Great Dorm Electric'],
+			id: 10021
+		},
+		{
+			name: 'Campus Gas',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			note: 'Campus Gas',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Gas', 'Theater Gas', 'Great Dorm Gas'],
+			childGroups: [],
+			id: 10022
+		},
+		{
+			name: 'Campus Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'Campus Energy',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: [],
+			childGroups: ['Campus Electric', 'Campus Gas'],
+			id: 10023
+		},
+		{
+			name: 'Campus All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			note: 'Campus All',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Water', 'Great Dorm Water'],
+			childGroups: ['Campus Energy'],
+			id: 10024
+		},
+		{
+			name: 'Campus All - Another',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			note: 'Campus All done another way with duplicate meter',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Library Electric', 'Dining Hall Electric'],
+			childGroups: ['Dining Hall All', 'Theater All', 'Great Dorm All'],
+			id: 10025
+		},
 		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric special vary
-		['Great Dorm Electric Vary', 'kWh', false, '-87.99817, 40.00057', 'Great Dorm Electric for use when shift 2nd floor to current', [compareMeters[3], compareName(compareMeters[4])], [], 10026]
+		{
+			name: 'Great Dorm Electric Vary',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm Electric for use when shift 2nd floor to current',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareMeters[3], compareName(compareMeters[4])],
+			childGroups: [],
+			id: 10026
+		}
 	];
 
 	// This array contains web unit data. It adds on the ones for web from the general special units.
@@ -591,7 +760,6 @@ async function insertWebsiteData() {
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
-	// await Group.insertMany(groups, conn);
 	await insertGroups(groups, conn);
 }
 

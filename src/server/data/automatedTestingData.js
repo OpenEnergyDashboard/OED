@@ -779,7 +779,7 @@ async function insertSpecialConversions(conn) {
 			intercept: 0,
 			note: 'gallon per minute → liter per hour'
 		}
-		]);
+	]);
 	await insertConversions(specialConversionsDev, conn);
 }
 
@@ -1150,18 +1150,123 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	// The table contains special groups' data.
 	// Don't create groups of raw type since could not be graphed as a group.
 	const specialGroups = [
-		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Electric Utility kWh', 'Natural Gas Dollar'], []],
-		['Electric Utility 1-5 + 2-6 Dollar', 'US dollar', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
-		['Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Natural Gas Dollar'], []],
-		['Electric kW + 2-6 kW', 'kW', true, undefined, 'special group', ['Electric kW', 'Electric kW 2-6'], []],
-		['Electric Utility 1-5 kWh not displayable', 'kWh', false, undefined, 'special group', ['Electric Utility kWh'], []],
-		['Sin Sq + Cos Sq kWh', 'kWh', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
-		['Sin Sq + Cos Sq no unit', '', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
-		['Sin Amp 1 + 2 kWh', 'kWh', true, '8.1, 20.2', 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], []],
-		['Sin Amp 2 + 3 kWh', 'kWh', true, '18.9, 5.6', 'special group', ['Sin Amp 2 kWh', 'Sin Amp 3 kWh'], []],
-		['Sin Amp 1 + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh'], ['Sin Amp 2 + 3 kWh']],
-		['Sin Amp 1 + 2 + (1 + 2) + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], ['Sin Amp 1 + 2 kWh', 'Sin Amp 2 + 3 kWh']],
+		{
+			name: 'Electric Utility 1-5 + 2-6 kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'special group',
+			area: 10,
+			areaUnit: 'meters',
+			childMeters: ['Electric Utility kWh', 'Electric Utility kWh 2-6'],
+			childGroups: []
+		},
+		{
+			name: 'Electric Utility 1-5 + Natural Gas Dollar Euro',
+			defaultGraphicUnit: 'euro',
+			displayable: true,
+			note: 'special group',
+			areaUnit: 'meters',
+			childMeters: ['Electric Utility kWh', 'Natural Gas Dollar'],
+			childGroups: []
+		},
+		{
+			name: 'Electric Utility 1-5 + 2-6 Dollar',
+			defaultGraphicUnit: 'US dollar',
+			displayable: true,
+			note: 'special group',
+			area: 10,
+			areaUnit: 'meters',
+			childMeters: ['Electric Utility kWh', 'Electric Utility kWh 2-6'],
+			childGroups: []
+		},
+		{
+			name: 'Natural Gas Dollar Euro',
+			defaultGraphicUnit: 'euro',
+			displayable: true,
+			note: 'special group',
+			areaUnit: 'meters',
+			childMeters: ['Natural Gas Dollar'],
+			childGroups: []
+		},
+		{
+			name: 'Electric kW + 2-6 kW',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			note: 'special group',
+			area: 100,
+			areaUnit: 'meters',
+			childMeters: ['Electric kW', 'Electric kW 2-6'],
+			childGroups: []
+		},
+		{
+			name: 'Electric Utility 1-5 kWh not displayable',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			note: 'special group',
+			areaUnit: 'meters',
+			childMeters: ['Electric Utility kWh'],
+			childGroups: []
+		},
+		{
+			name: 'Sin Sq + Cos Sq kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'special group',
+			area: 10,
+			areaUnit: 'meters',
+			childMeters: ['Sin Sq kWh', 'Cos Sq kWh'],
+			childGroups: []
+		},
+		{
+			name: 'Sin Sq + Cos Sq no unit',
+			displayable: true,
+			note: 'special group',
+			areaUnit: 'meters',
+			childMeters: ['Sin Sq kWh', 'Cos Sq kWh'],
+			childGroups: []
+		},
+		{
+			name: 'Sin Amp 1 + 2 kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '8.1, 20.2',
+			note: 'special group',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'],
+			childGroups: []
+		},
+		{
+			name: 'Sin Amp 2 + 3 kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '18.9, 5.6',
+			note: 'special group',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Sin Amp 2 kWh', 'Sin Amp 3 kWh'],
+			childGroups: []
+		},
+		{
+			name: 'Sin Amp 1 + (2 + 3) kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'special group',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Sin Amp 1 kWh'],
+			childGroups: ['Sin Amp 2 + 3 kWh']
+		},
+		{
+			name: 'Sin Amp 1 + 2 + (1 + 2) + (2 + 3) kWh',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'special group',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'],
+			childGroups: ['Sin Amp 1 + 2 kWh', 'Sin Amp 2 + 3 kWh']
+		},
 	];
 	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMetersGroups() to see how to remove the data that is being inserted.\n");
 	const conn = getConnection();
