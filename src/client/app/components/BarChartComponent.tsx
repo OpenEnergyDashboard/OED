@@ -8,12 +8,7 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
-import {
-	BarReadingApiArgs, ChartQueryProps,
-	selectGroupDataByID,
-	selectMeterDataByID, selectUnitDataById
-} from '../redux/selectors/dataSelectors';
-import { selectSelectedGroups, selectSelectedMeters } from '../redux/selectors/uiSelectors';
+import { BarReadingApiArgs, ChartQueryProps } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import Locales from '../types/locales';
 import { UnitRepresentType } from '../types/redux/units';
@@ -22,6 +17,10 @@ import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
+import { graphSlice } from '../reducers/graph';
+import { groupsSlice } from '../reducers/groups';
+import { metersSlice } from '../reducers/meters';
+import { unitsSlice } from '../reducers/units';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -48,13 +47,13 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 	const datasets: any[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
-	const unitDataByID = useAppSelector(state => selectUnitDataById(state));
+	const unitDataByID = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
-	const selectedMeters = useAppSelector(state => selectSelectedMeters(state))
-	const selectedGroups = useAppSelector(state => selectSelectedGroups(state))
-	const meterDataByID = useAppSelector(state => selectMeterDataByID(state))
-	const groupDataByID = useAppSelector(state => selectGroupDataByID(state))
+	const selectedMeters = useAppSelector(state => graphSlice.selectors.selectedMeters(state));
+	const selectedGroups = useAppSelector(state => graphSlice.selectors.selectedGroups(state));
+	const meterDataByID = useAppSelector(state => metersSlice.selectors.meterDataByID(state));
+	const groupDataByID = useAppSelector(state => groupsSlice.selectors.groupDataByID(state));
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading width={50} height={50} />

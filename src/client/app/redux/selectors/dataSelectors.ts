@@ -1,29 +1,18 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
+import { graphSlice } from '../../reducers/graph';
+import { groupsSlice } from '../../reducers/groups';
+import { metersSlice } from '../../reducers/meters';
 import { ThreeDReadingApiParams } from '../../redux/api/readingsApi';
-import { RootState } from '../../store';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { GroupDefinition } from '../../types/redux/groups';
 import { MeterData } from '../../types/redux/meters';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
 
-
-export const selectMeterDataByID = (state: RootState) => state.meters.byMeterID;
-export const selectGroupDataByID = (state: RootState) => state.groups.byGroupID;
-export const selectUnitDataById = (state: RootState) => state.units.units;
-
-export const selectMeterState = (state: RootState) => state.meters;
-export const selectGroupState = (state: RootState) => state.groups;
-export const selectUnitState = (state: RootState) => state.units;
-export const selectMapState = (state: RootState) => state.maps;
-export const selectThreeDState = (state: RootState) => state.graph.threeD;
-export const selectBarWidthDays = (state: RootState) => state.graph.barDuration;
-export const selectGraphState = (state: RootState) => state.graph;
-
 export const selectVisibleMetersGroupsDataByID = createSelector(
-	selectMeterDataByID,
-	selectGroupDataByID,
+	metersSlice.selectors.meterDataByID,
+	groupsSlice.selectors.groupDataByID,
 	selectIsLoggedInAsAdmin,
 	(meterDataByID, groupDataByID, isAdmin) => {
 		let visibleMeters;
@@ -66,7 +55,7 @@ export interface LineReadingApiArgs extends commonArgs { }
 export interface BarReadingApiArgs extends commonArgs { barWidthDays: number }
 
 export const selectChartQueryArgs = createSelector(
-	selectGraphState,
+	graphSlice.selectors.graphState,
 	graphState => {
 		const baseMeterArgs: commonArgs = {
 			// Sort the arrays immutably. Sorting the arrays helps with cache hits.
@@ -90,8 +79,14 @@ export const selectChartQueryArgs = createSelector(
 		}
 
 		const bar: ChartQueryArgs<BarReadingApiArgs> = {
-			meterArgs: { ...baseMeterArgs, barWidthDays: Math.round(graphState.barDuration.asDays()) },
-			groupsArgs: { ...baseGroupArgs, barWidthDays: Math.round(graphState.barDuration.asDays()) }
+			meterArgs: {
+				...baseMeterArgs,
+				barWidthDays: Math.round(graphState.barDuration.asDays())
+			},
+			groupsArgs: {
+				...baseGroupArgs,
+				barWidthDays: Math.round(graphState.barDuration.asDays())
+			}
 		}
 
 

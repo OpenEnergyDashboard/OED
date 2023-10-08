@@ -6,11 +6,11 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { preferencesApi } from '../redux/api/preferencesApi';
 import { SelectOption } from '../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { preferencesApi } from '../redux/api/preferencesApi';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -220,5 +220,20 @@ export const graphSlice = createSlice({
 					state.selectedAreaUnit = action.payload.defaultAreaUnit
 				}
 			})
+	},
+	// New Feature as of 2.0.0 Beta.
+	selectors: {
+		threeDState: state => state.threeD,
+		barWidthDays: state => state.barDuration,
+		graphState: state => state,
+		selectedMeters: state => state.selectedMeters,
+		selectedGroups: state => state.selectedGroups,
+		graphTimeInterval: state => state.timeInterval,
+		graphUnitID: state => state.selectedUnit,
+		graphAreaNormalization: state => state.areaNormalization,
+		chartToRender: state => state.chartToRender,
+		threeDMeterOrGroup: state => state.threeD.meterOrGroup,
+		threeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
+		threeDReadingInterval: state => state.threeD.readingInterval
 	}
 })

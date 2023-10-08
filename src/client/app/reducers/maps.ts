@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
-import {ActionType} from '../types/redux/actions';
+import { MapMetadata, MapsAction, MapState } from '../types/redux/map';
+import { ActionType } from '../types/redux/actions';
 import * as _ from 'lodash';
-import {CalibratedPoint} from '../utils/calibration';
+import { CalibratedPoint } from '../utils/calibration';
+import { RootState } from '../store';
 
 const defaultState: MapState = {
 	isLoading: false,
@@ -15,7 +16,7 @@ const defaultState: MapState = {
 	editedMaps: {},
 	submitting: [],
 	newMapCounter: 0,
-	calibrationSettings: {showGrid: false}
+	calibrationSettings: { showGrid: false }
 };
 
 export default function maps(state = defaultState, action: MapsAction) {
@@ -117,7 +118,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.ResetCalibration: {
 			editedMaps = state.editedMaps;
-			const mapToReset = {...editedMaps[action.mapID]};
+			const mapToReset = { ...editedMaps[action.mapID] };
 			delete mapToReset.currentPoint;
 			delete mapToReset.calibrationResult;
 			delete mapToReset.calibrationSet;
@@ -159,7 +160,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			editedMaps = state.editedMaps;
 			if (action.mapID > 0) {
 				submitting.splice(submitting.indexOf(action.mapID));
-				byMapID[action.mapID] = {...editedMaps[action.mapID]};
+				byMapID[action.mapID] = { ...editedMaps[action.mapID] };
 			}
 			delete editedMaps[action.mapID];
 			return {
@@ -182,7 +183,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 		case ActionType.UpdateCurrentCartesian: {
 			const newDataPoint: CalibratedPoint = {
 				cartesian: action.currentCartesian,
-				gps: {longitude: -1, latitude: -1}
+				gps: { longitude: -1, latitude: -1 }
 			};
 			return {
 				...state,
@@ -241,3 +242,4 @@ export default function maps(state = defaultState, action: MapsAction) {
 			return state;
 	}
 }
+export const selectMapState = (state: RootState) => state.maps;

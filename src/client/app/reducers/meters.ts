@@ -56,5 +56,10 @@ export const metersSlice = createSlice({
 				state.byMeterID = payload
 			}
 		)
+	},
+	selectors: {
+		meterState: state => state,
+		meterDataByID: state => state.byMeterID
+
 	}
 });

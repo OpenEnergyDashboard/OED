@@ -7,7 +7,6 @@ import ReactTooltip from 'react-tooltip';
 import ExportComponent from '../components/ExportComponent';
 import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { useAppSelector } from '../redux/hooks';
-import { selectChartToRender } from '../redux/selectors/uiSelectors';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import BarControlsComponent from './BarControlsComponent';
@@ -19,12 +18,13 @@ import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
+import { graphSlice } from '../reducers/graph';
 
 /**
  * @returns the Ui Control panel
  */
 export default function UIOptionsComponent() {
-	const chartToRender = useAppSelector(state => selectChartToRender(state));
+	const chartToRender = useAppSelector(state => graphSlice.selectors.chartToRender(state));
 	ReactTooltip.rebuild();
 	return (
 		<div>

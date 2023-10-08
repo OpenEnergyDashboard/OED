@@ -9,12 +9,13 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
-import { selectUnitDataById, selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
+import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
 import { GroupDefinition } from '../../types/redux/groups';
 import { potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
+import { unitsSlice } from '../../reducers/units';
 
 /**
  * Defines the groups page card view
@@ -29,7 +30,7 @@ export default function GroupsDetailComponent() {
 	const { visibleGroups } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const unitDataById = useAppSelector(state => selectUnitDataById(state));
+	const unitDataById = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(unitDataById);

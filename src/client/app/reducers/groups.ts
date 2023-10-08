@@ -135,5 +135,10 @@ export const groupsSlice = createSlice({
 					}
 				})
 
+	},
+	selectors: {
+		groupState: state => state,
+		groupDataByID: state => state.byGroupID
+
 	}
 });

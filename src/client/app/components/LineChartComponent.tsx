@@ -10,14 +10,12 @@ import Plot from 'react-plotly.js';
 import { Button } from 'reactstrap';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { graphSlice } from '../reducers/graph';
+import { groupsSlice } from '../reducers/groups';
+import { metersSlice } from '../reducers/meters';
+import { unitsSlice } from '../reducers/units';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import {
-	ChartQueryProps, LineReadingApiArgs,
-	selectGroupDataByID, selectMeterDataByID,
-	selectMeterState, selectUnitDataById
-} from '../redux/selectors/dataSelectors';
-import { selectSelectedGroups, selectSelectedMeters } from '../redux/selectors/uiSelectors';
+import { ChartQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import Locales from '../types/locales';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -52,14 +50,14 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(state => state.graph.lineGraphRate);
 	const timeInterval = useAppSelector(state => state.graph.timeInterval);
-	const unitDataByID = useAppSelector(state => selectUnitDataById(state));
+	const unitDataByID = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
-	const selectedMeters = useAppSelector(state => selectSelectedMeters(state));
-	const selectedGroups = useAppSelector(state => selectSelectedGroups(state));
-	const metersState = useAppSelector(state => selectMeterState(state));
-	const meterDataByID = useAppSelector(state => selectMeterDataByID(state));
-	const groupDataByID = useAppSelector(state => selectGroupDataByID(state));
+	const selectedMeters = useAppSelector(state => graphSlice.selectors.selectedMeters(state));
+	const selectedGroups = useAppSelector(state => graphSlice.selectors.selectedGroups(state));
+	const metersState = useAppSelector(state => metersSlice.selectors.meterState(state));
+	const meterDataByID = useAppSelector(state => metersSlice.selectors.meterDataByID(state));
+	const groupDataByID = useAppSelector(state => groupsSlice.selectors.groupDataByID(state));
 	// Keeps Track of the Slider Values
 	const startTsRef = React.useRef<Datum>(null);
 	const endTsRef = React.useRef<Datum>(null);

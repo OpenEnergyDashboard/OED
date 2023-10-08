@@ -1,20 +1,21 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
+import { graphSlice } from '../../reducers/graph';
+import { groupsSlice } from '../../reducers/groups';
+import { metersSlice } from '../../reducers/meters';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { ThreeDReadingApiParams } from '../api/readingsApi';
-import { selectGraphTimeInterval, selectGraphUnitID } from '../selectors/uiSelectors';
-import { selectGroupState, selectMeterState } from './dataSelectors';
 
 // Common Fine Grained selectors
-const selectThreeDMeterOrGroupID = (state: RootState) => state.graph.threeD.meterOrGroupID;
-const selectThreeDMeterOrGroup = (state: RootState) => state.graph.threeD.meterOrGroup;
-export const selectThreeDReadingInterval = (state: RootState) => state.graph.threeD.readingInterval;
+const { threeDMeterOrGroup, threeDMeterOrGroupID, threeDReadingInterval } = graphSlice.selectors;
+const { graphTimeInterval, graphUnitID } = graphSlice.selectors;
+const { meterState } = metersSlice.selectors;
+const { groupState } = groupsSlice.selectors;
 
 // Memoized Selectors
 export const selectThreeDComponentInfo = createSelector(
-	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterState, selectGroupState],
+	[threeDMeterOrGroupID, threeDMeterOrGroup, meterState, groupState],
 	(id, meterOrGroup, meterData, groupData) => {
 		//Default Values
 		let meterOrGroupName = 'Unselected Meter or Group'
@@ -44,11 +45,11 @@ export const selectThreeDComponentInfo = createSelector(
 )
 
 export const selectThreeDQueryArgs = createSelector(
-	selectThreeDMeterOrGroupID,
-	selectGraphTimeInterval,
-	selectGraphUnitID,
-	selectThreeDReadingInterval,
-	selectThreeDMeterOrGroup,
+	threeDMeterOrGroupID,
+	graphTimeInterval,
+	graphUnitID,
+	threeDReadingInterval,
+	threeDMeterOrGroup,
 	(id, timeInterval, unitID, readingInterval, meterOrGroup) => {
 		return {
 			meterOrGroupID: id,
@@ -61,7 +62,7 @@ export const selectThreeDQueryArgs = createSelector(
 )
 
 export const selectThreeDSkip = createSelector(
-	selectThreeDMeterOrGroupID,
-	selectGraphTimeInterval,
+	threeDMeterOrGroupID,
+	graphTimeInterval,
 	(id, interval) => !id || !interval.getIsBounded()
 )

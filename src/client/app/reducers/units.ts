@@ -46,5 +46,10 @@ export const unitsSlice = createSlice({
 		builder.addMatcher(unitsApi.endpoints.getUnitsDetails.matchFulfilled,
 			(state, action) => { state.units = _.keyBy(action.payload, unit => unit.id) }
 		)
+	},
+	selectors: {
+		unitsState: state => state,
+		unitDataById: state => state.units
+
 	}
 });

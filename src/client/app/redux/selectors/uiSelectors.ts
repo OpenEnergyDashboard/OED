@@ -5,13 +5,17 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
 import { instanceOfGroupsState, instanceOfMetersState, instanceOfUnitsState } from '../../components/ChartDataSelectComponent';
-import { RootState } from '../../store';
+import { graphSlice } from '../../reducers/graph';
+import { groupsSlice } from '../../reducers/groups';
+import { selectMapState } from '../../reducers/maps';
+import { metersSlice } from '../../reducers/meters';
+import { unitsSlice } from '../../reducers/units';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
 import { GroupsState } from '../../types/redux/groups';
 import { MetersState } from '../../types/redux/meters';
-import { DisplayableType, UnitData, UnitRepresentType, UnitType, UnitsState } from '../../types/redux/units';
+import { DisplayableType, UnitRepresentType, UnitType, UnitsState } from '../../types/redux/units';
 import {
 	CartesianPoint, Dimensions, calculateScaleFromEndpoints, gpsToUserGrid,
 	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
@@ -19,19 +23,19 @@ import {
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { selectCurrentUser } from './authSelectors';
-import { selectGroupState, selectMapState, selectMeterState, selectUnitState } from './dataSelectors';
 
-
-export const selectSelectedMeters = (state: RootState) => state.graph.selectedMeters;
-export const selectSelectedGroups = (state: RootState) => state.graph.selectedGroups;
-export const selectGraphTimeInterval = (state: RootState) => state.graph.timeInterval;
-export const selectGraphUnitID = (state: RootState) => state.graph.selectedUnit;
-export const selectGraphAreaNormalization = (state: RootState) => state.graph.areaNormalization;
-export const selectChartToRender = (state: RootState) => state.graph.chartToRender;
-
+// Destruct selectors from Slices (rtk5.0.2Beta)
+// Selectors will be used as arguments for the Create Selectors.
+// Ensure these selectors always return a stable reference.
+const { meterState } = metersSlice.selectors;
+const { groupState } = groupsSlice.selectors;
+const { graphUnitID, selectedMeters, selectedGroups, chartToRender, graphAreaNormalization } = graphSlice.selectors;
+const { unitsState } = unitsSlice.selectors;
 
 export const selectVisibleMetersAndGroups = createSelector(
-	[selectMeterState, selectGroupState, selectCurrentUser],
+	meterState,
+	groupState,
+	selectCurrentUser,
 	(meterState, groupState, currentUser) => {
 		// Holds all meters visible to the user
 		const visibleMeters = new Set<number>();
@@ -65,7 +69,12 @@ export const selectVisibleMetersAndGroups = createSelector(
 );
 
 export const selectCurrentUnitCompatibility = createSelector(
-	[selectVisibleMetersAndGroups, selectMeterState, selectGroupState, selectGraphUnitID],
+	[
+		selectVisibleMetersAndGroups,
+		meterState,
+		groupState,
+		graphUnitID
+	],
 	(visible, meterState, groupState, graphUnitID) => {
 		// meters and groups that can graph
 		const compatibleMeters = new Set<number>();
@@ -135,13 +144,16 @@ export const selectCurrentUnitCompatibility = createSelector(
 		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
 	}
 )
+
 export const selectCurrentAreaCompatibility = createSelector(
-	selectCurrentUnitCompatibility,
-	selectGraphAreaNormalization,
-	selectGraphUnitID,
-	selectMeterState,
-	selectGroupState,
-	selectUnitState,
+	[
+		selectCurrentUnitCompatibility,
+		graphAreaNormalization,
+		graphUnitID,
+		meterState,
+		groupState,
+		unitsState
+	],
 	(currentUnitCompatibility, areaNormalization, unitID, meterState, groupState, unitState) => {
 		// Deep Copy previous selector's values, and update as needed based on current Area Normalization setting
 		const compatibleMeters = new Set<number>(currentUnitCompatibility.compatibleMeters);
@@ -185,9 +197,9 @@ export const selectCurrentAreaCompatibility = createSelector(
 
 export const selectChartTypeCompatibility = createSelector(
 	selectCurrentAreaCompatibility,
-	selectChartToRender,
-	selectMeterState,
-	selectGroupState,
+	chartToRender,
+	meterState,
+	groupState,
 	selectMapState,
 	(areaCompat, chartToRender, meterState, groupState, mapState) => {
 		// Deep Copy previous selector's values, and update as needed based on current ChartType(s)
@@ -272,11 +284,13 @@ export const selectChartTypeCompatibility = createSelector(
 )
 
 export const selectMeterGroupSelectData = createSelector(
-	selectChartTypeCompatibility,
-	selectMeterState,
-	selectGroupState,
-	selectSelectedMeters,
-	selectSelectedGroups,
+	[
+		selectChartTypeCompatibility,
+		meterState,
+		groupState,
+		selectedMeters,
+		selectedGroups
+	],
 	(chartTypeCompatibility, meterState, groupState, selectedMeters, selectedGroups) => {
 		// Destructure Previous Selectors's values
 		const { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups } = chartTypeCompatibility;
@@ -332,19 +346,19 @@ export const selectMeterGroupSelectData = createSelector(
  * @returns an array of UnitData
  */
 export const selectVisibleUnitOrSuffixState = createSelector(
-	selectUnitState,
+	unitsState,
 	selectCurrentUser,
 	(unitState, currentUser) => {
 		let visibleUnitsOrSuffixes;
 		if (currentUser.profile?.role === 'admin') {
 			// User is an admin, allow all units to be seen
-			visibleUnitsOrSuffixes = _.filter(unitState.units, (o: UnitData) => {
+			visibleUnitsOrSuffixes = _.filter(unitState.units, o => {
 				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable != DisplayableType.none;
 			});
 		}
 		else {
 			// User is not an admin, do not allow for admin units to be seen
-			visibleUnitsOrSuffixes = _.filter(unitState.units, (o: UnitData) => {
+			visibleUnitsOrSuffixes = _.filter(unitState.units, o => {
 				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable == DisplayableType.all;
 			});
 		}
@@ -353,11 +367,13 @@ export const selectVisibleUnitOrSuffixState = createSelector(
 )
 
 export const selectUnitSelectData = createSelector(
-	selectUnitState,
-	selectVisibleUnitOrSuffixState,
-	selectSelectedMeters,
-	selectSelectedGroups,
-	selectGraphAreaNormalization,
+	[
+		unitsState,
+		selectVisibleUnitOrSuffixState,
+		selectedMeters,
+		selectedGroups,
+		graphAreaNormalization
+	],
 	(unitState, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
@@ -520,7 +536,7 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
 }
 
 export const selectDateRangeInterval = createSelector(
-	selectGraphTimeInterval,
+	graphSlice.selectors.graphTimeInterval,
 	timeInterval => {
 		return timeInterval
 	}

@@ -10,7 +10,7 @@ import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useAppSelector } from '../../redux/hooks';
 import { selectCurrentUser, selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
-import { selectUnitDataById, selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
+import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
 import '../../styles/card-page.css';
 import { MeterData } from '../../types/redux/meters';
 import { UnitData, UnitType } from '../../types/redux/units';
@@ -18,6 +18,7 @@ import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
+import { unitsSlice } from '../../reducers/units';
 
 /**
  * Defines the meters page card view
@@ -35,7 +36,7 @@ export default function MetersDetailComponent() {
 	const { visibleMeters } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const unitDataById = useAppSelector(state => selectUnitDataById(state));
+	const unitDataById = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
 
 	// TODO? Convert into Selector?
 	// Possible Meter Units to use

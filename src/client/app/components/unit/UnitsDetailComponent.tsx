@@ -10,11 +10,11 @@ import SpinnerComponent from '../../components/SpinnerComponent';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useAppSelector } from '../../redux/hooks';
-import { selectUnitDataById } from '../../redux/selectors/dataSelectors';
 import { State } from '../../types/redux/state';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
+import { unitsSlice } from '../../reducers/units';
 
 /**
  * Defines the units page card view
@@ -25,7 +25,7 @@ export default function UnitsDetailComponent() {
 	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
 
 	//Units state
-	const unitDataById = useAppSelector(state => selectUnitDataById(state));
+	const unitDataById = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
 
 
 	const titleStyle: React.CSSProperties = {
