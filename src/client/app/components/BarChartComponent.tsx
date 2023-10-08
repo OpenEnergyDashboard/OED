@@ -35,12 +35,12 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 	const {
 		data: meterReadings,
 		isFetching: meterIsFetching
-	} = readingsApi.useBarQuery(meterArgs, { skip: !meterArgs.selectedMeters.length });
+	} = readingsApi.useBarQuery(meterArgs, { skip: !meterArgs.ids.length });
 
 	const {
 		data: groupData,
 		isFetching: groupIsFetching
-	} = readingsApi.useBarQuery(groupsArgs, { skip: !groupsArgs.selectedGroups.length });
+	} = readingsApi.useBarQuery(groupsArgs, { skip: !groupsArgs.ids.length });
 
 	const barDuration = useAppSelector(state => state.graph.barDuration);
 	const barStacking = useAppSelector(state => state.graph.barStacking);

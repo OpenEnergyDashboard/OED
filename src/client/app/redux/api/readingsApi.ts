@@ -23,15 +23,13 @@ export const readingsApi = baseApi.injectEndpoints({
 			}
 		}),
 		line: builder.query<LineReadings, LineReadingApiArgs>({
-			query: ({ selectedMeters, selectedGroups, timeInterval, graphicUnitID, meterOrGroup }) => {
-				const stringifiedIDs = meterOrGroup === MeterOrGroup.meters ? selectedMeters.join(',') : selectedGroups.join(',')
-				return `api/unitReadings/line/${meterOrGroup}/${stringifiedIDs}?timeInterval=${timeInterval}&graphicUnitId=${graphicUnitID}`
+			query: ({ ids, timeInterval, graphicUnitID, meterOrGroup }) => {
+				return `api/unitReadings/line/${meterOrGroup}/${ids.join(',')}?timeInterval=${timeInterval}&graphicUnitId=${graphicUnitID}`
 			}
 		}),
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
-			query: ({ selectedMeters, selectedGroups, timeInterval, graphicUnitID, meterOrGroup, barWidthDays }) => {
-				const stringifiedIDs = meterOrGroup === MeterOrGroup.meters ? selectedMeters.join(',') : selectedGroups.join(',')
-				const endpoint = `api/unitReadings/bar/${meterOrGroup}/${stringifiedIDs}`
+			query: ({ ids, timeInterval, graphicUnitID, meterOrGroup, barWidthDays }) => {
+				const endpoint = `api/unitReadings/bar/${meterOrGroup}/${ids.join(',')}`
 				const args = `?timeInterval=${timeInterval}&barWidthDays=${barWidthDays}&graphicUnitId=${graphicUnitID}`
 				return `${endpoint}${args}`
 			}

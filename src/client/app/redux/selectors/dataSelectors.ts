@@ -50,16 +50,18 @@ export interface ChartQueryArgs<T> {
 	meterArgs: T
 	groupsArgs: T
 }
+
 export interface ChartQueryProps<T> {
 	queryProps: ChartQueryArgs<T>
 }
+
 export interface commonArgs {
-	selectedMeters: number[];
-	selectedGroups: number[];
+	ids: number[];
 	timeInterval: string;
 	graphicUnitID: number;
 	meterOrGroup: MeterOrGroup;
 }
+
 export interface LineReadingApiArgs extends commonArgs { }
 export interface BarReadingApiArgs extends commonArgs { barWidthDays: number }
 
@@ -67,16 +69,18 @@ export const selectChartQueryArgs = createSelector(
 	selectGraphState,
 	graphState => {
 		const baseMeterArgs: commonArgs = {
-			selectedMeters: graphState.selectedMeters,
-			selectedGroups: graphState.selectedGroups,
+			// Sort the arrays immutably. Sorting the arrays helps with cache hits.
+			ids: [...graphState.selectedMeters].sort(),
 			timeInterval: graphState.timeInterval.toString(),
 			graphicUnitID: graphState.selectedUnit,
 			meterOrGroup: MeterOrGroup.meters
 		}
 
-
 		const baseGroupArgs: commonArgs = {
-			...baseMeterArgs,
+			// Sort the arrays immutably. Sorting the arrays helps with cache hits.
+			ids: [...graphState.selectedGroups].sort(),
+			timeInterval: graphState.timeInterval.toString(),
+			graphicUnitID: graphState.selectedUnit,
 			meterOrGroup: MeterOrGroup.groups
 		}
 
@@ -105,3 +109,4 @@ export const selectChartQueryArgs = createSelector(
 		return { line, bar, threeD }
 	}
 )
+

@@ -38,12 +38,12 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	const {
 		data: meterReadings,
 		isFetching: meterIsFetching
-	} = readingsApi.useLineQuery(meterArgs, { skip: !meterArgs.selectedMeters.length });
+	} = readingsApi.useLineQuery(meterArgs, { skip: !meterArgs.ids.length });
 
 	const {
 		data: groupData,
 		isFetching: groupIsFetching
-	} = readingsApi.useLineQuery(groupsArgs, { skip: !groupsArgs.selectedGroups.length });
+	} = readingsApi.useLineQuery(groupsArgs, { skip: !groupsArgs.ids.length });
 
 	const selectedUnit = useAppSelector(state => state.graph.selectedUnit);
 	const datasets: any[] = [];
@@ -339,6 +339,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 			<Plot
 				data={datasets as Plotly.Data[]}
 				layout={layout as Plotly.Layout}
+				onInitialized={e => console.log(e.layout.xaxis?.range, e.layout.xaxis?.rangeslider?.range, e.layout.xaxis?.rangeselector)}
+				onUpdate={e => console.log(e.layout.xaxis?.range, e.layout.xaxis?.rangeslider?.range, e.layout.xaxis?.rangeselector)}
 				onRelayout={handleRelayout}
 				config={config}
 				style={{ width: '100%', height: '80%' }}

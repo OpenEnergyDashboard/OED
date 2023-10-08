@@ -518,3 +518,10 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
 
 	return { compatible: sortedCompatibleOptions, incompatible: sortedIncompatibleOptions }
 }
+
+export const selectDateRangeInterval = createSelector(
+	selectGraphTimeInterval,
+	timeInterval => {
+		return timeInterval
+	}
+)
