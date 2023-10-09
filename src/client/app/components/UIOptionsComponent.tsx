@@ -21,6 +21,7 @@ import ReactTooltip from 'react-tooltip';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import ErrorBarComponent from './ErrorBarComponent';
+import DateRangeComponent from './DateRangeComponent';
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
 
@@ -90,6 +91,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
 				<AreaUnitSelectComponent />
+				<DateRangeComponent/>
 				{/* Controls error bar, specifically for the line chart. */}
 				{this.props.chartToRender === ChartTypes.line &&
 					<ErrorBarComponent />
@@ -252,7 +254,7 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				}
 
 				{/* We can't export compare data or map data */}
-				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
+				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map && this.props.chartToRender != ChartTypes.radar &&
 					<div style={divTopPadding}>
 						<ExportComponent />
 					</div>
