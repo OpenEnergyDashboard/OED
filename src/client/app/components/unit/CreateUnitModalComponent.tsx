@@ -171,7 +171,11 @@ export default function CreateUnitModalComponent() {
 								})}
 							</Input>
 							<FormFeedback>
+<<<<<<< HEAD
 								<FormattedMessage id="error.typeOfUnit.suffix" />
+=======
+								<FormattedMessage id="Added suffix will set Unit Type to suffix" />
+>>>>>>> origin/Jake-Bodin/issue1019
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
