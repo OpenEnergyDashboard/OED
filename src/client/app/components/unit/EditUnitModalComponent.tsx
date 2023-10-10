@@ -20,6 +20,7 @@ import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 
+
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
@@ -74,19 +75,21 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const handleDeleteUnit = () => {
 		// Access the Redux store state
+		let error_message = '';
 		for (const [key, value] of Object.entries(groups)) {
-			for(let i = 0;i<value.deepMeters.length;i++)
-			{
-				if(meterState[value.deepMeters[i]].unitId == state.id)
-				{
-					console.log('WARNING: unit ', state.id,  'is being used in meter',  meterState[value.deepMeters[i]].name);
+			for (let i = 0; i < value.deepMeters.length; i++) {
+				if (meterState[value.deepMeters[i]].unitId == state.id) {
+					error_message += 'WARNING: unit '+ state.id + ' is being used in meter ' + meterState[value.deepMeters[i]].name + ' \n';
+
 				}
 			}
 		}
+		if(error_message)
+		{
+			alert(error_message);
+		}
 
 
-		//	object[1]
-		//  object.1
 		//
 		//
 		// Close the warning modal
