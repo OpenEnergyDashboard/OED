@@ -67,9 +67,9 @@ export default function CreateUnitModalComponent() {
 	}
 
 	/* Create Unit Validation:
-		Name cannot be blank
+		Name cannot blank
 		Sec in Rate must be greater than zero
-		If Unit is type Suffix a suffix their must be a suffix
+		If type of unit is suffix their must be a suffix
 	*/
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
@@ -171,7 +171,7 @@ export default function CreateUnitModalComponent() {
 								})}
 							</Input>
 							<FormFeedback>
-								<FormattedMessage id="Added suffix will set Unit Type to suffix" />
+								<FormattedMessage id="Added suffix will set type of unit to suffix" />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}

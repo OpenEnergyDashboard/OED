@@ -73,11 +73,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		Name cannot be blank
 		Sec in Rate must be greater than zero
 		Unit type mismatches checked on submit
+		If type of unit is suffix their must be a suffix
 	*/
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.name !== '' && state.secInRate > 0);
-	}, [state.name, state.secInRate]);
+		setValidUnit(state.name !== '' && state.secInRate > 0 &&
+		(state.typeOfUnit !== UnitType.suffix || (state.typeOfUnit === UnitType.suffix && state.suffix !== '')));
+	}, [state.name, state.secInRate, state.typeOfUnit, state.suffix]);
 	/* End State */
 
 	// Reset the state to default values
@@ -232,11 +234,15 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								name='typeOfUnit'
 								type='select'
 								onChange={e => handleStringChange(e)}
-								value={state.typeOfUnit}>
+								value={state.typeOfUnit}
+								invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}>
 								{Object.keys(UnitType).map(key => {
 									return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
 								})}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id="Added suffix will set type of unit to suffix" />
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
 						<Col><FormGroup>
@@ -316,7 +322,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								type='text'
 								value={state.suffix}
 								placeholder='Suffix'
-								onChange={e => handleStringChange(e)} />
+								onChange={e => handleStringChange(e)}
+								invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
 					{/* Note input */}
