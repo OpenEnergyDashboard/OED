@@ -67,7 +67,7 @@ export default function CreateUnitModalComponent() {
 	}
 
 	/* Create Unit Validation:
-		Name cannot blank
+		Name cannot be blank
 		Sec in Rate must be greater than zero
 		If type of unit is suffix their must be a suffix
 	*/
@@ -171,11 +171,7 @@ export default function CreateUnitModalComponent() {
 								})}
 							</Input>
 							<FormFeedback>
-<<<<<<< HEAD
 								<FormattedMessage id="error.typeOfUnit.suffix" />
-=======
-								<FormattedMessage id="Added suffix will set Unit Type to suffix" />
->>>>>>> origin/Jake-Bodin/issue1019
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
