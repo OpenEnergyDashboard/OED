@@ -143,6 +143,7 @@ const localeData = {
 		"error.bounds": "Must be between {min} and {max}.",
 		"error.displayable": "Displayable will be set to false because no unit is selected.",
 		"error.displayable.meter": "Meter units will set displayable to none.",
+		"error.typeOfUnit.suffix": "Added suffix will set type of unit to suffix",
 		"error.greater": "Must be greater than {min}.",
 		"error.gps": "Latitude must be between -90 and 90, and Longitude must be between -180 and 180.",
 		"error.negative": "Cannot be negative.",

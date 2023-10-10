@@ -78,7 +78,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
 		setValidUnit(state.name !== '' && state.secInRate > 0 &&
-		(state.typeOfUnit !== UnitType.suffix || (state.typeOfUnit === UnitType.suffix && state.suffix !== '')));
+			(state.typeOfUnit !== UnitType.suffix || (state.typeOfUnit === UnitType.suffix && state.suffix !== '')));
 	}, [state.name, state.secInRate, state.typeOfUnit, state.suffix]);
 	/* End State */
 
@@ -153,8 +153,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 			// set displayable to none if unit is meter
-			if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+			if (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
 				state.displayable = DisplayableType.none;
+			}
+			// set unit to suffix if suffix is not empty
+			if (state.typeOfUnit != UnitType.suffix && state.suffix != '') {
+				state.typeOfUnit = UnitType.suffix;
 			}
 			// Save our changes by dispatching the submitEditedUnit action
 			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
@@ -219,7 +223,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.name}
-								invalid={state.name === ''}/>
+								invalid={state.name === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -237,11 +241,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								value={state.typeOfUnit}
 								invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}>
 								{Object.keys(UnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+									return (<option value={key} key={key} disabled={state.suffix != '' && key != UnitType.suffix}>
+										{translate(`UnitType.${key}`)}</option>)
 								})}
 							</Input>
 							<FormFeedback>
-								<FormattedMessage id="Added suffix will set type of unit to suffix" />
+								<FormattedMessage id="error.typeOfUnit.suffix" />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
@@ -310,7 +315,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0' }} />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}
