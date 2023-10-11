@@ -13,7 +13,7 @@ import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { addConversion } from '../../actions/conversions';
-import { UnitDataById } from 'types/redux/units';
+import { UnitData, UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
 import { UnitType } from '../../types/redux/units';
 import { notifyUser } from '../../utils/input'
@@ -34,10 +34,16 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 
 	const dispatch: Dispatch = useDispatch();
 
+	// Want units in sorted order by identifier regardless of case.
+	const unitsSorted = _.sortBy(Object.values(props.unitsState), unit => unit.identifier.toLowerCase(), 'asc');
+
 	const defaultValues = {
 		// Invalid source/destination ids arbitrarily set to -999.
+		// Meter Units are not allowed to be a destination.
 		sourceId: -999,
+		sourceOptions: unitsSorted as UnitData[],
 		destinationId: -999,
+		destinationOptions: unitsSorted.filter(unit => unit.typeOfUnit !== 'meter') as UnitData[],
 		bidirectional: true,
 		slope: 0,
 		intercept: 0,
@@ -65,7 +71,22 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	}
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: Number(e.target.value) });
+		// once a source or destination is selected, it will be removed from the other options.
+		if (e.target.name === 'sourceId') {
+			setState({
+				...state,
+				sourceId: Number(e.target.value),
+				destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== Number(e.target.value))
+			});
+		} else if (e.target.name === 'destinationId') {
+			setState({
+				...state,
+				destinationId: Number(e.target.value),
+				sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== Number(e.target.value))
+			});
+		} else {
+			setState({ ...state, [e.target.name]: Number(e.target.value) });
+		}
 	}
 
 	// If the currently selected conversion is valid
@@ -113,12 +134,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			return false
 		}
 
-		// Source equals destination: invalid conversion
-		if (sourceId === destinationId) {
-			notifyUser(translate('conversion.create.source.destination.same'));
-			return false
-		}
-
 		// Conversion already exists
 		if ((props.conversionsState.findIndex(conversionData => ((
 			conversionData.sourceId === state.sourceId) &&
@@ -161,9 +176,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		}
 		return isValid;
 	}
-
-	// Want units in sorted order by identifier regardless of case.
-	const unitsSorted = _.sortBy(Object.values(props.unitsState), unit => unit.identifier.toLowerCase(), 'asc');
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -209,7 +221,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										id='sourceId'
 										name='sourceId'
 										type='select'
-										defaultValue={-999}
+										value={state.sourceId}
 										onChange={e => handleNumberChange(e)}
 										invalid={state.sourceId === -999}>
 										{<option
@@ -219,7 +231,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 											disabled>
 											{translate('conversion.select.source') + '...'}
 										</option>}
-										{Object.values(unitsSorted).map(unitData => {
+										{Object.values(state.sourceOptions).map(unitData => {
 											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 										})}
 									</Input>
@@ -236,7 +248,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 										id='destinationId'
 										name='destinationId'
 										type='select'
-										defaultValue={-999}
+										value={state.destinationId}
 										onChange={e => handleNumberChange(e)}
 										invalid={state.destinationId === -999}>
 										{<option
@@ -246,7 +258,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 											disabled>
 											{translate('conversion.select.destination') + '...'}
 										</option>}
-										{Object.values(unitsSorted).map(unitData => {
+										{Object.values(state.destinationOptions).map(unitData => {
 											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
 										})}
 									</Input>
@@ -297,7 +309,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 						</Row>
 						{/* Note input*/}
 						<FormGroup>
-							<Label for='note'>{translate('conversion.note')}</Label>
+							<Label for='note'>{translate('note')}</Label>
 							<Input
 								id='note'
 								name='note'

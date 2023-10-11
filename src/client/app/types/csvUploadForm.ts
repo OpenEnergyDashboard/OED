@@ -11,6 +11,14 @@ interface CSVUploadPreferences {
 	update: boolean;
 }
 
+// Very similar to CSVUploadPreferences but uses a different Boolean type that is expected when the form is submitted.
+export interface CSVUploadPreferencesForm {
+	meterName: string;
+	gzip: BooleanTypes;
+	headerRow: BooleanTypes;
+	update: BooleanTypes;
+}
+
 interface CSVUploadProps extends CSVUploadPreferences {
 	submitCSV: (file: File) => Promise<void>;
 	setMeterName: (mode: MODE, value: string) => void;
@@ -32,6 +40,13 @@ export const enum TimeSortTypes {
 export const enum BooleanTypes {
 	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
 	true = 'yes',
+	false = 'no'
+}
+
+// Unusual boolean that also allows for meter so 3-way.
+export const enum BooleanMeterTypes {
+	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
+	true = 'yes',
 	false = 'no',
 	// meter means to use value stored on meter or the default if not.
 	meter = 'meter value or default'
@@ -39,15 +54,15 @@ export const enum BooleanTypes {
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	createMeter: boolean;
-	cumulative: BooleanTypes;
-	cumulativeReset: BooleanTypes;
+	cumulative: BooleanMeterTypes;
+	cumulativeReset: BooleanMeterTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
 	meterName: string;
 	lengthGap: string;
 	lengthVariation: string;
-	endOnly: BooleanTypes;
+	endOnly: BooleanMeterTypes;
 	refreshHourlyReadings: boolean;
 	refreshReadings: boolean;
 	timeSort: TimeSortTypes;
@@ -55,12 +70,30 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	relaxedParsing: boolean;
 }
 
+export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
+	createMeter: BooleanTypes;
+	cumulative: BooleanMeterTypes;
+	cumulativeReset: BooleanMeterTypes;
+	cumulativeResetStart: string;
+	cumulativeResetEnd: string;
+	duplications: string; // Not sure how to type this an integer string;
+	meterName: string;
+	lengthGap: string;
+	lengthVariation: string;
+	endOnly: BooleanMeterTypes;
+	refreshHourlyReadings: BooleanTypes;
+	refreshReadings: BooleanTypes;
+	timeSort: TimeSortTypes;
+	honorDst: BooleanTypes;
+	relaxedParsing: BooleanTypes;
+}
+
 export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
 	// Note: each of these will have to change in consideration of redux;
 	selectTimeSort: (value: TimeSortTypes) => void;
 	selectDuplications: (value: string) => void;
-	selectCumulative: (value: BooleanTypes) => void;
-	selectCumulativeReset: (value: BooleanTypes) => void;
+	selectCumulative: (value: BooleanMeterTypes) => void;
+	selectCumulativeReset: (value: BooleanMeterTypes) => void;
 	setCumulativeResetStart: (value: string) => void;
 	setCumulativeResetEnd: (value: string) => void;
 	setLengthGap: (value: string) => void;

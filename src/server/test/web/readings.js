@@ -1509,7 +1509,7 @@ mocha.describe('readings API', () => {
 						{
 							name: 'invalidUnit',
 							identifier: '',
-							unitRepresent: Unit.unitRepresentType.UNUSED,
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
 							secInRate: 1,
 							typeOfUnit: Unit.unitType.UNIT,
 							suffix: '',
@@ -1634,6 +1634,105 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('reading');
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
+				});
+				mocha.it('1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					// Load the expected response data from the corresponding csv file
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf_bd_1.csv');
+					// Create a request to the API for unbounded reading times and save the response
+					const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+						.query({
+							timeInterval: ETERNITY.toString(),
+							barWidthDays: 1,
+							graphicUnitId: unitId
+						});
+					// Check that the API reading is equal to what it is expected to equal
+					expectReadingToEqualExpected(res, expected);
+				});
+				mocha.it('7 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					// Load the expected response data from the corresponding csv file
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf_bd_7.csv');
+					// Create a request to the API for unbounded reading times and save the response
+					const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+						.query({
+							timeInterval: ETERNITY.toString(),
+							barWidthDays: 7,
+							graphicUnitId: unitId
+						});
+					// Check that the API reading is equal to what it is expected to equal
+					expectReadingToEqualExpected(res, expected);
+				});
+				mocha.it('28 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+					// Create 2D array for meter to feed into the database
+					// Note the meter ID is set so we know what to expect when a query is made.
+					const meterData = [
+						{
+							name: 'Electric Utility kWh',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'kWh',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+					// Load the data into the database
+					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					// Load the expected response data from the corresponding csv file
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf_bd_28.csv');
+					// Create a request to the API for unbounded reading times and save the response
+					const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+						.query({
+							timeInterval: ETERNITY.toString(),
+							barWidthDays: 28,
+							graphicUnitId: unitId
+						});
+					// Check that the API reading is equal to what it is expected to equal
+					expectReadingToEqualExpected(res, expected);
 				});
 			});
 			mocha.describe('for groups', () => {

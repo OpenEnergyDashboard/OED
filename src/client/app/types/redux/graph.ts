@@ -16,6 +16,11 @@ export enum ChartTypes {
 	radar = 'radar'
 }
 
+export enum MeterOrGroup {
+	meter = 'meter',
+	group = 'group'
+}
+
 // Rates that can be graphed, only relevant to line graphs.
 export const LineGraphRates = {
 	'second': (1 / 3600),

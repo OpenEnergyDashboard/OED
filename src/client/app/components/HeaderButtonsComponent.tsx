@@ -19,6 +19,8 @@ import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMen
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
 import { BASE_URL } from './TooltipHelpComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -29,6 +31,13 @@ export default function HeaderButtonsComponent() {
 
 	// Get the current page so know which one should not be shown in menu.
 	const currentPage = getPage();
+
+	// OED version is needed for help redirect
+	const version = useSelector((state: State) => state.version.version);
+	// Help URL location
+	let helpUrl = BASE_URL + version;
+	// options help
+	const optionsHelp = helpUrl + '/optionsMenu.html';
 
 	// This is the state model for rendering this page.
 	const defaultState = {
@@ -60,7 +69,9 @@ export default function HeaderButtonsComponent() {
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
-		menuTitle: ''
+		menuTitle: '',
+		// link to help page for page choices. Should not see default but use general help URL.
+		pageChoicesHelp: helpUrl
 	};
 
 	// Local state for rendering.
@@ -71,9 +82,15 @@ export default function HeaderButtonsComponent() {
 	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
-	// OED version is needed for help redirect
-	const version = useSelector((state: State) => state.version.version);
-	const HELP_URL = BASE_URL + version;
+
+	// Must update in case the version was not set when the page was loaded.
+	useEffect(() => {
+		helpUrl = BASE_URL + version;
+		setState(prevState => ({
+			...prevState,
+			pageChoicesHelp: helpUrl
+		}));
+	}, [version]);
 
 	// This updates which page is disabled because it is the one you are on.
 	useEffect(() => {
@@ -133,6 +150,10 @@ export default function HeaderButtonsComponent() {
 		const currentShowOptionsStyle = {
 			display: currentPage === '' ? 'block' : 'none'
 		}
+		// Admin help or regular user page
+		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
+		const currentPageChoicesHelp = helpUrl + neededPage;
+
 		setState(prevState => ({
 			...prevState,
 			adminViewableLinkStyle: currentAdminViewableLinkStyle,
@@ -140,9 +161,10 @@ export default function HeaderButtonsComponent() {
 			loginLinkStyle: currentLoginLinkStyle,
 			logoutLinkStyle: currentLogoutLinkStyle,
 			menuTitle: currentMenuTitle,
+			pageChoicesHelp: currentPageChoicesHelp,
 			showOptionsStyle: currentShowOptionsStyle
 		}));
-	}, [currentUser]);
+	}, [currentUser, helpUrl]);
 
 	// Handle actions on logout.
 	const handleLogOut = () => {
@@ -160,6 +182,8 @@ export default function HeaderButtonsComponent() {
 	return (
 		<div>
 			<Navbar expand>
+				<TooltipHelpContainer page={'all'} />
+				<TooltipMarkerComponent page='all' helpTextId='help.home.navigation' />
 				<Nav navbar>
 					<NavLink
 						disabled={state.shouldHomeButtonDisabled}
@@ -220,6 +244,11 @@ export default function HeaderButtonsComponent() {
 								to="/admin">
 								<FormattedMessage id='admin.panel' />
 							</DropdownItem>
+							<DropdownItem divider />
+							<DropdownItem
+								href={state.pageChoicesHelp}>
+								<FormattedMessage id="help" />
+							</DropdownItem>
 						</DropdownMenu>
 					</UncontrolledDropdown>
 					<UncontrolledDropdown nav inNavbar>
@@ -230,6 +259,7 @@ export default function HeaderButtonsComponent() {
 							<LanguageSelectorComponent />
 							<DropdownItem
 								style={state.showOptionsStyle}
+								className='d-none d-lg-block'
 								onClick={() => dispatch(toggleOptionsVisibility())}>
 								<FormattedMessage id={optionsVisibility ? 'hide.options' : 'show.options'} />
 							</DropdownItem>
@@ -247,10 +277,15 @@ export default function HeaderButtonsComponent() {
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
+							<DropdownItem divider />
+							<DropdownItem
+								href={optionsHelp}>
+								<FormattedMessage id="help" />
+							</DropdownItem>
 						</DropdownMenu>
 					</UncontrolledDropdown>
 					<NavLink
-						href={HELP_URL}>
+						href={helpUrl}>
 						<FormattedMessage id='help' />
 					</NavLink>
 				</Nav>
