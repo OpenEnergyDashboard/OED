@@ -22,43 +22,43 @@
   * @returns Date Range Calendar Picker
   */
  export default function DateRangeComponent() {
-     const timeInterval = useSelector((state: State) => state.graph.timeInterval);
-     const locale = useSelector((state: State) => state.options.selectedLanguage);
-     const chartToRender = useSelector((state: State) => state.graph.chartToRender);
-     const dispatch: Dispatch = useDispatch();
+	 const timeInterval = useSelector((state: State) => state.graph.timeInterval);
+	 const locale = useSelector((state: State) => state.options.selectedLanguage);
+	 const chartToRender = useSelector((state: State) => state.graph.chartToRender);
+	 const dispatch: Dispatch = useDispatch();
  
-     const [dateRange, setDateRange] = useState<Value>([null, null]);
-     // Keep this component in sync with global time interval
-     useEffect(() => setDateRange(timeIntervalToDateRange(timeInterval)), [timeInterval]);
+	 const [dateRange, setDateRange] = useState<Value>([null, null]);
+	 // Keep this component in sync with global time interval
+	 useEffect(() => setDateRange(timeIntervalToDateRange(timeInterval)), [timeInterval]);
  
-     // Don't Close Calendar when selecting dates.
-     // This allows the value to update before calling the onCalClose() method to fetch data if needed.
-     const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
-     const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
+	 // Don't Close Calendar when selecting dates.
+	 // This allows the value to update before calling the onCalClose() method to fetch data if needed.
+	 const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
+	 const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
  
-     // Only Render if a 3D Graphic Type Selected.
-     if (chartToRender === ChartTypes.radar)
-         return (
-             <div style={{ width: '100%' }}>
-                 <p style={labelStyle}>
-                     {translate('date.range')}:
-                     <TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
-                 </p>
-                 <DateRangePicker
-                     value={dateRange}
-                     onChange={setDateRange}
-                     shouldCloseCalendar={shouldCloseCalendar}
-                     onCalendarClose={onCalClose}
-                     defaultView={'year'}
-                     clearIcon={null} // clear not necessary for 3D interval must be bounded
-                     calendarIcon={null} // unnecessary
-                     minDate={new Date(1970, 0, 1)}
-                     maxDate={new Date()}
-                     locale={locale} // Formats Dates, and Calendar months base on locale
-                 />
-             </div>);
-     else
-         return null;
+	 // Only Render if a 3D Graphic Type Selected.
+	 if (chartToRender === ChartTypes.radar)
+		 return (
+			 <div style={{ width: '100%' }}>
+				 <p style={labelStyle}>
+					 {translate('date.range')}:
+					 <TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
+				 </p>
+				 <DateRangePicker
+					 value={dateRange}
+					 onChange={setDateRange}
+					 shouldCloseCalendar={shouldCloseCalendar}
+					 onCalendarClose={onCalClose}
+					 defaultView={'year'}
+					 clearIcon={null} // clear not necessary for 3D interval must be bounded
+					 calendarIcon={null} // unnecessary
+					 minDate={new Date(1970, 0, 1)}
+					 maxDate={new Date()}
+					 locale={locale} // Formats Dates, and Calendar months base on locale
+				 />
+			 </div>);
+	 else
+		 return null;
  }
  
  
