@@ -16,7 +16,7 @@
  import { ChartTypes } from '../types/redux/graph';
  import { Dispatch } from '../types/redux/actions';
  import { changeGraphZoomIfNeeded } from '../actions/graph';
- 
+
  /**
   * A component which allows users to select date ranges in lieu of a slider (line graphic)
   * @returns Date Range Calendar Picker
@@ -26,16 +26,16 @@
 	 const locale = useSelector((state: State) => state.options.selectedLanguage);
 	 const chartToRender = useSelector((state: State) => state.graph.chartToRender);
 	 const dispatch: Dispatch = useDispatch();
- 
+
 	 const [dateRange, setDateRange] = useState<Value>([null, null]);
 	 // Keep this component in sync with global time interval
 	 useEffect(() => setDateRange(timeIntervalToDateRange(timeInterval)), [timeInterval]);
- 
+
 	 // Don't Close Calendar when selecting dates.
 	 // This allows the value to update before calling the onCalClose() method to fetch data if needed.
 	 const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
 	 const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
- 
+
 	 // Only Render if a 3D Graphic Type Selected.
 	 if (chartToRender === ChartTypes.radar)
 		 return (
@@ -60,6 +60,6 @@
 	 else
 		 return null;
  }
- 
- 
+
+
  const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };
