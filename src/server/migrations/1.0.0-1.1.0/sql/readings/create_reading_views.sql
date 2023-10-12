@@ -261,6 +261,8 @@ hourly_readings_unit
 	ORDER BY gen.interval_start, r.meter_id;
 
 
+-- Must first drop function since the signature changed.
+DROP FUNCTION meter_line_readings_unit(integer[],integer,timestamp without time zone,timestamp without time zone,reading_line_accuracy,integer,integer);
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
 It is designed to return data for plotting line graphs. It works on meters.

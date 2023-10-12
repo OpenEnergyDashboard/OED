@@ -41,7 +41,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				{props.unit.identifier}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="unit.name" /></b> {props.unit.name}
+				<b><FormattedMessage id="name" /></b> {props.unit.name}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="unit.type.of.unit" /></b> {props.unit.typeOfUnit}
@@ -50,7 +50,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<b><FormattedMessage id="unit.represent" /></b> {props.unit.unitRepresent}
 			</div>
 			<div className={props.unit.displayable.toString()}>
-				<b><FormattedMessage id="unit.displayable" /></b> {props.unit.displayable}
+				<b><FormattedMessage id="displayable" /></b> {props.unit.displayable}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
@@ -63,7 +63,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 			</div>
 			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line. Protect against null from DB in note. */}
-				<b><FormattedMessage id="unit.note" /></b> {props.unit.note ? props.unit.note.slice(0, 29) : ''}
+				<b><FormattedMessage id="note" /></b> {props.unit.note ? props.unit.note.slice(0, 29) : ''}
 			</div>
 			<div className="edit-btn">
 				<Button color='secondary' onClick={handleShow}>

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN 
-	CREATE TYPE unit_represent_type AS ENUM('quantity', 'flow', 'raw', 'unused');
+	CREATE TYPE unit_represent_type AS ENUM('quantity', 'flow', 'raw');
 EXCEPTION
 	WHEN duplicate_object THEN null;
 END $$;
