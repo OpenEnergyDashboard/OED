@@ -79,16 +79,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		for (const [key, value] of Object.entries(groups)) {
 			for (let i = 0; i < value.deepMeters.length; i++) {
 				if (meterState[value.deepMeters[i]].unitId == state.id) {
-					error_message += 'WARNING: unit '+ state.id + ' is being used in meter ' + meterState[value.deepMeters[i]].name + ' \n';
+					error_message += translate('group') + value.name + ' uses ' + translate('meter') + ' "' + meterState[value.deepMeters[i]].name + '" \n';
 
 				}
 			}
 		}
+		//finish meter graphicalUnitId and UnitId
+		//finish conversion check both source or destination unit
 		if(error_message)
 		{
+			error_message = translate('unit.failed.to.delete.unit') + '\n' +  error_message;
 			alert(error_message);
 		}
-
 
 		//
 		//
