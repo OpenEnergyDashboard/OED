@@ -71,18 +71,23 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	// Log the Redux state to the console
 	const meterState = useSelector((state: State) => state.meters.byMeterID);
-	const groups = useSelector((state: State) => state.groups.byGroupID);
+	const conversions = useSelector((state: State) => state.conversions.conversions)
 
 	const handleDeleteUnit = () => {
 		// Access the Redux store state
 		let error_message = '';
-		for (const [key, value] of Object.entries(groups)) {
-			for (let i = 0; i < value.deepMeters.length; i++) {
-				if (meterState[value.deepMeters[i]].unitId == state.id) {
-					error_message += key + ' '  + translate('group') +' '+ value.name + ' uses ' + translate('meter') + ' "' + 
-					meterState[value.deepMeters[i]].name + '" \n';
+		for (const [key, value] of Object.entries(meterState)) {
+			if(value.unitId==state.id){
+				error_message += translate('meter') + value.name + ' uses ' + translate('unit') + ' "' + state.id+ '" \n';
+			}
+		}
+		for(let i=0;i<conversions.length;i++){
+			if(conversions[i].sourceId==state.id){
+				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.id+ '"as a source unit\n';
+			}
 
-				}
+			if(conversions[i].destinationId==state.id){
+				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.id+ '"as a destination unit\n';
 			}
 		}
 		//finish meter graphicalUnitId and UnitId
@@ -92,6 +97,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			error_message = translate('unit.failed.to.delete.unit') + '\n' +  error_message;
 			alert(error_message);
 		}
+
 
 		//
 		//
