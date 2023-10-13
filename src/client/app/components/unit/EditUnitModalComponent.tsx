@@ -79,7 +79,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		for (const [key, value] of Object.entries(groups)) {
 			for (let i = 0; i < value.deepMeters.length; i++) {
 				if (meterState[value.deepMeters[i]].unitId == state.id) {
-					error_message += translate('group') + value.name + ' uses ' + translate('meter') + ' "' + meterState[value.deepMeters[i]].name + '" \n';
+					error_message += key + ' '  + translate('group') +' '+ value.name + ' uses ' + translate('meter') + ' "' + 
+					meterState[value.deepMeters[i]].name + '" \n';
 
 				}
 			}
