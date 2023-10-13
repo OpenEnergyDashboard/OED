@@ -31,7 +31,7 @@ mocha.describe('groups API', () => {
 			* - - group C
 			* - - - meter C
 			*/
-		await new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT,
+		await new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.UNIT,
 			1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note').insert(conn);
 		const unitId = (await Unit.getByName('Unit', conn)).id;
 		groupA = new Group(undefined, 'A', true, gpsPoint, 'notes A', 33.5, unitId, Unit.areaUnitType.METERS);

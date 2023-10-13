@@ -105,7 +105,7 @@ router.use(function (req, res, next) {
 });
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip === 'true';
+	const isGzip = req.body.gzip === BooleanTypesJS.true;
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
@@ -149,7 +149,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip === 'true';
+	const isGzip = req.body.gzip ===  BooleanTypesJS.true;
 	const isRefreshReadings = req.body.refreshReadings === BooleanTypesJS.true;
 	const isRefreshHourlyReadings = req.body.refreshHourlyReadings === BooleanTypesJS.true;
 	const uploadedFilepath = req.file.path;

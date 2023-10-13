@@ -300,7 +300,7 @@ async function generateTestingData() {
  * the seventh which contains waves an amplitude of 7.
  */
 async function generateVariableAmplitudeTestingData() {
-	for (var i = 1; i <= 7; i++) {
+	for (var i = 1; i <= 3; i++) {
 		await generateSineTestingData(15, i);
 	}
 }
@@ -311,7 +311,7 @@ async function generateVariableAmplitudeTestingData() {
 async function testData() {
 	console.log("Start generating first set of test data (square, varying freq of readings: 7 files):");
 	await generateTestingData();
-	console.log("Start generating second set of test data (varying amplitudes: 7 files):")
+	console.log("Start generating second set of test data (varying amplitudes: 3 files):")
 	await generateVariableAmplitudeTestingData();
 }
 
@@ -1018,7 +1018,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: false
 		},
 		{
-			name: 'test4DaySin kWh',
+			name: 'Sin 4 Day kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1031,7 +1031,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test4HourSin kWh',
+			name: 'Sin 4 Hour kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1045,7 +1045,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test23MinSin kWh',
+			name: 'Sin 23 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1058,7 +1058,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test15MinSin kWh',
+			name: 'Sin 15 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1071,7 +1071,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test23MinCos kWh',
+			name: 'Cos 23 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1084,7 +1084,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testSqSin kWh',
+			name: 'Sin Sq kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1097,7 +1097,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testSqCos kWh',
+			name: 'Cos Sq kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -1110,87 +1110,43 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testAmp1Sin kWh',
+			name: 'Sin Amp 1 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '8.5, 41.6',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
-			name: 'testAmp2Sin kWh',
+			name: 'Sin Amp 2 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '23.4, 42.6',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
-			name: 'testAmp3Sin kWh',
+			name: 'Sin Amp 3 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '25.2, 26.8',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
-		{
-			name: 'testAmp4Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp5Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp6Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp7Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		}
 	];
 
 	// This assumes the insertSpecialMeters has been run.
 	// The table contains special groups' data.
-	// Don't create groups with of raw type since should not be graphed as a group.
+	// Don't create groups of raw type since could not be graphed as a group.
 	const specialGroups = [
 		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
 		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Electric Utility kWh', 'Natural Gas Dollar'], []],
@@ -1198,14 +1154,12 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Natural Gas Dollar'], []],
 		['Electric kW + 2-6 kW', 'kW', true, undefined, 'special group', ['Electric kW', 'Electric kW 2-6'], []],
 		['Electric Utility 1-5 kWh not displayable', 'kWh', false, undefined, 'special group', ['Electric Utility kWh'], []],
-		['SqSin + SqCos kWh', 'kWh', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['SqSin + SqCos no unit', '', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['Amp 1 + 5 kWh', 'kWh', true, undefined, 'special group', ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
-		['Amp 2 + 6 kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
-		['Amp 3 + 4 kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
-		['Amp 2 + (1 + 5) kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
-		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp 2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
-		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
+		['Sin Sq + Cos Sq kWh', 'kWh', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
+		['Sin Sq + Cos Sq no unit', '', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
+		['Sin Amp 1 + 2 kWh', 'kWh', true, '8.1, 20.2', 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], []],
+		['Sin Amp 2 + 3 kWh', 'kWh', true, '18.9, 5.6', 'special group', ['Sin Amp 2 kWh', 'Sin Amp 3 kWh'], []],
+		['Sin Amp 1 + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh'], ['Sin Amp 2 + 3 kWh']],
+		['Sin Amp 1 + 2 + (1 + 2) + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], ['Sin Amp 1 + 2 kWh', 'Sin Amp 2 + 3 kWh']],
 	];
 	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMetersGroups() to see how to remove the data that is being inserted.\n");
 	const conn = getConnection();

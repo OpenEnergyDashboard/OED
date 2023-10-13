@@ -98,7 +98,7 @@ mocha.describe('meters API', () => {
 	let unitId;
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
-		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.UNUSED, 1000, Unit.unitType.UNIT,
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.UNIT,
 			1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
 		await unit.insert(conn);
 		unitId = unit.id;
