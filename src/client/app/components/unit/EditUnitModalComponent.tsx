@@ -246,7 +246,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								})}
 							</Input>
 							<FormFeedback>
-								<FormattedMessage id="error.typeofunit.suffix" />
+								<FormattedMessage id="unit.type.of.unit.suffix" />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
