@@ -74,7 +74,7 @@ export default function CreateUnitModalComponent() {
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
 		setValidUnit(state.name !== '' && state.secInRate > 0 &&
-			(state.typeOfUnit !== UnitType.suffix || (state.typeOfUnit === UnitType.suffix && state.suffix !== '')));
+			(state.typeOfUnit === UnitType.suffix && state.suffix !== ''));
 	}, [state.name, state.secInRate, state.typeOfUnit, state.suffix]);
 	/* End State */
 
