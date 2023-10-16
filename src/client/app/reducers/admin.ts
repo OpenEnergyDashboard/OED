@@ -8,7 +8,7 @@ import { AdminState, AdminAction } from '../types/redux/admin';
 import { LanguageTypes } from '../types/redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { durationFormat } from '../utils/durationFormat';
-import * as moment from 'moment';
+import moment from 'moment';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
