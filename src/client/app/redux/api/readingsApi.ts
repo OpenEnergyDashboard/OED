@@ -47,7 +47,10 @@ export const readingsApi = baseApi.injectEndpoints({
 			merge: (currentCacheData, responseData) => {
 				// By default subsequent queries that resolve to the same cache entry will overwrite the existing data.
 				// For our use case, many queries will point to the same resolved cache, therefore we must provide merge behavior to not lose data
-				return _.merge(currentCacheData, responseData)
+
+				// it is important to note,
+				// Since this is wrapped with Immer, you may either mutate the currentCacheValue directly, or return a new value, but not both at once.
+				_.merge(currentCacheData, responseData)
 			},
 			forceRefetch: ({ currentArg, endpointState }) => {
 				// Since we modified the way the we serialize the args any subsequent query would return the cache data, even if new meters were requested
@@ -101,7 +104,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
-			merge: (currentCacheData, responseData) => _.merge(currentCacheData, responseData),
+			merge: (currentCacheData, responseData) => { _.merge(currentCacheData, responseData) },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : undefined
 				if (!currentData) { return true }

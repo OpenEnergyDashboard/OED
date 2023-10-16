@@ -244,7 +244,9 @@ export const graphSlice = createSlice({
 		selectChartToRender: state => state.chartToRender,
 		selectThreeDMeterOrGroup: state => state.threeD.meterOrGroup,
 		selectThreeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
-		selectThreeDReadingInterval: state => state.threeD.readingInterval
+		selectThreeDReadingInterval: state => state.threeD.readingInterval,
+		selectLineGraphRate: state => state.lineGraphRate,
+		selectAreaUnit: state => state.selectedAreaUnit
 	}
 })
 
@@ -256,5 +258,5 @@ export const {
 	selectWorkingTimeInterval, selectGraphUnitID,
 	selectGraphAreaNormalization, selectChartToRender,
 	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID,
-	selectThreeDReadingInterval
+	selectThreeDReadingInterval, selectLineGraphRate, selectAreaUnit
 } = graphSlice.selectors

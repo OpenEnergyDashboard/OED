@@ -8,10 +8,6 @@ import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot, { Figure } from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
-import { groupsSlice } from '../reducers/groups';
-import { metersSlice } from '../reducers/meters';
-import { unitsSlice } from '../reducers/units';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { ChartQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
@@ -21,7 +17,13 @@ import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
-
+import { selectGroupDataByID } from '../reducers/groups';
+import { selectMeterDataByID, selectMeterState } from '../reducers/meters';
+import { selectUnitDataById } from '../reducers/units';
+import {
+	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
+	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters
+} from '../reducers/graph';
 
 /**
  * @param props qpi query
@@ -35,23 +37,23 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The current selected rate
-	const currentSelectedRate = useAppSelector(state => state.graph.lineGraphRate);
-	const unitDataByID = useAppSelector(state => unitsSlice.selectors.selectUnitDataById(state));
-	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
-	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
-	const selectedMeters = useAppSelector(state => selectSelectedMeters(state));
-	const selectedGroups = useAppSelector(state => selectSelectedGroups(state));
-	const metersState = useAppSelector(state => metersSlice.selectors.selectMeterState(state));
-	const meterDataByID = useAppSelector(state => metersSlice.selectors.selectMeterDataByID(state));
-	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
+	const currentSelectedRate = useAppSelector(selectLineGraphRate);
+	const unitDataByID = useAppSelector(selectUnitDataById);
+	const selectedAreaNormalization = useAppSelector(selectGraphAreaNormalization);
+	const selectedAreaUnit = useAppSelector(selectAreaUnit);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const metersState = useAppSelector(selectMeterState);
+	const meterDataByID = useAppSelector(selectMeterDataByID);
+	const groupDataByID = useAppSelector(selectGroupDataByID);
 
 	// dataFetching Query Hooks
-	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
-	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
+	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
+	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
 
 	const datasets = [];
 
-	if (meterIsFetching || groupIsFetching) {
+	if (meterIsLoading || groupIsLoading) {
 		return <LogoSpinner />
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
@@ -92,7 +94,7 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
 				const readingsData = meterReadings[meterID]
-				if (readingsData !== undefined && !meterIsFetching) {
+				if (readingsData !== undefined && !meterIsLoading) {
 					const label = meterDataByID[meterID].identifier;
 					const colorID = meterID;
 					if (readingsData === undefined) {
@@ -169,7 +171,7 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
 				const readingsData = byGroupID[groupID];
-				if (readingsData !== undefined && !groupIsFetching) {
+				if (readingsData !== undefined && !groupIsLoading) {
 					const label = groupDataByID[groupID].name;
 					const colorID = groupID;
 					if (readingsData === undefined) {
@@ -278,7 +280,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
 					config={{
-						responsive: true
+						responsive: true,
+						displayModeBar: false
 					}}
 					layout={{
 						autosize: true, showlegend: true,
