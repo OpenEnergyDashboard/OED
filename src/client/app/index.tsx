@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import thunkMiddleware from 'redux-thunk';
 import { createRoot } from 'react-dom/client';
-import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import 'bootstrap/dist/css/bootstrap.css';
 import RouteContainer from './containers/RouteContainer';

@@ -56,6 +56,7 @@
 	},
 	"overrides": {
 		"@formatjs/ecma402-abstract": "1.13.0",
+		"@types/rc-tooltip": "^3.7.8",
 		"react-intl": {
 			"typescript": "$typescript"
 		},
@@ -105,10 +106,10 @@
 		"query-string": "~7.0.1",
 		"rc-slider": "~8.6.6",
 		"react": "~18.2.0",
-		"react-dom": "~18.2.0",
-		"react-intl": "~6.4.4",
 		"react-bootstrap": "~2.2.3",
+		"react-dom": "~18.2.0",
 		"react-dropzone": "~12.0.4",
+		"react-intl": "~6.4.4",
 		"react-plotly.js": "~2.6.0",
 		"react-redux": "~8.1.2",
 		"react-router": "~5.2.1",
@@ -132,7 +133,7 @@
 		"@types/node": "~20.5.6",
 		"@types/plotly.js": "~2.12.5",
 		"@types/rc-slider": "~8.2.3",
-		"@types/react": "~18.2.19",
+		"@types/react": "~18.2.28",
 		"@types/react-dom": "~18.2.7",
 		"@types/react-plotly.js": "~2.6.0",
 		"@types/react-redux": "~7.1.25",
