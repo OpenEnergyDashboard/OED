@@ -6,26 +6,15 @@ import * as React from 'react';
 import Select, { ActionMeta, MultiValue, StylesConfig } from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { Badge } from 'reactstrap';
+import { graphSlice } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { getFetchingStates } from '../redux/componentHooks';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { graphSlice } from '../reducers/graph';
-const animatedComponents = makeAnimated();
-const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
-	valueContainer: base => ({
-		...base,
-		maxHeight: 150,
-		overflowY: 'scroll',
-		'&::-webkit-scrollbar': {
-			display: 'none'
-		},
-		'msOverflowStyle': 'none',
-		'scrollbarWidth': 'none'
-	})
-};
+
 
 /**
  * Creates a React-Select component for the UI Options Panel.
@@ -35,6 +24,7 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
 	const meterAndGroupSelectOptions = useAppSelector(state => selectMeterGroupSelectData(state));
+	const { somethingIsFetching } = getFetchingStates();
 	const { meterOrGroup } = props;
 
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
@@ -50,7 +40,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		:
 		meterAndGroupSelectOptions.groupsGroupedOptions
 
-	const onChange = async (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
+	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMetersOrGroups = newValues.map((option: SelectOption) => option.value);
 		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	}
@@ -73,6 +63,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				// Included React-Select Animations
 				components={animatedComponents}
 				styles={customStyles}
+				isLoading={somethingIsFetching}
 			/>
 		</div>
 	)
@@ -104,3 +95,17 @@ const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',
 	margin: 0
 };
+const animatedComponents = makeAnimated();
+const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
+	valueContainer: base => ({
+		...base,
+		maxHeight: 150,
+		overflowY: 'scroll',
+		'&::-webkit-scrollbar': {
+			display: 'none'
+		},
+		'msOverflowStyle': 'none',
+		'scrollbarWidth': 'none'
+	})
+};
+

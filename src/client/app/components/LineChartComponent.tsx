@@ -46,8 +46,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
 
 	// dataFetching Query Hooks
-	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
-	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
+	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
+	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
 
 	const datasets = [];
 
@@ -226,19 +226,15 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 
 	// Method responsible for setting the 'Working Time Interval'
 	const handleOnInit = (figure: Figure) => {
-		// dispatch(graphSlice.actions.updateWorkingTimeInterval())
 		if (figure.layout.xaxis?.range) {
 			const startTS = moment.utc(figure.layout.xaxis?.range[0])
 			const endTS = moment.utc(figure.layout.xaxis?.range[1])
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
-
-			// console.log(figure.layout.xaxis?.range, figure.layout.xaxis?.rangeslider?.range, figure.layout.xaxis)
 		}
 	}
 
 	const handleRelayout = (e: PlotRelayoutEvent) => {
-		// console.log(e, e['xaxis.range[0]'], e['xaxis.range[1]'])
 		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 		// These values indicate when the user has zoomed or made other changes to the graph.
 		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
@@ -248,6 +244,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 			const endTS = moment.utc(e['xaxis.range[1]'])
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
+			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
+
 		}
 	}
 

@@ -47,8 +47,8 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
 
 	// useQueryHooks for data fetching
-	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });
-	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useBarQuery(groupsArgs, { skip: groupSkipQuery });
+	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });
+	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupsArgs, { skip: groupSkipQuery });
 	const datasets = [];
 
 	if (meterIsFetching || groupIsFetching) {
@@ -206,6 +206,7 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 			const endTS = moment.utc(e['xaxis.range[1]'])
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
+			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval));
 		}
 	}
 

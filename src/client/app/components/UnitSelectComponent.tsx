@@ -13,6 +13,8 @@ import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { getFetchingStates } from '../redux/componentHooks';
+
 
 /**
  * @returns A React-Select component for UI Options Panel
@@ -22,6 +24,8 @@ export default function UnitSelectComponent() {
 	const unitSelectOptions = useAppSelector(state => selectUnitSelectData(state));
 	const selectedUnitID = useAppSelector(state => state.graph.selectedUnit);
 	const unitsByID = useAppSelector(state => state.units.units);
+	const { endpointsFetchingData } = getFetchingStates();
+
 	let selectedUnitOption: SelectOption | null = null;
 
 	// Only use if valid/selected unit which means it is not -99.
@@ -33,6 +37,7 @@ export default function UnitSelectComponent() {
 			isDisabled: false
 		} as SelectOption;
 	}
+
 	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value))
 
 	return (
@@ -48,6 +53,7 @@ export default function UnitSelectComponent() {
 				onChange={onChange}
 				formatGroupLabel={formatGroupLabel}
 				isClearable
+				isLoading={endpointsFetchingData.unitsData.unitsIsLoading}
 			/>
 		</div>
 	)

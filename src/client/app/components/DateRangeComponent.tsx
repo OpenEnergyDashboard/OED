@@ -17,7 +17,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
  * @returns Date Range Calendar Picker
-*/
+ */
 export default function DateRangeComponent() {
 	const { selectWorkingTimeInterval: graphWorkingTimeInterval, selectQueryTimeInterval } = graphSlice.selectors
 	const dispatch: Dispatch = useDispatch();
