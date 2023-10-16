@@ -7,7 +7,6 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
-const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
 const { log, LogLevel } = require('./log');
@@ -60,7 +59,6 @@ if (log.level !== LogLevel.SILENT) {
 app.use(favicon(path.join(__dirname, '..', 'client', 'public', 'favicon.ico')));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ extended: false, limit: '50mb' }));
-app.use(cookieParser());
 
 app.use('/api/users', users);
 app.use('/api/meters', meters);

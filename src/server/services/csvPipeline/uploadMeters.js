@@ -7,6 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
+const { BooleanTypesJS } = require('./validateCsvUploadParams');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -27,7 +28,7 @@ async function uploadMeters(req, res, filepath, conn) {
 	});
 
 	// If there is a header row, we remove and ignore it for now.
-	const meters = (req.body.headerRow === 'true') ? temp.slice(1) : temp;
+	const meters = (req.body.headerRow === BooleanTypesJS.true) ? temp.slice(1) : temp;
 	// The original code used a Promise.all to run through the meters. The issue is that the promises are run in parallel.
 	// If the meters are independent as expected then this works fine. However, in the error case where one CSV file has
 	// the same meter name listed twice, the order of the attempts to add to the database was arbitrary. This meant one of them
@@ -74,7 +75,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
 
-			if (req.body.update === 'true') {
+			if (req.body.update === BooleanTypesJS.true) {
 				// Updating the new meters.
 				// First get its id.
 				let nameOfMeter = req.body.meterName;
@@ -136,7 +137,7 @@ function isValidGPSInput(input) {
  * Reverses the latitude and longitude in GPS string. More basically, it switches the two values separated by a comma.
  * Assumes went through isValidGPSInput first so know it has a single comma so does what it should.
  * @param gpsString The string with GPS pair separated by a comma to reverse
- * @return the new string with the updated GPS pair
+ * @returns the new string with the updated GPS pair
  */
 function switchGPS(gpsString) {
 	const array = gpsString.split(',');

@@ -15,10 +15,15 @@ export enum ChartTypes {
 	map = 'map'
 }
 
+export enum MeterOrGroup {
+	meter = 'meter',
+	group = 'group'
+}
+
 // Rates that can be graphed, only relevant to line graphs.
 export const LineGraphRates = {
-	'second': (1/3600),
-	'minute': (1/60),
+	'second': (1 / 3600),
+	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
 }
@@ -57,6 +62,10 @@ export interface ToggleAreaNormalizationAction {
 	type: ActionType.ToggleAreaNormalization;
 }
 
+export interface ToggleShowMinMaxAction {
+	type: ActionType.ToggleShowMinMax;
+}
+
 export interface ChangeBarStackingAction {
 	type: ActionType.ChangeBarStacking;
 }
@@ -91,9 +100,8 @@ export interface SetHotlinked {
 	hotlinked: boolean;
 }
 
-export interface SetOptionsVisibility {
-	type: ActionType.SetOptionsVisibility;
-	visibility: boolean;
+export interface ToggleOptionsVisibility {
+	type: ActionType.ToggleOptionsVisibility;
 }
 
 export interface UpdateLineGraphRate {
@@ -111,6 +119,7 @@ export type GraphAction =
 	| ResetRangeSliderStackAction
 	| ChangeBarStackingAction
 	| ToggleAreaNormalizationAction
+	| ToggleShowMinMaxAction
 	| ChangeChartToRenderAction
 	| UpdateBarDurationAction
 	| UpdateSelectedGroupsAction
@@ -120,7 +129,7 @@ export type GraphAction =
 	| UpdateComparePeriodAction
 	| SetHotlinked
 	| ChangeCompareSortingOrderAction
-	| SetOptionsVisibility
+	| ToggleOptionsVisibility
 	| UpdateLineGraphRate
 	| ConfirmGraphRenderOnce;
 
@@ -147,4 +156,5 @@ export interface GraphState {
 	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
+	showMinMax: boolean;
 }

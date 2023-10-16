@@ -14,7 +14,7 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_unit_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/create_units_table.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/conversion/create_conversions_table.sql'));
-		await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/unit/add_area_unit_types.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/unit/add_area_unit_types.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default_area.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/preferences/add_preferences_default_meter_reading_frequency.sql'));
 		// Insert default units and conversions into the database. 
@@ -39,7 +39,7 @@ module.exports = {
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/create_reading_views.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/readings/drop_old_functions.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_meter_type.sql'));
-		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/alter_meter_ipdAddress.sql'));
+		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/alter_meter_ipAddress.sql'));
 		await db.none(sqlFile('../migrations/0.8.0-1.0.0/sql/meter/add_meter_reading_frequency.sql'));
 		// This sql code creates a function that is used in the new meter's constraints.
 		// Hence, it's needed to be added before executing add_constraints.sql.

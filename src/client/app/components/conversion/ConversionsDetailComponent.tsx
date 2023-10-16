@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -16,11 +15,17 @@ import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { ConversionData } from 'types/redux/conversions';
 import SpinnerComponent from '../../components/SpinnerComponent';
+import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
+/**
+ * Defines the conversions page card view
+ * @returns Conversion page element
+ */
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to conversions API for conversions details if one has not already been made somewhere else, stores conversion by ids in state
@@ -58,7 +63,7 @@ export default function ConversionsDetailComponent() {
 				</div>
 			) : (
 				<div>
-					<HeaderContainer />
+					<HeaderComponent />
 					<TooltipHelpContainer page='conversions' />
 
 					<div className='container-fluid'>

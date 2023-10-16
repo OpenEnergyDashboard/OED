@@ -80,7 +80,7 @@ router.get('/idname', async (req, res) => {
  * This will only return IDs because it queries groups_immediate_children and groups_immediate_meters, which store
  * only the IDs of the children.
  * @param int group_id
- * @return {[int], [int]}  child meter IDs and child group IDs
+ * @returns {[int], [int]}  child meter IDs and child group IDs
  */
 router.get('/children/:group_id', async (req, res) => {
 	const conn = getConnection();

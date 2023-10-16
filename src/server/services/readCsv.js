@@ -11,7 +11,7 @@ const parseCsv = util.promisify(csv.parse);
 /**
  * Returns a promise to read the given CSV file into an array of arrays.
  * @param fileName the filename to read
- * @return {Promise.<array.<array>>}
+ * @returns {Promise.<array.<array>>}
  */
 async function readCsv(fileName) {
 	const buffer = await fs.readFile(fileName);

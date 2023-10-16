@@ -29,7 +29,6 @@ function patchMomentType(pgp) {
 
 	moment.duration.fn.rawType = true; // eslint-disable-line no-underscore-dangle
 	moment.duration.fn.toPostgres = function toPostgres() {
-		// TODO figure out if this is used anywhere.
 		return `'${this.toISOString()}'::INTERVAL`;
 	};
 

@@ -300,7 +300,7 @@ async function generateTestingData() {
  * the seventh which contains waves an amplitude of 7.
  */
 async function generateVariableAmplitudeTestingData() {
-	for (var i = 1; i <= 7; i++) {
+	for (var i = 1; i <= 3; i++) {
 		await generateSineTestingData(15, i);
 	}
 }
@@ -311,7 +311,7 @@ async function generateVariableAmplitudeTestingData() {
 async function testData() {
 	console.log("Start generating first set of test data (square, varying freq of readings: 7 files):");
 	await generateTestingData();
-	console.log("Start generating second set of test data (varying amplitudes: 7 files):")
+	console.log("Start generating second set of test data (varying amplitudes: 3 files):")
 	await generateVariableAmplitudeTestingData();
 }
 
@@ -321,26 +321,285 @@ async function testData() {
 async function insertSpecialUnits(conn) {
 	// The table contains special units' data.
 	const specialUnits = [
-		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['100 w bulb', '100 w bulb for 10 hrs', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Natural_Gas_Dollar', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Water_Gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['US dollar', 'US $', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['euro', '€', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit'],
-		['Trash', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Temperature_Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['gallon per minute', 'gallon (rate)', Unit.unitRepresentType.FLOW, 60, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['liter per hour', 'liter (rate)', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['Water_Gallon_Per_Minute', '', Unit.unitRepresentType.FLOW, 60, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit']
+		// Some units must be redone so visible since not for standard units.
+		{
+			name: 'BTU',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'm³ gas',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'kg',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'metric ton',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'gallon',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'liter',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Fahrenheit',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Celsius',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Electric_Utility',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'MJ',
+			identifier: 'megaJoules',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_BTU',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: '100 w bulb',
+			identifier: '100 w bulb for 10 hrs',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_M3',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Natural_Gas_Dollar',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Water_Gallon',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'US dollar',
+			identifier: 'US $',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'euro',
+			identifier: '€',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'kg CO₂',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: 'CO₂',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Trash',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Temperature_Fahrenheit',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'kW',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Electric_kW',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'gallon per minute',
+			identifier: 'gallon (rate)',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 60,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'liter per hour',
+			identifier: 'liter (rate)',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: true,
+			note: 'special unit'
+		},
+		{
+			name: 'Water_Gallon_Per_Minute',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.FLOW,
+			secInRate: 60,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		}
 	];
-	await insertUnits(specialUnits, conn);
+	// For now it updates any units that exist since standard ones are changed for developers. This will wipe out any changes on restart.
+	await insertUnits(specialUnits, true, conn);
 }
 
 
@@ -350,26 +609,174 @@ async function insertSpecialUnits(conn) {
 async function insertSpecialConversions(conn) {
 	// The table contains special conversions' data.
 	const specialConversions = [
-		['kWh', '100 w bulb', false, 1, 0, 'kWh → 100 w bulb'],
-		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
-		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
-		['Electric_Utility', 'kg CO₂', false, 0.709, 0, 'Electric_Utility → CO2'],
-		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
-		['Natural_Gas_BTU', 'euro', false, 2.6e-6, 0, 'Natural_Gas_BTU → euro'],
-		['Natural_Gas_BTU', 'kg CO₂', false, 5.28e-5, 0, 'Natural_Gas_BTU → CO2'],
-		['Natural_Gas_M3', 'm³ gas', false, 1, 0, 'Natural_Gas_M3 → m3 of gas'],
-		['Natural_Gas_M3', 'US dollar', false, 0.11, 0, 'Natural_Gas_M3 → US dollar'],
-		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
-		['liter', 'gallon', true, 0.2641729, 0, 'liter → gallon'],
-		['US dollar', 'euro', true, 0.88, 0, 'US dollar → euro'],
-		['Natural_Gas_Dollar', 'US dollar', false, 1, 0, 'Natural_Gas_Dollar → US dollar'],
-		['kg CO₂', 'kg', false, 1, 0, 'CO2 → kg'],
-		['Trash', 'kg CO₂', false, 3.24e-6, 0, 'Trash → CO2'],
-		['Trash', 'kg', false, 1, 0, 'Trash → kg'],
-		['Temperature_Fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature_Fahrenheit → Fahrenheit'],
-		['Electric_kW', 'kW', false, 1, 0, 'Electric_kW → kW'],
-		['Water_Gallon_Per_Minute', 'gallon per minute', false, 1, 0, 'Water_Gallon_Per_Minute → gallon per minute'],
-		['gallon per minute', 'liter per hour', true, 227.12398, 0, 'gallon per minute → liter per hour']
+		{
+			sourceName: 'kWh',
+			destinationName: '100 w bulb',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'kWh → 100 w bulb'
+		},
+		{
+			sourceName: 'kWh',
+			destinationName: 'MJ',
+			bidirectional: true,
+			slope: 3.6,
+			intercept: 0,
+			note: 'kWh → MJ'
+		},
+		{
+			sourceName: 'Electric_Utility',
+			destinationName: 'kWh',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Electric_Utility → kWh'
+		},
+		{
+			sourceName: 'Electric_Utility',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0.115,
+			intercept: 0,
+			note: 'Electric_Utility → US dollar'
+		},
+		{
+			sourceName: 'Electric_Utility',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 0.709,
+			intercept: 0,
+			note: 'Electric_Utility → CO2'
+		},
+		{
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'BTU',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → BTU'
+		},
+		{
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'euro',
+			bidirectional: false,
+			slope: 2.6e-6,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → euro'
+		},
+		{
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 5.28e-5,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → CO2'
+		},
+		{
+			sourceName: 'Natural_Gas_M3',
+			destinationName: 'm³ gas',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_M3 → m3 of gas'
+		},
+		{
+			sourceName: 'Natural_Gas_M3',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0.11,
+			intercept: 0,
+			note: 'Natural_Gas_M3 → US dollar'
+		},
+		{
+			sourceName: 'Water_Gallon',
+			destinationName: 'gallon',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Water_Gallon → gallon'
+		},
+		{
+			sourceName: 'liter',
+			destinationName: 'gallon',
+			bidirectional: true,
+			slope: 0.2641729,
+			intercept: 0,
+			note: 'liter → gallon'
+		},
+		{
+			sourceName: 'US dollar',
+			destinationName: 'euro',
+			bidirectional: true,
+			slope: 0.88,
+			intercept: 0,
+			note: 'US dollar → euro'
+		},
+		{
+			sourceName: 'Natural_Gas_Dollar',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Natural_Gas_Dollar → US dollar'
+		},
+		{
+			sourceName: 'kg CO₂',
+			destinationName: 'kg',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'CO2 → kg'
+		},
+		{
+			sourceName: 'Trash',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 3.24e-6,
+			intercept: 0,
+			note: 'Trash → CO2'
+		},
+		{
+			sourceName: 'Trash',
+			destinationName: 'kg',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Trash → kg'
+		},
+		{
+			sourceName: 'Temperature_Fahrenheit',
+			destinationName: 'Fahrenheit',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Temperature_Fahrenheit → Fahrenheit'
+		},
+		{
+			sourceName: 'Electric_kW',
+			destinationName: 'kW',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Electric_kW → kW'
+		},
+		{
+			sourceName: 'Water_Gallon_Per_Minute',
+			destinationName: 'gallon per minute',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Water_Gallon_Per_Minute → gallon per minute'
+		},
+		{
+			sourceName: 'gallon per minute',
+			destinationName: 'liter per hour',
+			bidirectional: true,
+			slope: 227.12398,
+			intercept: 0,
+			note: 'gallon per minute → liter per hour'
+		}
 	];
 	await insertConversions(specialConversions, conn);
 }
@@ -611,7 +1018,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: false
 		},
 		{
-			name: 'test4DaySin kWh',
+			name: 'Sin 4 Day kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -624,7 +1031,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test4HourSin kWh',
+			name: 'Sin 4 Hour kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -638,7 +1045,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test23MinSin kWh',
+			name: 'Sin 23 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -651,7 +1058,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test15MinSin kWh',
+			name: 'Sin 15 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -664,7 +1071,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'test23MinCos kWh',
+			name: 'Cos 23 Min kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -677,7 +1084,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testSqSin kWh',
+			name: 'Sin Sq kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -690,7 +1097,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testSqCos kWh',
+			name: 'Cos Sq kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
@@ -703,87 +1110,43 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			deleteFile: true
 		},
 		{
-			name: 'testAmp1Sin kWh',
+			name: 'Sin Amp 1 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '8.5, 41.6',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
-			name: 'testAmp2Sin kWh',
+			name: 'Sin Amp 2 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '23.4, 42.6',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
 		{
-			name: 'testAmp3Sin kWh',
+			name: 'Sin Amp 3 kWh',
 			unit: 'Electric_Utility',
 			defaultGraphicUnit: 'kWh',
 			displayable: true,
-			gps: undefined,
+			gps: '25.2, 26.8',
 			note: 'special meter',
 			file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
 			readingFrequency: '15 minutes',
 			deleteFile: true
 		},
-		{
-			name: 'testAmp4Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq4AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp5Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq5AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp6Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq6AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'testAmp7Sin kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq7AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		}
 	];
 
 	// This assumes the insertSpecialMeters has been run.
 	// The table contains special groups' data.
-	// Don't create groups with of raw type since should not be graphed as a group.
+	// Don't create groups of raw type since could not be graphed as a group.
 	const specialGroups = [
 		['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], []],
 		['Electric Utility 1-5 + Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Electric Utility kWh', 'Natural Gas Dollar'], []],
@@ -791,14 +1154,12 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		['Natural Gas Dollar Euro', 'euro', true, undefined, 'special group', ['Natural Gas Dollar'], []],
 		['Electric kW + 2-6 kW', 'kW', true, undefined, 'special group', ['Electric kW', 'Electric kW 2-6'], []],
 		['Electric Utility 1-5 kWh not displayable', 'kWh', false, undefined, 'special group', ['Electric Utility kWh'], []],
-		['SqSin + SqCos kWh', 'kWh', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['SqSin + SqCos no unit', '', true, undefined, 'special group', ['testSqSin kWh', 'testSqCos kWh'], []],
-		['Amp 1 + 5 kWh', 'kWh', true, undefined, 'special group', ['testAmp1Sin kWh', 'testAmp5Sin kWh'], []],
-		['Amp 2 + 6 kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh', 'testAmp6Sin kWh'], []],
-		['Amp 3 + 4 kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp4Sin kWh'], []],
-		['Amp 2 + (1 + 5) kWh', 'kWh', true, undefined, 'special group', ['testAmp2Sin kWh'], ['Amp 1 + 5 kWh']],
-		['Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp3Sin kWh', 'testAmp6Sin kWh'], ['Amp 2 + (1 + 5) kWh', 'Amp 3 + 4 kWh']],
-		['Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh', 'kWh', true, undefined, 'special group', ['testAmp6Sin kWh', 'testAmp7Sin kWh'], ['Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 1 + 5 kWh']]
+		['Sin Sq + Cos Sq kWh', 'kWh', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
+		['Sin Sq + Cos Sq no unit', '', true, undefined, 'special group', ['Sin Sq kWh', 'Cos Sq kWh'], []],
+		['Sin Amp 1 + 2 kWh', 'kWh', true, '8.1, 20.2', 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], []],
+		['Sin Amp 2 + 3 kWh', 'kWh', true, '18.9, 5.6', 'special group', ['Sin Amp 2 kWh', 'Sin Amp 3 kWh'], []],
+		['Sin Amp 1 + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh'], ['Sin Amp 2 + 3 kWh']],
+		['Sin Amp 1 + 2 + (1 + 2) + (2 + 3) kWh', 'kWh', true, undefined, 'special group', ['Sin Amp 1 kWh', 'Sin Amp 2 kWh'], ['Sin Amp 1 + 2 kWh', 'Sin Amp 2 + 3 kWh']],
 	];
 	console.log("See src/server/data/automatedTestingData.js in insertSpecialUnitsConversionsMetersGroups() to see how to remove the data that is being inserted.\n");
 	const conn = getConnection();

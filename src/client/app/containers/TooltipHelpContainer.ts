@@ -8,9 +8,9 @@ import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { State } from '../types/redux/state';
 import { Dispatch } from '../types/redux/actions';
 
-/*
-* A container that does data fetching for TooltipHelpComponent and connects it to the redux store.
-*/
+/**
+ * A container that does data fetching for TooltipHelpComponent and connects it to the redux store.
+ */
 function mapStateToProps(state: State) {
 	return {
 		version: state.version.version

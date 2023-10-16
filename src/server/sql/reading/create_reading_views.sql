@@ -47,15 +47,18 @@ because infinity is used to indicate to graph all readings. This version does it
 day by using the day reading view since bars use to the nearest day and this should be faster.
 This should be fine since bar uses the same view to get data.
  */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings_by_day(tsrange_to_shrink TSRANGE)
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_meters_by_day(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
 	RETURNS TSRANGE
 AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
 	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM daily_readings_unit;
-	RETURN tsrange_to_shrink * readings_max_tsrange;
+	FROM daily_readings_unit dr
+	-- Get all the meter_ids in the passed array of meters.
+	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id;
+	-- Make the original range be to the day by dropping parts of days at start/end.
+	RETURN tsrange(date_trunc_up('day', lower(tsrange_to_shrink)), date_trunc('day', upper(tsrange_to_shrink))) * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -130,74 +133,74 @@ daily_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(max(( --Extract the maximum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 			extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(max(( 
-		-- 		(r.reading * 3600 / u.sec_in_rate)
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as max,
+		-- The following code does the min/max for daily readings
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(max(( --Extract the maximum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(max(( 
+				(r.reading * 3600 / u.sec_in_rate)
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as max_rate,
 
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(min(( --Extract the minimum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(min((
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	))) 
-		-- END as min,
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(min(( --Extract the minimum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(min((
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			))) 
+		END as min_rate,
 		
 	tsrange(gen.interval_start, gen.interval_start + '1 day'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
@@ -256,74 +259,74 @@ hourly_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(max(( -- Extract the maximum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(max(( -- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as max,
+		-- The following code does the min/max for hourly readings
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(max(( -- Extract the maximum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(max(( -- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as max_rate,
 			
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-		-- 	(min(( --Extract the minimum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	) / (
-		-- 			extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(min((
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as min,
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+			(min(( --Extract the minimum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			) / (
+					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(min((
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as min_rate,
 
 	tsrange(gen.interval_start, gen.interval_start + '1 hour'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
@@ -370,7 +373,7 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	max_raw_points INTEGER,
 	max_hour_points INTEGER
 )
-	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, min_rate FLOAT, max_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
 	requested_range TSRANGE;
@@ -398,38 +401,47 @@ DECLARE
 		-- Make sure the time range is within the reading values for this meter.
 		-- There may be a better way to create the array with one element as last argument.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), array_append(ARRAY[]::INTEGER[], current_meter_id));
-		if (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
+		IF (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
 			-- The request wants automatic calculation of the points returned.
 
-			-- The interval of time for the requested_range.
-			requested_interval := upper(requested_range) - lower(requested_range);
-			-- Get the seconds in the interval.
-			-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-			requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-			-- Get the frequency that this meter reads at.
-			select reading_frequency into frequency FROM meters where id = current_meter_id;
-			-- Get the seconds in the frequency.
-			frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
-
-			-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
-			-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
-			-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
-			-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
-			-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
-			-- Note this overrides the max raw points if it applies.
-			IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
-				-- Return raw meter data.
-				current_point_accuracy := 'raw'::reading_line_accuracy;
-			-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
-			-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
-			-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
-			-- so you don't interpolate points by using the hourly data.
-			ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
-				-- Return hourly reading data.
-				current_point_accuracy := 'hourly'::reading_line_accuracy;
-			ELSE
-				-- Return daily reading data.
+			-- The request_range will still be infinity if there is no meter data. This causes the
+			-- auto calculation to fail because you cannot subtract them.
+			-- Just check the upper range since simpler.
+			IF (upper(requested_range) = 'infinity') THEN
+				-- We know there is no data but easier to just let a query happen since fast.
+				-- Do daily since that should be the fastest due to the least data in most cases.
 				current_point_accuracy := 'daily'::reading_line_accuracy;
+			ELSE
+				-- The interval of time for the requested_range.
+				requested_interval := upper(requested_range) - lower(requested_range);
+				-- Get the seconds in the interval.
+				-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
+				requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
+				-- Get the frequency that this meter reads at.
+				SELECT reading_frequency INTO frequency FROM meters WHERE id = current_meter_id;
+				-- Get the seconds in the frequency.
+				frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
+
+				-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
+				-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
+				-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
+				-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
+				-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
+				-- Note this overrides the max raw points if it applies.
+				IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
+					-- Return raw meter data.
+					current_point_accuracy := 'raw'::reading_line_accuracy;
+				-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
+				-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
+				-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
+				-- so you don't interpolate points by using the hourly data.
+				ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
+					-- Return hourly reading data.
+					current_point_accuracy := 'hourly'::reading_line_accuracy;
+				ELSE
+					-- Return daily reading data.
+					current_point_accuracy := 'daily'::reading_line_accuracy;
+				END IF;
 			END IF;
 		END IF;
 		-- At this point current_point_accuracy should never be 'auto'.
@@ -447,6 +459,10 @@ DECLARE
 					-- to per hour.
 					((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
 				END AS reading_rate,
+				-- There is no range of values on raw/meter data so return NaN to indicate that.
+				-- The route will return this as null when it shows up in Redux state.
+				cast('NaN' AS DOUBLE PRECISION) AS min_rate,
+				cast('NaN' AS DOUBLE PRECISION) as max_rate,
 				r.start_timestamp,
 				r.end_timestamp
 				FROM (((readings r
@@ -467,6 +483,8 @@ DECLARE
 					-- Convert the reading based on the conversion found below.
 					-- Hourly readings are already averaged correctly into a rate.
 					hourly.reading_rate * c.slope + c.intercept as reading_rate,
+					hourly.min_rate * c.slope + c.intercept AS min_rate,
+					hourly.max_rate * c.slope + c.intercept AS max_rate,
 					lower(hourly.time_interval) AS start_timestamp,
 					upper(hourly.time_interval) AS end_timestamp
 				FROM (((hourly_readings_unit hourly
@@ -486,6 +504,8 @@ DECLARE
 					-- Convert the reading based on the conversion found below.
 					-- Daily readings are already averaged correctly into a rate.
 					daily.reading_rate * c.slope + c.intercept as reading_rate,
+					daily.min_rate * c.slope + c.intercept AS min_rate,
+					daily.max_rate * c.slope + c.intercept AS max_rate,
 					lower(daily.time_interval) AS start_timestamp,
 					upper(daily.time_interval) AS end_timestamp
 				FROM (((daily_readings_unit daily
@@ -549,34 +569,43 @@ BEGIN
 
 		-- Make sure the time range is within the reading values for meters in this group.
 		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), meter_ids);
-		-- The interval of time for the requested_range.
-		requested_interval := upper(requested_range) - lower(requested_range);
-		-- Get the seconds in the interval.
-		-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-		requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-		-- Make sure that the number of hour points is no more than maximum hourly readings.
-		-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
-		IF (requested_interval_seconds / 3600 <= max_hour_points) THEN
-			-- Return hourly reading data.
-			point_accuracy := 'hourly'::reading_line_accuracy;
-		ELSE
-			-- Return daily reading data.
+		-- The request_range will still be infinity if there is no meter data. This causes the
+		-- auto calculation to fail because you cannot subtract them.
+		-- Just check the upper range since simpler.
+		IF (upper(requested_range) = 'infinity') THEN
+			-- We know there is no data but easier to just let a query happen since fast.
+			-- Do daily since that should be the fastest due to the least data in most cases.
 			point_accuracy := 'daily'::reading_line_accuracy;
-		END IF;
+		ELSE
+			-- The interval of time for the requested_range.
+			requested_interval := upper(requested_range) - lower(requested_range);
+			-- Get the seconds in the interval.
+			-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
+			requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
+			-- Make sure that the number of hour points is no more than maximum hourly readings.
+			-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
+			IF (requested_interval_seconds / 3600 <= max_hour_points) THEN
+				-- Return hourly reading data.
+				point_accuracy := 'hourly'::reading_line_accuracy;
+			ELSE
+				-- Return daily reading data.
+				point_accuracy := 'daily'::reading_line_accuracy;
+			END IF;
 
-		-- Groups can require reading interpolation because of multiple meters. For example, if one meter
-		-- is 30 day reading frequency then it will interpolate to hourly or daily depending other
-		-- meters (if exist). However, to limit this effect, if hourly has been selected automatically,
-		-- check if shortest meter reading frequency for this group is more than an hour and then
-		-- choose daily instead.
-		IF (point_accuracy = 'hourly'::reading_line_accuracy) THEN
-			-- Find the min reading frequency for all meters in the group.
-			SELECT min(reading_frequency) INTO meters_min_frequency
-			FROM (meters m
-			INNER JOIN unnest(meter_ids) meters(id) ON m.id = meters.id);
-			IF (EXTRACT(EPOCH FROM meters_min_frequency) > 3600) THEN
-				-- The smallest meter frequency is greater than 1 hour (3600 seconds) so use daily instead.
-				point_accuracy = 'daily'::reading_line_accuracy;
+			-- Groups can require reading interpolation because of multiple meters. For example, if one meter
+			-- is 30 day reading frequency then it will interpolate to hourly or daily depending other
+			-- meters (if exist). However, to limit this effect, if hourly has been selected automatically,
+			-- check if shortest meter reading frequency for this group is more than an hour and then
+			-- choose daily instead.
+			IF (point_accuracy = 'hourly'::reading_line_accuracy) THEN
+				-- Find the min reading frequency for all meters in the group.
+				SELECT min(reading_frequency) INTO meters_min_frequency
+				FROM (meters m
+				INNER JOIN unnest(meter_ids) meters(id) ON m.id = meters.id);
+				IF (EXTRACT(EPOCH FROM meters_min_frequency) > 3600) THEN
+					-- The smallest meter frequency is greater than 1 hour (3600 seconds) so use daily instead.
+					point_accuracy = 'daily'::reading_line_accuracy;
+				END IF;
 			END IF;
 		END IF;
 	END IF;
@@ -632,7 +661,7 @@ BEGIN
 	This rounds to the day for the start and end times requested. It then shrinks in case the actual readings span
 	less time than the request. This can commonly happen when you get +/-infinity for all readings available.
 	It uses the day reading view because that is faster than using all the readings.
-	This has a few issues associated with it:
+	This has an issue associated with it:
 
 	1) If the readings at the start/end have a partial day then it shows up as a day. The original code did:
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
@@ -640,14 +669,8 @@ BEGIN
 	A more general solution would be to change the daily (and hourly) view so it does not include partial ones at start/end.
 	This would fix this case and also impact other uses in what seems a positive way.
 	Note this does not address that missing days in a bar width get no value so the bar will likely read low.
-
-	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separatly is that if
-	they have different end times then the bars may not align. For example, if you have 7 day bars and the end time of one meter is two days
-	earlier than the global max then all of its bars will be shifted two days. Since people want to compare among bars in a group, this
-	was undesirable so the global values are used. It means the shifted meters may have missing days that make them smaller than the others.
-	It also is needed for group bars that sum these results so they must align.
 	*/
-	real_tsrange := shrink_tsrange_to_real_readings_by_day(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_tsrange := shrink_tsrange_to_meters_by_day(tsrange(start_stamp, end_stamp), meter_ids);
 	-- Get the actual start/end time rounded to the nearest day from the range.
 	real_start_stamp := lower(real_tsrange);
 	real_end_stamp := upper(real_tsrange);

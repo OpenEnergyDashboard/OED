@@ -2,7 +2,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { FormattedMessage } from 'react-intl';
-import HeaderContainer from '../../containers/HeaderContainer';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -15,11 +14,17 @@ import UnitViewComponent from './UnitViewComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import { UnitData } from 'types/redux/units';
 import SpinnerComponent from '../../components/SpinnerComponent';
+import HeaderComponent from '../../components/HeaderComponent';
+import { Dispatch } from 'types/redux/actions';
 
+/**
+ * Defines the units page card view
+ * @returns Units page element
+ */
 export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	useEffect(() => {
 		// Makes async call to units API for units details if one has not already been made somewhere else, stores unit ids in state
@@ -51,7 +56,7 @@ export default function UnitsDetailComponent() {
 				</div>
 			) : (
 				<div>
-					<HeaderContainer />
+					<HeaderComponent />
 					<TooltipHelpContainer page='units' />
 
 					<div className='container-fluid'>

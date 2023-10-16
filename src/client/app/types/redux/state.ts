@@ -7,7 +7,6 @@ import { LineReadingsState } from './lineReadings';
 import { GraphState } from './graph';
 import { GroupsState } from './groups';
 import { MetersState } from './meters';
-import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
 import { VersionState } from './version';
@@ -16,7 +15,7 @@ import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
 import { UnitsState } from './units';
 import { ConversionsState } from './conversions';
-
+import { OptionsState } from './options';
 
 export interface State {
 	meters: MetersState;
@@ -28,11 +27,11 @@ export interface State {
 	graph: GraphState;
 	maps: MapState;
 	groups: GroupsState;
-	notifications: NotificationsState;
 	admin: AdminState;
 	version: VersionState;
 	currentUser: CurrentUserState;
 	unsavedWarning: UnsavedWarningState;
 	units: UnitsState;
 	conversions: ConversionsState;
+	options: OptionsState;
 }

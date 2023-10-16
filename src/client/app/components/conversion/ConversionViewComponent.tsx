@@ -5,19 +5,24 @@
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
-import { Button } from 'react-bootstrap';
 import { FormattedMessage } from 'react-intl';
 import EditConversionModalComponent from './EditConversionModalComponent';
 import '../../styles/card-page.css';
 import { ConversionData } from 'types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import translate from '../../utils/translate';
+import { Button } from 'reactstrap';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
 	units: UnitDataById;
 }
 
+/**
+ * Defines the conversion info card
+ * @param props defined above
+ * @returns Single conversion element
+ */
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
 
@@ -66,10 +71,10 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 			</div>
 			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-				<b><FormattedMessage id="conversion.note" /></b> {props.conversion.note.slice(0, 29)}
+				<b><FormattedMessage id="note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
-				<Button variant="secondary" onClick={handleShow}>
+				<Button color='secondary' onClick={handleShow}>
 					<FormattedMessage id="conversion.edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}

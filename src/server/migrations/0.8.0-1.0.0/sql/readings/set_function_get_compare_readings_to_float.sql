@@ -16,7 +16,7 @@ shift: How far back in time to shift the curr_start and curr_end date/time to ge
 
 -- This changes the signature of the function. It did not exist before version 1.0 but if
 -- someone has it then you have to drop before replace so doing to be safe.
-DROP FUNCTION meter_compare_readings_unit;
+DROP FUNCTION IF EXISTS meter_compare_readings_unit;
  
 CREATE OR REPLACE FUNCTION meter_compare_readings_unit (
 	meter_ids INTEGER[],
@@ -100,7 +100,7 @@ shift: How far back in time to shift the curr_start and curr_end date/time to ge
 
 -- This changes the signature of the function. It did not exist before version 1.0 but if
 -- someone has it then you have to drop before replace so doing to be safe.
-DROP FUNCTION group_compare_readings_unit;
+DROP FUNCTION IF EXISTS group_compare_readings_unit;
 
 CREATE OR REPLACE FUNCTION group_compare_readings_unit (
 	group_ids INTEGER[],

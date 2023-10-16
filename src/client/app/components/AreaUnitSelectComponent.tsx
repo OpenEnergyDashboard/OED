@@ -16,7 +16,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React Component that creates the area unit selector dropdown
- * @returns {Element} JSX Element
+ * @returns Area unit select element
  */
 export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();
@@ -69,11 +69,11 @@ export default function AreaUnitSelectComponent() {
 			{graphState.areaNormalization &&
 				<div>
 					<p style={labelStyle}>
-						<FormattedMessage id='units.area' />:
+						<FormattedMessage id='area.unit' />:
 					</p>
 					<Select
 						options={unitOptions}
-						value={{ label: translate(`AreaUnitType.${graphState.selectedAreaUnit}`), value: graphState.selectedAreaUnit} as StringSelectOption}
+						value={{ label: translate(`AreaUnitType.${graphState.selectedAreaUnit}`), value: graphState.selectedAreaUnit } as StringSelectOption}
 						onChange={newSelectedUnit => {
 							if (newSelectedUnit) {
 								dispatch(updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType))

@@ -2,21 +2,40 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { LineReading, RawReadings } from '../types/readings';
+import { LineReading, BarReading, RawReadings } from '../types/readings';
 import moment from 'moment';
-import { ChartTypes } from 'types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
  * Function to converts the meter readings into a CSV formatted string.
- *
- * @param {LineReading[]} readings The meter readings.
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unitLabel the full y-axis label on the graphic
- * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
- * @returns {string} output A string containing the CSV formatted meter readings.
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
+ * @param unitLabel the full y-axis label on the graphic
+ * @param chartName the name of the chart/graphic being exported
+ * @param scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param meterGroup tells if this is a meter or group export
+ * @param errorBarState This indicate if the error bars are on. Automatically false if no argument is given.
+ * @returns A string containing the CSV formatted meter readings.
  */
-function convertToCSV(readings: LineReading[], meter: string, unitLabel: string, scaling: number) {
-	let csvOutput = `Readings,Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unitLabel}\n`;
+function convertToCSV(readings: LineReading[] | BarReading[], name: string, unitLabel: string, chartName: ChartTypes,
+	scaling: number, meterGroup: MeterOrGroup, errorBarState: boolean = false) {
+	let csvOutput = 'Readings, Start Timestamp, End Timestamp';
+	// Check if readings is of LineReading type and if error bars are turned on.
+	// If these two are true then add columns for min and max.
+	const showMinMax = chartName === ChartTypes.line && errorBarState;
+	if (showMinMax) {
+		csvOutput += ', Min, Max';
+	} else {
+		csvOutput += ',,';
+	}
+	// TODO should be internationalized
+	let meterOrGroupString = '';
+	if (meterGroup === MeterOrGroup.meter) {
+		meterOrGroupString = 'Meter'
+	} else {
+		meterOrGroupString = 'Group'
+	}
+	csvOutput += `, ${meterOrGroupString} name, ${name}, Unit, ${unitLabel}\n`
 	readings.forEach(reading => {
 		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
@@ -25,16 +44,29 @@ function convertToCSV(readings: LineReading[], meter: string, unitLabel: string,
 		// somewhat universal way of formatting.
 		const startTimeStamp = moment.utc(reading.startTimestamp).format('YYYY-MM-DD HH:mm:ss');
 		const endTimeStamp = moment.utc(reading.endTimestamp).format('YYYY-MM-DD HH:mm:ss');
-		csvOutput += `${value},${startTimeStamp},${endTimeStamp}\n`;
+		csvOutput += `${value},${startTimeStamp},${endTimeStamp}`;
+		// Include min and max in export if appropriate."
+		if (showMinMax) {
+			// This sometimes gives:
+			// TS18046: 'reading.max' is of type 'unknown'. (and min too).
+			// Not sure how to fix.
+			// if ('min' in reading && 'max' in reading) {
+			// So far this is working but unsure why better.
+			if (reading.min && reading.max) {
+				const min = reading.min * scaling;
+				const max = reading.max * scaling;
+				csvOutput += `,${min},${max}`
+			}
+		}
+		csvOutput += '\n';
 	});
 	return csvOutput;
 }
 
 /**
  * Function to download the formatted CSV file to the users computer.
- *
- * @param {string} inputCSV A String containing the formatted CSV data.
- * @param {string} fileName A string representing the name of the file.
+ * @param inputCSV A String containing the formatted CSV data.
+ * @param fileName A string representing the name of the file.
  */
 function downloadCSV(inputCSV: string, fileName: string) {
 	const element = document.createElement('a');
@@ -51,19 +83,20 @@ function downloadCSV(inputCSV: string, fileName: string) {
 
 /**
  * Function to export readings from the graph currently displaying. May be used for routing if more export options are added
- *
- * @param {LineReading[]} readings The readings from the meter to export the graphic points.
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unitLabel the full y-axis label on the graphic
- * @param {string} unitIdentifier the unit identifier for data being exported
- * @param {ChartTypes} chartName the name of the chart/graphic being exported
- * @param {number} scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param readings The readings from the meter/group to export the graphic points.
+ * @param name the meter identifier or group name for data being exported
+ * @param unitLabel the full y-axis label on the graphic
+ * @param unitIdentifier the unit identifier for data being exported
+ * @param chartName the name of the chart/graphic being exported
+ * @param scaling factor to scale readings by, normally the rate factor for line or 1
+ * @param meterGroup tells if this is a meter or group export
+ * @param errorBarState This indicate if the error bars are on. Automatically false if no argument is given.
  */
-export default function graphExport(readings: LineReading[], meter: string, unitLabel: string, unitIdentifier: string,
-	chartName: ChartTypes, scaling: number) {
+export default function graphExport(readings: LineReading[] | BarReading[], name: string, unitLabel: string, unitIdentifier: string,
+	chartName: ChartTypes, scaling: number, meterGroup: MeterOrGroup, errorBarState: boolean = false) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		const dataToExport = convertToCSV(readings, meter, unitLabel, scaling);
+		const dataToExport = convertToCSV(readings, name, unitLabel, chartName, scaling, meterGroup, errorBarState);
 
 		// Determine and format the first time in the dataset which is first one in array since just sorted and the start time.
 		// As usual, maintain UTC.
@@ -76,22 +109,21 @@ export default function graphExport(readings: LineReading[], meter: string, unit
 
 		// This is the file name with all the above info so unique.
 		// Note it only uses the unit identifier not with the rate because that has funny characters.
-		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${meter}_${unitIdentifier}.csv`;
+		const filename = `oedExport_${chartName}_${startTimeString}_to_${endTimeString}_${name}_${unitIdentifier}.csv`;
 		downloadCSV(dataToExport, filename);
 	}
 }
 
 /**
  * Function to export raw data that we request on button click
- *
- * @param {RawReadings[]} readings list of readings directly from the database
- * @param {string} meter the meter identifier for data being exported
- * @param {string} unit the unit identifier for data being exported
+ * @param readings list of readings directly from the database
+ * @param meter the meter identifier for data being exported
+ * @param unit the unit identifier for data being exported
  */
 export function downloadRawCSV(readings: RawReadings[], meter: string, unit: string) {
 	// It is possible that some meters have not readings so skip if do. This can happen if resize the range of dates (or no data).
 	if (readings.length !== 0) {
-		let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter, ${meter}, Unit, ${unit} \n`;
+		let csvOutput = `Readings, Start Timestamp, End Timestamp, Meter name, ${meter}, Unit, ${unit} \n`;
 		readings.forEach(ele => {
 			// As elsewhere, preserve the UTC time that comes from the DB.
 			// See above for why formatted this way.
@@ -104,7 +136,7 @@ export function downloadRawCSV(readings: RawReadings[], meter: string, unit: str
 		// Easy to get since the data is sorted.
 		const startTime = moment.utc(readings[0].s).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
 		const endTime = moment.utc(readings[readings.length - 1].e).format('LL_LTS').replace(/,/g, '').replace(/[\s:-]/g, '_');
-		const filename = `oedRawExport_line_${startTime}_to_${endTime}_for_${meter}.csv`;
+		const filename = `oedRawExport_line_${startTime}_to_${endTime}_${meter}.csv`;
 		downloadCSV(csvOutput, filename);
 	}
 }

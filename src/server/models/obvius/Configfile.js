@@ -33,7 +33,7 @@ class Configfile {
 	/**
 	 * Returns a promise to create the Configfile table.
 	 * @param conn The connection to use.
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('obvius/create_config_table.sql'));
@@ -42,7 +42,7 @@ class Configfile {
 	/**
 	 * Returns a promise to remove all entries in the table.
 	 * @param conn The connection to use.
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static purgeAll(conn) {
 		return conn.none(sqlFile('obvius/purge_configs.sql'));

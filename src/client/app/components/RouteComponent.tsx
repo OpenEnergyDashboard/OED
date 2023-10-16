@@ -12,7 +12,7 @@ import moment from 'moment';
 import HomeComponent from './HomeComponent';
 import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
-import { LinkOptions } from 'actions/graph';
+import { LinkOptions } from '../actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
 import { ChartTypes, LineGraphRate } from '../types/redux/graph';
@@ -37,11 +37,12 @@ import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
 	barStacking: boolean;
-	defaultLanguage: LanguageTypes;
+	selectedLanguage: LanguageTypes;
 	loggedInAsAdmin: boolean;
 	role: UserRole;
 	renderOnce: boolean;
 	areaNormalization: boolean;
+	minMax: boolean;
 	changeOptionsFromLink(options: LinkOptions): Promise<any[]>;
 	clearCurrentUser(): any;
 	changeRenderOnce(): any;
@@ -60,7 +61,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Their async blocks evaluate properly, but the returns inside of them are never honored. The end return statement is always what is evaluated.
 	 * Fixing this may require some major changes to how page redirects are done. This is detailed more in issue #817.
 	 * The errors can be obtained by putting breakpoints on all returns and then stepping through a page load in a debugger.
-	*/
+	 */
 
 	/**
 	 * Generates middleware that requires proper role and authentication for a page route
@@ -149,6 +150,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * Middleware function that allows hotlinking to a graph with options
 	 * @param component The component of the page redirecting
 	 * @param search The string of queries in the path
+	 * @returns component
 	 */
 	public linkToGraph(component: JSX.Element, search: string) {
 		/*
@@ -210,6 +212,14 @@ export default class RouteComponent extends React.Component<RouteProps> {
 									options.toggleAreaNormalization = true;
 								}
 								break;
+							case 'areaUnit':
+								options.areaUnit = info;
+								break;
+							case 'minMax':
+								if (this.props.minMax.toString() !== info) {
+									options.toggleMinMax = true;
+								}
+								break;
 							case 'comparePeriod':
 								options.comparePeriod = validateComparePeriod(info);
 								break;
@@ -262,7 +272,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 * @returns JSX to create the RouteComponent
 	 */
 	public render() {
-		const lang = this.props.defaultLanguage;
+		const lang = this.props.selectedLanguage;
 		const messages = (localeData as any)[lang];
 		return (
 			<div>
@@ -294,11 +304,11 @@ export default class RouteComponent extends React.Component<RouteProps> {
 
 	/**
 	 * Generates new time interval based on current time and user selected amount to trace back;
-	 * @param message: currently able to accept how many days to go back in time;
+	 * @param {string} message currently able to accept how many days to go back in time;
+	 * @returns {string} interval as a string
 	 */
 	// private getNewIntervalFromMessage(message: string) {
 	// 	const numDays = parseInt(message);
-	//
 	// If we ever use this code we might need to fix up moment for UTC as elsewhere in the code.
 	// 	const current = moment();
 	// 	const newMinTimeStamp = current.clone();

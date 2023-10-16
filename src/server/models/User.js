@@ -112,7 +112,7 @@ class User {
 	 * Returns a promise to create the user_type type.
 	 * This needs to be run before User.createTable().
 	 * @param conn the connection to use
-	 * @return {Promise<void>}
+	 * @returns {Promise<void>}
 	 */
 	static createUserTypesEnum(conn) {
 		return conn.none(sqlFile('user/create_user_types_enum.sql'));

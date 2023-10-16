@@ -15,7 +15,7 @@ import { hasToken } from '../utils/token';
 import { usersApi } from '../utils/api'
 import { UserRole } from '../types/items';
 import translate from '../utils/translate';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { lineUnitLabel, barUnitLabel } from '../utils/graphics';
 import { ConversionData } from '../types/redux/conversions';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -39,6 +39,8 @@ export default function ExportComponent() {
 	const adminState = useSelector((state: State) => state.admin);
 	// readings state
 	const readingsState = useSelector((state: State) => state.readings);
+	// error bar state
+	const errorBarState = useSelector((state: State) => state.graph.showMinMax);
 	// Time range of graphic
 	const timeInterval = graphState.timeInterval;
 
@@ -55,20 +57,22 @@ export default function ExportComponent() {
 			// Get the full y-axis unit label for a line
 			const returned = lineUnitLabel(unitsState[unitId], graphState.lineGraphRate, graphState.areaNormalization, graphState.selectedAreaUnit);
 			const unitLabel = returned.unitLabel
+			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
+			const rateScaling = returned.needsRateScaling ? graphState.lineGraphRate.rate : 1;
 			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
 			for (const meterId of graphState.selectedMeters) {
+				const meterArea = metersState[meterId].area;
 				// export if area normalization is off or the meter can be normalized
-				if (!graphState.areaNormalization || (metersState[meterId].area > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (meterArea > 0 && metersState[meterId].areaUnit !== AreaUnitType.none)) {
 					// Line readings data for this meter.
 					const byMeterID = readingsState.line.byMeterID[meterId];
 					// Make sure it exists in case state is not there yet.
 					if (byMeterID !== undefined) {
-						// The selected rate for scaling
-						let scaling = graphState.lineGraphRate.rate;
-						if (graphState.areaNormalization) {
-							// convert the meter area into the proper unit, if needed
-							scaling *= getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit);
-						}
+						// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
+						const areaScaling = graphState.areaNormalization ?
+							meterArea * getAreaUnitConversion(metersState[meterId].areaUnit, graphState.selectedAreaUnit) : 1;
+						// Divide areaScaling into the rate so have complete scaling factor for readings.
+						const scaling = rateScaling / areaScaling;
 						// Get the readings for the time range and unit graphed
 						const byTimeInterval = byMeterID[timeInterval.toString()];
 						if (byTimeInterval !== undefined) {
@@ -84,7 +88,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current meter.
 								const meterIdentifier = metersState[meterId].identifier;
-								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
+								graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meter, errorBarState);
 							}
 						}
 					}
@@ -92,18 +96,19 @@ export default function ExportComponent() {
 			}
 			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
 			for (const groupId of graphState.selectedGroups) {
+				const groupArea = groupsState[groupId].area;
 				// export if area normalization is off or the group can be normalized
-				if (!graphState.areaNormalization || (groupsState[groupId].area > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
+				if (!graphState.areaNormalization || (groupArea > 0 && groupsState[groupId].areaUnit !== AreaUnitType.none)) {
 					// Line readings data for this group.
 					const byGroupID = readingsState.line.byGroupID[groupId];
 					// Make sure it exists in case state is not there yet.
 					if (byGroupID !== undefined) {
-						// The selected rate for scaling
-						let scaling = graphState.lineGraphRate.rate;
-						if (graphState.areaNormalization) {
-							// convert the meter area into the proper unit, if needed
-							scaling *= getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit);
-						}
+						// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
+						const areaScaling = graphState.areaNormalization ?
+							groupArea * getAreaUnitConversion(groupsState[groupId].areaUnit, graphState.selectedAreaUnit) : 1;
+						// Divide areaScaling into the rate so have complete scaling factor for readings.
+						const scaling = rateScaling / areaScaling;
+
 						// Get the readings for the time range and unit graphed
 						const byTimeInterval = byGroupID[timeInterval.toString()];
 						if (byTimeInterval !== undefined) {
@@ -119,7 +124,7 @@ export default function ExportComponent() {
 								const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 								// Identifier for current group.
 								const groupName = groupsState[groupId].name;
-								graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
+								graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.group);
 							}
 						}
 					}
@@ -162,7 +167,7 @@ export default function ExportComponent() {
 									const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 									// Identifier for current meter.
 									const meterIdentifier = metersState[meterId].identifier;
-									graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling);
+									graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meter);
 								}
 							}
 						}
@@ -200,7 +205,7 @@ export default function ExportComponent() {
 									const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 									// Identifier for current group.
 									const groupName = groupsState[groupId].name;
-									graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling);
+									graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.group);
 								}
 							}
 						}
@@ -311,14 +316,14 @@ export default function ExportComponent() {
 	return (
 		<>
 			<div>
-				<Button outline onClick={exportGraphReading}>
+				<Button color='secondary' outline onClick={exportGraphReading}>
 					<FormattedMessage id='export.graph.data' />
 				</Button>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
 			</div>
 			{/* Only raw export if a line graph */}
 			{graphState.chartToRender === 'line' ? <div style={{ paddingTop: '10px' }}>
-				<Button outline onClick={exportRawReadings}>
+				<Button color='secondary' outline onClick={exportRawReadings}>
 					<FormattedMessage id='export.raw.graph.data' />
 				</Button>
 			</div> : ''}

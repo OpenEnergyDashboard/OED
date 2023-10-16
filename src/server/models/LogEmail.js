@@ -19,7 +19,7 @@ class LogEmail {
 	/**
 	 * Returns a promise to create the log email table.
 	 * @param conn the connection to be used.
-	 * @return {Promise.<>}
+	 * @returns {Promise.<>}
 	 */
 	static async createTable(conn) {
 		await conn.none(sqlFile('logemail/create_log_table.sql'));
@@ -43,7 +43,7 @@ class LogEmail {
 	/**
 	 * Returns a promise to delete all logs email
 	 * @param conn the connection to be used.
-	 * @return {Promise.<void>}
+	 * @returns {Promise.<void>}
 	 */
 	static async delete(conn) {
 		await conn.none(sqlFile('logemail/delete_all_logs.sql'));

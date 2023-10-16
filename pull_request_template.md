@@ -10,7 +10,6 @@ Fixes #[issue]
 
 (Check the ones that apply by placing an "x" instead of the space in the [ ] so it becomes [x])
 
-- [ ] Note merging this changes the node modules
 - [ ] Note merging this changes the database configuration.
 - [ ] This change requires a documentation update
 
@@ -20,6 +19,7 @@ Fixes #[issue]
 
 - [ ] I have followed the [OED pull request](https://openenergydashboard.github.io/developer/pr.html) ideas
 - [ ] I have removed text in ( ) from the issue request
+- [ ] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](https://openenergydashboard.github.io/developer/cla.html) and each author is listed in the Description section.
 
 ## Limitations
 

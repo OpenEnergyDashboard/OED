@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const reqPromise = require('request-promise-native');
+const axios = require('axios');
 const readCsv = require('./readCsv');
 const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
@@ -12,7 +12,7 @@ const stopDB = require('../models/database').stopDB;
 const { log } = require('../log');
 const moment = require('moment');
 const Unit = require('../models/Unit');
-
+const Preferences = require('../../models/Preferences');
 const parseXMLPromisified = util.promisify(parseString);
 
 async function parseCSV(filename) {
@@ -34,7 +34,7 @@ async function parseCSV(filename) {
  */
 async function reqWithTimeout(url, timeout, csvLine) {
 	return Promise.race([
-		reqPromise(url),
+		axios.get(url),
 		new Promise((resolve, reject) =>
 			setTimeout(() => reject(new Error(`CSV line ${csvLine}: Failed to GET ${url} within ${timeout} ms`)), timeout))
 	]);
@@ -62,8 +62,10 @@ async function getMeterInfo(url, ip, csvLine) {
 	} else {
 		unitId = kWhUnit.id;
 	}
+	const preferences = await Preferences.get(conn);
 	return reqWithTimeout(url, 5000, csvLine)
-		.then(raw => parseXMLPromisified(raw))
+		// Doing raw.data is untested since went to axios. If get access to MAMAC meter then should test.
+		.then(raw => parseXMLPromisified(raw.data))
 		.then(xml => {
 			const name = xml.Maverick.NodeID[0];
 			// For historical reasons, MAMAC meters store the IP address and not the URL.
@@ -95,7 +97,13 @@ async function getMeterInfo(url, ip, csvLine) {
 				unitId, // unit
 				unitId, // default graphic unit
 				undefined, // area unit
-				undefined // reading frequency
+				preferences.defaultMeterReadingFrequency, // reading frequency
+				preferences.defaultMeterMinimumValue, // minVal
+				preferences.defaultMeterMaximumValue, // maxVal
+				preferences.defaultMeterMinimumDate, // minDate
+				preferences.defaultMeterMaximumDate, // maxDate
+				preferences.defaultMeterMaximumErrors, // maxError
+				preferences.defaultMeterDisableChecks  // disableChecks
 			);
 		});
 }

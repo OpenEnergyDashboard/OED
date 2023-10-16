@@ -6,7 +6,7 @@ import { PreferenceRequestItem } from '../items';
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { ActionType } from './actions';
-import { AreaUnitType } from 'utils/getAreaUnitConversion';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export type AdminAction =
 	| UpdateImportMeterAction
@@ -22,9 +22,16 @@ export type AdminAction =
 	| UpdateDefaultWarningFileSize
 	| UpdateDefaultFileSizeLimit
 	| MarkPreferencesSubmittedAction
-	| UpdateCikAndDBViews
+	| ToggleWaitForCikAndDB
 	| UpdateDefaultAreaUnitAction
-	| UpdateDefaultMeterReadingFrequencyAction;
+	| UpdateDefaultMeterReadingFrequencyAction
+	| UpdateDefaultMeterMinimumValueAction
+	| UpdateDefaultMeterMaximumValueAction
+	| UpdateDefaultMeterMinimumDateAction
+	| UpdateDefaultMeterMaximumDateAction
+	| UpdateDefaultMeterReadingGapAction
+	| UpdateDefaultMeterMaximumErrorsAction
+	| UpdateDefaultMeterDisableChecksAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -92,13 +99,49 @@ export interface UpdateDefaultFileSizeLimit {
 	defaultFileSizeLimit: number;
 }
 
-export interface UpdateCikAndDBViews {
-	type: ActionType.UpdateCikAndDBViews;
+export interface ToggleWaitForCikAndDB {
+	type: ActionType.ToggleWaitForCikAndDB;
 }
 
 export interface UpdateDefaultMeterReadingFrequencyAction {
 	type: ActionType.UpdateDefaultMeterReadingFrequency;
 	defaultMeterReadingFrequency: string;
+}
+
+export interface UpdateDefaultMeterMinimumValueAction {
+	type: ActionType.UpdateDefaultMeterMinimumValue;
+	defaultMeterMinimumValue: number;
+}
+
+export interface UpdateDefaultMeterMaximumValueAction {
+	type: ActionType.UpdateDefaultMeterMaximumValue;
+	defaultMeterMaximumValue: number;
+}
+
+
+export interface UpdateDefaultMeterMinimumDateAction {
+	type: ActionType.UpdateDefaultMeterMinimumDate;
+	defaultMeterMinimumDate: string;
+}
+
+export interface UpdateDefaultMeterMaximumDateAction {
+	type: ActionType.UpdateDefaultMeterMaximumDate;
+	defaultMeterMaximumDate: string;
+}
+
+export interface UpdateDefaultMeterReadingGapAction {
+	type: ActionType.UpdateDefaultMeterReadingGap;
+	defaultMeterReadingGap: number;
+}
+
+export interface UpdateDefaultMeterMaximumErrorsAction {
+	type: ActionType.UpdateDefaultMeterMaximumErrors;
+	defaultMeterMaximumErrors: number;
+}
+
+export interface UpdateDefaultMeterDisableChecksAction {
+	type: ActionType.UpdateDefaultMeterDisableChecks;
+	defaultMeterDisableChecks: boolean;
 }
 
 export interface AdminState {
@@ -116,4 +159,11 @@ export interface AdminState {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
+	defaultMeterMaximumValue: number;
+	defaultMeterMinimumDate: string;
+	defaultMeterMaximumDate: string;
+	defaultMeterReadingGap: number;
+	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }

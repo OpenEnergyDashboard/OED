@@ -79,7 +79,7 @@ The input meter file will be pipe#AInputMeter.csv, the input readings file will 
  | 73    |                 |            |                  |                          |             |             |          |     The meter in DB is set to reading_gap=60 and reading_variation=120 but then the curl passes 120.1 and 121.2 for gap & variation. Should get Length variation for line 5. Expect 1, 2+, 3, 4+, 5-, 5- (same as previous point and extra one since last reading goes into next day). This also checks that floating point numbers come through correctly by seeing message has correct value.
  | 74    |                 | X          |                  |                          |             | 3           |          |     The meter in DB is set to reading_duplication=3 and no value in curl. Repeat every reading 3x but should only see once.  Get standard cum values. |
  | 75    | X               |            |                  |                          |             |             |          |     The meter in DB is set to time_sort='decreasing' and no value in curl. Should get usual values. |
- | 76    |                 |            |                  |                          |             |             | X        |     The meter in DB is set to end_only_time='true' and no value in curl. Should get usual values with first one dropped. |
+ | 76    |                 |            |                  |                          |             |             | X        |     The meter in DB is set to end_only_time='yes' and no value in curl. Should get usual values with first one dropped. |
 
 ## Tests with multiple input files of first two meter and then readings
 

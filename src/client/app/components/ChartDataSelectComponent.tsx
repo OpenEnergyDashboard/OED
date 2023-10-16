@@ -27,9 +27,11 @@ import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import translate from '../utils/translate';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
+ * @returns Chart data select element
  */
 export default function ChartDataSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
@@ -186,7 +188,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledMeter != -1) {
 			sortedMeters.splice(firstDisabledMeter, 0, {
 				value: 0,
-				label: '----- Incompatible Meters -----',
+				label: '----- ' + translate('incompatible.meters') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
@@ -229,7 +231,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledGroup != -1) {
 			sortedGroups.splice(firstDisabledGroup, 0, {
 				value: 0,
-				label: '----- Incompatible Groups -----',
+				label: '----- ' + translate('incompatible.groups') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
@@ -256,7 +258,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledUnit != -1) {
 			sortedUnits.splice(firstDisabledUnit, 0, {
 				value: 0,
-				label: '----- Incompatible Units -----',
+				label: '----- ' + translate('incompatible.units') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
@@ -290,6 +292,7 @@ export default function ChartDataSelectComponent() {
 		<div>
 			<p style={labelStyle}>
 				<FormattedMessage id='groups' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</p>
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
@@ -298,22 +301,24 @@ export default function ChartDataSelectComponent() {
 					placeholder={intl.formatMessage(messages.selectGroups)}
 					onValuesChange={(newSelectedGroupOptions: SelectOption[]) => {
 						// see meters code below for comments, as the code functions the same
-						const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
-						const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
-						const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
-						const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
-						if (difference === undefined) {
-							allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
-						} else {
-							allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+						if (dataProps.compatibleSelectedGroups.length !== 0 || newSelectedGroupOptions.length !== 0) {
+							const allSelectedGroupIDs: number[] = dataProps.allSelectedGroups.map(s => s.value);
+							const oldSelectedGroupIDs: number[] = dataProps.compatibleSelectedGroups.map(s => s.value);
+							const newSelectedGroupIDs: number[] = newSelectedGroupOptions.map(s => s.value);
+							const difference: number = oldSelectedGroupIDs.filter(x => !newSelectedGroupIDs.includes(x))[0];
+							if (difference === undefined) {
+								allSelectedGroupIDs.push(newSelectedGroupIDs.filter(x => !oldSelectedGroupIDs.includes(x))[0]);
+							} else {
+								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
+							}
+							dispatch(changeSelectedGroups(allSelectedGroupIDs));
 						}
-						dispatch(changeSelectedGroups(allSelectedGroupIDs));
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.groups' />
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='meters' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</p>
 			<div style={divBottomPadding}>
 				<MultiSelectComponent
@@ -321,27 +326,33 @@ export default function ChartDataSelectComponent() {
 					selectedOptions={dataProps.compatibleSelectedMeters}
 					placeholder={intl.formatMessage(messages.selectMeters)}
 					onValuesChange={(newSelectedMeterOptions: SelectOption[]) => {
-						//computes difference between previously selected meters and current selected meters,
-						// then makes the change to all selected meters, which includes incompatible selected meters
-						const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
-						const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
-						const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
-						// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
-						// first filter finds items in the old list than are not in the new (deletions)
-						const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
-						if (difference === undefined) {
-							// finds items in the new list which are not in the old list (insertions)
-							allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
-						} else {
-							allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
+						// If the user deletes when no item then this is considered a change so this executes.
+						// The difference is undefined and the resulting push puts undefined due to the filter.
+						// This if statement stops this case from being considered a change by not doing it
+						// if both the old and new lengths are zero.
+						if (dataProps.compatibleSelectedMeters.length !== 0 || newSelectedMeterOptions.length !== 0) {
+							//computes difference between previously selected meters and current selected meters,
+							// then makes the change to all selected meters, which includes incompatible selected meters
+							const allSelectedMeterIDs: number[] = dataProps.allSelectedMeters.map(s => s.value);
+							const oldSelectedMeterIDs: number[] = dataProps.compatibleSelectedMeters.map(s => s.value);
+							const newSelectedMeterIDs: number[] = newSelectedMeterOptions.map(s => s.value);
+							// It is assumed there can only be one element in this array, because this is triggered every time the selection is changed
+							// first filter finds items in the old list than are not in the new (deletions)
+							const difference: number = oldSelectedMeterIDs.filter(x => !newSelectedMeterIDs.includes(x))[0];
+							if (difference === undefined) {
+								// finds items in the new list which are not in the old list (insertions)
+								allSelectedMeterIDs.push(newSelectedMeterIDs.filter(x => !oldSelectedMeterIDs.includes(x))[0]);
+							} else {
+								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
+							}
+							dispatch(changeSelectedMeters(allSelectedMeterIDs));
 						}
-						dispatch(changeSelectedMeters(allSelectedMeterIDs));
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.meters' />
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='units' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</p>
 			<div style={divBottomPadding}>
 				{/* TODO this could be converted to a regular Select component */}
@@ -366,7 +377,6 @@ export default function ChartDataSelectComponent() {
 						else { dispatch(changeSelectedUnit(-99)); }
 					}}
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.units' />
 			</div>
 		</div>
 	);
@@ -374,8 +384,8 @@ export default function ChartDataSelectComponent() {
 
 /**
  * Determines the compatibility of units in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible units
  */
 function getUnitCompatibilityForDropdown(state: State) {
 
@@ -437,8 +447,8 @@ function getUnitCompatibilityForDropdown(state: State) {
 
 /**
  * Determines the compatibility of meters in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible meters
  */
 export function getMeterCompatibilityForDropdown(state: State) {
 	// Holds all meters visible to the user
@@ -512,8 +522,8 @@ export function getMeterCompatibilityForDropdown(state: State) {
 
 /**
  * Determines the compatibility of group in the redux state for display in dropdown
- * @param {State} state - current redux state
- * @returns {SelectOption[]} an array of SelectOption
+ * @param state - current redux state
+ * @returns a list of compatible groups
  */
 export function getGroupCompatibilityForDropdown(state: State) {
 	// Holds all groups visible to the user
@@ -588,8 +598,8 @@ export function getGroupCompatibilityForDropdown(state: State) {
 
 /**
  * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
- * @param {State} state - current redux state
- * @returns {UnitData[]} an array of UnitData
+ * @param state - current redux state
+ * @returns an array of UnitData
  */
 export function getVisibleUnitOrSuffixState(state: State) {
 	let visibleUnitsOrSuffixes;
@@ -611,10 +621,10 @@ export function getVisibleUnitOrSuffixState(state: State) {
 /**
  *  Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
  * Visibility is determined by which set the items are contained in.
- * @param {Set<number>} compatibleItems - items that are compatible with current selected options
- * @param {Set<number>} incompatibleItems - units that are not compatible with current selected options
- * @param {UnitsState | MetersState | GroupsState} state - current redux state, must be one of UnitsState, MetersState, or GroupsState
- * @returns {SelectOption[]} an array of SelectOption
+ * @param compatibleItems - items that are compatible with current selected options
+ * @param incompatibleItems - units that are not compatible with current selected options
+ * @param state - current redux state, must be one of UnitsState, MetersState, or GroupsState
+ * @returns list of selectOptions of the given item
  */
 export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
 	// Holds the label of the select item, set dynamically according to the type of item passed in
@@ -678,19 +688,19 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
 
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a UnitsState
+ * @param state The state to check
+ * @returns Whether or not this is a UnitsState
  */
 function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a MetersState
+ * @param state The state to check
+ * @returns Whether or not this is a MetersState
  */
 function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
 /**
  * Helper function to determine what type of state was passed in
- * @param {*} state The state to check
- * @returns {boolean} Whether or not this is a GroupsState
+ * @param state The state to check
+ * @returns Whether or not this is a GroupsState
  */
 function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }

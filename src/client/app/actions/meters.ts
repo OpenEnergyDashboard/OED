@@ -7,6 +7,7 @@ import { showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
+import { updateCikAndDBViewsIfNeeded } from './admin';
 
 export function requestMetersDetails(): t.RequestMetersDetailsAction {
 	return { type: ActionType.RequestMetersDetails };
@@ -71,7 +72,7 @@ export function fetchMetersDetailsIfNeeded(): Thunk {
 	};
 }
 
-export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
+export function submitEditedMeter(editedMeter: t.MeterData, shouldRefreshReadingViews: boolean): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// check if meterData is already submitting (indexOf returns -1 if item does not exist in array)
 		if (getState().meters.submitting.indexOf(editedMeter.id) === -1) {
@@ -82,6 +83,9 @@ export function submitEditedMeter(editedMeter: t.MeterData): Thunk {
 			// Attempt to edit the meter in the database
 			try {
 				// posts the edited meterData to the meters API
+				await metersApi.edit(editedMeter);
+				// Update reading views if needed. Never redoCik so false.
+				dispatch(updateCikAndDBViewsIfNeeded(false, shouldRefreshReadingViews));
 				const changedMeter = await metersApi.edit(editedMeter);
 				// Clear meter Id from submitting state array
 				dispatch(deleteSubmittedMeter(editedMeter.id));

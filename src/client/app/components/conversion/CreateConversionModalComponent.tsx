@@ -5,8 +5,7 @@
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { Input } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import '../../styles/modal.css';
@@ -14,24 +13,37 @@ import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { addConversion } from '../../actions/conversions';
-import { UnitDataById } from 'types/redux/units';
+import { UnitData, UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
+import { UnitType } from '../../types/redux/units';
+import { notifyUser } from '../../utils/input'
 import _ from 'lodash';
-import {formInputStyle, tableStyle, requiredStyle, tooltipBaseStyle} from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
 	unitsState: UnitDataById;
 }
-
+/**
+ * Defines the create conversion modal form
+ * @param props Props for the component
+ * @returns Conversion create element
+ */
 export default function CreateConversionModalComponent(props: CreateConversionModalComponentProps) {
 
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
+
+	// Want units in sorted order by identifier regardless of case.
+	const unitsSorted = _.sortBy(Object.values(props.unitsState), unit => unit.identifier.toLowerCase(), 'asc');
 
 	const defaultValues = {
 		// Invalid source/destination ids arbitrarily set to -999.
+		// Meter Units are not allowed to be a destination.
 		sourceId: -999,
+		sourceOptions: unitsSorted as UnitData[],
 		destinationId: -999,
+		destinationOptions: unitsSorted.filter(unit => unit.typeOfUnit !== 'meter') as UnitData[],
 		bidirectional: true,
 		slope: 0,
 		intercept: 0,
@@ -59,7 +71,22 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	}
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: Number(e.target.value) });
+		// once a source or destination is selected, it will be removed from the other options.
+		if (e.target.name === 'sourceId') {
+			setState({
+				...state,
+				sourceId: Number(e.target.value),
+				destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== Number(e.target.value))
+			});
+		} else if (e.target.name === 'destinationId') {
+			setState({
+				...state,
+				destinationId: Number(e.target.value),
+				sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== Number(e.target.value))
+			});
+		} else {
+			setState({ ...state, [e.target.name]: Number(e.target.value) });
+		}
 	}
 
 	// If the currently selected conversion is valid
@@ -84,20 +111,26 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	 * @returns boolean representing if new conversion is valid or not
 	 */
 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
-		/*
+		/* Create Conversion Validation:
 			Source equals destination: invalid conversion
 			Conversion exists: invalid conversion
 			Conversion does not exist:
 				Inverse exists:
-					Conversion is bidirectional: invalid conversion */
+					Conversion is bidirectional: invalid conversion
+			Destination cannot be a meter
+			Cannot mix unit represent
+
+			TODO Some of these can go away when we make the menus dynamic.
+		*/
+
+		// The destination cannot be a meter unit.
+		if (destinationId !== -999 && props.unitsState[destinationId].typeOfUnit === UnitType.meter) {
+			notifyUser(translate('conversion.create.destination.meter'));
+			return false;
+		}
 
 		// Source or destination not set
 		if (sourceId === -999 || destinationId === -999) {
-			return false
-		}
-
-		// Source equals destination: invalid conversion
-		if (sourceId === destinationId) {
 			return false
 		}
 
@@ -105,8 +138,17 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 		if ((props.conversionsState.findIndex(conversionData => ((
 			conversionData.sourceId === state.sourceId) &&
 			conversionData.destinationId === state.destinationId))) !== -1) {
+			notifyUser(translate('conversion.create.exists'));
 			return false;
 		}
+
+		// You cannot have a conversion between units that differ in unit_represent.
+		// This means you cannot mix quantity, flow & raw.
+		if (props.unitsState[sourceId].unitRepresent !== props.unitsState[destinationId].unitRepresent) {
+			notifyUser(translate('conversion.create.mixed.represent'));
+			return false;
+		}
+
 
 		let isValid = true;
 		// Loop over conversions and check for existence of inverse of conversion passed in
@@ -129,11 +171,11 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				}
 			}
 		});
+		if (!isValid) {
+			notifyUser(translate('conversion.create.exists.inverse'));
+		}
 		return isValid;
 	}
-
-	// Want units in sorted order by identifier regardless of case.
-	const unitsSorted = _.sortBy(Object.values(props.unitsState), unit => unit.identifier.toLowerCase(), 'asc');
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -155,121 +197,138 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	return (
 		<>
 			{/* Show modal button */}
-			<Button variant="Secondary" onClick={handleShow}>
+			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
 			</Button>
 
-			<Modal show={showModal} onHide={handleClose}>
-				<Modal.Header>
-					<Modal.Title> <FormattedMessage id="create.conversion" />
-						<TooltipHelpContainer page='conversions-create' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
-						</div>
-					</Modal.Title>
-				</Modal.Header>
-				{/* when any of the conversion are changed call one of the functions. */}
-				<Modal.Body className="show-grid">
-					<div id="container">
-						<div id="modalChild">
-							{/* Modal content */}
-							<div className="container-fluid">
-								<div style={tableStyle}>
-									{/* Source unit input*/}
-									<div style={formInputStyle}>
-										<label>{translate('conversion.source')} <label style={requiredStyle}>*</label></label>
-										<Input
-											name='sourceId'
-											type='select'
-											defaultValue={-999}
-											onChange={e => handleNumberChange(e)}>
-											{<option
-												value={-999}
-												key={-999}
-												hidden={state.sourceId !== -999}
-												disabled>
-												{translate('conversion.select.source') + '...'}
-											</option>}
-											{Object.values(unitsSorted).map(unitData => {
-												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Destination unit input*/}
-									<div style={formInputStyle}>
-										<label>{translate('conversion.destination')} <label style={requiredStyle}>*</label></label>
-										<Input
-											name='destinationId'
-											type='select'
-											defaultValue={-999}
-											onChange={e => handleNumberChange(e)}>
-											{<option
-												value={-999}
-												key={-999}
-												hidden={state.destinationId !== -999}
-												disabled>
-												{translate('conversion.select.destination') + '...'}
-											</option>}
-											{Object.values(unitsSorted).map(unitData => {
-												return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Bidirectional Y/N input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.bidirectional" /></label>
-										<Input
-											name='bidirectional'
-											type='select'
-											onChange={e => handleBooleanChange(e)}>
-											{Object.keys(TrueFalseType).map(key => {
-												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
-											})}
-										</Input>
-									</div>
-									{/* Slope input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.slope" /></label>
-										<Input
-											name='slope'
-											type='number'
-											defaultValue={state.slope}
-											onChange={e => handleNumberChange(e)}
-										/>
-									</div>
-									{/* Intercept input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.intercept" /></label>
-										<Input
-											name='intercept'
-											type='number'
-											onChange={e => handleNumberChange(e)}
-											required value={state.intercept} />
-									</div>
-									{/* Note input*/}
-									<div style={formInputStyle}>
-										<label><FormattedMessage id="conversion.note" /></label>
-										<Input
-											name='note'
-											type='textarea'
-											onChange={e => handleStringChange(e)}
-											value={state.note} />
-									</div>
-								</div>
-							</div>
-						</div>
+			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
+				<ModalHeader>
+					<FormattedMessage id="create.conversion" />
+					<TooltipHelpContainer page='conversions-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 					</div>
-				</Modal.Body>
-				<Modal.Footer>
+				</ModalHeader>
+				{/* when any of the conversion are changed call one of the functions. */}
+				<ModalBody>
+					<Container>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Source unit input*/}
+								<FormGroup>
+									<Label for='sourceId'>{translate('conversion.source')}</Label>
+									<Input
+										id='sourceId'
+										name='sourceId'
+										type='select'
+										value={state.sourceId}
+										onChange={e => handleNumberChange(e)}
+										invalid={state.sourceId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={state.sourceId !== -999}
+											disabled>
+											{translate('conversion.select.source') + '...'}
+										</option>}
+										{Object.values(state.sourceOptions).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Destination unit input*/}
+								<FormGroup>
+									<Label for='destinationId'>{translate('conversion.destination')}</Label>
+									<Input
+										id='destinationId'
+										name='destinationId'
+										type='select'
+										value={state.destinationId}
+										onChange={e => handleNumberChange(e)}
+										invalid={state.destinationId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={state.destinationId !== -999}
+											disabled>
+											{translate('conversion.select.destination') + '...'}
+										</option>}
+										{Object.values(state.destinationOptions).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Bidirectional Y/N input*/}
+						<FormGroup>
+							<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
+							<Input
+								id='bidirectional'
+								name='bidirectional'
+								type='select'
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Slope input*/}
+								<FormGroup>
+									<Label for='slope'>{translate('conversion.slope')}</Label>
+									<Input
+										id='slope'
+										name='slope'
+										type='number'
+										value={state.slope}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Intercept input*/}
+								<FormGroup>
+									<Label for='intercept'>{translate('conversion.intercept')}</Label>
+									<Input
+										id='intercept'
+										name='intercept'
+										type='number'
+										value={state.intercept}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Note input*/}
+						<FormGroup>
+							<Label for='note'>{translate('note')}</Label>
+							<Input
+								id='note'
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={state.note} />
+						</FormGroup>
+					</Container>
+				</ModalBody>
+				<ModalFooter>
 					{/* Hides the modal */}
-					<Button variant="secondary" onClick={handleClose}>
+					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button variant="primary" onClick={handleSubmit} disabled={!validConversion}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion}>
 						<FormattedMessage id="save.all" />
 					</Button>
-				</Modal.Footer>
+				</ModalFooter>
 			</Modal>
 		</>
 	);

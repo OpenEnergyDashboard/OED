@@ -11,9 +11,9 @@ export enum AreaUnitType {
 /**
  * Gets the conversion between two area units
  * NOTE: See earlier version of this function for a way to support more units
- * @param {AreaUnitType} fromUnit unit to convert FROM
- * @param {AreaUnitType} toUnit unit to convert TO
- * @returns {number} conversion multiplier, or zero if conversion to none
+ * @param fromUnit unit to convert FROM
+ * @param toUnit unit to convert TO
+ * @returns conversion multiplier, or zero if conversion to none
  */
 export function getAreaUnitConversion(fromUnit: AreaUnitType, toUnit: AreaUnitType): number {
 	if (fromUnit === toUnit) {
