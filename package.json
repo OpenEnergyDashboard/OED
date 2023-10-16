@@ -55,7 +55,20 @@
 		]
 	},
 	"overrides": {
-		"@formatjs/ecma402-abstract": "1.13.0"
+		"@formatjs/ecma402-abstract": "1.13.0",
+		"react-intl": {
+			"typescript": "$typescript"
+		},
+		"@emotion/react": {
+			"react": "$react"
+		},
+		"@redux-devtools/core": {
+			"react": "$react",
+			"react-redux": "$react-redux"
+		},
+		"mini-create-react-context": {
+			"react": "$react"
+		}
 	},
 	"dependencies": {
 		"@formatjs/intl": "~1.17.0",
