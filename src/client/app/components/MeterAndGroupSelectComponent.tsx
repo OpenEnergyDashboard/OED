@@ -3,18 +3,29 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import Select, { ActionMeta, MultiValue } from 'react-select';
+import Select, { ActionMeta, MultiValue, StylesConfig } from 'react-select';
 import makeAnimated from 'react-select/animated';
 import { Badge } from 'reactstrap';
-import { GroupedOption, SelectOption } from 'types/items';
-import { graphSlice } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-
+import { graphSlice } from '../reducers/graph';
 const animatedComponents = makeAnimated();
+const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
+	valueContainer: base => ({
+		...base,
+		maxHeight: 150,
+		overflowY: 'scroll',
+		'&::-webkit-scrollbar': {
+			display: 'none'
+		},
+		'msOverflowStyle': 'none',
+		'scrollbarWidth': 'none'
+	})
+};
 
 /**
  * Creates a React-Select component for the UI Options Panel.
@@ -39,9 +50,9 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		:
 		meterAndGroupSelectOptions.groupsGroupedOptions
 
-	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
+	const onChange = async (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMetersOrGroups = newValues.map((option: SelectOption) => option.value);
-		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }))
+		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	}
 
 	return (
@@ -61,6 +72,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				formatGroupLabel={formatGroupLabel}
 				// Included React-Select Animations
 				components={animatedComponents}
+				styles={customStyles}
 			/>
 		</div>
 	)

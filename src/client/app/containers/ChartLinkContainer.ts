@@ -37,7 +37,7 @@ function mapStateToProps(state: State) {
 	}
 	linkText += `chartType=${state.graph.chartToRender}`;
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
-	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
+	linkText += `&serverRange=${state.graph.queryTimeInterval.toString()}`;
 	switch (chartType) {
 		case ChartTypes.bar:
 			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
@@ -46,7 +46,7 @@ function mapStateToProps(state: State) {
 		case ChartTypes.line:
 			// no code for this case
 			// under construction;
-			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
+			// linkText += `&displayRange=${state.graph.queryTimeInterval.toString().split('_')}`;
 			break;
 		case ChartTypes.compare:
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;

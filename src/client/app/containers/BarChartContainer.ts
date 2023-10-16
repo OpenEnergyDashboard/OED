@@ -23,7 +23,7 @@ import { UnitRepresentType } from '../types/redux/units';
  * Returns the props object.
  */
 function mapStateToProps(state: State) {
-	const timeInterval = state.graph.timeInterval;
+	const timeInterval = state.graph.queryTimeInterval;
 	const barDuration = state.graph.barDuration;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];

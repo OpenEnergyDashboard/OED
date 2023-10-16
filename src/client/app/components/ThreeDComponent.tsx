@@ -52,7 +52,7 @@ export default function ThreeDComponent(props: ThreeDChartProps) {
 		layout = setHelpLayout(translate('select.meter.group'));
 	} else if (graphState.areaNormalization && !isAreaCompatible) {
 		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.timeInterval))) {
+	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.queryTimeInterval))) {
 		// Not a valid time interval. ThreeD can only support up to 1 year of readings
 		layout = setHelpLayout(translate('threeD.date.range.too.long'));
 	} else if (!threeDData) {

@@ -48,8 +48,9 @@ export const unitsSlice = createSlice({
 		)
 	},
 	selectors: {
-		unitsState: state => state,
-		unitDataById: state => state.units
-
+		selectUnitsState: state => state,
+		selectUnitDataById: state => state.units
 	}
 });
+
+export const { selectUnitsState, selectUnitDataById } = unitsSlice.selectors

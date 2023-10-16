@@ -4,23 +4,24 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot from 'react-plotly.js';
+import Plot, { Figure } from 'react-plotly.js';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
+import { groupsSlice } from '../reducers/groups';
+import { metersSlice } from '../reducers/meters';
+import { unitsSlice } from '../reducers/units';
 import { readingsApi } from '../redux/api/readingsApi';
-import { useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { BarReadingApiArgs, ChartQueryProps } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
-import Locales from '../types/locales';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
-import { graphSlice } from '../reducers/graph';
-import { groupsSlice } from '../reducers/groups';
-import { metersSlice } from '../reducers/meters';
-import { unitsSlice } from '../reducers/units';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -30,30 +31,25 @@ import { unitsSlice } from '../reducers/units';
  * @returns Plotly BarChart
  */
 export default function BarChartComponent(props: ChartQueryProps<BarReadingApiArgs>) {
-	const { meterArgs, groupsArgs } = props.queryProps;
-	const {
-		data: meterReadings,
-		isFetching: meterIsFetching
-	} = readingsApi.useBarQuery(meterArgs, { skip: !meterArgs.ids.length });
-
-	const {
-		data: groupData,
-		isFetching: groupIsFetching
-	} = readingsApi.useBarQuery(groupsArgs, { skip: !groupsArgs.ids.length });
-
+	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryProps;
+	const dispatch = useAppDispatch();
 	const barDuration = useAppSelector(state => state.graph.barDuration);
 	const barStacking = useAppSelector(state => state.graph.barStacking);
 	const unitID = useAppSelector(state => state.graph.selectedUnit);
-	const datasets: any[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
-	const unitDataByID = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
+	const unitDataByID = useAppSelector(state => unitsSlice.selectors.selectUnitDataById(state));
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
-	const selectedMeters = useAppSelector(state => graphSlice.selectors.selectedMeters(state));
-	const selectedGroups = useAppSelector(state => graphSlice.selectors.selectedGroups(state));
-	const meterDataByID = useAppSelector(state => metersSlice.selectors.meterDataByID(state));
-	const groupDataByID = useAppSelector(state => groupsSlice.selectors.groupDataByID(state));
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const meterDataByID = useAppSelector(state => metersSlice.selectors.selectMeterDataByID(state));
+	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
+
+	// useQueryHooks for data fetching
+	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });
+	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useBarQuery(groupsArgs, { skip: groupSkipQuery });
+	const datasets = [];
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading width={50} height={50} />
@@ -187,105 +183,88 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 		}
 	}
 
-	let layout: any;
-	// Customize the layout of the plot
-	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-	if (raw) {
-		// This is a raw type graphing unit so cannot plot
-		layout = {
-			'xaxis': {
-				'visible': false
-			},
-			'yaxis': {
-				'visible': false
-			},
-			'annotations': [
-				{
-					'text': `<b>${translate('bar.raw')}</b>`,
-					'xref': 'paper',
-					'yref': 'paper',
-					'showarrow': false,
-					'font': {
-						'size': 28
-					}
-				}
-			]
-		}
-	} else if (datasets.length === 0) {
-		// There is not data so tell user.
-		layout = {
-			'xaxis': {
-				'visible': false
-			},
-			'yaxis': {
-				'visible': false
-			},
-			'annotations': [
-				{
-					'text': `${translate('select.meter.group')}`,
-					'xref': 'paper',
-					'yref': 'paper',
-					'showarrow': false,
-					'font': {
-						'size': 28
-					}
-				}
-			]
-		}
+	// Method responsible for setting the 'Working Time Interval'
+	const handleOnInit = (figure: Figure) => {
+		if (figure.layout.xaxis?.range) {
+			const startTS = moment.utc(figure.layout.xaxis?.range[0])
+			const endTS = moment.utc(figure.layout.xaxis?.range[1])
+			const workingTimeInterval = new TimeInterval(startTS, endTS);
+			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
 
-	} else {
-		// This normal so plot.
-		layout = {
-			barmode: (barStacking ? 'stack' : 'group'),
-			bargap: 0.2, // Gap between different times of readings
-			bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
-			autosize: true,
-			height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
-			showlegend: true,
-			legend: {
-				x: 0,
-				y: 1.1,
-				orientation: 'h'
-			},
-			yaxis: {
-				title: unitLabel,
-				showgrid: true,
-				gridcolor: '#ddd'
-			},
-			xaxis: {
-				showgrid: true,
-				gridcolor: '#ddd',
-				tickfont: {
-					size: 10
-				},
-				tickangle: -45,
-				autotick: true,
-				nticks: 10,
-				automargin: true
-			},
-			margin: {
-				t: 0,
-				b: 120,
-				l: 120
-			}
-		};
+			// console.log(figure.layout.xaxis?.range, figure.layout.xaxis?.rangeslider?.range, figure.layout.xaxis)
+		}
+	}
+
+	const handleRelayout = (e: PlotRelayoutEvent) => {
+		console.log(typeof e['xaxis.range[0]'], typeof e['xaxis.range[1]'])
+		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
+		// These values indicate when the user has zoomed or made other changes to the graph.
+		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
+			// The event signals changes in the user's interaction with the graph.
+			// this will automatically trigger a refetch due to updating a query arg.
+			const startTS = moment.utc(e['xaxis.range[0]'])
+			const endTS = moment.utc(e['xaxis.range[1]'])
+			const workingTimeInterval = new TimeInterval(startTS, endTS);
+			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
+		}
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
-	const config = {
-		displayModeBar: false,
-		responsive: true,
-		locales: Locales // makes locales available for use
-	}
-	return (
-		<Plot
-			data={datasets as Plotly.Data[]}
-			layout={layout as Plotly.Layout}
-			config={config}
-			style={{ width: '100%', height: '80%' }}
-			useResizeHandler={true}
-		/>
-	);
-}
 
+	if (raw) {
+		return <h1><b>${translate('bar.raw')}</b></h1>
+	}
+	let enoughData = false;
+	datasets.forEach(dataset => {
+		if (dataset.x.length > 1) {
+			enoughData = true
+		}
+	})
+	console.log(datasets.length, datasets)
+	if (datasets.length === 0) {
+		return <h1>
+			{`${translate('select.meter.group')}`}
+		</h1>
+	} else if (!enoughData) {
+		// This normal so plot.
+		return <h1>
+			{`${translate('threeD.no.data')}`}
+		</h1>
+	} else {
+		return (
+			<Plot
+				data={datasets as Plotly.Data[]}
+				style={{ width: '100%', height: '80%' }}
+				onInitialized={handleOnInit}
+				onRelayout={handleRelayout}
+				useResizeHandler={true}
+				config={{
+					// displayModeBar: false,
+					responsive: true
+				}}
+				layout={{
+					barmode: (barStacking ? 'stack' : 'group'),
+					bargap: 0.2, // Gap between different times of readings
+					bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
+					autosize: true,
+					height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
+					showlegend: true,
+					legend: { x: 0, y: 1.1, orientation: 'h' },
+					yaxis: {
+						title: unitLabel, showgrid: true,
+						gridcolor: '#ddd', fixedrange: true
+					},
+					xaxis: {
+						rangeslider: { visible: true },
+						// rangeselector: { visible: true },
+						showgrid: true, gridcolor: '#ddd',
+						tickangle: -45, autotick: true,
+						nticks: 10, automargin: true,
+						tickfont: { size: 10 }
+					}
+				}}
+			/>
+		);
+	}
+}

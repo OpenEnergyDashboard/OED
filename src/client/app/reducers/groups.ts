@@ -137,8 +137,9 @@ export const groupsSlice = createSlice({
 
 	},
 	selectors: {
-		groupState: state => state,
-		groupDataByID: state => state.byGroupID
-
+		selectGroupState: state => state,
+		selectGroupDataByID: state => state.byGroupID
 	}
-});
+})
+
+export const { selectGroupDataByID, selectGroupState } = groupsSlice.selectors

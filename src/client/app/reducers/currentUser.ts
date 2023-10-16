@@ -4,10 +4,10 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
+import { authApi } from '../redux/api/authApi';
+import { userApi } from '../redux/api/userApi';
 import { User } from '../types/items';
 import { CurrentUserState } from '../types/redux/currentUser';
-import { userApi } from '../redux/api/userApi';
-import { authApi } from '../redux/api/authApi';
 import { setToken } from '../utils/token';
 
 /*
@@ -51,5 +51,11 @@ export const currentUserSlice = createSlice({
 					state.token = api.payload.token
 					setToken(state.token)
 				})
+	},
+	selectors: {
+		selectCurrentUser: state => state
+		// Should resolve to a boolean, Typescript doesn't agree so type assertion 'as boolean'
 	}
 })
+
+export const { selectCurrentUser } = currentUserSlice.selectors

@@ -42,7 +42,7 @@ export default function ExportComponent() {
 	// error bar state
 	const errorBarState = useSelector((state: State) => state.graph.showMinMax);
 	// Time range of graphic
-	const timeInterval = graphState.timeInterval;
+	const timeInterval = graphState.queryTimeInterval;
 
 	// Function to export the data in a graph.
 	const exportGraphReading = () => {
@@ -222,7 +222,7 @@ export default function ExportComponent() {
 		// we will still get the correct count since this is not done very often and don't want to get
 		// the wrong value. The time to do this is small compared to most raw exports (if file is large
 		// when it matters).
-		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.timeInterval);
+		const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.queryTimeInterval);
 		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
 		// This is just a decent estimate for larger files.
 		const fileSize = (count * 0.082 / 1000);

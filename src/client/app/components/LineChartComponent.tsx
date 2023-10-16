@@ -4,12 +4,11 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { Datum, PlotRelayoutEvent } from 'plotly.js';
+import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot from 'react-plotly.js';
-import { Button } from 'reactstrap';
+import Plot, { Figure } from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
 import { groupsSlice } from '../reducers/groups';
 import { metersSlice } from '../reducers/meters';
 import { unitsSlice } from '../reducers/units';
@@ -17,13 +16,11 @@ import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { ChartQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
-import Locales from '../types/locales';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 
 /**
@@ -31,64 +28,34 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent(props: ChartQueryProps<LineReadingApiArgs>) {
-	const { meterArgs, groupsArgs } = props.queryProps;
+	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryProps;
 	const dispatch = useAppDispatch();
-	const {
-		data: meterReadings,
-		isFetching: meterIsFetching
-	} = readingsApi.useLineQuery(meterArgs, { skip: !meterArgs.ids.length });
-
-	const {
-		data: groupData,
-		isFetching: groupIsFetching
-	} = readingsApi.useLineQuery(groupsArgs, { skip: !groupsArgs.ids.length });
 
 	const selectedUnit = useAppSelector(state => state.graph.selectedUnit);
-	const datasets: any[] = [];
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(state => state.graph.lineGraphRate);
-	const timeInterval = useAppSelector(state => state.graph.timeInterval);
-	const unitDataByID = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
+	const unitDataByID = useAppSelector(state => unitsSlice.selectors.selectUnitDataById(state));
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
-	const selectedMeters = useAppSelector(state => graphSlice.selectors.selectedMeters(state));
-	const selectedGroups = useAppSelector(state => graphSlice.selectors.selectedGroups(state));
-	const metersState = useAppSelector(state => metersSlice.selectors.meterState(state));
-	const meterDataByID = useAppSelector(state => metersSlice.selectors.meterDataByID(state));
-	const groupDataByID = useAppSelector(state => groupsSlice.selectors.groupDataByID(state));
-	// Keeps Track of the Slider Values
-	const startTsRef = React.useRef<Datum>(null);
-	const endTsRef = React.useRef<Datum>(null);
+	const selectedMeters = useAppSelector(state => selectSelectedMeters(state));
+	const selectedGroups = useAppSelector(state => selectSelectedGroups(state));
+	const metersState = useAppSelector(state => metersSlice.selectors.selectMeterState(state));
+	const meterDataByID = useAppSelector(state => metersSlice.selectors.selectMeterDataByID(state));
+	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
+
+	// dataFetching Query Hooks
+	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
+	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
+
+	const datasets = [];
 
 	if (meterIsFetching || groupIsFetching) {
 		return <LogoSpinner />
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
-	const handleRelayout = (e: PlotRelayoutEvent) => {
-		// Relayout emits many kinds of events listen for the two that give the slider range changes.
-		if (e['xaxis.range']) {
-			startTsRef.current = e['xaxis.range'][0];
-			endTsRef.current = e['xaxis.range'][1];
-		} else if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
-			startTsRef.current = e['xaxis.range[0]'];
-			endTsRef.current = e['xaxis.range[1]'];
-		}
-	}
-
-
-	const getTimeIntervalFromRefs = () => {
-		if (!startTsRef.current && !endTsRef.current) {
-			return TimeInterval.unbounded();
-		} else {
-			return new TimeInterval(
-				moment.utc(startTsRef.current),
-				moment.utc(endTsRef.current)
-			)
-		}
-	}
 	// The unit label depends on the unit which is in selectUnit state.
 	// The current selected rate
 	let unitLabel = '';
@@ -257,121 +224,78 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 		}
 	}
 
-	// set the bounds for the slider
-	if (minTimestamp == undefined) {
-		minTimestamp = 0;
-		maxTimestamp = 0;
+	// Method responsible for setting the 'Working Time Interval'
+	const handleOnInit = (figure: Figure) => {
+		// dispatch(graphSlice.actions.updateWorkingTimeInterval())
+		if (figure.layout.xaxis?.range) {
+			const startTS = moment.utc(figure.layout.xaxis?.range[0])
+			const endTS = moment.utc(figure.layout.xaxis?.range[1])
+			const workingTimeInterval = new TimeInterval(startTS, endTS);
+			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
+
+			// console.log(figure.layout.xaxis?.range, figure.layout.xaxis?.rangeslider?.range, figure.layout.xaxis)
+		}
 	}
-	const root: any = document.getElementById('root');
-	root.setAttribute('min-timestamp', minTimestamp);
-	root.setAttribute('max-timestamp', maxTimestamp);
 
-	// Use the min/max time found for the readings (and shifted as desired) as the
-	// x-axis range for the graph.
-	// Avoid pesky shifting timezones with utc.
-	const start = moment.utc(minTimestamp).toISOString();
-	const end = moment.utc(maxTimestamp).toISOString();
+	const handleRelayout = (e: PlotRelayoutEvent) => {
+		// console.log(e, e['xaxis.range[0]'], e['xaxis.range[1]'])
+		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
+		// These values indicate when the user has zoomed or made other changes to the graph.
+		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
+			// The event signals changes in the user's interaction with the graph.
+			// this will automatically trigger a refetch due to updating a query arg.
+			const startTS = moment.utc(e['xaxis.range[0]'])
+			const endTS = moment.utc(e['xaxis.range[1]'])
+			const workingTimeInterval = new TimeInterval(startTS, endTS);
+			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
+		}
+	}
 
-	let layout: any;
+	let enoughData = false;
+	datasets.forEach(dataset => {
+		if (dataset.x.length > 1) {
+			enoughData = true
+			return
+		}
+	})
+	// console.log(datasets.length, datasets)
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (datasets.length === 0) {
-		// There is not data so tell user.
-		layout = {
-			'xaxis': {
-				'visible': false
-			},
-			'yaxis': {
-				'visible': false
-			},
-			'annotations': [
-				{
-					'text': `${translate('select.meter.group')}`,
-					'xref': 'paper',
-					'yref': 'paper',
-					'showarrow': false,
-					'font': {
-						'size': 28
-					}
-				}
-			]
-		}
-
-	} else {
+		return <h1>
+			{`${translate('select.meter.group')}`}
+		</h1>
+	} else if (!enoughData) {
 		// This normal so plot.
-		layout = {
-			autosize: true,
-			showlegend: true,
-			height: 700,
-			legend: {
-				x: 0,
-				y: 1.1,
-				orientation: 'h'
-			},
-			yaxis: {
-				title: unitLabel,
-				gridcolor: '#ddd'
-			},
-
-			xaxis: {
-				range: [start, end], // Specifies the start and end points of visible part of graph
-				rangeslider: {
-					thickness: 0.1
-				},
-				showgrid: true,
-				gridcolor: '#ddd'
-			},
-			margin: {
-				t: 10,
-				b: 10
-			}
-		};
+		return <h1>
+			{`${translate('threeD.no.data')}`}
+		</h1>
+	} else {
+		return (
+			<div style={{ width: '100%', height: '100%' }}>
+				<Plot
+					data={datasets as Plotly.Data[]}
+					onInitialized={handleOnInit}
+					onRelayout={handleRelayout}
+					style={{ width: '100%', height: '80%' }}
+					useResizeHandler={true}
+					config={{
+						responsive: true
+					}}
+					layout={{
+						autosize: true, showlegend: true,
+						legend: { x: 0, y: 1.1, orientation: 'h' },
+						yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
+						xaxis: {
+							rangeslider: { visible: true },
+							showgrid: true, gridcolor: '#ddd'
+						}
+					}}
+				/>
+			</div>
+		)
 	}
-	const config = {
-		displayModeBar: true,
-		responsive: true,
-		locales: Locales // makes locales available for use
-	}
-	return (
-		<div>
-			<Plot
-				data={datasets as Plotly.Data[]}
-				layout={layout as Plotly.Layout}
-				onInitialized={e => console.log(e.layout.xaxis?.range, e.layout.xaxis?.rangeslider?.range, e.layout.xaxis?.rangeselector)}
-				onUpdate={e => console.log(e.layout.xaxis?.range, e.layout.xaxis?.rangeslider?.range, e.layout.xaxis?.rangeselector)}
-				onRelayout={handleRelayout}
-				config={config}
-				style={{ width: '100%', height: '80%' }}
-				useResizeHandler={true}
-			/>
-			{/*  Only Show if there's data */
-				(datasets.length !== 0) &&
-				<>
-					<Button
-						key={1}
-						style={buttonMargin}
-						onClick={() => dispatch(graphSlice.actions.changeGraphZoom(getTimeIntervalFromRefs()))}
 
-					> {translate('redraw')}
-					</Button>
-					<Button
-						key={2}
-						style={buttonMargin}
-						onClick={() => {
-							if (!timeInterval.equals(TimeInterval.unbounded())) {
-								dispatch(graphSlice.actions.changeGraphZoom(TimeInterval.unbounded()))
-							}
-						}}
-					> {translate('restore')}
-					</Button>
-					<TooltipMarkerComponent
-						key={3}
-						page='home'
-						helpTextId='help.home.chart.redraw.restore'
-					/>
-				</>}
-		</div>
-	)
 }
 
 /**
@@ -414,6 +338,3 @@ export function getRangeSliderInterval(): string {
 }
 
 
-const buttonMargin: React.CSSProperties = {
-	marginRight: '10px'
-};

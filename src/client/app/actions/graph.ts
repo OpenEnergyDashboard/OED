@@ -32,13 +32,13 @@ export function toggleOptionsVisibility() {
 }
 
 function changeGraphZoom(timeInterval: TimeInterval) {
-	return graphSlice.actions.changeGraphZoom(timeInterval);
+	return graphSlice.actions.updateTimeInterval(timeInterval);
 }
 
 export function changeBarDuration(barDuration: moment.Duration): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(graphSlice.actions.updateBarDuration(barDuration));
-		dispatch(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+		dispatch(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 		return Promise.resolve();
 	};
 }
@@ -70,10 +70,10 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(graphSlice.actions.updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededLineReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -84,10 +84,10 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(graphSlice.actions.updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededLineReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
 	};
@@ -97,10 +97,10 @@ export function changeSelectedUnit(unitID: number): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
 		dispatch(graphSlice.actions.updateSelectedUnit(unitID));
 		dispatch((dispatch2: Dispatch) => {
-			dispatch(fetchNeededLineReadings(getState().graph.timeInterval, unitID));
-			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
+			dispatch(fetchNeededLineReadings(getState().graph.queryTimeInterval, unitID));
+			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
-			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, unitID));
 		});
 		return Promise.resolve();
 	}
@@ -116,7 +116,7 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 }
 
 function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolean {
-	return !state.graph.timeInterval.equals(timeInterval);
+	return !state.graph.queryTimeInterval.equals(timeInterval);
 }
 
 export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {

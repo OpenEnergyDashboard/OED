@@ -13,10 +13,11 @@ import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
+import { selectCurrentUser } from '../reducers/currentUser';
 import { graphSlice } from '../reducers/graph';
 import { baseApi } from '../redux/api/baseApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { selectCurrentUser, selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
+import { selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
 import localeData from '../translations/data';
 import { UserRole } from '../types/items';
 import { ChartTypes, LineGraphRate, MeterOrGroup } from '../types/redux/graph';
@@ -39,9 +40,6 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
  */
 export default function RouteComponentWIP() {
 	const lang = useAppSelector(state => state.options.selectedLanguage)
-
-
-
 	const messages = (localeData as any)[lang];
 	return (
 		<>
@@ -200,7 +198,7 @@ const GraphLink = () => {
 					console.log('Todo, FIXME! Maplink not working')
 					break;
 				case 'serverRange':
-					dispatchQueue.push(graphSlice.actions.changeGraphZoom(TimeInterval.fromString(value)));
+					dispatchQueue.push(graphSlice.actions.updateTimeInterval(TimeInterval.fromString(value)));
 					/**
 					 * commented out since days from present feature is not currently used
 					 */

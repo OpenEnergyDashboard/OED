@@ -15,7 +15,7 @@ import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
-	const timeInterval = state.graph.timeInterval;
+	const timeInterval = state.graph.queryTimeInterval;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
 	// The unit label depends on the unit which is in selectUnit state.

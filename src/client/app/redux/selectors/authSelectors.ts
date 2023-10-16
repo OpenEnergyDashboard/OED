@@ -1,8 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from '../../store';
 import { UserRole } from '../../types/items';
-
-export const selectCurrentUser = (state: RootState) => state.currentUser;
+import { selectCurrentUser } from '../../reducers/currentUser'
 
 // Memoized Selectors for stable obj reference from derived Values
 export const selectIsLoggedInAsAdmin = createSelector(

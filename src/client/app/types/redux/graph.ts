@@ -66,7 +66,6 @@ export interface GraphState {
 	selectedGroups: number[];
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
-	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
@@ -80,4 +79,11 @@ export interface GraphState {
 	renderOnce: boolean;
 	showMinMax: boolean;
 	threeD: ThreeDState;
+	// Time interval that is used to query for data (either definite or TimeInterval.unbounded())
+	queryTimeInterval: TimeInterval;
+	// Time Interval that handles the ''effect'' of querying an unbounded() time interval
+	// Querying a time interval returns the entire meter's readings with is our working time interval.
+	// E.X. query(unbounded) returned readings(working time interval): 12-01-01 => 12-01-02. This working time interval is initially an unknown
+	// On initial render, or parsing of the data returned, Set the returned data's max and min time intervals to be the current workingTimeInterval.
+	workingTimeInterval: TimeInterval;
 }

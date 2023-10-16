@@ -15,7 +15,7 @@ import { potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
-import { unitsSlice } from '../../reducers/units';
+import { selectUnitDataById } from '../../reducers/units';
 
 /**
  * Defines the groups page card view
@@ -30,7 +30,7 @@ export default function GroupsDetailComponent() {
 	const { visibleGroups } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const unitDataById = useAppSelector(state => unitsSlice.selectors.unitDataById(state));
+	const unitDataById = useAppSelector(state => selectUnitDataById(state));
 
 	// Possible graphic units to use
 	const possibleGraphicUnits = potentialGraphicUnits(unitDataById);

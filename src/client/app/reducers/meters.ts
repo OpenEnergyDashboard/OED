@@ -58,8 +58,10 @@ export const metersSlice = createSlice({
 		)
 	},
 	selectors: {
-		meterState: state => state,
-		meterDataByID: state => state.byMeterID
+		selectMeterState: state => state,
+		selectMeterDataByID: state => state.byMeterID
 
 	}
 });
+
+export const { selectMeterState, selectMeterDataByID } = metersSlice.selectors

@@ -5,11 +5,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
 import { instanceOfGroupsState, instanceOfMetersState, instanceOfUnitsState } from '../../components/ChartDataSelectComponent';
-import { graphSlice } from '../../reducers/graph';
-import { groupsSlice } from '../../reducers/groups';
 import { selectMapState } from '../../reducers/maps';
-import { metersSlice } from '../../reducers/meters';
-import { unitsSlice } from '../../reducers/units';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
@@ -22,19 +18,20 @@ import {
 } from '../../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { selectCurrentUser } from './authSelectors';
 
-// Destruct selectors from Slices (rtk5.0.2Beta)
-// Selectors will be used as arguments for the Create Selectors.
-// Ensure these selectors always return a stable reference.
-const { meterState } = metersSlice.selectors;
-const { groupState } = groupsSlice.selectors;
-const { graphUnitID, selectedMeters, selectedGroups, chartToRender, graphAreaNormalization } = graphSlice.selectors;
-const { unitsState } = unitsSlice.selectors;
+import { selectCurrentUser } from '../../reducers/currentUser';
+import {
+	selectChartToRender, selectGraphAreaNormalization, selectGraphUnitID,
+	selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters
+} from '../../reducers/graph';
+import { selectGroupState } from '../../reducers/groups';
+import { selectMeterState } from '../../reducers/meters';
+import { selectUnitsState } from '../../reducers/units';
+
 
 export const selectVisibleMetersAndGroups = createSelector(
-	meterState,
-	groupState,
+	selectMeterState,
+	selectGroupState,
 	selectCurrentUser,
 	(meterState, groupState, currentUser) => {
 		// Holds all meters visible to the user
@@ -69,12 +66,10 @@ export const selectVisibleMetersAndGroups = createSelector(
 );
 
 export const selectCurrentUnitCompatibility = createSelector(
-	[
-		selectVisibleMetersAndGroups,
-		meterState,
-		groupState,
-		graphUnitID
-	],
+	selectVisibleMetersAndGroups,
+	selectMeterState,
+	selectGroupState,
+	selectGraphUnitID,
 	(visible, meterState, groupState, graphUnitID) => {
 		// meters and groups that can graph
 		const compatibleMeters = new Set<number>();
@@ -146,14 +141,12 @@ export const selectCurrentUnitCompatibility = createSelector(
 )
 
 export const selectCurrentAreaCompatibility = createSelector(
-	[
-		selectCurrentUnitCompatibility,
-		graphAreaNormalization,
-		graphUnitID,
-		meterState,
-		groupState,
-		unitsState
-	],
+	selectCurrentUnitCompatibility,
+	selectGraphAreaNormalization,
+	selectGraphUnitID,
+	selectMeterState,
+	selectGroupState,
+	selectUnitsState,
 	(currentUnitCompatibility, areaNormalization, unitID, meterState, groupState, unitState) => {
 		// Deep Copy previous selector's values, and update as needed based on current Area Normalization setting
 		const compatibleMeters = new Set<number>(currentUnitCompatibility.compatibleMeters);
@@ -197,9 +190,9 @@ export const selectCurrentAreaCompatibility = createSelector(
 
 export const selectChartTypeCompatibility = createSelector(
 	selectCurrentAreaCompatibility,
-	chartToRender,
-	meterState,
-	groupState,
+	selectChartToRender,
+	selectMeterState,
+	selectGroupState,
 	selectMapState,
 	(areaCompat, chartToRender, meterState, groupState, mapState) => {
 		// Deep Copy previous selector's values, and update as needed based on current ChartType(s)
@@ -284,13 +277,11 @@ export const selectChartTypeCompatibility = createSelector(
 )
 
 export const selectMeterGroupSelectData = createSelector(
-	[
-		selectChartTypeCompatibility,
-		meterState,
-		groupState,
-		selectedMeters,
-		selectedGroups
-	],
+	selectChartTypeCompatibility,
+	selectMeterState,
+	selectGroupState,
+	selectSelectedMeters,
+	selectSelectedGroups,
 	(chartTypeCompatibility, meterState, groupState, selectedMeters, selectedGroups) => {
 		// Destructure Previous Selectors's values
 		const { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups } = chartTypeCompatibility;
@@ -346,7 +337,7 @@ export const selectMeterGroupSelectData = createSelector(
  * @returns an array of UnitData
  */
 export const selectVisibleUnitOrSuffixState = createSelector(
-	unitsState,
+	selectUnitsState,
 	selectCurrentUser,
 	(unitState, currentUser) => {
 		let visibleUnitsOrSuffixes;
@@ -367,13 +358,11 @@ export const selectVisibleUnitOrSuffixState = createSelector(
 )
 
 export const selectUnitSelectData = createSelector(
-	[
-		unitsState,
-		selectVisibleUnitOrSuffixState,
-		selectedMeters,
-		selectedGroups,
-		graphAreaNormalization
-	],
+	selectUnitsState,
+	selectVisibleUnitOrSuffixState,
+	selectSelectedMeters,
+	selectSelectedGroups,
+	selectGraphAreaNormalization,
 	(unitState, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
@@ -448,7 +437,7 @@ export const selectUnitSelectData = createSelector(
  * @returns Two Lists: Compatible, and Incompatible selectOptions for use as grouped React-Select options
  */
 export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibleItems: Set<number>, state: UnitsState | MetersState | GroupsState) {
-	// TODO Refactor origina
+	// TODO Refactor original
 	// redefined here for testing.
 	// Holds the label of the select item, set dynamically according to the type of item passed in
 
@@ -536,7 +525,7 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
 }
 
 export const selectDateRangeInterval = createSelector(
-	graphSlice.selectors.graphTimeInterval,
+	selectQueryTimeInterval,
 	timeInterval => {
 		return timeInterval
 	}

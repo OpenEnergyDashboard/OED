@@ -48,7 +48,7 @@ function mapStateToProps(state: State) {
 		const y: number[] = [];
 
 		// Figure out what time interval the bar is using since user bar data for now.
-		const timeInterval = state.graph.timeInterval;
+		const timeInterval = state.graph.queryTimeInterval;
 		const barDuration = state.graph.barDuration
 		// Make sure there is a map with values so avoid issues.
 		if (map && map.origin && map.opposite) {

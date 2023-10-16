@@ -17,7 +17,8 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
-	timeInterval: TimeInterval.unbounded(),
+	queryTimeInterval: TimeInterval.unbounded(),
+	workingTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
@@ -69,8 +70,11 @@ export const graphSlice = createSlice({
 		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
 			state.barDuration = action.payload
 		},
-		changeGraphZoom: (state, action: PayloadAction<TimeInterval>) => {
-			state.timeInterval = action.payload
+		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			state.queryTimeInterval = action.payload
+		},
+		updateWorkingTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			state.workingTimeInterval = action.payload
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.rangeSliderInterval = action.payload
@@ -211,29 +215,46 @@ export const graphSlice = createSlice({
 				state.threeD.meterOrGroup = undefined
 
 			}
+		},
+		resetTimeInterval: state => {
+			if (!state.queryTimeInterval.equals(TimeInterval.unbounded())) {
+				state.queryTimeInterval = TimeInterval.unbounded()
+				state.workingTimeInterval = TimeInterval.unbounded()
+			}
 		}
 	},
 	extraReducers: builder => {
-		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled,
-			(state, action) => {
-				if (state.selectedAreaUnit == AreaUnitType.none) {
-					state.selectedAreaUnit = action.payload.defaultAreaUnit
-				}
-			})
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
+			if (state.selectedAreaUnit === AreaUnitType.none) {
+				state.selectedAreaUnit = action.payload.defaultAreaUnit;
+			}
+		})
 	},
 	// New Feature as of 2.0.0 Beta.
 	selectors: {
-		threeDState: state => state.threeD,
-		barWidthDays: state => state.barDuration,
-		graphState: state => state,
-		selectedMeters: state => state.selectedMeters,
-		selectedGroups: state => state.selectedGroups,
-		graphTimeInterval: state => state.timeInterval,
-		graphUnitID: state => state.selectedUnit,
-		graphAreaNormalization: state => state.areaNormalization,
-		chartToRender: state => state.chartToRender,
-		threeDMeterOrGroup: state => state.threeD.meterOrGroup,
-		threeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
-		threeDReadingInterval: state => state.threeD.readingInterval
+		selectThreeDState: state => state.threeD,
+		selectBarWidthDays: state => state.barDuration,
+		selectGraphState: state => state,
+		selectSelectedMeters: state => state.selectedMeters,
+		selectSelectedGroups: state => state.selectedGroups,
+		selectQueryTimeInterval: state => state.queryTimeInterval,
+		selectWorkingTimeInterval: state => state.workingTimeInterval,
+		selectGraphUnitID: state => state.selectedUnit,
+		selectGraphAreaNormalization: state => state.areaNormalization,
+		selectChartToRender: state => state.chartToRender,
+		selectThreeDMeterOrGroup: state => state.threeD.meterOrGroup,
+		selectThreeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
+		selectThreeDReadingInterval: state => state.threeD.readingInterval
 	}
 })
+
+// Selectors that can be imported and used in 'useAppSelectors' and 'createSelectors'
+export const {
+	selectThreeDState, selectBarWidthDays,
+	selectGraphState, selectSelectedMeters,
+	selectSelectedGroups, selectQueryTimeInterval,
+	selectWorkingTimeInterval, selectGraphUnitID,
+	selectGraphAreaNormalization, selectChartToRender,
+	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID,
+	selectThreeDReadingInterval
+} = graphSlice.selectors
