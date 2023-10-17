@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot, { Figure } from 'react-plotly.js';
+import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
 import { groupsSlice } from '../reducers/groups';
@@ -14,7 +14,7 @@ import { metersSlice } from '../reducers/meters';
 import { unitsSlice } from '../reducers/units';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { BarReadingApiArgs, ChartQueryProps } from '../redux/selectors/dataSelectors';
+import { BarReadingApiArgs, ChartMultiQueryProps } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -30,8 +30,8 @@ import SpinnerComponent from './SpinnerComponent';
  * @param props query arguments to be used in the dataFetching Hooks.
  * @returns Plotly BarChart
  */
-export default function BarChartComponent(props: ChartQueryProps<BarReadingApiArgs>) {
-	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryProps;
+export default function BarChartComponent(props: ChartMultiQueryProps<BarReadingApiArgs>) {
+	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryArgs;
 	const dispatch = useAppDispatch();
 	const barDuration = useAppSelector(state => state.graph.barDuration);
 	const barStacking = useAppSelector(state => state.graph.barStacking);
@@ -183,20 +183,7 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 		}
 	}
 
-	// Method responsible for setting the 'Working Time Interval'
-	const handleOnInit = (figure: Figure) => {
-		if (figure.layout.xaxis?.range) {
-			const startTS = moment.utc(figure.layout.xaxis?.range[0])
-			const endTS = moment.utc(figure.layout.xaxis?.range[1])
-			const workingTimeInterval = new TimeInterval(startTS, endTS);
-			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
-
-			// console.log(figure.layout.xaxis?.range, figure.layout.xaxis?.rangeslider?.range, figure.layout.xaxis)
-		}
-	}
-
 	const handleRelayout = (e: PlotRelayoutEvent) => {
-		console.log(typeof e['xaxis.range[0]'], typeof e['xaxis.range[1]'])
 		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 		// These values indicate when the user has zoomed or made other changes to the graph.
 		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
@@ -206,7 +193,6 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 			const endTS = moment.utc(e['xaxis.range[1]'])
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
-			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval));
 		}
 	}
 
@@ -222,7 +208,6 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 			enoughData = true
 		}
 	})
-	console.log(datasets.length, datasets)
 	if (datasets.length === 0) {
 		return <h1>
 			{`${translate('select.meter.group')}`}
@@ -237,11 +222,10 @@ export default function BarChartComponent(props: ChartQueryProps<BarReadingApiAr
 			<Plot
 				data={datasets as Plotly.Data[]}
 				style={{ width: '100%', height: '80%' }}
-				onInitialized={handleOnInit}
 				onRelayout={handleRelayout}
 				useResizeHandler={true}
 				config={{
-					// displayModeBar: false,
+					displayModeBar: false,
 					responsive: true
 				}}
 				layout={{

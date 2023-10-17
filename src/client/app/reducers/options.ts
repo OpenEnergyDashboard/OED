@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { preferencesApi } from '../redux/api/preferencesApi';
 import { LanguageTypes } from '../types/redux/i18n';
 import { OptionsState } from '../types/redux/options';
 import { createSlice } from '@reduxjs/toolkit'
@@ -18,5 +19,10 @@ export const optionsSlice = createSlice({
 		updateSelectedLanguage: (state, action: PayloadAction<LanguageTypes>) => {
 			state.selectedLanguage = action.payload
 		}
+	},
+	extraReducers: builder => {
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
+			state.selectedLanguage = action.payload.defaultLanguage
+		})
 	}
 });

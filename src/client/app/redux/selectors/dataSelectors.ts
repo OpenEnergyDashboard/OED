@@ -3,66 +3,85 @@ import * as _ from 'lodash';
 import { selectGraphState } from '../../reducers/graph';
 import { selectGroupDataByID } from '../../reducers/groups';
 import { selectMeterDataByID } from '../../reducers/meters';
-import { ThreeDReadingApiParams } from '../../redux/api/readingsApi';
-import { MeterOrGroup } from '../../types/redux/graph';
+import { readingsApi } from '../../redux/api/readingsApi';
+import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { GroupDefinition } from '../../types/redux/groups';
 import { MeterData } from '../../types/redux/meters';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
 
 // Props that are passed to plotly components
-export interface ChartQueryProps<T> {
-	queryProps: ChartQueryArgs<T>
+export interface ChartMultiQueryProps<T> {
+	queryArgs: ChartMultiQueryArgs<T>
 }
 
-export interface ChartQueryArgs<T> {
+export interface ChartMultiQueryArgs<T> {
 	meterArgs: T
 	groupsArgs: T
 	meterSkipQuery: boolean
 	groupSkipQuery: boolean
+	meta: ChartQueryArgsMeta
 }
 
 // query args that all graphs share
-export interface commonArgs {
+export interface commonArgsMultiID {
 	ids: number[];
 	timeInterval: string;
-	graphicUnitID: number;
+	unitID: number;
 	meterOrGroup: MeterOrGroup;
 }
+export interface ChartSingleQueryProps<T> {
+	queryArgs: ChartQuerySingleArgs<T>
+}
+
+
+export interface ChartQuerySingleArgs<T> {
+	args: T;
+	skipQuery: boolean;
+	meta: ChartQueryArgsMeta
+}
+export interface ChartQueryArgsMeta {
+	endpoint: string;
+}
+export interface commonArgsSingleID extends Omit<commonArgsMultiID, 'ids'> { id: number }
 // endpoint specific args
-export interface LineReadingApiArgs extends commonArgs { }
-export interface BarReadingApiArgs extends commonArgs { barWidthDays: number }
+export interface LineReadingApiArgs extends commonArgsMultiID { }
+export interface BarReadingApiArgs extends commonArgsMultiID { barWidthDays: number }
+export interface ThreeDReadingApiArgs extends commonArgsSingleID { readingInterval: ReadingInterval; }
 
 // Selector prepares the query args for each endpoint based on the current graph slice state
 export const selectChartQueryArgs = createSelector(
 	selectGraphState,
 	graphState => {
 		// args that all meters queries share
-		const baseMeterArgs: commonArgs = {
+		const baseMeterArgs: commonArgsMultiID = {
 			ids: graphState.selectedMeters,
 			timeInterval: graphState.queryTimeInterval.toString(),
-			graphicUnitID: graphState.selectedUnit,
+			unitID: graphState.selectedUnit,
 			meterOrGroup: MeterOrGroup.meters
 		}
 
 		// args that all groups queries share
-		const baseGroupArgs: commonArgs = {
+		const baseGroupArgs: commonArgsMultiID = {
 			ids: graphState.selectedGroups,
 			timeInterval: graphState.queryTimeInterval.toString(),
-			graphicUnitID: graphState.selectedUnit,
+			unitID: graphState.selectedUnit,
 			meterOrGroup: MeterOrGroup.groups
 		}
 
 		// props to pass into the line chart component
-		const line: ChartQueryArgs<LineReadingApiArgs> = {
+		const line: ChartMultiQueryArgs<LineReadingApiArgs> = {
 			meterArgs: baseMeterArgs,
 			groupsArgs: baseGroupArgs,
 			meterSkipQuery: !baseMeterArgs.ids.length,
-			groupSkipQuery: !baseGroupArgs.ids.length
+			groupSkipQuery: !baseGroupArgs.ids.length,
+			meta: {
+				endpoint: readingsApi.endpoints.line.name
+			}
 		}
 
 		// props to pass into the bar chart component
-		const bar: ChartQueryArgs<BarReadingApiArgs> = {
+		const bar: ChartMultiQueryArgs<BarReadingApiArgs> = {
 			meterArgs: {
 				...baseMeterArgs,
 				barWidthDays: Math.round(graphState.barDuration.asDays())
@@ -72,19 +91,24 @@ export const selectChartQueryArgs = createSelector(
 				barWidthDays: Math.round(graphState.barDuration.asDays())
 			},
 			meterSkipQuery: !baseMeterArgs.ids.length,
-			groupSkipQuery: !baseGroupArgs.ids.length
+			groupSkipQuery: !baseGroupArgs.ids.length,
+			meta: {
+				endpoint: readingsApi.endpoints.bar.name
+			}
 		}
-
-
-		const threeD = {
+		// TODO; Make 2 types for multi-id and single-id request ARGS
+		const threeD: ChartQuerySingleArgs<ThreeDReadingApiArgs> = {
 			args: {
-				meterOrGroupID: graphState.threeD.meterOrGroupID,
+				id: graphState.threeD.meterOrGroupID,
 				timeInterval: roundTimeIntervalForFetch(graphState.queryTimeInterval).toString(),
 				unitID: graphState.selectedUnit,
 				readingInterval: graphState.threeD.readingInterval,
 				meterOrGroup: graphState.threeD.meterOrGroup
-			} as ThreeDReadingApiParams,
-			skip: !graphState.threeD.meterOrGroupID || !graphState.queryTimeInterval.getIsBounded()
+			} as ThreeDReadingApiArgs,
+			skipQuery: !graphState.threeD.meterOrGroupID || !graphState.queryTimeInterval.getIsBounded(),
+			meta: {
+				endpoint: readingsApi.endpoints.threeD.name
+			}
 		}
 
 		return { line, bar, threeD }

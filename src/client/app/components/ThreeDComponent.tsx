@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import { ThreeDReadingApiParams, readingsApi } from '../redux/api/readingsApi';
+import { readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { ThreeDReading } from '../types/readings';
@@ -21,19 +21,16 @@ import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
+import { ChartSingleQueryProps, ThreeDReadingApiArgs } from '../redux/selectors/dataSelectors';
 
-interface ThreeDChartProps {
-	queryArgs: ThreeDReadingApiParams,
-	skip: boolean
-}
 /**
  * Component used to render 3D graphics
  * @param props query args for the useQueryDataFetching hooks
  * @returns 3D Plotly 3D Surface Graph
  */
-export default function ThreeDComponent(props: ThreeDChartProps) {
-	const { queryArgs, skip } = props;
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(queryArgs, { skip: skip });
+export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadingApiArgs>) {
+	const { args, skipQuery } = props.queryArgs;
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: skipQuery });
 	const metersState = useSelector((state: State) => state.meters);
 	const groupsState = useSelector((state: State) => state.groups);
 	const graphState = useSelector((state: State) => state.graph);

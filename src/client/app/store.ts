@@ -5,6 +5,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { rootReducer } from './reducers';
 import { baseApi } from './redux/api/baseApi';
+import { historyMiddleware } from './redux/middleware/graphHistory';
 
 
 export const store = configureStore({
@@ -12,7 +13,9 @@ export const store = configureStore({
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
 		// immutableCheck: false,
 		serializableCheck: false
-	}).concat(baseApi.middleware)
+	})
+		.prepend(historyMiddleware.middleware)
+		.concat(baseApi.middleware)
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

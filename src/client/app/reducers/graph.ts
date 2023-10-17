@@ -4,11 +4,12 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
+import * as _ from 'lodash'
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { preferencesApi } from '../redux/api/preferencesApi';
 import { SelectOption } from '../types/items';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
+import { ChartTypes, GraphState, GraphStateHistory, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
@@ -18,7 +19,6 @@ const defaultState: GraphState = {
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
 	queryTimeInterval: TimeInterval.unbounded(),
-	workingTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
@@ -36,7 +36,9 @@ const defaultState: GraphState = {
 		meterOrGroupID: undefined,
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
-	}
+	},
+	backHistoryStack: [],
+	forwardHistoryStack: []
 };
 
 export const graphSlice = createSlice({
@@ -72,9 +74,6 @@ export const graphSlice = createSlice({
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.queryTimeInterval = action.payload
-		},
-		updateWorkingTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.workingTimeInterval = action.payload
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.rangeSliderInterval = action.payload
@@ -216,10 +215,28 @@ export const graphSlice = createSlice({
 
 			}
 		},
+		updateHistory: (state, action: PayloadAction<GraphStateHistory>) => {
+			state.backHistoryStack.push(action.payload)
+			// reset forward history on new visit
+			state.forwardHistoryStack = []
+		},
+		prevHistory: state => {
+			if (state.backHistoryStack.length > 1) {
+				state.forwardHistoryStack.push(state.backHistoryStack.pop()!)
+			}
+			Object.assign(state, state.backHistoryStack[state.backHistoryStack.length - 1]);
+		},
+		nextHistory: state => {
+			if (state.forwardHistoryStack.length) {
+				state.backHistoryStack.push(state.forwardHistoryStack.pop()!)
+				Object.assign(state, state.backHistoryStack[state.backHistoryStack.length - 1])
+			}
+
+
+		},
 		resetTimeInterval: state => {
 			if (!state.queryTimeInterval.equals(TimeInterval.unbounded())) {
 				state.queryTimeInterval = TimeInterval.unbounded()
-				state.workingTimeInterval = TimeInterval.unbounded()
 			}
 		}
 	},
@@ -228,6 +245,12 @@ export const graphSlice = createSlice({
 			if (state.selectedAreaUnit === AreaUnitType.none) {
 				state.selectedAreaUnit = action.payload.defaultAreaUnit;
 			}
+			if (!state.hotlinked) {
+				state.chartToRender = action.payload.defaultChartToRender
+				state.barStacking = action.payload.defaultBarStacking
+				state.areaNormalization = action.payload.defaultAreaNormalization
+			}
+			state.backHistoryStack.push(_.omit(state, ['backHistoryStack', 'forwardHistoryStack']))
 		})
 	},
 	// New Feature as of 2.0.0 Beta.
@@ -238,7 +261,6 @@ export const graphSlice = createSlice({
 		selectSelectedMeters: state => state.selectedMeters,
 		selectSelectedGroups: state => state.selectedGroups,
 		selectQueryTimeInterval: state => state.queryTimeInterval,
-		selectWorkingTimeInterval: state => state.workingTimeInterval,
 		selectGraphUnitID: state => state.selectedUnit,
 		selectGraphAreaNormalization: state => state.areaNormalization,
 		selectChartToRender: state => state.chartToRender,
@@ -252,11 +274,53 @@ export const graphSlice = createSlice({
 
 // Selectors that can be imported and used in 'useAppSelectors' and 'createSelectors'
 export const {
-	selectThreeDState, selectBarWidthDays,
-	selectGraphState, selectSelectedMeters,
-	selectSelectedGroups, selectQueryTimeInterval,
-	selectWorkingTimeInterval, selectGraphUnitID,
-	selectGraphAreaNormalization, selectChartToRender,
-	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID,
-	selectThreeDReadingInterval, selectLineGraphRate, selectAreaUnit
+	selectThreeDState,
+	selectBarWidthDays,
+	selectGraphState,
+	selectSelectedMeters,
+	selectSelectedGroups,
+	selectQueryTimeInterval,
+	selectGraphUnitID,
+	selectGraphAreaNormalization,
+	selectChartToRender,
+	selectThreeDMeterOrGroup,
+	selectThreeDMeterOrGroupID,
+	selectThreeDReadingInterval,
+	selectLineGraphRate,
+	selectAreaUnit
 } = graphSlice.selectors
+
+// actionCreators exports
+export const {
+	confirmGraphRenderOnce,
+	updateSelectedMeters,
+	updateSelectedGroups,
+	updateSelectedUnit,
+	updateSelectedAreaUnit,
+	updateBarDuration,
+	updateTimeInterval,
+	changeSliderRange,
+	resetRangeSliderStack,
+	updateComparePeriod,
+	changeChartToRender,
+	toggleAreaNormalization,
+	setAreaNormalization,
+	toggleShowMinMax,
+	setShowMinMax,
+	changeBarStacking,
+	setBarStacking,
+	setHotlinked,
+	changeCompareSortingOrder,
+	toggleOptionsVisibility,
+	setOptionsVisibility,
+	updateLineGraphRate,
+	updateThreeDReadingInterval,
+	updateThreeDMeterOrGroupInfo,
+	updateThreeDMeterOrGroupID,
+	updateThreeDMeterOrGroup,
+	updateSelectedMetersOrGroups,
+	resetTimeInterval,
+	updateHistory,
+	prevHistory,
+	nextHistory
+} = graphSlice.actions

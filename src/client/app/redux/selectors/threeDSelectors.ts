@@ -10,7 +10,7 @@ import { selectMeterState } from '../../reducers/meters';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { ThreeDReadingApiParams } from '../api/readingsApi';
+import { ThreeDReadingApiArgs } from './dataSelectors';
 
 
 // Memoized Selectors
@@ -52,12 +52,12 @@ export const selectThreeDQueryArgs = createSelector(
 	selectThreeDMeterOrGroup,
 	(id, timeInterval, unitID, readingInterval, meterOrGroup) => {
 		return {
-			meterOrGroupID: id,
+			id: id,
 			timeInterval: roundTimeIntervalForFetch(timeInterval).toString(),
 			unitID: unitID,
 			readingInterval: readingInterval,
 			meterOrGroup: meterOrGroup
-		} as ThreeDReadingApiParams
+		} as ThreeDReadingApiArgs
 	}
 )
 

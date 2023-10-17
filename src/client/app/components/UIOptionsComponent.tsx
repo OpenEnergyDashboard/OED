@@ -34,7 +34,6 @@ export default function UIOptionsComponent() {
 			<GraphicRateMenuComponent />
 			<ThreeDSelectComponent />
 			<DateRangeComponent />
-
 			<AreaUnitSelectComponent />
 			{ /* Controls error bar, specifically for the line chart. */
 				chartToRender === ChartTypes.line && <ErrorBarComponent />}

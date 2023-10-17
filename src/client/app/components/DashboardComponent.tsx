@@ -5,13 +5,14 @@
 import * as React from 'react';
 import MapChartContainer from '../containers/MapChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
-import UIOptionsContainer from '../containers/UIOptionsContainer';
 import { useAppSelector } from '../redux/hooks';
 import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { ChartTypes } from '../types/redux/graph';
 import BarChartComponent from './BarChartComponent';
 import LineChartComponent from './LineChartComponent';
 import ThreeDComponent from './ThreeDComponent';
+import UIOptionsComponent from './UIOptionsComponent';
+import HistoryComponent from './HistoryComponent';
 
 /**
  * React component that controls the dashboard
@@ -25,30 +26,22 @@ export default function DashboardComponent() {
 	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
-
-
 	return (
 		<div className='container-fluid'>
 			<div className='row'>
 				<div className={optionsClassName}>
-					<UIOptionsContainer />
+					<UIOptionsComponent />
 				</div>
 				<div className={`${chartClassName} align-self-auto text-center`}>
-					{chartToRender === ChartTypes.line && <LineChartComponent queryProps={queryArgs.line} />}
-					{chartToRender === ChartTypes.bar && <BarChartComponent queryProps={queryArgs.bar} />}
-					{
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						chartToRender === ChartTypes.compare && <MultiCompareChartContainer />
-					}
-					{
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						chartToRender === ChartTypes.map && <MapChartContainer />
-					}
-					{
-						chartToRender === ChartTypes.threeD && <ThreeDComponent queryArgs={queryArgs.threeD.args} skip={queryArgs.threeD.skip} />
-					}
+					<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+						<HistoryComponent />
+
+						{chartToRender === ChartTypes.line && <LineChartComponent queryArgs={queryArgs.line} />}
+						{chartToRender === ChartTypes.bar && <BarChartComponent queryArgs={queryArgs.bar} />}
+						{chartToRender === ChartTypes.compare && <MultiCompareChartContainer />}
+						{chartToRender === ChartTypes.map && <MapChartContainer />}
+						{chartToRender === ChartTypes.threeD && <ThreeDComponent queryArgs={queryArgs.threeD} />}
+					</div>
 
 				</div>
 			</div>

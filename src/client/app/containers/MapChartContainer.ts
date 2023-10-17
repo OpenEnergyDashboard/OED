@@ -2,20 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import { connect } from 'react-redux';
-import Plot from 'react-plotly.js';
-import { State } from '../types/redux/state';
-import {
-	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
-	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
-} from '../utils/calibration';
 import * as _ from 'lodash';
-import getGraphColor from '../utils/getGraphColor';
-import Locales from '../types/locales';
+import * as moment from 'moment';
+import Plot, { PlotParams } from 'react-plotly.js';
+import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';
+import { State } from '../types/redux/state';
 import { UnitRepresentType } from '../types/redux/units';
+import {
+	CartesianPoint,
+	Dimensions,
+	calculateScaleFromEndpoints,
+	gpsToUserGrid,
+	itemDisplayableOnMap,
+	itemMapInfoOk,
+	normalizeImageDimensions
+} from '../utils/calibration';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import getGraphColor from '../utils/getGraphColor';
 import translate from '../utils/translate';
 
 function mapStateToProps(state: State) {
@@ -339,14 +343,10 @@ function mapStateToProps(state: State) {
 	 *               layout={layout}
 	 *               onClick={({points, event}) => console.log(points, event)}>
 	 */
-	const props: any = {
+	const props = {
 		data,
-		layout,
-		config: {
-			locales: Locales // makes locales available for use
-		}
-	};
-	props.config.locale = state.options.selectedLanguage;
+		layout
+	} as PlotParams
 	return props;
 }
 

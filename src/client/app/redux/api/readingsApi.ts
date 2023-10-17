@@ -1,31 +1,23 @@
 import * as _ from 'lodash';
-import { BarReadingApiArgs, LineReadingApiArgs } from '../../redux/selectors/dataSelectors';
+import { BarReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../../redux/selectors/dataSelectors';
 import { RootState } from '../../store';
 import { BarReadings, LineReadings, ThreeDReading } from '../../types/readings';
-import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { baseApi } from './baseApi';
 
 
-export type ThreeDReadingApiParams = {
-	meterOrGroupID: number;
-	timeInterval: string;
-	unitID: number;
-	readingInterval: ReadingInterval;
-	meterOrGroup: MeterOrGroup;
-};
 
 
 export const readingsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		// threeD: the queryEndpoint name		// builder.query<ReturnType, QueryArgs Type>
-		threeD: builder.query<ThreeDReading, ThreeDReadingApiParams>({
+		threeD: builder.query<ThreeDReading, ThreeDReadingApiArgs>({
 			// ThreeD request only single meters at a time which plays well with default cache behavior
 			// No other properties are necessary for this endpoint
 			// Refer to the line endpoint for an example of an endpoint with custom cache behavior
-			query: ({ meterOrGroupID, timeInterval, unitID, readingInterval, meterOrGroup }) => {
+			query: ({ id, timeInterval, unitID, readingInterval, meterOrGroup }) => {
 				// destructure args that are passed into the callback, and generate the API url for the request.
 				const endpoint = `api/unitReadings/threeD/${meterOrGroup}/`
-				const args = `${meterOrGroupID}?timeInterval=${timeInterval.toString()}&graphicUnitId=${unitID}&readingInterval=${readingInterval}`
+				const args = `${id}?timeInterval=${timeInterval}&graphicUnitId=${unitID}&readingInterval=${readingInterval}`
 				return `${endpoint}${args}`
 			}
 		}),
@@ -81,12 +73,12 @@ export const readingsApi = baseApi.injectEndpoints({
 				// map cache keys to a number array, if any
 				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : []
 				// get the args provided in the original request
-				const { ids, timeInterval, graphicUnitID, meterOrGroup } = args
+				const { ids, timeInterval, unitID, meterOrGroup } = args
 				// subtract any already cached keys from the requested ids, and stringify the array for the url endpoint
 				const idsToFetch = _.difference(ids, cachedIDs).join(',')
 
 				// api url from derived request arguments
-				const endpointURL = `api/unitReadings/line/${meterOrGroup}/${idsToFetch}?timeInterval=${timeInterval}&graphicUnitId=${graphicUnitID}`
+				const endpointURL = `api/unitReadings/line/${meterOrGroup}/${idsToFetch}?timeInterval=${timeInterval}&graphicUnitId=${unitID}`
 
 				// use the baseQuery from the queryFn with our url endpoint
 				const { data, error } = await baseQuery(endpointURL)
@@ -112,17 +104,16 @@ export const readingsApi = baseApi.injectEndpoints({
 				return !dataInCache ? true : false
 			},
 			queryFn: async (args, queryApi, _extra, baseQuery) => {
-				const { ids, timeInterval, graphicUnitID, meterOrGroup, barWidthDays } = args
+				const { ids, timeInterval, unitID, meterOrGroup, barWidthDays } = args
 				const state = queryApi.getState() as RootState
 				const cachedData = readingsApi.endpoints.bar.select(args)(state).data
 				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : []
 				const idsToFetch = _.difference(ids, cachedIDs).join(',')
 				const endpoint = `api/unitReadings/bar/${meterOrGroup}/${idsToFetch}?`
-				const queryArgs = `timeInterval=${timeInterval}&barWidthDays=${barWidthDays}&graphicUnitId=${graphicUnitID}`
+				const queryArgs = `timeInterval=${timeInterval}&barWidthDays=${barWidthDays}&graphicUnitId=${unitID}`
 				const endpointURL = `${endpoint}${queryArgs}`
 				const { data, error } = await baseQuery(endpointURL)
-				if (error) { return { error } }
-				return { data: data as LineReadings }
+				return error ? { error } : { data: data as LineReadings }
 			}
 		})
 	})

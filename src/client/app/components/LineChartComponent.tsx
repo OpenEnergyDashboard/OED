@@ -6,31 +6,31 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot, { Figure } from 'react-plotly.js';
+import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
+import {
+	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
+	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters
+} from '../reducers/graph';
+import { selectGroupDataByID } from '../reducers/groups';
+import { selectMeterDataByID, selectMeterState } from '../reducers/meters';
+import { selectUnitDataById } from '../reducers/units';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { ChartQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
+import { ChartMultiQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
-import { selectGroupDataByID } from '../reducers/groups';
-import { selectMeterDataByID, selectMeterState } from '../reducers/meters';
-import { selectUnitDataById } from '../reducers/units';
-import {
-	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
-	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters
-} from '../reducers/graph';
 
 /**
  * @param props qpi query
  * @returns plotlyLine graphic
  */
-export default function LineChartComponent(props: ChartQueryProps<LineReadingApiArgs>) {
-	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryProps;
+export default function LineChartComponent(props: ChartMultiQueryProps<LineReadingApiArgs>) {
+	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryArgs;
 	const dispatch = useAppDispatch();
 
 	const selectedUnit = useAppSelector(state => state.graph.selectedUnit);
@@ -48,8 +48,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	const groupDataByID = useAppSelector(selectGroupDataByID);
 
 	// dataFetching Query Hooks
-	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
+	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
 
 	const datasets = [];
 
@@ -79,6 +79,7 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 	// Add all valid data from existing meters to the line plot
+
 	for (const meterID of selectedMeters) {
 		const byMeterID = meterReadings
 		// Make sure have the meter data. If you already have the meter, unselect, change
@@ -225,17 +226,6 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 			}
 		}
 	}
-
-	// Method responsible for setting the 'Working Time Interval'
-	const handleOnInit = (figure: Figure) => {
-		if (figure.layout.xaxis?.range) {
-			const startTS = moment.utc(figure.layout.xaxis?.range[0])
-			const endTS = moment.utc(figure.layout.xaxis?.range[1])
-			const workingTimeInterval = new TimeInterval(startTS, endTS);
-			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
-		}
-	}
-
 	const handleRelayout = (e: PlotRelayoutEvent) => {
 		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 		// These values indicate when the user has zoomed or made other changes to the graph.
@@ -246,8 +236,6 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 			const endTS = moment.utc(e['xaxis.range[1]'])
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
-			dispatch(graphSlice.actions.updateWorkingTimeInterval(workingTimeInterval))
-
 		}
 	}
 
@@ -275,8 +263,8 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 			<div style={{ width: '100%', height: '100%' }}>
 				<Plot
 					data={datasets as Plotly.Data[]}
-					onInitialized={handleOnInit}
 					onRelayout={handleRelayout}
+					onClick={e => console.log(e)}
 					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
 					config={{
@@ -286,6 +274,7 @@ export default function LineChartComponent(props: ChartQueryProps<LineReadingApi
 					layout={{
 						autosize: true, showlegend: true,
 						legend: { x: 0, y: 1.1, orientation: 'h' },
+						// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 						yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
 						xaxis: {
 							rangeslider: { visible: true },
