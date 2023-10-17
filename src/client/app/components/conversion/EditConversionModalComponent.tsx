@@ -18,6 +18,7 @@ import { ConversionData } from '../../types/redux/conversions';
 import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -36,7 +37,7 @@ interface EditConversionModalComponentProps {
  * @returns Conversion edit element
  */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Set existing conversion values
 	const values = {
@@ -231,7 +232,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						</Row>
 						{/* Note input */}
 						<FormGroup>
-							<Label for='note'>{translate('conversion.note')}</Label>
+							<Label for='note'>{translate('note')}</Label>
 							<Input
 								id='note'
 								name='note'

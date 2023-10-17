@@ -25,6 +25,8 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { UnitRepresentType } from '../../types/redux/units';
+import { Dispatch } from 'types/redux/actions';
+import * as moment from 'moment';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -40,7 +42,7 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useSelector((state: State) => state.meters.byMeterID[props.meter.id]);
@@ -74,9 +76,14 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		unitId: props.meter.unitId,
 		defaultGraphicUnit: props.meter.defaultGraphicUnit,
 		areaUnit: props.meter.areaUnit,
-		readingFrequency: props.meter.readingFrequency
+		readingFrequency: props.meter.readingFrequency,
+		minVal: props.meter.minVal,
+		maxVal: props.meter.maxVal,
+		minDate: props.meter.minDate,
+		maxDate: props.meter.maxDate,
+		maxError: props.meter.maxError,
+		disableChecks: props.meter.disableChecks
 	}
-
 	const dropdownsStateDefaults = {
 		possibleMeterUnits: props.possibleMeterUnits,
 		possibleGraphicUnits: props.possibleGraphicUnits,
@@ -122,8 +129,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		Reading Duplication must be between 1 and 9
 		Reading frequency cannot be blank
 		If displayable is true and unitId is set to -99, warn admin
+		Mininum Value cannot bigger than Maximum Value
+		Minimum Value and Maximum Value must be between valid input
+		Minimum Date and Maximum cannot be blank
+		Minimum Date cannot be after Maximum Date
+		Minimum Date and Maximum Value must be between valid input
+		Maximum No of Error must be between 0 and valid input
 	*/
 	const [validMeter, setValidMeter] = useState(false);
+	const MIN_VAL = Number.MIN_SAFE_INTEGER;
+	const MAX_VAL = Number.MAX_SAFE_INTEGER;
+	const MIN_DATE_MOMENT = moment(0).utc();
+	const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
+	const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
+	const MAX_ERRORS = 75;
 	useEffect(() => {
 		setValidMeter(
 			state.name !== '' &&
@@ -131,9 +151,31 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			state.readingGap >= 0 &&
 			state.readingVariation >= 0 &&
 			(state.readingDuplication >= 1 && state.readingDuplication <= 9) &&
-			state.readingFrequency !== ''
+			state.readingFrequency !== '' &&
+			state.minVal >= MIN_VAL &&
+			state.minVal <= state.maxVal &&
+			state.maxVal <= MAX_VAL &&
+			moment(state.minDate).isValid() &&
+			moment(state.maxDate).isValid() &&
+			moment(state.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
+			moment(state.minDate).isSameOrBefore(moment(state.maxDate)) &&
+			moment(state.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
+			(state.maxError >= 0 && state.maxError <= MAX_ERRORS)
 		);
-	}, [state.area, state.name, state.readingGap, state.readingVariation, state.readingDuplication, state.areaUnit, state.readingFrequency]);
+	}, [
+		state.area,
+		state.name,
+		state.readingGap,
+		state.readingVariation,
+		state.readingDuplication,
+		state.areaUnit,
+		state.readingFrequency,
+		state.minVal,
+		state.maxVal,
+		state.minDate,
+		state.maxDate,
+		state.maxError
+	]);
 	/* End State */
 
 	// Reset the state to default values
@@ -193,7 +235,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.endTimestamp != state.endTimestamp ||
 				props.meter.previousEnd != state.previousEnd ||
 				props.meter.areaUnit != state.areaUnit ||
-				props.meter.readingFrequency != state.readingFrequency
+				props.meter.readingFrequency != state.readingFrequency ||
+				props.meter.minVal != state.minVal ||
+				props.meter.maxVal != state.maxVal ||
+				props.meter.minDate != state.minDate ||
+				props.meter.maxDate != state.maxDate ||
+				props.meter.maxError != state.maxError ||
+				props.meter.disableChecks != state.disableChecks
 			);
 		let error_message = '';
 		for (const [key, value] of Object.entries(groups)) {
@@ -376,7 +424,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('meter.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -387,7 +435,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('meter.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -421,7 +469,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* default graphic unit input */}
 						<Col><FormGroup>
-							<Label for='defaultGraphicUnit'>{translate('meter.defaultGraphicUnit')}</Label>
+							<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 							<Input
 								id='defaultGraphicUnit'
 								name='defaultGraphicUnit'
@@ -460,7 +508,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* Displayable input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('meter.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -523,7 +571,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
-							<Label for='gps'>{translate('meter.gps')}</Label>
+							<Label for='gps'>{translate('gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'
@@ -536,7 +584,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					<Row xs='1' lg='2'>
 						{/* Area input */}
 						<Col><FormGroup>
-							<Label for='area'>{translate('meter.area')}</Label>
+							<Label for='area'>{translate('area')}</Label>
 							<Input
 								id='area'
 								name='area'
@@ -551,7 +599,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* meter area unit input */}
 						<Col><FormGroup>
-							<Label for='areaUnit'>{translate('meter.area.unit')}</Label>
+							<Label for='areaUnit'>{translate('area.unit')}</Label>
 							<Input
 								id='areaUnit'
 								name='areaUnit'
@@ -570,7 +618,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					</Row>
 					{/* note input */}
 					<FormGroup>
-						<Label for='note'>{translate('meter.note')}</Label>
+						<Label for='note'>{translate('note')}</Label>
 						<Input
 							id='note'
 							name='note'
@@ -593,6 +641,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
 								})}
 							</Input>
+<<<<<<< HEAD
 						</FormGroup>
 							{/* cumulativeReset input */}
 							<FormGroup>
@@ -608,6 +657,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									})}
 								</Input>
 							</FormGroup></Col>
+=======
+						</FormGroup></Col>
+						{/* cumulativeReset input */}
+						<Col><FormGroup>
+							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
+							<Input
+								id='cumulativeReset'
+								name='cumulativeReset'
+								type='select'
+								value={state.cumulativeReset?.toString()}
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+>>>>>>> 6d21ed3028bd5245f5f483beaa5457bfe4301261
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
@@ -619,6 +687,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								value={state.cumulativeResetStart}
 								placeholder='HH:MM:SS' />
+<<<<<<< HEAD
 						</FormGroup>
 							{/* cumulativeResetEnd input */}
 							<FormGroup>
@@ -632,6 +701,21 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									value={state?.cumulativeResetEnd}
 									placeholder='HH:MM:SS' />
 							</FormGroup></Col>
+=======
+						</FormGroup></Col>
+						{/* cumulativeResetEnd input */}
+						<Col><FormGroup>
+							<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
+							<Input
+								id='cumulativeResetEnd'
+								name='cumulativeResetEnd'
+								type='text'
+								autoComplete='off'
+								onChange={e => handleStringChange(e)}
+								value={state?.cumulativeResetEnd}
+								placeholder='HH:MM:SS' />
+						</FormGroup></Col>
+>>>>>>> 6d21ed3028bd5245f5f483beaa5457bfe4301261
 					</Row>
 					<Row xs='1' lg='2'>
 						{/* endOnlyTime input */}
@@ -714,6 +798,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
 								})}
 							</Input>
+<<<<<<< HEAD
 						</FormGroup>
 							{/* Timezone input */}
 							<FormGroup>
@@ -730,6 +815,131 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									onChange={e => handleNumberChange(e)}
 									defaultValue={state?.reading} />
 							</FormGroup></Col>
+=======
+						</FormGroup></Col>
+						{/* Timezone input */}
+						<Col><FormGroup>
+							<Label>{translate('meter.time.zone')}</Label>
+							<TimeZoneSelect current={state.timeZone} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* minVal input */}
+						<Col><FormGroup>
+							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Input
+								id='minVal'
+								name='minVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min={MIN_VAL}
+								max={state.maxVal}
+								required value={state.minVal}
+								invalid={state?.minVal < MIN_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }} />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* maxVal input */}
+						<Col><FormGroup>
+							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Input
+								id='maxVal'
+								name='maxVal'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min={state.minVal}
+								max={MAX_VAL}
+								required value={state.maxVal}
+								invalid={state?.maxVal > MAX_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }} />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* minDate input */}
+						<Col><FormGroup>
+							<Label for='minDate'>{translate('meter.minDate')}</Label>
+							<Input
+								id='minDate'
+								name='minDate'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								required value={state.minDate}
+								invalid={!moment(state.minDate).isValid()
+									|| !moment(state.minDate).isSameOrAfter(MIN_DATE_MOMENT)
+									|| !moment(state.minDate).isSameOrBefore(moment(state.maxDate))} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_DATE, max: moment(state.maxDate).utc().format() }} />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* maxDate input */}
+						<Col><FormGroup>
+							<Label for='maxDate'>{translate('meter.maxDate')}</Label>
+							<Input
+								id='maxDate'
+								name='maxDate'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								required value={state.maxDate}
+								invalid={!moment(state.maxDate).isValid()
+									|| !moment(state.maxDate).isSameOrBefore(MAX_DATE_MOMENT)
+									|| !moment(state.maxDate).isSameOrAfter(moment(state.minDate))} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: moment(state.minDate).utc().format(), max: MAX_DATE }} />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* maxError input */}
+						<Col><FormGroup>
+							<Label for='maxError'>{translate('meter.maxError')}</Label>
+							<Input
+								id='maxError'
+								name='maxError'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								min='0'
+								max={MAX_ERRORS}
+								required value={state.maxError}
+								invalid={state?.maxError > MAX_ERRORS || state?.maxError < 0} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_ERRORS }} />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* DisableChecks input */}
+						<Col><FormGroup>
+							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
+							<Input
+								id='disableChecks'
+								name='disableChecks'
+								type='select'
+								value={state?.disableChecks?.toString()}
+								onChange={e => handleBooleanChange(e)}
+								invalid={state?.disableChecks && state.unitId === -99}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* reading input */}
+						<Col><FormGroup>
+							<Label for='reading'>{translate('meter.reading')}</Label>
+							<Input
+								id='reading'
+								name='reading'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								defaultValue={state?.reading} />
+						</FormGroup></Col>
+>>>>>>> 6d21ed3028bd5245f5f483beaa5457bfe4301261
 						{/* startTimestamp input */}
 						<Col><FormGroup>
 							<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
@@ -741,6 +951,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={state?.startTimestamp} />
+<<<<<<< HEAD
 						</FormGroup>
 							{/* endTimestamp input */}
 							<FormGroup>
@@ -766,6 +977,35 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									placeholder='YYYY-MM-DD HH:MM:SS'
 									value={state?.previousEnd} />
 							</FormGroup></Col>
+=======
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* endTimestamp input */}
+						<Col><FormGroup>
+							<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
+							<Input
+								id='endTimestamp'
+								name='endTimestamp'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								value={state?.endTimestamp} />
+						</FormGroup></Col>
+						{/* previousEnd input */}
+						<Col><FormGroup>
+							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
+							<Input
+								id='previousEnd'
+								name='previousEnd'
+								type='text'
+								autoComplete='on'
+								onChange={e => handleStringChange(e)}
+								placeholder='YYYY-MM-DD HH:MM:SS'
+								value={state?.previousEnd} />
+						</FormGroup></Col>
+>>>>>>> 6d21ed3028bd5245f5f483beaa5457bfe4301261
 					</Row>
 				</Container></ModalBody>
 				<ModalFooter>
@@ -778,7 +1018,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
-			</Modal>
+			</Modal >
 		</>
 	);
 }

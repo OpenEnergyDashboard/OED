@@ -5,7 +5,9 @@
  */
 
 import ApiBackend from './ApiBackend';
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import {
+	ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, BooleanTypes, CSVUploadPreferencesForm, ReadingsCSVUploadPreferencesForm
+} from '../../types/csvUploadForm';
 
 export default class UploadCSVApi {
 	private readonly backend: ApiBackend;
@@ -16,7 +18,19 @@ export default class UploadCSVApi {
 
 	public async submitReadings(uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File): Promise<void> {
 		const formData = new FormData();
-		for (const [preference, value] of Object.entries(uploadPreferences)) {
+		// The Boolean values in state must be converted to the submitted values of yes and no.
+		const uploadPreferencesForm: ReadingsCSVUploadPreferencesForm = {
+			...uploadPreferences,
+			gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
+			headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
+			update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false,
+			createMeter: uploadPreferences.createMeter ? BooleanTypes.true : BooleanTypes.false,
+			refreshHourlyReadings: uploadPreferences.refreshHourlyReadings ? BooleanTypes.true : BooleanTypes.false,
+			refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
+			honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,
+			relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false
+		}
+		for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 			formData.append(preference, value.toString());
 		}
 		formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
@@ -25,7 +39,14 @@ export default class UploadCSVApi {
 
 	public async submitMeters(uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File): Promise<void> {
 		const formData = new FormData();
-		for (const [preference, value] of Object.entries(uploadPreferences)) {
+		// The Boolean values in state must be converted to the submitted values of yes and no.
+		const uploadPreferencesForm: CSVUploadPreferencesForm = {
+			...uploadPreferences,
+			gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
+			headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
+			update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false
+		}
+		for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 			formData.append(preference, value.toString());
 		}
 		formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.

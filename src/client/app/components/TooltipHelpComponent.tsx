@@ -19,7 +19,7 @@ interface TooltipHelpProps {
 export const BASE_URL = 'https://openenergydashboard.github.io/help/'
 // Debug URL where need to put own GitHub ID before .github.io.
 // This works if you have a fork of the web pages and setup your GitHub account to serve them up.
-// export const BASE_URL = `https://xxx.github.io/OpenEnergyDashboard.github.io/help/`;
+// export const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io/help/';
 
 export default class TooltipHelpComponent extends React.Component<TooltipHelpProps> {
 	constructor(props: TooltipHelpProps) {
@@ -47,7 +47,7 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.admin.groupedit': { link: `${HELP_URL}/adminGroupEditing.html` },
 			'help.admin.groupview': { link: `${HELP_URL}/adminGroupViewing.html` },
 			'help.admin.header': { link: `${HELP_URL}/adminPreferences.html` },
-			'help.admin.mapview': { link: `${HELP_URL}/adminMap.html` },
+			'help.admin.mapview': { link: `${HELP_URL}/adminMapViewing.html` },
 			'help.admin.metercreate': { link: `${HELP_URL}/adminMeterCreating.html` },
 			'help.admin.meteredit': { link: `${HELP_URL}/adminMeterEditing.html` },
 			'help.admin.meterview': { link: `${HELP_URL}/adminMeterViewing.html` },
@@ -65,18 +65,18 @@ export default class TooltipHelpComponent extends React.Component<TooltipHelpPro
 			'help.home.chart.select': { link: `${HELP_URL}/graphType.html` },
 			'help.home.compare.interval.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
 			'help.home.compare.sort.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
+			'help.home.error.bar': { link: `${HELP_URL}/errorBar.html#usage` },
 			'help.home.export.graph.data': { link: `${HELP_URL}/export.html` },
-			'help.home.hide.or.show.options': { link: `${HELP_URL}/hideOptions.html` },
 			'help.home.map.interval.tip': { link: `${HELP_URL}/mapGraphic.html#usage` },
+			'help.home.navigation': { link: '' },
 			'help.home.select.groups': { link: `${HELP_URL}/graphingGroups.html` },
 			'help.home.select.maps': { link: `${HELP_URL}/mapGraphic.html` },
 			'help.home.select.meters': { link: `${HELP_URL}/graphingMeters.html` },
-			'help.home.select.rates': { link: `${BASE_URL}/graphingRates.html` },
+			'help.home.select.rates': { link: `${HELP_URL}/graphingRates.html` },
 			'help.home.select.units': { link: `${HELP_URL}/graphingUnits.html` },
 			'help.home.toggle.chart.link': { link: `${HELP_URL}/chartLink.html` },
-			'help.groups.groupdetails': { link: `${HELP_URL}/groupDetails.html` },
+			'help.groups.groupdetails': { link: `${HELP_URL}/groupViewing.html#groupDetails` },
 			'help.groups.groupview': { link: `${HELP_URL}/groupViewing.html` },
-			'help.maps.mapview': { link: `${HELP_URL}/mapGraphic.html` },
 			'help.meters.meterview': { link: `${HELP_URL}/meterViewing.html` }
 		};
 

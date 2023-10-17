@@ -135,7 +135,7 @@ export function fetchAllGroupChildrenIfNeeded(): Thunk {
  * `submitGroupInEditingIfNeeded` to handle sending the API request
  * and processing the response.
  */
-export function submitNewGroup(group: t.GroupData): Thunk {
+export function submitNewGroup(group: t.GroupData): Dispatch {
 	return async (dispatch: Dispatch) => {
 		try {
 			await groupsApi.create(group);
@@ -198,7 +198,7 @@ export function submitGroupEdits(group: t.GroupEditData, reload: boolean = true)
 	};
 }
 
-export function deleteGroup(group: t.GroupEditData): Thunk {
+export function deleteGroup(group: t.GroupEditData): Dispatch {
 	// TODO This no longer does a dispatch so it may need to be reworked.
 	// For now, get to ignore eslint issue.
 	/* eslint-disable @typescript-eslint/no-unused-vars */

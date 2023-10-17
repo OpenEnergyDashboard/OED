@@ -47,15 +47,18 @@ because infinity is used to indicate to graph all readings. This version does it
 day by using the day reading view since bars use to the nearest day and this should be faster.
 This should be fine since bar uses the same view to get data.
  */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings_by_day(tsrange_to_shrink TSRANGE)
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_meters_by_day(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
 	RETURNS TSRANGE
 AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
 	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM daily_readings_unit;
-	RETURN tsrange_to_shrink * readings_max_tsrange;
+	FROM daily_readings_unit dr
+	-- Get all the meter_ids in the passed array of meters.
+	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id;
+	-- Make the original range be to the day by dropping parts of days at start/end.
+	RETURN tsrange(date_trunc_up('day', lower(tsrange_to_shrink)), date_trunc('day', upper(tsrange_to_shrink))) * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -130,74 +133,74 @@ daily_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(max(( --Extract the maximum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 			extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(max(( 
-		-- 		(r.reading * 3600 / u.sec_in_rate)
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as max,
+		-- The following code does the min/max for daily readings
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(max(( --Extract the maximum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(max(( 
+				(r.reading * 3600 / u.sec_in_rate)
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as max_rate,
 
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(min(( --Extract the minimum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(min((
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	))) 
-		-- END as min,
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(min(( --Extract the minimum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(min((
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			))) 
+		END as min_rate,
 		
 	tsrange(gen.interval_start, gen.interval_start + '1 day'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
@@ -256,74 +259,74 @@ hourly_readings_unit
 			))
 		END AS reading_rate,
 
-		-- The following code does the max/min and is commented out until the front-end supports this.
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-    	-- 	(max(( -- Extract the maximum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(max(( -- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as max,
+		-- The following code does the min/max for hourly readings
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+    		(max(( -- Extract the maximum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(max(( -- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as max_rate,
 			
-		-- CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-		-- 	(min(( --Extract the minimum rate over each day
-		-- 		(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	) / (
-		-- 			extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 				least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 				-
-		-- 				greatest(r.start_timestamp, gen.interval_start)
-		-- 			)
-		-- 	)))
-		-- WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-		-- 	(min((
-		-- 		(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
-		-- 		*
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	) / (
-		-- 		extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
-		-- 			least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
-		-- 			-
-		-- 			greatest(r.start_timestamp, gen.interval_start)
-		-- 		)
-		-- 	)))
-		-- END as min,
+		CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+			(min(( --Extract the minimum rate over each day
+				(r.reading * 3600 / (extract(EPOCH FROM (r.end_timestamp - r.start_timestamp)))) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			) / (
+					extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+						least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+						-
+						greatest(r.start_timestamp, gen.interval_start)
+					)
+			)))
+		WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
+			(min((
+				(r.reading * 3600 / u.sec_in_rate) -- Reading rate in kw
+				*
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 hour'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			) / (
+				extract(EPOCH FROM -- The number of seconds that the reading shares with the interval
+					least(r.end_timestamp, gen.interval_start + '1 day'::INTERVAL)
+					-
+					greatest(r.start_timestamp, gen.interval_start)
+				)
+			)))
+		END as min_rate,
 
 	tsrange(gen.interval_start, gen.interval_start + '1 hour'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
@@ -370,7 +373,7 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 	max_raw_points INTEGER,
 	max_hour_points INTEGER
 )
-	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
+	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, min_rate FLOAT, max_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
 	requested_range TSRANGE;
@@ -456,6 +459,10 @@ DECLARE
 					-- to per hour.
 					((r.reading * 3600 / u.sec_in_rate) * c.slope + c.intercept)
 				END AS reading_rate,
+				-- There is no range of values on raw/meter data so return NaN to indicate that.
+				-- The route will return this as null when it shows up in Redux state.
+				cast('NaN' AS DOUBLE PRECISION) AS min_rate,
+				cast('NaN' AS DOUBLE PRECISION) as max_rate,
 				r.start_timestamp,
 				r.end_timestamp
 				FROM (((readings r
@@ -476,6 +483,8 @@ DECLARE
 					-- Convert the reading based on the conversion found below.
 					-- Hourly readings are already averaged correctly into a rate.
 					hourly.reading_rate * c.slope + c.intercept as reading_rate,
+					hourly.min_rate * c.slope + c.intercept AS min_rate,
+					hourly.max_rate * c.slope + c.intercept AS max_rate,
 					lower(hourly.time_interval) AS start_timestamp,
 					upper(hourly.time_interval) AS end_timestamp
 				FROM (((hourly_readings_unit hourly
@@ -495,6 +504,8 @@ DECLARE
 					-- Convert the reading based on the conversion found below.
 					-- Daily readings are already averaged correctly into a rate.
 					daily.reading_rate * c.slope + c.intercept as reading_rate,
+					daily.min_rate * c.slope + c.intercept AS min_rate,
+					daily.max_rate * c.slope + c.intercept AS max_rate,
 					lower(daily.time_interval) AS start_timestamp,
 					upper(daily.time_interval) AS end_timestamp
 				FROM (((daily_readings_unit daily
@@ -650,7 +661,7 @@ BEGIN
 	This rounds to the day for the start and end times requested. It then shrinks in case the actual readings span
 	less time than the request. This can commonly happen when you get +/-infinity for all readings available.
 	It uses the day reading view because that is faster than using all the readings.
-	This has a few issues associated with it:
+	This has an issue associated with it:
 
 	1) If the readings at the start/end have a partial day then it shows up as a day. The original code did:
 	real_tsrange := shrink_tsrange_to_real_readings(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
@@ -658,14 +669,8 @@ BEGIN
 	A more general solution would be to change the daily (and hourly) view so it does not include partial ones at start/end.
 	This would fix this case and also impact other uses in what seems a positive way.
 	Note this does not address that missing days in a bar width get no value so the bar will likely read low.
-
-	2) This is using the max/min reading date timestamps for all meters. The issue with doing each meter separately is that if
-	they have different end times then the bars may not align. For example, if you have 7 day bars and the end time of one meter is two days
-	earlier than the global max then all of its bars will be shifted two days. Since people want to compare among bars in a group, this
-	was undesirable so the global values are used. It means the shifted meters may have missing days that make them smaller than the others.
-	It also is needed for group bars that sum these results so they must align.
 	*/
-	real_tsrange := shrink_tsrange_to_real_readings_by_day(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)));
+	real_tsrange := shrink_tsrange_to_meters_by_day(tsrange(start_stamp, end_stamp), meter_ids);
 	-- Get the actual start/end time rounded to the nearest day from the range.
 	real_start_stamp := lower(real_tsrange);
 	real_end_stamp := upper(real_tsrange);

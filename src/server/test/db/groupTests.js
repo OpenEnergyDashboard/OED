@@ -12,11 +12,11 @@ const Unit = require('../../models/Unit');
 const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
-	const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.UNUSED, 1000, 
+	const unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.QUANTITY, 1000, 
 							Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
-	const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.UNUSED, 2000, 
+	const unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.QUANTITY, 2000, 
 							Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
-	const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.UNUSED, 3000, 
+	const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.QUANTITY, 3000, 
 							Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
 	await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
 	const unitAId = (await Unit.getByName('Unit A', conn)).id;
@@ -73,7 +73,7 @@ mocha.describe('Groups', () => {
 		await groupPreInsert.insert(conn);
 
 		groupPreInsert.name = 'New name';
-		const unit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.UNUSED, 1000, 
+		const unit = new Unit(undefined, 'Unit', 'Unit Id', Unit.unitRepresentType.QUANTITY, 1000, 
 								Unit.unitType.UNIT, 1, 'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
 		await unit.insert(conn);
 		const unitId = (await Unit.getByName('Unit', conn)).id;

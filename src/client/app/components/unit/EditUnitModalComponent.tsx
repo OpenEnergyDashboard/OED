@@ -19,6 +19,9 @@ import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../ty
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { Dispatch } from 'types/redux/actions';
+import { useSelector } from 'react-redux';
+import { State } from 'types/redux/state';
 
 
 interface EditUnitModalComponentProps {
@@ -34,7 +37,7 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Set existing unit values
 	const values = {
@@ -54,6 +57,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
+	const globalConversionsState = useSelector((state: State) => state.conversions.conversions);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -201,6 +205,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		}
 	}
 
+	// Check if the unit is used in any conversion.
+	// 1. If the unit is used, the Unit Represent cannot be changed.
+	// 2. Otherwise, the Unit Represent can be changed.
+	const inConversions = () => {
+		for (const conversion of globalConversionsState) {
+			if (conversion.sourceId === state.id || conversion.destinationId === state.id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipEditUnitView: 'help.admin.unitedit'
@@ -221,7 +237,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('unit.identifier')}</Label>
+							<Label for='identifier'>{translate('identifier')}</Label>
 							<Input
 								id='identifier'
 								name='identifier'
@@ -233,7 +249,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('unit.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -270,6 +286,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								name='unitRepresent'
 								type='select'
 								value={state.unitRepresent}
+								disabled={inConversions()}
 								onChange={e => handleStringChange(e)}>
 								{Object.keys(UnitRepresentType).map(key => {
 									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
@@ -280,7 +297,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					<Row xs='1' lg='2'>
 						{/* Displayable type input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('unit.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -344,7 +361,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</Row>
 					{/* Note input */}
 					<FormGroup>
-						<Label for='note'>{translate('unit.note')}</Label>
+						<Label for='note'>{translate('unit')}</Label>
 						<Input
 							id='note'
 							name='note'

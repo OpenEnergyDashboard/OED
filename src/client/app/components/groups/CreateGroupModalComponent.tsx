@@ -8,8 +8,10 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
-	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import {
+	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
+	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
+} from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -28,6 +30,7 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
+import { Dispatch } from 'types/redux/actions';
 
 interface CreateGroupModalComponentProps {
 	possibleGraphicUnits: Set<UnitData>;
@@ -39,7 +42,7 @@ interface CreateGroupModalComponentProps {
  * @returns Group create element
  */
 export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
-	const dispatch = useDispatch();
+	const dispatch: Dispatch = useDispatch();
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
@@ -146,7 +149,6 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				translate('group.area.calculate.header')
 				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${state.areaUnit}`);
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
@@ -308,7 +310,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					<Row xs='1' lg='2'>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('group.name')}</Label>
+							<Label for='name'>{translate('name')}</Label>
 							<Input
 								id='name'
 								name='name'
@@ -323,7 +325,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						</FormGroup></Col>
 						{/* default graphic unit input */}
 						<Col><FormGroup>
-							<Label for='defaultGraphicUnit'>{translate('group.defaultGraphicUnit')}</Label>
+							<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
 							<Input
 								id='defaultGraphicUnit'
 								name='defaultGraphicUnit'
@@ -342,7 +344,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row><Row xs='1' lg='2'>
 						{/* Displayable input */}
 						<Col><FormGroup>
-							<Label for='displayable'>{translate('group.displayable')}</Label>
+							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input
 								id='displayable'
 								name='displayable'
@@ -356,7 +358,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
-							<Label for='gps'>{translate('group.gps')}</Label>
+							<Label for='gps'>{translate('gps')}</Label>
 							<Input
 								id='gps'
 								name='gps'
@@ -368,8 +370,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row><Row xs='1' lg='2'>
 						{/* Area input */}
 						<Col><FormGroup>
-							<Label for='area'>{translate('group.area')}</Label>
-							<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
+							<Label for='area'>{translate('area')}</Label>
 							<InputGroup>
 								<Input
 									id='area'
@@ -385,6 +386,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								<Button color='secondary' onClick={handleAutoCalculateArea}>
 									<FormattedMessage id="group.area.calculate" />
 								</Button>
+								<TooltipMarkerComponent page='groups-create' helpTextId='help.groups.area.calculate' />
 								<FormFeedback>
 									<FormattedMessage id="error.negative" />
 								</FormFeedback>
@@ -392,7 +394,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 						</FormGroup></Col>
 						{/* meter area unit input */}
 						<Col><FormGroup>
-							<Label for='areaUnit'>{translate('group.area.unit')}</Label>
+							<Label for='areaUnit'>{translate('area.unit')}</Label>
 							<Input
 								id='areaUnit'
 								name='areaUnit'
@@ -411,7 +413,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 					</Row>
 					{/* Note input */}
 					<FormGroup>
-						<Label for='note'>{translate('group.note')}</Label>
+						<Label for='note'>{translate('note')} </Label>
 						<Input
 							id='note'
 							name='note'

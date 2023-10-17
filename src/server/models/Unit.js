@@ -81,7 +81,7 @@ class Unit {
 	}
 
 	/**
-	 * Returns a promise to create the unitRepresentType enum of quantity, flow, raw, and unused.
+	 * Returns a promise to create the unitRepresentType enum of quantity, flow and raw.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
@@ -260,8 +260,7 @@ Unit.displayableType = Object.freeze({
 Unit.unitRepresentType = Object.freeze({
 	QUANTITY: 'quantity',
 	FLOW: 'flow',
-	RAW: 'raw',
-	UNUSED: 'unused'
+	RAW: 'raw'
 });
 
 Unit.areaUnitType = Object.freeze({

@@ -9,6 +9,7 @@ import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibr
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderComponent from '../../components/HeaderComponent';
+import MapsDetailContainer from '../../containers/maps/MapsDetailContainer';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -26,7 +27,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderComponent/>
+					<HeaderComponent />
 					<MapCalibrationInitiateContainer />
 				</div>
 			);
@@ -36,17 +37,21 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 					<UnsavedWarningContainer />
 					<HeaderComponent />
 					<div id={'MapCalibrationContainer'}>
-						<MapCalibrationChartDisplayContainer/>
-						<MapCalibrationInfoDisplayContainer/>
+						{/* TODO These types of plotly containers expect a lot of passed
+						values and it gives a TS error. Given we plan to  replace this
+						with the react hooks version and it does not seem to cause any
+						issues, this TS error is being suppressed for now.
+						eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						@ts-ignore */}
+						<MapCalibrationChartDisplayContainer />
+						<MapCalibrationInfoDisplayContainer />
 					</div>
 				</div>
 			);
 		} else { // preview mode containers
 			return (
 				<div className='container-fluid'>
-					<UnsavedWarningContainer />
-					<HeaderComponent/>
-					<p/>
+					<MapsDetailContainer />
 				</div>
 			);
 		}

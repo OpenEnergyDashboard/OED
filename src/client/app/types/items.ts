@@ -47,6 +47,13 @@ export interface PreferenceRequestItem {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
+	defaultMeterMinimumValue: number;
+	defaultMeterMaximumValue: number;
+	defaultMeterMinimumDate: string;
+	defaultMeterMaximumDate: string;
+	defaultMeterReadingGap: number;
+	defaultMeterMaximumErrors: number;
+	defaultMeterDisableChecks: boolean;
 }
 
 /**

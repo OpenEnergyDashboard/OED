@@ -7,7 +7,6 @@ import { LineReadingsState } from './lineReadings';
 import { GraphState } from './graph';
 import { GroupsState } from './groups';
 import { MetersState } from './meters';
-import { NotificationsState } from './notifications';
 import { AdminState } from './admin';
 import { CompareReadingsState } from './compareReadings';
 import { VersionState } from './version';
@@ -28,7 +27,6 @@ export interface State {
 	graph: GraphState;
 	maps: MapState;
 	groups: GroupsState;
-	notifications: NotificationsState;
 	admin: AdminState;
 	version: VersionState;
 	currentUser: CurrentUserState;
