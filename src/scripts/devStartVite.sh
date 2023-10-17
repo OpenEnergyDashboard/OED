@@ -15,4 +15,11 @@ if [ -f /.dockerenv ]; then
 	extra_args="--host"
 fi
 
+# `npm ci` is handled by the 'installOED.sh', which is also ran by `docker-compose`
+# Here, we wait until `.package-lock.json` exists, or when `npm ci` has finished.
+until [ -f 'node_modules/.package-lock.json' ]; do
+	printf '%s\n' "Waiting for node_modules to install"
+	sleep 5
+done
+
 npm run client:dev -- $extra_args
