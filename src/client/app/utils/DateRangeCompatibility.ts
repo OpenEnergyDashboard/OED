@@ -46,7 +46,7 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 	}
 	if (start && end) {
 		start = moment(toUTC(start));
-		end = moment(toUTC(end));
+		end = moment(toUTC(end)).add(1, 'second');
 		return new TimeInterval(start, end);
 	}
 	// If start or end ts is missing, treat as unbounded interval
