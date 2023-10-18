@@ -33,7 +33,6 @@ startHistoryListening({
 	),
 	effect: (action, api) => {
 		const state = api.getState();
-		// Graph Actions may occur on startup. Do not track history until init preferences are set.
 		const historyState = _.omit(state.graph, ['backHistoryStack', 'forwardHistoryStack'])
 		api.dispatch(updateHistory(historyState))
 	}

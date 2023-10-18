@@ -33,7 +33,7 @@ export default function DashboardComponent() {
 					<UIOptionsComponent />
 				</div>
 				<div className={`${chartClassName} align-self-auto text-center`}>
-					<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 						<HistoryComponent />
 
 						{chartToRender === ChartTypes.line && <LineChartComponent queryArgs={queryArgs.line} />}

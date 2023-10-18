@@ -5,8 +5,6 @@ import { selectGroupDataByID } from '../../reducers/groups';
 import { selectMeterDataByID } from '../../reducers/meters';
 import { readingsApi } from '../../redux/api/readingsApi';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
-import { GroupDefinition } from '../../types/redux/groups';
-import { MeterData } from '../../types/redux/meters';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
 
@@ -47,7 +45,7 @@ export interface commonArgsSingleID extends Omit<commonArgsMultiID, 'ids'> { id:
 // endpoint specific args
 export interface LineReadingApiArgs extends commonArgsMultiID { }
 export interface BarReadingApiArgs extends commonArgsMultiID { barWidthDays: number }
-export interface ThreeDReadingApiArgs extends commonArgsSingleID { readingInterval: ReadingInterval; }
+export interface ThreeDReadingApiArgs extends commonArgsSingleID { readingInterval: ReadingInterval }
 
 // Selector prepares the query args for each endpoint based on the current graph slice state
 export const selectChartQueryArgs = createSelector(
@@ -98,13 +96,14 @@ export const selectChartQueryArgs = createSelector(
 		}
 		// TODO; Make 2 types for multi-id and single-id request ARGS
 		const threeD: ChartQuerySingleArgs<ThreeDReadingApiArgs> = {
+			// Fix not null assertion(s)
 			args: {
-				id: graphState.threeD.meterOrGroupID,
+				id: graphState.threeD.meterOrGroupID!,
 				timeInterval: roundTimeIntervalForFetch(graphState.queryTimeInterval).toString(),
 				unitID: graphState.selectedUnit,
 				readingInterval: graphState.threeD.readingInterval,
-				meterOrGroup: graphState.threeD.meterOrGroup
-			} as ThreeDReadingApiArgs,
+				meterOrGroup: graphState.threeD.meterOrGroup!
+			},
 			skipQuery: !graphState.threeD.meterOrGroupID || !graphState.queryTimeInterval.getIsBounded(),
 			meta: {
 				endpoint: readingsApi.endpoints.threeD.name
@@ -126,12 +125,8 @@ export const selectVisibleMetersGroupsDataByID = createSelector(
 			visibleMeters = meterDataByID
 			visibleGroups = groupDataByID;
 		} else {
-			visibleMeters = _.filter(meterDataByID, (meter: MeterData) => {
-				return meter.displayable === true
-			});
-			visibleGroups = _.filter(groupDataByID, (group: GroupDefinition) => {
-				return group.displayable === true
-			});
+			visibleMeters = _.filter(meterDataByID, meter => meter.displayable);
+			visibleGroups = _.filter(groupDataByID, group => group.displayable);
 		}
 
 		return { visibleMeters, visibleGroups }
