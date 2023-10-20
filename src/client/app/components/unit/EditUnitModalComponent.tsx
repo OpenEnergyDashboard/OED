@@ -90,7 +90,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			}
 
 			if(conversions[i].destinationId==state.id){
-				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.id+ '"as a destination unit\n';
+				error_message += translate('conversion') + conversions[i].sourceId + '→' + conversions[i].destinationId + ' uses '
+				+ translate('unit') + ' "' + state.id+ '" as a destination unit\n';
 			}
 		}
 		//finish meter graphicalUnitId and UnitId
