@@ -5,7 +5,7 @@ import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch} from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
@@ -14,7 +14,6 @@ import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
 import { removeUnsavedChanges } from '../../actions/unsavedWarning';
 import { submitEditedUnit } from '../../actions/units';
-import { State } from 'types/redux/state';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { TrueFalseType } from '../../types/items';
 import { notifyUser } from '../../utils/input'
@@ -80,7 +79,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const handleDeleteUnit = () => {
 		// Access the Redux store state
 		let error_message = '';
-		for (const [key, value] of Object.entries(meterState)) {
+		for (const value of Object.values(meterState)) {
 			if(value.unitId==state.id){
 				error_message += translate('meter') + value.name + ' uses ' + translate('unit') + ' "' + state.id+ '" \n';
 			}

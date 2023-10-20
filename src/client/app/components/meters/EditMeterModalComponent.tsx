@@ -244,13 +244,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.disableChecks != state.disableChecks
 			);
 		let error_message = '';
-		for (const [key, value] of Object.entries(groups)) {
+		for (const value of Object.values(groups)) {
 			for (let i = 0; i < value.deepMeters.length; i++) {
-				if (metersByID[value.deepMeters[i]].unitId == props.meter.unitId) {
-					error_message += key + ' '  + translate('group') + value.name + ' uses ' + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
+				console.log(metersByID[value.deepMeters[i]].name, props.meter.name)
+				if(metersByID[value.deepMeters[i]].name== props.meter.name)
+				{
+					error_message += translate('group') + value.name + ' uses ' + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
 				}
 			}
 		}
+		state.unitId = props.meter.unitId;
 
 		if (error_message) {
 			error_message = 'Are you sure you want to change this unit? ' + '\n' + error_message;
