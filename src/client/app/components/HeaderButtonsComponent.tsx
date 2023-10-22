@@ -266,7 +266,7 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem
 								style={state.loginLinkStyle}
 								tag={Link}
-								to='/login'>
+								to='login'>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem

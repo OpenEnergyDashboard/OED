@@ -25,7 +25,9 @@ export const userApi = baseApi.injectEndpoints({
 			query: users => ({
 				url: 'api/users/edit',
 				method: 'POST',
-				body: { users }
+				body: { users },
+				// Response not json. Use 'text' responseHandler to parsing  errors avoid
+				responseHandler: 'text'
 			}),
 			invalidatesTags: ['Users']
 		}),

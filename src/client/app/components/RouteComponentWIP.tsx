@@ -6,13 +6,8 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
-import { BrowserRouter } from 'react-router-dom';
-import { CompatRouter, Navigate, Outlet, Route, Routes, useSearchParams } from 'react-router-dom-v5-compat';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom-v5-compat';
 import { TimeInterval } from '../../../common/TimeInterval';
-import CreateUserContainer from '../containers/admin/CreateUserContainer';
-import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
-import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
-import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import { selectCurrentUser } from '../reducers/currentUser';
 import { graphSlice } from '../reducers/graph';
 import { baseApi } from '../redux/api/baseApi';
@@ -28,6 +23,10 @@ import translate from '../utils/translate';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import SpinnerComponent from './SpinnerComponent';
+import CreateUserContainer from '../containers/admin/CreateUserContainer';
+import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
+import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
+import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponentWIP from './admin/UsersDetailComponentWIP';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
@@ -35,50 +34,7 @@ import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 
-/**
- * @returns the router component Currently under migration!
- */
-export default function RouteComponentWIP() {
-	const lang = useAppSelector(state => state.options.selectedLanguage)
-	const messages = (localeData as any)[lang];
-	return (
-		<>
-			<IntlProvider locale={lang} messages={messages} key={lang}>
-				<BrowserRouter  >
-					<CompatRouter >	{/*	Compatibility layer for transitioning to react-router 6	Checkout https://github.com/remix-run/react-router/discussions/8753 */}
-						{/*
-							The largest barrier to completely transitioning is Reworking the UnsavedWarningComponent.
-							<Prompt/> is not compatible with react-router v6, and will need to be completely reworked if router-migration goes moves forward.
-							The UnsavedWarningComponent is use in many of the admin routes, so it is likely that they will also need to be reworked.
-					*/}
-						<Routes>
-							<Route path='/' element={<HomeComponent />} />
-							<Route path='/login' element={<LoginComponent />} />
-							<Route path='/graph' element={<GraphLink />} />
-							{/* // Any Route in this must passthrough the admin outlet which checks for authentication status */}
-							<Route path='/' element={<AdminOutlet />}>
-								<Route path='/admin' element={<AdminComponent />} />
-								<Route path='/calibration' element={<MapCalibrationContainer />} />
-								<Route path='/maps' element={<MapsDetailContainer />} />
-								<Route path='/users/new' element={<CreateUserContainer />} />
-								<Route path='/units' element={<UnitsDetailComponent />} />
-								<Route path='/conversions' element={<ConversionsDetailComponent />} />
-								<Route path='/groups' element={<GroupsDetailComponent />} />
-								<Route path='/meters' element={<MetersDetailComponent />} />
-								<Route path='/users' element={<UsersDetailComponentWIP />} />
-							</Route>
-							<Route path='/' element={<RoleOutlet UserRole={UserRole.CSV} />}>
-								<Route path='/csv' element={<UploadCSVContainer />} />
-							</Route>
-							{/* // Redirect any other invalid route to root */}
-							<Route path='*' element={<NotFound />} />
-						</Routes>
-					</CompatRouter>
-				</BrowserRouter>
-			</IntlProvider>
-		</>
-	);
-}
+
 
 const useWaitForInit = () => {
 	const dispatch = useAppDispatch();
@@ -101,7 +57,7 @@ const useWaitForInit = () => {
 	return { isAdmin, currentUser, initComplete }
 }
 
-const AdminOutlet = () => {
+export const AdminOutlet = () => {
 	const { isAdmin, initComplete } = useWaitForInit();
 
 	if (!initComplete) {
@@ -119,7 +75,7 @@ const AdminOutlet = () => {
 }
 
 // Function that returns a JSX element. Either the requested route's Component, as outlet or back to root
-const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
+export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
 	const { currentUser, initComplete } = useWaitForInit();
 	// If state contains token it has been validated on startup or login.
 	if (!initComplete) {
@@ -132,13 +88,13 @@ const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
 	return <Navigate to='/' replace />
 }
 
-const NotFound = () => {
+export const NotFound = () => {
 	return <Navigate to='/' replace />
 }
 
 
 // TODO fix this route
-const GraphLink = () => {
+export const GraphLink = () => {
 	const dispatch = useAppDispatch();
 	const [URLSearchParams] = useSearchParams();
 	const { initComplete } = useWaitForInit();
@@ -236,4 +192,49 @@ const GraphLink = () => {
 
 	return <Navigate to='/' />
 
+}
+
+
+/// Router
+const router = createBrowserRouter([
+	{ path: '/', element: <HomeComponent /> },
+	{ path: 'login', element: <LoginComponent /> },
+	{
+		path: '/',
+		element: <AdminOutlet />,
+		children: [
+			{ path: 'admin', element: <AdminComponent /> },
+			{ path: 'calibration', element: <MapCalibrationContainer /> },
+			{ path: 'maps', element: <MapsDetailContainer /> },
+			{ path: 'users/new', element: <CreateUserContainer /> },
+			{ path: 'units', element: <UnitsDetailComponent /> },
+			{ path: 'conversions', element: <ConversionsDetailComponent /> },
+			{ path: 'groups', element: <GroupsDetailComponent /> },
+			{ path: 'meters', element: <MetersDetailComponent /> },
+			{ path: 'users', element: <UsersDetailComponentWIP /> }
+		]
+	},
+	{
+		path: '/',
+		element: <RoleOutlet UserRole={UserRole.CSV} />,
+		children: [
+			{ path: 'csv', element: <UploadCSVContainer /> }
+		]
+	},
+	{
+		path: '*', element: <NotFound />
+	}
+])
+
+/**
+ * @returns the router component Currently under migration!
+ */
+export default function RouteComponentWIP() {
+	const lang = useAppSelector(state => state.options.selectedLanguage)
+	const messages = (localeData as any)[lang];
+	return (
+		<IntlProvider locale={lang} messages={messages} key={lang}>
+			<RouterProvider router={router} />
+		</IntlProvider>
+	);
 }

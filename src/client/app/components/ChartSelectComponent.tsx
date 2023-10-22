@@ -47,6 +47,7 @@ export default function ChartSelectComponent() {
 							// map to components
 							.map(chartType =>
 								<DropdownItem
+									key={chartType}
 									onClick={() => dispatch(graphSlice.actions.changeChartToRender(chartType))}
 								>
 									{translate(`${chartType}`)}

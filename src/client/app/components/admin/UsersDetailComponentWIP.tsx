@@ -6,16 +6,17 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input, Table } from 'reactstrap';
+import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import { userApi } from '../../redux/api/userApi';
 import { User, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
-import FooterContainer from '../../containers/FooterContainer';
 import HeaderComponent from '../HeaderComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { UnsavedWarningComponentWIP } from '../UnsavedWarningComponentWIP';
+import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
+
 
 /**
  * Component which shows user details
@@ -25,9 +26,19 @@ export default function UserDetailComponentWIP() {
 	const { data: users = [] } = userApi.useGetUsersQuery(undefined);
 	const [submitUserEdits] = userApi.useEditUsersMutation();
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
+	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
-	// keep history in sync whenever query data changes
 	React.useEffect(() => { setLocalUsersChanges(users) }, [users])
+	React.useEffect(
+		() => {
+			if (!_.isEqual(users, localUsersChanges)) {
+				setHasChanges(true)
+			} else {
+				setHasChanges(false)
+			}
+		},
+		[localUsersChanges]
+	)
 
 	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
 		// copy user, and update role
@@ -43,7 +54,7 @@ export default function UserDetailComponentWIP() {
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.edit.users'));
 			})
-			.catch((e) => {
+			.catch(e => {
 				console.log(e)
 				showErrorNotification(translate('users.failed.to.edit.users'))
 			})
@@ -56,8 +67,12 @@ export default function UserDetailComponentWIP() {
 
 	return (
 		<div>
-			<UnsavedWarningContainer />
 			<HeaderComponent />
+			<UnsavedWarningComponentWIP
+				hasUnsavedChanges={hasChanges}
+				changes={localUsersChanges}
+				submitChanges={submitUserEdits}
+			/>
 			<TooltipHelpContainer page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
@@ -111,6 +126,7 @@ export default function UserDetailComponentWIP() {
 					</div>
 				</div>
 			</div>
+
 			<FooterContainer />
 		</div>
 	)

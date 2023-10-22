@@ -42,7 +42,7 @@ export const readingsApi = baseApi.injectEndpoints({
 
 				// it is important to note,
 				// Since this is wrapped with Immer, you may either mutate the currentCacheValue directly, or return a new value, but not both at once.
-				_.merge(currentCacheData, responseData)
+				Object.assign(currentCacheData, responseData)
 			},
 			forceRefetch: ({ currentArg, endpointState }) => {
 				// Since we modified the way the we serialize the args any subsequent query would return the cache data, even if new meters were requested
@@ -96,7 +96,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
-			merge: (currentCacheData, responseData) => { _.merge(currentCacheData, responseData) },
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : undefined
 				if (!currentData) { return true }
