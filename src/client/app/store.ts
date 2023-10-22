@@ -22,7 +22,7 @@ export const store = createStore(reducers, composeWithDevTools(applyMiddleware(t
 // in the initScript with a proper route would likely fix this up.
 // For now,
 // the developer needs to comment out the line above and uncomment the two lines below to get traces.
-// The webpack rebuild should make the change while OED is running.
+// The Vite rebuild should make the change while OED is running.
 // Allow tracing of code.
 // const composeEnhancers = composeWithDevTools({trace: true});
 // const store = createStore(reducers, composeEnhancers(applyMiddleware(thunkMiddleware)));

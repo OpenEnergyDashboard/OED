@@ -159,11 +159,11 @@ if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
 	npm run developerdb
 fi
 
-# Build webpack if needed
+# Build client if needed
 if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
-	npm run webpack:build
+	npm run client:build
 elif [ "$dostart" == "no" ]; then
-	npm run webpack
+	npm run client:dev
 fi
 
 printf "%s\n" "OED install finished"
