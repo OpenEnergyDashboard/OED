@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { localeData } from 'moment';
 
 /* eslint-disable */
 
 // This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
-const localeData = {
+const LocaleTranslationData = {
 	"en": {
 		"3D": "3D",
 		"400": "400 Bad Request",
@@ -1405,4 +1404,12 @@ const localeData = {
 	}
 }
 
-export default localeData;
+// Infer 
+export default LocaleTranslationData as typeof LocaleTranslationData;
+export type TranslationKey = keyof typeof LocaleTranslationData
+// All locales should share the same keys, but intersection over all to be safe?
+// Will probably error when forgetting to add same key to all locales when using translate()
+export type LocaleDataKey =
+	keyof typeof LocaleTranslationData['en'] &
+	keyof typeof LocaleTranslationData['es'] &
+	keyof typeof LocaleTranslationData['fr']
