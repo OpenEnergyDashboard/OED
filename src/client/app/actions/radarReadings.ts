@@ -7,7 +7,7 @@ import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
 import * as t from '../types/redux/radarReadings';
 import { readingsApi } from '../utils/api';
-import { RadarReadings } from '../types/readings';
+import { LineReadings } from '../types/readings';
 
 /**
  * @param state the Redux state
@@ -19,7 +19,7 @@ import { RadarReadings } from '../types/readings';
 function shouldFetchMeterRadarReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 
-	const readingsForID = state.readings.radar.byMeterID[meterID];
+	const readingsForID = state.readings.line.byMeterID[meterID];
 	if (readingsForID === undefined) {
 		return true;
 	}
@@ -47,7 +47,7 @@ function shouldFetchMeterRadarReadings(state: State, meterID: number, timeInterv
 function shouldFetchGroupRadarReadings(state: State, groupID: number, timeInterval: TimeInterval, unitID: number): boolean {
 	const timeIntervalIndex = timeInterval.toString();
 
-	const readingsForID = state.readings.radar.byGroupID[groupID];
+	const readingsForID = state.readings.line.byGroupID[groupID];
 	if (readingsForID === undefined) {
 		return true;
 	}
@@ -71,7 +71,7 @@ function shouldFetchGroupRadarReadings(state: State, groupID: number, timeInterv
  * @param unitID the ID of the unit for which to check
  */
 function requestMeterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): t.RequestMeterRadarReadingAction {
-	return { type: ActionType.RequestMeterRadarReadings, meterIDs, timeInterval, unitID };
+	return { type: ActionType.RequestMeterLineReadings, meterIDs, timeInterval, unitID };
 }
 
 /**
@@ -80,7 +80,7 @@ function requestMeterRadarReadings(meterIDs: number[], timeInterval: TimeInterva
  * @param unitID the ID of the unit for which to check
  */
 function requestGroupRadarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): t.RequestGroupRadarReadingAction {
-	return { type: ActionType.RequestGroupRadarReadings, groupIDs, timeInterval, unitID };
+	return { type: ActionType.RequestGroupLineReadings, groupIDs, timeInterval, unitID };
 }
 /**
  * @param meterIDs the IDs of the meters to get readings
@@ -89,8 +89,8 @@ function requestGroupRadarReadings(groupIDs: number[], timeInterval: TimeInterva
  * @param readings the readings for the given meters
  */
 function receiveMeterRadarReadings(
-	meterIDs: number[], timeInterval: TimeInterval, unitID: number, readings: RadarReadings): t.ReceiveMeterRadarReadingAction {
-	return { type: ActionType.ReceiveMeterRadarReadings, meterIDs, timeInterval, unitID, readings };
+	meterIDs: number[], timeInterval: TimeInterval, unitID: number, readings: LineReadings): t.ReceiveMeterRadarReadingAction {
+	return { type: ActionType.ReceiveMeterLineReadings, meterIDs, timeInterval, unitID, readings };
 }
 
 /**
@@ -100,8 +100,8 @@ function receiveMeterRadarReadings(
  * @param readings the readings for the given groups
  */
 function receiveGroupLineReadings(
-	groupIDs: number[], timeInterval: TimeInterval, unitID: number, readings: RadarReadings): t.ReceiveGroupRadarReadingAction {
-	return { type: ActionType.ReceiveGroupRadarReadings, groupIDs, timeInterval, unitID, readings };
+	groupIDs: number[], timeInterval: TimeInterval, unitID: number, readings: LineReadings): t.ReceiveGroupRadarReadingAction {
+	return { type: ActionType.ReceiveGroupLineReadings, groupIDs, timeInterval, unitID, readings };
 }
 
 /**

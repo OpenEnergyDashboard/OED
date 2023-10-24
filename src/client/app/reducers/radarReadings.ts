@@ -15,7 +15,7 @@ const defaultState: RadarReadingsState = {
 
 export default function readings(state = defaultState, action: RadarReadingsAction) {
 	switch (action.type) {
-		case ActionType.RequestMeterRadarReadings: {
+		case ActionType.RequestMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
 			const newState = {
@@ -46,7 +46,7 @@ export default function readings(state = defaultState, action: RadarReadingsActi
 
 			return newState;
 		}
-		case ActionType.RequestGroupRadarReadings: {
+		case ActionType.RequestGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
 			const newState = {
@@ -77,7 +77,7 @@ export default function readings(state = defaultState, action: RadarReadingsActi
 
 			return newState;
 		}
-		case ActionType.ReceiveMeterRadarReadings: {
+		case ActionType.ReceiveMeterLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
 			const newState: RadarReadingsState = {
@@ -98,7 +98,7 @@ export default function readings(state = defaultState, action: RadarReadingsActi
 
 			return newState;
 		}
-		case ActionType.ReceiveGroupRadarReadings: {
+		case ActionType.ReceiveGroupLineReadings: {
 			const timeInterval = action.timeInterval.toString();
 			const unitID = action.unitID;
 			const newState: RadarReadingsState = {

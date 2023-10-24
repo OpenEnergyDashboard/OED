@@ -4,36 +4,36 @@
 
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
-import { RadarReading, RadarReadings } from '../readings';
+import { LineReading, LineReadings } from '../readings';
 
 export interface RequestMeterRadarReadingAction {
-	type: ActionType.RequestMeterRadarReadings;
+	type: ActionType.RequestMeterLineReadings;
 	meterIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
 }
 
 export interface RequestGroupRadarReadingAction {
-	type: ActionType.RequestGroupRadarReadings;
+	type: ActionType.RequestGroupLineReadings;
 	groupIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
 }
 
 export interface ReceiveMeterRadarReadingAction {
-	type: ActionType.ReceiveMeterRadarReadings;
+	type: ActionType.ReceiveMeterLineReadings;
 	meterIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
-	readings: RadarReadings;
+	readings: LineReadings;
 }
 
 export interface ReceiveGroupRadarReadingAction {
-	type: ActionType.ReceiveGroupRadarReadings;
+	type: ActionType.ReceiveGroupLineReadings;
 	groupIDs: number[];
 	unitID: number;
 	timeInterval: TimeInterval;
-	readings: RadarReadings;
+	readings: LineReadings;
 }
 
 export type RadarReadingsAction =
@@ -55,7 +55,7 @@ export interface RadarReadingsState {
 			[timeInterval: string]: {
 				[unitID: number]: {
 					isFetching: boolean;
-					readings?: RadarReading[];
+					readings?: LineReading[];
 				}
 			}
 		}
@@ -65,7 +65,7 @@ export interface RadarReadingsState {
 			[timeInterval: string]: {
 				[unitID: number]: {
 					isFetching: boolean;
-					readings?: RadarReading[];
+					readings?: LineReading[];
 				}
 			}
 		}

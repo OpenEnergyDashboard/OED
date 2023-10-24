@@ -39,13 +39,3 @@ export interface BarReading {
 export interface BarReadings {
 	[id: number]: BarReading[];
 }
-
-export interface RadarReading {
-	reading: number;
-	startTimestamp: number;
-	endTimestamp: number;
-}
-
-export interface RadarReadings {
-	[id: number]: RadarReading[];
-}

@@ -4,7 +4,6 @@
 
 import { BarReadingsState } from './barReadings';
 import { LineReadingsState } from './lineReadings';
-import { RadarReadingsState } from './radarReadings';
 import { GraphState } from './graph';
 import { GroupsState } from './groups';
 import { MetersState } from './meters';
@@ -24,7 +23,6 @@ export interface State {
 		line: LineReadingsState;
 		bar: BarReadingsState;
 		compare: CompareReadingsState;
-		radar: RadarReadingsState;
 	};
 	graph: GraphState;
 	maps: MapState;
