@@ -73,7 +73,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
 				// Test using a date range of infinity, which should return as days
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+				mocha.it('L1: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -104,7 +104,7 @@ mocha.describe('readings API', () => {
 				});
 				// This test is effectively the same as the last, but we specify the date range
 				// Should return daily point readings
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
+				mocha.it('L2: should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -133,7 +133,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// This date range is on the threshold of returning daily point readings, 61 days
-				mocha.it('should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
+				mocha.it('L3: should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -159,8 +159,7 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-25', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
-				// 60 days gives hourly points & middle readings
-				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
+				mocha.it('L4: should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -186,8 +185,7 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
-
-				mocha.it('should barely have hourly points for middle readings of 15 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => {
+				mocha.it('L5: should barely have hourly points for middle readings of 15 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -214,7 +212,7 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// 14 days barely gives raw points & middle readings
-				mocha.it('14 days barely gives raw points & middle readings', async () => {
+				mocha.it('L6: 14 days barely gives raw points & middle readings', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -240,10 +238,14 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected);
 				});
+
+				// Add L7 here
+
 				// Test 15 minutes over all time for flow unit.
-				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
+				mocha.it('L8: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
 					const unitData = [
 						{
+							// u4
 							name: 'kW',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
@@ -255,6 +257,7 @@ mocha.describe('readings API', () => {
 							note: 'kilowatts'
 						},
 						{
+							// u5
 							name: 'Electric',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.FLOW,
@@ -268,6 +271,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c4
 							sourceName: 'Electric',
 							destinationName: 'kW',
 							bidirectional: false,
@@ -301,9 +305,10 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				// Test 15 minutes over all time for raw unit.
-				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
+				mocha.it('L9: should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
 					const unitData = [
 						{
+							// u6
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -315,6 +320,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius'
 						},
 						{
+							// u7
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -328,6 +334,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c5
 							sourceName: 'Degrees',
 							destinationName: 'C',
 							bidirectional: false,
@@ -361,9 +368,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
+				mocha.it('L10: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
 					const unitData = unitDatakWh.concat([
 						{
+							// u3
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -377,6 +385,7 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
+							// c2
 							sourceName: 'kWh',
 							destinationName: 'MJ',
 							bidirectional: true,
@@ -410,9 +419,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
+				mocha.it('L11: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([
 						{
+							// u3
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -426,6 +436,7 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
+							// c6
 							sourceName: 'MJ',
 							destinationName: 'kWh',
 							bidirectional: true,
@@ -459,9 +470,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
+				mocha.it('L12: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
 					const unitData = unitDatakWh.concat([
 						{
+							// u3
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -473,6 +485,7 @@ mocha.describe('readings API', () => {
 							note: 'MJ'
 						},
 						{
+							// u16
 							name: 'BTU',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -481,11 +494,12 @@ mocha.describe('readings API', () => {
 							suffix: '',
 							displayable: Unit.displayableType.ALL,
 							preferredDisplay: true,
-							note: 'OED created standard unit'
+							note: 'special unit'
 						}
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
+							// c2
 							sourceName: 'kWh',
 							destinationName: 'MJ',
 							bidirectional: true,
@@ -494,6 +508,7 @@ mocha.describe('readings API', () => {
 							note: 'kWh → MJ'
 						},
 						{
+							// c3
 							sourceName: 'MJ',
 							destinationName: 'BTU',
 							bidirectional: true,
@@ -528,9 +543,10 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected)
 				});
 
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained with reverse conversion', async () => {
+				mocha.it('L13: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained with reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([
 						{
+							// u3
 							name: 'MJ',
 							identifier: 'megaJoules',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -542,6 +558,7 @@ mocha.describe('readings API', () => {
 							note: 'MJ'
 						},
 						{
+							// u16
 							name: 'BTU',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -555,20 +572,22 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						{
-							sourceName: 'MJ',
-							destinationName: 'kWh',
-							bidirectional: true,
-							slope: 1 / 3.6,
-							intercept: 0,
-							note: 'MJ → KWh'
-						},
-						{
+							// c3
 							sourceName: 'MJ',
 							destinationName: 'BTU',
 							bidirectional: true,
 							slope: 947.8,
 							intercept: 0,
 							note: 'MJ → BTU'
+						},
+						{
+							// c6
+							sourceName: 'MJ',
+							destinationName: 'kWh',
+							bidirectional: true,
+							slope: 1 / 3.6,
+							intercept: 0,
+							note: 'MJ → KWh'
 						}
 					]);
 					const meterData = [
@@ -596,58 +615,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and quantity units & kWh as MJ', async () => {
-					const unitData = unitDatakWh.concat([
-						{
-							name: 'MJ',
-							identifier: 'megaJoules',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'MJ'
-						}
-					]);
-					const conversionData = conversionDatakWh.concat([
-						{
-							sourceName: 'kWh',
-							destinationName: 'MJ',
-							bidirectional: true,
-							slope: 3.6,
-							intercept: 0,
-							note: 'kWh → MJ'
-						}
-					]);
-					const meterData = [
-						{
-							name: 'Electric_Utility MJ',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'MJ',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-
-					await prepareTest(unitData, conversionData, meterData);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('MJ');
-					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
-
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
-					expectReadingToEqualExpected(res, expected)
-				});
-				mocha.it('should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
+				mocha.it('L14: should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
 					const unitData = [
 						{
+							// u6
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -659,6 +630,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius'
 						},
 						{
+							// u7
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -670,6 +642,7 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						},
 						{
+							// u8
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -683,6 +656,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c5
 							sourceName: 'Degrees',
 							destinationName: 'C',
 							bidirectional: false,
@@ -691,214 +665,7 @@ mocha.describe('readings API', () => {
 							note: 'Degrees → C'
 						},
 						{
-							sourceName: 'C',
-							destinationName: 'F',
-							bidirectional: true,
-							slope: 1.8,
-							intercept: 32,
-							note: 'Celsius → Fahrenheit'
-						}
-					];
-					const meterData = [
-						{
-							name: 'Degrees F',
-							unit: 'Degrees',
-							defaultGraphicUnit: 'F',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-
-					await prepareTest(unitData, conversionData, meterData);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('F');
-					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_F_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
-
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
-					expectReadingToEqualExpected(res, expected)
-				});
-				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
-					const unitData = unitDatakWh.concat([
-						{
-							name: 'MJ',
-							identifier: 'megaJoules',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'MJ'
-						}
-					]);
-					const conversionData = conversionDatakWh.concat([
-						{
-							sourceName: 'kWh',
-							destinationName: 'MJ',
-							bidirectional: true,
-							slope: 3.6,
-							intercept: 0,
-							note: 'kWh → MJ'
-						}
-					]);
-					const meterData = [
-						{
-							name: 'Electric_Utility MJ',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'MJ',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-
-					await prepareTest(unitData, conversionData, meterData);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('MJ');
-					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
-
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
-					expectReadingToEqualExpected(res, expected)
-				});
-				mocha.it('should have raw points for middle readings of 15 minute for a 14 day period and raw units & C as F with intercept', async () => {
-					const unitData = [
-						{
-							name: 'C',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: true,
-							note: 'Celsius'
-						},
-						{
-							name: 'Degrees',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.METER,
-							suffix: '',
-							displayable: Unit.displayableType.NONE,
-							preferredDisplay: false,
-							note: 'special unit'
-						},
-						{
-							name: 'F',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'OED created standard unit'
-						}
-					];
-					const conversionData = [
-						{
-							sourceName: 'Degrees',
-							destinationName: 'C',
-							bidirectional: false,
-							slope: 1,
-							intercept: 0,
-							note: 'Degrees → C'
-						},
-						{
-							sourceName: 'C',
-							destinationName: 'F',
-							bidirectional: true,
-							slope: 1.8,
-							intercept: 32,
-							note: 'Celsius → Fahrenheit'
-						}
-					];
-					const meterData = [
-						{
-							name: 'Degrees F',
-							unit: 'Degrees',
-							defaultGraphicUnit: 'F',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-
-					await prepareTest(unitData, conversionData, meterData);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('F');
-					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_F_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
-
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
-					expectReadingToEqualExpected(res, expected)
-				});
-
-				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
-					const unitData = [
-						{
-							name: 'C',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: true,
-							note: 'Celsius'
-						},
-						{
-							name: 'Degrees',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.METER,
-							suffix: '',
-							displayable: Unit.displayableType.NONE,
-							preferredDisplay: false,
-							note: 'special unit'
-						},
-						{
-							name: 'F',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.RAW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'OED created standard unit'
-						}
-					];
-					const conversionData = [
-						{
-							sourceName: 'Degrees',
-							destinationName: 'C',
-							bidirectional: false,
-							slope: 1,
-							intercept: 0,
-							note: 'Degrees → C'
-						},
-						{
+							// c7
 							sourceName: 'C',
 							destinationName: 'F',
 							bidirectional: true,
@@ -932,10 +699,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-
-				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept reverse conversion', async () => {
+				mocha.it('L15: should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept reverse conversion', async () => {
 					const unitData = [
 						{
+							// u6
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -947,6 +714,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius'
 						},
 						{
+							// u7
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -958,6 +726,7 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						},
 						{
+							// u8
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -971,6 +740,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c5
 							sourceName: 'Degrees',
 							destinationName: 'C',
 							bidirectional: false,
@@ -979,6 +749,7 @@ mocha.describe('readings API', () => {
 							note: 'Degrees → C'
 						},
 						{
+							// c8
 							sourceName: 'F',
 							destinationName: 'C',
 							bidirectional: true,
@@ -1012,71 +783,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-
-
-				mocha.it('should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
+				mocha.it('L16: should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained', async () => {
 					const unitData = [
 						{
-							name: 'Thing_36',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate: 36,
-							typeOfUnit: Unit.unitType.METER,
-							suffix: '',
-							displayable: Unit.displayableType.NONE,
-							preferredDisplay: false,
-							note: 'special unit'
-						},
-						{
-							name: 'thing unit',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.FLOW,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'special unit'
-						}
-					];
-					const conversionData = [
-						{
-							sourceName: 'Thing_36',
-							destinationName: 'thing unit',
-							bidirectional: false,
-							slope: 1,
-							intercept: 0,
-							note: 'Thing_36 → thing unit'
-						}
-					];
-					const meterData = [
-						{
-							name: 'Thing_36 thing unit',
-							unit: 'Thing_36',
-							defaultGraphicUnit: 'thing unit',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-
-					await prepareTest(unitData, conversionData, meterData);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('thing unit');
-					// Reuse same file as flow since value should be the same values.
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_Thing36_gu_thing_st_-inf_et_inf.csv');
-
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
-					expectReadingToEqualExpected(res, expected)
-				});
-				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained', async () => {
-					const unitData = [
-						{
+							// u6
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1088,6 +798,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius'
 						},
 						{
+							// u7
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1099,6 +810,7 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						},
 						{
+							// u8
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1110,6 +822,7 @@ mocha.describe('readings API', () => {
 							note: 'OED created standard unit'
 						},
 						{
+							// u9
 							name: 'Widget',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1123,6 +836,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c5
 							sourceName: 'Degrees',
 							destinationName: 'C',
 							bidirectional: false,
@@ -1131,6 +845,7 @@ mocha.describe('readings API', () => {
 							note: 'Degrees → C'
 						},
 						{
+							// c7
 							sourceName: 'C',
 							destinationName: 'F',
 							bidirectional: true,
@@ -1139,6 +854,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius → Fahrenheit'
 						},
 						{
+							// c9
 							sourceName: 'F',
 							destinationName: 'Widget',
 							bidirectional: true,
@@ -1172,9 +888,10 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () => {
+				mocha.it('L17: should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () => {
 					const unitData = [
 						{
+							// u6
 							name: 'C',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1186,6 +903,7 @@ mocha.describe('readings API', () => {
 							note: 'Celsius'
 						},
 						{
+							// u7
 							name: 'Degrees',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1197,6 +915,7 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						},
 						{
+							// u8
 							name: 'F',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1208,6 +927,7 @@ mocha.describe('readings API', () => {
 							note: 'OED created standard unit'
 						},
 						{
+							// u9
 							name: 'Widget',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.RAW,
@@ -1221,6 +941,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c5
 							sourceName: 'Degrees',
 							destinationName: 'C',
 							bidirectional: false,
@@ -1229,6 +950,7 @@ mocha.describe('readings API', () => {
 							note: 'Degrees → C'
 						},
 						{
+							// c8
 							sourceName: 'F',
 							destinationName: 'C',
 							bidirectional: true,
@@ -1237,6 +959,7 @@ mocha.describe('readings API', () => {
 							note: 'Fahrenheit → Celsius'
 						},
 						{
+							// c10
 							sourceName: 'Widget',
 							destinationName: 'F',
 							bidirectional: true,
@@ -1270,9 +993,13 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
-				mocha.it('should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
+
+				// Add L18 here
+
+				mocha.it('L19: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
 					const unitData = [
 						{
+							// u2 - add by self since not want kWh
 							name: 'Electric_Utility',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -1284,6 +1011,7 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						},
 						{
+							// u10
 							name: 'kg',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -1295,6 +1023,7 @@ mocha.describe('readings API', () => {
 							note: 'OED created standard unit'
 						},
 						{
+							// u11
 							name: 'metric ton',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -1306,6 +1035,7 @@ mocha.describe('readings API', () => {
 							note: 'OED created standard unit'
 						},
 						{
+							// u12
 							name: 'kg CO₂',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -1319,6 +1049,7 @@ mocha.describe('readings API', () => {
 					];
 					const conversionData = [
 						{
+							// c11
 							sourceName: 'Electric_Utility',
 							destinationName: 'kg CO₂',
 							bidirectional: false,
@@ -1327,6 +1058,7 @@ mocha.describe('readings API', () => {
 							note: 'Electric_Utility → kg CO₂'
 						},
 						{
+							// c12
 							sourceName: 'kg CO₂',
 							destinationName: 'kg',
 							bidirectional: false,
@@ -1335,6 +1067,7 @@ mocha.describe('readings API', () => {
 							note: 'CO₂ → kg'
 						},
 						{
+							// c13
 							sourceName: 'kg',
 							destinationName: 'metric ton',
 							bidirectional: true,
@@ -1367,10 +1100,347 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 					expectReadingToEqualExpected(res, expected)
 				});
+
+				// Add L20 here
+
+				mocha.it('L21: should have hourly points for middle readings of 15 minute for a 60 day period and quantity units & kWh as MJ', async () => {
+					const unitData = unitDatakWh.concat([
+						{
+							// u3
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
+					]);
+					const conversionData = conversionDatakWh.concat([
+						{
+							// c2
+							sourceName: 'kWh',
+							destinationName: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						}
+					]);
+					const meterData = [
+						{
+							name: 'Electric_Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('MJ');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('L22: should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
+					const unitData = [
+						{
+							// u6
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+						{
+							// u7
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
+							suffix: '',
+							displayable: Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+						{
+							// u8
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						}
+					];
+					const conversionData = [
+						{
+							// c5
+							sourceName: 'Degrees',
+							destinationName: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							// c7
+							sourceName: 'C',
+							destinationName: 'F',
+							bidirectional: true,
+							slope: 1.8,
+							intercept: 32,
+							note: 'Celsius → Fahrenheit'
+						}
+					];
+					const meterData = [
+						{
+							name: 'Degrees F',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'F',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('F');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_F_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('L23: should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
+					const unitData = unitDatakWh.concat([
+						{
+							// u3
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						}
+					]);
+					const conversionData = conversionDatakWh.concat([
+						{
+							// c2
+							sourceName: 'kWh',
+							destinationName: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'kWh → MJ'
+						}
+					]);
+					const meterData = [
+						{
+							name: 'Electric_Utility MJ',
+							unit: 'Electric_Utility',
+							defaultGraphicUnit: 'MJ',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('MJ');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('L24: should have raw points for middle readings of 15 minute for a 14 day period and raw units & C as F with intercept', async () => {
+					const unitData = [
+						{
+							// u6
+							name: 'C',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'Celsius'
+						},
+						{
+							// u7
+							name: 'Degrees',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.METER,
+							suffix: '',
+							displayable: Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+						{
+							// u8
+							name: 'F',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.RAW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						}
+					];
+					const conversionData = [
+						{
+							// c5
+							sourceName: 'Degrees',
+							destinationName: 'C',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Degrees → C'
+						},
+						{
+							// c7
+							sourceName: 'C',
+							destinationName: 'F',
+							bidirectional: true,
+							slope: 1.8,
+							intercept: 32,
+							note: 'Celsius → Fahrenheit'
+						}
+					];
+					const meterData = [
+						{
+							name: 'Degrees F',
+							unit: 'Degrees',
+							defaultGraphicUnit: 'F',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('F');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_C_gu_F_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
+				mocha.it('L25: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
+					const unitData = [
+						{
+							// u14
+							name: 'Thing_36',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate: 36,
+							typeOfUnit: Unit.unitType.METER,
+							suffix: '',
+							displayable: Unit.displayableType.NONE,
+							preferredDisplay: false,
+							note: 'special unit'
+						},
+						{
+							// u15
+							name: 'thing unit',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.FLOW,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
+					];
+					const conversionData = [
+						{
+							// c15
+							sourceName: 'Thing_36',
+							destinationName: 'thing unit',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'Thing_36 → thing unit'
+						}
+					];
+					const meterData = [
+						{
+							name: 'Thing_36 thing unit',
+							unit: 'Thing_36',
+							defaultGraphicUnit: 'thing unit',
+							displayable: true,
+							gps: undefined,
+							note: 'special meter',
+							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+							deleteFile: false,
+							readingFrequency: '15 minutes',
+							id: METER_ID
+						}
+					];
+
+					await prepareTest(unitData, conversionData, meterData);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('thing unit');
+					// Reuse same file as flow since value should be the same values.
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_Thing36_gu_thing_st_-inf_et_inf.csv');
+
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+					expectReadingToEqualExpected(res, expected)
+				});
 				// When an invalid unit is added to a meter and loaded to the db, the API should return an empty array
 				mocha.it('should return an empty json object for an invalid unit', async () => {
 					const unitData = [
 						{
+							// u1 - do separately since don't want Electric Utility.
 							name: 'kWh',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -1510,7 +1580,7 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('startTimestamp');
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
-				mocha.it('1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+				mocha.it('B1: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -1543,7 +1613,7 @@ mocha.describe('readings API', () => {
 					// Check that the API reading is equal to what it is expected to equal
 					expectReadingToEqualExpected(res, expected);
 				});
-				mocha.it('7 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+				mocha.it('B2: 7 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -1576,7 +1646,7 @@ mocha.describe('readings API', () => {
 					// Check that the API reading is equal to what it is expected to equal
 					expectReadingToEqualExpected(res, expected);
 				});
-				mocha.it('28 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+				mocha.it('B3: 28 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
 					// Create 2D array for meter to feed into the database
 					// Note the meter ID is set so we know what to expect when a query is made.
 					const meterData = [
@@ -1610,6 +1680,15 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 			});
+
+			// Add B4 here
+
+
+			// Add B5 here
+
+
+			// Add B6 here
+
 			mocha.describe('for groups', () => {
 				mocha.it('response should have a valid reading, startTimestamp, and endTimestamp', async () => {
 					// Create 2D array for meter to feed into the database
