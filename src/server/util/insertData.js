@@ -9,6 +9,7 @@ const Group = require('../models/Group');
 const { loadCsvInput } = require('../services/pipeline-in-progress/loadCsvInput');
 const moment = require('moment');
 const fs = require('fs').promises;
+const _ = require('lodash');
 
 /**
  * Inserts specified units into the database.
@@ -312,7 +313,8 @@ async function insertMeters(metersToInsert, conn) {
 	// Loop over all meters.
 	for (let i = 0; i < metersToInsert.length; ++i) {
 		// Meter key/value pairs for the current meter.
-		const meterData = metersToInsert[i];
+		// Since potentially change the values of the key/value pairs, clone it. The Lodash clone is probably overkill but okay.
+		const meterData = _.cloneDeep(metersToInsert[i]);
 
 		// Check that needed keys are there.
 		const requiredKeys = ['name', 'file'];

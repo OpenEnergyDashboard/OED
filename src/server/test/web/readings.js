@@ -26,7 +26,8 @@ const { prepareTest,
 	GROUP_ID,
 	HTTP_CODE,
 	unitDatakWh,
-	conversionDatakWh } = require('../../util/readingsUtils');
+	conversionDatakWh,
+	meterDatakWh } = require('../../util/readingsUtils');
 
 // TODO
 // Test readings from meters at different rates (15 min, 23 min)
@@ -40,24 +41,8 @@ mocha.describe('readings API', () => {
 			mocha.describe('for meters', () => {
 				// A reading response should have a reading, startTimestamp, and endTimestamp key
 				mocha.it('response should have valid reading and timestamps,', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Create a request to the API and save the response
@@ -74,24 +59,8 @@ mocha.describe('readings API', () => {
 				});
 				// Test using a date range of infinity, which should return as days
 				mocha.it('L1: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
@@ -105,24 +74,8 @@ mocha.describe('readings API', () => {
 				// This test is effectively the same as the last, but we specify the date range
 				// Should return daily point readings
 				mocha.it('L2: should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load and parse the corresponding expected values from csv
@@ -134,24 +87,8 @@ mocha.describe('readings API', () => {
 				});
 				// This date range is on the threshold of returning daily point readings, 61 days
 				mocha.it('L3: should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
@@ -160,24 +97,8 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				mocha.it('L4: should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
@@ -186,24 +107,8 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				mocha.it('L5: should barely have hourly points for middle readings of 15 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
@@ -213,24 +118,8 @@ mocha.describe('readings API', () => {
 				});
 				// 14 days barely gives raw points & middle readings
 				mocha.it('L6: 14 days barely gives raw points & middle readings', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
@@ -1549,23 +1438,7 @@ mocha.describe('readings API', () => {
 			// barWidthDays parameter that must be accounted for, which adds a few extra steps
 			mocha.describe('for meters', () => {
 				mocha.it('response should have a valid reading, startTimestamp, and endTimestamp', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
@@ -1581,24 +1454,8 @@ mocha.describe('readings API', () => {
 					expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');
 				});
 				mocha.it('B1: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
@@ -1614,24 +1471,8 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				mocha.it('B2: 7 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
@@ -1647,24 +1488,8 @@ mocha.describe('readings API', () => {
 					expectReadingToEqualExpected(res, expected);
 				});
 				mocha.it('B3: 28 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
-					// Create 2D array for meter to feed into the database
-					// Note the meter ID is set so we know what to expect when a query is made.
-					const meterData = [
-						{
-							name: 'Electric Utility kWh',
-							unit: 'Electric_Utility',
-							defaultGraphicUnit: 'kWh',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterData);
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
 					// Load the expected response data from the corresponding csv file
