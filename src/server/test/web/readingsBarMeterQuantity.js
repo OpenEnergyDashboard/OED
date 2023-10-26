@@ -78,11 +78,25 @@ mocha.describe('readings API', () => {
 
                 // Add B4 here
 
-
                 // Add B5 here
 
-
                 // Add B6 here
+
+                // Add B7 here
+
+                // Add B8 here
+
+                // Add B9 here
+
+                // Add B10 here
+
+                // Add B11 here
+
+                // Add B12 here
+
+                // Add B13 here
+
+                // Add B14 here
 
             });
         });
