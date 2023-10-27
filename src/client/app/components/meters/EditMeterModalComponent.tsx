@@ -246,8 +246,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let error_message = '';
 		for (const value of Object.values(groups)) {
 			for (let i = 0; i < value.deepMeters.length; i++) {
-				console.log(metersByID[value.deepMeters[i]].name, props.meter.name)
-				if(metersByID[value.deepMeters[i]].name== props.meter.name)
+				console.log(value.deepMeters[i], props.meter.id)
+				if(value.deepMeters[i]== props.meter.id)
 				{
 					error_message += translate('group') + value.name + ' uses ' + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
 				}
