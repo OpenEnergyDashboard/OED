@@ -6,8 +6,7 @@
 
 version: "3.8"
 services:
-  # Database service. It's PostgreSQL, see the
-  # Dockerfile in ./database
+  # Database service. It's PostgreSQL, see the Dockerfile in ./containers/database.
   database:
     build: ./containers/database/
     environment:
@@ -20,7 +19,7 @@ services:
     #     - "5432:5432"
     # Uncomment the above lines to enable access to the PostgreSQL server
     # from the host machine.
-    # Web service runs Node
+  # Web service runs Node
   dev-server:
     # Comment out the this service for production
     build:

@@ -93,7 +93,7 @@ while [ $create_error == 0 ]; do
 	# Sleep to let PostgreSQL chill out
 	sleep 3
 	printf "%s\n" "Attempting to create database..."
-	# Redirect stderr to a file
+	# Redirect stdout and stderr to a file
 	npm run createdb |& tee /tmp/oed.error > /dev/null
 	createdb_code=${PIPESTATUS[0]}
 	# TODO: This should be moved to the error case below once issues with this process are under control.
