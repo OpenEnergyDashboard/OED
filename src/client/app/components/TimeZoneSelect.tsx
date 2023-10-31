@@ -22,7 +22,6 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 			const zone = moment.tz(zoneName);
 			const abbrev = zone.format('z');
 			return { value: zoneName, label: `${zoneName} (${abbrev})` };
-
 		});
 	};
 	const resetTimeZone = [{ value: null, label: translate('timezone.no') }];
