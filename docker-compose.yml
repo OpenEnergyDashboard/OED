@@ -29,7 +29,7 @@ services:
     volumes:
       - ./:/usr/src/app
     ports:
-      - "9229:9229"
+      - "8085:8085"
     depends_on:
       - web
     command:
