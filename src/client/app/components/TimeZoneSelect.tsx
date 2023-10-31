@@ -4,9 +4,9 @@
 
 import * as React from 'react';
 import Select from 'react-select';
-import axios from 'axios';
-import { TimeZones, TimeZoneOption } from 'types/timezone';
+import { TimeZoneOption } from 'types/timezone';
 import translate from '../utils/translate';
+import * as moment from 'moment-timezone';
 
 interface TimeZoneSelectProps {
 	// The timezone is a string and null is stored in DB when there isn't one.
@@ -14,32 +14,26 @@ interface TimeZoneSelectProps {
 	handleClick: (value: string) => void;
 }
 
-let options: null | TimeZoneOption[] = null;
-
 const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick }) => {
 
-	const [optionsLoaded, setOptionsLoaded] = React.useState(false);
+	const getTimeZones = () => {
+		const zoneNames = moment.tz.names();
+		return zoneNames.map(zoneName => {
+			const zone = moment.tz(zoneName);
+			const abbrev = zone.format('z');
+			return { value: zoneName, label: `${zoneName} (${abbrev})` };
 
-	React.useEffect(() => {
-		if (!optionsLoaded) {
-			axios.get('/api/timezones').then(res => {
-				const timeZones = res.data;
-				const resetTimeZone = [{value: null, label: translate('timezone.no')}];
-				const allTimeZones = (timeZones.map((timezone: TimeZones) => {
-					return { value: timezone.name, label: `${timezone.name} (${timezone.abbrev}) ${timezone.offset}` };
-				}));
-				options = [...resetTimeZone, ...allTimeZones];
-				setOptionsLoaded(true);
-			});
-		}
-	}, []);
+		});
+	};
+	const resetTimeZone = [{ value: null, label: translate('timezone.no') }];
+	const options = [...resetTimeZone, ...getTimeZones()];
 
 	const handleChange = (selectedOption: TimeZoneOption) => {
 		handleClick(selectedOption.value);
 	};
 
 	return (options !== null ?
-		<Select isClearable={false} value={options.filter(({value}) => value === current)} options={options} onChange={handleChange} /> :
+		<Select isClearable={false} value={options.filter(({ value }) => value === current)} options={options} onChange={handleChange} /> :
 		<span>Please Reload</span>);
 };
 
