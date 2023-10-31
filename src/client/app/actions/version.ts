@@ -27,7 +27,7 @@ export function receiveVersion(data: string): t.ReceiveVersion {
  * @returns Whether preferences are fetching
  */
 function shouldFetchVersion(state: State): boolean {
-	return !state.version.isFetching;
+	return !state.version.isFetching && !state.version.version;
 }
 
 /**
