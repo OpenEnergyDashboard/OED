@@ -13,11 +13,9 @@ import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { fetchNeededBarReadings } from './barReadings';
 import { fetchNeededCompareReadings } from './compareReadings';
-import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
 import { changeSelectedMap } from './map';
 import { fetchNeededMapReadings } from './mapReadings';
-import { fetchMetersDetailsIfNeeded } from './meters';
 import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function setHotlinkedAsync(hotlinked: boolean): Thunk {
@@ -204,11 +202,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
 	const dispatchSecond: Array<Thunk | m.UpdateSelectedMapAction | ReturnType<typeof graphSlice.actions[keyof typeof graphSlice.actions]>> = [];
 	if (options.meterIDs) {
-		dispatchFirst.push(fetchMetersDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
 	}
 	if (options.groupIDs) {
-		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
 	}
 	if (options.meterOrGroupID && options.meterOrGroup) {

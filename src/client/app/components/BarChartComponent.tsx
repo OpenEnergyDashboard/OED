@@ -9,9 +9,7 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
-import { groupsSlice } from '../reducers/groups';
-import { metersSlice } from '../reducers/meters';
-import { unitsSlice } from '../reducers/units';
+import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { BarReadingApiArgs, ChartMultiQueryProps } from '../redux/selectors/dataSelectors';
@@ -22,6 +20,8 @@ import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -38,13 +38,14 @@ export default function BarChartComponent(props: ChartMultiQueryProps<BarReading
 	const unitID = useAppSelector(state => state.graph.selectedUnit);
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
-	const unitDataByID = useAppSelector(state => unitsSlice.selectors.selectUnitDataById(state));
+	const { data: unitDataByID = {} } = useAppSelector(selectUnitDataById);
+
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const meterDataByID = useAppSelector(state => metersSlice.selectors.selectMeterDataByID(state));
-	const groupDataByID = useAppSelector(state => groupsSlice.selectors.selectGroupDataByID(state));
+	const { data: meterDataByID = {} } = useAppSelector(selectMeterDataById);
+	const { data: groupDataByID = {} } = useAppSelector(selectGroupDataById);
 
 	// useQueryHooks for data fetching
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });

@@ -2,25 +2,25 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import {store} from '../../store';
+import { store } from '../../store';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
+import { Dispatch } from 'types/redux/actions';
+import { submitEditedUnit } from '../../actions/units';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+import { selectMeterDataById } from '../../redux/api/metersApi';
+import { useAppSelector } from '../../redux/hooks';
+import '../../styles/modal.css';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { TrueFalseType } from '../../types/items';
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { notifyUser } from '../../utils/input';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import '../../styles/modal.css';
-import { submitEditedUnit } from '../../actions/units';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
-import { TrueFalseType } from '../../types/items';
-import { notifyUser } from '../../utils/input'
-import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { Dispatch } from 'types/redux/actions';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
-import { useSelector } from 'react-redux';
-import { State } from 'types/redux/state';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -55,7 +55,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
-	const globalConversionsState = useSelector((state: State) => state.conversions.conversions);
+	const globalConversionsState = useAppSelector(state => state.conversions.conversions);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -101,11 +101,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
+		const { data: meterDataByID = {} } = selectMeterDataById(store.getState())
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
 			// Get an array of all meters
-			const meters = Object.values(store.getState().meters.byMeterID);
+			const meters = Object.values(meterDataByID);
 			const meter = meters.find(m => m.unitId === props.unit.id);
 			if (meter) {
 				// There exists a meter that is still linked with this unit

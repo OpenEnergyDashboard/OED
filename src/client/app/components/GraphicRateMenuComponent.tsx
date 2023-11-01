@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Select from 'react-select';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { graphSlice } from '../reducers/graph';
+import { useAppSelector } from '../redux/hooks';
 import { SelectOption } from '../types/items';
 import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
-import { State } from '../types/redux/state';
 import { UnitRepresentType } from '../types/redux/units';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -22,10 +23,10 @@ export default function GraphicRateMenuComponent() {
 	const dispatch = useDispatch();
 
 	// Graph state
-	const graphState = useSelector((state: State) => state.graph);
+	const graphState = useAppSelector(state => state.graph);
 
 	// Unit state
-	const unitDataById = useSelector((state: State) => state.units.units);
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
 
 	// Unit data by Id
 	const selectedUnitData = unitDataById[graphState.selectedUnit];
@@ -40,7 +41,7 @@ export default function GraphicRateMenuComponent() {
 		}
 	}
 	// Also don't show if not the line graphic.
-	if (graphState.chartToRender !== 'line'){
+	if (graphState.chartToRender !== 'line') {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates

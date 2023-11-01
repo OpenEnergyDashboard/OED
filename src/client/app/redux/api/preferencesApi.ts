@@ -5,7 +5,8 @@ import { baseApi } from './baseApi';
 export const preferencesApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		getPreferences: builder.query<PreferenceRequestItem, void>({
-			query: () => 'api/preferences'
+			query: () => 'api/preferences',
+			providesTags: ['Preferences']
 		}),
 		submitPreferences: builder.mutation<PreferenceRequestItem, PreferenceRequestItem>({
 			query: preferences => ({

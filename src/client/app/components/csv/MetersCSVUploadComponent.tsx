@@ -3,13 +3,12 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
+import { FormattedMessage } from 'react-intl';
+import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import { fetchMetersDetails } from '../../actions/meters';
+import { MODE } from '../../containers/csv/UploadCSVContainer';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import { FormattedMessage } from 'react-intl';
-import { MODE } from '../../containers/csv/UploadCSVContainer';
-import { fetchMetersDetails } from '../../actions/meters';
-import {store} from '../../store';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
 	private fileInput: React.RefObject<HTMLInputElement>;
@@ -37,7 +36,8 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			window.alert(error.response.data as string);
 		}
 		// Refetch meters details.
-		store.getState().meters.hasBeenFetchedOnce = false;
+		// Removed with rtk migration
+		// store.getState().meters.hasBeenFetchedOnce = false;
 		fetchMetersDetails();
 	}
 

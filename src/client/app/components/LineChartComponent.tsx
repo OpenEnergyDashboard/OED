@@ -12,9 +12,8 @@ import {
 	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
 	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters
 } from '../reducers/graph';
-import { selectGroupDataByID } from '../reducers/groups';
-import { selectMeterDataByID, selectMeterState } from '../reducers/meters';
-import { selectUnitDataById } from '../reducers/units';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { ChartMultiQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
@@ -24,6 +23,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 
 /**
  * @param props qpi query
@@ -38,14 +38,14 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(selectLineGraphRate);
-	const unitDataByID = useAppSelector(selectUnitDataById);
+	const { data: unitDataByID = {} } = useAppSelector(selectUnitDataById);
 	const selectedAreaNormalization = useAppSelector(selectGraphAreaNormalization);
 	const selectedAreaUnit = useAppSelector(selectAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const metersState = useAppSelector(selectMeterState);
-	const meterDataByID = useAppSelector(selectMeterDataByID);
-	const groupDataByID = useAppSelector(selectGroupDataByID);
+	const { data: meterDataByID = {} } = useAppSelector(selectMeterDataById);
+	const { data: groupDataByID = {} } = useAppSelector(selectGroupDataById);
+
 
 	// dataFetching Query Hooks
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
@@ -87,7 +87,7 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 		// may not yet be in state so verify with the second condition on the if.
 		// Note the second part may not be used based on next checks but do here since simple.
 		if (byMeterID) {
-			const meterArea = metersState.byMeterID[meterID].area;
+			const meterArea = meterDataByID[meterID].area;
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
 			if (!selectedAreaNormalization || (meterArea > 0 && meterDataByID[meterID].areaUnit != AreaUnitType.none)) {
 				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.

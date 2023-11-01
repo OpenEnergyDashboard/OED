@@ -7,6 +7,7 @@ import { LanguageTypes } from '../types/redux/i18n';
 import { OptionsState } from '../types/redux/options';
 import { createSlice } from '@reduxjs/toolkit'
 import type { PayloadAction } from '@reduxjs/toolkit'
+import * as moment from 'moment'
 
 const defaultState: OptionsState = {
 	selectedLanguage: LanguageTypes.en
@@ -23,6 +24,12 @@ export const optionsSlice = createSlice({
 	extraReducers: builder => {
 		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
 			state.selectedLanguage = action.payload.defaultLanguage
+			moment.locale(action.payload.defaultLanguage);
 		})
+	},
+	selectors: {
+		selectSelectedLanguage: state => state.selectedLanguage
 	}
 });
+
+export const { selectSelectedLanguage } = optionsSlice.selectors

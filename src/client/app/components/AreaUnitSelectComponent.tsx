@@ -4,15 +4,16 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Select from 'react-select';
+import { useAppSelector } from '../redux/hooks';
+import { graphSlice } from '../reducers/graph';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
-import { State } from '../types/redux/state';
+import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
-import { UnitRepresentType } from '../types/redux/units';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { graphSlice } from '../reducers/graph';
 
 /**
  * React Component that creates the area unit selector dropdown
@@ -21,8 +22,8 @@ import { graphSlice } from '../reducers/graph';
 export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();
 
-	const graphState = useSelector((state: State) => state.graph);
-	const unitState = useSelector((state: State) => state.units.units);
+	const graphState = useAppSelector(state => state.graph);
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
@@ -46,7 +47,7 @@ export default function AreaUnitSelectComponent() {
 		margin: 0
 	};
 
-	if (graphState.selectedUnit != -99 && unitState[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
+	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
 		return null;
 	}
 

@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import FooterContainer from '../../containers/FooterContainer';
-import PreferencesContainer from '../../containers/admin/PreferencesContainer';
-import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import HeaderComponent from '../../components/HeaderComponent';
+import FooterContainer from '../../containers/FooterContainer';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+// import PreferencesContainer from '../../containers/admin/PreferencesContainer';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
+import PreferencesComponentWIP from './PreferencesComponentWIP'
 
 /**
  * React component that defines the admin page
@@ -27,7 +27,7 @@ export default function AdminComponent() {
 		margin: 0,
 		paddingBottom: '5px'
 	}
-	const titleStyle: React.CSSProperties ={
+	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
 	};
 	const tooltipStyle = {
@@ -36,14 +36,13 @@ export default function AdminComponent() {
 	};
 	return (
 		<div>
-			<UnsavedWarningContainer />
 			<HeaderComponent />
 			<TooltipHelpContainer page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='admin.panel' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header'/>
+						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
 					</div>
 				</h2>
 				<div className='row'>
@@ -54,7 +53,8 @@ export default function AdminComponent() {
 								<ManageUsersLinkButtonComponent />
 							</div>
 						</div>
-						<PreferencesContainer />
+						{/* <PreferencesContainer /> */}
+						<PreferencesComponentWIP />
 					</div>
 				</div>
 			</div>

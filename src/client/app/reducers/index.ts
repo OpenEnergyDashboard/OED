@@ -3,25 +3,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { combineReducers } from 'redux';
-import { metersSlice } from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
-import { groupsSlice } from './groups';
 import maps from './maps';
 import { adminSlice } from './admin';
 import { versionSlice } from './version';
 import { currentUserSlice } from './currentUser';
 import { unsavedWarningSlice } from './unsavedWarning';
-import { unitsSlice } from './units';
 import { conversionsSlice } from './conversions';
 import { optionsSlice } from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
+// removing these in favor of api reducers
+// import { metersSlice } from './meters';
+// import { groupsSlice } from './groups';
+// import { unitsSlice } from './units';
 
 
 export const rootReducer = combineReducers({
-	meters: metersSlice.reducer,
 	readings: combineReducers({
 		line: lineReadings,
 		bar: barReadings,
@@ -29,12 +29,13 @@ export const rootReducer = combineReducers({
 	}),
 	graph: graphSlice.reducer,
 	maps,
-	groups: groupsSlice.reducer,
+	// meters: metersSlice.reducer,
+	// groups: groupsSlice.reducer,
 	admin: adminSlice.reducer,
 	version: versionSlice.reducer,
 	currentUser: currentUserSlice.reducer,
 	unsavedWarning: unsavedWarningSlice.reducer,
-	units: unitsSlice.reducer,
+	// units: unitsSlice.reducer,
 	conversions: conversionsSlice.reducer,
 	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers

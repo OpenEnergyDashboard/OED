@@ -8,12 +8,16 @@ import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { Navigate, Outlet, RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom-v5-compat';
 import { TimeInterval } from '../../../common/TimeInterval';
+import CreateUserContainer from '../containers/admin/CreateUserContainer';
+import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
+import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
+import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import { selectCurrentUser } from '../reducers/currentUser';
 import { graphSlice } from '../reducers/graph';
 import { baseApi } from '../redux/api/baseApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
-import localeData from '../translations/data';
+import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import { ChartTypes, LineGraphRate, MeterOrGroup } from '../types/redux/graph';
 import { validateComparePeriod, validateSortingOrder } from '../utils/calculateCompare';
@@ -23,15 +27,11 @@ import translate from '../utils/translate';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import SpinnerComponent from './SpinnerComponent';
-import CreateUserContainer from '../containers/admin/CreateUserContainer';
-import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
-import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
-import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponentWIP from './admin/UsersDetailComponentWIP';
-import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
-import GroupsDetailComponent from './groups/GroupsDetailComponent';
-import MetersDetailComponent from './meters/MetersDetailComponent';
+import ConversionsDetailComponentWIP from './conversion/ConversionsDetailComponentWIP';
+import GroupsDetailComponentWIP from './groups/GroupsDetailComponentWIP';
+import MetersDetailComponentWIP from './meters/MetersDetailComponentWIP';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 
 
@@ -49,43 +49,56 @@ const useWaitForInit = () => {
 			await Promise.all(dispatch(baseApi.util.getRunningQueriesThunk()))
 			setInitComplete(true)
 			// TODO Fix crashing in components on startup if data has yet to be returned, for now readyToNav works.
-			// This Could be avoided if these components were written to handle such cases upon startup
+			// This Could be avoided if these components were written to handle such cases upon startup| undefined data
 		}
 
 		waitForInit();
-	}, []);
+	}, [dispatch]);
 	return { isAdmin, currentUser, initComplete }
 }
 
 export const AdminOutlet = () => {
-	const { isAdmin, initComplete } = useWaitForInit();
+	const { isAdmin
+		// , initComplete
+	} = useWaitForInit();
 
-	if (!initComplete) {
-		// Return a spinner until all init queries return and populate cache with data
-		return <SpinnerComponent loading width={50} height={50} />
-	}
+	// if (!initComplete) {
+	// 	// Return a spinner until all init queries return and populate cache with data
+	// 	return <SpinnerComponent loading width={50} height={50} />
+	// }
 
+	// Keeping for now in case changes are desired
 	if (isAdmin) {
 		return <Outlet />
 	}
 
+	return <Outlet />
+	// For now this functionality is disabled.
+	// If no longer desired can remove this and close PR
 	// No other cases means user doesn't have the permissions.
-	return <Navigate to='/' replace />
+	// return <Navigate to='/' replace />
 
 }
 
 // Function that returns a JSX element. Either the requested route's Component, as outlet or back to root
 export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
-	const { currentUser, initComplete } = useWaitForInit();
-	// If state contains token it has been validated on startup or login.
-	if (!initComplete) {
-		return <SpinnerComponent loading width={50} height={50} />
-	}
+	const { currentUser
+		// , initComplete
+	} = useWaitForInit();
+	// // If state contains token it has been validated on startup or login.
+	// if (!initComplete) {
+	// 	return <SpinnerComponent loading width={50} height={50} />
+	// }
 
+
+	// Keeping for now in case changes are desired
 	if (currentUser.profile?.role === UserRole) {
 		return <Outlet />
 	}
-	return <Navigate to='/' replace />
+	// If no longer desired can remove this and close PR
+	// For now this functionality is disabled.
+	// return <Navigate to='/' replace />
+	return <Outlet />
 }
 
 export const NotFound = () => {
@@ -198,7 +211,7 @@ export const GraphLink = () => {
 /// Router
 const router = createBrowserRouter([
 	{ path: '/', element: <HomeComponent /> },
-	{ path: 'login', element: <LoginComponent /> },
+	{ path: '/login', element: <LoginComponent /> },
 	{
 		path: '/',
 		element: <AdminOutlet />,
@@ -208,9 +221,9 @@ const router = createBrowserRouter([
 			{ path: 'maps', element: <MapsDetailContainer /> },
 			{ path: 'users/new', element: <CreateUserContainer /> },
 			{ path: 'units', element: <UnitsDetailComponent /> },
-			{ path: 'conversions', element: <ConversionsDetailComponent /> },
-			{ path: 'groups', element: <GroupsDetailComponent /> },
-			{ path: 'meters', element: <MetersDetailComponent /> },
+			{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
+			{ path: 'groups', element: <GroupsDetailComponentWIP /> },
+			{ path: 'meters', element: <MetersDetailComponentWIP /> },
 			{ path: 'users', element: <UsersDetailComponentWIP /> }
 		]
 	},
@@ -231,7 +244,7 @@ const router = createBrowserRouter([
  */
 export default function RouteComponentWIP() {
 	const lang = useAppSelector(state => state.options.selectedLanguage)
-	const messages = (localeData as any)[lang];
+	const messages = (LocaleTranslationData as any)[lang];
 	return (
 		<IntlProvider locale={lang} messages={messages} key={lang}>
 			<RouterProvider router={router} />

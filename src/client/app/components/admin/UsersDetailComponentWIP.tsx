@@ -28,17 +28,19 @@ export default function UserDetailComponentWIP() {
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
+
 	React.useEffect(() => { setLocalUsersChanges(users) }, [users])
-	React.useEffect(
-		() => {
-			if (!_.isEqual(users, localUsersChanges)) {
-				setHasChanges(true)
-			} else {
-				setHasChanges(false)
-			}
-		},
-		[localUsersChanges]
-	)
+	React.useEffect(() => { !_.isEqual(users, localUsersChanges) ? setHasChanges(true) : setHasChanges(false) }, [localUsersChanges, users])
+	const submitChanges = async () => {
+		submitUserEdits(localUsersChanges)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.edit.users'));
+			})
+			.catch(() => {
+				showErrorNotification(translate('users.failed.to.edit.users'))
+			})
+	}
 
 	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
 		// copy user, and update role
@@ -47,17 +49,6 @@ export default function UserDetailComponentWIP() {
 		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user)
 		setLocalUsersChanges(updatedList)
 		// editUser(user.email, target.value as UserRole);
-	}
-	const submitChanges = async () => {
-		submitUserEdits(localUsersChanges)
-			.unwrap()
-			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.users'));
-			})
-			.catch(e => {
-				console.log(e)
-				showErrorNotification(translate('users.failed.to.edit.users'))
-			})
 	}
 
 	const deleteUser = (email: string) => {
@@ -72,6 +63,8 @@ export default function UserDetailComponentWIP() {
 				hasUnsavedChanges={hasChanges}
 				changes={localUsersChanges}
 				submitChanges={submitUserEdits}
+				successMessage='users.successfully.edit.users'
+				failureMessage='failed.to.submit.changes'
 			/>
 			<TooltipHelpContainer page='users' />
 			<div className='container-fluid'>

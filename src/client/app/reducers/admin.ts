@@ -131,5 +131,30 @@ export const adminSlice = createSlice({
 			state.defaultMeterDisableChecks = action.payload;
 			state.submitted = false;
 		}
+	},
+	selectors: {
+		selectAdminState: state => state
 	}
 });
+
+export const {
+	updateDisplayTitle,
+	updateDefaultChartToRender,
+	updateDefaultLanguage,
+	updateDefaultTimeZone,
+	updateDefaultWarningFileSize,
+	updateDefaultFileSizeLimit,
+	updateDefaultAreaUnit,
+	updateDefaultMeterReadingFrequency,
+	updateDefaultMeterMinimumValue,
+	updateDefaultMeterMaximumValue,
+	updateDefaultMeterMinimumDate,
+	updateDefaultMeterMaximumDate,
+	updateDefaultMeterReadingGap,
+	updateDefaultMeterMaximumErrors,
+	updateDefaultMeterDisableChecks
+} = adminSlice.actions
+
+export const {
+	selectAdminState
+} = adminSlice.selectors

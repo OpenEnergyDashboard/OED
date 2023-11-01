@@ -14,7 +14,7 @@ import { State } from '../../types/redux/state';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
-import { selectUnitDataById } from '../../reducers/units';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 /**
  * Defines the units page card view
@@ -25,7 +25,7 @@ export default function UnitsDetailComponent() {
 	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
 
 	//Units state
-	const unitDataById = useAppSelector(state => selectUnitDataById(state));
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
 
 
 	const titleStyle: React.CSSProperties = {

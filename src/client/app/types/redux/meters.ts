@@ -113,7 +113,6 @@ export interface MeterDataByID {
 export interface MetersState {
 	hasBeenFetchedOnce: boolean;
 	isFetching: boolean;
-	selectedMeters: number[];
 	submitting: number[];
 	byMeterID: MeterDataByID;
 }

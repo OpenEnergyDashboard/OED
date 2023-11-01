@@ -1,12 +1,12 @@
 import { createSelector } from '@reduxjs/toolkit';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 import {
 	selectGraphUnitID,
 	selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID,
 	selectThreeDReadingInterval
 } from '../../reducers/graph';
-import { selectGroupState } from '../../reducers/groups';
-import { selectMeterState } from '../../reducers/meters';
+import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
@@ -15,20 +15,23 @@ import { ThreeDReadingApiArgs } from './dataSelectors';
 
 // Memoized Selectors
 export const selectThreeDComponentInfo = createSelector(
-	[selectThreeDMeterOrGroupID, selectThreeDMeterOrGroup, selectMeterState, selectGroupState],
-	(id, meterOrGroup, meterData, groupData) => {
+	selectThreeDMeterOrGroupID,
+	selectThreeDMeterOrGroup,
+	selectMeterDataById,
+	selectGroupDataById,
+	(id, meterOrGroup, { data: meterDataById = {} }, { data: groupDataById = {} }) => {
 		//Default Values
 		let meterOrGroupName = 'Unselected Meter or Group'
 		let isAreaCompatible = true;
 
 		if (id) {
 			// Get Meter or Group's info
-			if (meterOrGroup === MeterOrGroup.meters && meterData) {
-				const meterInfo = meterData.byMeterID[id]
+			if (meterOrGroup === MeterOrGroup.meters && meterDataById) {
+				const meterInfo = meterDataById[id]
 				meterOrGroupName = meterInfo.identifier;
 				isAreaCompatible = meterInfo.area !== 0 && meterInfo.areaUnit !== AreaUnitType.none;
-			} else if (meterOrGroup === MeterOrGroup.groups && groupData) {
-				const groupInfo = groupData.byGroupID[id];
+			} else if (meterOrGroup === MeterOrGroup.groups && groupDataById) {
+				const groupInfo = groupDataById[id];
 				meterOrGroupName = groupInfo.name;
 				isAreaCompatible = groupInfo.area !== 0 && groupInfo.areaUnit !== AreaUnitType.none;
 			}

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Route, Router, Switch, Redirect } from 'react-router-dom';
 import { IntlProvider } from 'react-intl';
-import localeData from '../translations/data';
+import LocaleTranslationData from '../translations/data';
 import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -283,7 +283,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 	 */
 	public render() {
 		const lang = this.props.selectedLanguage;
-		const messages = (localeData as any)[lang];
+		const messages = (LocaleTranslationData as any)[lang];
 		return (
 			<div>
 				<InitializationComponent />

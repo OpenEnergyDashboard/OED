@@ -5,16 +5,19 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
 import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import { State } from 'types/redux/state';
+import { GroupData } from 'types/redux/groups';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { useAppSelector } from '../../redux/hooks';
+import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { ConversionArray } from '../../types/conversionArray';
 import { SelectOption, TrueFalseType } from '../../types/items';
 import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -25,37 +28,33 @@ import {
 	unitsCompatibleWithMeters
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 import { getGPSString, notifyUser } from '../../utils/input';
 import translate from '../../utils/translate';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
-interface CreateGroupModalComponentProps {
-	possibleGraphicUnits: Set<UnitData>;
-}
-
 /**
  * Defines the create group modal form
- * @param props pass in graphic units
  * @returns Group create element
  */
-export default function CreateGroupModalComponent(props: CreateGroupModalComponentProps) {
+export default function CreateGroupModalComponentWIP() {
+	const [createGroup] = groupsApi.useCreateGroupMutation()
 
-	// Meter state
-	const metersState = useSelector((state: State) => state.meters.byMeterID);
-	// Group state
-	const groupsState = useSelector((state: State) => state.groups.byGroupID);
-	// Unit state
-	const unitsState = useSelector((state: State) => state.units.units);
+	// Meters state
+	const { data: metersDataById = {} } = useAppSelector(selectMeterDataById);
+	// Groups state
+	const { data: groupsDataById = {} } = useAppSelector(selectGroupDataById);
+	// Units state
+	const { data: unitsDataById = {} } = useAppSelector(selectUnitDataById);
 
 	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
 
 	// Since creating group the initial values are effectively nothing or the desired defaults.
-	const defaultValues = {
+	const defaultValues: GroupData = {
+		// ID not needed, assigned by DB, add here for TS
+		id: -1,
 		name: '',
 		childMeters: [] as number[],
 		childGroups: [] as number[],
@@ -80,8 +79,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 
 	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
-		possibleGraphicUnits: props.possibleGraphicUnits,
-		compatibleGraphicUnits: props.possibleGraphicUnits,
+		possibleGraphicUnits: possibleGraphicUnits,
+		compatibleGraphicUnits: possibleGraphicUnits,
 		incompatibleGraphicUnits: new Set<UnitData>()
 	}
 
@@ -135,7 +134,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				let areaSum = 0;
 				let notifyMsg = '';
 				state.deepMeters.forEach(meterID => {
-					const meter = metersState[meterID];
+					const meter = metersDataById[meterID];
 					if (meter.area > 0) {
 						if (meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, state.areaUnit);
@@ -219,7 +218,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
 			console.log('removeMe', submitState)
-			// dispatch(submitNewGroup(submitState));
+
+			createGroup(submitState)
 			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
@@ -230,61 +230,57 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	// Determine allowed child meters/groups for menu.
 	useEffect(() => {
 		// Can only vary if admin and only used then.
-		if (loggedInAsAdmin) {
-			// This is the current deep meters of this group including any changes.
-			// The id is not really needed so set to -1 since same function for edit.
-			const groupDeepMeter = metersInChangedGroup({ ...state, id: -1 });
-			// Get meters that okay for this group in a format the component can display.
-			const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
-			// Get groups okay for this group. Similar to meters.
-			// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
-			// in this case so set to -1 so it never matches in this function.
-			const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
-			// Update the state
-			setGroupChildrenState({
-				...groupChildrenState,
-				meterSelectOptions: possibleMeters,
-				groupSelectOptions: possibleGroups
-			});
-		}
+		// This is the current deep meters of this group including any changes.
+		// The id is not really needed so set to -1 since same function for edit.
+		const groupDeepMeter = metersInChangedGroup(state);
+		// Get meters that okay for this group in a format the component can display.
+		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
+		// Get groups okay for this group. Similar to meters.
+		// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
+		// in this case so set to -1 so it never matches in this function.
+		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
+		// Update the state
+		setGroupChildrenState(groupChildrenState => ({
+			...groupChildrenState,
+			meterSelectOptions: possibleMeters,
+			groupSelectOptions: possibleGroups
+		}));
 		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// groupState can change if another group is created/edited and this can change ones displayed in menus.
-	}, [metersState, groupsState, state.defaultGraphicUnit, state.deepMeters]);
+	}, [state]);
 
 	// Update compatible default graphic units set.
 	useEffect(() => {
-		if (loggedInAsAdmin) {
-			// Graphic units compatible with currently selected meters/groups.
-			const compatibleGraphicUnits = new Set<UnitData>();
-			// Graphic units incompatible with currently selected meters/groups.
-			const incompatibleGraphicUnits = new Set<UnitData>();
-			// First must get a set from the array of deep meter numbers which is all meters currently in this group.
-			const deepMetersSet = new Set(state.deepMeters);
-			// Get the units that are compatible with this set of meters.
-			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
-			// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
-			allowedDefaultGraphicUnit.add(-99);
-			graphicUnitsState.possibleGraphicUnits.forEach(unit => {
-				// If current graphic unit exists in the set of allowed graphic units then compatible and not otherwise.
-				if (allowedDefaultGraphicUnit.has(unit.id)) {
-					compatibleGraphicUnits.add(unit);
-				}
-				else {
-					incompatibleGraphicUnits.add(unit);
-				}
-			});
-			// Update the state
-			setGraphicUnitsState({
-				...graphicUnitsState,
-				compatibleGraphicUnits: compatibleGraphicUnits,
-				incompatibleGraphicUnits: incompatibleGraphicUnits
-			});
-		}
+		// Graphic units compatible with currently selected meters/groups.
+		const compatibleGraphicUnits = new Set<UnitData>();
+		// Graphic units incompatible with currently selected meters/groups.
+		const incompatibleGraphicUnits = new Set<UnitData>();
+		// First must get a set from the array of deep meter numbers which is all meters currently in this group.
+		const deepMetersSet = new Set(state.deepMeters);
+		// Get the units that are compatible with this set of meters.
+		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
+		// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
+		allowedDefaultGraphicUnit.add(-99);
+		graphicUnitsState.possibleGraphicUnits.forEach(unit => {
+			// If current graphic unit exists in the set of allowed graphic units then compatible and not otherwise.
+			if (allowedDefaultGraphicUnit.has(unit.id)) {
+				compatibleGraphicUnits.add(unit);
+			}
+			else {
+				incompatibleGraphicUnits.add(unit);
+			}
+		});
+		// Update the state
+		setGraphicUnitsState(graphicUnitsState => ({
+			...graphicUnitsState,
+			compatibleGraphicUnits: compatibleGraphicUnits,
+			incompatibleGraphicUnits: incompatibleGraphicUnits
+		}));
 		// If any of these change then it needs to be updated.
 		// metersState normally does not change but can so include.
 		// pik is needed since the compatible units is not correct until pik is available.
-	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
+	}, [graphicUnitsState.possibleGraphicUnits, state.deepMeters]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -446,7 +442,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 									let dgu = state.defaultGraphicUnit;
 									if (!newAllowedDGU.has(dgu)) {
 										// The current default graphic unit is not compatible so set to no unit and warn admin.
-										notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+										notifyUser(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
 										dgu = -99;
 									}
 									// Update the deep meter, child meter & default graphic unit state based on the changes.
@@ -482,7 +478,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 								let dgu = state.defaultGraphicUnit;
 								if (!newAllowedDGU.has(dgu)) {
 									// The current default graphic unit is not compatible so set to no unit and warn admin.
-									notifyUser(`${translate('group.create.nounit')} "${unitsState[dgu].identifier}"`);
+									notifyUser(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
 									dgu = -99;
 								}
 								// Update the deep meter, child meter & default graphic unit state based on the changes.
@@ -524,7 +520,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		state.childMeters.forEach(groupId => {
 			selectedMetersUnsorted.push({
 				value: groupId,
-				label: metersState[groupId].identifier
+				label: metersDataById[groupId].identifier
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -543,7 +539,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		state.childGroups.forEach(groupId => {
 			selectedGroupsUnsorted.push({
 				value: groupId,
-				label: groupsState[groupId].name
+				label: groupsDataById[groupId].name
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -560,7 +556,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		// Create list of meter identifiers.
 		const listedDeepMeters: string[] = [];
 		state.deepMeters.forEach(meterId => {
-			listedDeepMeters.push(metersState[meterId].identifier);
+			listedDeepMeters.push(metersDataById[meterId].identifier);
 		});
 		// Sort for display.
 		return listedDeepMeters.sort();

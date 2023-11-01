@@ -1,9 +1,9 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
 import { selectGraphState } from '../../reducers/graph';
-import { selectGroupDataByID } from '../../reducers/groups';
-import { selectMeterDataByID } from '../../reducers/meters';
-import { readingsApi } from '../../redux/api/readingsApi';
+import { selectGroupDataById } from '../api/groupsApi';
+import { selectMeterDataById } from '../api/metersApi';
+import { readingsApi } from '../api/readingsApi';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
@@ -115,10 +115,10 @@ export const selectChartQueryArgs = createSelector(
 )
 
 export const selectVisibleMetersGroupsDataByID = createSelector(
-	selectMeterDataByID,
-	selectGroupDataByID,
+	selectMeterDataById,
+	selectGroupDataById,
 	selectIsLoggedInAsAdmin,
-	(meterDataByID, groupDataByID, isAdmin) => {
+	({ data: meterDataByID = {} }, { data: groupDataByID = {} }, isAdmin) => {
 		let visibleMeters;
 		let visibleGroups;
 		if (isAdmin) {

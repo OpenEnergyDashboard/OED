@@ -11,14 +11,12 @@ import { Dispatch } from 'types/redux/actions';
 import { fetchMapsDetails } from '../actions/map';
 import { authApi } from '../redux/api/authApi';
 import { conversionsApi } from '../redux/api/conversionsApi';
-import { groupsApi } from '../redux/api/groupsApi';
 import { metersApi } from '../redux/api/metersApi';
 import { preferencesApi } from '../redux/api/preferencesApi';
 import { unitsApi } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/hooks';
-import { selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
 import { ConversionArray } from '../types/conversionArray';
 import { getToken, hasToken } from '../utils/token';
+import { groupsApi } from '../redux/api/groupsApi';
 
 /**
  * Initializes the app by fetching and subscribing to the store with various queries
@@ -26,7 +24,6 @@ import { getToken, hasToken } from '../utils/token';
  */
 export default function InitializationComponent() {
 	const dispatch: Dispatch = useDispatch();
-	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
 
 	// With RTKQuery, Mutations are used for POST, PUT, PATCH, etc.
 	// The useMutation() hooks returns a tuple containing triggerFunction that can be called to initiate the request
@@ -43,12 +40,12 @@ export default function InitializationComponent() {
 	metersApi.useGetMetersQuery();
 
 	// Use Query hooks return an object with various derived values related to the query's status which can be destructured as flows
-	const { data: groupData, isFetching: groupDataIsFetching } = groupsApi.useGetGroupsQuery();
+	groupsApi.useGetGroupsQuery();
 
 	// Queries can be conditionally fetched based if optional parameter skip is true;
 	// Skip this query if user is not admin
 	// When user is an admin, ensure that the initial Group data exists and is not currently fetching
-	groupsApi.useGetAllGroupsChildrenQuery(undefined, { skip: (!isAdmin || !groupData || groupDataIsFetching) });
+	// groupsApi.useGetAllGroupsChildrenQuery(undefined, { skip: (!isAdmin || !groupData || groupDataIsFetching) });
 
 
 
@@ -73,7 +70,7 @@ export default function InitializationComponent() {
 		// dispatch(fetchPreferencesIfNeeded());
 		// dispatch(fetchUnitsDetailsIfNeeded());
 		// dispatch(fetchConversionsDetailsIfNeeded());
-	}, []);
+	}, [dispatch, verifyTokenTrigger]);
 
 	return (
 		<div>

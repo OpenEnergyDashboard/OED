@@ -18,8 +18,9 @@ import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
-import { selectUnitDataById } from '../../reducers/units';
+
 import { selectCurrentUser } from '../../reducers/currentUser';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 /**
  * Defines the meters page card view
@@ -37,7 +38,7 @@ export default function MetersDetailComponent() {
 	const { visibleMeters } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const unitDataById = useAppSelector(state => selectUnitDataById(state));
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
 
 	// TODO? Convert into Selector?
 	// Possible Meter Units to use

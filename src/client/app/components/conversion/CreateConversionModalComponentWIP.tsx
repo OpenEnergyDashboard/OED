@@ -1,0 +1,335 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import * as _ from 'lodash';
+import * as React from 'react';
+import { useState } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { selectIsValidConversion } from '../../redux/selectors/adminSelectors';
+import { UnitData } from '../../types/redux/units';
+import { addConversion } from '../../actions/conversions';
+import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import '../../styles/modal.css';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { TrueFalseType } from '../../types/items';
+import translate from '../../utils/translate';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+
+/**
+ * Defines the create conversion modal form
+ * @returns Conversion create element
+ */
+export default function CreateConversionModalComponent() {
+
+	const dispatch = useAppDispatch();
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById)
+	// Want units in sorted order by identifier regardless of case.
+	const unitsSorted = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
+
+	const defaultValues = {
+		// Invalid source/destination ids arbitrarily set to -999.
+		// Meter Units are not allowed to be a destination.
+		sourceId: -999,
+		sourceOptions: unitsSorted as UnitData[],
+		destinationId: -999,
+		destinationOptions: unitsSorted.filter(unit => unit.typeOfUnit !== 'meter') as UnitData[],
+		bidirectional: true,
+		slope: 0,
+		intercept: 0,
+		note: ''
+	}
+
+	/* State */
+	// Modal show
+	const [showModal, setShowModal] = useState(false);
+	const handleClose = () => {
+		setShowModal(false);
+		resetState();
+	};
+	const handleShow = () => setShowModal(true);
+
+	// Handlers for each type of input change
+	const [conversionState, setConversionState] = useState(defaultValues);
+
+	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setConversionState({ ...conversionState, [e.target.name]: e.target.value });
+	}
+
+	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setConversionState({ ...conversionState, [e.target.name]: JSON.parse(e.target.value) });
+	}
+
+	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// once a source or destination is selected, it will be removed from the other options.
+		if (e.target.name === 'sourceId') {
+			setConversionState(state => ({
+				...state,
+				sourceId: Number(e.target.value),
+				destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== Number(e.target.value))
+			}));
+		} else if (e.target.name === 'destinationId') {
+			setConversionState(state => ({
+				...state,
+				destinationId: Number(e.target.value),
+				sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== Number(e.target.value))
+			}));
+		} else {
+			setConversionState(state => ({ ...state, [e.target.name]: Number(e.target.value) }));
+		}
+	}
+
+	// If the currently selected conversion is valid
+	const validConversion = useAppSelector(
+		state => selectIsValidConversion(
+			state,
+			conversionState.sourceId,
+			conversionState.destinationId,
+			conversionState.bidirectional)
+	)
+	/* End State */
+
+
+	// //Update the valid conversion state any time the source id, destination id, or bidirectional status changes
+	// useEffect(() => {
+	// 	/**
+	// 	 * Checks if conversion is valid
+	// 	 * @param sourceId New conversion sourceId
+	// 	 * @param destinationId New conversion destinationId
+	// 	 * @param bidirectional New conversion bidirectional status
+	// 	 * @returns boolean representing if new conversion is valid or not
+	// 	 */
+	// 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
+	// 		/* Create Conversion Validation:
+	// 			Source equals destination: invalid conversion
+	// 			Conversion exists: invalid conversion
+	// 			Conversion does not exist:
+	// 				Inverse exists:
+	// 					Conversion is bidirectional: invalid conversion
+	// 			Destination cannot be a meter
+	// 			Cannot mix unit represent
+	// 			TODO Some of these can go away when we make the menus dynamic.
+	// 		*/
+
+	// 		// The destination cannot be a meter unit.
+	// 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
+	// 			notifyUser(translate('conversion.create.destination.meter'));
+	// 			return false;
+	// 		}
+
+	// 		// Source or destination not set
+	// 		if (sourceId === -999 || destinationId === -999) {
+	// 			return false
+	// 		}
+
+	// 		// Conversion already exists
+	// 		if ((conversionState.findIndex(conversionData => ((
+	// 			conversionData.sourceId === state.sourceId) &&
+	// 			conversionData.destinationId === state.destinationId))) !== -1) {
+	// 			notifyUser(translate('conversion.create.exists'));
+	// 			return false;
+	// 		}
+
+	// 		// You cannot have a conversion between units that differ in unit_represent.
+	// 		// This means you cannot mix quantity, flow & raw.
+	// 		if (unitDataById[sourceId].unitRepresent !== unitDataById[destinationId].unitRepresent) {
+	// 			notifyUser(translate('conversion.create.mixed.represent'));
+	// 			return false;
+	// 		}
+
+
+	// 		let isValid = true;
+	// 		// Loop over conversions and check for existence of inverse of conversion passed in
+	// 		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
+	// 		// If there is a non bidirectional inverse, then it is a valid conversion
+	// 		Object.values(conversionState).forEach(conversion => {
+	// 			// Inverse exists
+	// 			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)) {
+	// 				// Inverse is bidirectional
+	// 				if (conversion.bidirectional) {
+	// 					isValid = false;
+	// 				}
+	// 				// Inverse is not bidirectional
+	// 				else {
+	// 					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
+	// 					if (bidirectional) {
+	// 						// The new conversion is bidirectional
+	// 						isValid = false;
+	// 					}
+	// 				}
+	// 			}
+	// 		});
+	// 		if (!isValid) {
+	// 			notifyUser(translate('conversion.create.exists.inverse'));
+	// 		}
+	// 		return isValid;
+	// 	}
+
+
+	// 	setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional));
+	// }, [state.sourceId, state.destinationId, state.bidirectional, unitDataById, conversionState]);
+
+	// Reset the state to default values
+	const resetState = () => {
+		setConversionState(defaultValues);
+	}
+
+	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
+	// that create starts from an empty template.
+
+	// Submit
+	const handleSubmit = () => {
+		// Close modal first to avoid repeat clicks
+		setShowModal(false);
+		// Add the new conversion and update the store
+		dispatch(addConversion(conversionState));
+		resetState();
+	};
+
+	const tooltipStyle = {
+		...tooltipBaseStyle,
+		tooltipCreateConversionView: 'help.admin.conversioncreate'
+	};
+
+	return (
+		<>
+			{/* Show modal button */}
+			<Button color='secondary' onClick={handleShow}>
+				<FormattedMessage id="create.conversion" />
+			</Button>
+
+			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
+				<ModalHeader>
+					<FormattedMessage id="create.conversion" />
+					<TooltipHelpContainer page='conversions-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
+					</div>
+				</ModalHeader>
+				{/* when any of the conversion are changed call one of the functions. */}
+				<ModalBody>
+					<Container>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Source unit input*/}
+								<FormGroup>
+									<Label for='sourceId'>{translate('conversion.source')}</Label>
+									<Input
+										id='sourceId'
+										name='sourceId'
+										type='select'
+										value={conversionState.sourceId}
+										onChange={e => handleNumberChange(e)}
+										invalid={conversionState.sourceId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={conversionState.sourceId !== -999}
+											disabled>
+											{translate('conversion.select.source') + '...'}
+										</option>}
+										{Object.values(conversionState.sourceOptions).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Destination unit input*/}
+								<FormGroup>
+									<Label for='destinationId'>{translate('conversion.destination')}</Label>
+									<Input
+										id='destinationId'
+										name='destinationId'
+										type='select'
+										value={conversionState.destinationId}
+										onChange={e => handleNumberChange(e)}
+										invalid={conversionState.destinationId === -999}>
+										{<option
+											value={-999}
+											key={-999}
+											hidden={conversionState.destinationId !== -999}
+											disabled>
+											{translate('conversion.select.destination') + '...'}
+										</option>}
+										{Object.values(conversionState.destinationOptions).map(unitData => {
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Bidirectional Y/N input*/}
+						<FormGroup>
+							<Label for='bidirectional'>{translate('conversion.bidirectional')}</Label>
+							<Input
+								id='bidirectional'
+								name='bidirectional'
+								type='select'
+								onChange={e => handleBooleanChange(e)}>
+								{Object.keys(TrueFalseType).map(key => {
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+								})}
+							</Input>
+						</FormGroup>
+						<Row xs='1' lg='2'>
+							<Col>
+								{/* Slope input*/}
+								<FormGroup>
+									<Label for='slope'>{translate('conversion.slope')}</Label>
+									<Input
+										id='slope'
+										name='slope'
+										type='number'
+										value={conversionState.slope}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+							<Col>
+								{/* Intercept input*/}
+								<FormGroup>
+									<Label for='intercept'>{translate('conversion.intercept')}</Label>
+									<Input
+										id='intercept'
+										name='intercept'
+										type='number'
+										value={conversionState.intercept}
+										onChange={e => handleNumberChange(e)} />
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Note input*/}
+						<FormGroup>
+							<Label for='note'>{translate('note')}</Label>
+							<Input
+								id='note'
+								name='note'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={conversionState.note} />
+						</FormGroup>
+					</Container>
+				</ModalBody>
+				<ModalFooter>
+					{/* Hides the modal */}
+					<Button color='secondary' onClick={handleClose}>
+						<FormattedMessage id="discard.changes" />
+					</Button>
+					{/* On click calls the function handleSaveChanges in this component */}
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion}>
+						<FormattedMessage id="save.all" />
+					</Button>
+				</ModalFooter>
+			</Modal>
+		</>
+	);
+}

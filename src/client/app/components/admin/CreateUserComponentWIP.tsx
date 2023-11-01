@@ -32,7 +32,8 @@ export default function CreateUserComponentWIP() {
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.create.user'))
 
-			}).catch(() => {
+			})
+			.catch(() => {
 				showErrorNotification(translate('users.failed.to.create.user'));
 			})
 

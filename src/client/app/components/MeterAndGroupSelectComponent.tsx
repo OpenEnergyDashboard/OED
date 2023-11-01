@@ -23,7 +23,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
-	const meterAndGroupSelectOptions = useAppSelector(state => selectMeterGroupSelectData(state));
+	const meterAndGroupSelectOptions = useAppSelector(selectMeterGroupSelectData);
 	const { somethingIsFetching } = getFetchingStates();
 	const { meterOrGroup } = props;
 

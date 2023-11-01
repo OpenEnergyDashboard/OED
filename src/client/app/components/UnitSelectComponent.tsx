@@ -14,6 +14,7 @@ import { graphSlice } from '../reducers/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { getFetchingStates } from '../redux/componentHooks';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 
 
 /**
@@ -23,7 +24,8 @@ export default function UnitSelectComponent() {
 	const dispatch = useAppDispatch();
 	const unitSelectOptions = useAppSelector(state => selectUnitSelectData(state));
 	const selectedUnitID = useAppSelector(state => state.graph.selectedUnit);
-	const unitsByID = useAppSelector(state => state.units.units);
+	const { data: unitsByID = {} } = useAppSelector(selectUnitDataById);
+
 	const { endpointsFetchingData } = getFetchingStates();
 
 	let selectedUnitOption: SelectOption | null = null;

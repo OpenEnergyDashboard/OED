@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { TranslatedString } from './translate';
 import { ToastPosition, toast } from 'react-toastify';
 
 /**
@@ -11,7 +10,7 @@ import { ToastPosition, toast } from 'react-toastify';
  * @param position screen position for notification where top, right is the default
  * @param autoDismiss milliseconds until notification goes away with default of 3 seconds
  */
-export function showSuccessNotification(message: TranslatedString, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 3000) {
+export function showSuccessNotification(message: string, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 3000) {
 	toast.success(message, {
 		position: position,
 		autoClose: autoDismiss,
@@ -28,7 +27,7 @@ export function showSuccessNotification(message: TranslatedString, position: Toa
  * @param position screen position for notification where top, right is the default
  * @param autoDismiss milliseconds until notification goes away with default of 15 seconds
  */
-export function showErrorNotification(message: TranslatedString, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 15000) {
+export function showErrorNotification(message: string, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 15000) {
 	toast.error(message, {
 		position: position,
 		autoClose: autoDismiss,

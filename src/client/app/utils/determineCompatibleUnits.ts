@@ -2,16 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {store} from '../store';
 import * as _ from 'lodash';
-import { MeterData } from '../types/redux/meters';
-import { ConversionArray } from '../types/conversionArray';
-import { UnitData, UnitType } from '../types/redux/units';
-import { GroupDefinition, GroupEditData } from '../types/redux/groups';
-import { DataType } from '../types/Datasources';
-import { State } from '../types/redux/state';
-import { SelectOption } from '../types/items';
 import React from 'react';
+import { selectPIK } from '../redux/api/conversionsApi';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
+import { store } from '../store';
+import { DataType } from '../types/Datasources';
+import { SelectOption } from '../types/items';
+import { GroupData } from '../types/redux/groups';
+import { UnitData, UnitType } from '../types/redux/units';
+
 
 /**
  * The intersect operation of two sets.
@@ -29,7 +31,8 @@ export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> 
  * @returns Set of compatible unit ids.
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
-	const state = store.getState();
+	const { data: meterDataByID = {} } = selectMeterDataById(store.getState())
+
 	// The first meter processed is different since intersection with empty set is empty.
 	let first = true;
 	// Holds current set of compatible units.
@@ -37,7 +40,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	// Loops over all meters.
 	meters.forEach(function (meterId: number) {
 		// Gets the meter associated with the meterId.
-		const meter = _.get(state.meters.byMeterID, meterId) as MeterData;
+		const meter = _.get(meterDataByID, meterId);
 		let meterUnits = new Set<number>();
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
@@ -71,9 +74,8 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
 	// Do same if pik is not yet available.
-	if (unitId != -99 && ConversionArray.pikAvailable()) {
-		// The Pik array.
-		const pik = ConversionArray.pik;
+	const { data: pik } = selectPIK(store.getState())
+	if (unitId != -99 && pik) {
 		// Get the row index in Pik of this unit.
 		const row = pRowFromUnit(unitId);
 		// The compatible units are all columns with true for Pik where i = row.
@@ -95,8 +97,9 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
  * @returns The row index in Pik for given meter unit.
  */
 export function pRowFromUnit(unitId: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
+	const { data: unitDataById = {} } = selectUnitDataById(store.getState())
+
+	const unit = _.find(unitDataById, function (o: UnitData) {
 		// Since this is the row index, type of unit must be meter.
 		return o.id == unitId && o.typeOfUnit == UnitType.meter;
 	}) as UnitData;
@@ -109,8 +112,9 @@ export function pRowFromUnit(unitId: number): number {
  * @returns The unit id given the row in Pik units.
  */
 export function unitFromPRow(row: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
+	const { data: unitDataById = {} } = selectUnitDataById(store.getState())
+
+	const unit = _.find(unitDataById, function (o: UnitData) {
 		// Since the given unitIndex is a row index, the unit type must be meter.
 		return o.unitIndex == row && o.typeOfUnit == UnitType.meter;
 	}) as UnitData;
@@ -123,8 +127,9 @@ export function unitFromPRow(row: number): number {
  * @returns The unit id given the column in Pik.
  */
 export function unitFromPColumn(column: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
+	const { data: unitDataById = {} } = selectUnitDataById(store.getState())
+
+	const unit = _.find(unitDataById, function (o: UnitData) {
 		// Since the given unitIndex is a column index, the unit type must be different from meter.
 		return o.unitIndex == column && o.typeOfUnit != UnitType.meter;
 	}) as UnitData;
@@ -141,7 +146,8 @@ export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();
 	// Gets the group associated with groupId.
 	// The deep children are automatically fetched with group state so should exist.
-	const group = _.get(state.groups.byGroupID, groupId) as GroupDefinition;
+	const { data: groupDataById = {} } = selectGroupDataById(state)
+	const group = _.get(groupDataById, groupId);
 	// Create a set of the deep meters of this group and return it.
 	return new Set(group.deepMeters);
 }
@@ -152,14 +158,16 @@ export function metersInGroup(groupId: number): Set<number> {
  * @param changedGroupState The state for the changed group
  * @returns array of deep meter ids of the changed group considering possible changes
  */
-export function metersInChangedGroup(changedGroupState: GroupEditData): number[] {
+export function metersInChangedGroup(changedGroupState: GroupData): number[] {
 	const state = store.getState();
+	const { data: groupDataById = {} } = selectGroupDataById(state)
+
 	// deep meters starts with all the direct child meters of the group being changed.
 	const deepMeters = new Set(changedGroupState.childMeters);
 	// These groups cannot contain the group being changed so the redux state is okay.
 	changedGroupState.childGroups.forEach((group: number) => {
 		// The group state for the current child group.
-		const groupState = _.get(state.groups.byGroupID, group) as GroupDefinition;
+		const groupState = _.get(groupDataById, group);
 		// The group state might not be defined, e.g., a group delete happened and the state is refreshing.
 		// In this case the deepMeters returned will be off but they should quickly refresh.
 		if (groupState) {
@@ -182,19 +190,19 @@ export function metersInChangedGroup(changedGroupState: GroupEditData): number[]
  */
 export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
-	const state = store.getState() as State;
+	const state = store.getState();
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
 	// First must get a set from the array of meter numbers.
 	const deepMetersSet = new Set(deepMeters);
 	// Get the units that are compatible with this set of meters.
 	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
 	// Get all meters' state.
-	const meters = Object.values(state.meters.byMeterID) as MeterData[];
+	const { data: meters = {} } = selectMeterDataById(state)
 
 	// Options for the meter menu.
 	const options: SelectOption[] = [];
 	// For each meter, decide its compatibility for the menu
-	meters.forEach((meter: MeterData) => {
+	Object.values(meters).forEach(meter => {
 		const option = {
 			label: meter.identifier,
 			value: meter.id,
@@ -214,7 +222,8 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 	});
 
 	// We want the options sorted by meter identifier.
-	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
+	// Had to make item.label? potentially undefined due to start up race conditions
+	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc')
 }
 
 /**
@@ -225,20 +234,18 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
  * @returns The current group options for this group.
  */
 export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
-	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
-	const state = store.getState() as State;
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
 	// First must get a set from the array of meter numbers.
 	const deepMetersSet = new Set(deepMeters);
 	// Get the currentGroup's compatible units.
 	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
 	// Get all groups' state.
-	const groups = Object.values(state.groups.byGroupID) as GroupDefinition[];
+	const { data: groups = {} } = selectGroupDataById(store.getState());
 
 	// Options for the group menu.
 	const options: SelectOption[] = [];
 
-	groups.forEach((group: GroupDefinition) => {
+	Object.values(groups).forEach(group => {
 		// You cannot have yourself in the group so not an option.
 		if (group.id !== groupId) {
 			const option = {
@@ -260,7 +267,8 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 	});
 
 	// We want the options sorted by group name.
-	return _.sortBy(options, item => item.label.toLowerCase(), 'asc');
+	// Had to make item.label? potentially undefined due to start up race conditions
+	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc')
 }
 
 /**
@@ -304,8 +312,9 @@ export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: n
 function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): Set<number> {
 	if (type == DataType.Meter) {
 		const state = store.getState();
+		const { data: meterDataByID = {} } = selectMeterDataById(state)
 		// Get the unit id of meter.
-		const unitId = state.meters.byMeterID[id].unitId;
+		const unitId = meterDataByID[id].unitId;
 		// Returns all compatible units with this unit id.
 		return unitsCompatibleWithUnit(unitId);
 	} else {

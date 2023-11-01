@@ -34,7 +34,7 @@ export default function HeaderButtonsComponent() {
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
 	// Help URL location
-	let helpUrl = BASE_URL + version;
+	const helpUrl = BASE_URL + version;
 	// options help
 	const optionsHelp = helpUrl + '/optionsMenu.html';
 
@@ -84,10 +84,9 @@ export default function HeaderButtonsComponent() {
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {
-		helpUrl = BASE_URL + version;
 		setState(prevState => ({
 			...prevState,
-			pageChoicesHelp: helpUrl
+			pageChoicesHelp: BASE_URL + version
 		}));
 	}, [version]);
 
@@ -163,7 +162,7 @@ export default function HeaderButtonsComponent() {
 			pageChoicesHelp: currentPageChoicesHelp,
 			showOptionsStyle: currentShowOptionsStyle
 		}));
-	}, [currentUser, helpUrl]);
+	}, [currentPage, currentUser, helpUrl]);
 
 	// Handle actions on logout.
 	const handleLogOut = () => {
@@ -266,7 +265,7 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem
 								style={state.loginLinkStyle}
 								tag={Link}
-								to='login'>
+								to='/login'>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem

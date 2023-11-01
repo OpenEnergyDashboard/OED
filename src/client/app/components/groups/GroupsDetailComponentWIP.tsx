@@ -7,22 +7,18 @@ import { FormattedMessage } from 'react-intl';
 import HeaderComponent from '../../components/HeaderComponent';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
 import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
-import { potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateGroupModalComponent from './CreateGroupModalComponent';
-import GroupViewComponent from './GroupViewComponent';
-import { GroupData } from 'types/redux/groups';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
+import CreateGroupModalComponentWIP from './CreateGroupModalComponentWIP';
+import GroupViewComponentWIP from './GroupViewComponentWIP';
 
 /**
  * Defines the groups page card view
  * @returns Groups page element
  */
-export default function GroupsDetailComponent() {
+export default function GroupsDetailComponentWIP() {
 
 	// Check for admin status
 	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
@@ -30,12 +26,7 @@ export default function GroupsDetailComponent() {
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
-	// Units state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
 
-
-	// Possible graphic units to use
-	const possibleGraphicUnits = potentialGraphicUnits(unitDataById);
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -64,8 +55,7 @@ export default function GroupsDetailComponent() {
 					{isAdmin &&
 						<div className="edit-btn">
 							{/* The actual button for create is inside this component. */}
-							< CreateGroupModalComponent
-								possibleGraphicUnits={possibleGraphicUnits}
+							< CreateGroupModalComponentWIP
 							/>
 						</div>
 					}
@@ -73,13 +63,12 @@ export default function GroupsDetailComponent() {
 						<div className="card-container">
 							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 							{Object.values(visibleGroups)
-								.sort((groupA: GroupData, groupB: GroupData) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
+								.sort((groupA, groupB) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
 									((groupB.name.toLowerCase() > groupA.name.toLowerCase()) ? -1 : 0))
-								.map(groupData => (<GroupViewComponent
-									group={groupData as GroupData}
-									key={(groupData as GroupData).id}
-									// This prop is used in the edit component (child of view component)
-									possibleGraphicUnits={possibleGraphicUnits}
+								.map(groupData => (<GroupViewComponentWIP
+									group={groupData}
+									key={groupData.id}
+								// This prop is used in the edit component (child of view component)
 								/>))}
 						</div>
 					}

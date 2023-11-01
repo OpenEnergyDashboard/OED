@@ -11,7 +11,20 @@ export const conversionsApi = baseApi.injectEndpoints({
 				url: 'api/conversions/addConversion',
 				method: 'POST',
 				body: { conversion }
-			})
+			}),
+			onQueryStarted: async (arg, api) => {
+				await api.queryFulfilled.
+					then(() => {
+						{
+							api.dispatch(
+								conversionsApi.endpoints.refresh.initiate({
+									redoCik: false,
+									refreshReadingViews: false
+								}))
+						}
+					})
+
+			}
 		}),
 		deleteConversion: builder.query<void, ConversionData>({
 			query: conversion => ({
@@ -34,8 +47,12 @@ export const conversionsApi = baseApi.injectEndpoints({
 			query: args => ({
 				url: 'api/conversion-array/refresh',
 				method: 'POST',
-				body: { redoCik: args.redoCik, refreshReadingViews: args.refreshReadingViews }
+				body: { redoCik: args.redoCik, refreshReadingViews: args.refreshReadingViews },
+				responseHandler: 'text'
 			})
 		})
 	})
 })
+
+export const selectPIK = conversionsApi.endpoints.getConversionArray.select()
+export const selectConversionsDetails = conversionsApi.endpoints.getConversionsDetails.select()

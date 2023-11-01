@@ -1,18 +1,17 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
+import { metersApi } from '../redux/api/metersApi';
+import * as t from '../types/redux/meters';
 import { MetersState } from '../types/redux/meters';
 import { durationFormat } from '../utils/durationFormat';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { metersApi } from '../redux/api/metersApi';
-import * as t from '../types/redux/meters'
 
 const defaultState: MetersState = {
 	hasBeenFetchedOnce: false,
 	isFetching: false,
 	byMeterID: {},
-	selectedMeters: [],
 	submitting: []
 };
 
@@ -30,9 +29,6 @@ export const metersSlice = createSlice({
 		receiveMetersDetails: (state, action: PayloadAction<t.MeterData[]>) => {
 			state.isFetching = false;
 			state.byMeterID = _.keyBy(action.payload, meter => meter.id);
-		},
-		changeDisplayedMeters: (state, action: PayloadAction<number[]>) => {
-			state.selectedMeters = action.payload;
 		},
 		submitEditedMeter: (state, action: PayloadAction<number>) => {
 			state.submitting.push(action.payload);
@@ -58,10 +54,7 @@ export const metersSlice = createSlice({
 		)
 	},
 	selectors: {
-		selectMeterState: state => state,
-		selectMeterDataByID: state => state.byMeterID
+		selectMeterState: state => state
 
 	}
 });
-
-export const { selectMeterState, selectMeterDataByID } = metersSlice.selectors
