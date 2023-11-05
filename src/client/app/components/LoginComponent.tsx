@@ -5,13 +5,11 @@
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { useNavigate } from 'react-router-dom-v5-compat';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
-import FooterContainer from '../containers/FooterContainer';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import HeaderComponent from './HeaderComponent';
-import { useNavigate } from 'react-router-dom-v5-compat';
 
 
 /**
@@ -50,7 +48,6 @@ export default function LoginComponent() {
 
 	return (
 		<div>
-			<HeaderComponent />
 			<Form style={formStyle}>
 				<FormGroup>
 					<Label for='email'>{translate('email')}</Label>
@@ -82,7 +79,6 @@ export default function LoginComponent() {
 					<FormattedMessage id='submit' />
 				</Button>
 			</Form>
-			<FooterContainer />
 		</div >
 	)
 }

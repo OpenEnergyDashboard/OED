@@ -4,13 +4,11 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderComponent from '../../components/HeaderComponent';
-import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 // import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import PreferencesComponentWIP from './PreferencesComponentWIP';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
-import PreferencesComponentWIP from './PreferencesComponentWIP'
 
 /**
  * React component that defines the admin page
@@ -36,7 +34,6 @@ export default function AdminComponent() {
 	};
 	return (
 		<div>
-			<HeaderComponent />
 			<TooltipHelpContainer page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
@@ -58,7 +55,6 @@ export default function AdminComponent() {
 					</div>
 				</div>
 			</div>
-			<FooterContainer />
 		</div>
 	);
 }

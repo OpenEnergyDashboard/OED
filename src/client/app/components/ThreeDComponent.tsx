@@ -5,23 +5,25 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
-import { useSelector } from 'react-redux';
+import { selectGraphState } from '../reducers/graph';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/hooks';
+import { ChartSingleQueryProps, ThreeDReadingApiArgs } from '../redux/selectors/dataSelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
-import { GroupsState } from '../types/redux/groups';
-import { MetersState } from '../types/redux/meters';
-import { State } from '../types/redux/state';
-import { UnitsState } from '../types/redux/units';
+import { GroupDataByID } from '../types/redux/groups';
+import { MeterDataByID } from '../types/redux/meters';
+import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
-import { ChartSingleQueryProps, ThreeDReadingApiArgs } from '../redux/selectors/dataSelectors';
 
 /**
  * Component used to render 3D graphics
@@ -31,10 +33,10 @@ import { ChartSingleQueryProps, ThreeDReadingApiArgs } from '../redux/selectors/
 export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadingApiArgs>) {
 	const { args, skipQuery } = props.queryArgs;
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: skipQuery });
-	const metersState = useSelector((state: State) => state.meters);
-	const groupsState = useSelector((state: State) => state.groups);
-	const graphState = useSelector((state: State) => state.graph);
-	const unitState = useSelector((state: State) => state.units);
+	const { data: meterDataById = {} } = useAppSelector(selectMeterDataById);
+	const { data: groupDataById = {} } = useAppSelector(selectGroupDataById);
+	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const graphState = useAppSelector(selectGraphState);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
 
 
@@ -62,7 +64,7 @@ export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadi
 		// Special Case where meter frequency is greater than 12 hour intervals
 		layout = setHelpLayout(translate('threeD.incompatible'));
 	} else {
-		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, metersState, groupsState, graphState, unitState);
+		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
 	}
 
 	return (
@@ -87,19 +89,19 @@ export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadi
  * Formats Readings for plotly 3d surface
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
- * @param meters redux meters state
- * @param groups redux groups state
+ * @param meterDataById redux meters state
+ * @param groupDataById redux groups state
  * @param graphState redux graph state
- * @param unitsState redux units state
+ * @param unitDataById redux units state
  * @returns Data, and Layout objects for a 3D Plotly Graph
  */
 function formatThreeDData(
 	data: ThreeDReading,
 	selectedMeterOrGroupID: number,
-	meters: MetersState,
-	groups: GroupsState,
+	meterDataById: MeterDataByID,
+	groupDataById: GroupDataByID,
 	graphState: GraphState,
-	unitsState: UnitsState
+	unitDataById: UnitDataById
 ) {
 	// Initialize Plotly Data
 	const xDataToRender: string[] = [];
@@ -116,7 +118,7 @@ function formatThreeDData(
 	let unitLabel = '';
 	let needsRateScaling = false;
 	if (graphingUnit !== -99) {
-		const selectUnitState = unitsState.units[graphState.selectedUnit];
+		const selectUnitState = unitDataById[graphState.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, graphState.areaNormalization, graphState.selectedAreaUnit);
@@ -126,14 +128,14 @@ function formatThreeDData(
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
 			const meterArea = meterOrGroup === MeterOrGroup.meters ?
-				meters.byMeterID[selectedMeterOrGroupID].area
+				meterDataById[selectedMeterOrGroupID].area
 				:
-				groups.byGroupID[selectedMeterOrGroupID].area;
+				groupDataById[selectedMeterOrGroupID].area;
 
 			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
-				meters.byMeterID[selectedMeterOrGroupID].areaUnit
+				meterDataById[selectedMeterOrGroupID].areaUnit
 				:
-				groups.byGroupID[selectedMeterOrGroupID].areaUnit;
+				groupDataById[selectedMeterOrGroupID].areaUnit;
 
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
 			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {

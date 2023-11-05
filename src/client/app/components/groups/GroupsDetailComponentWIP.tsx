@@ -4,8 +4,6 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderComponent from '../../components/HeaderComponent';
-import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
@@ -42,7 +40,6 @@ export default function GroupsDetailComponentWIP() {
 	return (
 		<div>
 			<div>
-				<HeaderComponent />
 				<TooltipHelpContainer page='groups' />
 
 				<div className='container-fluid'>
@@ -73,7 +70,6 @@ export default function GroupsDetailComponentWIP() {
 						</div>
 					}
 				</div>
-				<FooterContainer />
 			</div>
 		</div>
 	);

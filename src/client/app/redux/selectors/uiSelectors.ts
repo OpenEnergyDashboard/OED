@@ -356,7 +356,7 @@ export const selectVisibleUnitOrSuffixState = createSelector(
 )
 
 export const selectUnitSelectData = createSelector(
-	selectMeterDataById,
+	selectUnitDataById,
 	selectVisibleUnitOrSuffixState,
 	selectSelectedMeters,
 	selectSelectedGroups,
@@ -462,17 +462,17 @@ export function getSelectOptionsByItem(
 		// Once for the initial state type check, again because the interpreter (for some reason) needs to be sure that the property exists in the object
 		// If else statements do not suffer from this
 		if (type === 'unit') {
-			label = dataById[itemId].identifier;
+			label = dataById[itemId]?.identifier;
 		}
 		else if (type === 'meter') {
-			label = dataById[itemId].identifier;
+			label = dataById[itemId]?.identifier;
 			meterOrGroup = MeterOrGroup.meters
-			defaultGraphicUnit = dataById[itemId].defaultGraphicUnit;
+			defaultGraphicUnit = dataById[itemId]?.defaultGraphicUnit;
 		}
 		else if (type === 'group') {
-			label = dataById[itemId].name;
+			label = dataById[itemId]?.name;
 			meterOrGroup = MeterOrGroup.groups
-			defaultGraphicUnit = dataById[itemId].defaultGraphicUnit;
+			defaultGraphicUnit = dataById[itemId]?.defaultGraphicUnit;
 		}
 		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
 		// This should clear once the state is loaded.
@@ -496,14 +496,14 @@ export function getSelectOptionsByItem(
 			label = dataById[itemId].identifier;
 		}
 		else if (type === 'meter') {
-			label = dataById[itemId].identifier;
+			label = dataById[itemId]?.identifier;
 			meterOrGroup = MeterOrGroup.meters
 			defaultGraphicUnit = dataById[itemId].defaultGraphicUnit;
 		}
 		else if (type === 'group') {
-			label = dataById[itemId].name;
+			label = dataById[itemId]?.name;
 			meterOrGroup = MeterOrGroup.groups
-			defaultGraphicUnit = dataById[itemId].defaultGraphicUnit;
+			defaultGraphicUnit = dataById[itemId]?.defaultGraphicUnit;
 		}
 		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
 		// This should clear once the state is loaded.
@@ -518,8 +518,8 @@ export function getSelectOptionsByItem(
 		} as SelectOption
 		);
 	});
-	const sortedCompatibleOptions = _.sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc')
-	const sortedIncompatibleOptions = _.sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc')
+	const sortedCompatibleOptions = _.sortBy(compatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
+	const sortedIncompatibleOptions = _.sortBy(incompatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
 
 
 	return { compatible: sortedCompatibleOptions, incompatible: sortedIncompatibleOptions }

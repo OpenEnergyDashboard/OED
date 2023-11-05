@@ -3,18 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
-import FooterContainer from '../../containers/FooterContainer';
-import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { Link } from 'react-router-dom-v5-compat';
+import { Button, Table } from 'reactstrap';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { store } from '../../store';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import HeaderComponent from '../../components/HeaderComponent';
+import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+import { store } from '../../store';
+import { hasToken } from '../../utils/token';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 
 interface MapsDetailProps {
@@ -61,7 +59,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		return (
 			<div>
 				<UnsavedWarningContainer />
-				<HeaderComponent />
 				<TooltipHelpContainer page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
@@ -109,7 +106,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						<FormattedMessage id='save.map.edits' />
 					</Button>}
 				</div>
-				<FooterContainer />
 			</div>
 		);
 	}

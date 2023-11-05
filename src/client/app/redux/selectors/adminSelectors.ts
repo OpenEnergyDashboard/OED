@@ -9,6 +9,7 @@ import { UnitData, UnitType } from '../../types/redux/units'
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits'
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
 import { selectUnitDataById } from '../api/unitsApi'
+import translate from '../../utils/translate'
 
 export const selectAdminPreferences = createSelector(
 	selectAdminState,
@@ -204,6 +205,7 @@ export const makeSelectGraphicUnitCompatibility = () => {
 
 /**
  * Checks if conversion is valid
+ * @param state redux store RootState
  * @param sourceId New conversion sourceId
  * @param destinationId New conversion destinationId
  * @param bidirectional New conversion bidirectional status
@@ -215,7 +217,7 @@ export const selectIsValidConversion = createSelector(
 	(_state: RootState, sourceId: number) => sourceId,
 	(_state: RootState, _sourceId: number, destinationId: number) => destinationId,
 	(_state: RootState, _sourceId: number, _destinationId: number, bidirectional: boolean) => bidirectional,
-	({ data: unitDataById = {} }, { data: conversionData = [] }, sourceId, destinationId, bidirectional) => {
+	({ data: unitDataById = {} }, { data: conversionData = [] }, sourceId, destinationId, bidirectional): [boolean, string] => {
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion
@@ -226,16 +228,18 @@ export const selectIsValidConversion = createSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
+		console.log('running again!')
 
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			// notifyUser(translate('conversion.create.destination.meter'));
-			return false;
+			return [false, translate('conversion.create.destination.meter')];
 		}
 
 		// Source or destination not set
 		if (sourceId === -999 || destinationId === -999) {
-			return false
+			// TODO Translate Me!
+			return [false, 'Source or destination not set']
 		}
 
 		// Conversion already exists
@@ -243,14 +247,14 @@ export const selectIsValidConversion = createSelector(
 			conversionData.sourceId === sourceId) &&
 			conversionData.destinationId === destinationId))) !== -1) {
 			// notifyUser(translate('conversion.create.exists'));
-			return false;
+			return [false, translate('conversion.create.exists')];
 		}
 
 		// You cannot have a conversion between units that differ in unit_represent.
 		// This means you cannot mix quantity, flow & raw.
 		if (unitDataById[sourceId].unitRepresent !== unitDataById[destinationId].unitRepresent) {
 			// notifyUser(translate('conversion.create.mixed.represent'));
-			return false;
+			return [false, translate('conversion.create.mixed.represent')];
 		}
 
 
@@ -275,9 +279,7 @@ export const selectIsValidConversion = createSelector(
 				}
 			}
 		});
-		if (!isValid) {
-			// notifyUser(translate('conversion.create.exists.inverse'));
-		}
-		return isValid;
+
+		return !isValid ? [false, translate('conversion.create.exists.inverse')] : [isValid, 'Conversion is Valid']
 	}
 )

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { RootState } from '../../store';
-// TODO Should be env variable
+// TODO Should be env variable?
 const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
 
 export const baseApi = createApi({
@@ -17,7 +17,15 @@ export const baseApi = createApi({
 		}
 	}),
 	// The types of tags that any injected endpoint may, provide, or invalidate.
-	tagTypes: ['MeterData', 'GroupData', 'GroupChildrenData', 'Preferences','Users'],
+	// Must be defined here, for use in injected endpoints
+	tagTypes: [
+		'MeterData',
+		'GroupData',
+		'GroupChildrenData',
+		'Preferences',
+		'Users',
+		'ConversionDetails'
+	],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({})
 	// Defaults to 60 seconds or 1 minute

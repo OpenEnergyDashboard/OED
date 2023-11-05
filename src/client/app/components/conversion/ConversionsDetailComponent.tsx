@@ -16,7 +16,9 @@ import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { ConversionData } from 'types/redux/conversions';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import HeaderComponent from '../../components/HeaderComponent';
-import { Dispatch } from 'types/redux/actions';
+import { Dispatch } from '../../types/redux/actions';
+import { useAppSelector } from '../../redux/hooks';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 
 /**
  * Defines the conversions page card view
@@ -33,7 +35,8 @@ export default function ConversionsDetailComponent() {
 	}, [dispatch]);
 
 	// Conversions state
-	const conversionsState = useSelector((state: State) => state.conversions.conversions);
+	const { data: conversionsState = [] } = useAppSelector(selectConversionsDetails);
+
 
 	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
 

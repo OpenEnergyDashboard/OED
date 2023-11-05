@@ -7,15 +7,16 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { selectIsValidConversion } from '../../redux/selectors/adminSelectors';
-import { UnitData } from '../../types/redux/units';
-import { addConversion } from '../../actions/conversions';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { conversionsApi } from '../../redux/api/conversionsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/hooks';
+import { selectIsValidConversion } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
+import { UnitData } from '../../types/redux/units';
+import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -24,8 +25,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Conversion create element
  */
 export default function CreateConversionModalComponent() {
-
-	const dispatch = useAppDispatch();
+	const [addConversionMutation] = conversionsApi.useAddConversionMutation()
 	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById)
 	// Want units in sorted order by identifier regardless of case.
 	const unitsSorted = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
@@ -55,6 +55,15 @@ export default function CreateConversionModalComponent() {
 	// Handlers for each type of input change
 	const [conversionState, setConversionState] = useState(defaultValues);
 
+	// If the currently selected conversion is valid
+	const [validConversion, reason] = useAppSelector(
+		state => selectIsValidConversion(
+			state,
+			conversionState.sourceId,
+			conversionState.destinationId,
+			conversionState.bidirectional)
+	)
+
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setConversionState({ ...conversionState, [e.target.name]: e.target.value });
 	}
@@ -81,96 +90,7 @@ export default function CreateConversionModalComponent() {
 			setConversionState(state => ({ ...state, [e.target.name]: Number(e.target.value) }));
 		}
 	}
-
-	// If the currently selected conversion is valid
-	const validConversion = useAppSelector(
-		state => selectIsValidConversion(
-			state,
-			conversionState.sourceId,
-			conversionState.destinationId,
-			conversionState.bidirectional)
-	)
 	/* End State */
-
-
-	// //Update the valid conversion state any time the source id, destination id, or bidirectional status changes
-	// useEffect(() => {
-	// 	/**
-	// 	 * Checks if conversion is valid
-	// 	 * @param sourceId New conversion sourceId
-	// 	 * @param destinationId New conversion destinationId
-	// 	 * @param bidirectional New conversion bidirectional status
-	// 	 * @returns boolean representing if new conversion is valid or not
-	// 	 */
-	// 	const isValidConversion = (sourceId: number, destinationId: number, bidirectional: boolean) => {
-	// 		/* Create Conversion Validation:
-	// 			Source equals destination: invalid conversion
-	// 			Conversion exists: invalid conversion
-	// 			Conversion does not exist:
-	// 				Inverse exists:
-	// 					Conversion is bidirectional: invalid conversion
-	// 			Destination cannot be a meter
-	// 			Cannot mix unit represent
-	// 			TODO Some of these can go away when we make the menus dynamic.
-	// 		*/
-
-	// 		// The destination cannot be a meter unit.
-	// 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
-	// 			notifyUser(translate('conversion.create.destination.meter'));
-	// 			return false;
-	// 		}
-
-	// 		// Source or destination not set
-	// 		if (sourceId === -999 || destinationId === -999) {
-	// 			return false
-	// 		}
-
-	// 		// Conversion already exists
-	// 		if ((conversionState.findIndex(conversionData => ((
-	// 			conversionData.sourceId === state.sourceId) &&
-	// 			conversionData.destinationId === state.destinationId))) !== -1) {
-	// 			notifyUser(translate('conversion.create.exists'));
-	// 			return false;
-	// 		}
-
-	// 		// You cannot have a conversion between units that differ in unit_represent.
-	// 		// This means you cannot mix quantity, flow & raw.
-	// 		if (unitDataById[sourceId].unitRepresent !== unitDataById[destinationId].unitRepresent) {
-	// 			notifyUser(translate('conversion.create.mixed.represent'));
-	// 			return false;
-	// 		}
-
-
-	// 		let isValid = true;
-	// 		// Loop over conversions and check for existence of inverse of conversion passed in
-	// 		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
-	// 		// If there is a non bidirectional inverse, then it is a valid conversion
-	// 		Object.values(conversionState).forEach(conversion => {
-	// 			// Inverse exists
-	// 			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)) {
-	// 				// Inverse is bidirectional
-	// 				if (conversion.bidirectional) {
-	// 					isValid = false;
-	// 				}
-	// 				// Inverse is not bidirectional
-	// 				else {
-	// 					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
-	// 					if (bidirectional) {
-	// 						// The new conversion is bidirectional
-	// 						isValid = false;
-	// 					}
-	// 				}
-	// 			}
-	// 		});
-	// 		if (!isValid) {
-	// 			notifyUser(translate('conversion.create.exists.inverse'));
-	// 		}
-	// 		return isValid;
-	// 	}
-
-
-	// 	setValidConversion(isValidConversion(state.sourceId, state.destinationId, state.bidirectional));
-	// }, [state.sourceId, state.destinationId, state.bidirectional, unitDataById, conversionState]);
 
 	// Reset the state to default values
 	const resetState = () => {
@@ -182,11 +102,18 @@ export default function CreateConversionModalComponent() {
 
 	// Submit
 	const handleSubmit = () => {
-		// Close modal first to avoid repeat clicks
-		setShowModal(false);
-		// Add the new conversion and update the store
-		dispatch(addConversion(conversionState));
-		resetState();
+		if (validConversion) {
+			// Close modal first to avoid repeat clicks
+			setShowModal(false);
+			//5 Add the new conversion and update the store
+			// Omit the source options , do not need to send in request so remove here.
+			//
+			addConversionMutation(_.omit(conversionState, 'sourceOptions'))
+			// dispatch(addConversion(conversionState));
+			resetState();
+		} else {
+			showErrorNotification(reason)
+		}
 	};
 
 	const tooltipStyle = {
@@ -320,12 +247,17 @@ export default function CreateConversionModalComponent() {
 					</Container>
 				</ModalBody>
 				<ModalFooter>
+					{
+						// Todo looks kind of bad make a better visible notification
+						!validConversion && <p>{reason}</p>
+					}
+
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validConversion}>
+					<Button color='primary' onClick={handleSubmit} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

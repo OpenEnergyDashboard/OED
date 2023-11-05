@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Link } from 'react-router-dom-v5-compat';
-import LogoComponent from './LogoComponent';
-import MenuModalComponent from './MenuModalComponent';
-import HeaderButtonsComponent from './HeaderButtonsComponent';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom-v5-compat';
 import { State } from '../types/redux/state';
 import getPage from '../utils/getPage';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
+import LogoComponent from './LogoComponent';
+import MenuModalComponent from './MenuModalComponent';
 
 /**
  * React component that controls the header strip at the top of all pages

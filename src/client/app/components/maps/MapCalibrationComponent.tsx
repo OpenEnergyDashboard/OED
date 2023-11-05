@@ -35,7 +35,6 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 			return (
 				<div className='container-fluid'>
 					<UnsavedWarningContainer />
-					<HeaderComponent />
 					<div id={'MapCalibrationContainer'}>
 						{/* TODO These types of plotly containers expect a lot of passed
 						values and it gives a TS error. Given we plan to  replace this

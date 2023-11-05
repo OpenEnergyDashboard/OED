@@ -99,13 +99,17 @@ const animatedComponents = makeAnimated();
 const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 	valueContainer: base => ({
 		...base,
-		maxHeight: 150,
+		maxHeight: 175,
 		overflowY: 'scroll',
 		'&::-webkit-scrollbar': {
 			display: 'none'
 		},
 		'msOverflowStyle': 'none',
 		'scrollbarWidth': 'none'
+	}),
+	multiValue: base => ({
+		...base
 	})
+
 };
 

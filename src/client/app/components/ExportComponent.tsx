@@ -20,6 +20,7 @@ import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
 import { hasToken } from '../utils/token';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectConversionsDetails } from '../redux/api/conversionsApi';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -33,7 +34,7 @@ export default function ExportComponent() {
 	// Units state
 	const { data: unitsDataById = {} } = useAppSelector(selectUnitDataById);
 	// Conversion state
-	const conversionState = useAppSelector(state => state.conversions.conversions);
+	const { data: conversionState = [] } = useAppSelector(selectConversionsDetails);
 	// graph state
 	const graphState = useAppSelector(state => state.graph);
 	// admin state

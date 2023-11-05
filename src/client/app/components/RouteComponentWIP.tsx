@@ -25,6 +25,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 import HomeComponent from './HomeComponent';
+import AppLayout from './AppLayout';
 import LoginComponent from './LoginComponent';
 import SpinnerComponent from './SpinnerComponent';
 import AdminComponent from './admin/AdminComponent';
@@ -33,6 +34,7 @@ import ConversionsDetailComponentWIP from './conversion/ConversionsDetailCompone
 import GroupsDetailComponentWIP from './groups/GroupsDetailComponentWIP';
 import MetersDetailComponentWIP from './meters/MetersDetailComponentWIP';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
+
 
 
 
@@ -102,6 +104,7 @@ export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
 }
 
 export const NotFound = () => {
+	// redirect to home page if non-existent route is requested.
 	return <Navigate to='/' replace />
 }
 
@@ -210,32 +213,37 @@ export const GraphLink = () => {
 
 /// Router
 const router = createBrowserRouter([
-	{ path: '/', element: <HomeComponent /> },
-	{ path: '/login', element: <LoginComponent /> },
 	{
-		path: '/',
-		element: <AdminOutlet />,
+		path: '/', element: <AppLayout />,
 		children: [
-			{ path: 'admin', element: <AdminComponent /> },
-			{ path: 'calibration', element: <MapCalibrationContainer /> },
-			{ path: 'maps', element: <MapsDetailContainer /> },
-			{ path: 'users/new', element: <CreateUserContainer /> },
-			{ path: 'units', element: <UnitsDetailComponent /> },
-			{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
-			{ path: 'groups', element: <GroupsDetailComponentWIP /> },
-			{ path: 'meters', element: <MetersDetailComponentWIP /> },
-			{ path: 'users', element: <UsersDetailComponentWIP /> }
+			{ index: true, element: <HomeComponent /> },
+			{ path: '/login', element: <LoginComponent /> },
+			{
+				path: '/',
+				element: <AdminOutlet />,
+				children: [
+					{ path: 'admin', element: <AdminComponent /> },
+					{ path: 'calibration', element: <MapCalibrationContainer /> },
+					{ path: 'maps', element: <MapsDetailContainer /> },
+					{ path: 'users/new', element: <CreateUserContainer /> },
+					{ path: 'units', element: <UnitsDetailComponent /> },
+					{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
+					{ path: 'groups', element: <GroupsDetailComponentWIP /> },
+					{ path: 'meters', element: <MetersDetailComponentWIP /> },
+					{ path: 'users', element: <UsersDetailComponentWIP /> },
+					{
+						path: '/',
+						element: <RoleOutlet UserRole={UserRole.CSV} />,
+						children: [
+							{ path: 'csv', element: <UploadCSVContainer /> }
+						]
+					},
+					{
+						path: '*', element: <NotFound />
+					}
+				]
+			}
 		]
-	},
-	{
-		path: '/',
-		element: <RoleOutlet UserRole={UserRole.CSV} />,
-		children: [
-			{ path: 'csv', element: <UploadCSVContainer /> }
-		]
-	},
-	{
-		path: '*', element: <NotFound />
 	}
 ])
 

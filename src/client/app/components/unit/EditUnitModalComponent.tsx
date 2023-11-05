@@ -12,6 +12,7 @@ import { Dispatch } from 'types/redux/actions';
 import { submitEditedUnit } from '../../actions/units';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
 import '../../styles/modal.css';
@@ -55,7 +56,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
-	const globalConversionsState = useAppSelector(state => state.conversions.conversions);
+	const { data: globalConversionsState = [] } = useAppSelector(selectConversionsDetails);
+
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });

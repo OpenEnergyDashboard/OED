@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import FooterContainer from '../containers/FooterContainer';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
-import HeaderComponent from './HeaderComponent';
 import DashboardComponent from './DashboardComponent';
 
 /**
@@ -16,10 +14,8 @@ export default function HomeComponent() {
 
 	return (
 		<div>
-			<HeaderComponent />
 			<TooltipHelpContainer page='home' />
 			<DashboardComponent />
-			<FooterContainer />
 		</div>
 	);
 }

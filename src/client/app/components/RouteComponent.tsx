@@ -33,7 +33,6 @@ import MetersDetailComponent from './meters/MetersDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import * as queryString from 'query-string';
-import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -286,7 +285,6 @@ export default class RouteComponent extends React.Component<RouteProps> {
 		const messages = (LocaleTranslationData as any)[lang];
 		return (
 			<div>
-				<InitializationComponent />
 				<IntlProvider locale={lang} messages={messages} key={lang}>
 					<>
 						<Router history={browserHistory}>

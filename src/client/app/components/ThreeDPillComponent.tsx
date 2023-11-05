@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { Badge } from 'reactstrap';
-import { State } from '../types/redux/state';
-import { Dispatch } from '../types/redux/actions';
-import { changeMeterOrGroupInfo } from '../actions/graph';
+import { updateThreeDMeterOrGroupInfo } from '../reducers/graph';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
@@ -16,15 +16,15 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
  * @returns List of selected groups and meters as reactstrap Pills Badges
  */
 export default function ThreeDPillComponent() {
-	const dispatch: Dispatch = useDispatch();
-	const metersState = useSelector((state: State) => state.meters);
-	const groupsState = useSelector((state: State) => state.groups);
-	const threeDState = useSelector((state: State) => state.graph.threeD);
-	const graphState = useSelector((state: State) => state.graph);
+	const dispatch = useAppDispatch();
+	const { data: meterDataById = {} } = useAppSelector(selectMeterDataById);
+	const { data: groupDataById = {} } = useAppSelector(selectGroupDataById);
+	const threeDState = useAppSelector(state => state.graph.threeD);
+	const graphState = useAppSelector(state => state.graph);
 
 	const meterPillData = graphState.selectedMeters.map(meterID => {
-		const area = metersState.byMeterID[meterID].area;
-		const areaUnit = metersState.byMeterID[meterID].areaUnit;
+		const area = meterDataById[meterID].area;
+		const areaUnit = meterDataById[meterID].areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		const isDisabled = !isAreaCompatible && graphState.areaNormalization
 
@@ -32,24 +32,29 @@ export default function ThreeDPillComponent() {
 	})
 
 	const groupPillData = graphState.selectedGroups.map(groupID => {
-		const area = groupsState.byGroupID[groupID].area;
-		const areaUnit = groupsState.byGroupID[groupID].areaUnit;
+		const area = groupDataById[groupID].area;
+		const areaUnit = groupDataById[groupID].areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		const isDisabled = !isAreaCompatible && graphState.areaNormalization
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill
 	})
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
-	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(changeMeterOrGroupInfo(pillData.meterOrGroupID, pillData.meterOrGroup));
+	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(updateThreeDMeterOrGroupInfo(
+		{
+			meterOrGroupID: pillData.meterOrGroupID,
+			meterOrGroup: pillData.meterOrGroup
+		}
+	));
 
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
 		return meterOrGroupPillData.map(pillData => {
 			//retrieve data from appropriate state slice .meters or .group
 			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
-				metersState.byMeterID[pillData.meterOrGroupID].identifier
+				meterDataById[pillData.meterOrGroupID].identifier
 				:
-				groupsState.byGroupID[pillData.meterOrGroupID].name;
+				groupDataById[pillData.meterOrGroupID].name;
 
 			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;

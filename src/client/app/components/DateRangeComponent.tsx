@@ -14,6 +14,10 @@ import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+
+// Potential Fixes, for now omitted
+// import '../styles/DateRangeCustom.css'
+
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
  * @returns Date Range Calendar Picker

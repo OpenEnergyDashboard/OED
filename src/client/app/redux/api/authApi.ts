@@ -21,23 +21,23 @@ export const authApi = baseApi.injectEndpoints({
 			// in this case, a user logged in which means that some info for ADMIN meters groups etc.
 			// invalidate forces a refetch to any subscribed components or the next query.
 			invalidatesTags: ['MeterData', 'GroupData']
-			// Listeners (ExtraReducers) for this query:
+			// Listeners for this query (ExtraReducers):
 			//	currentUserSlice->MatchFulfilled
 		}),
 		verifyToken: builder.mutation<{ success: boolean }, string>({
-			query: queryArgs => ({
+			query: token => ({
 				url: 'api/verification',
 				method: 'POST',
-				body: { token: queryArgs }
+				body: { token: token }
 			}),
 			// Optional endpoint property that does additional logic when the query is initiated.
-			onQueryStarted: async (queryArgs, { dispatch, queryFulfilled }) => {
+			onQueryStarted: async (token, { dispatch, queryFulfilled }) => {
 				// wait for the initial query (verifyToken) to finish
 				await queryFulfilled
 					.then(async () => {
 						// Token is valid if not errored out by this point,
 						// Apis will now use the token in headers via baseAPI's Prepare Headers
-						dispatch(currentUserSlice.actions.setUserToken(queryArgs))
+						dispatch(currentUserSlice.actions.setUserToken(token))
 
 						//  Get userDetails with verified token in headers
 						const response = dispatch(userApi.endpoints.getUserDetails.initiate());
@@ -51,7 +51,7 @@ export const authApi = baseApi.injectEndpoints({
 
 						// if no error thrown user is now logged in and cache(s) may be out of date due to potential admin privileges etc.
 						// manually invalidate potentially out of date cache stores
-						dispatch(baseApi.util.invalidateTags(['MeterData', 'GroupData']))
+						dispatch(baseApi.util.invalidateTags(['MeterData', 'GroupData', 'Users']))
 						// If subscriptions to these tagged endpoints exist, they will automatically re-fetch.
 						// Otherwise subsequent requests will bypass and overwrite cache
 					})

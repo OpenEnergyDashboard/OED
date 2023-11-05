@@ -22,6 +22,7 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 
 	React.useEffect(() => {
 		if (!optionsLoaded) {
+			// TODO REWRITE AS rtkQUERY?
 			axios.get('/api/timezones').then(res => {
 				const timeZones = res.data;
 				const resetTimeZone = [{ value: null, label: translate('timezone.no') }];

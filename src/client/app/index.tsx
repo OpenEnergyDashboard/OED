@@ -2,28 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
-import { store } from './store'
-import 'bootstrap/dist/css/bootstrap.css';
+import { store } from './store';
 // import RouteContainer from './containers/RouteContainer';
 import RouteComponentWIP from './components/RouteComponentWIP';
+import { initializeApp } from './initScript';
 import './styles/index.css';
-import InitializationComponent from './components/InitializationComponent';
 
+initializeApp()
 // Renders the entire application, starting with RouteComponent, into the root div
-const container = document.getElementById('root');
+const container = document.getElementById('root') as HTMLElement;
+const root = createRoot(container);
 
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const root = createRoot(container!);
 root.render(
-	// Provides the Redux store to all child components
-	<Provider store={store} stabilityCheck='always' >
-		<InitializationComponent />
-		{/* Route container is a test of react-router-dom v6
-		This update introduces many useful routing hooks which can potentially be useful when migrating the codebase to hooks from Class components.
-		Very much experimental/ Work in Progress */}
-		<RouteComponentWIP />
-	</Provider>
+	//  Provides the Redux store to all child components
+	< Provider store={store} stabilityCheck='always' >
+		< RouteComponentWIP />
+	</Provider >
 );

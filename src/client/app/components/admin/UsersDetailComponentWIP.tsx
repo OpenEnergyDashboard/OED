@@ -6,13 +6,11 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input, Table } from 'reactstrap';
-import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { userApi } from '../../redux/api/userApi';
 import { User, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import HeaderComponent from '../HeaderComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponentWIP } from '../UnsavedWarningComponentWIP';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
@@ -58,7 +56,6 @@ export default function UserDetailComponentWIP() {
 
 	return (
 		<div>
-			<HeaderComponent />
 			<UnsavedWarningComponentWIP
 				hasUnsavedChanges={hasChanges}
 				changes={localUsersChanges}
@@ -119,8 +116,6 @@ export default function UserDetailComponentWIP() {
 					</div>
 				</div>
 			</div>
-
-			<FooterContainer />
 		</div>
 	)
 }
