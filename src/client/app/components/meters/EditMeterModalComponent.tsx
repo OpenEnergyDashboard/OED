@@ -256,7 +256,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		state.unitId = props.meter.unitId;
 
 		if (error_message) {
-			error_message = 'Are you sure you want to change this unit? ' + '\n' + error_message;
+			error_message = translate('meter.is.not.editable') + '\n' + error_message;
 			alert(error_message);
 		}
 
