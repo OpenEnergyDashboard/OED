@@ -21,10 +21,7 @@ export interface RawReadings {
 	e: string
 }
 
-export interface LineReading {
-	reading: number;
-	startTimestamp: number;
-	endTimestamp: number;
+export interface LineReading extends BarReading{
 	min: number;
 	max: number;
 }

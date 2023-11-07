@@ -27,6 +27,7 @@ import { UnitsState } from '../types/redux/units';
 import { MetersState } from 'types/redux/meters';
 import { GroupsState } from 'types/redux/groups';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import translate from '../utils/translate';
 
 /**
  * A component which allows the user to select which data should be displayed on the chart.
@@ -188,7 +189,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledMeter != -1) {
 			sortedMeters.splice(firstDisabledMeter, 0, {
 				value: 0,
-				label: '----- Incompatible Meters -----',
+				label: '----- ' + translate('incompatible.meters') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
@@ -231,7 +232,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledGroup != -1) {
 			sortedGroups.splice(firstDisabledGroup, 0, {
 				value: 0,
-				label: '----- Incompatible Groups -----',
+				label: '----- ' + translate('incompatible.groups') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
@@ -258,7 +259,7 @@ export default function ChartDataSelectComponent() {
 		if (firstDisabledUnit != -1) {
 			sortedUnits.splice(firstDisabledUnit, 0, {
 				value: 0,
-				label: '----- Incompatible Units -----',
+				label: '----- ' + translate('incompatible.units') + ' -----',
 				isDisabled: true
 			} as SelectOption
 			);
