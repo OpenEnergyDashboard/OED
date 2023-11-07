@@ -31,9 +31,7 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 		handleClick(selectedOption.value);
 	};
 
-	return (options !== null ?
-		<Select isClearable={false} value={options.filter(({ value }) => value === current)} options={options} onChange={handleChange} /> :
-		<span>Please Reload</span>);
+	return <Select isClearable={false} value={options.filter(({ value }) => value === current)} options={options} onChange={handleChange} />;
 };
 
 export default TimeZoneSelect;
