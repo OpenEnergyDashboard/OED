@@ -373,7 +373,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				</Container></ModalBody>
 				<ModalFooter>
 					<Button variant="warning" color='danger' onClick={handleDeleteUnit}>
-						<FormattedMessage id="discard.changes" />
+						<FormattedMessage id="Delete Changes" />
 					</Button>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
