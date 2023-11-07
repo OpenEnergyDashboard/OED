@@ -31,7 +31,8 @@ const defaultState: AdminState = {
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
-	defaultMeterDisableChecks: false
+	defaultMeterDisableChecks: false,
+	defaultUrl: 'https://openenergydashboard.github.io/help/'
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -108,7 +109,8 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterMaximumDate: action.data.defaultMeterMaximumDate,
 				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks
+				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks,
+				defaultUrl: action.data.defaultUrl
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -185,6 +187,12 @@ export default function admin(state = defaultState, action: AdminAction) {
 			return {
 				...state,
 				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
+				submitted: false
+			}
+		case ActionType.UpdateDefaultUrl:
+			return {
+				...state,
+				defaultUrl: action.defaultUrl,
 				submitted: false
 			}
 		default:

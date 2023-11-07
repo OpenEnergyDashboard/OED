@@ -526,6 +526,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.updateUnsavedChanges();
 	}
 
+	private handleDefaultUrl(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultMeterDisableChecks(JSON.parse(e.target.value))
+		this.updateUnsavedChanges();
+	}
+
 }
 
 export default injectIntl(PreferencesComponent);

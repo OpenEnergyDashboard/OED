@@ -88,6 +88,10 @@ export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boole
 	return { type: ActionType.UpdateDefaultMeterDisableChecks, defaultMeterDisableChecks };
 }
 
+export function updateDefaultUrl(defaultUrl: string): t.UpdateDefaultUrlAction {
+	return {type: ActionType.UpdateDefaultUrl, defaultUrl}
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -195,7 +199,8 @@ export function submitPreferences() {
 				defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 				defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
+				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
+				defaultUrl: state.admin.defaultUrl
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

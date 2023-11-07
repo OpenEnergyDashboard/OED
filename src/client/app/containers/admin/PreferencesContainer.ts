@@ -22,7 +22,8 @@ import {
 	updateDefaultMeterMaximumDate,
 	updateDefaultMeterReadingGap,
 	updateDefaultMeterMaximumErrors,
-	updateDefaultMeterDisableChecks
+	updateDefaultMeterDisableChecks,
+	updateDefaultUrl
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -49,7 +50,8 @@ function mapStateToProps(state: State) {
 		defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 		defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
-		defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
+		defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
+		defaultUrl: state.admin.defaultUrl
 	};
 }
 
@@ -73,7 +75,8 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultMeterMaximumDate: (defaultMeterMaximumDate: string) => dispatch(updateDefaultMeterMaximumDate(defaultMeterMaximumDate)),
 		updateDefaultMeterReadingGap: (defaultMeterReadingGap: number) => dispatch(updateDefaultMeterReadingGap(defaultMeterReadingGap)),
 		updateDefaultMeterMaximumErrors: (defaultMeterMaximumErrors: number) => dispatch(updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
-		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) => dispatch(updateDefaultMeterDisableChecks(defaultMeterDisableChecks))
+		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) => dispatch(updateDefaultMeterDisableChecks(defaultMeterDisableChecks)),
+		updateDefaultUrl: (defaultUrl: string) => dispatch(updateDefaultUrl(defaultUrl))
 	};
 }
 
