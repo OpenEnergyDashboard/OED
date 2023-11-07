@@ -4,9 +4,7 @@
 
 import thunkMiddleware from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
-import 'bootstrap/dist/css/bootstrap.css';
 import reducers from './reducers';
-import './styles/index.css';
 import { composeWithDevTools } from '@redux-devtools/extension';
 import initScript from './initScript';
 
