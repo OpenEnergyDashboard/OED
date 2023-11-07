@@ -14,7 +14,7 @@ import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminS
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
-import { MeterTimeSortType, MeterType } from '../../types/redux/meters';
+import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
@@ -98,7 +98,8 @@ export default function CreateMeterModalComponent() {
 		compatibleGraphicUnits,
 		compatibleUnits,
 		incompatibleUnits
-	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails.unitId, meterDetails.defaultGraphicUnit))
+		// Weird Type assertion due to conflicting GPS Property
+	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails as unknown as MeterData))
 	const handleShow = () => setShowModal(true);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,7 +221,7 @@ export default function CreateMeterModalComponent() {
 		if (typeof gpsInput === 'string') {
 			if (isValidGPSInput(gpsInput)) {
 				// Clearly gpsInput is a string but TS complains about the split so cast.
-				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				const gpsValues = gpsInput.split(',').map((value: string) => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
 					longitude: gpsValues[longitudeIndex],
@@ -255,7 +256,7 @@ export default function CreateMeterModalComponent() {
 				.catch(err => {
 					// TODO Better way than popup with React but want to stay so user can read/copy.
 
-					window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data  + '"');
+					window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data + '"');
 				})
 		} else {
 			// Tell user that not going to update due to input issues.

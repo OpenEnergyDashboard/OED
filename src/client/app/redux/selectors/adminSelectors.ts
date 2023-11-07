@@ -2,18 +2,20 @@ import { createSelector } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
 import { selectAdminState } from '../../reducers/admin'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectMeterDataById } from '../../redux/api/metersApi'
+import { selectMeterDataWithID } from '../../redux/api/metersApi'
 import { RootState } from '../../store'
 import { PreferenceRequestItem } from '../../types/items'
 import { UnitData, UnitType } from '../../types/redux/units'
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits'
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
-import { selectUnitDataById } from '../api/unitsApi'
 import translate from '../../utils/translate'
+import { selectUnitDataById } from '../api/unitsApi'
+import { MeterData } from 'types/redux/meters'
+import { ConversionData } from 'types/redux/conversions'
 
 export const selectAdminPreferences = createSelector(
 	selectAdminState,
-	adminState => ({
+	(adminState): PreferenceRequestItem => ({
 		displayTitle: adminState.displayTitle,
 		defaultChartToRender: adminState.defaultChartToRender,
 		defaultBarStacking: adminState.defaultBarStacking,
@@ -31,7 +33,7 @@ export const selectAdminPreferences = createSelector(
 		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
 		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks
-	} as PreferenceRequestItem)
+	})
 )
 
 
@@ -46,6 +48,7 @@ export const selectPossibleGraphicUnits = createSelector(
 		return potentialGraphicUnits(unitDataById)
 	}
 )
+
 /**
  * Calculates the set of all possible meter units for a meter.
  * This is any unit that is of type unit or suffix.
@@ -68,24 +71,13 @@ export const selectPossibleMeterUnits = createSelector(
 	}
 )
 
-
-export const selectMeterDataWithID = (state: RootState, meterID: number) => {
-	const { data: meterDataByID = {} } = selectMeterDataById(state)
-	return meterDataByID[meterID]
-}
-export const selectUnitWithID = (state: RootState, unitID: number) => {
-	const { data: unitDataById = {} } = selectMeterDataById(state)
-	return unitDataById[unitID]
-
-}
-
 /**
  * Selector that returns a unit associated with a meter given an meterID
  * @param {RootState} state redux global state
  * @param {number} id redux global state
  * @returns {string} Unit Name.
  * @example
- *  useAppSelector(state => selectUnitName(state, 42))
+ *  const unitName = useAppSelector(state => selectUnitName(state, 42))
  */
 export const selectUnitName = createSelector(
 	// This is the unit associated with the meter.
@@ -132,14 +124,13 @@ export const selectGraphicName = createSelector(
  * useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits.unitId, localMeterEdits.defaultGraphicUnit))
  */
 export const makeSelectGraphicUnitCompatibility = () => {
+	// 3rd/4th callback  used to pass in non-state value in this case the local edits.
+	// two separate call backs so their return values will pass a === equality check for memoized behavior
 	const selectGraphicUnitCompatibilityInstance = createSelector(
 		selectPossibleGraphicUnits,
 		selectPossibleMeterUnits,
-		// 3rd/4th callback  used to pass in non-state value in this case the local edits.
-		// two separate call backs so their return values will pass a === equality check for memoized behavior
-		(state: RootState, unitId: number) => unitId,
-		(state: RootState, unitId: number, defaultGraphicUnit: number) => defaultGraphicUnit,
-		(possibleGraphicUnits, possibleMeterUnits, unitId, defaultGraphicUnit) => {
+		(_state: RootState, meterDetails: MeterData) => meterDetails,
+		(possibleGraphicUnits, possibleMeterUnits, { unitId, defaultGraphicUnit }) => {
 			// Graphic units compatible with currently selected unit
 			const compatibleGraphicUnits = new Set<UnitData>();
 			// Graphic units incompatible with currently selected unit
@@ -206,18 +197,14 @@ export const makeSelectGraphicUnitCompatibility = () => {
 /**
  * Checks if conversion is valid
  * @param state redux store RootState
- * @param sourceId New conversion sourceId
- * @param destinationId New conversion destinationId
- * @param bidirectional New conversion bidirectional status
+ * @param conversionData ConversionState Data
  * @returns boolean representing if new conversion is valid or not
  */
 export const selectIsValidConversion = createSelector(
 	selectUnitDataById,
 	selectConversionsDetails,
-	(_state: RootState, sourceId: number) => sourceId,
-	(_state: RootState, _sourceId: number, destinationId: number) => destinationId,
-	(_state: RootState, _sourceId: number, _destinationId: number, bidirectional: boolean) => bidirectional,
-	({ data: unitDataById = {} }, { data: conversionData = [] }, sourceId, destinationId, bidirectional): [boolean, string] => {
+	(_state: RootState, conversionData: ConversionData) => conversionData,
+	({ data: unitDataById = {} }, { data: conversionData = [] }, { sourceId, destinationId, bidirectional }): [boolean, string] => {
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion

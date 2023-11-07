@@ -10,9 +10,10 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
-import { metersApi } from '../../redux/api/metersApi';
+import { metersApi, selectMeterDataWithID } from '../../redux/api/metersApi';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { makeSelectGraphicUnitCompatibility, selectMeterDataWithID } from '../../redux/selectors/adminSelectors';
+import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -24,7 +25,6 @@ import { getGPSString, notifyUser, nullToEmptyString } from '../../utils/input';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -51,7 +51,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		incompatibleGraphicUnits,
 		compatibleUnits,
 		incompatibleUnits
-	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits.unitId, localMeterEdits.defaultGraphicUnit))
+	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits))
 
 	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)) }, [meterState])
 	/* State */

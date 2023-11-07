@@ -6,6 +6,7 @@ import { baseApi } from './baseApi';
 import { NamedIDItem } from 'types/items';
 import { CompareReadings, RawReadings } from 'types/readings';
 import { conversionsApi } from './conversionsApi';
+import { RootState } from '../../store';
 
 
 export const metersApi = baseApi.injectEndpoints({
@@ -76,3 +77,7 @@ export const metersApi = baseApi.injectEndpoints({
 })
 
 export const selectMeterDataById = metersApi.endpoints.getMeters.select()
+export const selectMeterDataWithID = (state: RootState, meterID: number) => {
+	const { data: meterDataByID = {} } = selectMeterDataById(state)
+	return meterDataByID[meterID]
+}

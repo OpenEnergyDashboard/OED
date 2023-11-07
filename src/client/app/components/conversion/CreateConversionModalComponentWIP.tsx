@@ -57,11 +57,7 @@ export default function CreateConversionModalComponent() {
 
 	// If the currently selected conversion is valid
 	const [validConversion, reason] = useAppSelector(
-		state => selectIsValidConversion(
-			state,
-			conversionState.sourceId,
-			conversionState.destinationId,
-			conversionState.bidirectional)
+		state => selectIsValidConversion(state, conversionState)
 	)
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
