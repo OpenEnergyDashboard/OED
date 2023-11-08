@@ -61,6 +61,14 @@ export const authApi = baseApi.injectEndpoints({
 						deleteToken()
 					})
 			}
+		}),
+		logout: builder.mutation<null, void>({
+			queryFn: (_, { dispatch }) => {
+				// Opt to use a RTK mutation instead of manually writing a thunk to take advantage mutation invalidations
+				dispatch(currentUserSlice.actions.clearCurrentUser())
+				return { data: null }
+			},
+			invalidatesTags: ['MeterData', 'GroupData']
 		})
 	})
 })

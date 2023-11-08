@@ -4,9 +4,8 @@
 
 import * as React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom-v5-compat';
+import { Link, useLocation } from 'react-router-dom-v5-compat';
 import { State } from '../types/redux/state';
-import getPage from '../utils/getPage';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
@@ -18,7 +17,7 @@ import MenuModalComponent from './MenuModalComponent';
 export default function HeaderComponent() {
 	const siteTitle = useSelector((state: State) => state.admin.displayTitle);
 	const showOptions = useSelector((state: State) => state.graph.optionsVisibility);
-
+	const { pathname } = useLocation()
 	const divStyle = {
 		marginTop: '5px',
 		paddingBottom: '5px'
@@ -55,7 +54,7 @@ export default function HeaderComponent() {
 				</div>
 				<div className='col-4 justify-content-end d-lg-flex d-none'>
 					{/* collapse menu if optionsVisibility is false */}
-					{getPage() === '' && !showOptions ?
+					{pathname === '/' && !showOptions ?
 						<MenuModalComponent /> :
 						<HeaderButtonsComponent />
 					}

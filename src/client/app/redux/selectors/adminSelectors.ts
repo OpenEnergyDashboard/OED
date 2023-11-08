@@ -215,8 +215,6 @@ export const selectIsValidConversion = createSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
-		console.log('running again!')
-
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			// notifyUser(translate('conversion.create.destination.meter'));

@@ -27,6 +27,7 @@ export const initializeApp = async () => {
 
 	// If user is an admin, they receive additional meter details.
 	// To avoid sending duplicate requests upon startup, verify user then fetch
+	// TODO Not working as expected, still pings for meters and groups twice, due to onQueryStarted async call on verify Token
 	if (hasToken()) {
 		// User has a session token verify before requesting meter/group details
 		await store.dispatch(authApi.endpoints.verifyToken.initiate(getToken()))

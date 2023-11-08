@@ -50,8 +50,7 @@ const useWaitForInit = () => {
 		const waitForInit = async () => {
 			await Promise.all(dispatch(baseApi.util.getRunningQueriesThunk()))
 			setInitComplete(true)
-			// TODO Fix crashing in components on startup if data has yet to be returned, for now readyToNav works.
-			// This Could be avoided if these components were written to handle such cases upon startup| undefined data
+			// TODO Startup Crashing fixed, authen
 		}
 
 		waitForInit();
@@ -76,7 +75,7 @@ export const AdminOutlet = () => {
 
 	return <Outlet />
 	// For now this functionality is disabled.
-	// If no longer desired can remove this and close PR
+	// If no longer desired can remove this and close Issue #817
 	// No other cases means user doesn't have the permissions.
 	// return <Navigate to='/' replace />
 
@@ -97,7 +96,7 @@ export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
 	if (currentUser.profile?.role === UserRole) {
 		return <Outlet />
 	}
-	// If no longer desired can remove this and close PR
+	// If no longer desired can remove this and close Issue #817
 	// For now this functionality is disabled.
 	// return <Navigate to='/' replace />
 	return <Outlet />

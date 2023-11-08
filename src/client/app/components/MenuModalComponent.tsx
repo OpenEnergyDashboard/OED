@@ -7,9 +7,9 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap';
-import getPage from '../utils/getPage';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import UIOptionsComponent from './UIOptionsComponent';
+import { useLocation } from 'react-router-dom-v5-compat';
 
 /**
  * React component to define the collapsed menu modal
@@ -18,6 +18,7 @@ import UIOptionsComponent from './UIOptionsComponent';
 export default function MenuModalComponent() {
 	const [showModal, setShowModal] = useState(false);
 	const toggleModal = () => { setShowModal(!showModal); }
+	const { pathname } = useLocation()
 
 	const inlineStyle: React.CSSProperties = {
 		display: 'inline',
@@ -33,7 +34,7 @@ export default function MenuModalComponent() {
 				<ModalHeader tag={customModalHeader} style={{ padding: '0.25rem 1rem' }} />
 				<ModalBody>
 					{/* Only render graph options if on the graph page */}
-					{getPage() === '' &&
+					{pathname === '/' &&
 						<UIOptionsComponent />
 					}
 				</ModalBody>

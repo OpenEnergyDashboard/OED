@@ -3,33 +3,33 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom-v5-compat';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import getPage from '../utils/getPage';
-import translate from '../utils/translate';
-import { UserRole } from '../types/items';
-import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
-import { deleteToken } from '../utils/token';
-import { State } from '../types/redux/state';
-import { useDispatch, useSelector } from 'react-redux';
-import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import LanguageSelectorComponent from './LanguageSelectorComponent';
+import { useSelector } from 'react-redux';
+import { Link, useLocation } from 'react-router-dom-v5-compat';
+import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import { toggleOptionsVisibility } from '../actions/graph';
-import { BASE_URL } from './TooltipHelpComponent';
+import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 import { currentUserSlice } from '../reducers/currentUser';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';
+import { useAppDispatch } from '../redux/hooks';
+import { UserRole } from '../types/items';
+import { State } from '../types/redux/state';
+import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
+import { deleteToken } from '../utils/token';
+import translate from '../utils/translate';
+import LanguageSelectorComponent from './LanguageSelectorComponent';
+import { BASE_URL } from './TooltipHelpComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 
 /**
  * React Component that defines the header buttons at the top of a page
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
-	const currentPage = getPage();
+	const { pathname } = useLocation();
 
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
@@ -94,16 +94,16 @@ export default function HeaderButtonsComponent() {
 	useEffect(() => {
 		setState(prevState => ({
 			...prevState,
-			shouldHomeButtonDisabled: currentPage === '',
-			shouldAdminButtonDisabled: currentPage === 'admin',
-			shouldGroupsButtonDisabled: currentPage === 'groups',
-			shouldMetersButtonDisabled: currentPage === 'meters',
-			shouldMapsButtonDisabled: currentPage === 'maps',
-			shouldCSVButtonDisabled: currentPage === 'csv',
-			shouldUnitsButtonDisabled: currentPage === 'units',
-			shouldConversionsButtonDisabled: currentPage === 'conversions'
+			shouldHomeButtonDisabled: pathname === '/',
+			shouldAdminButtonDisabled: pathname === '/admin',
+			shouldGroupsButtonDisabled: pathname === '/groups',
+			shouldMetersButtonDisabled: pathname === '/meters',
+			shouldMapsButtonDisabled: pathname === '/maps',
+			shouldCSVButtonDisabled: pathname === '/csv',
+			shouldUnitsButtonDisabled: pathname === '/units',
+			shouldConversionsButtonDisabled: pathname === '/conversions'
 		}));
-	}, [currentPage]);
+	}, [pathname]);
 
 	// This updates which items are hidden based on the login status.
 	useEffect(() => {
@@ -146,7 +146,7 @@ export default function HeaderButtonsComponent() {
 			display: !renderLoginButton ? 'block' : 'none'
 		};
 		const currentShowOptionsStyle = {
-			display: currentPage === '' ? 'block' : 'none'
+			display: pathname === '/' ? 'block' : 'none'
 		}
 		// Admin help or regular user page
 		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
@@ -162,7 +162,7 @@ export default function HeaderButtonsComponent() {
 			pageChoicesHelp: currentPageChoicesHelp,
 			showOptionsStyle: currentShowOptionsStyle
 		}));
-	}, [currentPage, currentUser, helpUrl]);
+	}, [pathname, currentUser, helpUrl]);
 
 	// Handle actions on logout.
 	const handleLogOut = () => {

@@ -5,12 +5,10 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
 import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
 import '../../styles/card-page.css';
-import { MeterData } from '../../types/redux/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponentWIP from './CreateMeterModalComponentWIP';
 import MeterViewComponentWIP from './MeterViewComponentWIP';
@@ -26,7 +24,6 @@ export default function MetersDetailComponent() {
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMetersGroupsDataByID);
-	const { isFetching } = metersApi.useGetMetersQuery()
 
 	return (
 		<div>
@@ -47,9 +44,14 @@ export default function MetersDetailComponent() {
 				{
 					<div className="card-container">
 						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-						{!isFetching && Object.values(visibleMeters)
-							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
-								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
+						{/*  Optional Chaining to prevent from crashing upon startup race conditions*/}
+						{Object.values(visibleMeters)
+							.sort((MeterA, MeterB) =>
+								(MeterA.identifier?.toLowerCase() > MeterB.identifier?.toLowerCase())
+									? 1
+									: ((MeterB.identifier?.toLowerCase() > MeterA.identifier?.toLowerCase())
+										? -1
+										: 0))
 							.map(MeterData => (
 								<MeterViewComponentWIP
 									key={`${MeterData.id}:${MeterData.identifier}`}
