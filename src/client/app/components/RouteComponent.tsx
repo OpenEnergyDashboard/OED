@@ -10,7 +10,6 @@ import { browserHistory } from '../utils/history';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import HomeComponent from './HomeComponent';
-import LoginContainer from '../containers/LoginContainer';
 import AdminComponent from './admin/AdminComponent';
 import { LinkOptions } from '../actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
@@ -33,6 +32,7 @@ import MetersDetailComponent from './meters/MetersDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import * as queryString from 'query-string';
+import LoginComponent from './LoginComponent';
 
 interface RouteProps {
 	barStacking: boolean;
@@ -289,7 +289,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 					<>
 						<Router history={browserHistory}>
 							<Switch>
-								<Route path='/login' component={LoginContainer} />
+								<Route path='/login' component={LoginComponent} />
 								<Route path='/admin' render={() => this.requireAuth(AdminComponent())} />
 								<Route path='/csv' render={() => this.requireRole(UserRole.CSV, <UploadCSVContainer />)} />
 								<Route path='/groups' render={() => this.checkAuth(<GroupsDetailComponent />)} />

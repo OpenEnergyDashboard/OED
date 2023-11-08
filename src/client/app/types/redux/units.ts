@@ -48,10 +48,10 @@ export interface UnitEditData {
 	note: string;
 }
 
-export interface UnitDataById {
-	[unitId: number]: UnitData;
-}
-
+// export interface UnitDataById {
+// 	[unitId: number]: UnitData;
+// }
+export interface UnitDataById extends Record<number, UnitData> { }
 export interface UnitsState {
 	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;

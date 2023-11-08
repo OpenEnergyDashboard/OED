@@ -106,9 +106,7 @@ export interface MeterData {
 	disableChecks: boolean;
 }
 
-export interface MeterDataByID {
-	[meterID: number]: MeterData;
-}
+export interface MeterDataByID extends Record<number, MeterData> { }
 
 export interface MetersState {
 	hasBeenFetchedOnce: boolean;

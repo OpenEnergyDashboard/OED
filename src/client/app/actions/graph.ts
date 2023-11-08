@@ -7,16 +7,8 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { graphSlice } from '../reducers/graph';
 import { Dispatch, GetState, Thunk } from '../types/redux/actions';
 import * as t from '../types/redux/graph';
-import * as m from '../types/redux/map';
-import { State } from '../types/redux/state';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { fetchNeededBarReadings } from './barReadings';
-import { fetchNeededCompareReadings } from './compareReadings';
-import { fetchNeededLineReadings } from './lineReadings';
-import { changeSelectedMap } from './map';
 import { fetchNeededMapReadings } from './mapReadings';
-import { fetchUnitsDetailsIfNeeded } from './units';
 
 export function setHotlinkedAsync(hotlinked: boolean): Thunk {
 	return (dispatch: Dispatch) => {
@@ -29,36 +21,6 @@ export function toggleOptionsVisibility() {
 	return graphSlice.actions.toggleOptionsVisibility();
 }
 
-function changeGraphZoom(timeInterval: TimeInterval) {
-	return graphSlice.actions.updateTimeInterval(timeInterval);
-}
-
-export function changeBarDuration(barDuration: moment.Duration): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(graphSlice.actions.updateBarDuration(barDuration));
-		dispatch(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
-		return Promise.resolve();
-	};
-}
-
-function updateComparePeriod(comparePeriod: ComparePeriod, currentTime: moment.Moment) {
-	return graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime });
-}
-
-export function changeCompareGraph(comparePeriod: ComparePeriod): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		// Here there is no shift since we want to do it in terms of the current time in the browser.
-		// Note this does mean that if someone is in a different time zone then they may be ahead of
-		// reading on the server (so get 0 readings for those times) or behind (so miss recent readings).
-		// TODO At some point we may want to see if we can use the server time to avoid this.
-		dispatch(updateComparePeriod(comparePeriod, moment()));
-		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededCompareReadings(comparePeriod, getState().graph.selectedUnit));
-		});
-		return Promise.resolve();
-	};
-}
-
 export function changeCompareSortingOrder(compareSortingOrder: SortingOrder) {
 	return graphSlice.actions.changeCompareSortingOrder(compareSortingOrder);
 }
@@ -68,9 +30,6 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 		dispatch(graphSlice.actions.updateSelectedMeters(meterIDs));
 		// Nesting dispatches to preserve that updateSelectedMeters() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 		});
 		return Promise.resolve();
@@ -82,73 +41,8 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 		dispatch(graphSlice.actions.updateSelectedGroups(groupIDs));
 		// Nesting dispatches to preserve that updateSelectedGroups() is called before fetching readings
 		dispatch((dispatch2: Dispatch) => {
-			dispatch2(fetchNeededLineReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, getState().graph.selectedUnit));
 		});
-		return Promise.resolve();
-	};
-}
-
-export function changeSelectedUnit(unitID: number): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		dispatch(graphSlice.actions.updateSelectedUnit(unitID));
-		dispatch((dispatch2: Dispatch) => {
-			dispatch(fetchNeededLineReadings(getState().graph.queryTimeInterval, unitID));
-			dispatch2(fetchNeededBarReadings(getState().graph.queryTimeInterval, unitID));
-			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
-			dispatch2(fetchNeededMapReadings(getState().graph.queryTimeInterval, unitID));
-		});
-		return Promise.resolve();
-	}
-}
-
-function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number): Thunk {
-	return (dispatch: Dispatch) => {
-		dispatch(fetchNeededLineReadings(timeInterval, unitID));
-		dispatch(fetchNeededBarReadings(timeInterval, unitID));
-		dispatch(fetchNeededMapReadings(timeInterval, unitID));
-		return Promise.resolve();
-	};
-}
-
-function shouldChangeGraphZoom(state: State, timeInterval: TimeInterval): boolean {
-	return !state.graph.queryTimeInterval.equals(timeInterval);
-}
-
-export function changeGraphZoomIfNeeded(timeInterval: TimeInterval): Thunk {
-	return (dispatch: Dispatch, getState: GetState) => {
-		if (shouldChangeGraphZoom(getState(), timeInterval)) {
-			dispatch(resetRangeSliderStack());
-			dispatch(changeGraphZoom(timeInterval));
-			dispatch(fetchNeededReadingsForGraph(timeInterval, getState().graph.selectedUnit));
-		}
-		return Promise.resolve();
-	};
-}
-
-function shouldChangeRangeSlider(range: TimeInterval): boolean {
-	return range !== TimeInterval.unbounded();
-}
-
-function changeRangeSlider(sliderInterval: TimeInterval) {
-	return graphSlice.actions.changeSliderRange(sliderInterval);
-}
-
-/**
- * remove constraints for rangeslider after user clicked redraw or restore
- * by setting sliderRange to an empty string
- */
-function resetRangeSliderStack() {
-	return graphSlice.actions.resetRangeSliderStack();
-}
-
-function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
-	return (dispatch: Dispatch) => {
-		if (shouldChangeRangeSlider(interval)) {
-			dispatch(changeRangeSlider(interval));
-		}
 		return Promise.resolve();
 	};
 }
@@ -192,72 +86,4 @@ export interface LinkOptions {
 	meterOrGroupID?: number;
 	meterOrGroup?: t.MeterOrGroup;
 	readingInterval?: t.ReadingInterval;
-}
-
-/**
- * Update graph options from a link
- * @param options - Object of possible values to dispatch with keys: meterIDs, groupIDs, chartType, barDuration, toggleBarStacking, ...
- */
-export function changeOptionsFromLink(options: LinkOptions) {
-	const dispatchFirst: Thunk[] = [setHotlinkedAsync(true)];
-	const dispatchSecond: Array<Thunk | m.UpdateSelectedMapAction | ReturnType<typeof graphSlice.actions[keyof typeof graphSlice.actions]>> = [];
-	if (options.meterIDs) {
-		dispatchSecond.push(changeSelectedMeters(options.meterIDs));
-	}
-	if (options.groupIDs) {
-		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
-	}
-	if (options.meterOrGroupID && options.meterOrGroup) {
-		dispatchSecond.push(updateThreeDMeterOrGroupInfo(options.meterOrGroupID, options.meterOrGroup));
-	}
-	if (options.chartType) {
-		dispatchSecond.push(graphSlice.actions.changeChartToRender(options.chartType));
-	}
-	if (options.unitID) {
-		dispatchFirst.push(fetchUnitsDetailsIfNeeded());
-		dispatchSecond.push(changeSelectedUnit(options.unitID));
-	}
-	if (options.rate) {
-		dispatchSecond.push(graphSlice.actions.updateLineGraphRate(options.rate));
-	}
-	if (options.barDuration) {
-		dispatchFirst.push(changeBarDuration(options.barDuration));
-	}
-	if (options.serverRange) {
-		dispatchSecond.push(changeGraphZoomIfNeeded(options.serverRange));
-	}
-	if (options.sliderRange) {
-		dispatchSecond.push(changeRangeSliderIfNeeded(options.sliderRange));
-	}
-	if (options.toggleAreaNormalization) {
-		dispatchSecond.push(graphSlice.actions.toggleAreaNormalization());
-	}
-	if (options.areaUnit) {
-		dispatchSecond.push(graphSlice.actions.updateSelectedAreaUnit(options.areaUnit as AreaUnitType));
-	}
-	if (options.toggleMinMax) {
-		dispatchSecond.push(graphSlice.actions.toggleShowMinMax());
-	}
-	if (options.toggleBarStacking) {
-		dispatchSecond.push(graphSlice.actions.changeBarStacking());
-	}
-	if (options.comparePeriod) {
-		dispatchSecond.push(changeCompareGraph(options.comparePeriod));
-	}
-	if (options.compareSortingOrder) {
-		dispatchSecond.push(changeCompareSortingOrder(options.compareSortingOrder));
-	}
-	if (options.optionsVisibility != null) {
-		dispatchSecond.push(toggleOptionsVisibility());
-	}
-	if (options.mapID) {
-		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
-		// TODO Not currently working with RTK migration
-		dispatchSecond.push(changeSelectedMap(options.mapID));
-	}
-	if (options.readingInterval) {
-		dispatchSecond.push(updateThreeDReadingInterval(options.readingInterval));
-	}
-	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
-		.then(() => Promise.all(dispatchSecond.map(dispatch)));
 }

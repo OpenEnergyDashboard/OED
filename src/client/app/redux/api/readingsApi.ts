@@ -1,11 +1,8 @@
 import * as _ from 'lodash';
-import { BarReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../../redux/selectors/dataSelectors';
+import { BarReadingApiArgs, CompareReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../../redux/selectors/dataSelectors';
 import { RootState } from '../../store';
-import { BarReadings, LineReadings, ThreeDReading } from '../../types/readings';
+import { BarReadings, CompareReadings, LineReadings, ThreeDReading } from '../../types/readings';
 import { baseApi } from './baseApi';
-
-
-
 
 export const readingsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -113,8 +110,41 @@ export const readingsApi = baseApi.injectEndpoints({
 				const queryArgs = `timeInterval=${timeInterval}&barWidthDays=${barWidthDays}&graphicUnitId=${unitID}`
 				const endpointURL = `${endpoint}${queryArgs}`
 				const { data, error } = await baseQuery(endpointURL)
-				return error ? { error } : { data: data as LineReadings }
+				return error ? { error } : { data: data as BarReadings }
 			}
+		}),
+		/**
+		 * Gets compare readings for meters for the given current time range and a shift for previous time range
+		 * @param meterIDs The meter IDs to get readings for
+		 * @param timeInterval  start and end of current/this compare period
+		 * @param shift how far to shift back in time from current period to previous period
+		 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+		 * @returns CompareReadings in sorted order
+		 */
+		compare: builder.query<CompareReadings, CompareReadingApiArgs>({
+			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
+			forceRefetch: ({ currentArg, endpointState }) => {
+				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : undefined
+				if (!currentData) { return true }
+				const dataInCache = currentArg?.ids.every(id => currentData.includes(id))
+				return !dataInCache ? true : false
+			},
+			queryFn: async (args, queryApi, _extra, baseQuery) => {
+				const { ids, curr_start, curr_end, shift, unitID, meterOrGroup } = args
+				const state = queryApi.getState() as RootState
+				const cachedData = readingsApi.endpoints.compare.select(args)(state).data
+				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : []
+				const idsToFetch = _.difference(ids, cachedIDs).join(',')
+				const apiURL = `/api/compareReadings/${meterOrGroup}/${idsToFetch}?`
+				const params = `curr_start=${curr_start}&curr_end=${curr_end}&shift=${shift}&graphicUnitId=${unitID}`
+				const URL = `${apiURL}${params}`
+				const { data, error } = await baseQuery(URL)
+				return error ? { error } : { data: data as CompareReadings }
+			}
+			// }
 		})
+
 	})
+
 })

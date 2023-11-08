@@ -4,15 +4,15 @@
 
 import * as React from 'react';
 import MapChartContainer from '../containers/MapChartContainer';
-import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
 import { useAppSelector } from '../redux/hooks';
 import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { ChartTypes } from '../types/redux/graph';
 import BarChartComponent from './BarChartComponent';
+import HistoryComponent from './HistoryComponent';
 import LineChartComponent from './LineChartComponent';
+import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
-import HistoryComponent from './HistoryComponent';
 
 /**
  * React component that controls the dashboard
@@ -40,7 +40,7 @@ export default function DashboardComponent() {
 
 						{chartToRender === ChartTypes.line && <LineChartComponent queryArgs={queryArgs.line} />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent queryArgs={queryArgs.bar} />}
-						{chartToRender === ChartTypes.compare && <MultiCompareChartContainer />}
+						{chartToRender === ChartTypes.compare && <MultiCompareChartComponentWIP />}
 						{chartToRender === ChartTypes.map && <MapChartContainer />}
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent queryArgs={queryArgs.threeD} />}
 					</div>

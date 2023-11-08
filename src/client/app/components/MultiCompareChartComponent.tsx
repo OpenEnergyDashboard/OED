@@ -5,8 +5,7 @@
 import * as React from 'react';
 import { UncontrolledAlert } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import CompareChartContainer from '../containers/CompareChartContainer';
-import { CompareEntity } from '../containers/MultiCompareChartContainer';
+import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
 
 interface MultiCompareChartProps {
 	selectedCompareEntities: CompareEntity[];

@@ -5,15 +5,27 @@
  */
 
 import { connect } from 'react-redux';
-import { State } from '../types/redux/state';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
-import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { selectUnitDataById } from '../redux/api/unitsApi';
+import { RootState } from '../store';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+export interface CompareEntity {
+	id: number;
+	isGroup: boolean;
+	name: string;
+	identifier: string;
+	change: number;
+	currUsage: number;
+	prevUsage: number;
+	prevTotalUsage?: number;
+}
 
 interface CompareChartContainerProps {
 	entity: CompareEntity;
@@ -27,7 +39,7 @@ interface CompareChartContainerProps {
  * @param ownProps Chart container props
  * @returns The props object
  */
-function mapStateToProps(state: State, ownProps: CompareChartContainerProps): any {
+function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps): any {
 	const comparePeriod = state.graph.comparePeriod;
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
@@ -35,7 +47,10 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	// Also need to determine if raw.
 	const graphingUnit = state.graph.selectedUnit;
 	// This container is not called if there is no data of there are not units so this is safe.
-	const selectUnitState = state.units.units[state.graph.selectedUnit];
+	const { data: unitDataById = {} } = selectUnitDataById(state)
+	const { data: meterDataById = {} } = selectMeterDataById(state)
+	const { data: groupDataById = {} } = selectGroupDataById(state)
+	const selectUnitState = unitDataById[graphingUnit];
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
@@ -108,12 +123,13 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
+	console.log(entity)
 
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
 		if (state.graph.areaNormalization) {
-			const area = entity.isGroup ? state.groups.byGroupID[entity.id].area : state.meters.byMeterID[entity.id].area;
-			const areaUnit = entity.isGroup ? state.groups.byGroupID[entity.id].areaUnit : state.meters.byMeterID[entity.id].areaUnit;
+			const area = entity.isGroup ? groupDataById[entity.id].area : meterDataById[entity.id].area;
+			const areaUnit = entity.isGroup ? groupDataById[entity.id].areaUnit : meterDataById[entity.id].areaUnit;
 			const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
 			previousPeriod /= normalization;
 			currentPeriod /= normalization;
@@ -142,7 +158,8 @@ function mapStateToProps(state: State, ownProps: CompareChartContainerProps): an
 	let layout: any;
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-	if (selectUnitState.unitRepresent === UnitRepresentType.raw) {
+	// added graph unit check to avoid crashing in edge case when traversing history backwards
+	if (graphingUnit === -99 || selectUnitState.unitRepresent === UnitRepresentType.raw) {
 		// This is a raw type graphing unit so cannot plot
 		layout = {
 			'xaxis': {

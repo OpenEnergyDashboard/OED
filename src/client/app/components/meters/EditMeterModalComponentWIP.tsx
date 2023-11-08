@@ -44,7 +44,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
 	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
 	// The current meter's state of meter being edited. It should always be valid.
-	const meterState = useAppSelector(state => selectMeterDataWithID(state, props.meter.id));
+	const meterState = useAppSelector(state => selectMeterDataWithID(state, props.meter.id)) as MeterData;
 	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
 	const {
 		compatibleGraphicUnits,

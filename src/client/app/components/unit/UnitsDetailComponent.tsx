@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+import { QueryStatus } from '@reduxjs/toolkit/query';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
@@ -10,8 +11,6 @@ import { useAppSelector } from '../../redux/hooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
-import { QueryStatus } from '@reduxjs/toolkit/query';
-import { UnitData } from 'types/redux/units';
 
 /**
  * Defines the units page card view
@@ -50,9 +49,9 @@ export default function UnitsDetailComponent() {
 							{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
 							{
 								Object.values(unitDataById)
-									.sort((unitA: UnitData, unitB: UnitData) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
+									.sort((unitA, unitB) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
 										((unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
-									.map((unitData: UnitData) => (
+									.map(unitData => (
 										<UnitViewComponent
 											key={unitData.id}
 											unit={unitData}

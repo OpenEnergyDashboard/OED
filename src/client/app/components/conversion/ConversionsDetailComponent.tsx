@@ -2,23 +2,22 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as React from 'react';
+import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { useSelector } from 'react-redux';
+import { ConversionData } from 'types/redux/conversions';
+import { fetchConversionsDetailsIfNeeded } from '../../actions/conversions';
+import HeaderComponent from '../../components/HeaderComponent';
+import SpinnerComponent from '../../components/SpinnerComponent';
 import FooterContainer from '../../containers/FooterContainer';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import * as React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { State } from '../../types/redux/state';
-import { fetchConversionsDetailsIfNeeded } from '../../actions/conversions';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
-import { ConversionData } from 'types/redux/conversions';
-import SpinnerComponent from '../../components/SpinnerComponent';
-import HeaderComponent from '../../components/HeaderComponent';
-import { Dispatch } from '../../types/redux/actions';
-import { useAppSelector } from '../../redux/hooks';
-import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 
 /**
  * Defines the conversions page card view
@@ -27,7 +26,7 @@ import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch: Dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
 		// Makes async call to conversions API for conversions details if one has not already been made somewhere else, stores conversion by ids in state

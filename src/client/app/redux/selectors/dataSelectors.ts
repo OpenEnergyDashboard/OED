@@ -7,6 +7,7 @@ import { readingsApi } from '../api/readingsApi';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
+import { calculateCompareShift } from '../../utils/calculateCompare';
 
 // Props that are passed to plotly components
 export interface ChartMultiQueryProps<T> {
@@ -21,17 +22,29 @@ export interface ChartMultiQueryArgs<T> {
 	meta: ChartQueryArgsMeta
 }
 
-// query args that all graphs share
+// query args that 'most' graphs share
 export interface commonArgsMultiID {
 	ids: number[];
 	timeInterval: string;
 	unitID: number;
 	meterOrGroup: MeterOrGroup;
 }
+export interface commonArgsSingleID extends Omit<commonArgsMultiID, 'ids'> { id: number }
+
+// endpoint specific args
+export interface LineReadingApiArgs extends commonArgsMultiID { }
+export interface BarReadingApiArgs extends commonArgsMultiID { barWidthDays: number }
+export interface ThreeDReadingApiArgs extends commonArgsSingleID { readingInterval: ReadingInterval }
+export interface CompareReadingApiArgs extends Omit<commonArgsMultiID, 'timeInterval'> {
+	// compare breaks the timeInterval pattern query pattern therefore omit and add required for api.
+	shift: string,
+	curr_start: string,
+	curr_end: string
+}
+// { meterIDs: number[], timeInterval: TimeInterval, shift: moment.Duration, unitID: number }
 export interface ChartSingleQueryProps<T> {
 	queryArgs: ChartQuerySingleArgs<T>
 }
-
 
 export interface ChartQuerySingleArgs<T> {
 	args: T;
@@ -41,13 +54,9 @@ export interface ChartQuerySingleArgs<T> {
 export interface ChartQueryArgsMeta {
 	endpoint: string;
 }
-export interface commonArgsSingleID extends Omit<commonArgsMultiID, 'ids'> { id: number }
-// endpoint specific args
-export interface LineReadingApiArgs extends commonArgsMultiID { }
-export interface BarReadingApiArgs extends commonArgsMultiID { barWidthDays: number }
-export interface ThreeDReadingApiArgs extends commonArgsSingleID { readingInterval: ReadingInterval }
 
-// Selector prepares the query args for each endpoint based on the current graph slice state
+// Selector prepares the query args for ALL graph endpoints based on the current graph slice state
+// TODO Break down into individual selectors? Verify if prop drilling is required
 export const selectChartQueryArgs = createSelector(
 	selectGraphState,
 	graphState => {
@@ -94,7 +103,7 @@ export const selectChartQueryArgs = createSelector(
 				endpoint: readingsApi.endpoints.bar.name
 			}
 		}
-		// TODO; Make 2 types for multi-id and single-id request ARGS
+		// TODO; Make 2 types for multi-id and single-id request ARGS not idea, but works for now.
 		const threeD: ChartQuerySingleArgs<ThreeDReadingApiArgs> = {
 			// Fix not null assertion(s)
 			args: {
@@ -110,10 +119,31 @@ export const selectChartQueryArgs = createSelector(
 			}
 		}
 
-		return { line, bar, threeD }
+		const compare: ChartMultiQueryArgs<CompareReadingApiArgs> = {
+			meterArgs: {
+				...baseMeterArgs,
+				shift: calculateCompareShift(graphState.comparePeriod).toISOString(),
+				curr_start: graphState.compareTimeInterval.getStartTimestamp()?.toISOString(),
+				curr_end: graphState.compareTimeInterval.getEndTimestamp()?.toISOString()
+			},
+			groupsArgs: {
+				...baseGroupArgs,
+				shift: calculateCompareShift(graphState.comparePeriod).toISOString(),
+				curr_start: graphState.compareTimeInterval.getStartTimestamp()?.toISOString(),
+				curr_end: graphState.compareTimeInterval.getEndTimestamp()?.toISOString()
+			},
+			meterSkipQuery: !baseMeterArgs.ids.length,
+			groupSkipQuery: !baseGroupArgs.ids.length,
+			meta: {
+				endpoint: readingsApi.endpoints.compare.name
+			}
+		}
+
+		return { line, bar, threeD, compare }
 	}
 )
 
+// TODO DUPLICATE SELECTOR? UI SELECTOR MAY CONTAIN SAME LOGIC, CONSOLIDATE IF POSSIBLE?
 export const selectVisibleMetersGroupsDataByID = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,

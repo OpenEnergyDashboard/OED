@@ -98,3 +98,13 @@ export const groupsApi = baseApi.injectEndpoints({
 })
 
 export const selectGroupDataById = groupsApi.endpoints.getGroups.select();
+
+export const selectGroupDataWithID = (state: RootState, groupId: number): GroupData | undefined => {
+	const { data: groupDataById = {} } = selectGroupDataById(state)
+	return groupDataById[groupId]
+}
+
+export const selectGroupNameWithID = (state: RootState, groupId: number) => {
+	const groupInfo = selectGroupDataWithID(state, groupId)
+	return groupInfo ? groupInfo.name : '';
+}

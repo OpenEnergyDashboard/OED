@@ -88,7 +88,7 @@ export const selectUnitName = createSelector(
 	selectUnitDataById,
 	selectMeterDataWithID,
 	({ data: unitDataById = {} }, meterData) => {
-		const unitName = (Object.keys(unitDataById).length === 0 || meterData.unitId === -99) ?
+		const unitName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.unitId === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
 		return unitName
 	}
@@ -109,7 +109,7 @@ export const selectGraphicName = createSelector(
 	selectUnitDataById,
 	selectMeterDataWithID,
 	({ data: unitDataById = {} }, meterData) => {
-		const graphicName = (Object.keys(unitDataById).length === 0 || meterData.defaultGraphicUnit === -99) ?
+		const graphicName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.defaultGraphicUnit === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
 		return graphicName
 	}

@@ -1,19 +1,20 @@
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+/* eslint-disable jsdoc/require-param */
+
+fetchGroupMapReadings();
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {Dispatch, GetState, Thunk} from '../types/redux/actions';
-import {TimeInterval} from '../../../common/TimeInterval';
+import { Dispatch, GetState, Thunk } from '../types/redux/actions';
+import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import {
-	receiveGroupBarReadings,
-	receiveMeterBarReadings,
-	requestGroupBarReadings,
-	requestMeterBarReadings,
-	shouldFetchGroupBarReadings,
-	shouldFetchMeterBarReadings
-} from './barReadings';
-import {readingsApi} from '../utils/api';
+
+import { readingsApi } from '../utils/api';
 
 /**
  * Fetch the data for the given meters over the given interval. Fully manages the Redux lifecycle.
@@ -39,11 +40,14 @@ function fetchMeterMapReadings(meterIDs: number[], timeInterval: TimeInterval, d
  * @param duration The length of time covered in this timeInterval
  * @param unitID the ID of the unit for which to check
  */
+
 function fetchGroupMapReadings(groupIDs: number[], timeInterval: TimeInterval, duration: moment.Duration, unitID: number): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestGroupBarReadings(groupIDs, timeInterval, duration, unitID));
 		const groupMapReadings = await readingsApi.groupBarReadings(groupIDs, timeInterval, Math.round(duration.asDays()), unitID);
 		dispatch(receiveGroupBarReadings(groupIDs, timeInterval, duration, unitID, groupMapReadings));
+		return Promise.resolve()
+
 	};
 }
 

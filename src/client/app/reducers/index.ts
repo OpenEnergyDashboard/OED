@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { combineReducers } from 'redux';
-import compareReadings from './compareReadings';
 import maps from './maps';
 import { adminSlice } from './admin';
 import { versionSlice } from './version';
@@ -15,11 +14,8 @@ import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
 
 export const rootReducer = combineReducers({
-	readings: combineReducers({
-		compare: compareReadings
-	}),
-	graph: graphSlice.reducer,
 	maps,
+	graph: graphSlice.reducer,
 	admin: adminSlice.reducer,
 	version: versionSlice.reducer,
 	currentUser: currentUserSlice.reducer,

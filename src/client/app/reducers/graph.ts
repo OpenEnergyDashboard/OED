@@ -268,7 +268,8 @@ export const graphSlice = createSlice({
 		selectThreeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.threeD.readingInterval,
 		selectLineGraphRate: state => state.lineGraphRate,
-		selectAreaUnit: state => state.selectedAreaUnit
+		selectAreaUnit: state => state.selectedAreaUnit,
+		selectSortingOrder: state => state.compareSortingOrder
 	}
 })
 
@@ -287,7 +288,8 @@ export const {
 	selectThreeDMeterOrGroupID,
 	selectThreeDReadingInterval,
 	selectLineGraphRate,
-	selectAreaUnit
+	selectAreaUnit,
+	selectSortingOrder
 } = graphSlice.selectors
 
 // actionCreators exports

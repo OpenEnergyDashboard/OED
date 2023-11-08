@@ -43,10 +43,7 @@ export interface StatefulEditable {
 	dirty: boolean;
 	submitted?: boolean;
 }
-export interface GroupDataByID {
-	[groupID: number]: GroupData;
-
-}
+export interface GroupDataByID extends Record<number, GroupData> {}
 export interface GroupsState {
 	byGroupID: GroupDataByID
 	selectedGroups: number[];

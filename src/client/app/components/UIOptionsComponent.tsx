@@ -11,7 +11,6 @@ import { useAppSelector } from '../redux/hooks';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import BarControlsComponent from './BarControlsComponent';
-import ChartDataSelectComponentWIP from './ChartDataSelectComponentWIP';
 import ChartSelectComponent from './ChartSelectComponent';
 import CompareControlsComponent from './CompareControlsComponent';
 import DateRangeComponent from './DateRangeComponent';
@@ -19,6 +18,7 @@ import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
+import ChartDataSelectComponent from './ChartDataSelectComponent';
 
 
 /**
@@ -30,7 +30,7 @@ export default function UIOptionsComponent() {
 	return (
 		<div>
 			<ChartSelectComponent />
-			<ChartDataSelectComponentWIP />
+			<ChartDataSelectComponent />
 			<GraphicRateMenuComponent />
 			<ThreeDSelectComponent />
 			<DateRangeComponent />

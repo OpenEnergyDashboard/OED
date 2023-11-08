@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
-import UIOptionsContainer from '../containers/UIOptionsContainer';
-import HeaderButtonsComponent from './HeaderButtonsComponent';
+import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
-import { useState } from 'react';
+import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import getPage from '../utils/getPage';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
+import UIOptionsComponent from './UIOptionsComponent';
 
 /**
  * React component to define the collapsed menu modal
@@ -34,7 +34,7 @@ export default function MenuModalComponent() {
 				<ModalBody>
 					{/* Only render graph options if on the graph page */}
 					{getPage() === '' &&
-						<UIOptionsContainer />
+						<UIOptionsComponent />
 					}
 				</ModalBody>
 			</Modal>

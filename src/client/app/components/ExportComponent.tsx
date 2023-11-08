@@ -90,7 +90,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current meter.
 						const meterIdentifier = metersDataById[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meter, errorBarState);
+						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meters, errorBarState);
 					} else {
 						throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
 					}
@@ -118,7 +118,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current group.
 						const groupName = groupsDataById[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.group);
+						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.groups);
 					} else {
 						throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
 					}
@@ -149,7 +149,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current meter.
 						const meterIdentifier = metersDataById[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meter);
+						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meters);
 					} else if (!readingsData && !barMeterIsFetching) {
 						throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
 					}
@@ -177,7 +177,7 @@ export default function ExportComponent() {
 						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
 						// Identifier for current group.
 						const groupName = groupsDataById[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.group);
+						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.groups);
 					} else if (!readingsData && !barGroupIsFetching) {
 						throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
 					}
