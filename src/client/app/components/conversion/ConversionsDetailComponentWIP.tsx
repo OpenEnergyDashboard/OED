@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
 import { unitsApi } from '../../redux/api/unitsApi';
 import { ConversionData } from '../../types/redux/conversions';
@@ -52,7 +52,7 @@ export default function ConversionsDetailComponent() {
 				</div>
 			) : (
 				<div>
-					<TooltipHelpContainer page='conversions' />
+					<TooltipHelpComponent page='conversions' />
 
 					<div className='container-fluid'>
 						<h2 style={titleStyle}>

@@ -6,7 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom-v5-compat';
 import { Button, Table } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
@@ -59,7 +59,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		return (
 			<div>
 				<UnsavedWarningContainer />
-				<TooltipHelpContainer page='maps' />
+				<TooltipHelpComponent page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />

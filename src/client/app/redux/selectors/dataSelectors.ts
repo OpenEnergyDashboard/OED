@@ -56,7 +56,7 @@ export interface ChartQueryArgsMeta {
 }
 
 // Selector prepares the query args for ALL graph endpoints based on the current graph slice state
-// TODO Break down into individual selectors? Verify if prop drilling is required
+// TODO Break down into individual selectors? Verify if prop drilling is a better pattern vs useSelector in same sameComponent
 export const selectChartQueryArgs = createSelector(
 	selectGraphState,
 	graphState => {
@@ -148,15 +148,15 @@ export const selectVisibleMetersGroupsDataByID = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	selectIsLoggedInAsAdmin,
-	({ data: meterDataByID = {} }, { data: groupDataByID = {} }, isAdmin) => {
+	(meterDataById, groupDataById, isAdmin) => {
 		let visibleMeters;
 		let visibleGroups;
 		if (isAdmin) {
-			visibleMeters = meterDataByID
-			visibleGroups = groupDataByID;
+			visibleMeters = meterDataById
+			visibleGroups = groupDataById;
 		} else {
-			visibleMeters = _.filter(meterDataByID, meter => meter.displayable);
-			visibleGroups = _.filter(groupDataByID, group => group.displayable);
+			visibleMeters = _.filter(meterDataById, meter => meter.displayable);
+			visibleGroups = _.filter(groupDataById, group => group.displayable);
 		}
 
 		return { visibleMeters, visibleGroups }

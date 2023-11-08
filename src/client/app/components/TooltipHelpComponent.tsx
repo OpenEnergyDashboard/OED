@@ -7,11 +7,11 @@ import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import '../styles/tooltip.css';
 import translate from '../utils/translate';
+import { useAppSelector } from '../redux/hooks';
+import { selectOEDVersion } from '../redux/api/versionApi';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
-	version: string;
-	fetchVersionIfNeeded(): Promise<any>;
 }
 
 // Normal/live URL for OED help pages
@@ -21,102 +21,101 @@ export const BASE_URL = 'https://openenergydashboard.github.io/help/'
 // This works if you have a fork of the web pages and setup your GitHub account to serve them up.
 // export const BASE_URL = 'https://xxx.github.io/OpenEnergyDashboard.github.io/help/';
 
-export default class TooltipHelpComponent extends React.Component<TooltipHelpProps> {
-	constructor(props: TooltipHelpProps) {
-		super(props);
-		this.props.fetchVersionIfNeeded();
-	}
+/**
+ * @param props // Specifies which page the tip is in.
+ * @returns ToolTipHelpComponent
+ */
+export default function TooltipHelpComponent(props: TooltipHelpProps) {
 
 	/**
 	 * @returns JSX to create the help icons with links
 	 */
-	public render() {
-		const divStyle = {
-			display: 'inline-block'
-		};
 
-		const version = this.props.version
 
-		const HELP_URL = BASE_URL + version;
+	const version = useAppSelector(selectOEDVersion)
 
-		const helpLinks: Record<string, Record<string, string>> = {
-			'help.admin.conversioncreate': { link: `${HELP_URL}/adminConversionCreating.html` },
-			'help.admin.conversionedit': { link: `${HELP_URL}/adminConversionEditing.html` },
-			'help.admin.conversionview': { link: `${HELP_URL}/adminConversionViewing.html` },
-			'help.admin.groupcreate': { link: `${HELP_URL}/adminGroupCreating.html` },
-			'help.admin.groupedit': { link: `${HELP_URL}/adminGroupEditing.html` },
-			'help.admin.groupview': { link: `${HELP_URL}/adminGroupViewing.html` },
-			'help.admin.header': { link: `${HELP_URL}/adminPreferences.html` },
-			'help.admin.mapview': { link: `${HELP_URL}/adminMapViewing.html` },
-			'help.admin.metercreate': { link: `${HELP_URL}/adminMeterCreating.html` },
-			'help.admin.meteredit': { link: `${HELP_URL}/adminMeterEditing.html` },
-			'help.admin.meterview': { link: `${HELP_URL}/adminMeterViewing.html` },
-			'help.admin.unitcreate': { link: `${HELP_URL}/adminUnitCreating.html` },
-			'help.admin.unitedit': { link: `${HELP_URL}/adminUnitEditing.html` },
-			'help.admin.unitview': { link: `${HELP_URL}/adminUnitViewing.html` },
-			'help.admin.user': { link: `${HELP_URL}/adminUser.html` },
-			'help.csv.header': { link: `${HELP_URL}/adminDataAcquisition.html` },
-			'help.home.area.normalize': { link: `${HELP_URL}/areaNormalization.html` },
-			'help.home.bar.custom.slider.tip': { link: `${HELP_URL}/barGraphic.html#usage` },
-			'help.home.bar.interval.tip': { link: `${HELP_URL}/barGraphic.html#usage` },
-			'help.home.bar.stacking.tip': { link: `${HELP_URL}/barGraphic.html#barStacking` },
-			'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
-			'help.home.chart.redraw.restore': { link: `${HELP_URL}/lineGraphic.html#redrawRestore` },
-			'help.home.chart.select': { link: `${HELP_URL}/graphType.html` },
-			'help.home.compare.interval.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
-			'help.home.compare.sort.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
-			'help.home.error.bar': { link: `${HELP_URL}/errorBar.html#usage` },
-			'help.home.export.graph.data': { link: `${HELP_URL}/export.html` },
-			'help.home.map.interval.tip': { link: `${HELP_URL}/mapGraphic.html#usage` },
-			'help.home.navigation': { link: '' },
-			'help.home.select.groups': { link: `${HELP_URL}/graphingGroups.html` },
-			'help.home.select.maps': { link: `${HELP_URL}/mapGraphic.html` },
-			'help.home.select.meters': { link: `${HELP_URL}/graphingMeters.html` },
-			'help.home.select.rates': { link: `${HELP_URL}/graphingRates.html` },
-			'help.home.select.units': { link: `${HELP_URL}/graphingUnits.html` },
-			'help.home.readings.per.day': { link: `${HELP_URL}/readingsPerDay.html` },
-			'help.home.toggle.chart.link': { link: `${HELP_URL}/chartLink.html` },
-			'help.groups.groupdetails': { link: `${HELP_URL}/groupViewing.html#groupDetails` },
-			'help.groups.groupview': { link: `${HELP_URL}/groupViewing.html` },
-			'help.meters.meterview': { link: `${HELP_URL}/meterViewing.html` }
-		};
+	const HELP_URL = BASE_URL + version;
 
-		return (
-			<div style={divStyle}>
-				<ReactTooltip
-					className='tip'
-					id={`${this.props.page}`}
-					event='click'
-					clickable
-					effect='solid'
-					globalEventOff='click'
-					getContent={dataTip => {
-						if (dataTip === null) {
-							return;
-						}
-						// Create links
-						const values = helpLinks[dataTip] || {}; // This is in case the help tip does not have any links.
-						const links: Record<string, JSX.Element> = {};
-						Object.keys(values).forEach(key => {
-							const link = values[key];
-							links[key] = version ? (<a target='_blank' rel='noopener noreferrer' href={link}>
-								{translate('here')}
-							</a>
-							) : <>...</>;
-							// TODO: Provide default link when there are issues fetching version number
-						});
-						return (
-							<div style={{ width: '300px' }}>
-								<FormattedMessage
-									id={dataTip}
-									values={links}
-								/>
-							</div>
-						);
-					}}
-				/>
+	const helpLinks: Record<string, Record<string, string>> = {
+		'help.admin.conversioncreate': { link: `${HELP_URL}/adminConversionCreating.html` },
+		'help.admin.conversionedit': { link: `${HELP_URL}/adminConversionEditing.html` },
+		'help.admin.conversionview': { link: `${HELP_URL}/adminConversionViewing.html` },
+		'help.admin.groupcreate': { link: `${HELP_URL}/adminGroupCreating.html` },
+		'help.admin.groupedit': { link: `${HELP_URL}/adminGroupEditing.html` },
+		'help.admin.groupview': { link: `${HELP_URL}/adminGroupViewing.html` },
+		'help.admin.header': { link: `${HELP_URL}/adminPreferences.html` },
+		'help.admin.mapview': { link: `${HELP_URL}/adminMapViewing.html` },
+		'help.admin.metercreate': { link: `${HELP_URL}/adminMeterCreating.html` },
+		'help.admin.meteredit': { link: `${HELP_URL}/adminMeterEditing.html` },
+		'help.admin.meterview': { link: `${HELP_URL}/adminMeterViewing.html` },
+		'help.admin.unitcreate': { link: `${HELP_URL}/adminUnitCreating.html` },
+		'help.admin.unitedit': { link: `${HELP_URL}/adminUnitEditing.html` },
+		'help.admin.unitview': { link: `${HELP_URL}/adminUnitViewing.html` },
+		'help.admin.user': { link: `${HELP_URL}/adminUser.html` },
+		'help.csv.header': { link: `${HELP_URL}/adminDataAcquisition.html` },
+		'help.home.area.normalize': { link: `${HELP_URL}/areaNormalization.html` },
+		'help.home.bar.custom.slider.tip': { link: `${HELP_URL}/barGraphic.html#usage` },
+		'help.home.bar.interval.tip': { link: `${HELP_URL}/barGraphic.html#usage` },
+		'help.home.bar.stacking.tip': { link: `${HELP_URL}/barGraphic.html#barStacking` },
+		'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
+		'help.home.chart.redraw.restore': { link: `${HELP_URL}/lineGraphic.html#redrawRestore` },
+		'help.home.chart.select': { link: `${HELP_URL}/graphType.html` },
+		'help.home.compare.interval.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
+		'help.home.compare.sort.tip': { link: `${HELP_URL}/compareGraphic.html#usage` },
+		'help.home.error.bar': { link: `${HELP_URL}/errorBar.html#usage` },
+		'help.home.export.graph.data': { link: `${HELP_URL}/export.html` },
+		'help.home.map.interval.tip': { link: `${HELP_URL}/mapGraphic.html#usage` },
+		'help.home.navigation': { link: '' },
+		'help.home.select.groups': { link: `${HELP_URL}/graphingGroups.html` },
+		'help.home.select.maps': { link: `${HELP_URL}/mapGraphic.html` },
+		'help.home.select.meters': { link: `${HELP_URL}/graphingMeters.html` },
+		'help.home.select.rates': { link: `${HELP_URL}/graphingRates.html` },
+		'help.home.select.units': { link: `${HELP_URL}/graphingUnits.html` },
+		'help.home.readings.per.day': { link: `${HELP_URL}/readingsPerDay.html` },
+		'help.home.toggle.chart.link': { link: `${HELP_URL}/chartLink.html` },
+		'help.groups.groupdetails': { link: `${HELP_URL}/groupViewing.html#groupDetails` },
+		'help.groups.groupview': { link: `${HELP_URL}/groupViewing.html` },
+		'help.meters.meterview': { link: `${HELP_URL}/meterViewing.html` }
+	};
 
-			</div>
-		);
-	}
+	return (
+		<div style={divStyle}>
+			<ReactTooltip
+				className='tip'
+				id={`${props.page}`}
+				event='click'
+				clickable
+				effect='solid'
+				globalEventOff='click'
+				getContent={dataTip => {
+					if (dataTip === null) {
+						return;
+					}
+					// Create links
+					const values = helpLinks[dataTip] || {}; // This is in case the help tip does not have any links.
+					const links: Record<string, JSX.Element> = {};
+					Object.keys(values).forEach(key => {
+						const link = values[key];
+						links[key] = version ? (<a target='_blank' rel='noopener noreferrer' href={link}>
+							{translate('here')}
+						</a>
+						) : <>...</>;
+						// TODO: Provide default link when there are issues fetching version number
+					});
+					return (
+						<div style={{ width: '300px' }}>
+							<FormattedMessage
+								id={dataTip}
+								values={links}
+							/>
+						</div>
+					);
+				}}
+			/>
+
+		</div>
+	);
 }
+const divStyle = {
+	display: 'inline-block'
+};

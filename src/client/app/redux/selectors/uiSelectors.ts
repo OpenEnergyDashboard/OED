@@ -31,7 +31,7 @@ export const selectVisibleMetersAndGroups = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	selectCurrentUser,
-	({ data: meterDataByID = {} }, { data: groupDataById = {} }, currentUser) => {
+	(meterDataByID, groupDataById, currentUser) => {
 		// Holds all meters visible to the user
 		const visibleMeters = new Set<number>();
 		const visibleGroups = new Set<number>();
@@ -68,7 +68,7 @@ export const selectCurrentUnitCompatibility = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	selectGraphUnitID,
-	(visible, { data: meterDataById = {} }, { data: groupDataById = {} }, graphUnitID) => {
+	(visible, meterDataById, groupDataById, graphUnitID) => {
 		// meters and groups that can graph
 		const compatibleMeters = new Set<number>();
 		const compatibleGroups = new Set<number>();
@@ -145,7 +145,7 @@ export const selectCurrentAreaCompatibility = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	selectUnitDataById,
-	(currentUnitCompatibility, areaNormalization, unitID, { data: meterDataById = {} }, { data: groupDataById = {} }, { data: unitDataById = {} }) => {
+	(currentUnitCompatibility, areaNormalization, unitID, meterDataById, groupDataById, unitDataById) => {
 		// Deep Copy previous selector's values, and update as needed based on current Area Normalization setting
 		const compatibleMeters = new Set<number>(currentUnitCompatibility.compatibleMeters);
 		const compatibleGroups = new Set<number>(currentUnitCompatibility.compatibleGroups);
@@ -192,7 +192,7 @@ export const selectChartTypeCompatibility = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	selectMapState,
-	(areaCompat, chartToRender, { data: meterDataById = {} }, { data: groupDataById = {} }, mapState) => {
+	(areaCompat, chartToRender, meterDataById, groupDataById, mapState) => {
 		// Deep Copy previous selector's values, and update as needed based on current ChartType(s)
 		const compatibleMeters = new Set<number>(Array.from(areaCompat.compatibleMeters));
 		const incompatibleMeters = new Set<number>(Array.from(areaCompat.incompatibleMeters));
@@ -280,7 +280,7 @@ export const selectMeterGroupSelectData = createSelector(
 	selectGroupDataById,
 	selectSelectedMeters,
 	selectSelectedGroups,
-	(chartTypeCompatibility, { data: meterDataById = {} }, { data: groupDataById = {} }, selectedMeters, selectedGroups) => {
+	(chartTypeCompatibility, meterDataById, groupDataById, selectedMeters, selectedGroups) => {
 		// Destructure Previous Selectors's values
 		const { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups } = chartTypeCompatibility;
 
@@ -337,7 +337,7 @@ export const selectMeterGroupSelectData = createSelector(
 export const selectVisibleUnitOrSuffixState = createSelector(
 	selectUnitDataById,
 	selectCurrentUser,
-	({ data: unitDataById }, currentUser) => {
+	(unitDataById, currentUser) => {
 		let visibleUnitsOrSuffixes;
 		if (currentUser.profile?.role === 'admin') {
 			// User is an admin, allow all units to be seen
@@ -361,7 +361,7 @@ export const selectUnitSelectData = createSelector(
 	selectSelectedMeters,
 	selectSelectedGroups,
 	selectGraphAreaNormalization,
-	({ data: unitDataById = {} }, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
+	(unitDataById, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
 		// Holds all units that are not compatible with selected meters/groups

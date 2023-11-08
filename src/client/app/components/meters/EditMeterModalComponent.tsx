@@ -13,7 +13,7 @@ import '../../styles/modal.css';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { submitEditedMeter } from '../../actions/meters';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { TrueFalseType } from '../../types/items';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -398,7 +398,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.meter" />
-					<TooltipHelpContainer page='meters-edit' />
+					<TooltipHelpComponent page='meters-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
 					</div>

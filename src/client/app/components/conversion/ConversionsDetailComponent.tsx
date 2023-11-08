@@ -10,8 +10,7 @@ import { ConversionData } from 'types/redux/conversions';
 import { fetchConversionsDetailsIfNeeded } from '../../actions/conversions';
 import HeaderComponent from '../../components/HeaderComponent';
 import SpinnerComponent from '../../components/SpinnerComponent';
-import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { State } from '../../types/redux/state';
@@ -34,7 +33,7 @@ export default function ConversionsDetailComponent() {
 	}, [dispatch]);
 
 	// Conversions state
-	const { data: conversionsState = [] } = useAppSelector(selectConversionsDetails);
+	const conversionsState = useAppSelector(selectConversionsDetails);
 
 
 	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
@@ -66,7 +65,7 @@ export default function ConversionsDetailComponent() {
 			) : (
 				<div>
 					<HeaderComponent />
-					<TooltipHelpContainer page='conversions' />
+					<TooltipHelpComponent page='conversions' />
 
 					<div className='container-fluid'>
 						<h2 style={titleStyle}>
@@ -95,7 +94,6 @@ export default function ConversionsDetailComponent() {
 									units={unitsState} />))}
 						</div>
 					</div>
-					<FooterContainer />
 				</div>
 			)}
 		</div>

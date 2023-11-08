@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as _ from 'lodash'
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { preferencesApi } from '../redux/api/preferencesApi';
 import { SelectOption } from '../types/items';
-import { ChartTypes, GraphState, GraphStateHistory, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
@@ -215,9 +215,14 @@ export const graphSlice = createSlice({
 
 			}
 		},
-		updateHistory: (state, action: PayloadAction<GraphStateHistory>) => {
-			state.backHistoryStack.push(action.payload)
-			// reset forward history on new visit
+		resetTimeInterval: state => {
+			if (!state.queryTimeInterval.equals(TimeInterval.unbounded())) {
+				state.queryTimeInterval = TimeInterval.unbounded()
+			}
+		},
+		updateHistory: (state, action: PayloadAction<GraphState>) => {
+			state.backHistoryStack.push(_.omit(action.payload, ['backHistoryStack', 'forwardHistoryStack']))
+			// reset forward history on new 'visit'
 			state.forwardHistoryStack = []
 		},
 		prevHistory: state => {
@@ -230,13 +235,6 @@ export const graphSlice = createSlice({
 			if (state.forwardHistoryStack.length) {
 				state.backHistoryStack.push(state.forwardHistoryStack.pop()!)
 				Object.assign(state, state.backHistoryStack[state.backHistoryStack.length - 1])
-			}
-
-
-		},
-		resetTimeInterval: state => {
-			if (!state.queryTimeInterval.equals(TimeInterval.unbounded())) {
-				state.queryTimeInterval = TimeInterval.unbounded()
 			}
 		}
 	},

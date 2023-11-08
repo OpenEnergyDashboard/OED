@@ -7,7 +7,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
 import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
@@ -287,7 +287,7 @@ export default function CreateMeterModalComponent() {
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="meter.create" />
-					<TooltipHelpContainer page='meters-create' />
+					<TooltipHelpComponent page='meters-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='meters-create' helpTextId={tooltipStyle.tooltipCreateMeterView} />
 					</div>

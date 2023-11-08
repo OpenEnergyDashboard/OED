@@ -38,13 +38,13 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(selectLineGraphRate);
-	const { data: unitDataByID = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 	const selectedAreaNormalization = useAppSelector(selectGraphAreaNormalization);
 	const selectedAreaUnit = useAppSelector(selectAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const { data: meterDataByID = {} } = useAppSelector(selectMeterDataById);
-	const { data: groupDataByID = {} } = useAppSelector(selectGroupDataById);
+	const meterDataByID  = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 
 
 	// dataFetching Query Hooks
@@ -68,7 +68,7 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
-		const selectUnitState = unitDataByID[selectedUnit];
+		const selectUnitState = unitDataById[selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, selectedAreaNormalization, selectedAreaUnit);
@@ -163,17 +163,17 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 		// may not yet be in state so verify with the second condition on the if.
 		// Note the second part may not be used based on next checks but do here since simple.
 		if (byGroupID) {
-			const groupArea = groupDataByID[groupID].area;
+			const groupArea = groupDataById[groupID].area;
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!selectedAreaNormalization || (groupArea > 0 && groupDataByID[groupID].areaUnit != AreaUnitType.none)) {
+			if (!selectedAreaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
 				// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
 				const areaScaling = selectedAreaNormalization ?
-					groupArea * getAreaUnitConversion(groupDataByID[groupID].areaUnit, selectedAreaUnit) : 1;
+					groupArea * getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
 				const readingsData = byGroupID[groupID];
 				if (readingsData !== undefined && !groupIsLoading) {
-					const label = groupDataByID[groupID].name;
+					const label = groupDataById[groupID].name;
 					const colorID = groupID;
 					if (readingsData === undefined) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');

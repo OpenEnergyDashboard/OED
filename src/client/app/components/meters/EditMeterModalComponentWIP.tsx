@@ -8,7 +8,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 import { metersApi, selectMeterDataWithID } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
@@ -56,7 +56,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)) }, [meterState])
 	/* State */
 	// unit state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 
 	const [validMeter, setValidMeter] = useState(isValidMeter(localMeterEdits));
@@ -171,7 +171,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.meter" />
-					<TooltipHelpContainer page='meters-edit' />
+					<TooltipHelpComponent page='meters-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='meters-edit' helpTextId={tooltipStyle.tooltipEditMeterView} />
 					</div>

@@ -11,7 +11,7 @@ import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
@@ -59,13 +59,13 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 	const [submitGroupEdits] = groupsApi.useEditGroupMutation()
 	const [deleteGroup] = groupsApi.useDeleteGroupMutation()
 	// Meter state
-	const { data: metersState = {} } = useAppSelector(selectMeterDataById);
+	const meterDataById = useAppSelector(selectMeterDataById);
 	// Group state used on other pages
-	const { data: globalGroupsState = {} } = useAppSelector(selectGroupDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	// Make a local copy of the group data so we can update during the edit process.
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
-	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(globalGroupsState));
+	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
 
 	// The current groups state of group being edited of the local copy. It should always be valid.
@@ -180,7 +180,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 				let areaSum = 0;
 				let notifyMsg = '';
 				groupState.deepMeters.forEach(meterID => {
-					const meter = metersState[meterID];
+					const meter = meterDataById[meterID];
 					if (meter.area > 0) {
 						if (meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, groupState.areaUnit);
@@ -222,7 +222,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		// Set back to the global group values for this group. As before, need a deep copy.
-		setEditGroupsState(_.cloneDeep(globalGroupsState));
+		setEditGroupsState(_.cloneDeep(groupDataById));
 		// Set back to the default values for the menus.
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
@@ -253,7 +253,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 
 		// Check for changes by comparing the original, global state to edited state.
 		// This is the unedited state of the group being edited to compare to for changes.
-		const originalGroupState = globalGroupsState[groupState.id];
+		const originalGroupState = groupDataById[groupState.id];
 		// Check children separately since lists.
 		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
 		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
@@ -304,7 +304,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 				// been made in the edit state.
 				const groupsChanged: number[] = [];
 				Object.values(editGroupsState).forEach(group => {
-					if (group.defaultGraphicUnit !== globalGroupsState[group.id].defaultGraphicUnit) {
+					if (group.defaultGraphicUnit !== groupDataById[group.id].defaultGraphicUnit) {
 						groupsChanged.push(group.id);
 					}
 				});
@@ -414,7 +414,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 				{/* In a number of the items that follow, what is shown varies on whether you are an admin. */}
 				<ModalHeader>
 					<FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
-					<TooltipHelpContainer page='groups-edit' />
+					<TooltipHelpComponent page='groups-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='groups-edit' helpTextId={tooltipStyle.tooltipEditGroupView} />
 					</div>
@@ -607,7 +607,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 											// The new child meter removal was rejected so put it back. Should only be one item so no need to sort.
 											newSelectedMeterOptions.push({
 												value: removedMeterId,
-												label: metersState[removedMeterId].identifier
+												label: meterDataById[removedMeterId].identifier
 												// isDisabled not needed since only used for selected and not display.
 											} as SelectOption
 											);
@@ -920,7 +920,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 		groupState.childMeters.forEach(groupId => {
 			selectedMetersUnsorted.push({
 				value: groupId,
-				label: metersState[groupId].identifier
+				label: meterDataById[groupId].identifier
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -941,7 +941,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 				value: groupId,
 				// Use globalGroupsState so see edits in other groups. You would miss an update
 				// in this group but it cannot be on the menu so that is okay.
-				label: globalGroupsState[groupId].name
+				label: groupDataById[groupId].name
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -961,7 +961,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 		// Tells if any meter is not visible to user.
 		let hasHidden = false;
 		groupState.childMeters.forEach(meterId => {
-			const meterIdentifier = metersState[meterId].identifier;
+			const meterIdentifier = meterDataById[meterId].identifier;
 			// The identifier is null if the meter is not visible to this user. If hidden then do
 			// not list and otherwise label.
 			if (meterIdentifier === null) {
@@ -1020,7 +1020,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 		const listedDeepMeters: string[] = [];
 		let hasHidden = false;
 		groupState.deepMeters.forEach(meterId => {
-			const meterIdentifier = metersState[meterId].identifier;
+			const meterIdentifier = meterDataById[meterId].identifier;
 			if (meterIdentifier === null) {
 				// The identifier is null if the meter is not visible to this user.
 				hasHidden = true;

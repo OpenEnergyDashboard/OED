@@ -11,7 +11,7 @@ import translate from '../../utils/translate';
 import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { addConversion } from '../../actions/conversions';
 import { UnitData, UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
@@ -204,7 +204,7 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.conversion" />
-					<TooltipHelpContainer page='conversions-create' />
+					<TooltipHelpComponent page='conversions-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 					</div>

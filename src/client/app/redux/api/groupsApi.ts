@@ -5,6 +5,7 @@ import { selectIsLoggedInAsAdmin } from '../selectors/authSelectors';
 import { RootState } from '../../store';
 import { CompareReadings } from 'types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
+import { createSelector } from '@reduxjs/toolkit';
 
 export const groupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -97,10 +98,16 @@ export const groupsApi = baseApi.injectEndpoints({
 	})
 })
 
-export const selectGroupDataById = groupsApi.endpoints.getGroups.select();
+export const selectGroupDataByIdQueryState = groupsApi.endpoints.getGroups.select();
+export const selectGroupDataById = createSelector(
+	selectGroupDataByIdQueryState,
+	({ data: groupDataById = {} }) => {
+		return groupDataById
+	}
+)
 
 export const selectGroupDataWithID = (state: RootState, groupId: number): GroupData | undefined => {
-	const { data: groupDataById = {} } = selectGroupDataById(state)
+	const groupDataById = selectGroupDataById(state)
 	return groupDataById[groupId]
 }
 

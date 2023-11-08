@@ -1,6 +1,5 @@
 // https://redux-toolkit.js.org/api/createListenerMiddleware#typescript-usage
 import { createListenerMiddleware, isAnyOf } from '@reduxjs/toolkit'
-import * as _ from 'lodash'
 import {
 	graphSlice,
 	nextHistory,
@@ -31,9 +30,8 @@ startHistoryListening({
 			)
 			)
 	),
-	effect: (action, api) => {
-		const state = api.getState();
-		const historyState = _.omit(state.graph, ['backHistoryStack', 'forwardHistoryStack'])
-		api.dispatch(updateHistory(historyState))
+	effect: (_action, { dispatch, getState }) => {
+		const { graph } = getState();
+		dispatch(updateHistory(graph))
 	}
 })

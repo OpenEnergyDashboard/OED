@@ -7,6 +7,7 @@ import { MeterData, MeterDataByID } from '../../types/redux/meters';
 import { durationFormat } from '../../utils/durationFormat';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
+import { createSelector } from '@reduxjs/toolkit';
 
 
 export const metersApi = baseApi.injectEndpoints({
@@ -57,6 +58,7 @@ export const metersApi = baseApi.injectEndpoints({
 	})
 })
 
+export const selectMeterDataByIdQueryState = metersApi.endpoints.getMeters.select()
 /**
  * Selects the meter data associated with a given meter ID from the Redux state.
  * @param {RootState} state - The current state of the Redux store.
@@ -67,7 +69,12 @@ export const metersApi = baseApi.injectEndpoints({
  * or
  * const { data: meterDataByID } = useAppSelector(state => selectMeterDataById(state))
  */
-export const selectMeterDataById = metersApi.endpoints.getMeters.select()
+export const selectMeterDataById = createSelector(
+	selectMeterDataByIdQueryState,
+	({ data: meterDataById = {} }) => {
+		return meterDataById
+	}
+)
 
 
 /**
@@ -79,7 +86,7 @@ export const selectMeterDataById = metersApi.endpoints.getMeters.select()
  * const meterData = useAppSelector(state => selectMeterDataWithID(state, 42))
  */
 export const selectMeterDataWithID = (state: RootState, meterID: number): MeterData | undefined => {
-	const { data: meterDataByID = {} } = selectMeterDataById(state);
+	const meterDataByID = selectMeterDataById(state);
 	return meterDataByID[meterID];
 }
 

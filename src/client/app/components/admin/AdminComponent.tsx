@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 // import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import PreferencesComponentWIP from './PreferencesComponentWIP';
@@ -34,7 +34,7 @@ export default function AdminComponent() {
 	};
 	return (
 		<div>
-			<TooltipHelpContainer page='admin' />
+			<TooltipHelpComponent page='admin' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='admin.panel' />

@@ -33,9 +33,9 @@ import ThreeDPillComponent from './ThreeDPillComponent';
 export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadingApiArgs>) {
 	const { args, skipQuery } = props.queryArgs;
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: skipQuery });
-	const { data: meterDataById = {} } = useAppSelector(selectMeterDataById);
-	const { data: groupDataById = {} } = useAppSelector(selectGroupDataById);
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const meterDataById  = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 	const graphState = useAppSelector(selectGraphState);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
 

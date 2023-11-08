@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input, Table } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { userApi } from '../../redux/api/userApi';
 import { User, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -63,7 +63,7 @@ export default function UserDetailComponentWIP() {
 				successMessage='users.successfully.edit.users'
 				failureMessage='failed.to.submit.changes'
 			/>
-			<TooltipHelpContainer page='users' />
+			<TooltipHelpComponent page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='users' />

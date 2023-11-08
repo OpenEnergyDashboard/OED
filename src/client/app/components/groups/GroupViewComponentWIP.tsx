@@ -45,7 +45,7 @@ export default function GroupViewComponentWIP(props: GroupViewComponentProps) {
 
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 
 	return (

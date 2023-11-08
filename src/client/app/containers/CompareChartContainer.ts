@@ -47,9 +47,9 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	// Also need to determine if raw.
 	const graphingUnit = state.graph.selectedUnit;
 	// This container is not called if there is no data of there are not units so this is safe.
-	const { data: unitDataById = {} } = selectUnitDataById(state)
-	const { data: meterDataById = {} } = selectMeterDataById(state)
-	const { data: groupDataById = {} } = selectGroupDataById(state)
+	const unitDataById = selectUnitDataById(state)
+	const meterDataById  = selectMeterDataById(state)
+	const groupDataById = selectGroupDataById(state)
 	const selectUnitState = unitDataById[graphingUnit];
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.

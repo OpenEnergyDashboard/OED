@@ -24,7 +24,7 @@ export default function UnitSelectComponent() {
 	const dispatch = useAppDispatch();
 	const unitSelectOptions = useAppSelector(state => selectUnitSelectData(state));
 	const selectedUnitID = useAppSelector(state => state.graph.selectedUnit);
-	const { data: unitsByID = {} } = useAppSelector(selectUnitDataById);
+	const unitsByID = useAppSelector(selectUnitDataById);
 
 	const { endpointsFetchingData } = getFetchingStates();
 

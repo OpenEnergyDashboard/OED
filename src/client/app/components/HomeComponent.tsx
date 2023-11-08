@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import TooltipHelpContainer from '../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../components/TooltipHelpComponent';
+
 import DashboardComponent from './DashboardComponent';
 
 /**
@@ -14,7 +15,7 @@ export default function HomeComponent() {
 
 	return (
 		<div>
-			<TooltipHelpContainer page='home' />
+			<TooltipHelpComponent page='home' />
 			<DashboardComponent />
 		</div>
 	);

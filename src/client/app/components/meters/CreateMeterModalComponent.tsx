@@ -11,7 +11,7 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { Dispatch } from 'types/redux/actions';
 import { State } from 'types/redux/state';
 import { addMeter } from '../../actions/meters';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { ConversionArray } from '../../types/conversionArray';
@@ -358,7 +358,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="meter.create" />
-					<TooltipHelpContainer page='meters-create' />
+					<TooltipHelpComponent page='meters-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='meters-create' helpTextId={tooltipStyle.tooltipCreateMeterView} />
 					</div>

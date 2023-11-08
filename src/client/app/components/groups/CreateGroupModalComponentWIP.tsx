@@ -10,7 +10,7 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
@@ -42,11 +42,11 @@ export default function CreateGroupModalComponentWIP() {
 	const [createGroup] = groupsApi.useCreateGroupMutation()
 
 	// Meters state
-	const { data: metersDataById = {} } = useAppSelector(selectMeterDataById);
+	const metersDataById = useAppSelector(selectMeterDataById);
 	// Groups state
-	const { data: groupsDataById = {} } = useAppSelector(selectGroupDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	// Units state
-	const { data: unitsDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitsDataById  = useAppSelector(selectUnitDataById);
 
 	// Check for admin status
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
@@ -296,7 +296,7 @@ export default function CreateGroupModalComponentWIP() {
 			<Modal isOpen={showModal} toggle={handleClose} size='lg' >
 				<ModalHeader>
 					<FormattedMessage id="create.group" />
-					<TooltipHelpContainer page='groups-create' />
+					<TooltipHelpComponent page='groups-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='groups-create' helpTextId={tooltipStyle.tooltipCreateGroupView} />
 					</div>
@@ -539,7 +539,7 @@ export default function CreateGroupModalComponentWIP() {
 		state.childGroups.forEach(groupId => {
 			selectedGroupsUnsorted.push({
 				value: groupId,
-				label: groupsDataById[groupId].name
+				label: groupDataById[groupId].name
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);

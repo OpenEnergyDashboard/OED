@@ -23,7 +23,7 @@ export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();
 
 	const graphState = useAppSelector(state => state.graph);
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];

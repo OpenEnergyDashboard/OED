@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit';
 import { ConversionData } from '../../types/redux/conversions';
 import { baseApi } from './baseApi';
 
@@ -88,5 +89,18 @@ export const conversionsApi = baseApi.injectEndpoints({
 	})
 })
 
-export const selectPIK = conversionsApi.endpoints.getConversionArray.select()
-export const selectConversionsDetails = conversionsApi.endpoints.getConversionsDetails.select()
+export const selectConversionsQueryState = conversionsApi.endpoints.getConversionsDetails.select()
+export const selectConversionsDetails = createSelector(
+	selectConversionsQueryState,
+	({ data: conversionData = [] }) => {
+		return conversionData
+	}
+)
+
+export const selectPikQueryState = conversionsApi.endpoints.getConversionArray.select()
+export const selectPik = createSelector(
+	selectPikQueryState,
+	({ data: pik = [[]] }) => {
+		return pik
+	}
+)

@@ -5,9 +5,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderComponent from '../../components/HeaderComponent';
-import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
 import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
@@ -38,7 +36,7 @@ export default function MetersDetailComponent() {
 	const { visibleMeters } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// TODO? Convert into Selector?
 	// Possible Meter Units to use
@@ -70,8 +68,7 @@ export default function MetersDetailComponent() {
 
 	return (
 		<div>
-			<HeaderComponent />
-			<TooltipHelpContainer page='meters' />
+			<TooltipHelpComponent page='meters' />
 
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
@@ -105,7 +102,6 @@ export default function MetersDetailComponent() {
 					</div>
 				}
 			</div>
-			<FooterContainer />
 		</div >
 	);
 }

@@ -10,7 +10,6 @@ import { User, UserRole } from '../../types/items';
 import { usersApi } from '../../utils/api';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import FooterContainer from '../FooterContainer';
 
 interface UsersDisplayContainerProps {
 	fetchUsers: () => User[];
@@ -90,7 +89,6 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 					users={this.state.users}
 					submitUserEdits={this.submitUserEdits}
 				/>
-				<FooterContainer />
 			</div>
 		)
 	}

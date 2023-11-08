@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { versionApi } from './redux/api/versionApi';
 import { authApi } from './redux/api/authApi';
 import { conversionsApi } from './redux/api/conversionsApi';
 import { groupsApi } from './redux/api/groupsApi';
@@ -20,6 +21,7 @@ export const initializeApp = async () => {
 
 	// These queries will trigger a api request, and add a subscription to the store.
 	// Typically they return an unsubscribe method, however we always want to be subscribed to any cache changes for these endpoints.
+	store.dispatch(versionApi.endpoints.getVersion.initiate())
 	store.dispatch(preferencesApi.endpoints.getPreferences.initiate())
 	store.dispatch(unitsApi.endpoints.getUnitsDetails.initiate())
 	store.dispatch(conversionsApi.endpoints.getConversionsDetails.initiate())

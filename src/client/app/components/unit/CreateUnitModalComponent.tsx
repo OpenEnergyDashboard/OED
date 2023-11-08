@@ -10,7 +10,7 @@ import translate from '../../utils/translate';
 import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
 import { addUnit } from '../../actions/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -113,7 +113,7 @@ export default function CreateUnitModalComponent() {
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.unit" />
-					<TooltipHelpContainer page='units-create' />
+					<TooltipHelpComponent page='units-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='units-create' helpTextId={tooltipStyle.tooltipCreateUnitView} />
 					</div>

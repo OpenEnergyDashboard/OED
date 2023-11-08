@@ -7,8 +7,8 @@ import { FormattedMessage } from 'react-intl';
 import { UncontrolledAlert } from 'reactstrap';
 import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
 import { selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSortingOrder } from '../reducers/graph';
-import { groupsApi } from '../redux/api/groupsApi';
-import { metersApi } from '../redux/api/metersApi';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
 import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
@@ -33,8 +33,8 @@ export default function MultiCompareChartComponentWIP() {
 	const { data: meterReadings = {} } = readingsApi.useCompareQuery(meterArgs, { skip: meterSkipQuery })
 	const { data: groupReadings = {} } = readingsApi.useCompareQuery(groupsArgs, { skip: groupSkipQuery })
 
-	const { data: meterDataByID = {} } = metersApi.useGetMetersQuery()
-	const { data: groupDataByID = {} } = groupsApi.useGetGroupsQuery()
+	const meterDataByID = useAppSelector(selectMeterDataById)
+	const groupDataById = useAppSelector(selectGroupDataById)
 
 	// TODO SEEMS UNUSED, kept due to uncertainty when migrating to RTK VERIFY BEHAVIOR
 	const errorEntities: string[] = [];
@@ -60,8 +60,8 @@ export default function MultiCompareChartComponentWIP() {
 		}
 	})
 	Object.entries(groupReadings).forEach(([key, value]) => {
-		const identifier = groupDataByID[Number(key)].name
-		const areaNormValid = (!areaNormalization || (groupDataByID[Number(key)].area > 0 && groupDataByID[Number(key)].areaUnit !== AreaUnitType.none))
+		const identifier = groupDataById[Number(key)].name
+		const areaNormValid = (!areaNormalization || (groupDataById[Number(key)].area > 0 && groupDataById[Number(key)].areaUnit !== AreaUnitType.none))
 		if (areaNormValid && selectedGroups.includes(Number(key))) {
 			const change = calculateChange(value.curr_use, value.prev_use);
 			const entity: CompareEntity = {

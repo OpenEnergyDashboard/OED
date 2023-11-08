@@ -19,7 +19,7 @@ export const selectThreeDComponentInfo = createSelector(
 	selectThreeDMeterOrGroup,
 	selectMeterDataById,
 	selectGroupDataById,
-	(id, meterOrGroup, { data: meterDataById = {} }, { data: groupDataById = {} }) => {
+	(id, meterOrGroup, meterDataById, groupDataById) => {
 		//Default Values
 		let meterOrGroupName = 'Unselected Meter or Group'
 		let isAreaCompatible = true;

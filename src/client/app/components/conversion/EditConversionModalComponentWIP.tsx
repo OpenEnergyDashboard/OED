@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
@@ -37,7 +37,7 @@ interface EditConversionModalComponentProps {
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const [editConversion] = conversionsApi.useEditConversionMutation()
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation()
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById)
+	const unitDataById = useAppSelector(selectUnitDataById)
 
 	// Set existing conversion values
 	const values = { ...props.conversion }
@@ -148,7 +148,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			<Modal isOpen={props.show} toggle={props.handleClose}>
 				<ModalHeader>
 					<FormattedMessage id="conversion.edit.conversion" />
-					<TooltipHelpContainer page='conversions-edit' />
+					<TooltipHelpComponent page='conversions-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 					</div>

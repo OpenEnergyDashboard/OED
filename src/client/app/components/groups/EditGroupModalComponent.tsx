@@ -13,7 +13,7 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { State } from 'types/redux/state';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import '../../styles/card-page.css';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -413,7 +413,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				{/* In a number of the items that follow, what is shown varies on whether you are an admin. */}
 				<ModalHeader>
 					<FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
-					<TooltipHelpContainer page='groups-edit' />
+					<TooltipHelpComponent page='groups-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='groups-edit' helpTextId={tooltipStyle.tooltipEditGroupView} />
 					</div>

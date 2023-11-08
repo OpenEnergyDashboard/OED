@@ -3,17 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 import MetersCSVUploadComponent from '../../components/csv/MetersCSVUploadComponent';
 import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadComponent';
-import FooterContainer from '../FooterContainer';
+import { BooleanMeterTypes, MetersCSVUploadPreferencesItem, ReadingsCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { uploadCSVApi } from '../../utils/api';
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanMeterTypes } from '../../types/csvUploadForm';
-import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
-import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainer from '../TooltipHelpContainer';
-import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
-import HeaderComponent from '../../components/HeaderComponent';
+import { MetersCSVUploadDefaults, ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 
 export const enum MODE {
 	meters = 'meters',
@@ -269,8 +267,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}
 		return (
 			<div>
-				<HeaderComponent />
-				<TooltipHelpContainer page='csv' />
+				<TooltipHelpComponent page='csv' />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.readings)}>
@@ -322,7 +319,6 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 						/>
 					</TabPane>
 				</TabContent>
-				<FooterContainer />
 			</div>
 		)
 	}

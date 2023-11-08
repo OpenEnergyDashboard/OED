@@ -5,10 +5,8 @@
 import { combineReducers } from 'redux';
 import maps from './maps';
 import { adminSlice } from './admin';
-import { versionSlice } from './version';
 import { currentUserSlice } from './currentUser';
 import { unsavedWarningSlice } from './unsavedWarning';
-import { conversionsSlice } from './conversions';
 import { optionsSlice } from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
@@ -17,10 +15,8 @@ export const rootReducer = combineReducers({
 	maps,
 	graph: graphSlice.reducer,
 	admin: adminSlice.reducer,
-	version: versionSlice.reducer,
 	currentUser: currentUserSlice.reducer,
 	unsavedWarning: unsavedWarningSlice.reducer,
-	conversions: conversionsSlice.reducer,
 	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers
 	[baseApi.reducerPath]: baseApi.reducer

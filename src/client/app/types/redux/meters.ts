@@ -5,53 +5,6 @@ import { GPSPoint } from 'utils/calibration';
 // import { ActionType } from './actions';
 import { AreaUnitType } from 'utils/getAreaUnitConversion';
 
-// export interface RequestMetersDetailsAction {
-// 	type: ActionType.RequestMetersDetails;
-// }
-
-// export interface ReceiveMetersDetailsAction {
-// 	type: ActionType.ReceiveMetersDetails;
-// 	data: MeterData[];
-// }
-
-// export interface ChangeDisplayedMetersAction {
-// 	type: ActionType.ChangeDisplayedMeters;
-// 	selectedMeters: number[];
-// }
-
-// export interface ConfirmEditedMeterAction {
-// 	type: ActionType.ConfirmEditedMeter;
-// 	editedMeter: MeterEditData;
-// }
-
-// export interface ConfirmAddMeterAction {
-// 	type: ActionType.ConfirmAddMeter;
-// 	addedMeter: MeterEditData;
-// }
-
-// export interface DeleteSubmittedMeterAction {
-// 	type: ActionType.DeleteSubmittedMeter;
-// 	meterId: number;
-// }
-
-// export interface SubmitEditedMeterAction {
-// 	type: ActionType.SubmitEditedMeter;
-// 	meterId: number;
-// }
-
-// export interface ConfirmMetersFetchedOnceAction {
-// 	type: ActionType.ConfirmMetersFetchedOnce;
-// }
-
-// export type MetersAction = RequestMetersDetailsAction
-// 	| ReceiveMetersDetailsAction
-// 	| ChangeDisplayedMetersAction
-// 	| ConfirmEditedMeterAction
-// 	| ConfirmAddMeterAction
-// 	| DeleteSubmittedMeterAction
-// 	| SubmitEditedMeterAction
-// 	| ConfirmMetersFetchedOnceAction;
-
 // The relates to the JS object Meter.types for the same use in src/server/models/Meter.js.
 // They should be kept in sync.
 export enum MeterType {

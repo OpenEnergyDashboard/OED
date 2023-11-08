@@ -44,9 +44,7 @@ export const selectAdminPreferences = createSelector(
  */
 export const selectPossibleGraphicUnits = createSelector(
 	selectUnitDataById,
-	({ data: unitDataById = {} }) => {
-		return potentialGraphicUnits(unitDataById)
-	}
+	unitDataById => potentialGraphicUnits(unitDataById)
 )
 
 /**
@@ -56,7 +54,7 @@ export const selectPossibleGraphicUnits = createSelector(
  */
 export const selectPossibleMeterUnits = createSelector(
 	selectUnitDataById,
-	({ data: unitDataById = {} }) => {
+	unitDataById => {
 		let possibleMeterUnits = new Set<UnitData>();
 		// The meter unit can be any unit of type meter.
 		Object.values(unitDataById).forEach(unit => {
@@ -87,7 +85,7 @@ export const selectUnitName = createSelector(
 	// ThisSelector takes an argument, due to one or more of the selectors accepts an argument (selectUnitWithID selectMeterDataWithID)
 	selectUnitDataById,
 	selectMeterDataWithID,
-	({ data: unitDataById = {} }, meterData) => {
+	(unitDataById, meterData) => {
 		const unitName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.unitId === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
 		return unitName
@@ -108,7 +106,7 @@ export const selectGraphicName = createSelector(
 	// notice that this selector is written with inline selectors for demonstration purposes
 	selectUnitDataById,
 	selectMeterDataWithID,
-	({ data: unitDataById = {} }, meterData) => {
+	(unitDataById, meterData) => {
 		const graphicName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.defaultGraphicUnit === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
 		return graphicName
@@ -204,7 +202,7 @@ export const selectIsValidConversion = createSelector(
 	selectUnitDataById,
 	selectConversionsDetails,
 	(_state: RootState, conversionData: ConversionData) => conversionData,
-	({ data: unitDataById = {} }, { data: conversionData = [] }, { sourceId, destinationId, bidirectional }): [boolean, string] => {
+	(unitDataById, conversionData, { sourceId, destinationId, bidirectional }): [boolean, string] => {
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion

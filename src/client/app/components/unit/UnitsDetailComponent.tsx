@@ -5,8 +5,8 @@ import { QueryStatus } from '@reduxjs/toolkit/query';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import { selectUnitDataByIdQueryState } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
@@ -20,7 +20,7 @@ export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
 	//Units state
-	const { data: unitDataById = {}, status } = useAppSelector(selectUnitDataById);
+	const { data: unitDataById = {}, status } = useAppSelector(selectUnitDataByIdQueryState);
 
 
 	return (
@@ -32,7 +32,7 @@ export default function UnitsDetailComponent() {
 				</div>
 			) : (
 				<div>
-					<TooltipHelpContainer page='units' />
+					<TooltipHelpComponent page='units' />
 
 					<div className='container-fluid'>
 						<h2 style={titleStyle}>

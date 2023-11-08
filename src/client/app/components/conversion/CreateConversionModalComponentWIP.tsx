@@ -7,7 +7,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
@@ -26,7 +26,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  */
 export default function CreateConversionModalComponent() {
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation()
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById)
+	const unitDataById = useAppSelector(selectUnitDataById)
 	// Want units in sorted order by identifier regardless of case.
 	const unitsSorted = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
 
@@ -127,7 +127,7 @@ export default function CreateConversionModalComponent() {
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.conversion" />
-					<TooltipHelpContainer page='conversions-create' />
+					<TooltipHelpComponent page='conversions-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-create' helpTextId={tooltipStyle.tooltipCreateConversionView} />
 					</div>

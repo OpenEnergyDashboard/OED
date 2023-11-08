@@ -4,9 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import HeaderComponent from '../../components/HeaderComponent';
-import FooterContainer from '../../containers/FooterContainer';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
@@ -31,7 +29,7 @@ export default function GroupsDetailComponent() {
 	const { visibleGroups } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
 
 	// Units state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 
 	// Possible graphic units to use
@@ -51,8 +49,7 @@ export default function GroupsDetailComponent() {
 	return (
 		<div>
 			<div>
-				<HeaderComponent />
-				<TooltipHelpContainer page='groups' />
+				<TooltipHelpComponent page='groups' />
 
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
@@ -84,7 +81,6 @@ export default function GroupsDetailComponent() {
 						</div>
 					}
 				</div>
-				<FooterContainer />
 			</div>
 		</div>
 	);

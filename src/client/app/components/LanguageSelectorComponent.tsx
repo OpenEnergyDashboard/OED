@@ -3,12 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { LanguageTypes } from '../types/redux/i18n';
 import { FormattedMessage } from 'react-intl';
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../types/redux/state';
 import { updateSelectedLanguage } from '../actions/options';
+import { selectSelectedLanguage } from '../reducers/options';
+import { selectOEDVersion } from '../redux/api/versionApi';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { LanguageTypes } from '../types/redux/i18n';
 import { BASE_URL } from './TooltipHelpComponent';
 
 /**
@@ -16,10 +17,10 @@ import { BASE_URL } from './TooltipHelpComponent';
  * @returns Language selector element for navbar
  */
 export default function LanguageSelectorComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
-	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
-	const version = useSelector((state: State) => state.version.version);
+	const selectedLanguage = useAppSelector(selectSelectedLanguage);
+	const version = useAppSelector(selectOEDVersion);
 
 	const HELP_URL = BASE_URL + version;
 

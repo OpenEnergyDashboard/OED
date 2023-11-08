@@ -5,8 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input } from 'reactstrap';
-import HeaderComponent from '../../components/HeaderComponent';
-import FooterContainer from '../../containers/FooterContainer';
 import { userApi } from '../../redux/api/userApi';
 import { NewUser, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -40,7 +38,6 @@ export default function CreateUserComponentWIP() {
 	}
 	return (
 		<div>
-			<HeaderComponent />
 			<div className='container-fluid'>
 				<h1 style={titleStyle}> <FormattedMessage id='create.user' /> </h1>
 				<div style={tableStyle}>
@@ -71,7 +68,6 @@ export default function CreateUserComponentWIP() {
 					</form>
 				</div>
 			</div>
-			<FooterContainer />
 		</div>
 
 	)

@@ -26,7 +26,7 @@ export default function GraphicRateMenuComponent() {
 	const graphState = useAppSelector(state => state.graph);
 
 	// Unit state
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Unit data by Id
 	const selectedUnitData = unitDataById[graphState.selectedUnit];

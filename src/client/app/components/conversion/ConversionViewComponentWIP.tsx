@@ -28,7 +28,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
-	const { data: unitDataById = {} } = useAppSelector(selectUnitDataById)
+	const unitDataById = useAppSelector(selectUnitDataById)
 
 	const handleShow = () => {
 		setShowEditModal(true);

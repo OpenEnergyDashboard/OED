@@ -38,14 +38,14 @@ export default function BarChartComponent(props: ChartMultiQueryProps<BarReading
 	const unitID = useAppSelector(state => state.graph.selectedUnit);
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
-	const { data: unitDataByID = {} } = useAppSelector(selectUnitDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const { data: meterDataByID = {} } = useAppSelector(selectMeterDataById);
-	const { data: groupDataByID = {} } = useAppSelector(selectGroupDataById);
+	const meterDataByID  = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 
 	// useQueryHooks for data fetching
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });
@@ -60,7 +60,7 @@ export default function BarChartComponent(props: ChartMultiQueryProps<BarReading
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
-		const selectUnitState = unitDataByID[unitID];
+		const selectUnitState = unitDataById[unitID];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label.
 			unitLabel = barUnitLabel(selectUnitState, selectedAreaNormalization, selectedAreaUnit);
@@ -130,15 +130,15 @@ export default function BarChartComponent(props: ChartMultiQueryProps<BarReading
 
 	for (const groupID of selectedGroups) {
 		if (groupData) {
-			let groupArea = groupDataByID[groupID].area;
-			if (!selectedAreaNormalization || (groupArea > 0 && groupDataByID[groupID].areaUnit != AreaUnitType.none)) {
+			let groupArea = groupDataById[groupID].area;
+			if (!selectedAreaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
 				if (selectedAreaNormalization) {
 					// convert the meter area into the proper unit, if needed
-					groupArea *= getAreaUnitConversion(groupDataByID[groupID].areaUnit, selectedAreaUnit);
+					groupArea *= getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit);
 				}
 				const readingsData = groupData[groupID];
 				if (readingsData && !groupIsFetching) {
-					const label = groupDataByID[groupID].name;
+					const label = groupDataById[groupID].name;
 					const colorID = groupID;
 					if (!readingsData) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');

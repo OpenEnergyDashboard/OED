@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
 import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
@@ -40,7 +40,7 @@ export default function GroupsDetailComponentWIP() {
 	return (
 		<div>
 			<div>
-				<TooltipHelpContainer page='groups' />
+				<TooltipHelpComponent page='groups' />
 
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>

@@ -9,7 +9,7 @@ import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, Moda
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import '../../styles/modal.css';
 import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
 import { TrueFalseType } from '../../types/items';
@@ -153,7 +153,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			<Modal isOpen={props.show} toggle={props.handleClose}>
 				<ModalHeader>
 					<FormattedMessage id="conversion.edit.conversion" />
-					<TooltipHelpContainer page='conversions-edit' />
+					<TooltipHelpComponent page='conversions-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 					</div>

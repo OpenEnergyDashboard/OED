@@ -17,8 +17,8 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
  */
 export default function ThreeDPillComponent() {
 	const dispatch = useAppDispatch();
-	const { data: meterDataById = {} } = useAppSelector(selectMeterDataById);
-	const { data: groupDataById = {} } = useAppSelector(selectGroupDataById);
+	const meterDataById  = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	const threeDState = useAppSelector(state => state.graph.threeD);
 	const graphState = useAppSelector(state => state.graph);
 

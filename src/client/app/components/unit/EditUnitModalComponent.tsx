@@ -10,7 +10,7 @@ import { useDispatch } from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { Dispatch } from 'types/redux/actions';
 import { submitEditedUnit } from '../../actions/units';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
@@ -56,7 +56,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
-	const { data: globalConversionsState = [] } = useAppSelector(selectConversionsDetails);
+	const conversionData = useAppSelector(selectConversionsDetails);
 
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +103,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
-		const { data: meterDataByID = {} } = selectMeterDataById(store.getState())
+		const meterDataByID  = selectMeterDataById(store.getState())
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
@@ -172,7 +172,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// 1. If the unit is used, the Unit Represent cannot be changed.
 	// 2. Otherwise, the Unit Represent can be changed.
 	const inConversions = () => {
-		for (const conversion of globalConversionsState) {
+		for (const conversion of conversionData) {
 			if (conversion.sourceId === state.id || conversion.destinationId === state.id) {
 				return true;
 			}
@@ -190,7 +190,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.unit" />
-					<TooltipHelpContainer page='units-edit' />
+					<TooltipHelpComponent page='units-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 					</div>

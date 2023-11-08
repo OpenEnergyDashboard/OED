@@ -5,18 +5,16 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom-v5-compat';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
+import { selectOEDVersion } from '../redux/api/versionApi';
 import { toggleOptionsVisibility } from '../actions/graph';
-import TooltipHelpContainer from '../containers/TooltipHelpContainer';
-import { currentUserSlice } from '../reducers/currentUser';
+import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';
-import { useAppDispatch } from '../redux/hooks';
+import { authApi } from '../redux/api/authApi';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { UserRole } from '../types/items';
-import { State } from '../types/redux/state';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
-import { deleteToken } from '../utils/token';
 import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { BASE_URL } from './TooltipHelpComponent';
@@ -27,12 +25,13 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
+	const [logout] = authApi.useLogoutMutation()
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
 	const { pathname } = useLocation();
 
 	// OED version is needed for help redirect
-	const version = useSelector((state: State) => state.version.version);
+	const version = useAppSelector(selectOEDVersion);
 	// Help URL location
 	const helpUrl = BASE_URL + version;
 	// options help
@@ -76,11 +75,11 @@ export default function HeaderButtonsComponent() {
 	// Local state for rendering.
 	const [state, setState] = useState(defaultState);
 	// Information on the current user.
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
+	const currentUser = useAppSelector(state => state.currentUser.profile);
 	// Tracks unsaved changes.
-	const unsavedChangesState = useSelector((state: State) => state.unsavedWarning.hasUnsavedChanges);
+	const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
 	// whether to collapse options when on graphs page
-	const optionsVisibility = useSelector((state: State) => state.graph.optionsVisibility);
+	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {
@@ -170,17 +169,14 @@ export default function HeaderButtonsComponent() {
 			// Unsaved changes so deal with them and then it takes care of logout.
 			dispatch(unsavedWarningSlice.actions.flipLogOutState());
 		} else {
-			// Remove token so has no role.
-			deleteToken();
-			// Clean up state since lost your role.
-			dispatch(currentUserSlice.actions.clearCurrentUser());
+			logout()
 		}
 	};
 
 	return (
 		<div>
 			<Navbar expand>
-				<TooltipHelpContainer page={'all'} />
+				<TooltipHelpComponent page={'all'} />
 				<TooltipMarkerComponent page='all' helpTextId='help.home.navigation' />
 				<Nav navbar>
 					<NavLink

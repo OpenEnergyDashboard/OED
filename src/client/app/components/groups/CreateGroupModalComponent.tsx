@@ -11,7 +11,7 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { State } from 'types/redux/state';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { ConversionArray } from '../../types/conversionArray';
@@ -300,7 +300,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 			<Modal isOpen={showModal} toggle={handleClose} size='lg' >
 				<ModalHeader>
 					<FormattedMessage id="create.group" />
-					<TooltipHelpContainer page='groups-create' />
+					<TooltipHelpComponent page='groups-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='groups-create' helpTextId={tooltipStyle.tooltipCreateGroupView} />
 					</div>
