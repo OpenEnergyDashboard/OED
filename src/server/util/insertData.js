@@ -228,7 +228,7 @@ async function insertStandardConversions(conn) {
 			sourceName: 'BTU',
 			destinationName: 'm³ gas',
 			bidirectional: true,
-			slope: 9.625,
+			slope: 2.73e-5,
 			intercept: 0,
 			note: 'OED created BTU → m³ gas (average U.S. for 2021 according to U.S. E.I.A)'
 		},
@@ -453,65 +453,80 @@ async function insertMeters(metersToInsert, conn) {
  * @param {*} conn database connection
  */
 async function insertGroups(groupsToInsert, conn) {
+	// Check that needed keys are there.
+	const requiredKeys = ['name', 'displayable', 'childMeters', 'childGroups'];
 	// We don't use Promise.all since one group may include another group.
 	for (let i = 0; i < groupsToInsert.length; ++i) {
-		// Group values from above.
+		// Group currently working on
 		const groupData = groupsToInsert[i];
-		const groupName = groupData[0];
-		console.log(`            creating group ${groupName}`);
-		// We get the needed unit id from the name given.
-		let groupDefaultGraphicUnit;
-		if (groupData[1] === '') {
-			// No unit so make it -99.
-			groupDefaultGraphicUnit = -99;
-		} else {
-			groupDefaultGraphicUnit = (await Unit.getByName(groupData[1], conn)).id;
-		}
-		const group = new Group(
-			undefined, // id
-			groupName, // name
-			groupData[2], //displayable
-			groupData[3], // gps
-			groupData[4], // note
-			undefined, //area
-			groupDefaultGraphicUnit, // default graphic unit
-			undefined // area unit
-		);
-		if (await group.existsByName(conn)) {
-			console.log(`              Warning: group '${group.name}' existed so not changed.`);
-		} else {
-			// Only insert the group and its children if the group did not already exist.
-			await group.insert(conn);
-			// If meterData[7] is not undefined then use value to set meter id.
-			// This is normally only done for the website data.
-			// It is best/easiest to do this before there are any members of the group.
-			const newId = groupData[7];
-			let parent;
-			if (newId != undefined) {
-				console.log('              group id set to ', newId);
-				group.id = newId;
-				const query = `update groups set id = ${group.id} where name = '${groupName}'`;
-				await conn.none(query);
-				parent = group;
+		let ok = true;
+		requiredKeys.forEach(key => {
+			if (!groupData.hasOwnProperty(key)) {
+				console.log(`********key "${key}" is required but missing so group number ${index} not processed with values:`, groupData);
+				// Don't insert
+				ok = false;
+			}
+		})
+		if (ok) {
+			// Group values from above.
+			const groupName = groupData.name;
+			console.log(`            creating group ${groupName}`);
+			// We get the needed unit id from the name given.
+			let groupDefaultGraphicUnit;
+			if (groupData.hasOwnProperty('defaultGraphicUnit')) {
+				// Find the unit id for this unit name.
+				groupDefaultGraphicUnit = (await Unit.getByName(groupData.defaultGraphicUnit, conn)).id;
 			} else {
-				// Get it again so have id.
-				parent = await Group.getByName(group.name, conn);
+				// No unit so make it -99, i.e., no unit.
+				groupDefaultGraphicUnit = -99;
 			}
-			// Now add the meter children.
-			for (let k = 0; k < groupData[5].length; ++k) {
-				const childMeter = groupData[5][k];
-				console.log(`              adding child meter ${childMeter}`);
-				// Use meter id to add to group.
-				const childId = (await Meter.getByName(childMeter, conn)).id;
-				await parent.adoptMeter(childId, conn);
-			}
-			// Now add the group children.
-			for (let k = 0; k < groupData[6].length; ++k) {
-				const childGroup = groupData[6][k];
-				console.log(`              adding child group ${childGroup}`);
-				// Use group id to add to group.
-				const childId = (await Group.getByName(childGroup, conn)).id;
-				await parent.adoptGroup(childId, conn);
+			const group = new Group(
+				undefined, // id
+				groupName,
+				groupData.displayable,
+				groupData.gps,
+				groupData.note,
+				groupData.area,
+				groupDefaultGraphicUnit,
+				groupData.areaUnit
+			);
+			if (await group.existsByName(conn)) {
+				console.log(`              Warning: group '${group.name}' existed so not changed.`);
+			} else {
+				// Only insert the group and its children if the group did not already exist.
+				await group.insert(conn);
+				// If id is not undefined then use value to set meter id.
+				// This is normally only done for the website data.
+				// It is best/easiest to do this before there are any members of the group.
+				let parent;
+				if (groupData.hasOwnProperty('id')) {
+					// Get it again so have id.
+					const newId = groupData.id;
+					console.log('              group id set to ', newId);
+					group.id = newId;
+					const query = `update groups set id = ${group.id} where name = '${groupName}'`;
+					await conn.none(query);
+					parent = group;
+				} else {
+					// Set to id provided.
+					parent = await Group.getByName(group.name, conn);
+				}
+				// Now add the meter children.
+				for (let k = 0; k < groupData.childMeters.length; ++k) {
+					const childMeter = groupData.childMeters[k];
+					console.log(`              adding child meter ${childMeter}`);
+					// Use meter id to add to group.
+					const childId = (await Meter.getByName(childMeter, conn)).id;
+					await parent.adoptMeter(childId, conn);
+				}
+				// Now add the group children.
+				for (let k = 0; k < groupData.childGroups.length; ++k) {
+					const childGroup = groupData.childGroups[k];
+					console.log(`              adding child group ${childGroup}`);
+					// Use group id to add to group.
+					const childId = (await Group.getByName(childGroup, conn)).id;
+					await parent.adoptGroup(childId, conn);
+				}
 			}
 		}
 	}
