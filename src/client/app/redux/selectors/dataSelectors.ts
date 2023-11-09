@@ -6,6 +6,12 @@ import { selectBarWidthDays, selectComparePeriod, selectCompareTimeInterval, sel
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
+import * as moment from 'moment';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import { selectBarWidthDays, selectComparePeriod, selectCompareTimeInterval, selectGraphState, selectQueryTimeInterval } from '../../reducers/graph';
+import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { calculateCompareShift } from '../../utils/calculateCompare';
+import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { selectGroupDataById } from '../api/groupsApi';
 import { selectMeterDataById } from '../api/metersApi';
 import { selectIsLoggedInAsAdmin } from './authSelectors';
@@ -84,8 +90,8 @@ export const selectLineChartQueryArgs = createSelector(
 	({ commonMeterArgs, commonGroupArgs }) => {
 		// props to pass into the line chart component
 
-		const meterArgs = commonMeterArgs;
-		const groupArgs = commonGroupArgs;
+		const meterArgs: LineReadingApiArgs = commonMeterArgs;
+		const groupArgs: LineReadingApiArgs = commonGroupArgs;
 		const meterShouldSkip = !commonMeterArgs.ids.length;
 		const groupShouldSkip = !commonGroupArgs.ids.length;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
@@ -98,12 +104,12 @@ export const selectBarChartQueryArgs = createSelector(
 	({ commonMeterArgs, commonGroupArgs }, barWidthDays) => {
 		// props to pass into the line chart component
 
-		const meterArgs = {
+		const meterArgs: BarReadingApiArgs = {
 			...commonMeterArgs,
 			barWidthDays: Math.round(barWidthDays.asDays())
 
 		};
-		const groupArgs = {
+		const groupArgs: BarReadingApiArgs = {
 			...commonGroupArgs,
 			barWidthDays: Math.round(barWidthDays.asDays())
 		};
@@ -118,13 +124,13 @@ export const selectCompareChartQueryArgs = createSelector(
 	selectComparePeriod,
 	selectCompareTimeInterval,
 	({ commonMeterArgs, commonGroupArgs }, comparePeriod, compareTimeInterval) => {
-		const meterArgs = {
+		const meterArgs: CompareReadingApiArgs = {
 			...commonMeterArgs,
 			shift: calculateCompareShift(comparePeriod).toISOString(),
 			curr_start: compareTimeInterval.getStartTimestamp()?.toISOString(),
 			curr_end: compareTimeInterval.getEndTimestamp()?.toISOString()
 		}
-		const groupArgs = {
+		const groupArgs: CompareReadingApiArgs = {
 			...commonGroupArgs,
 			shift: calculateCompareShift(comparePeriod).toISOString(),
 			curr_start: compareTimeInterval.getStartTimestamp()?.toISOString(),
@@ -142,14 +148,14 @@ export const selectMapChartQueryArgs = createSelector(
 	(state: RootState) => state.maps,
 	(barChartArgs, queryTimeInterval, maps) => {
 
-		const meterArgs = {
+		const meterArgs: MapReadingApiArgs = {
 			...barChartArgs.meterArgs,
 			// Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 			barWidthDays: Math.round(((queryTimeInterval.equals(TimeInterval.unbounded()))
 				? moment.duration(4, 'weeks')
 				: moment.duration(queryTimeInterval.duration('days'), 'days')).asDays())
 		}
-		const groupArgs = {
+		const groupArgs: MapReadingApiArgs = {
 			...barChartArgs.groupArgs,
 			// Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 			barWidthDays: Math.round(((queryTimeInterval.equals(TimeInterval.unbounded()))
@@ -159,7 +165,6 @@ export const selectMapChartQueryArgs = createSelector(
 		}
 		const meterShouldSkip = barChartArgs.meterShouldSkip || maps.selectedMap === 0
 		const groupShouldSkip = barChartArgs.groupShouldSkip || maps.selectedMap === 0
-		console.log(meterShouldSkip, groupShouldSkip)
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
 	}
 
@@ -173,7 +178,7 @@ export const selectThreeDQueryArgs = createSelector(
 	selectGraphState,
 	graphState => {
 		const queryTimeInterval = graphState.queryTimeInterval
-		const args = {
+		const args: ThreeDReadingApiArgs = {
 			id: graphState.threeD.meterOrGroupID!,
 			timeInterval: roundTimeIntervalForFetch(queryTimeInterval).toString(),
 			unitID: graphState.selectedUnit,
