@@ -13,7 +13,7 @@ import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { getFetchingStates } from '../redux/componentHooks';
+import { useFetchingStates } from '../redux/componentHooks';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 
 
@@ -26,7 +26,7 @@ export default function UnitSelectComponent() {
 	const selectedUnitID = useAppSelector(state => state.graph.selectedUnit);
 	const unitsByID = useAppSelector(selectUnitDataById);
 
-	const { endpointsFetchingData } = getFetchingStates();
+	const { endpointsFetchingData } = useFetchingStates();
 
 	let selectedUnitOption: SelectOption | null = null;
 

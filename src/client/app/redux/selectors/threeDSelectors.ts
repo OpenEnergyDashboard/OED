@@ -1,16 +1,11 @@
 import { createSelector } from '@reduxjs/toolkit';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 import {
-	selectGraphUnitID,
-	selectQueryTimeInterval,
-	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID,
-	selectThreeDReadingInterval
+	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID
 } from '../../reducers/graph';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 import { MeterOrGroup } from '../../types/redux/graph';
-import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { ThreeDReadingApiArgs } from './dataSelectors';
 
 
 // Memoized Selectors
@@ -45,27 +40,4 @@ export const selectThreeDComponentInfo = createSelector(
 		}
 	}
 
-)
-
-export const selectThreeDQueryArgs = createSelector(
-	selectThreeDMeterOrGroupID,
-	selectQueryTimeInterval,
-	selectGraphUnitID,
-	selectThreeDReadingInterval,
-	selectThreeDMeterOrGroup,
-	(id, timeInterval, unitID, readingInterval, meterOrGroup) => {
-		return {
-			id: id,
-			timeInterval: roundTimeIntervalForFetch(timeInterval).toString(),
-			unitID: unitID,
-			readingInterval: readingInterval,
-			meterOrGroup: meterOrGroup
-		} as ThreeDReadingApiArgs
-	}
-)
-
-export const selectThreeDSkip = createSelector(
-	selectThreeDMeterOrGroupID,
-	selectQueryTimeInterval,
-	(id, interval) => !id || !interval.getIsBounded()
 )

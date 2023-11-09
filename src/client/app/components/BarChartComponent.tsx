@@ -9,10 +9,12 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
+import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { BarReadingApiArgs, ChartMultiQueryProps } from '../redux/selectors/dataSelectors';
+import { selectBarChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -20,19 +22,19 @@ import getGraphColor from '../utils/getGraphColor';
 import { barUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
-import { selectGroupDataById } from '../redux/api/groupsApi';
-import { selectUnitDataById } from '../redux/api/unitsApi';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access
  * your reducer state objects from within your React components.
- * @param props query arguments to be used in the dataFetching Hooks.
  * @returns Plotly BarChart
  */
-export default function BarChartComponent(props: ChartMultiQueryProps<BarReadingApiArgs>) {
-	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryArgs;
+export default function BarChartComponent() {
 	const dispatch = useAppDispatch();
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs)
+	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterShouldSkip });
+	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, { skip: groupShouldSkip });
+
 	const barDuration = useAppSelector(state => state.graph.barDuration);
 	const barStacking = useAppSelector(state => state.graph.barStacking);
 	const unitID = useAppSelector(state => state.graph.selectedUnit);
@@ -44,12 +46,10 @@ export default function BarChartComponent(props: ChartMultiQueryProps<BarReading
 	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const meterDataByID  = useAppSelector(selectMeterDataById);
+	const meterDataByID = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 
 	// useQueryHooks for data fetching
-	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterSkipQuery });
-	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupsArgs, { skip: groupSkipQuery });
 	const datasets = [];
 
 	if (meterIsFetching || groupIsFetching) {

@@ -142,7 +142,6 @@ export const readingsApi = baseApi.injectEndpoints({
 				const { data, error } = await baseQuery(URL)
 				return error ? { error } : { data: data as CompareReadings }
 			}
-			// }
 		})
 
 	})

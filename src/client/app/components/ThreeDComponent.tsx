@@ -11,7 +11,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/hooks';
-import { ChartSingleQueryProps, ThreeDReadingApiArgs } from '../redux/selectors/dataSelectors';
+import { selectThreeDQueryArgs } from '../redux/selectors/dataSelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
@@ -27,13 +27,12 @@ import ThreeDPillComponent from './ThreeDPillComponent';
 
 /**
  * Component used to render 3D graphics
- * @param props query args for the useQueryDataFetching hooks
  * @returns 3D Plotly 3D Surface Graph
  */
-export default function ThreeDComponent(props: ChartSingleQueryProps<ThreeDReadingApiArgs>) {
-	const { args, skipQuery } = props.queryArgs;
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: skipQuery });
-	const meterDataById  = useAppSelector(selectMeterDataById);
+export default function ThreeDComponent() {
+	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const graphState = useAppSelector(selectGraphState);

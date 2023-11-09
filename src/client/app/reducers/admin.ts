@@ -10,6 +10,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
 import { durationFormat } from '../utils/durationFormat';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { preferencesApi } from '../redux/api/preferencesApi';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -131,6 +132,13 @@ export const adminSlice = createSlice({
 			state.defaultMeterDisableChecks = action.payload;
 			state.submitted = false;
 		}
+	},
+	extraReducers: builder => {
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => ({
+			...state,
+			...action.payload,
+			defaultMeterReadingFrequency: durationFormat(action.payload.defaultMeterReadingFrequency)
+		}))
 	},
 	selectors: {
 		selectAdminState: state => state

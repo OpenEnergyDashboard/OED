@@ -49,9 +49,9 @@ export default function ExportComponent() {
 	const queryArgs = useAppSelector(selectChartQueryArgs)
 
 	const { data: lineMeterReadings = {}, isFetching: lineMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.meterArgs);
-	const { data: lineGroupReadings = {}, isFetching: groupMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupsArgs);
+	const { data: lineGroupReadings = {}, isFetching: groupMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupArgs);
 	const { data: barMeterReadings = {}, isFetching: barMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.bar.meterArgs);
-	const { data: barGroupReadings = {}, isFetching: barGroupIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.bar.groupsArgs);
+	const { data: barGroupReadings = {}, isFetching: barGroupIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.bar.groupArgs);
 
 	// Function to export the data in a graph.
 	const exportGraphReading = () => {

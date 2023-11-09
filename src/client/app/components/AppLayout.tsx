@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import FooterComponent from './FooterComponent'
 import HeaderComponent from './HeaderComponent'
 /**
- * @returns The OED Application Layout, header, and footer, with the current route as the outlet.
+ * @returns The OED Application Layout. The current route as the outlet Wrapped in the header, and footer components
  */
 export default function AppLayout() {
 	return (

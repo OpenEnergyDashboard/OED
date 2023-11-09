@@ -15,23 +15,24 @@ import {
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { ChartMultiQueryProps, LineReadingApiArgs } from '../redux/selectors/dataSelectors';
+import { selectLineChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { DataType } from '../types/Datasources';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
-import { selectUnitDataById } from '../redux/api/unitsApi';
 
 /**
- * @param props qpi query
  * @returns plotlyLine graphic
  */
-export default function LineChartComponent(props: ChartMultiQueryProps<LineReadingApiArgs>) {
-	const { meterArgs, groupsArgs, meterSkipQuery, groupSkipQuery } = props.queryArgs;
+export default function LineChartComponent() {
 	const dispatch = useAppDispatch();
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs)
+	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
+	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
 
 	const selectedUnit = useAppSelector(state => state.graph.selectedUnit);
 	// The unit label depends on the unit which is in selectUnit state.
@@ -43,13 +44,11 @@ export default function LineChartComponent(props: ChartMultiQueryProps<LineReadi
 	const selectedAreaUnit = useAppSelector(selectAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const meterDataByID  = useAppSelector(selectMeterDataById);
+	const meterDataByID = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 
 
 	// dataFetching Query Hooks
-	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupsArgs, { skip: groupSkipQuery });
-	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterSkipQuery });
 
 	const datasets = [];
 

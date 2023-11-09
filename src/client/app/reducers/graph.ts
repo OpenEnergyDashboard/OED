@@ -253,9 +253,9 @@ export const graphSlice = createSlice({
 	},
 	// New Feature as of 2.0.0 Beta.
 	selectors: {
+		selectGraphState: state => state,
 		selectThreeDState: state => state.threeD,
 		selectBarWidthDays: state => state.barDuration,
-		selectGraphState: state => state,
 		selectSelectedMeters: state => state.selectedMeters,
 		selectSelectedGroups: state => state.selectedGroups,
 		selectQueryTimeInterval: state => state.queryTimeInterval,
@@ -267,7 +267,10 @@ export const graphSlice = createSlice({
 		selectThreeDReadingInterval: state => state.threeD.readingInterval,
 		selectLineGraphRate: state => state.lineGraphRate,
 		selectAreaUnit: state => state.selectedAreaUnit,
-		selectSortingOrder: state => state.compareSortingOrder
+		selectSortingOrder: state => state.compareSortingOrder,
+		selectSelectedUnit: state => state.selectedUnit,
+		selectComparePeriod: state => state.comparePeriod,
+		selectCompareTimeInterval: state => state.compareTimeInterval
 	}
 })
 
@@ -287,7 +290,10 @@ export const {
 	selectThreeDReadingInterval,
 	selectLineGraphRate,
 	selectAreaUnit,
-	selectSortingOrder
+	selectSortingOrder,
+	selectSelectedUnit,
+	selectComparePeriod,
+	selectCompareTimeInterval
 } = graphSlice.selectors
 
 // actionCreators exports

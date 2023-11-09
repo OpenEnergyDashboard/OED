@@ -11,7 +11,7 @@ import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
-import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectCompareChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
@@ -25,13 +25,14 @@ export interface MultiCompareChartProps {
  * @returns Multi Compare Chart element
  */
 export default function MultiCompareChartComponentWIP() {
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectCompareChartQueryArgs)
+	const { data: meterReadings = {} } = readingsApi.useCompareQuery(meterArgs, { skip: meterShouldSkip })
+	const { data: groupReadings = {} } = readingsApi.useCompareQuery(groupArgs, { skip: groupShouldSkip })
+
 	const areaNormalization = useAppSelector(selectGraphAreaNormalization)
 	const sortingOrder = useAppSelector(selectSortingOrder)
 	const selectedMeters = useAppSelector(selectSelectedMeters)
 	const selectedGroups = useAppSelector(selectSelectedGroups)
-	const { compare: { meterArgs, meterSkipQuery, groupSkipQuery, groupsArgs } } = useAppSelector(selectChartQueryArgs)
-	const { data: meterReadings = {} } = readingsApi.useCompareQuery(meterArgs, { skip: meterSkipQuery })
-	const { data: groupReadings = {} } = readingsApi.useCompareQuery(groupsArgs, { skip: groupSkipQuery })
 
 	const meterDataByID = useAppSelector(selectMeterDataById)
 	const groupDataById = useAppSelector(selectGroupDataById)

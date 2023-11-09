@@ -7,12 +7,12 @@ import { selectChartQueryArgs } from './selectors/dataSelectors';
 import { unitsApi } from './api/unitsApi';
 
 // General purpose custom hook mostly useful for Select component loadingIndicators, and current graph loading state(s)
-export const getFetchingStates = () => {
+export const useFetchingStates = () => {
 	const queryArgs = useAppSelector(state => selectChartQueryArgs(state));
 	const { isFetching: meterLineIsFetching, isLoading: meterLineIsLoading } = readingsApi.endpoints.line.useQueryState(queryArgs.line.meterArgs);
-	const { isFetching: groupLineIsFetching, isLoading: groupLineIsLoading } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupsArgs);
+	const { isFetching: groupLineIsFetching, isLoading: groupLineIsLoading } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupArgs);
 	const { isFetching: meterBarIsFetching, isLoading: meterBarIsLoading } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.meterArgs);
-	const { isFetching: groupBarIsFetching, isLoading: groupBarIsLoading } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.groupsArgs);
+	const { isFetching: groupBarIsFetching, isLoading: groupBarIsLoading } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.groupArgs);
 	const { isFetching: threeDIsFetching, isLoading: threeDIsLoading } = readingsApi.endpoints.threeD.useQueryState(queryArgs.threeD.args);
 	const { isFetching: metersFetching, isLoading: metersLoading } = metersApi.endpoints.getMeters.useQueryState();
 	const { isFetching: groupsFetching, isLoading: groupsLoading } = groupsApi.endpoints.getGroups.useQueryState();

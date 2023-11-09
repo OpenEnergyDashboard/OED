@@ -3,13 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import MapChartContainer from '../containers/MapChartContainer';
 import { useAppSelector } from '../redux/hooks';
-import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
 import { ChartTypes } from '../types/redux/graph';
 import BarChartComponent from './BarChartComponent';
 import HistoryComponent from './HistoryComponent';
 import LineChartComponent from './LineChartComponent';
+import MapChartComponent from './MapChartComponent';
 import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
@@ -21,7 +20,6 @@ import UIOptionsComponent from './UIOptionsComponent';
 export default function DashboardComponent() {
 	const chartToRender = useAppSelector(state => state.graph.chartToRender);
 	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
-	const queryArgs = useAppSelector(state => selectChartQueryArgs(state))
 
 	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
@@ -38,11 +36,11 @@ export default function DashboardComponent() {
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 						<HistoryComponent />
 
-						{chartToRender === ChartTypes.line && <LineChartComponent queryArgs={queryArgs.line} />}
-						{chartToRender === ChartTypes.bar && <BarChartComponent queryArgs={queryArgs.bar} />}
+						{chartToRender === ChartTypes.line && <LineChartComponent />}
+						{chartToRender === ChartTypes.bar && <BarChartComponent />}
 						{chartToRender === ChartTypes.compare && <MultiCompareChartComponentWIP />}
-						{chartToRender === ChartTypes.map && <MapChartContainer />}
-						{chartToRender === ChartTypes.threeD && <ThreeDComponent queryArgs={queryArgs.threeD} />}
+						{chartToRender === ChartTypes.map && <MapChartComponent />}
+						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
 					</div>
 
 				</div>
