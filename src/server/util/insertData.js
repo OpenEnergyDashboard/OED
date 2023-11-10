@@ -462,7 +462,7 @@ async function insertGroups(groupsToInsert, conn) {
 		let ok = true;
 		requiredKeys.forEach(key => {
 			if (!groupData.hasOwnProperty(key)) {
-				console.log(`********key "${key}" is required but missing so group number ${index} not processed with values:`, groupData);
+				console.log(`********key "${key}" is required but missing so group number ${i} not processed with values:`, groupData);
 				// Don't insert
 				ok = false;
 			}
