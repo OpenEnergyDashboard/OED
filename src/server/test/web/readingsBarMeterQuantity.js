@@ -7,7 +7,7 @@
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, app } = require('../common');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
