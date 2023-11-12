@@ -10,6 +10,7 @@
 const { chai, mocha, expect, app } = require('../common');
 const { prepareTest,
     parseExpectedCsv,
+    createTimeString,
     expectReadingToEqualExpected,
     getUnitId,
     ETERNITY,
@@ -83,8 +84,33 @@ mocha.describe('readings API', () => {
                 // Add B6 here
 
                 // Add B7 here
+                mocha.it('Custom: 13 day bars for 15 minute reading intervals and quantity units with reduced, partial days & kWh as kWh', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28_bd_13.csv');
+                
+                    // Create a request to the API with the necessary parameters
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+                        .query({
+                            timeInterval: createTimeString('2022-08-20 ', '07:25:35', '2022-10-28 ', '13:18:28'),
+                            barWidthDays: 13,
+                            graphicUnitId: unitId,
+                            // Simulate reduced, partial days in the 13-day window
+                            // Add any additional parameters specific to your case
+                        });
+                
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected);
+                });
+                
 
                 // Add B8 here
+                // Add a new test case for the described issue
 
                 // Add B9 here
 
