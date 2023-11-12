@@ -97,7 +97,6 @@ mocha.describe('readings API', () => {
 
                 // Add B13 here
 
-                // Add B14 here
                 mocha.it('B14: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as lbs of CO2 & chained & reversed', async () => {
                     const unitData = [
                         {
@@ -201,7 +200,7 @@ mocha.describe('readings API', () => {
                     ];
                     const meterData = [
                         {
-                            name: 'Electric_Utility lbs of CO₂',
+                            name: 'Electric_Utility pound of CO₂',
                             unit: 'Electric_Utility',
                             displayable: true,
                             gps: undefined,
