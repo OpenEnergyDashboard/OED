@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -36,9 +35,7 @@ const defaultState: GraphState = {
 		meterOrGroupID: undefined,
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
-	},
-	backHistoryStack: [],
-	forwardHistoryStack: []
+	}
 };
 
 export const graphSlice = createSlice({
@@ -220,23 +217,7 @@ export const graphSlice = createSlice({
 				state.queryTimeInterval = TimeInterval.unbounded()
 			}
 		},
-		updateHistory: (state, action: PayloadAction<GraphState>) => {
-			state.backHistoryStack.push(_.omit(action.payload, ['backHistoryStack', 'forwardHistoryStack']))
-			// reset forward history on new 'visit'
-			state.forwardHistoryStack = []
-		},
-		prevHistory: state => {
-			if (state.backHistoryStack.length > 1) {
-				state.forwardHistoryStack.push(state.backHistoryStack.pop()!)
-			}
-			Object.assign(state, state.backHistoryStack[state.backHistoryStack.length - 1]);
-		},
-		nextHistory: state => {
-			if (state.forwardHistoryStack.length) {
-				state.backHistoryStack.push(state.forwardHistoryStack.pop()!)
-				Object.assign(state, state.backHistoryStack[state.backHistoryStack.length - 1])
-			}
-		}
+		setGraphState: (_state, action: PayloadAction<GraphState>) => action.payload
 	},
 	extraReducers: builder => {
 		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
@@ -248,7 +229,6 @@ export const graphSlice = createSlice({
 				state.barStacking = action.payload.defaultBarStacking
 				state.areaNormalization = action.payload.defaultAreaNormalization
 			}
-			state.backHistoryStack.push(_.omit(state, ['backHistoryStack', 'forwardHistoryStack']))
 		})
 	},
 	// New Feature as of 2.0.0 Beta.
@@ -326,7 +306,5 @@ export const {
 	updateThreeDMeterOrGroup,
 	updateSelectedMetersOrGroups,
 	resetTimeInterval,
-	updateHistory,
-	prevHistory,
-	nextHistory
+	setGraphState
 } = graphSlice.actions

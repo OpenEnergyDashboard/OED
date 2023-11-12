@@ -35,7 +35,6 @@ export default function DashboardComponent() {
 				<div className={`${chartClassName} align-self-auto text-center`}>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 						<HistoryComponent />
-
 						{chartToRender === ChartTypes.line && <LineChartComponent />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent />}
 						{chartToRender === ChartTypes.compare && <MultiCompareChartComponentWIP />}

@@ -10,14 +10,16 @@ import { unsavedWarningSlice } from './unsavedWarning';
 import { optionsSlice } from './options';
 import { baseApi } from '../redux/api/baseApi';
 import { graphSlice } from './graph';
+import { appStateSlice } from './appStateSlice';
 
 export const rootReducer = combineReducers({
-	maps,
+	appState: appStateSlice.reducer,
 	graph: graphSlice.reducer,
 	admin: adminSlice.reducer,
 	currentUser: currentUserSlice.reducer,
 	unsavedWarning: unsavedWarningSlice.reducer,
 	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers
-	[baseApi.reducerPath]: baseApi.reducer
+	[baseApi.reducerPath]: baseApi.reducer,
+	maps
 });

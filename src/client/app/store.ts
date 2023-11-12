@@ -5,8 +5,8 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { rootReducer } from './reducers';
 import { baseApi } from './redux/api/baseApi';
-import { historyMiddleware } from './redux/middleware/graphHistory';
 import { Dispatch } from './types/redux/actions';
+import { listenerMiddleware } from './redux/middleware/middleware';
 
 
 export const store = configureStore({
@@ -15,7 +15,7 @@ export const store = configureStore({
 		// immutableCheck: false,
 		serializableCheck: false
 	})
-		.prepend(historyMiddleware.middleware)
+		.prepend(listenerMiddleware.middleware)
 		.concat(baseApi.middleware)
 });
 

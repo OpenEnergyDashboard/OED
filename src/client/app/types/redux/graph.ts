@@ -75,8 +75,4 @@ export interface GraphState {
 	showMinMax: boolean;
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;
-	backHistoryStack: GraphStateHistory[];
-	forwardHistoryStack: GraphStateHistory[];
-}
-export interface GraphStateHistory extends Omit<GraphState, 'backHistoryStack' | 'forwardHistoryStack'> {
 }
