@@ -5,11 +5,11 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
+import * as moment from 'moment';
 import { hasToken } from '../../utils/token';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import * as moment from 'moment';
-import store from '../../index';
+import { store } from '../../store';
 import { updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
 

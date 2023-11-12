@@ -24,10 +24,10 @@ export function receiveVersion(data: string): t.ReceiveVersion {
 
 /**
  * @param state The redux state.
- * @returns Whether preferences are fetching
+ * @returns Whether preferences are fetching or already exist in state
  */
 function shouldFetchVersion(state: State): boolean {
-	return !state.version.isFetching;
+	return !state.version.isFetching && !state.version.version;
 }
 
 /**

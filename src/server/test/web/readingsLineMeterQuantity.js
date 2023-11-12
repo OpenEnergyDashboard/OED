@@ -83,8 +83,18 @@ mocha.describe('readings API', () => {
                         .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:15:00'), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected);
                 });
- 
-				// Add L7 here
+
+                //partial days/hours for daily gives only full days
+                mocha.it('L7: partial days/hours for daily gives only full days', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28.csv');
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected);
+                });
 
                 mocha.it('L10: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
                     const unitData = unitDatakWh.concat([
