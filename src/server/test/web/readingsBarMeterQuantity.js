@@ -8,6 +8,7 @@
 */
 
 const { chai, mocha, expect, app } = require('../common');
+const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
@@ -24,7 +25,6 @@ mocha.describe('readings API', () => {
             mocha.describe('for quantity meters', () => {
                 // The logic here is effectively the same as the line charts, however bar charts have an added
                 // barWidthDays parameter that must be accounted for, which adds a few extra steps
-                /*REMOVE
                 mocha.it('B1: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
@@ -76,8 +76,6 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-
-                REMOVE*/
 
                 // Add B4 here
 
@@ -218,7 +216,7 @@ mocha.describe('readings API', () => {
                     // Load the data into the database
                     await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
-                    const unitId = await getUnitId("pound");
+                    const unitId = await getUnitId("pound of CO₂");
                     // Load the expected response data from the corresponding csv file
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_lbsCO2_st_-inf_et_inf_bd_1.csv');
                     // Create a request to the API for unbounded reading times and save the response
