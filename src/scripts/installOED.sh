@@ -67,11 +67,7 @@ if [ "$keep_node_modules" == "yes" ]; then
 	printf "\n%s\n\n" "skipping NPM install as requested or because node_modules seems up to date"
 else
 	printf "\n%s\n\n" "NPM install..."
-	# TODO --legacy-peer-deps was added per npm message to fix issue that react-notification-system 
-	# does not have react 17 as a peerDependency. See
-	# https://stackoverflow.com/questions/66239691/what-does-npm-install-legacy-peer-deps-do-exactly-when-is-it-recommended-wh.
-	# The issue is this changes for all packages. Issue #1000 is open to fix this.
-	npm ci --loglevel=warn --legacy-peer-deps
+	npm ci --loglevel=warn
 	if [ $? == 0 ]; then
 		printf "\n%s\n\n" "NPM install finished."
 	else
