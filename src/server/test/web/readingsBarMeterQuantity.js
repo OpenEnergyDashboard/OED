@@ -108,7 +108,31 @@ mocha.describe('readings API', () => {
 
                 // Add B11 here
 
-                // Add B12 here
+                // Tony: Copied the previous tests (B1, B2, B3, B4) and adjusted parameters to test for B12.
+                // Tony: Changed the path of "const expected = await parseExpectedCsv" to the B12 csv file.
+                // Tony: Changed mocha.it to describe the time interval, period, and "graphic unit" being tested.
+                    // Tony: While B1-to-B4 test for kWh as kWh, B12 tests for kg of CO₂.
+                    // Tony: B1-to-B4's line "const unitId = await getUnitId('kWh');", I changed it to "const unitId = await getUnitId('kgCO2');" for B12.
+                        // Tony ISSUE: I don't know that is correct.
+                // Tony: "barWidthDays:" for B1-to-B4 seems to reflect the amount of days, so I put 75 for B12.
+ 
+                mocha.it('B12: Testing 15-minute interval readings over a 75-day period for consistency and accuracy in kg of CO₂ units.', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kgCO2');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/readings_ri_15_days_75.csv');
+                    // Create a request to the API with specific parameters for B12 and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+                        .query({
+                            timeInterval: ETERNITY.toString(), // Replace with the specific time interval for B12
+                            barWidthDays: 75, // Replace with the specific bar width for B12
+                            graphicUnitId: unitId
+                        });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected);
+                });
 
                 // Add B13 here
 
