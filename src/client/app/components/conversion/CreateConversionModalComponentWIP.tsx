@@ -15,7 +15,6 @@ import { selectIsValidConversion } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
-import { UnitData } from '../../types/redux/units';
 import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -28,15 +27,15 @@ export default function CreateConversionModalComponent() {
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation()
 	const unitDataById = useAppSelector(selectUnitDataById)
 	// Want units in sorted order by identifier regardless of case.
-	const unitsSorted = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
+	const sortedUnitData = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
 
 	const defaultValues = {
 		// Invalid source/destination ids arbitrarily set to -999.
 		// Meter Units are not allowed to be a destination.
 		sourceId: -999,
-		sourceOptions: unitsSorted as UnitData[],
+		sourceOptions: sortedUnitData,
 		destinationId: -999,
-		destinationOptions: unitsSorted.filter(unit => unit.typeOfUnit !== 'meter') as UnitData[],
+		destinationOptions: sortedUnitData.filter(unit => unit.typeOfUnit !== 'meter'),
 		bidirectional: true,
 		slope: 0,
 		intercept: 0,
@@ -56,9 +55,7 @@ export default function CreateConversionModalComponent() {
 	const [conversionState, setConversionState] = useState(defaultValues);
 
 	// If the currently selected conversion is valid
-	const [validConversion, reason] = useAppSelector(
-		state => selectIsValidConversion(state, conversionState)
-	)
+	const [validConversion, reason] = useAppSelector(state => selectIsValidConversion(state, conversionState))
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setConversionState({ ...conversionState, [e.target.name]: e.target.value });

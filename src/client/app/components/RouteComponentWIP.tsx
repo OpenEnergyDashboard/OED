@@ -12,11 +12,10 @@ import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
-import { selectCurrentUser } from '../reducers/currentUser';
+import { selectCurrentUser, selectIsAdmin } from '../reducers/currentUser';
 import { graphSlice } from '../reducers/graph';
 import { baseApi } from '../redux/api/baseApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { selectIsLoggedInAsAdmin } from '../redux/selectors/authSelectors';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import { ChartTypes, LineGraphRate, MeterOrGroup } from '../types/redux/graph';
@@ -40,7 +39,7 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
 
 const useWaitForInit = () => {
 	const dispatch = useAppDispatch();
-	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
+	const isAdmin = useAppSelector(selectIsAdmin);
 	const currentUser = useAppSelector(state => selectCurrentUser(state));
 	const [initComplete, setInitComplete] = React.useState<boolean>(false);
 

@@ -3,10 +3,10 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSlice } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { authApi } from '../redux/api/authApi';
 import { userApi } from '../redux/api/userApi';
-import { User } from '../types/items';
+import { User, UserRole } from '../types/items';
 import { CurrentUserState } from '../types/redux/currentUser';
 import { setToken } from '../utils/token';
 
@@ -59,3 +59,13 @@ export const currentUserSlice = createSlice({
 })
 
 export const { selectCurrentUser } = currentUserSlice.selectors
+
+// Memoized Selectors for stable obj reference from derived Values
+export const selectIsAdmin = createSelector(
+	selectCurrentUser,
+	currentUser => {
+		// True of token in state, and  has Admin Role.
+		// Token If token is in state, it has been validated upon app initialization, or by login verification
+		return (currentUser.token && currentUser.profile?.role === UserRole.ADMIN) as boolean
+	}
+)

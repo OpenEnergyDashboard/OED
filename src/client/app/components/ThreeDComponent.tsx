@@ -11,7 +11,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/hooks';
-import { selectThreeDQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';

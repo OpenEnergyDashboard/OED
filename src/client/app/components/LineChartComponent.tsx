@@ -17,7 +17,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { selectLineChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { DataType } from '../types/Datasources';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';

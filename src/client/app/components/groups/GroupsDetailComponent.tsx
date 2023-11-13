@@ -7,14 +7,14 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 
 import { useAppSelector } from '../../redux/hooks';
-import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
-import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
+import { selectVisibleMeterAndGroupDataByID } from '../../redux/selectors/adminSelectors';
 import { potentialGraphicUnits } from '../../utils/input';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
 import { GroupData } from 'types/redux/groups';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { selectIsAdmin } from '../../reducers/currentUser';
 
 /**
  * Defines the groups page card view
@@ -23,10 +23,10 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 export default function GroupsDetailComponent() {
 
 	// Check for admin status
-	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
+	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
-	const { visibleGroups } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
+	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupDataByID(state));
 
 	// Units state
 	const unitDataById = useAppSelector(selectUnitDataById);

@@ -12,7 +12,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/hooks';
-import { selectChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectAllChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { UserRole } from '../types/items';
 import { ConversionData } from '../types/redux/conversions';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
@@ -46,7 +46,7 @@ export default function ExportComponent() {
 	// Time range of graphic
 	const timeInterval = graphState.queryTimeInterval;
 
-	const queryArgs = useAppSelector(selectChartQueryArgs)
+	const queryArgs = useAppSelector(selectAllChartQueryArgs)
 
 	const { data: lineMeterReadings = {}, isFetching: lineMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.meterArgs);
 	const { data: lineGroupReadings = {}, isFetching: groupMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupArgs);

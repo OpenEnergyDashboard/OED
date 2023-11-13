@@ -16,7 +16,7 @@ import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
-import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
+import { selectIsAdmin } from '../../reducers/currentUser';
 import { store } from '../../store';
 import '../../styles/card-page.css';
 import '../../styles/modal.css';
@@ -72,7 +72,7 @@ export default function EditGroupModalComponentWIP(props: EditGroupModalComponen
 	const groupState = editGroupsState[props.groupId];
 
 	// Check for admin status
-	const loggedInAsAdmin = useAppSelector(selectIsLoggedInAsAdmin);
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 
 	// The information on the allowed children of this group that can be selected in the menus.
 	const groupChildrenDefaults = {

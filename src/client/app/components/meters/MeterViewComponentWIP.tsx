@@ -9,10 +9,10 @@ import { Button } from 'reactstrap';
 import { MeterData } from 'types/redux/meters';
 import { useAppSelector } from '../../redux/hooks';
 import { selectGraphicName, selectUnitName } from '../../redux/selectors/adminSelectors';
-import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
 import EditMeterModalComponentWIP from './EditMeterModalComponentWIP';
+import { selectIsAdmin } from '../../reducers/currentUser';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -27,7 +27,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
 	// Check for admin status
-	const loggedInAsAdmin = useAppSelector(selectIsLoggedInAsAdmin);
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 
 
 	// Set up to display the units associated with the meter as the unit identifier.

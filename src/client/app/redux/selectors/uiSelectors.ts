@@ -8,7 +8,7 @@ import { selectMapState } from '../../reducers/maps';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
-import { DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { UnitDataById, UnitRepresentType } from '../../types/redux/units';
 import {
 	CartesianPoint, Dimensions, calculateScaleFromEndpoints, gpsToUserGrid,
 	itemDisplayableOnMap, itemMapInfoOk, normalizeImageDimensions
@@ -16,59 +16,27 @@ import {
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
-import { selectCurrentUser } from '../../reducers/currentUser';
 import {
-	selectChartToRender, selectGraphAreaNormalization, selectGraphUnitID,
-	selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters
+	selectChartToRender, selectGraphAreaNormalization,
+	selectSelectedGroups, selectSelectedMeters,
+	selectSelectedUnit
 } from '../../reducers/graph';
 
 import { selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { selectMeterDataById } from '../api/metersApi';
+import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
+import { MeterDataByID } from 'types/redux/meters';
+import { GroupDataByID } from 'types/redux/groups';
 
 
-export const selectVisibleMetersAndGroups = createSelector(
-	selectMeterDataById,
-	selectGroupDataById,
-	selectCurrentUser,
-	(meterDataByID, groupDataById, currentUser) => {
-		// Holds all meters visible to the user
-		const visibleMeters = new Set<number>();
-		const visibleGroups = new Set<number>();
-
-		// Get all the meters that this user can see.
-		if (currentUser.profile?.role === 'admin') {
-			// Can see all meters
-			Object.values(meterDataByID).forEach(meter => {
-				visibleMeters.add(meter.id);
-			});
-			Object.values(groupDataById).forEach(group => {
-				visibleGroups.add(group.id);
-			});
-		}
-		else {
-			// Regular user or not logged in so only add displayable meters
-			Object.values(meterDataByID).forEach(meter => {
-				if (meter.displayable) {
-					visibleMeters.add(meter.id);
-				}
-			});
-			Object.values(groupDataById).forEach(group => {
-				if (group.displayable) {
-					visibleGroups.add(group.id);
-				}
-			});
-		}
-		return { meters: visibleMeters, groups: visibleGroups }
-	}
-);
 
 export const selectCurrentUnitCompatibility = createSelector(
 	selectVisibleMetersAndGroups,
 	selectMeterDataById,
 	selectGroupDataById,
-	selectGraphUnitID,
-	(visible, meterDataById, groupDataById, graphUnitID) => {
+	selectSelectedUnit,
+	(visible, meterDataById, groupDataById, selectedUnitId) => {
 		// meters and groups that can graph
 		const compatibleMeters = new Set<number>();
 		const compatibleGroups = new Set<number>();
@@ -77,62 +45,45 @@ export const selectCurrentUnitCompatibility = createSelector(
 		const incompatibleMeters = new Set<number>();
 		const incompatibleGroups = new Set<number>();
 
-		if (graphUnitID === -99) {
-			// No unit is selected then no meter/group should be selected.
-			// In this case, every meter is valid (provided it has a default graphic unit)
+		visible.meters.forEach(meterId => {
+			const meterGraphingUnit = meterDataById[meterId].defaultGraphicUnit;
+			// when no unit is currently selected, every meter/group is valid provided it has a default graphic unit
 			// If the meter/group has a default graphic unit set then it can graph, otherwise it cannot.
-			visible.meters.forEach(meterId => {
-				const meterGraphingUnit = meterDataById[meterId].defaultGraphicUnit;
-				if (meterGraphingUnit === -99) {
-					//Default graphic unit is not set
-					incompatibleMeters.add(meterId);
-				}
-				else {
-					//Default graphic unit is set
-					compatibleMeters.add(meterId);
-				}
-			});
-			visible.groups.forEach(groupId => {
-				const groupGraphingUnit = groupDataById[groupId].defaultGraphicUnit;
-				if (groupGraphingUnit === -99) {
-					//Default graphic unit is not set
-					incompatibleGroups.add(groupId);
-				}
-				else {
-					//Default graphic unit is set
-					compatibleGroups.add(groupId);
-				}
-			});
-		} else {
-			// A unit is selected
-			// For each meter get all of its compatible units
-			// Then, check if the selected unit exists in that set of compatible units
-			visible.meters.forEach(meterId => {
-				// Get the set of units compatible with the current meter
+			// selectedUnitId -99 indicates no unit selected
+			if (selectedUnitId === -99 && meterGraphingUnit === -99) {
+				// No Unit Selected and Default graphic unit is not set
+				incompatibleMeters.add(meterId);
+			}
+			else if (selectedUnitId === -99) {
+				// no unitSelected, but has a default unit
+				compatibleMeters.add(meterId)
+			}
+			else {
+				// A unit is selected
+				// Get all of compatible units for this meter
 				const compatibleUnits = unitsCompatibleWithMeters(new Set<number>([meterId]));
-				if (compatibleUnits.has(graphUnitID)) {
-					// The selected unit is part of the set of compatible units with this meter
-					compatibleMeters.add(meterId);
-				}
-				else {
-					// The selected unit is not part of the compatible units set for this meter
-					incompatibleMeters.add(meterId);
-				}
-			});
-			visible.groups.forEach(groupId => {
-				// Get the set of units compatible with the current group (through its deepMeters attribute)
-				// TODO If a meter in a group is not visible to this user then it is not in Redux state and this fails.
-				const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
-				if (compatibleUnits.has(graphUnitID)) {
-					// The selected unit is part of the set of compatible units with this group
-					compatibleGroups.add(groupId);
-				}
-				else {
-					// The selected unit is not part of the compatible units set for this group
+				// Then, check if the selected unit exists in that set of compatible units
+				compatibleUnits.has(selectedUnitId) ? compatibleMeters.add(meterId) : incompatibleMeters.add(meterId);
+			}
+		});
+
+		// Same As Meters
+		visible.groups
+			.forEach(groupId => {
+				const groupGraphingUnit = groupDataById[groupId].defaultGraphicUnit;
+				if (selectedUnitId === -99 && groupGraphingUnit === -99) {
 					incompatibleGroups.add(groupId);
 				}
-			});
-		}
+				else if (selectedUnitId === -99) {
+					compatibleGroups.add(groupId)
+				}
+				else {
+					// Get the set of units compatible with the current group (through its deepMeters attribute)
+					// TODO If a meter in a group is not visible to this user then it is not in Redux state and this fails.
+					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
+					compatibleUnits.has(selectedUnitId) ? compatibleGroups.add(groupId) : incompatibleGroups.add(groupId);
+				}
+			})
 
 		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
 	}
@@ -141,11 +92,11 @@ export const selectCurrentUnitCompatibility = createSelector(
 export const selectCurrentAreaCompatibility = createSelector(
 	selectCurrentUnitCompatibility,
 	selectGraphAreaNormalization,
-	selectGraphUnitID,
+	selectSelectedUnit,
 	selectMeterDataById,
 	selectGroupDataById,
 	selectUnitDataById,
-	(currentUnitCompatibility, areaNormalization, unitID, meterDataById, groupDataById, unitDataById) => {
+	(currentUnitCompatibility, areaNormalization, selectedUnit, meterDataById, groupDataById, unitDataById) => {
 		// Deep Copy previous selector's values, and update as needed based on current Area Normalization setting
 		const compatibleMeters = new Set<number>(currentUnitCompatibility.compatibleMeters);
 		const compatibleGroups = new Set<number>(currentUnitCompatibility.compatibleGroups);
@@ -157,31 +108,20 @@ export const selectCurrentAreaCompatibility = createSelector(
 		// only run this check if area normalization is on
 		if (areaNormalization) {
 			compatibleMeters.forEach(meterID => {
-				const meterGraphingUnit = meterDataById[meterID].defaultGraphicUnit;
 				// No unit is selected then no meter/group should be selected if area normalization is enabled and meter type is raw
-				if ((unitID === -99 && unitDataById[meterGraphingUnit] && unitDataById[meterGraphingUnit].unitRepresent === UnitRepresentType.raw) ||
-					// do not allow meter to be selected if it has zero area or no area unit
-					meterDataById[meterID].area === 0 || meterDataById[meterID].areaUnit === AreaUnitType.none
-				) {
+				if (!isAreaNormCompatible(meterID, selectedUnit, meterDataById, unitDataById)) {
 					incompatibleMeters.add(meterID);
 				}
 			});
 			compatibleGroups.forEach(groupID => {
-				const groupGraphingUnit = groupDataById[groupID].defaultGraphicUnit;
-				// No unit is selected then no meter/group should be selected if area normalization is enabled and meter type is raw
-
-				if ((unitID === -99 && unitDataById[groupGraphingUnit] && unitDataById[groupGraphingUnit].unitRepresent === UnitRepresentType.raw) ||
-					// do not allow group to be selected if it has zero area or no area unit
-					groupDataById[groupID].area === 0 || groupDataById[groupID].areaUnit === AreaUnitType.none) {
+				if (!isAreaNormCompatible(groupID, selectedUnit, groupDataById, unitDataById)) {
 					incompatibleGroups.add(groupID);
 				}
 			});
-			// Filter out any new incompatible meters/groups from the compatibility list.
-			incompatibleMeters.forEach(meterID => compatibleMeters.delete(meterID))
-			incompatibleGroups.forEach(groupID => compatibleGroups.delete(groupID))
 		}
-
-
+		// Filter out any new incompatible meters/groups from the compatibility list.
+		incompatibleMeters.forEach(meterID => compatibleMeters.delete(meterID))
+		incompatibleGroups.forEach(groupID => compatibleGroups.delete(groupID))
 		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
 	}
 )
@@ -308,12 +248,13 @@ export const selectMeterGroupSelectData = createSelector(
 		const meterSelectOptions = getSelectOptionsByItem(compatibleMeters, incompatibleMeters, meterDataById, 'meter')
 		const groupSelectOptions = getSelectOptionsByItem(compatibleGroups, incompatibleGroups, groupDataById, 'group')
 
-		// currently when selected values are found to be incompatible (by area for example) get removed from selected options.
-		// in the near future they should instead remain selected but visually appear disabled.
-		// TODO WRITE CUSTOM SELECT VALUE TO BE ABLE TO UTILIZE THESE Values
+		// currently when selected values are found to be incompatible get removed from selected options  (by area for example) .
+		// in the near future they should instead remain 'selected' but visually appear disabled.
+		// TODO write custom React-Select component to be able to utilize these values
+		// The select options have an attached 'disabled' boolean which can be used when writing custom component for react-select
 		// These value(s) is not currently utilized
-		const selectedMeterValues = selectedMeterOptions.compatible.concat(selectedMeterOptions.incompatible)
-		const selectedGroupValues = selectedGroupOptions.compatible.concat(selectedGroupOptions.incompatible)
+		const allSelectedMeterValues = selectedMeterOptions.compatible.concat(selectedMeterOptions.incompatible)
+		const allSelectedGroupValues = selectedGroupOptions.compatible.concat(selectedGroupOptions.incompatible)
 
 		// Format The generated selectOptions into grouped options for the React-Select component
 		const meterGroupedOptions: GroupedOption[] = [
@@ -325,35 +266,11 @@ export const selectMeterGroupSelectData = createSelector(
 			{ label: 'Incompatible Options', options: groupSelectOptions.incompatible }
 		]
 
-		return { meterGroupedOptions, groupsGroupedOptions, selectedMeterValues, selectedGroupValues }
+		return { meterGroupedOptions, groupsGroupedOptions, selectedMeterOptions, selectedGroupOptions, allSelectedMeterValues, allSelectedGroupValues }
 	}
 )
 
-/**
- * Filters all units that are of type meter or displayable type none from the redux state, as well as admin only units if the user is not an admin.
- * @param state - current redux state
- * @returns an array of UnitData
- */
-export const selectVisibleUnitOrSuffixState = createSelector(
-	selectUnitDataById,
-	selectCurrentUser,
-	(unitDataById, currentUser) => {
-		let visibleUnitsOrSuffixes;
-		if (currentUser.profile?.role === 'admin') {
-			// User is an admin, allow all units to be seen
-			visibleUnitsOrSuffixes = _.filter(unitDataById, o => {
-				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable != DisplayableType.none;
-			});
-		}
-		else {
-			// User is not an admin, do not allow for admin units to be seen
-			visibleUnitsOrSuffixes = _.filter(unitDataById, o => {
-				return (o.typeOfUnit == UnitType.unit || o.typeOfUnit == UnitType.suffix) && o.displayable == DisplayableType.all;
-			});
-		}
-		return visibleUnitsOrSuffixes;
-	}
-)
+
 
 export const selectUnitSelectData = createSelector(
 	selectUnitDataById,
@@ -440,6 +357,7 @@ export function getSelectOptionsByItem(
 	incompatibleItems: Set<number>,
 	// using any due to ts errs
 	dataById: any,
+	// After moving to RTK the older instanceOfx no longer works due to lack of meter,group,unit state reducers.
 	type: 'meter' | 'group' | 'unit') {
 	// TODO Refactor original
 	// redefined here for testing.
@@ -476,7 +394,7 @@ export function getSelectOptionsByItem(
 		}
 		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
 		// This should clear once the state is loaded.
-		label = label === null ? '' : label;
+		// label = label === null ? '' : label;
 		compatibleItemOptions.push({
 			value: itemId,
 			label: label,
@@ -505,9 +423,6 @@ export function getSelectOptionsByItem(
 			meterOrGroup = MeterOrGroup.groups
 			defaultGraphicUnit = dataById[itemId]?.defaultGraphicUnit;
 		}
-		// TODO This is a bit of a hack. When an admin logs in they may not have the new state so label is null.
-		// This should clear once the state is loaded.
-		label = label === null ? '' : label;
 		incompatibleItemOptions.push({
 			value: itemId,
 			label: label,
@@ -518,16 +433,25 @@ export function getSelectOptionsByItem(
 		} as SelectOption
 		);
 	});
-	const sortedCompatibleOptions = _.sortBy(compatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
-	const sortedIncompatibleOptions = _.sortBy(incompatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
+	const compatible = _.sortBy(compatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
+	const incompatible = _.sortBy(incompatibleItemOptions, item => item.label?.toLowerCase(), 'asc')
 
 
-	return { compatible: sortedCompatibleOptions, incompatible: sortedIncompatibleOptions }
+	return { compatible, incompatible }
 }
 
-export const selectDateRangeInterval = createSelector(
-	selectQueryTimeInterval,
-	timeInterval => {
-		return timeInterval
-	}
-)
+
+
+// Helper function for area compatibility
+// areaNorm should be active when called
+const isAreaNormCompatible = (id: number, selectedUnit: number, meterOrGroupData: MeterDataByID | GroupDataByID, unitDataById: UnitDataById) => {
+	const meterGraphingUnit = meterOrGroupData[id].defaultGraphicUnit;
+
+	// If no unit is selected then no meter/group should be selected if meter type is raw
+	const noUnitAndRaw = selectedUnit === -99 && unitDataById[meterGraphingUnit]?.unitRepresent === UnitRepresentType.raw
+
+	// do not allow meter to be selected if it has zero area or no area unit
+	const noAreaOrUnitType = meterOrGroupData[id].area === 0 || meterOrGroupData[id].areaUnit === AreaUnitType.none
+	const isAreaNormCompatible = !noUnitAndRaw && !noAreaOrUnitType
+	return isAreaNormCompatible
+}

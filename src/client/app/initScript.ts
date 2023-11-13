@@ -50,8 +50,5 @@ export const initializeApp = async () => {
 	// Request meter/group/details
 	store.dispatch(metersApi.endpoints.getMeters.initiate())
 	store.dispatch(groupsApi.endpoints.getGroups.initiate())
-	await store.dispatch(preferencesApi.util.getRunningQueryThunk('getPreferences', undefined))
-	store.dispatch(appStateSlice.actions.updateHistory(store.getState().graph))
-
 	store.dispatch(appStateSlice.actions.setInitComplete(true))
 }

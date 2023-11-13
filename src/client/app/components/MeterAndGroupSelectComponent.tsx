@@ -23,25 +23,19 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
-	const meterAndGroupSelectOptions = useAppSelector(selectMeterGroupSelectData);
+	const { meterGroupedOptions, groupsGroupedOptions, selectedMeterOptions, selectedGroupOptions } = useAppSelector(selectMeterGroupSelectData);
 	const { somethingIsFetching } = useFetchingStates();
 	const { meterOrGroup } = props;
 
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
 
-	const value = meterOrGroup === MeterOrGroup.meters ?
-		meterAndGroupSelectOptions.selectedMeterValues
-		:
-		meterAndGroupSelectOptions.selectedGroupValues
+	const value = meterOrGroup === MeterOrGroup.meters ? selectedMeterOptions.compatible : selectedGroupOptions.compatible;
 
 	// Set the current component's appropriate meter or group SelectOption
-	const options = meterOrGroup === MeterOrGroup.meters ?
-		meterAndGroupSelectOptions.meterGroupedOptions
-		:
-		meterAndGroupSelectOptions.groupsGroupedOptions
+	const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
-		const newMetersOrGroups = newValues.map((option: SelectOption) => option.value);
+		const newMetersOrGroups = newValues.map(option => option.value);
 		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	}
 

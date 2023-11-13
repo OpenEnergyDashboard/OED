@@ -163,7 +163,6 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 				}
 				// Inverse is not bidirectional
 				else {
-					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
 					if (bidirectional) {
 						// The new conversion is bidirectional
 						isValid = false;

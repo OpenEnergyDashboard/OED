@@ -2,16 +2,19 @@ import { createSelector } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
 import { selectAdminState } from '../../reducers/admin'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectMeterDataWithID } from '../../redux/api/metersApi'
+import { selectGroupDataById } from '../../redux/api/groupsApi'
+import { selectMeterDataById, selectMeterDataWithID } from '../../redux/api/metersApi'
 import { RootState } from '../../store'
 import { PreferenceRequestItem } from '../../types/items'
+import { ConversionData } from '../../types/redux/conversions'
+import { MeterData, MeterTimeSortType } from '../../types/redux/meters'
 import { UnitData, UnitType } from '../../types/redux/units'
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits'
+import { AreaUnitType } from '../../utils/getAreaUnitConversion'
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
 import translate from '../../utils/translate'
 import { selectUnitDataById } from '../api/unitsApi'
-import { MeterData } from 'types/redux/meters'
-import { ConversionData } from 'types/redux/conversions'
+import { selectVisibleMetersAndGroups } from './authVisibilitySelectors'
 
 export const selectAdminPreferences = createSelector(
 	selectAdminState,
@@ -122,13 +125,12 @@ export const selectGraphicName = createSelector(
  * useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits.unitId, localMeterEdits.defaultGraphicUnit))
  */
 export const makeSelectGraphicUnitCompatibility = () => {
-	// 3rd/4th callback  used to pass in non-state value in this case the local edits.
-	// two separate call backs so their return values will pass a === equality check for memoized behavior
 	const selectGraphicUnitCompatibilityInstance = createSelector(
 		selectPossibleGraphicUnits,
 		selectPossibleMeterUnits,
-		(_state: RootState, meterDetails: MeterData) => meterDetails,
-		(possibleGraphicUnits, possibleMeterUnits, { unitId, defaultGraphicUnit }) => {
+		(_state: RootState, meterDetails: MeterData) => meterDetails.unitId,
+		(_state: RootState, meterDetails: MeterData) => meterDetails.defaultGraphicUnit,
+		(possibleGraphicUnits, possibleMeterUnits, unitId, defaultGraphicUnit) => {
 			// Graphic units compatible with currently selected unit
 			const compatibleGraphicUnits = new Set<UnitData>();
 			// Graphic units incompatible with currently selected unit
@@ -201,8 +203,11 @@ export const makeSelectGraphicUnitCompatibility = () => {
 export const selectIsValidConversion = createSelector(
 	selectUnitDataById,
 	selectConversionsDetails,
-	(_state: RootState, conversionData: ConversionData) => conversionData,
-	(unitDataById, conversionData, { sourceId, destinationId, bidirectional }): [boolean, string] => {
+	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.sourceId,
+	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.destinationId,
+	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.bidirectional,
+	(unitDataById, conversions, sourceId, destinationId, bidirectional): [boolean, string] => {
+		console.log('Validating Conversion Details!')
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion
@@ -213,6 +218,8 @@ export const selectIsValidConversion = createSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
+		// console.log(sourceId, destinationId, bidirectional)
+
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			// notifyUser(translate('conversion.create.destination.meter'));
@@ -220,15 +227,15 @@ export const selectIsValidConversion = createSelector(
 		}
 
 		// Source or destination not set
-		if (sourceId === -999 || destinationId === -999) {
+		if (sourceId == -999 || destinationId == -999) {
 			// TODO Translate Me!
 			return [false, 'Source or destination not set']
 		}
 
 		// Conversion already exists
-		if ((conversionData.findIndex(conversionData => ((
-			conversionData.sourceId === sourceId) &&
-			conversionData.destinationId === destinationId))) !== -1) {
+		if ((conversions.findIndex(conversion => ((
+			conversion.sourceId === sourceId) &&
+			conversion.destinationId === destinationId))) !== -1) {
 			// notifyUser(translate('conversion.create.exists'));
 			return [false, translate('conversion.create.exists')];
 		}
@@ -241,28 +248,81 @@ export const selectIsValidConversion = createSelector(
 		}
 
 
+		console.log('Seems to Break about here!')
 		let isValid = true;
 		// Loop over conversions and check for existence of inverse of conversion passed in
 		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
 		// If there is a non bidirectional inverse, then it is a valid conversion
-		Object.values(conversionData).forEach(conversion => {
+
+		Object.values(conversions).forEach(conversion => {
+			// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
 			// Inverse exists
-			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)) {
-				// Inverse is bidirectional
-				if (conversion.bidirectional) {
-					isValid = false;
-				}
-				// Inverse is not bidirectional
-				else {
-					// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
-					if (bidirectional) {
-						// The new conversion is bidirectional
-						isValid = false;
-					}
-				}
+			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)
+				&&
+				// Inverse is bidirectional or new conversion is bidirectional
+				(conversion.bidirectional || bidirectional)) {
+				isValid = false;
 			}
 		});
 
-		return !isValid ? [false, translate('conversion.create.exists.inverse')] : [isValid, 'Conversion is Valid']
+		console.log('Conversion never seems to get here? ')
+		return isValid ? [isValid, 'Conversion is Valid'] : [false, translate('conversion.create.exists.inverse')]
+	}
+)
+
+export const selectVisibleMeterAndGroupDataByID = createSelector(
+	selectVisibleMetersAndGroups,
+	selectMeterDataById,
+	selectGroupDataById,
+	(visible, meterDataById, groupDataById) => {
+		const visibleMeters = Object.values(meterDataById).filter(meterData => visible.meters.has(meterData.id))
+		const visibleGroups = Object.values(groupDataById).filter(groupData => visible.groups.has(groupData.id))
+		return { visibleMeters, visibleGroups }
+	}
+)
+
+export const selectDefaultCreateMeterValues = createSelector(
+	selectAdminPreferences,
+	adminPreferences => {
+		const defaultValues = {
+			id: -99,
+			identifier: '',
+			name: '',
+			area: 0,
+			enabled: false,
+			displayable: false,
+			meterType: '',
+			url: '',
+			timeZone: '',
+			gps: '',
+			// Defaults of -999 (not to be confused with -99 which is no unit)
+			// Purely for allowing the default select to be "select a ..."
+			unitId: -99,
+			defaultGraphicUnit: -99,
+			note: '',
+			cumulative: false,
+			cumulativeReset: false,
+			cumulativeResetStart: '',
+			cumulativeResetEnd: '',
+			endOnlyTime: false,
+			readingGap: adminPreferences.defaultMeterReadingGap,
+			readingVariation: 0,
+			readingDuplication: 1,
+			timeSort: MeterTimeSortType.increasing,
+			reading: 0.0,
+			startTimestamp: '',
+			endTimestamp: '',
+			previousEnd: '',
+			areaUnit: AreaUnitType.none,
+			readingFrequency: adminPreferences.defaultMeterReadingFrequency,
+			minVal: adminPreferences.defaultMeterMinimumValue,
+			maxVal: adminPreferences.defaultMeterMaximumValue,
+			minDate: adminPreferences.defaultMeterMinimumDate,
+			maxDate: adminPreferences.defaultMeterMaximumDate,
+			maxError: adminPreferences.defaultMeterMaximumErrors,
+			disableChecks: adminPreferences.defaultMeterDisableChecks
+		}
+
+		return defaultValues
 	}
 )

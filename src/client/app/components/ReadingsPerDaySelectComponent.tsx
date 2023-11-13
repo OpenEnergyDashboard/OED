@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectThreeDQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 
 /**
  * A component which allows users to select date ranges for the graphic

@@ -14,7 +14,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { selectBarChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';

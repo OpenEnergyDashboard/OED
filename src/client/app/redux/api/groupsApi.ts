@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { GroupChildren, GroupData, GroupDataByID } from '../../types/redux/groups';
 import { baseApi } from './baseApi';
-import { selectIsLoggedInAsAdmin } from '../selectors/authSelectors';
+import { selectIsAdmin } from '../../reducers/currentUser';
 import { RootState } from '../../store';
 import { CompareReadings } from 'types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -24,7 +24,7 @@ export const groupsApi = baseApi.injectEndpoints({
 				try {
 					await api.queryFulfilled
 					const state = api.getState() as RootState
-					const isAdmin = selectIsLoggedInAsAdmin(state)
+					const isAdmin = selectIsAdmin(state)
 					// if user is an admin, automatically fetch allGroupChildren and update the
 					if (isAdmin) {
 						const { data = [] } = await api.dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate(undefined))

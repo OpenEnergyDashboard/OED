@@ -10,7 +10,7 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
-import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
+import { makeSelectGraphicUnitCompatibility, selectDefaultCreateMeterValues } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -40,49 +40,9 @@ export default function CreateMeterModalComponent() {
 
 	const [addMeter] = metersApi.endpoints.addMeter.useMutation()
 	// Admin state so can get the default reading frequency.
-	const adminState = useAppSelector(state => state.admin)
 	// Memo'd memoized selector
 	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
-
-	// TODO MAKE A SELECTOR?
-	const defaultValues = {
-		id: -99,
-		identifier: '',
-		name: '',
-		area: 0,
-		enabled: false,
-		displayable: false,
-		meterType: '',
-		url: '',
-		timeZone: '',
-		gps: '',
-		// Defaults of -999 (not to be confused with -99 which is no unit)
-		// Purely for allowing the default select to be "select a ..."
-		unitId: -99,
-		defaultGraphicUnit: -99,
-		note: '',
-		cumulative: false,
-		cumulativeReset: false,
-		cumulativeResetStart: '',
-		cumulativeResetEnd: '',
-		endOnlyTime: false,
-		readingGap: adminState.defaultMeterReadingGap,
-		readingVariation: 0,
-		readingDuplication: 1,
-		timeSort: MeterTimeSortType.increasing,
-		reading: 0.0,
-		startTimestamp: '',
-		endTimestamp: '',
-		previousEnd: '',
-		areaUnit: AreaUnitType.none,
-		readingFrequency: adminState.defaultMeterReadingFrequency,
-		minVal: adminState.defaultMeterMinimumValue,
-		maxVal: adminState.defaultMeterMaximumValue,
-		minDate: adminState.defaultMeterMinimumDate,
-		maxDate: adminState.defaultMeterMaximumDate,
-		maxError: adminState.defaultMeterMaximumErrors,
-		disableChecks: adminState.defaultMeterDisableChecks
-	}
+	const defaultValues = useAppSelector(selectDefaultCreateMeterValues)
 
 	/* State */
 	// To make this consistent with EditUnitModalComponent, we don't pass show and close via props
@@ -142,43 +102,9 @@ export default function CreateMeterModalComponent() {
 	const [validMeter, setValidMeter] = useState(false);
 
 	useEffect(() => {
-		setValidMeter(
-			meterDetails.name !== '' &&
-			(meterDetails.area === 0 || (meterDetails.area > 0 && meterDetails.areaUnit !== AreaUnitType.none)) &&
-			meterDetails.readingGap >= 0 &&
-			meterDetails.readingVariation >= 0 &&
-			(meterDetails.readingDuplication >= 1 && meterDetails.readingDuplication <= 9) &&
-			meterDetails.readingFrequency !== '' &&
-			meterDetails.unitId !== -99 &&
-			meterDetails.defaultGraphicUnit !== -99 &&
-			meterDetails.meterType !== '' &&
-			meterDetails.minVal >= MIN_VAL &&
-			meterDetails.minVal <= meterDetails.maxVal &&
-			meterDetails.maxVal <= MAX_VAL &&
-			moment(meterDetails.minDate).isValid() &&
-			moment(meterDetails.maxDate).isValid() &&
-			moment(meterDetails.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
-			moment(meterDetails.minDate).isSameOrBefore(moment(meterDetails.maxDate)) &&
-			moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
-			(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS)
-		);
-	}, [
-		meterDetails.area,
-		meterDetails.name,
-		meterDetails.readingGap,
-		meterDetails.readingVariation,
-		meterDetails.readingDuplication,
-		meterDetails.areaUnit,
-		meterDetails.readingFrequency,
-		meterDetails.unitId,
-		meterDetails.defaultGraphicUnit,
-		meterDetails.meterType,
-		meterDetails.minVal,
-		meterDetails.maxVal,
-		meterDetails.minDate,
-		meterDetails.maxDate,
-		meterDetails.maxError
-	]);
+		// Conflicting GPS point type so type assertions
+		setValidMeter(isValidCreateMeter(meterDetails as unknown as MeterData));
+	}, [meterDetails]);
 	/* End State */
 
 	// Reset the state to default values
@@ -207,8 +133,6 @@ export default function CreateMeterModalComponent() {
 
 		// TODO Maybe should do as a single popup?
 
-		// Set default identifier as name if left blank
-		meterDetails.identifier = (!meterDetails.identifier || meterDetails.identifier.length === 0) ? meterDetails.name : meterDetails.identifier;
 
 		// Check GPS entered.
 		// Validate GPS is okay and take from string to GPSPoint to submit.
@@ -221,14 +145,13 @@ export default function CreateMeterModalComponent() {
 		if (typeof gpsInput === 'string') {
 			if (isValidGPSInput(gpsInput)) {
 				// Clearly gpsInput is a string but TS complains about the split so cast.
-				const gpsValues = gpsInput.split(',').map((value: string) => parseFloat(value));
+				const gpsValues = gpsInput.split(',').map(value => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
 					longitude: gpsValues[longitudeIndex],
 					latitude: gpsValues[latitudeIndex]
 				};
-				// gpsInput must be of type string but TS does not think so so cast.
-			} else if ((gpsInput as string).length !== 0) {
+			} else if (gpsInput.length !== 0) {
 				// GPS not okay. Only true if some input.
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
@@ -241,9 +164,14 @@ export default function CreateMeterModalComponent() {
 			// The input passed validation.
 			// The default value for timeZone is an empty string but that should be null for DB.
 			// See below for usage of timeZoneValue.
-			const timeZoneValue = (meterDetails.timeZone == '' ? null : meterDetails.timeZone);
 			// GPS may have been updated so create updated state to submit.
-			const submitState = { ...meterDetails, gps: gps, timeZone: timeZoneValue };
+			const submitState = {
+				...meterDetails,
+				gps: gps,
+				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone),
+				// Set default identifier as name if left blank
+				identifier: !meterDetails.identifier || meterDetails.identifier.length === 0 ? meterDetails.name : meterDetails.identifier
+			};
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
 			addMeter(submitState)
@@ -841,6 +769,30 @@ export default function CreateMeterModalComponent() {
 		</>
 	);
 }
+const isValidCreateMeter = (meterDetails: MeterData) => {
+	return meterDetails.name !== '' &&
+		(meterDetails.area === 0 || (meterDetails.area > 0 && meterDetails.areaUnit !== AreaUnitType.none)) &&
+		meterDetails.readingGap >= 0 &&
+		meterDetails.readingVariation >= 0 &&
+		(meterDetails.readingDuplication >= 1 && meterDetails.readingDuplication <= 9) &&
+		meterDetails.readingFrequency !== '' &&
+		meterDetails.unitId !== -99 &&
+		meterDetails.defaultGraphicUnit !== -99 &&
+		meterDetails.meterType !== '' &&
+		meterDetails.minVal >= MIN_VAL &&
+		meterDetails.minVal <= meterDetails.maxVal &&
+		meterDetails.maxVal <= MAX_VAL &&
+		moment(meterDetails.minDate).isValid() &&
+		moment(meterDetails.maxDate).isValid() &&
+		moment(meterDetails.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
+		moment(meterDetails.minDate).isSameOrBefore(moment(meterDetails.maxDate)) &&
+		moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
+		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS)
+}
+
+
+
+
 const MIN_VAL = Number.MIN_SAFE_INTEGER;
 const MAX_VAL = Number.MAX_SAFE_INTEGER;
 const MIN_DATE_MOMENT = moment(0).utc();

@@ -11,7 +11,7 @@ import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/hooks';
-import { selectCompareChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectCompareChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 

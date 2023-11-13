@@ -7,7 +7,7 @@ import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import { selectMapChartQueryArgs } from '../redux/selectors/dataSelectors';
+import { selectMapChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';

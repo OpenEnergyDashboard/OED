@@ -48,7 +48,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	const graphingUnit = state.graph.selectedUnit;
 	// This container is not called if there is no data of there are not units so this is safe.
 	const unitDataById = selectUnitDataById(state)
-	const meterDataById  = selectMeterDataById(state)
+	const meterDataById = selectMeterDataById(state)
 	const groupDataById = selectGroupDataById(state)
 	const selectUnitState = unitDataById[graphingUnit];
 	let unitLabel: string = '';
@@ -197,13 +197,15 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 			yaxis: {
 				title: unitLabel,
 				showgrid: true,
-				gridcolor: '#ddd'
+				gridcolor: '#ddd',
+				fixedrange: true
 			},
 			xaxis: {
 				title: `${xTitle}`,
 				showgrid: false,
 				gridcolor: '#ddd',
-				automargin: true
+				automargin: true,
+				fixedrange: true
 			},
 			margin: {
 				t: 20,

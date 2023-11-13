@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { BarReadingApiArgs, CompareReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../../redux/selectors/dataSelectors';
+import { BarReadingApiArgs, CompareReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../selectors/chartQuerySelectors';
 import { RootState } from '../../store';
 import { BarReadings, CompareReadings, LineReadings, ThreeDReading } from '../../types/readings';
 import { baseApi } from './baseApi';

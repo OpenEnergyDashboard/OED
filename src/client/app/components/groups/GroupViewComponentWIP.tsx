@@ -10,7 +10,7 @@ import { Button } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
-import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
+import { selectIsAdmin } from '../../reducers/currentUser';
 import '../../styles/card-page.css';
 import { noUnitTranslated } from '../../utils/input';
 import translate from '../../utils/translate';
@@ -41,7 +41,7 @@ export default function GroupViewComponentWIP(props: GroupViewComponentProps) {
 	}
 
 	// Check for admin status
-	const loggedInAsAdmin = useAppSelector(selectIsLoggedInAsAdmin);
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state

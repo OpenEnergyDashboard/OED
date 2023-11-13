@@ -3,12 +3,12 @@ import { groupsApi } from './api/groupsApi';
 import { metersApi } from './api/metersApi';
 import { readingsApi } from './api/readingsApi';
 import { useAppSelector } from './hooks';
-import { selectChartQueryArgs } from './selectors/dataSelectors';
+import { selectAllChartQueryArgs } from './selectors/chartQuerySelectors';
 import { unitsApi } from './api/unitsApi';
 
 // General purpose custom hook mostly useful for Select component loadingIndicators, and current graph loading state(s)
 export const useFetchingStates = () => {
-	const queryArgs = useAppSelector(state => selectChartQueryArgs(state));
+	const queryArgs = useAppSelector(state => selectAllChartQueryArgs(state));
 	const { isFetching: meterLineIsFetching, isLoading: meterLineIsLoading } = readingsApi.endpoints.line.useQueryState(queryArgs.line.meterArgs);
 	const { isFetching: groupLineIsFetching, isLoading: groupLineIsLoading } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupArgs);
 	const { isFetching: meterBarIsFetching, isLoading: meterBarIsLoading } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.meterArgs);
@@ -38,35 +38,5 @@ export const useFetchingStates = () => {
 			metersFetching ||
 			groupsFetching ||
 			unitsIsFetching
-
 	}
-	// Since we're deriving data, we can useMemo() for stable references.
-	// const fetchInfo = React.useMemo(() => ({
-	// 	endpointsFetchingData: {
-	// 		meterLineIsLoading,
-	// 		groupLineIsLoading,
-	// 		meterBarIsLoading,
-	// 		groupBarIsLoading,
-	// 		threeDIsLoading,
-	// 		metersLoading,
-	// 		groupsLoading,
-	// 		unitsIsLoading
-	// 	},
-	// 	somethingIsFetching: meterLineIsLoading ||
-	// 		groupLineIsLoading ||
-	// 		meterBarIsLoading ||
-	// 		groupBarIsLoading ||
-	// 		threeDIsLoading ||
-	// 		metersLoading ||
-	// 		groupsLoading ||
-	// 		unitsIsLoading
-
-	// }
-	// ), [
-	// 	meterLineIsLoading, groupLineIsLoading,
-	// 	meterBarIsLoading, groupBarIsLoading,
-	// 	threeDIsLoading, metersLoading,
-	// 	groupsLoading, unitsIsLoading
-	// ])
-
 }

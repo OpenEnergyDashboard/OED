@@ -7,8 +7,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
-import { selectIsLoggedInAsAdmin } from '../../redux/selectors/authSelectors';
-import { selectVisibleMetersGroupsDataByID } from '../../redux/selectors/dataSelectors';
+import { selectVisibleMeterAndGroupDataByID } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
 import { MeterData } from '../../types/redux/meters';
 import { UnitData, UnitType } from '../../types/redux/units';
@@ -17,7 +16,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
 
-import { selectCurrentUser } from '../../reducers/currentUser';
+import { selectCurrentUser, selectIsAdmin } from '../../reducers/currentUser';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 /**
@@ -29,11 +28,11 @@ export default function MetersDetailComponent() {
 	const currentUserState = useAppSelector(state => selectCurrentUser(state));
 
 	// Check for admin status
-	const isAdmin = useAppSelector(state => selectIsLoggedInAsAdmin(state));
+	const isAdmin = useAppSelector(selectIsAdmin);
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	const { visibleMeters } = useAppSelector(state => selectVisibleMetersGroupsDataByID(state));
+	const { visibleMeters } = useAppSelector(state => selectVisibleMeterAndGroupDataByID(state));
 
 	// Units state
 	const unitDataById = useAppSelector(selectUnitDataById);

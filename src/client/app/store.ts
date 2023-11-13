@@ -7,7 +7,7 @@ import { rootReducer } from './reducers';
 import { baseApi } from './redux/api/baseApi';
 import { Dispatch } from './types/redux/actions';
 import { listenerMiddleware } from './redux/middleware/middleware';
-
+import { setInputStabilityCheckEnabled } from 'reselect'
 
 export const store = configureStore({
 	reducer: rootReducer,
@@ -18,11 +18,13 @@ export const store = configureStore({
 		.prepend(listenerMiddleware.middleware)
 		.concat(baseApi.middleware)
 });
+// TODO determine where to place this, and only set for dev env
+setInputStabilityCheckEnabled('always')
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 // https://react-redux.js.org/using-react-redux/usage-with-typescript#define-root-state-and-dispatch-types
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
-// Adding old dispatch definition for backwards compatibility with useAppDispatch and older style thunks
-// TODO eventually move away and delete Dispatch Type
+	// Adding old dispatch definition for backwards compatibility with useAppDispatch and older style thunks
+	// TODO eventually move away and delete Dispatch Type entirely
 	& Dispatch
