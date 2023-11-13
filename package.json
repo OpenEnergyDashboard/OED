@@ -68,7 +68,7 @@
     "babel-plugin-lodash": "~3.3.4"
   },
   "dependencies": {
-    "axios": "~0.24.0",
+    "axios": "~1.6.1",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.20.2",
     "bootstrap": "~5.2.3",
