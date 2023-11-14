@@ -163,38 +163,13 @@ async function getUnitId(unitName) {
 // These are the 2D arrays for units, conversions to feed into the database
 // For kWh units.
 const unitDatakWh = [
-    {
-        name: 'kWh',
-        identifier: '',
-        unitRepresent: Unit.unitRepresentType.QUANTITY,
-        secInRate: 3600,
-        typeOfUnit: Unit.unitType.UNIT,
-        suffix: '',
-        displayable: Unit.displayableType.ALL,
-        preferredDisplay: true,
-        note: 'OED created standard unit'
-    },
-    {
-        name: 'Electric_Utility',
-        identifier: '',
-        unitRepresent: Unit.unitRepresentType.QUANTITY,
-        secInRate: 3600,
-        typeOfUnit: Unit.unitType.METER,
-        suffix: '',
-        displayable: Unit.displayableType.NONE,
-        preferredDisplay: false,
-        note: 'special unit'
-    }
+    { name: 'kWh', identifier: '', unitRepresent: Unit.unitRepresentType.QUANTITY, secInRate: 3600, typeOfUnit: Unit.unitType.UNIT, suffix: '', displayable: Unit.displayableType.ALL, preferredDisplay: true, note: 'OED created standard unit' },
+    { name: 'Electric_Utility', identifier: '', unitRepresent: Unit.unitRepresentType.QUANTITY, secInRate: 3600, typeOfUnit: Unit.unitType.METER, suffix: '', displayable: Unit.displayableType.NONE, preferredDisplay: false, note: 'special unit' },
+    { name: 'MJ', identifier: 'megaJoules', unitRepresent: Unit.unitRepresentType.QUANTITY, secInRate: 3600, typeOfUnit: Unit.unitType.UNIT, suffix: '', displayable: Unit.displayableType.ALL, preferredDisplay: false, note: 'MJ' }
 ];
 const conversionDatakWh = [
-    {
-        sourceName: 'Electric_Utility',
-        destinationName: 'kWh',
-        bidirectional: false,
-        slope: 1,
-        intercept: 0,
-        note: 'Electric_Utility → kWh'
-    }
+    { sourceName: 'Electric_Utility', destinationName: 'kWh', bidirectional: false, slope: 1, intercept: 0, note: 'Electric_Utility → kWh' },
+    { sourceName: 'kWh', destinationName: 'MJ', bidirectional: true, slope: 3.6, intercept: 0, note: 'kWh → MJ' }
 ];
 const meterDatakWh = [
     {
