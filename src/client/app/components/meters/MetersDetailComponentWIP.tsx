@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsAdmin } from '../../reducers/currentUser';
-import { selectVisibleMeterAndGroupDataByID } from '../../redux/selectors/adminSelectors';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponentWIP from './CreateMeterModalComponentWIP';
@@ -23,7 +23,7 @@ export default function MetersDetailComponent() {
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupDataByID);
+	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
 
 	return (
 		<div>

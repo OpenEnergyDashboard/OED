@@ -267,7 +267,7 @@ export const selectIsValidConversion = createSelector(
 	}
 )
 
-export const selectVisibleMeterAndGroupDataByID = createSelector(
+export const selectVisibleMeterAndGroupData = createSelector(
 	selectVisibleMetersAndGroups,
 	selectAllMeters,
 	selectAllGroups,

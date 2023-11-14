@@ -20,7 +20,6 @@ import UIOptionsComponent from './UIOptionsComponent';
 export default function DashboardComponent() {
 	const chartToRender = useAppSelector(state => state.graph.chartToRender);
 	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
-
 	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 	// const optionsClassName = optionsVisibility ? 'col-3 d-none d-lg-block' : 'd-none';

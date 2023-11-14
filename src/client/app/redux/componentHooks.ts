@@ -5,6 +5,16 @@ import { readingsApi } from './api/readingsApi';
 import { useAppSelector } from './hooks';
 import { selectAllChartQueryArgs } from './selectors/chartQuerySelectors';
 import { unitsApi } from './api/unitsApi';
+import { selectInitComplete } from '../reducers/appStateSlice';
+import { selectIsAdmin, selectCurrentUserRole } from '../reducers/currentUser';
+
+
+export const useWaitForInit = () => {
+	const isAdmin = useAppSelector(selectIsAdmin);
+	const userRole = useAppSelector(selectCurrentUserRole);
+	const initComplete = useAppSelector(selectInitComplete);
+	return { isAdmin, userRole, initComplete }
+}
 
 // General purpose custom hook mostly useful for Select component loadingIndicators, and current graph loading state(s)
 export const useFetchingStates = () => {

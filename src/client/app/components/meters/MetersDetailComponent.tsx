@@ -7,7 +7,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
-import { selectVisibleMeterAndGroupDataByID } from '../../redux/selectors/adminSelectors';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
 import { MeterData } from '../../types/redux/meters';
 import { UnitData, UnitType } from '../../types/redux/units';
@@ -32,7 +32,7 @@ export default function MetersDetailComponent() {
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupDataByID);
+	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
 
 	// Units state
 	const unitDataById = useAppSelector(selectUnitDataById);

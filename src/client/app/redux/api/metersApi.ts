@@ -9,7 +9,7 @@ import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
 
 export const meterAdapter = createEntityAdapter<MeterData>({
-	sortComparer: (MeterA, MeterB) => MeterA.identifier.localeCompare(MeterB.identifier)
+	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
 
 })
 export const metersInitialState = meterAdapter.getInitialState()

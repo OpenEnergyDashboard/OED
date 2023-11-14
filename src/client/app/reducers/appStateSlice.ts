@@ -45,6 +45,7 @@ export const appStateSlice = createSlice({
 		})
 	}),
 	selectors: {
+		selectInitComplete: state => state.initComplete,
 		selectBackHistoryStack: state => state.backHistoryStack,
 		selectForwardHistoryStack: state => state.forwardHistoryStack,
 		// Explicit return value required when calling sameSlice's getSelectors, otherwise circular type inference breaks TS.
@@ -68,5 +69,6 @@ export const {
 export const {
 	selectBackHistoryStack,
 	selectForwardHistoryStack,
-	selectBackHistoryTop
+	selectBackHistoryTop,
+	selectInitComplete
 } = appStateSlice.selectors

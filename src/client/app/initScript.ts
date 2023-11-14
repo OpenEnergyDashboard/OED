@@ -47,7 +47,7 @@ export const initializeApp = async () => {
 		}
 
 	}
-	// Request meter/group/details
+	// Request meter/group/details post-auth
 	store.dispatch(metersApi.endpoints.getMeters.initiate())
 	store.dispatch(groupsApi.endpoints.getGroups.initiate())
 	store.dispatch(appStateSlice.actions.setInitComplete(true))

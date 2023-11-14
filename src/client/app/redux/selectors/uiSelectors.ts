@@ -414,7 +414,7 @@ export function getSelectOptionsByItem(
 		else if (type === 'meter') {
 			label = dataById[itemId]?.identifier;
 			meterOrGroup = MeterOrGroup.meters
-			defaultGraphicUnit = dataById[itemId].defaultGraphicUnit;
+			defaultGraphicUnit = dataById[itemId]?.defaultGraphicUnit;
 		}
 		else if (type === 'group') {
 			label = dataById[itemId]?.name;

@@ -12,9 +12,8 @@ import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
-import { selectCurrentUser, selectIsAdmin } from '../reducers/currentUser';
 import { graphSlice } from '../reducers/graph';
-import { baseApi } from '../redux/api/baseApi';
+import { useWaitForInit } from '../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
@@ -23,8 +22,8 @@ import { validateComparePeriod, validateSortingOrder } from '../utils/calculateC
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { showErrorNotification } from '../utils/notifications';
 import translate from '../utils/translate';
-import HomeComponent from './HomeComponent';
 import AppLayout from './AppLayout';
+import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import SpinnerComponent from './SpinnerComponent';
 import AdminComponent from './admin/AdminComponent';
@@ -37,73 +36,41 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
 
 
 
-const useWaitForInit = () => {
-	const dispatch = useAppDispatch();
-	const isAdmin = useAppSelector(selectIsAdmin);
-	const currentUser = useAppSelector(state => selectCurrentUser(state));
-	const [initComplete, setInitComplete] = React.useState<boolean>(false);
-
-	React.useEffect(() => {
-		// Initialization sequence if not navigating here from the ui.
-		// E.g entering 'localhost:3000/groups' into the browser nav bar etc..
-		const waitForInit = async () => {
-			await Promise.all(dispatch(baseApi.util.getRunningQueriesThunk()))
-			setInitComplete(true)
-			// TODO Startup Crashing fixed, authen
-		}
-
-		waitForInit();
-	}, [dispatch]);
-	return { isAdmin, currentUser, initComplete }
-}
-
 export const AdminOutlet = () => {
-	const { isAdmin
-		// , initComplete
-	} = useWaitForInit();
+	const { isAdmin, initComplete } = useWaitForInit();
 
-	// if (!initComplete) {
-	// 	// Return a spinner until all init queries return and populate cache with data
-	// 	return <SpinnerComponent loading width={50} height={50} />
-	// }
+	if (!initComplete) {
+		// Return a spinner until all init queries return and populate cache with data
+		return <SpinnerComponent loading width={50} height={50} />
+	}
 
 	// Keeping for now in case changes are desired
 	if (isAdmin) {
 		return <Outlet />
 	}
 
-	return <Outlet />
-	// For now this functionality is disabled.
-	// If no longer desired can remove this and close Issue #817
-	// No other cases means user doesn't have the permissions.
-	// return <Navigate to='/' replace />
+	return <Navigate to='/' />
 
 }
 
 // Function that returns a JSX element. Either the requested route's Component, as outlet or back to root
 export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
-	const { currentUser
-		// , initComplete
-	} = useWaitForInit();
+	const { userRole, initComplete } = useWaitForInit();
 	// // If state contains token it has been validated on startup or login.
-	// if (!initComplete) {
-	// 	return <SpinnerComponent loading width={50} height={50} />
-	// }
-
-
+	if (!initComplete) {
+		return <SpinnerComponent loading width={50} height={50} />
+	}
 	// Keeping for now in case changes are desired
-	if (currentUser.profile?.role === UserRole) {
+	if (userRole === UserRole) {
 		return <Outlet />
 	}
-	// If no longer desired can remove this and close Issue #817
-	// For now this functionality is disabled.
-	// return <Navigate to='/' replace />
-	return <Outlet />
+
+	return <Navigate to='/' />
 }
 
 export const NotFound = () => {
 	// redirect to home page if non-existent route is requested.
-	return <Navigate to='/' replace />
+	return <Navigate to='/' />
 }
 
 
@@ -120,12 +87,6 @@ export const GraphLink = () => {
 		URLSearchParams.forEach((value, key) => {
 			//TODO validation could be implemented across all cases similar to compare period and sorting order
 			switch (key) {
-				case 'meterIDs':
-					dispatchQueue.push(graphSlice.actions.updateSelectedMeters(value.split(',').map(s => parseInt(s))))
-					break;
-				case 'groupIDs':
-					dispatchQueue.push(graphSlice.actions.updateSelectedGroups(value.split(',').map(s => parseInt(s))))
-					break;
 				case 'chartType':
 					dispatchQueue.push(graphSlice.actions.changeChartToRender(value as ChartTypes))
 					break;
@@ -193,6 +154,12 @@ export const GraphLink = () => {
 				case 'readingInterval':
 					dispatchQueue.push(graphSlice.actions.updateThreeDReadingInterval(parseInt(value)));
 					break;
+				case 'meterIDs':
+					dispatchQueue.push(graphSlice.actions.updateSelectedMeters(value.split(',').map(s => parseInt(s))))
+					break;
+				case 'groupIDs':
+					dispatchQueue.push(graphSlice.actions.updateSelectedGroups(value.split(',').map(s => parseInt(s))))
+					break;
 				default:
 					throw new Error('Unknown query parameter');
 			}
@@ -204,7 +171,7 @@ export const GraphLink = () => {
 	// All appropriate state updates should've been executed
 	// redirect to clear the link
 
-	return <Navigate to='/' />
+	return <Navigate to='/' replace/>
 
 }
 
@@ -216,6 +183,9 @@ const router = createBrowserRouter([
 		children: [
 			{ index: true, element: <HomeComponent /> },
 			{ path: '/login', element: <LoginComponent /> },
+			{ path: 'groups', element: <GroupsDetailComponentWIP /> },
+			{ path: 'meters', element: <MetersDetailComponentWIP /> },
+			{ path: 'graph', element: <GraphLink /> },
 			{
 				path: '/',
 				element: <AdminOutlet />,
@@ -226,8 +196,6 @@ const router = createBrowserRouter([
 					{ path: 'users/new', element: <CreateUserContainer /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
-					{ path: 'groups', element: <GroupsDetailComponentWIP /> },
-					{ path: 'meters', element: <MetersDetailComponentWIP /> },
 					{ path: 'users', element: <UsersDetailComponentWIP /> },
 					{
 						path: '/',

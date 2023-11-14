@@ -3,7 +3,7 @@ import { RootState } from 'store';
 import { UnitData } from '../../types/redux/units';
 import { baseApi } from './baseApi';
 export const unitsAdapter = createEntityAdapter<UnitData>({
-	sortComparer: (a, b) => a.identifier.localeCompare(b.identifier, undefined, { sensitivity:'base' })
+	sortComparer: (unitA, unitB) => unitA.identifier?.localeCompare(unitB.identifier, undefined, { sensitivity: 'accent' })
 });
 export const unitsInitialState = unitsAdapter.getInitialState();
 export type UnitDataState = EntityState<UnitData, number>;
@@ -13,6 +13,7 @@ export const unitsApi = baseApi.injectEndpoints({
 		getUnitsDetails: builder.query<UnitDataState, void>({
 			query: () => 'api/units',
 			transformResponse: (response: UnitData[]) => {
+				return unitsAdapter.setAll(unitsInitialState, response)
 				return unitsAdapter.setAll(unitsInitialState, response)
 			}
 		}),

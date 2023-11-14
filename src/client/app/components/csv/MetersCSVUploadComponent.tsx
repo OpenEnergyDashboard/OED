@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
-import { fetchMetersDetails } from '../../actions/meters';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
@@ -38,7 +37,7 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 		// Refetch meters details.
 		// Removed with rtk migration
 		// store.getState().meters.hasBeenFetchedOnce = false;
-		fetchMetersDetails();
+		// fetchMetersDetails();
 	}
 
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {

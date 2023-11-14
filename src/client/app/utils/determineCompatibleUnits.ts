@@ -45,7 +45,8 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
 		// the final result must be empty set but don't check specially since don't expect.
-		if (meter.unitId != -99) {
+		// null meter can crash on startup without undef check here
+		if (meter && meter.unitId != -99) {
 			// Set of compatible units with this meter.
 			meterUnits = unitsCompatibleWithUnit(meter.unitId);
 		}
@@ -149,7 +150,8 @@ export function metersInGroup(groupId: number): Set<number> {
 	const groupDataById = selectGroupDataById(state)
 	const group = _.get(groupDataById, groupId);
 	// Create a set of the deep meters of this group and return it.
-	return new Set(group.deepMeters);
+	// null group can break on startup without optional chain
+	return new Set(group?.deepMeters);
 }
 
 /**

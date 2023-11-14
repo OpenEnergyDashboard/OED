@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppSelector } from '../../redux/hooks';
 import { selectIsAdmin } from '../../reducers/currentUser';
-import { selectVisibleMeterAndGroupDataByID } from '../../redux/selectors/adminSelectors';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponentWIP from './CreateGroupModalComponentWIP';
 import GroupViewComponentWIP from './GroupViewComponentWIP';
@@ -22,7 +22,7 @@ export default function GroupsDetailComponentWIP() {
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
-	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupDataByID(state));
+	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
 
 
 
