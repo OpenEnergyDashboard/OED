@@ -8,7 +8,7 @@ import { Prompt, withRouter, RouteComponentProps } from 'react-router-dom';
 import { FlipLogOutStateAction, RemoveUnsavedChangesAction } from '../types/redux/unsavedWarning';
 import { deleteToken } from '../utils/token';
 import { clearCurrentUser } from '../actions/currentUser';
-import store from '../index';
+import { store }  from '../store';
 import { Modal, ModalBody, ModalFooter, Button } from 'reactstrap';
 
 interface UnsavedWarningProps extends RouteComponentProps<any> {
