@@ -137,6 +137,10 @@ export enum ActionType {
 	DeleteSubmittedConversion = 'DELETE_SUBMITTED_CONVERSION',
 	DeleteConversion = 'DELETE_CONVERSION',
 	ConfirmConversionsFetchedOnce = 'CONFIRM_CONVERSIONS_FETCHED_ONCE',
+
+	RequestCiksDetails = 'REQUEST_CIKS_DETAILS',
+	ReceiveCiksDetails = 'RECEIVE_CIKS_DETAILS',
+	ConfirmCiksFetchedOne = 'CONFIRM_CIKS_FETCHED_ONE',
 }
 
 /**

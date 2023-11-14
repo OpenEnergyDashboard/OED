@@ -12,6 +12,7 @@ import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { SelectOption } from '../types/items';
 import React from 'react';
+import { useSelector } from 'react-redux';
 
 /**
  * The intersect operation of two sets.
@@ -83,6 +84,26 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 				// unit at index k is compatible with meter unit so add to set.
 				// Convert index in Pik to unit id.
 				unitSet.add(unitFromPColumn(k));
+			}
+		}
+	}
+	return unitSet;
+}
+
+/**
+ * Returns a set of units ids that are compatible with a specific unit id.
+ * @param unitId The unit id
+ * @returns a set of compatible unit ids
+ */
+export function newUnitsCompatibleWithUnit(unitId: number): Set<Number> {
+	// Loop through each cik and add nonMeterUnitId to unitSet if
+	// the meterUnitId of the cik equals the given unitId.
+	const unitSet = new Set<number>();
+	const globalCiksState = useSelector((state: State) => state.ciks.ciks);
+	if (unitId !== -99 && globalCiksState) {
+		for (const cik of globalCiksState) {
+			if (cik.meterUnitId === unitId) {
+				unitSet.add(cik.nonMeterUnitId);
 			}
 		}
 	}

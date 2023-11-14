@@ -16,6 +16,7 @@ import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { Dispatch } from 'types/redux/actions';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchCiksIfNeeded } from '../actions/ciks';
 
 /**
  * Initializes OED redux with needed details
@@ -33,6 +34,7 @@ export default function InitializationComponent() {
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
 		dispatch(fetchConversionsDetailsIfNeeded());
+		dispatch(fetchCiksIfNeeded());
 		ConversionArray.fetchPik();
 	}, []);
 

@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+	* License, v. 2.0. If a copy of the MPL was not distributed with this
+	* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
 const { log } = require('../log');
@@ -69,7 +69,7 @@ router.post('/edit', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-        failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -122,7 +122,7 @@ router.post('/addConversion', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
-        failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -140,7 +140,7 @@ router.post('/addConversion', async (req, res) => {
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new conversion with error(s): ${err}`);
-            failure(res, 500, `Error while inserting new conversion with errors(s): ${err}`);
+			failure(res, 500, `Error while inserting new conversion with errors(s): ${err}`);
 		}
 	}
 });
@@ -171,7 +171,7 @@ router.post('/delete', async (req, res) => {
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-        failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -180,7 +180,7 @@ router.post('/delete', async (req, res) => {
 			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
 		} catch (err) {
 			log.error(`Error while deleting conversion with error(s): ${err}`);
-            failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
+			failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
 		}
 		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
 	}

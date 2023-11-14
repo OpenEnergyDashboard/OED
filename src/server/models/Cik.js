@@ -12,12 +12,44 @@ const sqlFile = database.sqlFile;
  */
 class Cik {
 	/**
+	 * @param {*} meterUnitId The id of the meter unit.
+	 * @param {*} nonMeterUnitId The id of the non meter unit.
+	 * @param {*} slope The slope of the conversion.
+	 * @param {*} intercept The intercept of the conversion.
+	 */
+	constructor(meterUnitId, nonMeterUnitId, slope, intercept) {
+		this.meterUnitId = meterUnitId;
+		this.nonMeterUnitId = nonMeterUnitId;
+		this.slope = slope;
+		this.intercept = intercept;
+	}
+
+	/**
 	 * Returns a promise to create the cik table.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('cik/create_cik_table.sql'));
+	}
+
+	/**
+	 * Create a new Cik object from row's data.
+	 * @param {*} row The row from which Cik will be created.
+	 * @returns {Promise.<Array.<Cik>>}
+	 */
+	static mapRow(row) {
+		return new Cik(row.meter_unit_id, row.non_meter_unit_id, row.slope, row.intercept);
+	}
+
+	/**
+	 * Get all Cik objects
+	 * @param {*} conn The database connection to use.
+	 * @returns all Cik objects
+	 */
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('cik/get_cik.sql'));
+		return rows.map(Cik.mapRow);
 	}
 
 	/**
