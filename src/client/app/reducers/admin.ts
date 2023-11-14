@@ -32,7 +32,7 @@ const defaultState: AdminState = {
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
 	defaultMeterDisableChecks: false,
-	defaultUrl: 'https://openenergydashboard.github.io/help/'
+	defaultHelpUrl: ''
 };
 
 export default function admin(state = defaultState, action: AdminAction) {
@@ -110,7 +110,7 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterReadingGap: action.data.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: action.data.defaultMeterMaximumErrors,
 				defaultMeterDisableChecks: action.data.defaultMeterDisableChecks,
-				defaultUrl: action.data.defaultUrl
+				defaultHelpUrl: action.data.defaultHelpUrl
 			};
 		case ActionType.MarkPreferencesNotSubmitted:
 			return {
@@ -189,10 +189,10 @@ export default function admin(state = defaultState, action: AdminAction) {
 				defaultMeterDisableChecks: action.defaultMeterDisableChecks,
 				submitted: false
 			}
-		case ActionType.UpdateDefaultUrl:
+		case ActionType.UpdateDefaultHelpUrl:
 			return {
 				...state,
-				defaultUrl: action.defaultUrl,
+				defaultHelpUrl: action.defaultHelpUrl,
 				submitted: false
 			}
 		default:

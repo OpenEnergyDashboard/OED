@@ -23,7 +23,7 @@ import {
 	updateDefaultMeterReadingGap,
 	updateDefaultMeterMaximumErrors,
 	updateDefaultMeterDisableChecks,
-	updateDefaultUrl
+	updateDefaultHelpUrl
 } from '../../actions/admin';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
@@ -51,7 +51,7 @@ function mapStateToProps(state: State) {
 		defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
 		defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
-		defaultUrl: state.admin.defaultUrl
+		defaultHelpUrl: state.admin.defaultHelpUrl
 	};
 }
 
@@ -76,7 +76,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
 		updateDefaultMeterReadingGap: (defaultMeterReadingGap: number) => dispatch(updateDefaultMeterReadingGap(defaultMeterReadingGap)),
 		updateDefaultMeterMaximumErrors: (defaultMeterMaximumErrors: number) => dispatch(updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
 		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) => dispatch(updateDefaultMeterDisableChecks(defaultMeterDisableChecks)),
-		updateDefaultUrl: (defaultUrl: string) => dispatch(updateDefaultUrl(defaultUrl))
+		updateDefaultHelpUrl: (defaultHelpUrl: string) => dispatch(updateDefaultHelpUrl(defaultHelpUrl))
 	};
 }
 

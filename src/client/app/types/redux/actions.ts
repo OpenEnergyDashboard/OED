@@ -88,7 +88,7 @@ export enum ActionType {
 	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_READING_GAP',
 	UpdateDefaultMeterMaximumErrors = 'UPDATE_DEFAULT_METER_MAXIMUM_ERRORS',
 	UpdateDefaultMeterDisableChecks = 'UPDATE_DEFAULT_METER_DISABLE_CHECKS',
-	UpdateDefaultUrl = 'UPDATE_DEFAULT_URL',
+	UpdateDefaultHelpUrl = 'UPDATE_DEFAULT_HELP_URL',
 
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 
