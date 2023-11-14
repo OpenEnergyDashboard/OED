@@ -1,15 +1,19 @@
-import * as _ from 'lodash';
+import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { RootState } from 'store';
-import { UnitData, UnitDataById } from '../../types/redux/units';
+import { UnitData } from '../../types/redux/units';
 import { baseApi } from './baseApi';
-import { createSelector } from '@reduxjs/toolkit';
+export const unitsAdapter = createEntityAdapter<UnitData>({
+	sortComparer: (a, b) => a.identifier.localeCompare(b.identifier, undefined, { sensitivity:'base' })
+});
+export const unitsInitialState = unitsAdapter.getInitialState();
+export type UnitDataState = EntityState<UnitData, number>;
 
 export const unitsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
-		getUnitsDetails: builder.query<UnitDataById, void>({
+		getUnitsDetails: builder.query<UnitDataState, void>({
 			query: () => 'api/units',
 			transformResponse: (response: UnitData[]) => {
-				return _.keyBy(response, unit => unit.id)
+				return unitsAdapter.setAll(unitsInitialState, response)
 			}
 		}),
 		addUnit: builder.mutation<void, UnitData>({
@@ -40,36 +44,12 @@ export const unitsApi = baseApi.injectEndpoints({
  * const queryState = useAppSelector(state => selectUnitDataByIdQueryState(state))
  * const {data: unitDataById = {}} = useAppSelector(state => selectUnitDataById(state))
  */
-export const selectUnitDataByIdQueryState = unitsApi.endpoints.getUnitsDetails.select()
+export const selectUnitDataResult = unitsApi.endpoints.getUnitsDetails.select()
+export const {
+	selectAll: selectAllUnits,
+	selectById: selectUnitById,
+	selectTotal: selectUnitTotal,
+	selectIds: selectUnitIds,
+	selectEntities: selectUnitDataById
+} = unitsAdapter.getSelectors((state: RootState) => selectUnitDataResult(state).data ?? unitsInitialState)
 
-/**
- * Selects the most recent query status
- * @param state - The complete state of the redux store.
- * @returns The unit data corresponding to the `unitID` if found, or undefined if not.
- * @example
- *
- * const unitDataById = useAppSelector(state =>selectUnitDataById(state))
- * const unitDataById = useAppSelector(selectUnitDataById)
- */
-export const selectUnitDataById = createSelector(
-	selectUnitDataByIdQueryState,
-	({ data: unitDataById = {} }) => {
-		return unitDataById
-	}
-)
-
-/**
- * Selects a unit from the state by its unique identifier.
- * @param state - The complete state of the redux store.
- * @param unitID - The unique identifier for the unit to be retrieved.
- * @returns The unit data corresponding to the `unitID` if found, or undefined if not.
- * @example
- *
- * // Get Unit Data for unit with ID of '1'
- * const unit = useAppSelector(state => selectUnitWithID(state, 1))
- */
-export const selectUnitWithID = (state: RootState, unitID: number) => {
-	const unitDataById = selectUnitDataById(state)
-	return unitDataById[unitID]
-
-}

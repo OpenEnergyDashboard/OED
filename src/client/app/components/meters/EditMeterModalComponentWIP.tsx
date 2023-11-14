@@ -10,7 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
-import { metersApi, selectMeterDataWithID } from '../../redux/api/metersApi';
+import { metersApi, selectMeterById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
@@ -44,7 +44,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
 	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
 	// The current meter's state of meter being edited. It should always be valid.
-	const meterState = useAppSelector(state => selectMeterDataWithID(state, props.meter.id)) as MeterData;
+	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
 	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
 	const {
 		compatibleGraphicUnits,

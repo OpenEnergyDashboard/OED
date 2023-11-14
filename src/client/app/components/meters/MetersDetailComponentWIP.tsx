@@ -46,12 +46,6 @@ export default function MetersDetailComponent() {
 						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
 						{/*  Optional Chaining to prevent from crashing upon startup race conditions*/}
 						{Object.values(visibleMeters)
-							.sort((MeterA, MeterB) =>
-								(MeterA.identifier?.toLowerCase() > MeterB.identifier?.toLowerCase())
-									? 1
-									: ((MeterB.identifier?.toLowerCase() > MeterA.identifier?.toLowerCase())
-										? -1
-										: 0))
 							.map(MeterData => (
 								<MeterViewComponentWIP
 									key={`${MeterData.id}:${MeterData.identifier}`}

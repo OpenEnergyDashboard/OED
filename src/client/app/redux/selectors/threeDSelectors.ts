@@ -3,9 +3,9 @@ import {
 	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID
 } from '../../reducers/graph';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 
 
 // Memoized Selectors

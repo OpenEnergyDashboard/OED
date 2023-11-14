@@ -58,7 +58,7 @@ export default function CreateMeterModalComponent() {
 		compatibleGraphicUnits,
 		compatibleUnits,
 		incompatibleUnits
-		// Weird Type assertion due to conflicting GPS Property
+		// Type assertion due to conflicting GPS Property
 	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails as unknown as MeterData))
 	const handleShow = () => setShowModal(true);
 
@@ -79,26 +79,9 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// Dropdowns
-	const [selectedUnitId, setSelectedUnitId] = useState<boolean>(false)
-	const [selectedGraphicId, setSelectedGraphicId] = useState<boolean>(false)
-	/* Create Meter Validation:
-		Name cannot be blank
-		Area must be positive or zero
-		If area is nonzero, area unit must be set
-		Reading Gap must be greater than zero
-		Reading Variation must be greater than zero
-		Reading Duplication must be between 1 and 9
-		Reading frequency cannot be blank
-		Unit and Default Graphic Unit must be set (can be to no unit)
-		Meter type must be set
-		If displayable is true and unitId is set to -99, warn admin
-		Mininum Value cannot bigger than Maximum Value
-		Minimum Value and Maximum Value must be between valid input
-		Minimum Date and Maximum cannot be blank
-		Minimum Date cannot be after Maximum Date
-		Minimum Date and Maximum Value must be between valid input
-		Maximum No of Error must be between 0 and valid input
-	*/
+	const [selectedUnitId, setSelectedUnitId] = useState<boolean>(false);
+	const [selectedGraphicId, setSelectedGraphicId] = useState<boolean>(false);
+
 	const [validMeter, setValidMeter] = useState(false);
 
 	useEffect(() => {
@@ -132,7 +115,6 @@ export default function CreateMeterModalComponent() {
 		let inputOk = true;
 
 		// TODO Maybe should do as a single popup?
-
 
 		// Check GPS entered.
 		// Validate GPS is okay and take from string to GPSPoint to submit.
@@ -183,8 +165,8 @@ export default function CreateMeterModalComponent() {
 				})
 				.catch(err => {
 					// TODO Better way than popup with React but want to stay so user can read/copy.
-
-					window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data + '"');
+					console.log(err)
+					window.alert(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
 				})
 		} else {
 			// Tell user that not going to update due to input issues.
@@ -769,6 +751,26 @@ export default function CreateMeterModalComponent() {
 		</>
 	);
 }
+
+
+/* Create Meter Validation:
+	Name cannot be blank
+	Area must be positive or zero
+	If area is nonzero, area unit must be set
+	Reading Gap must be greater than zero
+	Reading Variation must be greater than zero
+	Reading Duplication must be between 1 and 9
+	Reading frequency cannot be blank
+	Unit and Default Graphic Unit must be set (can be to no unit)
+	Meter type must be set
+	If displayable is true and unitId is set to -99, warn admin
+	Minimum Value cannot bigger than Maximum Value
+	Minimum Value and Maximum Value must be between valid input
+	Minimum Date and Maximum cannot be blank
+	Minimum Date cannot be after Maximum Date
+	Minimum Date and Maximum Value must be between valid input
+	Maximum No of Error must be between 0 and valid input
+*/
 const isValidCreateMeter = (meterDetails: MeterData) => {
 	return meterDetails.name !== '' &&
 		(meterDetails.area === 0 || (meterDetails.area > 0 && meterDetails.areaUnit !== AreaUnitType.none)) &&

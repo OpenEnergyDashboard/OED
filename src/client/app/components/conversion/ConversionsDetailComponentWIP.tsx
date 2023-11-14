@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
-import { unitsApi } from '../../redux/api/unitsApi';
+import { unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
 import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponentWIP from './ConversionViewComponentWIP';
@@ -23,7 +23,12 @@ export default function ConversionsDetailComponent() {
 	// Conversions state
 	const { data: conversionsState = [], isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
 	// Units DataById
-	const { data: unitDataById = {}, isFetching: unitsFetching } = unitsApi.useGetUnitsDetailsQuery()
+	const { unitDataById = {}, isFetching: unitsFetching } = unitsApi.useGetUnitsDetailsQuery(undefined, {
+		selectFromResult: ({ data, ...result }) => ({
+			...result,
+			unitDataById: data && unitsAdapter.getSelectors().selectEntities(data)
+		})
+	})
 	// const x = useAppSelector(state => conversionsApi.endpoints.refresh.select()(state))
 
 	// unnecessary? Currently this occurs as a side effect of the mutation which will invalidate meters/group

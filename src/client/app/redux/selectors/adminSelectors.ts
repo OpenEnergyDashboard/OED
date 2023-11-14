@@ -2,8 +2,8 @@ import { createSelector } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
 import { selectAdminState } from '../../reducers/admin'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectGroupDataById } from '../../redux/api/groupsApi'
-import { selectMeterDataById, selectMeterDataWithID } from '../../redux/api/metersApi'
+import { selectAllGroups } from '../../redux/api/groupsApi'
+import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi'
 import { RootState } from '../../store'
 import { PreferenceRequestItem } from '../../types/items'
 import { ConversionData } from '../../types/redux/conversions'
@@ -13,7 +13,7 @@ import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits'
 import { AreaUnitType } from '../../utils/getAreaUnitConversion'
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
 import translate from '../../utils/translate'
-import { selectUnitDataById } from '../api/unitsApi'
+import { selectAllUnits, selectUnitDataById } from '../api/unitsApi'
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors'
 
 export const selectAdminPreferences = createSelector(
@@ -56,11 +56,11 @@ export const selectPossibleGraphicUnits = createSelector(
  * @returns The set of all possible graphic units for a meter
  */
 export const selectPossibleMeterUnits = createSelector(
-	selectUnitDataById,
-	unitDataById => {
+	selectAllUnits,
+	unitData => {
 		let possibleMeterUnits = new Set<UnitData>();
 		// The meter unit can be any unit of type meter.
-		Object.values(unitDataById).forEach(unit => {
+		unitData.forEach(unit => {
 			if (unit.typeOfUnit == UnitType.meter) {
 				possibleMeterUnits.add(unit);
 			}
@@ -87,7 +87,7 @@ export const selectUnitName = createSelector(
 	// The second test of -99 is for meters without units.
 	// ThisSelector takes an argument, due to one or more of the selectors accepts an argument (selectUnitWithID selectMeterDataWithID)
 	selectUnitDataById,
-	selectMeterDataWithID,
+	selectMeterById,
 	(unitDataById, meterData) => {
 		const unitName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.unitId === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
@@ -108,7 +108,7 @@ export const selectGraphicName = createSelector(
 	// This is the default graphic unit associated with the meter. See above for how code works.
 	// notice that this selector is written with inline selectors for demonstration purposes
 	selectUnitDataById,
-	selectMeterDataWithID,
+	selectMeterById,
 	(unitDataById, meterData) => {
 		const graphicName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.defaultGraphicUnit === -99) ?
 			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
@@ -249,34 +249,31 @@ export const selectIsValidConversion = createSelector(
 
 
 		console.log('Seems to Break about here!')
-		let isValid = true;
-		// Loop over conversions and check for existence of inverse of conversion passed in
-		// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
 		// If there is a non bidirectional inverse, then it is a valid conversion
 
-		Object.values(conversions).forEach(conversion => {
-			// Do not allow for a bidirectional conversion with an inverse that is not bidirectional
-			// Inverse exists
-			if ((conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)
-				&&
-				// Inverse is bidirectional or new conversion is bidirectional
-				(conversion.bidirectional || bidirectional)) {
-				isValid = false;
+		for (const conversion of Object.values(conversions)) {
+			// Loop over conversions and check for existence of inverse of conversion passed in
+			const inverseExists = (conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)
+			const isBidirectional = conversion.bidirectional || bidirectional
+
+			// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
+			if (inverseExists && isBidirectional) {
+				return [false, translate('conversion.create.exists.inverse')]
 			}
-		});
+		}
 
 		console.log('Conversion never seems to get here? ')
-		return isValid ? [isValid, 'Conversion is Valid'] : [false, translate('conversion.create.exists.inverse')]
+		return [true, 'Conversion is Valid']
 	}
 )
 
 export const selectVisibleMeterAndGroupDataByID = createSelector(
 	selectVisibleMetersAndGroups,
-	selectMeterDataById,
-	selectGroupDataById,
-	(visible, meterDataById, groupDataById) => {
-		const visibleMeters = Object.values(meterDataById).filter(meterData => visible.meters.has(meterData.id))
-		const visibleGroups = Object.values(groupDataById).filter(groupData => visible.groups.has(groupData.id))
+	selectAllMeters,
+	selectAllGroups,
+	(visible, meterData, groupData) => {
+		const visibleMeters = meterData.filter(meterData => visible.meters.has(meterData.id))
+		const visibleGroups = groupData.filter(groupData => visible.groups.has(groupData.id))
 		return { visibleMeters, visibleGroups }
 	}
 )
@@ -294,6 +291,7 @@ export const selectDefaultCreateMeterValues = createSelector(
 			meterType: '',
 			url: '',
 			timeZone: '',
+			// String type conflicts with MeterDataType GPSPoint
 			gps: '',
 			// Defaults of -999 (not to be confused with -99 which is no unit)
 			// Purely for allowing the default select to be "select a ..."
@@ -323,6 +321,25 @@ export const selectDefaultCreateMeterValues = createSelector(
 			disableChecks: adminPreferences.defaultMeterDisableChecks
 		}
 
+		return defaultValues
+	}
+)
+
+export const selectDefaultCreateConversionValues = createSelector(
+	selectAllUnits,
+	sortedUnitData => {
+		const defaultValues = {
+			// Invalid source/destination ids arbitrarily set to -999.
+			// Meter Units are not allowed to be a destination.
+			sourceId: -999,
+			sourceOptions: sortedUnitData,
+			destinationId: -999,
+			destinationOptions: sortedUnitData.filter(unit => unit.typeOfUnit !== 'meter'),
+			bidirectional: true,
+			slope: 0,
+			intercept: 0,
+			note: ''
+		}
 		return defaultValues
 	}
 )

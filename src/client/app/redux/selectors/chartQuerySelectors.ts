@@ -1,4 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit';
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { RootState } from 'store';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -16,7 +17,7 @@ import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 export interface commonQueryArgs {
 	ids: number[];
 	timeInterval: string;
-	unitID: number;
+	graphicUnitId: number;
 	meterOrGroup: MeterOrGroup;
 }
 
@@ -45,7 +46,7 @@ export const selectCommonQueryArgs = createSelector(
 		const meterArgs = {
 			ids: selectedMeters,
 			timeInterval: queryTimeInterval.toString(),
-			unitID: selectedUnit,
+			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.meters
 		}
 
@@ -53,7 +54,7 @@ export const selectCommonQueryArgs = createSelector(
 		const groupArgs = {
 			ids: selectedGroups,
 			timeInterval: queryTimeInterval.toString(),
-			unitID: selectedUnit,
+			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.groups
 		}
 		const meterSkip = !meterArgs.ids.length;
@@ -106,12 +107,12 @@ export const selectCompareChartQueryArgs = createSelector(
 			curr_end: compareTimeInterval.getEndTimestamp()?.toISOString()
 		}
 		const meterArgs: CompareReadingApiArgs = {
-			...common.meterArgs,
+			..._.omit(common.meterArgs, 'timeInterval'),
 			...compareArgs
 
 		}
 		const groupArgs: CompareReadingApiArgs = {
-			...common.groupArgs,
+			..._.omit(common.groupArgs, 'timeInterval'),
 			...compareArgs
 		}
 		const meterShouldSkip = common.meterSkip;
@@ -161,7 +162,7 @@ export const selectThreeDQueryArgs = createSelector(
 		const args: ThreeDReadingApiArgs = {
 			id: threeD.meterOrGroupID!,
 			timeInterval: roundTimeIntervalForFetch(queryTimeInterval).toString(),
-			unitID: selectedUnit,
+			graphicUnitId: selectedUnit,
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
 		}

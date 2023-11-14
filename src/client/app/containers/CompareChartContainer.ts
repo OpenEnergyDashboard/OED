@@ -14,8 +14,8 @@ import { UnitRepresentType } from '../types/redux/units';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { RootState } from '../store';
-import { selectMeterDataById } from '../redux/api/metersApi';
 import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
 export interface CompareEntity {
 	id: number;
 	isGroup: boolean;

@@ -1,23 +1,31 @@
-import * as _ from 'lodash';
+import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { NamedIDItem } from 'types/items';
 import { RawReadings } from 'types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { RootState } from '../../store';
-import { MeterData, MeterDataByID } from '../../types/redux/meters';
+import { MeterData } from '../../types/redux/meters';
 import { durationFormat } from '../../utils/durationFormat';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
-import { createSelector } from '@reduxjs/toolkit';
 
+export const meterAdapter = createEntityAdapter<MeterData>({
+	sortComparer: (MeterA, MeterB) => MeterA.identifier.localeCompare(MeterB.identifier)
+
+})
+export const metersInitialState = meterAdapter.getInitialState()
+export type MeterDataState = EntityState<MeterData, number>
 
 export const metersApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
-		getMeters: builder.query<MeterDataByID, void>({
+		getMeters: builder.query<MeterDataState, void>({
 			query: () => 'api/meters',
 			// Optional endpoint property that can transform incoming api responses if needed
+			// Use EntityAdapters from RTK to normalizeData, and generate commonSelectors
 			transformResponse: (response: MeterData[]) => {
-				response.forEach(meter => { meter.readingFrequency = durationFormat(meter.readingFrequency) });
-				return _.keyBy(response, meter => meter.id)
+				return meterAdapter.setAll(metersInitialState, response.map(meter => ({
+					...meter,
+					readingFrequency: durationFormat(meter.readingFrequency)
+				})))
 			},
 			// Tags used for invalidation by mutation requests.
 			providesTags: ['MeterData']
@@ -28,10 +36,12 @@ export const metersApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { ...meterData }
 			}),
-			onQueryStarted: async ({ shouldRefreshViews }, api) => {
-				await api.queryFulfilled.then(() => {
+			onQueryStarted: async ({ meterData, shouldRefreshViews }, { dispatch, queryFulfilled }) => {
+				queryFulfilled.then(() => {
 					// Update reading views if needed. Never redoCik so false.
-					api.dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: false, refreshReadingViews: shouldRefreshViews }))
+					dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: false, refreshReadingViews: shouldRefreshViews }))
+					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, meterData) }))
+
 				})
 			},
 			invalidatesTags: ['MeterData']
@@ -42,10 +52,13 @@ export const metersApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { ...meter }
 			}),
-
-			invalidatesTags: ['MeterData']
+			transformResponse: (data: MeterData) => ({ ...data, readingFrequency: durationFormat(data.readingFrequency) }),
+			onQueryStarted: (_arg, { dispatch, queryFulfilled }) => {
+				queryFulfilled.then(({ data }) => {
+					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, data) }))
+				})
+			}
 		}),
-
 		lineReadingsCount: builder.query<number, { meterIDs: number[], timeInterval: TimeInterval }>({
 			query: ({ meterIDs, timeInterval }) => `api/readings/line/count/meters/${meterIDs.join(',')}?timeInterval=${timeInterval.toString()}`
 		}),
@@ -58,37 +71,16 @@ export const metersApi = baseApi.injectEndpoints({
 	})
 })
 
-export const selectMeterDataByIdQueryState = metersApi.endpoints.getMeters.select()
-/**
- * Selects the meter data associated with a given meter ID from the Redux state.
- * @param {RootState} state - The current state of the Redux store.
- * @returns The latest query state for the given which can be destructured for the dataById
- * @example
- * const endpointState = useAppSelector(state => selectMeterDataById(state))
- * const meterDataByID = endpointState.data
- * or
- * const { data: meterDataByID } = useAppSelector(state => selectMeterDataById(state))
- */
-export const selectMeterDataById = createSelector(
-	selectMeterDataByIdQueryState,
-	({ data: meterDataById = {} }) => {
-		return meterDataById
-	}
-)
 
+export const selectMeterDataResult = metersApi.endpoints.getMeters.select()
 
-/**
- * Selects the meter data associated with a given meter ID from the Redux state.
- * @param state - The current state of the Redux store.
- * @param meterID - The unique identifier for the meter.
- * @returns The data for the specified meter or undefined if not found.
- * @example
- * const meterData = useAppSelector(state => selectMeterDataWithID(state, 42))
- */
-export const selectMeterDataWithID = (state: RootState, meterID: number): MeterData | undefined => {
-	const meterDataByID = selectMeterDataById(state);
-	return meterDataByID[meterID];
-}
+export const {
+	selectAll: selectAllMeters,
+	selectById: selectMeterById,
+	selectTotal: selectMeterTotal,
+	selectIds: selectMeterIds,
+	selectEntities: selectMeterDataById
+} = meterAdapter.getSelectors((state: RootState) => selectMeterDataResult(state).data ?? metersInitialState)
 
 
 /**
@@ -97,10 +89,10 @@ export const selectMeterDataWithID = (state: RootState, meterID: number): MeterD
  * @param meterID - The unique identifier for the meter.
  * @returns The name of the specified meter or an empty string if not found.
  * @example
- * const meterName = useAppSelector(state => selectMeterNameWithID(state, 42))
+ * const meterName = useAppSelector(state => selectMeterNameById(state, 42))
  */
-export const selectMeterNameWithID = (state: RootState, meterID: number) => {
-	const meterInfo = selectMeterDataWithID(state, meterID);
+export const selectMeterNameById = (state: RootState, meterID: number) => {
+	const meterInfo = selectMeterById(state, meterID);
 	return meterInfo ? meterInfo.name : '';
 }
 
@@ -110,9 +102,9 @@ export const selectMeterNameWithID = (state: RootState, meterID: number) => {
  * @param meterID - The unique identifier for the meter.
  * @returns The identifier for the specified meter or an empty string if not found.
  * @example
- * const meterIdentifier = useAppSelector(state => selectMeterIdentifier(state, 42))
+ * const meterIdentifier = useAppSelector(state => selectMeterIdentifierById(state, 42))
  */
-export const selectMeterIdentifierWithID = (state: RootState, meterID: number) => {
-	const meterInfo = selectMeterDataWithID(state, meterID);
+export const selectMeterIdentifierById = (state: RootState, meterID: number) => {
+	const meterInfo = selectMeterById(state, meterID);
 	return meterInfo ? meterInfo.identifier : '';
 }

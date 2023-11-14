@@ -15,19 +15,17 @@ import {
 } from '../../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-
 import {
 	selectChartToRender, selectGraphAreaNormalization,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit
 } from '../../reducers/graph';
-
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { selectMeterDataById } from '../api/metersApi';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
 import { MeterDataByID } from 'types/redux/meters';
 import { GroupDataByID } from 'types/redux/groups';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 
 
 

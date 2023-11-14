@@ -15,8 +15,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 			query: conversion => ({
 				url: 'api/conversions/addConversion',
 				method: 'POST',
-				body: conversion,
-				responseHandler: 'text'
+				body: conversion
 			}),
 			onQueryStarted: async (_arg, api) => {
 				// TODO write more robust logic for error handling, and manually invalidate tags instead?
@@ -36,8 +35,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 			query: conversion => ({
 				url: 'api/conversions/delete',
 				method: 'POST',
-				body: conversion,
-				responseHandler: 'text'
+				body: conversion
 			}),
 			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
 				// TODO write more robust logic for error handling, and manually invalidate tags instead?
@@ -80,8 +78,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				body: {
 					redoCik: args.redoCik,
 					refreshReadingViews: args.refreshReadingViews
-				},
-				responseHandler: 'text'
+				}
 			}),
 			// TODO check behavior with maintainers, always invalidates, should be conditional?
 			invalidatesTags: ['ConversionDetails']

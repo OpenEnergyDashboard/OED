@@ -9,9 +9,8 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
-import { selectIsValidConversion } from '../../redux/selectors/adminSelectors';
+import { selectDefaultCreateConversionValues, selectIsValidConversion } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -25,22 +24,9 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  */
 export default function CreateConversionModalComponent() {
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation()
-	const unitDataById = useAppSelector(selectUnitDataById)
 	// Want units in sorted order by identifier regardless of case.
-	const sortedUnitData = _.sortBy(Object.values(unitDataById), unit => unit.identifier.toLowerCase(), 'asc');
 
-	const defaultValues = {
-		// Invalid source/destination ids arbitrarily set to -999.
-		// Meter Units are not allowed to be a destination.
-		sourceId: -999,
-		sourceOptions: sortedUnitData,
-		destinationId: -999,
-		destinationOptions: sortedUnitData.filter(unit => unit.typeOfUnit !== 'meter'),
-		bidirectional: true,
-		slope: 0,
-		intercept: 0,
-		note: ''
-	}
+	const defaultValues = useAppSelector(selectDefaultCreateConversionValues)
 
 	/* State */
 	// Modal show

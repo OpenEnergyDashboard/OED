@@ -1,32 +1,30 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { selectGroupDataById } from '../api/groupsApi';
-import { selectMeterDataById } from '../api/metersApi';
-import { selectUnitDataById } from '../api/unitsApi';
-import { DisplayableType, UnitType } from '../../types/redux/units';
 import { selectIsAdmin } from '../../reducers/currentUser';
+import { selectAllMeters } from '../../redux/api/metersApi';
+import { DisplayableType, UnitType } from '../../types/redux/units';
+import { selectAllGroups } from '../api/groupsApi';
+import { selectUnitDataById } from '../api/unitsApi';
 
 
 export const selectVisibleMetersAndGroups = createSelector(
-	selectMeterDataById,
-	selectGroupDataById,
+	selectAllMeters,
+	selectAllGroups,
 	selectIsAdmin,
 	(meterDataByID, groupDataById, isAdmin) => {
 		// Holds all meters visible to the user
 		const meters = new Set<number>();
 		const groups = new Set<number>();
-		Object.values(meterDataByID)
-			.forEach(meter => {
-				if (isAdmin || meter.displayable) {
-					meters.add(meter.id);
-				}
-			});
-		Object.values(groupDataById)
-			.forEach(group => {
-				if (isAdmin || group.displayable) {
-					groups.add(group.id);
-				}
-			});
+		meterDataByID.forEach(meter => {
+			if (isAdmin || meter.displayable) {
+				meters.add(meter.id);
+			}
+		});
+		groupDataById.forEach(group => {
+			if (isAdmin || group.displayable) {
+				groups.add(group.id);
+			}
+		});
 		return { meters, groups }
 	}
 );

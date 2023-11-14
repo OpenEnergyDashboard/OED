@@ -5,14 +5,14 @@
 import * as _ from 'lodash';
 import React from 'react';
 import { selectPik } from '../redux/api/conversionsApi';
-import { selectGroupDataById } from '../redux/api/groupsApi';
-import { selectMeterDataById } from '../redux/api/metersApi';
+import { selectAllGroups, selectGroupDataById } from '../redux/api/groupsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { store } from '../store';
 import { DataType } from '../types/Datasources';
 import { SelectOption } from '../types/items';
 import { GroupData } from '../types/redux/groups';
 import { UnitData, UnitType } from '../types/redux/units';
+import { selectAllMeters, selectMeterDataById } from '../redux/api/metersApi';
 
 
 /**
@@ -197,12 +197,12 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 	// Get the units that are compatible with this set of meters.
 	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
 	// Get all meters' state.
-	const meterDataById = selectMeterDataById(state)
+	const meterData = selectAllMeters(state)
 
 	// Options for the meter menu.
 	const options: SelectOption[] = [];
 	// For each meter, decide its compatibility for the menu
-	Object.values(meterDataById).forEach(meter => {
+	meterData.forEach(meter => {
 		const option = {
 			label: meter.identifier,
 			value: meter.id,
@@ -240,12 +240,12 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 	// Get the currentGroup's compatible units.
 	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
 	// Get all groups' state.
-	const groupDataById = selectGroupDataById(store.getState());
+	const groupData = selectAllGroups(store.getState());
 
 	// Options for the group menu.
 	const options: SelectOption[] = [];
 
-	Object.values(groupDataById).forEach(group => {
+	groupData.forEach(group => {
 		// You cannot have yourself in the group so not an option.
 		if (group.id !== groupId) {
 			const option = {

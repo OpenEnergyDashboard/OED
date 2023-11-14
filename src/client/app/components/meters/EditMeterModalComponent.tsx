@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector as useAppSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
 import '../../styles/modal.css';
@@ -45,7 +45,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const dispatch: Dispatch = useDispatch();
 
 	// The current meter's state of meter being edited. It should always be valid.
-	const meterState = useSelector((state: State) => state.meters.byMeterID[props.meter.id]);
+	const meterState = useAppSelector((state: State) => state.meters.byMeterID[props.meter.id]);
 
 	// Set existing meter values
 	const values = {
@@ -117,7 +117,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
 
 	// unit state
-	const unitState = useSelector((state: State) => state.units.units);
+	const unitState = useAppSelector((state: State) => state.units.units);
 
 
 	/* Edit Meter Validation:

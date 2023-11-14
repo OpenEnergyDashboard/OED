@@ -58,14 +58,10 @@ export default function GroupsDetailComponentWIP() {
 					}
 					{
 						<div className="card-container">
-							{/* Create a GroupViewComponent for each groupData in Groups State after sorting by name */}
 							{Object.values(visibleGroups)
-								.sort((groupA, groupB) => (groupA.name.toLowerCase() > groupB.name.toLowerCase()) ? 1 :
-									((groupB.name.toLowerCase() > groupA.name.toLowerCase()) ? -1 : 0))
 								.map(groupData => (<GroupViewComponentWIP
 									group={groupData}
 									key={groupData.id}
-								// This prop is used in the edit component (child of view component)
 								/>))}
 						</div>
 					}

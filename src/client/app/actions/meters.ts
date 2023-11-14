@@ -1,3 +1,6 @@
+/* eslint-disable */
+//@ts-nocheck
+
 /* This Source Code Form is subject to the terms of the Mozilla Public
 	* License, v. 2.0. If a copy of the MPL was not distributed with this
 	* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -8,7 +11,6 @@ import translate from '../utils/translate';
 import * as t from '../types/redux/meters';
 import { metersApi } from '../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
-import { metersSlice } from '../reducers/meters';
 
 
 export function fetchMetersDetails(): Thunk {

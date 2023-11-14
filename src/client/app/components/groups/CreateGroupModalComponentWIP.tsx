@@ -12,7 +12,6 @@ import {
 import { GroupData } from 'types/redux/groups';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
@@ -33,6 +32,7 @@ import translate from '../../utils/translate';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 
 /**
  * Defines the create group modal form
@@ -46,7 +46,7 @@ export default function CreateGroupModalComponentWIP() {
 	// Groups state
 	const groupDataById = useAppSelector(selectGroupDataById);
 	// Units state
-	const unitsDataById  = useAppSelector(selectUnitDataById);
+	const unitsDataById = useAppSelector(selectUnitDataById);
 
 	// Check for admin status
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)

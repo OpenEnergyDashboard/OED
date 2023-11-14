@@ -1,4 +1,4 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../../store';
 // TODO Should be env variable?
 const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
@@ -14,7 +14,11 @@ export const baseApi = createApi({
 			if (state.currentUser.token) {
 				headers.set('token', state.currentUser.token)
 			}
-		}
+		},
+		// Default Behavior assumes all response are json
+		// use content type cause API responses are varied
+		// TODO Validate Behavior against all endpoints
+		responseHandler: 'content-type'
 	}),
 	// The types of tags that any injected endpoint may, provide, or invalidate.
 	// Must be defined here, for use in injected endpoints

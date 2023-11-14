@@ -13,7 +13,6 @@ import {
 } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/hooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../reducers/currentUser';
@@ -40,6 +39,7 @@ import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 
 interface EditGroupModalComponentProps {
 	show: boolean;

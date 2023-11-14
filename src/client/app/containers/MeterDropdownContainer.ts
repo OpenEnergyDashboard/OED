@@ -4,14 +4,15 @@
 
 import * as _ from 'lodash';
 import { connect } from 'react-redux';
+import { selectMeterDataById } from 'redux/api/metersApi';
 import MeterDropdownComponent from '../components/MeterDropDownComponent';
-import { State } from '../types/redux/state';
-import { Dispatch } from '../types/redux/actions';
 import { adminSlice } from '../reducers/admin';
+import { RootState } from '../store';
+import { Dispatch } from '../types/redux/actions';
 
-function mapStateToProps(state: State) {
+function mapStateToProps(state: RootState) {
 	return {
-		meters: _.sortBy(_.values(state.meters.byMeterID).map(meter => ({ id: meter.id, name: meter.name })), 'name')
+		meters: _.sortBy(_.values(selectMeterDataById(state)).map(meter => ({ id: meter.id, name: meter.name })), 'name')
 	};
 }
 function mapDispatchToProps(dispatch: Dispatch) {

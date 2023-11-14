@@ -25,14 +25,14 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
  */
 export default function MetersDetailComponent() {
 	// current user state
-	const currentUserState = useAppSelector(state => selectCurrentUser(state));
+	const currentUserState = useAppSelector(selectCurrentUser);
 
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
 
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
-	const { visibleMeters } = useAppSelector(state => selectVisibleMeterAndGroupDataByID(state));
+	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupDataByID);
 
 	// Units state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -87,17 +87,16 @@ export default function MetersDetailComponent() {
 				}
 				{
 					<div className="card-container">
-						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-						{Object.values(visibleMeters)
-							.sort((MeterA: MeterData, MeterB: MeterData) => (MeterA.identifier.toLowerCase() > MeterB.identifier.toLowerCase()) ? 1 :
-								((MeterB.identifier.toLowerCase() > MeterA.identifier.toLowerCase()) ? -1 : 0))
-							.map(MeterData => (<MeterViewComponent
+						{visibleMeters.map(MeterData => (
+							<MeterViewComponent
 								meter={MeterData as MeterData}
 								key={(MeterData as MeterData).id}
 								currentUser={currentUserState}
 								// These two props are used in the edit component (child of view component)
 								possibleMeterUnits={possibleMeterUnits}
-								possibleGraphicUnits={possibleGraphicUnits} />))}
+								possibleGraphicUnits={possibleGraphicUnits}
+							/>
+						))}
 					</div>
 				}
 			</div>

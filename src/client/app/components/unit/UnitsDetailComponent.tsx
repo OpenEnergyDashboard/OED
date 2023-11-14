@@ -6,7 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { selectUnitDataByIdQueryState } from '../../redux/api/unitsApi';
+import { selectAllUnits, selectUnitDataResult } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/hooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
@@ -20,8 +20,8 @@ export default function UnitsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
 	//Units state
-	const { data: unitDataById = {}, status } = useAppSelector(selectUnitDataByIdQueryState);
-
+	const { status } = useAppSelector(selectUnitDataResult);
+	const unitData = useAppSelector(selectAllUnits)
 
 	return (
 		<div>
@@ -48,15 +48,12 @@ export default function UnitsDetailComponent() {
 						<div className="card-container">
 							{/* Create a UnitViewComponent for each UnitData in Units State after sorting by identifier */}
 							{
-								Object.values(unitDataById)
-									.sort((unitA, unitB) => (unitA.identifier.toLowerCase() > unitB.identifier.toLowerCase()) ? 1 :
-										((unitB.identifier.toLowerCase() > unitA.identifier.toLowerCase()) ? -1 : 0))
-									.map(unitData => (
-										<UnitViewComponent
-											key={unitData.id}
-											unit={unitData}
-										/>
-									))}
+								unitData.map(unitData => (
+									<UnitViewComponent
+										key={unitData.id}
+										unit={unitData}
+									/>
+								))}
 						</div>
 					</div>
 				</div>

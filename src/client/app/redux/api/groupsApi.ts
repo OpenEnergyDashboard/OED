@@ -1,42 +1,47 @@
+import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { GroupChildren, GroupData, GroupDataByID } from '../../types/redux/groups';
-import { baseApi } from './baseApi';
-import { selectIsAdmin } from '../../reducers/currentUser';
-import { RootState } from '../../store';
 import { CompareReadings } from 'types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { createSelector } from '@reduxjs/toolkit';
+import { selectIsAdmin } from '../../reducers/currentUser';
+import { RootState } from '../../store';
+import { GroupChildren, GroupData } from '../../types/redux/groups';
+import { baseApi } from './baseApi';
+export const groupsAdapter = createEntityAdapter<GroupData>({
+	sortComparer: (groupA, groupB) => groupA.name.localeCompare(groupB.name)
+})
+export const groupsInitialState = groupsAdapter.getInitialState()
+export type GroupDataState = EntityState<GroupData, number>
 
 export const groupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
-		getGroups: builder.query<GroupDataByID, void>({
+		getGroups: builder.query<GroupDataState, void>({
 			query: () => 'api/groups',
 			transformResponse: (response: GroupData[]) => {
-				const groupsData = response.map(groupData => ({
-					...groupData,
-					// endpoint doesn't return these so define them here or else undefined may cause issues on admin pages
-					childMeters: [],
-					childGroups: []
-				}))
-				return _.keyBy(groupsData, 'id')
+				return groupsAdapter.setAll(
+					groupsInitialState,
+					response.map(groupData => ({
+						...groupData,
+						// endpoint doesn't return these so define them here or else undefined may cause issues on admin pages
+						childMeters: [],
+						childGroups: []
+					})))
 			},
-			onQueryStarted: async (_, api) => {
+			onQueryStarted: async (_, { dispatch, queryFulfilled, getState }) => {
 				try {
-					await api.queryFulfilled
-					const state = api.getState() as RootState
-					const isAdmin = selectIsAdmin(state)
+					await queryFulfilled
+					const state = getState() as RootState
 					// if user is an admin, automatically fetch allGroupChildren and update the
-					if (isAdmin) {
-						const { data = [] } = await api.dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate(undefined))
-						api.dispatch(groupsApi.util.updateQueryData('getGroups', undefined, groupDataById => {
-							data.forEach(groupInfo => {
-								const groupId = groupInfo.groupId;
-								// Group id of the current item
-								// Reset the newState for this group to have child meters/groups.
-								groupDataById[groupId].childMeters = groupInfo.childMeters;
-								groupDataById[groupId].childGroups = groupInfo.childGroups;
-							})
-						}))
+					if (selectIsAdmin(state)) {
+						const { data = [] } = await dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate())
+						// Map the data to the format needed for updateMany
+						const updates = data.map(childrenInfo => ({
+							id: childrenInfo.groupId,
+							changes: {
+								childMeters: childrenInfo.childMeters,
+								childGroups: childrenInfo.childGroups
+							}
+						}));
+						dispatch(groupsApi.util.updateQueryData('getGroups', undefined, groupDataById => { groupsAdapter.updateMany(groupDataById, updates) }))
 					}
 				} catch (e) {
 					console.log(e)
@@ -98,20 +103,18 @@ export const groupsApi = baseApi.injectEndpoints({
 	})
 })
 
-export const selectGroupDataByIdQueryState = groupsApi.endpoints.getGroups.select();
-export const selectGroupDataById = createSelector(
-	selectGroupDataByIdQueryState,
-	({ data: groupDataById = {} }) => {
-		return groupDataById
-	}
-)
+export const selectGroupDataResult = groupsApi.endpoints.getGroups.select();
 
-export const selectGroupDataWithID = (state: RootState, groupId: number): GroupData | undefined => {
-	const groupDataById = selectGroupDataById(state)
-	return groupDataById[groupId]
-}
+export const {
+	selectAll: selectAllGroups,
+	selectById: selectGroupById,
+	selectTotal: selectGroupTotal,
+	selectIds: selectGroupIds,
+	selectEntities: selectGroupDataById
+} = groupsAdapter.getSelectors((state: RootState) => selectGroupDataResult(state).data ?? groupsInitialState)
+
 
 export const selectGroupNameWithID = (state: RootState, groupId: number) => {
-	const groupInfo = selectGroupDataWithID(state, groupId)
+	const groupInfo = selectGroupById(state, groupId)
 	return groupInfo ? groupInfo.name : '';
 }

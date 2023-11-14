@@ -6,10 +6,10 @@ import * as React from 'react';
 import { Badge } from 'reactstrap';
 import { updateThreeDMeterOrGroupInfo } from '../reducers/graph';
 import { selectGroupDataById } from '../redux/api/groupsApi';
-import { selectMeterDataById } from '../redux/api/metersApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { selectMeterDataById } from '../redux/api/metersApi';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
@@ -17,7 +17,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
  */
 export default function ThreeDPillComponent() {
 	const dispatch = useAppDispatch();
-	const meterDataById  = useAppSelector(selectMeterDataById);
+	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const threeDState = useAppSelector(state => state.graph.threeD);
 	const graphState = useAppSelector(state => state.graph);
