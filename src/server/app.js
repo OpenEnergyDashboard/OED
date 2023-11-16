@@ -34,6 +34,8 @@ const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 
 
+
+// Apply the limit to overall requests
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
 // Create a limit of 200 requests/5 seconds
@@ -44,6 +46,14 @@ const generalLimiter = new rateLimit({
 // Apply the limit to overall requests
 const app = express().use(generalLimiter);
 
+// This is limiting 3D-Graphic
+const threeDLimiter = new rateLimit({
+	windowMs: 5 * 1000, // 5 seconds
+	max: 5
+});
+
+app.use('/api/unitReadings/threeD/meters', threeDLimiter);
+
 // Limit the number of raw exports to 5 per 5 seconds
 const exportRawLimiter = new rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
@@ -51,6 +61,7 @@ const exportRawLimiter = new rateLimit({
 });
 // Apply the raw export limit
 app.use('/api/readings/line/raw/meters', exportRawLimiter);
+
 
 // If other logging is turned off, there's no reason to log HTTP requests either.
 // TODO: Potentially modify the Morgan logger to use the log API, thus unifying all our logging.
@@ -84,7 +95,6 @@ app.use('/api/conversions', conversions);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();
-
 router.get(/^(\/)(login|admin|groups|createGroup|editGroup|graph|meters|maps|calibration|users|csv|units|conversions)?$/, (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
