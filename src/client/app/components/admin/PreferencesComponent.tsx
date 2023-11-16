@@ -416,7 +416,8 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 					<Input
 						type='text'
 						value={this.props.defaultHelpUrl}
-						onChange={this.handleDefaultUrlChange}
+						onChange={this.handleDefaultHelpUrlChange}
+						placeholder = ''
 					/>
 				</div>
 				<Button
@@ -540,7 +541,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.updateUnsavedChanges();
 	}
 
-	private handleDefaultHelpUrl(value: string) {
+	private handleDefaultHelpUrlChange(value: string) {
 		this.props.updateDefaultHelpUrl(value);
 		this.updateUnsavedChanges();
 	}
