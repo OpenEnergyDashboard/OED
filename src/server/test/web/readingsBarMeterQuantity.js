@@ -6,6 +6,7 @@
     This file tests the readings retrieval API for charts quantity meters.
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
+
 const { chai, mocha, expect, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
