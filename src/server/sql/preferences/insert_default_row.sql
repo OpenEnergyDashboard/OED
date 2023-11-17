@@ -17,9 +17,11 @@ IF NOT EXISTS(SELECT *
 	default_language, default_timezone, default_warning_file_size, default_file_size_limit,
 	default_area_normalization, default_area_unit, default_meter_reading_frequency, 
 	default_meter_minimum_value, default_meter_maximum_value, default_meter_minimum_date, 
-	default_meter_maximum_date, default_meter_reading_gap, default_meter_maximum_errors, default_meter_disable_checks) 
+	default_meter_maximum_date, default_meter_reading_gap, default_meter_maximum_errors,
+	default_meter_disable_checks, default_help_url) 
 	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00', 
-	-9007199254740991, 9007199254740991, '1970-01-01 00:00:00+00:00', '6970-01-01 00:00:00+00:00', 0, 75, FALSE);
+	-9007199254740991, 9007199254740991, '1970-01-01 00:00:00+00:00', '6970-01-01 00:00:00+00:00',
+	0, 75, FALSE, 'https://openenergydashboard.github.io/help/');
     END IF ;
 
 END;
