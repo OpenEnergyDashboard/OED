@@ -99,7 +99,7 @@ mocha.describe('readings API', () => {
                 // Add B6 here
 
                 // Add B7 here
-                mocha.it('Custom: 13 day bars for 15 minute reading intervals and quantity units with reduced, partial days & kWh as kWh', async () => {
+                mocha.it('B7: 13 day bars for 15 minute reading intervals and quantity units with reduced, partial days & kWh as kWh', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                 
@@ -112,7 +112,7 @@ mocha.describe('readings API', () => {
                     // Create a request to the API with the necessary parameters
                     const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
                         .query({
-                            timeInterval: createTimeString('2022-08-20 ', '07:25:35', '2022-10-28 ', '13:18:28'),
+                            timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'),
                             barWidthDays: 13,
                             graphicUnitId: unitId,
                             // Simulate reduced, partial days in the 13-day window
