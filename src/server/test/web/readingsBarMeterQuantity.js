@@ -11,6 +11,7 @@ const { chai, mocha, expect, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
+    createTimeString,
     expectReadingToEqualExpected,
     getUnitId,
     ETERNITY,
@@ -113,9 +114,25 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-
-                // Add B7 here
-
+                mocha.it('B7: 13 day bars for 15 minute reading intervals and quantity units with reduced, partial days & kWh as kWh', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28_bd_13.csv');
+                    // Create a request to the API with the necessary parameters
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+                        .query({
+                            timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'),
+                            barWidthDays: 13,
+                            graphicUnitId: unitId,
+                            // Simulate reduced, partial days in the 13-day window
+                            // Add any additional parameters specific to your case
+                        });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected);
+                });
                 mocha.it('B8: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
                     // Load the data into the database
                     const unitData = unitDatakWh.concat([
@@ -274,7 +291,6 @@ mocha.describe('readings API', () => {
                             id: METER_ID
                         }
                     ];
-                    
                     // Load the data into the database
                     await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
@@ -286,7 +302,7 @@ mocha.describe('readings API', () => {
                         .query({
                             timeInterval: ETERNITY.toString(),
                             barWidthDays: 1,
-                            graphicUnitId: unitId                                
+                            graphicUnitId: unitId
                         });
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
@@ -341,9 +357,9 @@ mocha.describe('readings API', () => {
                             preferredDisplay: false,
                             note: 'special unit'
                         },
-                        { 
+                        {
                             // u13
-                            name: 'pound', 
+                            name: 'pound',
                             identifier: 'lb',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
                             secInRate: 3600,
@@ -351,7 +367,7 @@ mocha.describe('readings API', () => {
                             suffix: '',
                             displayable: Unit.displayableType.ALL,
                             preferredDisplay: false,
-                            note: 'special unit' 
+                            note: 'special unit'
                         }
                     ];
                     const conversionData = [
@@ -389,7 +405,7 @@ mocha.describe('readings API', () => {
                             bidirectional: true,
                             slope: 454.545454,
                             intercept: 0,
-                            note: 'lbs → metric tons' 
+                            note: 'lbs → metric tons'
                         }
                     ];
                     const meterData = [
@@ -405,7 +421,6 @@ mocha.describe('readings API', () => {
                             id: METER_ID
                         }
                     ];
-                    
                     // Load the data into the database
                     await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
