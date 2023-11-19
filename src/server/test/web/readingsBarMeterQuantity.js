@@ -135,46 +135,7 @@ mocha.describe('readings API', () => {
                 });
                 mocha.it('B8: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
                     // Load the data into the database
-                    const unitData = unitDatakWh.concat([
-                        {
-                            // add u3
-                            name: 'MJ',
-                            identifier: 'megaJoules',
-                            unitRepresent: Unit.unitRepresentType.QUANTITY,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: false,
-                            note: 'MJ'
-                        }
-                    ]);
-                    const conversionData = conversionDatakWh.concat([
-                        {
-                            // add c2
-                            sourceName: 'kWh',
-                            destinationName: 'MJ',
-                            bidirectional: true,
-                            slope: 3.6,
-                            intercept: 0,
-                            note: 'kWh → MJ'
-                        }
-                    ]);
-                    const meterData = [
-                        {
-                            name: 'Electric Utility MJ',
-                            unit: 'Electric_Utility',
-                            defaultGraphicUnit: 'MJ',
-                            displayable: true,
-                            gps: undefined,
-                            note: 'special meter',
-                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-                            deleteFile: false,
-                            readingFrequency: '15 minutes',
-                            id: METER_ID
-                        }
-                    ];
-                    await prepareTest(unitData, conversionData, meterData);
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('MJ');
                     // Load the expected response data from the corresponding csv file
