@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom-v5-compat';
-import { State } from '../types/redux/state';
+import { selectOptionsVisibility } from '../reducers/graph';
+import { useAppSelector } from '../redux/hooks';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
@@ -15,20 +15,9 @@ import MenuModalComponent from './MenuModalComponent';
  * @returns header element
  */
 export default function HeaderComponent() {
-	const siteTitle = useSelector((state: State) => state.admin.displayTitle);
-	const showOptions = useSelector((state: State) => state.graph.optionsVisibility);
+	const siteTitle = useAppSelector(state => state.admin.displayTitle);
+	const showOptions = useAppSelector(selectOptionsVisibility);
 	const { pathname } = useLocation()
-	const divStyle = {
-		marginTop: '5px',
-		paddingBottom: '5px'
-	};
-	const largeTitleStyle = {
-		display: 'inline-block'
-	};
-	const smallTitleStyle = {
-		display: 'inline-block',
-		marginTop: '10px'
-	};
 
 	return (
 		<div className='container-fluid' style={divStyle}>
@@ -54,12 +43,24 @@ export default function HeaderComponent() {
 				</div>
 				<div className='col-4 justify-content-end d-lg-flex d-none'>
 					{/* collapse menu if optionsVisibility is false */}
-					{pathname === '/' && !showOptions ?
-						<MenuModalComponent /> :
-						<HeaderButtonsComponent />
+					{
+						pathname === '/' && !showOptions
+							? <MenuModalComponent />
+							: <HeaderButtonsComponent />
 					}
 				</div>
 			</div>
 		</div>
 	);
 }
+const divStyle = {
+	marginTop: '5px',
+	paddingBottom: '5px'
+};
+const largeTitleStyle = {
+	display: 'inline-block'
+};
+const smallTitleStyle = {
+	display: 'inline-block',
+	marginTop: '10px'
+};

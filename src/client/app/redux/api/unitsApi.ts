@@ -14,7 +14,6 @@ export const unitsApi = baseApi.injectEndpoints({
 			query: () => 'api/units',
 			transformResponse: (response: UnitData[]) => {
 				return unitsAdapter.setAll(unitsInitialState, response)
-				return unitsAdapter.setAll(unitsInitialState, response)
 			}
 		}),
 		addUnit: builder.mutation<void, UnitData>({

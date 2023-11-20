@@ -7,12 +7,12 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store';
-// import RouteContainer from './containers/RouteContainer';
 import RouteComponentWIP from './components/RouteComponentWIP';
-import { initializeApp } from './initScript';
+import { initApp } from './reducers/appStateSlice';
 import './styles/index.css';
 
-initializeApp()
+store.dispatch(initApp())
+
 // Renders the entire application, starting with RouteComponent, into the root div
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);

@@ -4,13 +4,13 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
+import { preferencesApi } from '../redux/api/preferencesApi';
 import { PreferenceRequestItem } from '../types/items';
 import { AdminState } from '../types/redux/admin';
 import { ChartTypes } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
 import { durationFormat } from '../utils/durationFormat';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import { preferencesApi } from '../redux/api/preferencesApi';
 
 const defaultState: AdminState = {
 	selectedMeter: null,
@@ -141,7 +141,8 @@ export const adminSlice = createSlice({
 		}))
 	},
 	selectors: {
-		selectAdminState: state => state
+		selectAdminState: state => state,
+		selectDisplayTitle: state => state.displayTitle
 	}
 });
 
@@ -164,5 +165,6 @@ export const {
 } = adminSlice.actions
 
 export const {
-	selectAdminState
+	selectAdminState,
+	selectDisplayTitle
 } = adminSlice.selectors
