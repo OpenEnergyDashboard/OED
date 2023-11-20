@@ -9,3 +9,6 @@ trim_trailing_whitespace = true
 
 [*.{md,yml,yaml}]
 indent_style = space
+
+[*.md]
+trim_trailing_whitespace = false
