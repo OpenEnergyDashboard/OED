@@ -68,7 +68,7 @@
     "babel-plugin-lodash": "~3.3.4"
   },
   "dependencies": {
-    "axios": "~0.24.0",
+    "axios": "~1.6.2",
     "bcryptjs": "~2.4.3",
     "body-parser": "~1.20.2",
     "bootstrap": "~5.2.3",
@@ -129,7 +129,7 @@
     "@types/react-redux": "~7.1.25",
     "@types/react-router-dom": "~5.3.0",
     "@typescript-eslint/eslint-plugin": "~6.4.1",
-    "@typescript-eslint/parser": "~6.4.1",
+    "@typescript-eslint/parser": "~6.11.0",
     "babel-loader": "~8.2.3",
     "babel-plugin-formatjs": "~10.3.12",
     "chai": "~3.5.0",
@@ -142,7 +142,7 @@
     "mocha": "~9.2.2",
     "node-polyfill-webpack-plugin": "~1.1.4",
     "nodemon": "~2.0.22",
-    "sinon": "~12.0.0",
+    "sinon": "~17.0.1",
     "source-map-loader": "~4.0.1",
     "stream-browserify": "~3.0.0",
     "style-loader": "~3.3.1",
