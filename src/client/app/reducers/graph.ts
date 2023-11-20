@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, SliceCaseReducers, ValidateSliceCaseReducers, createAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -38,271 +38,364 @@ const defaultState: GraphState = {
 	}
 };
 
+interface History<T> {
+	prev: Array<T>
+	current: T
+	next: Array<T>
+}
+const initialState: History<GraphState> = {
+	prev: [],
+	current: defaultState,
+	next: []
+}
+
 export const graphSlice = createSlice({
 	name: 'graph',
-	initialState: defaultState,
+	initialState: initialState,
 	reducers: {
 		confirmGraphRenderOnce: state => {
-			state.renderOnce = true
+			state.current.renderOnce = true
 		},
 		updateSelectedMeters: (state, action: PayloadAction<number[]>) => {
-			state.selectedMeters = action.payload
+			state.current.selectedMeters = action.payload
 		},
 		updateSelectedGroups: (state, action: PayloadAction<number[]>) => {
-			state.selectedGroups = action.payload
+			state.current.selectedGroups = action.payload
 		},
 		updateSelectedUnit: (state, action: PayloadAction<number>) => {
 			// If Payload is defined, update selectedUnit
 			if (action.payload) {
-				state.selectedUnit = action.payload
+				state.current.selectedUnit = action.payload
 			} else {
 				// If NewValue is undefined, the current Unit has been cleared
 				// Reset groups and meters, and selected unit
-				state.selectedUnit = -99
-				state.selectedMeters = []
-				state.selectedGroups = []
+				state.current.selectedUnit = -99
+				state.current.selectedMeters = []
+				state.current.selectedGroups = []
 			}
 		},
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
-			state.selectedAreaUnit = action.payload
+			state.current.selectedAreaUnit = action.payload
 		},
 		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.barDuration = action.payload
+			state.current.barDuration = action.payload
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.queryTimeInterval = action.payload
+			state.current.queryTimeInterval = action.payload
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.rangeSliderInterval = action.payload
+			state.current.rangeSliderInterval = action.payload
 		},
 		resetRangeSliderStack: state => {
-			state.rangeSliderInterval = TimeInterval.unbounded()
+			state.current.rangeSliderInterval = TimeInterval.unbounded()
 		},
 		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
-			state.comparePeriod = action.payload.comparePeriod
-			state.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime)
+			state.current.comparePeriod = action.payload.comparePeriod
+			state.current.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime)
 		},
 		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
-			state.chartToRender = action.payload
+			state.current.chartToRender = action.payload
 		},
 		toggleAreaNormalization: state => {
-			state.areaNormalization = !state.areaNormalization
+			state.current.areaNormalization = !state.current.areaNormalization
 		},
 		setAreaNormalization: (state, action: PayloadAction<boolean>) => {
-			state.areaNormalization = action.payload
+			state.current.areaNormalization = action.payload
 		},
 		toggleShowMinMax: state => {
-			state.showMinMax = !state.showMinMax
+			state.current.showMinMax = !state.current.showMinMax
 		},
 		setShowMinMax: (state, action: PayloadAction<boolean>) => {
-			state.showMinMax = action.payload
+			state.current.showMinMax = action.payload
 		},
 		changeBarStacking: state => {
-			state.barStacking = !state.barStacking
+			state.current.barStacking = !state.current.barStacking
 		},
 		setBarStacking: (state, action: PayloadAction<boolean>) => {
-			state.barStacking = action.payload
+			state.current.barStacking = action.payload
 		},
 		setHotlinked: (state, action: PayloadAction<boolean>) => {
-			state.hotlinked = action.payload
+			state.current.hotlinked = action.payload
 		},
 		changeCompareSortingOrder: (state, action: PayloadAction<SortingOrder>) => {
-			state.compareSortingOrder = action.payload
+			state.current.compareSortingOrder = action.payload
 		},
 		toggleOptionsVisibility: state => {
-			state.optionsVisibility = !state.optionsVisibility
+			state.current.optionsVisibility = !state.current.optionsVisibility
 		},
 		setOptionsVisibility: (state, action: PayloadAction<boolean>) => {
-			state.optionsVisibility = action.payload
+			state.current.optionsVisibility = action.payload
 		},
 		updateLineGraphRate: (state, action: PayloadAction<LineGraphRate>) => {
-			state.lineGraphRate = action.payload
+			state.current.lineGraphRate = action.payload
 		},
 		updateThreeDReadingInterval: (state, action: PayloadAction<ReadingInterval>) => {
-			state.threeD.readingInterval = action.payload
+			state.current.threeD.readingInterval = action.payload
 		},
 		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
-			state.threeD.meterOrGroupID = action.payload.meterOrGroupID
-			state.threeD.meterOrGroup = action.payload.meterOrGroup
+			state.current.threeD.meterOrGroupID = action.payload.meterOrGroupID
+			state.current.threeD.meterOrGroup = action.payload.meterOrGroup
 		},
 		updateThreeDMeterOrGroupID: (state, action: PayloadAction<number>) => {
-			state.threeD.meterOrGroupID = action.payload
+			state.current.threeD.meterOrGroupID = action.payload
 		},
 		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
-			state.threeD.meterOrGroup = action.payload
+			state.current.threeD.meterOrGroup = action.payload
 		},
-		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+		updateSelectedMetersOrGroups: ({ current }, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
 			// This reducer handles the addition and subtraction values for both the meter and group select components.
 			// The 'MeterOrGroup' type is heavily utilized in the reducer and other parts of the code.
 			// Note that this option is binary, if it's not a meter, then it's a group.
 
 			// Destructure payload
 			const { newMetersOrGroups, meta } = action.payload;
+			const cleared = meta.action === 'clear'
+			const valueRemoved = meta.action === 'pop-value' || meta.action === 'remove-value'
+			const valueAdded = meta.action === 'select-option'
+			let isAMeter = true
 
-			// Used to check if value has been added or removed
-			// If 'meta.option' is defined, it indicates that a single value has been added or selected.
-			const addedMeterOrGroupID = meta.option?.value;
-			const addedMeterOrGroup = meta.option?.meterOrGroup;
-			const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
-
-			//  If 'meta.removedValue' is defined, it indicates that a single value has been removed or deselected.
-			const removedMeterOrGroupID = meta.removedValue?.value;
-			const removedMeterOrGroup = meta.removedValue?.meterOrGroup;
-
-			// If meta.removedValues is defined, it indicates that all values have been cleared.
-			const clearedMeterOrGroups = meta.removedValues;
-
-			// Generic if else block pertaining to all graph types
-			// Check for the three possible scenarios of a change in the meters
-			if (clearedMeterOrGroups) {
+			if (cleared) {
+				const clearedMeterOrGroups = meta.removedValues;
 				// A Select has been cleared(all values removed with clear)
 				// use the first index of cleared items to check for meter or group
-				const isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters
+				isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters
 				// if a meter clear meters, else clear groups
-				isAMeter ? state.selectedMeters = [] : state.selectedGroups = []
+				isAMeter ? current.selectedMeters = [] : current.selectedGroups = []
 
-			} else if (removedMeterOrGroup) {
+			}
+			if (valueRemoved && meta.option) {
+				const isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
 				// An entry was deleted.
 				// Update either selected meters or groups
 
-				removedMeterOrGroup === MeterOrGroup.meters ?
-					state.selectedMeters = newMetersOrGroups
-					:
-					state.selectedGroups = newMetersOrGroups
+				isAMeter
+					? current.selectedMeters = newMetersOrGroups
+					: current.selectedGroups = newMetersOrGroups
+			}
 
-			} else if (addedMeterOrGroup) {
+			if (valueAdded && meta.option) {
+				isAMeter = meta.option.meterOrGroup === MeterOrGroup.meters;
+				const addedMeterOrGroupUnit = meta.option.defaultGraphicUnit;
 				// An entry was added,
 				// Update either selected meters or groups
-				addedMeterOrGroup === MeterOrGroup.meters ?
-					state.selectedMeters = newMetersOrGroups
+				isAMeter ?
+					current.selectedMeters = newMetersOrGroups
 					:
-					state.selectedGroups = newMetersOrGroups
+					current.selectedGroups = newMetersOrGroups
 
 				// If the current unit is -99, there is not yet a graphic unit
 				// Set the newly added meterOrGroup's default graphic unit as the current selected unit.
-				if (state.selectedUnit === -99 && addedMeterOrGroupUnit) {
-					state.selectedUnit = addedMeterOrGroupUnit;
+				if (current.selectedUnit === -99 && addedMeterOrGroupUnit) {
+					current.selectedUnit = addedMeterOrGroupUnit;
 				}
 			}
 
+			// Blocks Pertaining to behaviors of specific pages below
 
-			// Blocks Pertaining to behaviors of specific pages
-
-			// Additional 3d logic
-			// When a meter or group is selected/added, make it the currently active in 3D state.
-			if (addedMeterOrGroupID && addedMeterOrGroup && state.chartToRender === ChartTypes.threeD) {
-				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
-				state.threeD.meterOrGroupID = addedMeterOrGroupID;
-				state.threeD.meterOrGroup = addedMeterOrGroup;
-				addedMeterOrGroup === MeterOrGroup.meters ?
-					state.selectedMeters = newMetersOrGroups
-					:
-					state.selectedGroups = newMetersOrGroups
-			}
-
+			// Additional 3d logic for each case.
 			// Reset Currently Selected 3D Meter Or Group if it has been removed from any page
-			if (
-				// meterOrGroup was removed
-				removedMeterOrGroupID && removedMeterOrGroup &&
-				// Removed meterOrGroup is the currently active on the 3D page
-				removedMeterOrGroupID === state.threeD.meterOrGroupID && removedMeterOrGroup === state.threeD.meterOrGroup
-			) {
-				state.threeD.meterOrGroupID = undefined
-				state.threeD.meterOrGroup = undefined
+			if (cleared) {
+				const removedType = meta.removedValues[0].meterOrGroup
+				const threeDSelectedType = current.threeD.meterOrGroup
+				if (removedType === threeDSelectedType) {
+					current.threeD.meterOrGroupID = undefined
+					current.threeD.meterOrGroup = undefined
 
+				}
+			}
+			// When a meter or group is selected/added, make it the currently active in 3D current.
+			else if (valueAdded && meta.option && current.chartToRender === ChartTypes.threeD) {
+				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
+				current.threeD.meterOrGroupID = meta.option.value;
+				current.threeD.meterOrGroup = meta.option.meterOrGroup;
+			}
+			else if (valueRemoved && meta.option) {
+				const idMatches = meta.removedValue.value === current.threeD.meterOrGroupID
+				const typeMatches = meta.removedValue.meterOrGroup === current.threeD.meterOrGroup
+				if (idMatches && typeMatches) {
+					current.threeD.meterOrGroupID = undefined
+					current.threeD.meterOrGroup = undefined
+				}
 			}
 		},
 		resetTimeInterval: state => {
-			if (!state.queryTimeInterval.equals(TimeInterval.unbounded())) {
-				state.queryTimeInterval = TimeInterval.unbounded()
+			if (!state.current.queryTimeInterval.equals(TimeInterval.unbounded())) {
+				state.current.queryTimeInterval = TimeInterval.unbounded()
 			}
 		},
-		setGraphState: (_state, action: PayloadAction<GraphState>) => action.payload
+		setGraphState: (state, action: PayloadAction<GraphState>) => {
+			state.current = action.payload
+		},
+		updateHistory: (state, action: PayloadAction<GraphState>) => {
+			state.next = [];
+			state.prev.push(action.payload)
+		},
+		traversePrevHistory: state => {
+			const prev = state.prev.pop()
+			if (prev) {
+				state.next.push(state.current)
+				state.current = prev
+			}
+		},
+		traverseNextHistory: state => {
+			const next = state.next.pop()
+			if (next) {
+				state.prev.push(state.current)
+				state.current = next
+			}
+		}
 	},
 	extraReducers: builder => {
-		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
-			if (state.selectedAreaUnit === AreaUnitType.none) {
-				state.selectedAreaUnit = action.payload.defaultAreaUnit;
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
+			if (current.selectedAreaUnit === AreaUnitType.none) {
+				current.selectedAreaUnit = action.payload.defaultAreaUnit;
 			}
-			if (!state.hotlinked) {
-				state.chartToRender = action.payload.defaultChartToRender
-				state.barStacking = action.payload.defaultBarStacking
-				state.areaNormalization = action.payload.defaultAreaNormalization
+			if (!current.hotlinked) {
+				current.chartToRender = action.payload.defaultChartToRender
+				current.barStacking = action.payload.defaultBarStacking
+				current.areaNormalization = action.payload.defaultAreaNormalization
 			}
 		})
 	},
 	// New Feature as of 2.0.0 Beta.
 	selectors: {
-		selectGraphState: state => state,
-		selectThreeDState: state => state.threeD,
-		selectBarWidthDays: state => state.barDuration,
-		selectSelectedUnit: state => state.selectedUnit,
-		selectAreaUnit: state => state.selectedAreaUnit,
-		selectChartToRender: state => state.chartToRender,
-		selectLineGraphRate: state => state.lineGraphRate,
-		selectComparePeriod: state => state.comparePeriod,
-		selectSelectedMeters: state => state.selectedMeters,
-		selectSelectedGroups: state => state.selectedGroups,
-		selectSortingOrder: state => state.compareSortingOrder,
-		selectQueryTimeInterval: state => state.queryTimeInterval,
-		selectThreeDMeterOrGroup: state => state.threeD.meterOrGroup,
-		selectCompareTimeInterval: state => state.compareTimeInterval,
-		selectGraphAreaNormalization: state => state.areaNormalization,
-		selectThreeDMeterOrGroupID: state => state.threeD.meterOrGroupID,
-		selectThreeDReadingInterval: state => state.threeD.readingInterval
+		selectGraphState: state => state.current,
+		selectPrevHistory: state => state.prev,
+		selectForwardHistory: state => state.next,
+		selectThreeDState: state => state.current.threeD,
+		selectShowMinMax: state => state.current.showMinMax,
+		selectBarStacking: state => state.current.barStacking,
+		selectBarWidthDays: state => state.current.barDuration,
+		selectAreaUnit: state => state.current.selectedAreaUnit,
+		selectSelectedUnit: state => state.current.selectedUnit,
+		selectChartToRender: state => state.current.chartToRender,
+		selectLineGraphRate: state => state.current.lineGraphRate,
+		selectComparePeriod: state => state.current.comparePeriod,
+		selectSelectedMeters: state => state.current.selectedMeters,
+		selectSelectedGroups: state => state.current.selectedGroups,
+		selectSortingOrder: state => state.current.compareSortingOrder,
+		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectOptionsVisibility: state => state.current.optionsVisibility,
+		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
+		selectCompareTimeInterval: state => state.current.compareTimeInterval,
+		selectGraphAreaNormalization: state => state.current.areaNormalization,
+		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
+		selectThreeDReadingInterval: state => state.current.threeD.readingInterval
 	}
 })
 
 // Selectors that can be imported and used in 'useAppSelectors' and 'createSelectors'
 export const {
-	selectThreeDState,
-	selectBarWidthDays,
+	selectAreaUnit,
+	selectShowMinMax,
 	selectGraphState,
+	selectPrevHistory,
+	selectThreeDState,
+	selectBarStacking,
+	selectSortingOrder,
+	selectBarWidthDays,
+	selectSelectedUnit,
+	selectLineGraphRate,
+	selectComparePeriod,
+	selectChartToRender,
+	selectForwardHistory,
 	selectSelectedMeters,
 	selectSelectedGroups,
+	selectOptionsVisibility,
 	selectQueryTimeInterval,
-	selectGraphAreaNormalization,
-	selectChartToRender,
 	selectThreeDMeterOrGroup,
+	selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID,
 	selectThreeDReadingInterval,
-	selectLineGraphRate,
-	selectAreaUnit,
-	selectSortingOrder,
-	selectSelectedUnit,
-	selectComparePeriod,
-	selectCompareTimeInterval
+	selectGraphAreaNormalization
 } = graphSlice.selectors
 
 // actionCreators exports
 export const {
-	confirmGraphRenderOnce,
-	updateSelectedMeters,
-	updateSelectedGroups,
-	updateSelectedUnit,
-	updateSelectedAreaUnit,
-	updateBarDuration,
-	updateTimeInterval,
-	changeSliderRange,
-	resetRangeSliderStack,
-	updateComparePeriod,
-	changeChartToRender,
-	toggleAreaNormalization,
-	setAreaNormalization,
-	toggleShowMinMax,
-	setShowMinMax,
-	changeBarStacking,
-	setBarStacking,
 	setHotlinked,
-	changeCompareSortingOrder,
-	toggleOptionsVisibility,
-	setOptionsVisibility,
+	setShowMinMax,
+	setGraphState,
+	updateHistory,
+	setBarStacking,
+	toggleShowMinMax,
+	changeBarStacking,
+	resetTimeInterval,
+	updateBarDuration,
+	changeSliderRange,
+	updateTimeInterval,
+	updateSelectedUnit,
+	traverseNextHistory,
+	traversePrevHistory,
+	changeChartToRender,
+	updateComparePeriod,
+	updateSelectedMeters,
 	updateLineGraphRate,
+	setAreaNormalization,
+	setOptionsVisibility,
+	updateSelectedGroups,
+	resetRangeSliderStack,
+	updateSelectedAreaUnit,
+	confirmGraphRenderOnce,
+	toggleOptionsVisibility,
+	toggleAreaNormalization,
+	updateThreeDMeterOrGroup,
+	changeCompareSortingOrder,
+	updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval,
 	updateThreeDMeterOrGroupInfo,
-	updateThreeDMeterOrGroupID,
-	updateThreeDMeterOrGroup,
-	updateSelectedMetersOrGroups,
-	resetTimeInterval,
-	setGraphState
+	updateSelectedMetersOrGroups
 } = graphSlice.actions
+
+export const historyStepBack = createAction('graph/HistoryStepBack')
+export const HistoryStepForward = createAction('graph/HistoryStepForward')
+
+
+const createGenericSlice = <
+	T,
+	Reducers extends SliceCaseReducers<History<T>>
+>({
+	name = '',
+	initialState,
+	reducers
+}: {
+	name: string
+	initialState: History<T>
+	reducers: ValidateSliceCaseReducers<History<T>, Reducers>
+}) => {
+	return createSlice({
+		name,
+		initialState,
+		reducers: {
+			updateHistory: (state: History<T>, action: PayloadAction<T>) => {
+				state.next = [];
+				state.prev.push(action.payload)
+			},
+			traversePrevHistory: state => {
+				const prev = state.prev.pop()
+				if (prev) {
+					state.next.push(state.current)
+					state.current = prev
+				}
+			},
+			traverseNextHistory: state => {
+				const next = state.next.pop()
+				if (next) {
+					state.prev.push(state.current)
+					state.current = next
+				}
+			},
+			...reducers
+
+		}
+	})
+}
+
+export const wrappedSlice = createGenericSlice({
+	name: 'test',
+	initialState: initialState,
+	reducers: {
+		toggleAreaNormalization: state => {
+			state.current.areaNormalization = !state.current.areaNormalization
+		}
+	}
+})

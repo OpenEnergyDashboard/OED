@@ -10,7 +10,7 @@ import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import {
 	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
-	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters
+	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../reducers/graph';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
@@ -34,9 +34,9 @@ export default function LineChartComponent() {
 	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
 
-	const selectedUnit = useAppSelector(state => state.graph.selectedUnit);
+	const selectedUnit = useAppSelector(selectSelectedUnit);
 	// The unit label depends on the unit which is in selectUnit state.
-	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
+	const graphingUnit = useAppSelector(selectSelectedUnit);
 	// The current selected rate
 	const currentSelectedRate = useAppSelector(selectLineGraphRate);
 	const unitDataById = useAppSelector(selectUnitDataById);

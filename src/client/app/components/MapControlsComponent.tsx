@@ -4,14 +4,14 @@ import { Button, ButtonGroup } from 'reactstrap';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectBarWidthDays } from '../reducers/graph';
 import * as moment from 'moment';
 /**
  * @returns Map page controls
  */
 export default function MapControlsComponent() {
 	const dispatch = useAppDispatch();
-	const barDuration = useAppSelector(state => state.graph.barDuration);
+	const barDuration = useAppSelector(selectBarWidthDays);
 
 	const handleDurationChange = (value: number) => {
 		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')))

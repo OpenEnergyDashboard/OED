@@ -10,7 +10,7 @@ import { GroupedOption, SelectOption } from '../types/items';
 // import TooltipMarkerComponent from './TooltipMarkerComponent';
 // import { FormattedMessage } from 'react-intl';
 import { Badge } from 'reactstrap';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectSelectedUnit } from '../reducers/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { useFetchingStates } from '../redux/componentHooks';
@@ -22,8 +22,8 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
  */
 export default function UnitSelectComponent() {
 	const dispatch = useAppDispatch();
-	const unitSelectOptions = useAppSelector(state => selectUnitSelectData(state));
-	const selectedUnitID = useAppSelector(state => state.graph.selectedUnit);
+	const unitSelectOptions = useAppSelector(selectUnitSelectData);
+	const selectedUnitID = useAppSelector(selectSelectedUnit);
 	const unitsByID = useAppSelector(selectUnitDataById);
 
 	const { endpointsFetchingData } = useFetchingStates();

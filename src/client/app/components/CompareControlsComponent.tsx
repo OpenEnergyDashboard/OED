@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import { Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectComparePeriod, selectSortingOrder } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import translate from '../utils/translate';
@@ -12,8 +12,8 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function CompareControlsComponent() {
 	const dispatch = useAppDispatch();
-	const comparePeriod = useAppSelector(state => state.graph.comparePeriod);
-	const compareSortingOrder = useAppSelector(state => state.graph.compareSortingOrder);
+	const comparePeriod = useAppSelector(selectComparePeriod);
+	const compareSortingOrder = useAppSelector(selectSortingOrder);
 	const [compareSortingDropdownOpen, setCompareSortingDropdownOpen] = React.useState<boolean>(false);
 	const handleCompareButton = (comparePeriod: ComparePeriod) => {
 		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }))

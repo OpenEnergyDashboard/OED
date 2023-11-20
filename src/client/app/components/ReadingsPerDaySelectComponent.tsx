@@ -5,13 +5,13 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import Select from 'react-select';
-import { updateThreeDReadingInterval } from '../reducers/graph';
+import { selectGraphState, selectThreeDReadingInterval, updateThreeDReadingInterval } from '../reducers/graph';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 
 /**
  * A component which allows users to select date ranges for the graphic
@@ -19,8 +19,8 @@ import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
  */
 export default function ReadingsPerDaySelect() {
 	const dispatch = useAppDispatch();
-	const graphState = useAppSelector(state => state.graph);
-	const readingInterval = useAppSelector(state => state.graph.threeD.readingInterval);
+	const graphState = useAppSelector(selectGraphState);
+	const readingInterval = useAppSelector(selectThreeDReadingInterval);
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });

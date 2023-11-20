@@ -5,12 +5,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { graphSlice } from '../reducers/graph';
-import { Dispatch } from '../types/redux/actions';
+import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { graphSlice, selectChartToRender } from '../reducers/graph';
 import { ChartTypes } from '../types/redux/graph';
-import { State } from '../types/redux/state';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -19,8 +17,8 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Chart select element
  */
 export default function ChartSelectComponent() {
-	const currentChartToRender = useSelector((state: State) => state.graph.chartToRender)
-	const dispatch: Dispatch = useDispatch();
+	const currentChartToRender = useAppSelector(selectChartToRender)
+	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);
 
 	// TODO Re-write as selector to use elsewhere

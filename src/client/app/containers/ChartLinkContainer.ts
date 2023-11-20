@@ -4,8 +4,9 @@
 
 import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
-import { State } from '../types/redux/state';
 import { ChartTypes } from '../types/redux/graph';
+import { RootState } from '../store';
+import { selectChartToRender, selectGraphState } from '../reducers/graph';
 
 /**
  * Passes the current redux state of the chart link text, and turns it into props for the React
@@ -14,8 +15,9 @@ import { ChartTypes } from '../types/redux/graph';
  *
  * Returns the updated link text
  */
-function mapStateToProps(state: State) {
-	const chartType = state.graph.chartToRender;
+function mapStateToProps(state: RootState) {
+	const current = selectGraphState(state)
+	const chartType = selectChartToRender(state);
 	// Determine the beginning of the URL to add arguments to.
 	// This is the current URL.
 	const winLocHref = window.location.href;
@@ -29,45 +31,45 @@ function mapStateToProps(state: State) {
 	// Add graph? since we want to route to graph and have a ? before any arguments.
 	let linkText = `${baseURL}graph?`;
 	// let weeklyLink = ''; // reflects graph 7 days from present, with user selected meters and groups;
-	if (state.graph.selectedMeters.length > 0) {
-		linkText += `meterIDs=${state.graph.selectedMeters.toString()}&`;
+	if (current.selectedMeters.length > 0) {
+		linkText += `meterIDs=${current.selectedMeters.toString()}&`;
 	}
-	if (state.graph.selectedGroups.length > 0) {
-		linkText += `groupIDs=${state.graph.selectedGroups.toString()}&`;
+	if (current.selectedGroups.length > 0) {
+		linkText += `groupIDs=${current.selectedGroups.toString()}&`;
 	}
-	linkText += `chartType=${state.graph.chartToRender}`;
+	linkText += `chartType=${current.chartToRender}`;
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
-	linkText += `&serverRange=${state.graph.queryTimeInterval.toString()}`;
+	linkText += `&serverRange=${current.queryTimeInterval.toString()}`;
 	switch (chartType) {
 		case ChartTypes.bar:
-			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
-			linkText += `&barStacking=${state.graph.barStacking}`;
+			linkText += `&barDuration=${current.barDuration.asDays()}`;
+			linkText += `&barStacking=${current.barStacking}`;
 			break;
 		case ChartTypes.line:
 			// no code for this case
 			// under construction;
-			// linkText += `&displayRange=${state.graph.queryTimeInterval.toString().split('_')}`;
+			// linkText += `&displayRange=${current.queryTimeInterval.toString().split('_')}`;
 			break;
 		case ChartTypes.compare:
-			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
-			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
+			linkText += `&comparePeriod=${current.comparePeriod}`;
+			linkText += `&compareSortingOrder=${current.compareSortingOrder}`;
 			break;
 		case ChartTypes.map:
 			linkText += `&mapID=${state.maps.selectedMap.toString()}`;
 			break;
 		case ChartTypes.threeD:
-			linkText += `&meterOrGroup=${state.graph.threeD.meterOrGroup}`;
-			linkText += `&meterOrGroupID=${state.graph.threeD.meterOrGroupID}`;
-			linkText += `&readingInterval=${state.graph.threeD.readingInterval}`;
+			linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
+			linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
+			linkText += `&readingInterval=${current.threeD.readingInterval}`;
 			break;
 		default:
 			break;
 	}
-	const unitID = state.graph.selectedUnit;
+	const unitID = current.selectedUnit;
 	linkText += `&unitID=${unitID.toString()}`;
-	linkText += `&rate=${state.graph.lineGraphRate.label.toString()},${state.graph.lineGraphRate.rate.toString()}`;
-	linkText += `&areaUnit=${state.graph.selectedAreaUnit}&areaNormalization=${state.graph.areaNormalization}`;
-	linkText += `&minMax=${state.graph.showMinMax}`;
+	linkText += `&rate=${current.lineGraphRate.label.toString()},${current.lineGraphRate.rate.toString()}`;
+	linkText += `&areaUnit=${current.selectedAreaUnit}&areaNormalization=${current.areaNormalization}`;
+	linkText += `&minMax=${current.showMinMax}`;
 	return {
 		linkText,
 		chartType

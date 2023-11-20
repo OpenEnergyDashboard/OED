@@ -16,6 +16,7 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { RootState } from '../store';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
+import { selectAreaUnit, selectComparePeriod, selectCompareTimeInterval, selectGraphAreaNormalization, selectSelectedUnit } from '../reducers/graph';
 export interface CompareEntity {
 	id: number;
 	isGroup: boolean;
@@ -40,12 +41,13 @@ interface CompareChartContainerProps {
  * @returns The props object
  */
 function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps): any {
-	const comparePeriod = state.graph.comparePeriod;
+	const comparePeriod = selectComparePeriod(state);
+	const compareTimeInterval = selectCompareTimeInterval(state);
 	const datasets: any[] = [];
 	const periodLabels = getComparePeriodLabels(comparePeriod);
 	// The unit label depends on the unit which is in selectUnit state.
 	// Also need to determine if raw.
-	const graphingUnit = state.graph.selectedUnit;
+	const graphingUnit = selectSelectedUnit(state);
 	// This container is not called if there is no data of there are not units so this is safe.
 	const unitDataById = selectUnitDataById(state)
 	const meterDataById = selectMeterDataById(state)
@@ -91,10 +93,10 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	// Thus, this may not be the reason but for now it is fixed as indicated.
 	// getStartTimestamp() and getEndTimestamp() should return a moment object in UTC so it is fine to use. It could only be
 	// null if it is unbounded but that should never happen with a compare interval.
-	const thisStartTime = moment.utc(state.graph.compareTimeInterval.getStartTimestamp().format('YYYY-MM-DD HH:mm:ss') + '+00:00');
+	const thisStartTime = moment.utc(compareTimeInterval.getStartTimestamp().format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 	// Only do to start of the hour since OED is using hourly data so fractions of an hour are not given.
 	// The start time is always midnight so this is not needed.
-	const thisEndTime = moment.utc(state.graph.compareTimeInterval.getEndTimestamp().startOf('hour').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
+	const thisEndTime = moment.utc(compareTimeInterval.getEndTimestamp().startOf('hour').format('YYYY-MM-DD HH:mm:ss') + '+00:00');
 
 	// The desired label times for this interval that is internationalized and shows day of week, date and time with hours.
 	const thisStartTimeLabel: string = thisStartTime.format('llll');
@@ -124,13 +126,13 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 	console.log(entity)
-
+	const areaNormalization = selectGraphAreaNormalization(state)
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
-		if (state.graph.areaNormalization) {
+		if (areaNormalization) {
 			const area = entity.isGroup ? groupDataById[entity.id].area : meterDataById[entity.id].area;
 			const areaUnit = entity.isGroup ? groupDataById[entity.id].areaUnit : meterDataById[entity.id].areaUnit;
-			const normalization = area * getAreaUnitConversion(areaUnit, state.graph.selectedAreaUnit);
+			const normalization = area * getAreaUnitConversion(areaUnit, selectAreaUnit(state));
 			previousPeriod /= normalization;
 			currentPeriod /= normalization;
 		}

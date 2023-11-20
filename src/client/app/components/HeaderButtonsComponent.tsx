@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom-v5-compat';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { toggleOptionsVisibility } from '../reducers/graph';
+import { selectOptionsVisibility, toggleOptionsVisibility } from '../reducers/graph';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
@@ -19,6 +19,7 @@ import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { BASE_URL } from './TooltipHelpComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectCurrentUser } from '../reducers/currentUser';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -75,11 +76,11 @@ export default function HeaderButtonsComponent() {
 	// Local state for rendering.
 	const [state, setState] = useState(defaultState);
 	// Information on the current user.
-	const currentUser = useAppSelector(state => state.currentUser.profile);
+	const { profile: currentUser } = useAppSelector(selectCurrentUser);
 	// Tracks unsaved changes.
 	const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
 	// whether to collapse options when on graphs page
-	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
+	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {

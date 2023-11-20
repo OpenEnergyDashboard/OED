@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import Select from 'react-select';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectGraphState } from '../reducers/graph';
 import { useAppSelector } from '../redux/hooks';
 import { SelectOption } from '../types/items';
 import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
@@ -23,7 +23,7 @@ export default function GraphicRateMenuComponent() {
 	const dispatch = useDispatch();
 
 	// Graph state
-	const graphState = useAppSelector(state => state.graph);
+	const graphState = useAppSelector(selectGraphState);
 
 	// Unit state
 	const unitDataById = useAppSelector(selectUnitDataById);

@@ -23,6 +23,7 @@ import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
 import { hasToken } from '../utils/token';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectGraphState, selectShowMinMax } from '../reducers/graph';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -38,11 +39,11 @@ export default function ExportComponent() {
 	// Conversion state
 	const conversionState = useAppSelector(selectConversionsDetails);
 	// graph state
-	const graphState = useAppSelector(state => state.graph);
+	const graphState = useAppSelector(selectGraphState);
 	// admin state
 	const adminState = useAppSelector(state => state.admin);
 	// error bar state
-	const errorBarState = useAppSelector(state => state.graph.showMinMax);
+	const errorBarState = useAppSelector(selectShowMinMax);
 	// Time range of graphic
 	const timeInterval = graphState.queryTimeInterval;
 

@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import Select from 'react-select';
 import { useAppSelector } from '../redux/hooks';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectGraphState } from '../reducers/graph';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
 import { UnitRepresentType } from '../types/redux/units';
@@ -22,7 +22,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 export default function AreaUnitSelectComponent() {
 	const dispatch = useDispatch();
 
-	const graphState = useAppSelector(state => state.graph);
+	const graphState = useAppSelector(selectGraphState);
 	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum

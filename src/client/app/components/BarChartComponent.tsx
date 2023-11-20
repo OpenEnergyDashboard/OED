@@ -8,7 +8,10 @@ import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { graphSlice, selectSelectedGroups, selectSelectedMeters } from '../reducers/graph';
+import {
+	graphSlice, selectAreaUnit, selectBarStacking, selectBarWidthDays,
+	selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
+} from '../reducers/graph';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
@@ -35,15 +38,15 @@ export default function BarChartComponent() {
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, { skip: groupShouldSkip });
 
-	const barDuration = useAppSelector(state => state.graph.barDuration);
-	const barStacking = useAppSelector(state => state.graph.barStacking);
-	const unitID = useAppSelector(state => state.graph.selectedUnit);
+	const barDuration = useAppSelector(selectBarWidthDays);
+	const barStacking = useAppSelector(selectBarStacking);
+	const unitID = useAppSelector(selectSelectedUnit);
 	// The unit label depends on the unit which is in selectUnit state.
-	const graphingUnit = useAppSelector(state => state.graph.selectedUnit);
+	const graphingUnit = useAppSelector(selectSelectedUnit);
 	const unitDataById = useAppSelector(selectUnitDataById);
 
-	const selectedAreaNormalization = useAppSelector(state => state.graph.areaNormalization);
-	const selectedAreaUnit = useAppSelector(state => state.graph.selectedAreaUnit);
+	const selectedAreaNormalization = useAppSelector(selectGraphAreaNormalization);
+	const selectedAreaUnit = useAppSelector(selectAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const meterDataByID = useAppSelector(selectMeterDataById);

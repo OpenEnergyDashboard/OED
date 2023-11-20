@@ -12,14 +12,15 @@ import MapChartComponent from './MapChartComponent';
 import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
+import { selectChartToRender, selectOptionsVisibility } from '../reducers/graph';
 
 /**
  * React component that controls the dashboard
  * @returns the Primary Dashboard Component comprising of Ui Controls, and
  */
 export default function DashboardComponent() {
-	const chartToRender = useAppSelector(state => state.graph.chartToRender);
-	const optionsVisibility = useAppSelector(state => state.graph.optionsVisibility);
+	const chartToRender = useAppSelector(selectChartToRender);
+	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 	// const optionsClassName = optionsVisibility ? 'col-3 d-none d-lg-block' : 'd-none';

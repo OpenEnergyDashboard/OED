@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Badge } from 'reactstrap';
-import { updateThreeDMeterOrGroupInfo } from '../reducers/graph';
+import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../reducers/graph';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
@@ -19,8 +19,8 @@ export default function ThreeDPillComponent() {
 	const dispatch = useAppDispatch();
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
-	const threeDState = useAppSelector(state => state.graph.threeD);
-	const graphState = useAppSelector(state => state.graph);
+	const threeDState = useAppSelector(selectThreeDState);
+	const graphState = useAppSelector(selectGraphState);
 
 	const meterPillData = graphState.selectedMeters.map(meterID => {
 		const area = meterDataById[meterID].area;

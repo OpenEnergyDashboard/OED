@@ -3,7 +3,7 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import * as React from 'react';
 import { Button, ButtonGroup } from 'reactstrap';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice, selectBarStacking, selectBarWidthDays } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -13,8 +13,8 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function BarControlsComponent() {
 	const dispatch = useAppDispatch();
-	const barDuration = useAppSelector(state => state.graph.barDuration);
-	const barStacking = useAppSelector(state => state.graph.barStacking);
+	const barDuration = useAppSelector(selectBarWidthDays);
+	const barStacking = useAppSelector(selectBarStacking);
 	const [showSlider, setShowSlider] = React.useState<boolean>(false);
 	const [sliderVal, setSliderVal] = React.useState<number>(barDuration.asDays());
 
