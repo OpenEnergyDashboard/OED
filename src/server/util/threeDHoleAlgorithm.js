@@ -17,7 +17,6 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 	// If readings exist, and first index is not the 'special case'(requested frequency exceeds meter reading frequency)
 	// find/replace missing readings if any, and format for plotly,
 	// Otherwise, return empty x,y,z data
-	// if (numOfReadings > 0 && meterOrGroupReadings[0].reading_rate !== -999) {
 	if (numOfReadings > 0) {
 		// If the meter is low frequency then the DB may return readings with larger time ranges than requested.
 		// All readings have same range so use the first one to determine the range. diff gives milliseconds

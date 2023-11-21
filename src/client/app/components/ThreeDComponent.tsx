@@ -217,7 +217,6 @@ function formatThreeDData(
 		type: 'surface',
 		showlegend: false,
 		showscale: false,
-		// zmin: 0,
 		x: xDataToRender,
 		y: yDataToRender,
 		z: zDataToRender,
