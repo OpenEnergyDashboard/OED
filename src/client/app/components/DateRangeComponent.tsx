@@ -42,7 +42,7 @@ export default function DateRangeComponent() {
 			<div style={{ width: '100%' }}>
 				<p style={labelStyle}>
 					{translate('date.range')}:
-					<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.dateRange' />
 				</p>
 				<DateRangePicker
 					value={dateRange}
