@@ -12,17 +12,18 @@ import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import { Dispatch } from '../types/redux/actions';
 import { updateThreeDReadingInterval } from '../actions/graph';
 import { ByMeterOrGroup, MeterOrGroup } from '../types/redux/graph';
-import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
+import { roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import * as moment from 'moment';
 
 /**
- * A component which allows users to select date ranges for the graphic
+ * A component which allows users to select number of reading per day for the graphic
  * @returns A Select menu with Readings per day options.
  */
 export default function ReadingsPerDaySelect() {
 	const dispatch: Dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
 	const readingInterval = useSelector((state: State) => state.graph.threeD.readingInterval);
+	// This makes sure that the time between graphic values is not less than the time between readings.
 	const actualReadingInterval = useSelector((state: State) => {
 		const threeDState = state.graph.threeD;
 		const meterOrGroupID = threeDState.meterOrGroupID;
@@ -34,7 +35,7 @@ export default function ReadingsPerDaySelect() {
 		// Level of detail along the xAxis / Readings per day
 		const readingInterval = state.graph.threeD.readingInterval;
 
-		// If Meter not selected return null data, else return  data if any.
+		// If meter or group not selected return null data, else return data if any.
 		const data = !meterOrGroupID ? null : state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
 
 		if (data && data.zData.length) {
@@ -46,6 +47,7 @@ export default function ReadingsPerDaySelect() {
 			// Calculate the actual time interval based on the xLabel values
 			const startTS = moment.utc(data.xData[0].startTimestamp);
 			const endTS = moment.utc(data.xData[0].endTimestamp);
+			// This should be the number of hours between readings.
 			const actualReadingInterval = endTS.diff(startTS) / 3600000;
 			return actualReadingInterval
 		}

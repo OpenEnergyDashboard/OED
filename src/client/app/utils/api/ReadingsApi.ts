@@ -104,7 +104,7 @@ export default class ReadingsApi {
 	}
 
 	/**
-	 * Gets 3D readings for a single meter in the given time range.
+	 * Gets 3D readings for a single group in the given time range.
 	 * @param groupID groupID to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit

@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import { ActionType, Thunk, Dispatch, GetState } from '../types/redux/actions';
@@ -9,12 +9,12 @@ import * as t from '../types/redux/threeDReadings';
 import { ChartTypes, ReadingInterval } from '../types/redux/graph'
 import { readingsApi } from '../utils/api';
 import { ThreeDReading } from '../types/readings';
-import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatability';
+import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 
 /**
- * @param meterID the IDs of the meters to get readings
- * @param timeInterval the interval over which to check
- * @param unitID the ID of the unit for which to check
+ * @param meterID the ID of the meter to get readings
+ * @param timeInterval the interval over which to get
+ * @param unitID the ID of the unit for which to get
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
 function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
@@ -23,9 +23,9 @@ function requestMeterThreeDReadings(meterID: number, timeInterval: TimeInterval,
 }
 
 /**
- * @param meterID the IDs of the meters to get readings
- * @param timeInterval the interval over which to check
- * @param unitID the ID of the unit for which to check
+ * @param meterID the ID of the meter to get readings
+ * @param timeInterval the interval over which to get
+ * @param unitID the ID of the unit for which to get
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @param readings the readings for the given meters
  */
@@ -36,9 +36,9 @@ function receiveMeterThreeDReadings(
 }
 
 /**
- * @param meterID the IDs of the meters to get readings
- * @param timeInterval the interval over which to check
- * @param unitID the ID of the unit for which to check
+ * @param meterID the ID of the meter to get readings
+ * @param timeInterval the interval over which to get
+ * @param unitID the ID of the unit for which to get
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
 function fetchMeterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval): Thunk {
@@ -57,7 +57,7 @@ export function fetchNeededThreeDReadings(): Thunk {
 		const state = getState();
 		const selectedMeterOrGroupID = state.graph.threeD.meterOrGroupID;
 		const meterOrGroup = state.graph.threeD.meterOrGroup;
-		//3D Graphic currently only allows full days. Round start down && end up
+		//3D Graphic currently only allows full days. Round start down & end up
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval);
 
 		// only fetch if on 3D page
@@ -87,23 +87,22 @@ export function fetchNeededThreeDReadings(): Thunk {
  * @param meterID the ID of the meter to check
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
- * @param precision number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
+ * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  * @returns True if the readings for the given meter, time duration and unit are missing; false otherwise.
  */
-// function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number): boolean {
-function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number, precision: ReadingInterval)
+function shouldFetchMeterThreeDReadings(state: State, meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
 	: boolean {
 	const timeIntervalIndex = timeInterval.toString();
 	// Optional chaining returns undefined if any of the properties in the chain aren't present
-	const hasReadings = state.readings.threeD.byMeterID[meterID]?.[timeIntervalIndex]?.[unitID]?.[precision]?.readings;
+	const hasReadings = state.readings.threeD.byMeterID[meterID]?.[timeIntervalIndex]?.[unitID]?.[readingInterval]?.readings;
 	// return true if readings aren't present.
-	return !hasReadings ? true : false;
+	return !hasReadings;
 }
 
 /**
- * @param groupID the IDs of the groups to get readings
- * @param timeInterval the interval over which to check
- * @param unitID the ID of the unit for which to check
+ * @param groupID the ID of the group to get readings
+ * @param timeInterval the interval over which to get
+ * @param unitID the ID of the unit for which to get
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
  */
 function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
@@ -112,11 +111,11 @@ function requestGroupThreeDReadings(groupID: number, timeInterval: TimeInterval,
 }
 
 /**
- * @param groupID the IDs of the groups to get readings
+ * @param groupID the ID of the group to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
- * @param readings the readings for the given groups
+ * @param readings the readings for the given group
  */
 function receiveGroupThreeDReadings(
 	groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval, readings: ThreeDReading)
@@ -125,7 +124,7 @@ function receiveGroupThreeDReadings(
 }
 
 /**
- * @param groupID the IDs of the groups to get readings
+ * @param groupID the ID of the group to get readings
  * @param timeInterval the interval over which to check
  * @param unitID the ID of the unit for which to check
  * @param readingInterval number of readings occurring on the x axis (one day typically corresponds to a y axis tick)
@@ -152,5 +151,5 @@ function shouldFetchGroupThreeDReadings(
 	// Optional chaining returns undefined if any of the properties in the chain aren't present
 	const hasReadings = state.readings.threeD.byGroupID[groupID]?.[timeIntervalIndex]?.[unitID]?.[readingInterval]?.readings;
 	// return true if readings aren't present.
-	return !hasReadings ? true : false;
+	return !hasReadings;
 }

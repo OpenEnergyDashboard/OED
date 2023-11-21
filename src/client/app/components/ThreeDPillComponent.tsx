@@ -45,7 +45,7 @@ export default function ThreeDPillComponent() {
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
 		return meterOrGroupPillData.map(pillData => {
-			//retrieve data from appropriate state slice .meters or .group
+			// retrieve data from appropriate state slice .meters or .group
 			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
 				metersState.byMeterID[pillData.meterOrGroupID].identifier
 				:

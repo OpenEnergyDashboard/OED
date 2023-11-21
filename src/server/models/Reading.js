@@ -384,7 +384,7 @@ class Reading {
 	}
 
 	/**
-	 * Gets hourly line readings for a meter for the given time range
+	 * Gets hour or multiple hour readings for meters for the given time range
 	 * @param meterIDs The meter IDs to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp Start point for the time range of readings returned
@@ -403,8 +403,8 @@ class Reading {
 	}
 
 	/**
-	 * Gets hourly readings for groups for the given time range
-	 * @param groupIDs The group IDs to get readings for
+	 * Gets hour or multiple hour readings for groups for the given time range
+	 * @param groupID The group ID to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp Start point for the time range of readings returned
 	 * @param toTimestamp End point for the time range of readings returned
@@ -412,11 +412,11 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getGroupThreeDReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
+	static async getGroupThreeDReadings(groupID, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
+		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupID, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
 		const groupThreeDData = threeDHoleAlgorithm(allGroupThreeDReadings, fromTimestamp, toTimestamp);
 		return groupThreeDData;
 	}

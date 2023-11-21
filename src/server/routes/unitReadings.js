@@ -203,7 +203,7 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
 }
 
 /**
- * Gets hourly line readings for meters for the given time range
+ * Gets hour or multiple hour readings for meters for the given time range
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
@@ -217,8 +217,8 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readin
 }
 
 /**
- * Gets line readings for groups for the given time range
- * @param groupIDs The group IDs to get readings for
+ * Gets hour or multiple hour readings for group for the given time range
+ * @param groupID The group ID to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
  * @param readingInterval rate of hours per reading

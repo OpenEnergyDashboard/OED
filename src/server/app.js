@@ -33,7 +33,6 @@ const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 
-// Apply the limit to overall requests
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
 // Create a limit of 200 requests/5 seconds
@@ -49,7 +48,6 @@ const threeDLimiter = new rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
 	max: 5
 });
-
 app.use('/api/unitReadings/threeD/meters', threeDLimiter);
 
 // Limit the number of raw exports to 5 per 5 seconds

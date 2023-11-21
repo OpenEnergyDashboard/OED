@@ -24,8 +24,8 @@ $$ LANGUAGE 'plpgsql';
 
 
 -- Gets meters graphing data for 3D graphic by returning points that span the requested
--- length of time over the days requested. This function can be slower than lin readings
--- so is designed to be called for one year of less of data.
+-- length of time over the days requested. This function can be slower than line readings
+-- so is designed to be called for one year or less of data.
 CREATE OR REPLACE FUNCTION meter_3d_readings_unit (
     -- The desired meter ids. It is normally a single value for a 3D graphic but groups
     -- may need multiple meters.
@@ -122,7 +122,7 @@ BEGIN
                 FROM hourly_readings_unit hr
                 -- Only want the desired meter and within the time requested
                 WHERE hr.meter_id = current_meter_id and requested_range @> hr.time_interval
-                 -- Time sort by which metrer and the start time for graphing.
+                 -- Time sort by which meter and the start time for graphing.
                 ORDER BY meter_id, start_timestamp
             ;
         ELSIF (reading_length_hours_use <= 12) THEN
@@ -181,7 +181,7 @@ $$ LANGUAGE plpgsql;
 
 
 /*Gets group meters graphing data for 3D graphic by returning points that span the requested
-length of time over the days requested. 
+  length of time over the days requested. 
 */
 CREATE OR REPLACE FUNCTION group_3d_readings_unit (
 	--Desire group ID

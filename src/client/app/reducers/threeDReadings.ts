@@ -43,8 +43,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 					...newState.byMeterID[meterID][timeInterval][unitID][readingInterval],
 					isFetching: true
 				};
-			}
-			else {
+			} else {
 				newState.byMeterID[meterID][timeInterval][unitID][readingInterval] = { isFetching: true };
 			}
 			return newState;
@@ -92,8 +91,7 @@ export default function readings(state = defaultState, action: ThreeDReadingsAct
 					...newState.byGroupID[groupID][timeInterval][unitID][readingInterval],
 					isFetching: true
 				};
-			}
-			else {
+			} else {
 				newState.byGroupID[groupID][timeInterval][unitID][readingInterval] = { isFetching: true };
 			}
 			return newState;
