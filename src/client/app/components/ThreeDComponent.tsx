@@ -206,7 +206,7 @@ function formatThreeDData(
 			yDataToRender.push(dateTS.format(moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY')));
 		}
 
-		const time = midpointTS.format('h:mm A');
+		const time = midpointTS.format('LT');
 		const date = dateTS.format('LL');
 		// ThreeD graphic readings can be null. If not null round to a precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
