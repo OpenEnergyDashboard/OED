@@ -22,6 +22,7 @@ import * as moment from 'moment';
 export default function ReadingsPerDaySelect() {
 	const dispatch: Dispatch = useDispatch();
 	const graphState = useSelector((state: State) => state.graph);
+	// Level of detail along the xAxis / Readings per day
 	const readingInterval = useSelector((state: State) => state.graph.threeD.readingInterval);
 	// This makes sure that the time between graphic values is not less than the time between readings.
 	const actualReadingInterval = useSelector((state: State) => {
@@ -32,8 +33,6 @@ export default function ReadingsPerDaySelect() {
 		// 3D requires intervals to be rounded to a full day.
 		const timeInterval = roundTimeIntervalForFetch(state.graph.timeInterval).toString();
 		const unitID = state.graph.selectedUnit;
-		// Level of detail along the xAxis / Readings per day
-		const readingInterval = state.graph.threeD.readingInterval;
 
 		// If meter or group not selected return null data, else return data if any.
 		const data = !meterOrGroupID ? null : state.readings.threeD[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
