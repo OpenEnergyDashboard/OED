@@ -196,7 +196,7 @@ function formatThreeDData(
 
 		// Use first day's values to populate xData Labels
 		if (i === 0) {
-			xDataToRender.push(midpointTS.format('h:mm A'));
+			xDataToRender.push(midpointTS.format('LT'));
 		}
 
 		// Use the first index of each row/day to extract the dates for the yLabels
