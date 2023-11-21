@@ -10,6 +10,7 @@ import { Dispatch } from '../types/redux/actions';
 import { changeMeterOrGroupInfo } from '../actions/graph';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import translate from '../utils/translate';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
@@ -80,7 +81,7 @@ export default function ThreeDPillComponent() {
 		<div style={pillContainer}>
 			{meterPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>Meters</p>
+					<p style={pillBoxLabel}>{translate('meters')}</p>
 					<div style={pills}>
 						{populatePills(meterPillData)}
 					</div>
@@ -89,7 +90,7 @@ export default function ThreeDPillComponent() {
 
 			{groupPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>Groups</p>
+					<p style={pillBoxLabel}>{translate('groups')}</p>
 					<div style={pills} >
 						{populatePills(groupPillData)}
 					</div>
