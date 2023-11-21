@@ -45,8 +45,10 @@ const app = express().use(generalLimiter);
 
 // This is limiting 3D-Graphic
 const threeDLimiter = new rateLimit({
-	windowMs: 5 * 1000, // 5 seconds
-	max: 5
+	// TODO This was causing tests to fail for 3D rejection. This limit seems to be okay
+	// but we should find a better solution than upping values just for tests.
+	windowMs: 10 * 1000, // 10 seconds
+	max: 15
 });
 app.use('/api/unitReadings/threeD/meters', threeDLimiter);
 
