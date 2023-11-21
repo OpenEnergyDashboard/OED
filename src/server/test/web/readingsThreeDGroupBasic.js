@@ -89,9 +89,9 @@ mocha.describe('readings API', () => {
                     expect(res.body).to.have.property('xData');
                     expect(res.body).to.have.property('yData');
                     // The lengths should be correct.
-                    expect(res.body, 'xData length').to.have.property(`xData`).to.have.lengthOf(0);
-                    expect(res.body, 'yData length').to.have.property(`yData`).to.have.lengthOf(0);
-                    expect(res.body, 'zData length').to.have.property(`zData`).to.have.lengthOf(0);
+                    expect(res.body, 'xData length').to.have.property('xData').to.have.lengthOf(0);
+                    expect(res.body, 'yData length').to.have.property('yData').to.have.lengthOf(0);
+                    expect(res.body, 'zData length').to.have.property('zData').to.have.lengthOf(0);
                 });
             });
         });
