@@ -96,7 +96,7 @@
 		"plotly.js": "~2.18.1",
 		"prop-types": "~15.8.1",
 		"query-string": "~8.1.0",
-		"rc-slider": "~8.6.6",
+		"rc-slider": "~10.4.0",
 		"react": "~18.2.0",
 		"react-dom": "~18.2.0",
 		"react-intl": "~6.4.4",
