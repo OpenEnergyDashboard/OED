@@ -193,6 +193,82 @@ mocha.describe('readings API', () => {
                 // Add B9 here
 
                 // Add B10 here
+                mocha.it('B10: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU', async () => {
+                    // Load the data into the database
+                    const unitData = unitDatakWh.concat([
+                        {
+                            // u3
+                            name: 'MJ',
+                            identifier: 'megaJoules',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'MJ'
+                        },
+                        { 
+                            // u16
+                            name: 'BTU', 
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                            secInRate: 3600, 
+                            typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: true, 
+                            note: 'OED created standard unit'
+                         }
+                    ]);
+                    const conversionData = conversionDatakWh.concat([
+                        {
+                            // c2
+                            sourceName: 'kWh',
+                            destinationName: 'MJ',
+                            bidirectional: true,
+                            slope: 3.6,
+                            intercept: 0,
+                            note: 'kWh → MJ'
+                        },
+                        { 
+                            // c3
+                            sourceName: 'MJ',
+                            destinationName: 'BTU', 
+                            bidirectional: true, 
+                            slope: 947.8, 
+                            intercept: 0, 
+                            note: 'MJ → BTU'
+                         }
+                    ]);
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility BTU',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            defaultGraphicUnit: "BTU",
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+                    await prepareTest(unitData, conversionData, meterData);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('BTU');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf_bd_1.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+                        .query({
+                            timeInterval: ETERNITY.toString(),
+                            barWidthDays: 1,
+                            graphicUnitId: unitId
+                        });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected);
+                });
 
                 // Add B11 here
 
@@ -442,3 +518,4 @@ mocha.describe('readings API', () => {
         });
     });
 });
+
