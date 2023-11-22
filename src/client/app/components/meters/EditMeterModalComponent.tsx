@@ -6,6 +6,7 @@ import * as React from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
@@ -243,22 +244,24 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				props.meter.maxError != state.maxError ||
 				props.meter.disableChecks != state.disableChecks
 			);
+		// Check if any deep meters in the redux state depend on the meter being edited
 		let error_message = '';
-		for (const value of Object.values(groups)) {
-			for (let i = 0; i < value.deepMeters.length; i++) {
-				console.log(value.deepMeters[i], props.meter.id)
-				if(value.deepMeters[i]== props.meter.id)
-				{
-					error_message += translate('group') + value.name + ' uses ' + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
+		if (state.unitId != props.meter.unitId) {
+			for (const value of Object.values(groups)) {
+				for (let i = 0; i < value.deepMeters.length; i++) {
+					if (value.deepMeters[i] == props.meter.id) {
+						error_message += translate('group') + value.name + translate('uses') + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
+					}
 				}
 			}
 		}
 		state.unitId = props.meter.unitId;
-
+		// Display an error message if there are dependent deep meters
 		if (error_message) {
 			error_message = translate('meter.is.not.editable') + '\n' + error_message;
-			alert(error_message);
+			showErrorNotification(error_message);
 		}
+
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
