@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import { showErrorNotification} from '../../utils/notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
