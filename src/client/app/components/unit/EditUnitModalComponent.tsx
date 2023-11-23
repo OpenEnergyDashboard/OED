@@ -22,7 +22,6 @@ import { Dispatch } from 'types/redux/actions';
 import { useSelector } from 'react-redux';
 import { State } from 'types/redux/state';
 
-
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
@@ -71,7 +70,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	}
 
 
-
 	// Log the Redux state to the console
 	const meterState = useSelector((state: State) => state.meters.byMeterID);
 	const conversions = useSelector((state: State) => state.conversions.conversions)
@@ -81,12 +79,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		let error_message = '';
 		for (const value of Object.values(meterState)) {
 			if(value.unitId==state.id){
-				error_message += translate('meter') + value.name + ' uses ' + translate('unit') + ' "' + state.id+ '" \n';
+				error_message += translate('meter') + value.name + ' uses ' + translate('unit') + ' "' + state.identifier+ '" \n';
 			}
 		}
 		for(let i=0;i<conversions.length;i++){
 			if(conversions[i].sourceId==state.id){
-				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.id+ '"as a source unit\n';
+				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.identifier+ '"as a source unit\n';
 			}
 
 			if(conversions[i].destinationId==state.id){
@@ -94,8 +92,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				+ translate('unit') + ' "' + state.id+ '" as a destination unit\n';
 			}
 		}
-		//finish meter graphicalUnitId and UnitId
-		//finish conversion check both source or destination unit
 		if(error_message)
 		{
 			error_message = translate('unit.failed.to.delete.unit') + '\n' +  error_message;
@@ -103,11 +99,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		}
 
 
-		//
-		//
-		// Close the warning modal
-		// Do not call the handler function because we do not want to open the parent modal
-		// Delete the conversion using the state object, it should only require the source and destination ids set
+
 	};
 	/* Edit Unit Validation:
 		Name cannot be blank
