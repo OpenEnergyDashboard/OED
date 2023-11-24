@@ -9,6 +9,7 @@ import { useDispatch} from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
+import { showErrorNotification} from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
@@ -72,7 +73,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	// Log the Redux state to the console
 	const meterState = useSelector((state: State) => state.meters.byMeterID);
-	const conversions = useSelector((state: State) => state.conversions.conversions)
+	const conversions = useSelector((state: State) => state.conversions.conversions);
 
 	const handleDeleteUnit = () => {
 		// Access the Redux store state
@@ -95,7 +96,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		if(error_message)
 		{
 			error_message = translate('unit.failed.to.delete.unit') + '\n' +  error_message;
-			alert(error_message);
+			showErrorNotification(error_message);
 		}
 
 
