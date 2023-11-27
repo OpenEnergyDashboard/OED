@@ -7,12 +7,17 @@ import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
-import { selectMapChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import {
+	selectAreaUnit, selectBarWidthDays,
+	selectGraphAreaNormalization, selectSelectedGroups,
+	selectSelectedMeters, selectSelectedUnit
+} from '../reducers/graph';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/hooks';
+import { selectMapChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { UnitRepresentType } from '../types/redux/units';
@@ -41,19 +46,21 @@ export default function MapChartComponent() {
 	console.log(meterShouldSkip, groupShouldSkip, meterReadings, groupData)
 
 	// converting maps to RTK has been proving troublesome, therefore using a combination of old/new stateSelectors
-	const unitID = useSelector((state: State) => state.graph.selectedUnit);
-	const selectedMap = useSelector((state: State) => state.maps.selectedMap);
-	const byMapID = useSelector((state: State) => state.maps.byMapID);
-	const editedMaps = useSelector((state: State) => state.maps.editedMaps);
-	const barDuration = useSelector((state: State) => state.graph.barDuration)
-	const areaNormalization = useSelector((state: State) => state.graph.areaNormalization)
-	const selectedAreaUnit = useSelector((state: State) => state.graph.selectedAreaUnit)
-	const selectedMeters = useSelector((state: State) => state.graph.selectedMeters)
-	const selectedGroups = useSelector((state: State) => state.graph.selectedGroups)
-
+	const unitID = useAppSelector(selectSelectedUnit);
+	const barDuration = useAppSelector(selectBarWidthDays)
+	const areaNormalization = useAppSelector(selectGraphAreaNormalization)
+	const selectedAreaUnit = useAppSelector(selectAreaUnit)
+	const selectedMeters = useAppSelector(selectSelectedMeters)
+	const selectedGroups = useAppSelector(selectSelectedGroups)
 	const unitDataById = useAppSelector(selectUnitDataById)
 	const groupDataById = useAppSelector(selectGroupDataById)
 	const meterDataById = useAppSelector(selectMeterDataById)
+
+	// RTK Types Disagree with maps ts types so, use old until migration completer for maps.
+	// This is also an issue when trying to refactor maps reducer into slice.
+	const selectedMap = useSelector((state: State) => state.maps.selectedMap);
+	const byMapID = useSelector((state: State) => state.maps.byMapID);
+	const editedMaps = useSelector((state: State) => state.maps.editedMaps)
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading width={50} height={50} />
 	}

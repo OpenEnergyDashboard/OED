@@ -26,6 +26,9 @@ import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './
 import { MeterDataByID } from 'types/redux/meters';
 import { GroupDataByID } from 'types/redux/groups';
 import { selectMeterDataById } from '../../redux/api/metersApi';
+import { RootState } from '../../store';
+import { QueryStatus } from '@reduxjs/toolkit/query';
+
 
 
 
@@ -452,4 +455,9 @@ const isAreaNormCompatible = (id: number, selectedUnit: number, meterOrGroupData
 	const noAreaOrUnitType = meterOrGroupData[id].area === 0 || meterOrGroupData[id].areaUnit === AreaUnitType.none
 	const isAreaNormCompatible = !noUnitAndRaw && !noAreaOrUnitType
 	return isAreaNormCompatible
+}
+
+export const selectAnythingLoading = (state: RootState) => {
+	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending)
+	return anythingLoading;
 }

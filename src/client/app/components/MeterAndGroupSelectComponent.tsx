@@ -8,8 +8,7 @@ import makeAnimated from 'react-select/animated';
 import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { useFetchingStates } from '../redux/componentHooks';
+import { selectAnythingLoading, selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
@@ -24,9 +23,8 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, selectedMeterOptions, selectedGroupOptions } = useAppSelector(selectMeterGroupSelectData);
-	const { somethingIsFetching } = useFetchingStates();
+	const somethingIsFetching = useAppSelector(selectAnythingLoading)
 	const { meterOrGroup } = props;
-
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
 
 	const value = meterOrGroup === MeterOrGroup.meters ? selectedMeterOptions.compatible : selectedGroupOptions.compatible;

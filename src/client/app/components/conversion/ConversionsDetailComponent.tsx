@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { useSelector } from 'react-redux';
 import { ConversionData } from 'types/redux/conversions';
 import { fetchConversionsDetailsIfNeeded } from '../../actions/conversions';
-import HeaderComponent from '../../components/HeaderComponent';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
@@ -64,7 +63,6 @@ export default function ConversionsDetailComponent() {
 				</div>
 			) : (
 				<div>
-					<HeaderComponent />
 					<TooltipHelpComponent page='conversions' />
 
 					<div className='container-fluid'>

@@ -12,13 +12,11 @@ export const historyMiddleware = (startListening: AppStartListening) => {
 
 	startListening({
 		predicate: (action, currentState, previousState) => {
-			// deep compare of previous state added mostly due to potential state triggers from laying on backspace when deleting meters or groups.
-			return isHistoryTrigger(action) &&
-				!_.isEqual(currentState.graph, previousState.graph)
-		}
-		,
-		effect: (action, { dispatch, getOriginalState }) => {
-			console.log('Running', action)
+			// deep compare of previous state added mostly due to potential state triggers/ dispatches that may not actually alter state
+			// For example 'popping' values from react-select w/ backspace when empty
+			return isHistoryTrigger(action) && !_.isEqual(currentState.graph, previousState.graph)
+		},
+		effect: (_action, { dispatch, getOriginalState }) => {
 			const prev = getOriginalState().graph.current
 			dispatch(updateHistory(prev))
 		}
@@ -26,12 +24,12 @@ export const historyMiddleware = (startListening: AppStartListening) => {
 
 }
 
-// we use updateHistory here, so listening for updateHistory would cause infinite loops etc.
+// listen to all graphSlice actions
 const isHistoryTrigger = isAnyOf(
-	// listen to all graphSlice actions
 	...Object.values(graphSlice.actions)
 		.filter(action => !(
 			// filter out the ones don't directly alter the graph, or ones which can cause infinite recursion
+			// we use updateHistory here, so listening for updateHistory would cause infinite loops etc.
 			toggleOptionsVisibility.match(action) ||
 			setOptionsVisibility.match(action) ||
 			setHotlinked.match(action) ||

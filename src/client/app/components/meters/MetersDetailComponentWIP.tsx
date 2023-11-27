@@ -20,7 +20,7 @@ import MeterViewComponentWIP from './MeterViewComponentWIP';
 export default function MetersDetailComponent() {
 
 	// Check for admin status
-	const isAdmin = useAppSelector(state => selectIsAdmin(state));
+	const isAdmin = useAppSelector(selectIsAdmin);
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);

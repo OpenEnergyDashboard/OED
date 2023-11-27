@@ -4,7 +4,6 @@
 
 import * as _ from 'lodash';
 import * as React from 'react';
-import HeaderComponent from '../../components/HeaderComponent';
 import UserDetailComponent from '../../components/admin/UsersDetailComponent';
 import { User, UserRole } from '../../types/items';
 import { usersApi } from '../../utils/api';
@@ -81,7 +80,6 @@ export default class UsersDetailContainer extends React.Component<UsersDisplayCo
 	public render() {
 		return (
 			<div>
-				<HeaderComponent />
 				<UserDetailComponent
 					deleteUser={this.deleteUser}
 					edited={!_.isEqual(this.state.users, this.state.history[0])}

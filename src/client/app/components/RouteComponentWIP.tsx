@@ -34,14 +34,27 @@ import MetersDetailComponentWIP from './meters/MetersDetailComponentWIP';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 
 
+const initCompStyles: React.CSSProperties = {
+	width: '100%', height: '100%',
+	display: 'flex', flexDirection: 'column',
+	alignContent: 'center', alignItems: 'center'
+}
+export const InitializingComponent = () => {
+	return (
+		<div style={initCompStyles}>
+			<p>Initializing</p>
+			<SpinnerComponent loading width={50} height={50} />
+		</div>
 
+	)
+}
 
 export const AdminOutlet = () => {
 	const { isAdmin, initComplete } = useWaitForInit();
 
 	if (!initComplete) {
 		// Return a spinner until all init queries return and populate cache with data
-		return <SpinnerComponent loading width={50} height={50} />
+		return <InitializingComponent />
 	}
 
 	// Keeping for now in case changes are desired
@@ -54,23 +67,22 @@ export const AdminOutlet = () => {
 }
 
 // Function that returns a JSX element. Either the requested route's Component, as outlet or back to root
-export const RoleOutlet = ({ UserRole }: { UserRole: UserRole }) => {
+export const RoleOutlet = ({ role }: { role: UserRole }) => {
 	const { userRole, initComplete } = useWaitForInit();
 	// // If state contains token it has been validated on startup or login.
 	if (!initComplete) {
-		return <SpinnerComponent loading width={50} height={50} />
+		return <InitializingComponent />
 	}
-	// Keeping for now in case changes are desired
-	if (userRole === UserRole) {
+	if (userRole === role || userRole === UserRole.ADMIN) {
 		return <Outlet />
 	}
 
-	return <Navigate to='/' />
+	return <Navigate to='/' replace />
 }
 
 export const NotFound = () => {
 	// redirect to home page if non-existent route is requested.
-	return <Navigate to='/' />
+	return <Navigate to='/' replace />
 }
 
 
@@ -81,10 +93,12 @@ export const GraphLink = () => {
 	const { initComplete } = useWaitForInit();
 	const dispatchQueue: PayloadAction<any>[] = [];
 	if (!initComplete) {
-		return <SpinnerComponent loading width={50} height={50} />
+		return <InitializingComponent />
 	}
+
 	try {
 		URLSearchParams.forEach((value, key) => {
+			// TODO Needs to be refactored into a single dispatch/reducer pair.
 			//TODO validation could be implemented across all cases similar to compare period and sorting order
 			switch (key) {
 				case 'chartType':
@@ -171,7 +185,7 @@ export const GraphLink = () => {
 	// All appropriate state updates should've been executed
 	// redirect to clear the link
 
-	return <Navigate to='/' replace/>
+	return <Navigate to='/' replace />
 
 }
 
@@ -182,12 +196,11 @@ const router = createBrowserRouter([
 		path: '/', element: <AppLayout />,
 		children: [
 			{ index: true, element: <HomeComponent /> },
-			{ path: '/login', element: <LoginComponent /> },
+			{ path: 'login', element: <LoginComponent /> },
 			{ path: 'groups', element: <GroupsDetailComponentWIP /> },
 			{ path: 'meters', element: <MetersDetailComponentWIP /> },
 			{ path: 'graph', element: <GraphLink /> },
 			{
-				path: '/',
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
@@ -196,19 +209,16 @@ const router = createBrowserRouter([
 					{ path: 'users/new', element: <CreateUserContainer /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
-					{ path: 'users', element: <UsersDetailComponentWIP /> },
-					{
-						path: '/',
-						element: <RoleOutlet UserRole={UserRole.CSV} />,
-						children: [
-							{ path: 'csv', element: <UploadCSVContainer /> }
-						]
-					},
-					{
-						path: '*', element: <NotFound />
-					}
+					{ path: 'users', element: <UsersDetailComponentWIP /> }
 				]
-			}
+			},
+			{
+				element: <RoleOutlet role={UserRole.CSV} />,
+				children: [
+					{ path: 'csv', element: <UploadCSVContainer /> }
+				]
+			},
+			{ path: '*', element: <NotFound /> }
 		]
 	}
 ])
