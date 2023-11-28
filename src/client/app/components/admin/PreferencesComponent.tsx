@@ -179,6 +179,19 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 								type='radio'
 								name='chartTypes'
 								style={{ marginRight: '10px' }}
+								value={ChartTypes.radar}
+								onChange={this.handleDefaultChartToRenderChange}
+								checked={this.props.defaultChartToRender === ChartTypes.radar}
+							/>
+							<FormattedMessage id='radar' />
+						</label>
+					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='chartTypes'
+								style={{ marginRight: '10px' }}
 								value={ChartTypes.map}
 								onChange={this.handleDefaultChartToRenderChange}
 								checked={this.props.defaultChartToRender === ChartTypes.map}
