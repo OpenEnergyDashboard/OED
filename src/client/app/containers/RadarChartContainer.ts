@@ -18,9 +18,12 @@ function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
-	//For largest and smallest usage in reading.reading.
-	let minR: number | undefined;
-	let maxR: number | undefined;
+	//For largest and smallest usage in reading.reading for meters and groups
+	let minR = Number.MAX_VALUE;
+	let maxR = Number.MIN_VALUE;
+	// Similar but for dates or theta values.
+	let minTheta = moment('3000-12-31');
+	let maxTheta = moment(0);
 	// relabel each theta axis to be more user friendly
 	const tickVal: number[] = [];
 	const tickTex: string[] = [];
@@ -77,6 +80,10 @@ function mapStateToProps(state: State) {
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						// Readings are sorted but compare each one because still moment with correct middle value since easier.
+						// Could do outside loop to speed up.
+						minTheta = moment.min(minTheta, timeReading);
+						maxTheta = moment.max(maxTheta, timeReading);
 						thetaData.push(timeReading.format('ddd, ll LTS'));
 						// Label each theta axis
 						tickTex.push(timeReading.format('ll'));
@@ -87,9 +94,9 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
 
-					//Find the largest and smallest usage in rData.
-					minR = Math.min(...rData);
-					maxR = Math.max(...rData);
+					//Find the largest and smallest usage in rData for meters.
+					minR = Math.min(...rData, minR);
+					maxR = Math.max(...rData, maxR);
 
 					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
@@ -144,6 +151,10 @@ function mapStateToProps(state: State) {
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						// Readings are sorted but compare each one because still moment with correct middle value since easier.
+						// Could do outside loop to speed up.
+						minTheta = moment.min(minTheta, timeReading);
+						maxTheta = moment.max(maxTheta, timeReading);
 						thetaData.push(timeReading.format('ddd, ll LTS'));
 						// Label each theta axis
 						tickTex.push(timeReading.format('ll'));
@@ -154,10 +165,9 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
 
-					//Find the largest and smallest usage in rData.
-					minR = Math.min(...rData);
-					maxR = Math.max(...rData);
-
+					//Find the largest and smallest usage in rData for groups including previous meter min/max.
+					minR = Math.min(...rData, minR);
+					maxR = Math.max(...rData, maxR);
 					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
 						name: label,
@@ -176,12 +186,6 @@ function mapStateToProps(state: State) {
 				}
 			}
 		}
-	}
-
-	// No range if minR or maxR is undefined.
-	if (minR == undefined || maxR == undefined) {
-		minR = 0;
-		maxR = 0;
 	}
 
 	let layout: any;
@@ -208,56 +212,114 @@ function mapStateToProps(state: State) {
 				}
 			]
 		}
-
 	} else {
-		// Data available so plot.
-		// TODO the theta labels at the bottom of the radar chart get cut off.
-		const maxTicks = 12; // Maximum number of ticks, represent 12 months
-		const numDataPoints = tickTex.length;
-
-		let tickVals;
-		let tickTexts;
-
-		if (numDataPoints <= maxTicks) {
-		// If there are 12 or fewer data points, use the original tick values and text
-			tickVals = tickVal;
-			tickTexts = tickTex;
-		} else {
-		// If there are more than 12 data points which represent 12 months, divide into intervals
-			const interval = Math.ceil(numDataPoints / maxTicks); // Calculate the interval size
-			tickVals = tickVal.filter((_, index) => index % interval === 0);
-			tickTexts = tickTex.filter((_, index) => index % interval === 0);
-		}
-		layout = {
-			autosize: true,
-			showlegend: true,
-			height: 800,
-			legend: {
-				x: 0,
-				y: 1.1,
-				orientation: 'h'
-			},
-
-			polar: {
-				radialaxis: {
-					title: unitLabel,
-					// Specifies the start and end points of the usage.
-					range: [minR, maxR],
-					showgrid: true,
-					gridcolor: '#ddd'
-				},
-				angularaxis: {
-					direction: 'clockwise',
-					tickvals: tickVals,
-					ticktext: tickTexts,
-					tickmode: 'array'
-				}
-			},
-			margin: {
-				t: 10,
-				b: -20
+		// Check if all the values for the dates are compatible. Plotly does not like having different dates in different
+		// scatterpolar lines. Lots of attempts to get this to work failed so not going to allow since not that common.
+		// First find the line with the most points. If same, use the first one found with that number of points.
+		let maxLinePoints = Number.MIN_VALUE;
+		let index = -1;
+		for (let i = 0; i < datasets.length; i++) {
+			if (datasets[i].theta.length > maxLinePoints) {
+				maxLinePoints = datasets[i].theta.length;
+				index = i;
 			}
-		};
+		}
+		// Second, compare the dates (theta) for line with the max point to see if it has all the points in all other lines.
+		let ok = true;
+		for (let i = 0; i < datasets.length; i++) {
+			// Don't compare to self
+			if (i !== index) {
+				// Current line to consider.
+				const currentLine: string[] = datasets[i].theta;
+				// See if all points in current line are in max length line. && means get false if any false.
+				ok = ok && currentLine.every(v => datasets[index].theta.includes(v));
+			}
+		}
+		if (!ok) {
+			// Remove plotting data.
+			datasets.splice(0, datasets.length);
+			// The lines are not compatible so tell user.
+			layout = {
+				'xaxis': {
+					'visible': false
+				},
+				'yaxis': {
+					'visible': false
+				},
+				'annotations': [
+					{
+						'text': `${translate('radar.lines.incompatible')}`,
+						'xref': 'paper',
+						'yref': 'paper',
+						'showarrow': false,
+						'font': {
+							'size': 28
+						}
+					}
+				]
+			}
+		} else {
+			// Data available and okay so plot.
+			// TODO the theta labels at the bottom of the radar chart get cut off.
+			const maxTicks = 12; // Maximum number of ticks, represent 12 months
+			const numDataPoints = tickTex.length;
+
+			let tickVals;
+			let tickTexts;
+			let numTicks = maxTicks;
+			layout = {
+				autosize: true,
+				showlegend: true,
+				height: 800,
+				legend: {
+					x: 0,
+					y: 1.1,
+					orientation: 'h'
+				},
+
+				polar: {
+					// ticklabeloverflow: 'allow',
+					radialaxis: {
+						title: unitLabel,
+						// TODO not clear this helps
+						// Specifies the start and end points of the usage.
+						// range: [minR, maxR],
+						showgrid: true,
+						gridcolor: '#ddd'
+					},
+					angularaxis: {
+						direction: 'clockwise',
+						// TODO why does this not seem to matter?
+						// type: 'date',
+						// TODO not clear this helps
+						// range: [minTheta.format(), maxTheta.format()],
+						showgrid: true,
+						gridcolor: '#ddd',
+						// tickmode: 'auto',
+						// TODO adjust
+						// nticks: 31
+						// TODO does not work
+						// tickformat: '%Y-%m-%d',
+						// tickformat: '%B',
+						nticks: numTicks
+						// tick0: minTheta,
+						// dtick: (maxTheta.diff(minTheta)) / (7 * 86400000)
+						// dtick: (maxTheta.diff(minTheta)) / (numTicks * 86400000.0)
+						// tick0: datasets[0].theta[0],
+						// tick0: '2020-05-15',
+						// dtick: 86400000.0
+						// dtick: 4000000.0
+						// tickvals: tickVals,
+						// ticktext: tickTexts,
+						// tickmode: 'array'
+					}
+				},
+				margin: {
+					t: 10,
+					b: -20
+				}
+			};
+		}
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
