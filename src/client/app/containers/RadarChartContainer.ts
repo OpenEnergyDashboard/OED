@@ -18,16 +18,6 @@ function mapStateToProps(state: State) {
 	const timeInterval = state.graph.timeInterval;
 	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
-	//For largest and smallest usage in reading.reading for meters and groups
-	let minR = Number.MAX_VALUE;
-	let maxR = Number.MIN_VALUE;
-	// Similar but for dates or theta values.
-	let minTheta = moment('3000-12-31');
-	let maxTheta = moment(0);
-	// relabel each theta axis to be more user friendly
-	const tickVal: number[] = [];
-	const tickTex: string[] = [];
-	let tickPosition = 0;
 	// The unit label depends on the unit which is in selectUnit state.
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
@@ -80,23 +70,11 @@ function mapStateToProps(state: State) {
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						// Readings are sorted but compare each one because still moment with correct middle value since easier.
-						// Could do outside loop to speed up.
-						minTheta = moment.min(minTheta, timeReading);
-						maxTheta = moment.max(maxTheta, timeReading);
 						thetaData.push(timeReading.format('ddd, ll LTS'));
-						// Label each theta axis
-						tickTex.push(timeReading.format('ll'));
-						tickVal.push(tickPosition);
-						tickPosition += 1;
 						const readingValue = reading.reading * scaling;
 						rData.push(readingValue);
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
-
-					//Find the largest and smallest usage in rData for meters.
-					minR = Math.min(...rData, minR);
-					maxR = Math.max(...rData, maxR);
 
 					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
@@ -151,23 +129,12 @@ function mapStateToProps(state: State) {
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						// Readings are sorted but compare each one because still moment with correct middle value since easier.
-						// Could do outside loop to speed up.
-						minTheta = moment.min(minTheta, timeReading);
-						maxTheta = moment.max(maxTheta, timeReading);
 						thetaData.push(timeReading.format('ddd, ll LTS'));
-						// Label each theta axis
-						tickTex.push(timeReading.format('ll'));
-						tickVal.push(tickPosition);
-						tickPosition += 1;
 						const readingValue = reading.reading * scaling;
 						rData.push(readingValue);
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
 
-					//Find the largest and smallest usage in rData for groups including previous meter min/max.
-					minR = Math.min(...rData, minR);
-					maxR = Math.max(...rData, maxR);
 					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
 						name: label,
@@ -260,13 +227,9 @@ function mapStateToProps(state: State) {
 			}
 		} else {
 			// Data available and okay so plot.
-			// TODO the theta labels at the bottom of the radar chart get cut off.
-			const maxTicks = 12; // Maximum number of ticks, represent 12 months
-			const numDataPoints = tickTex.length;
-
-			let tickVals;
-			let tickTexts;
-			let numTicks = maxTicks;
+			// Maximum number of ticks, represent 12 months. Too many is cluttered so this seems good value.
+			// Plotly shows less if only a few points.
+			const maxTicks = 12;
 			layout = {
 				autosize: true,
 				showlegend: true,
@@ -278,40 +241,18 @@ function mapStateToProps(state: State) {
 				},
 
 				polar: {
-					// ticklabeloverflow: 'allow',
 					radialaxis: {
 						title: unitLabel,
-						// TODO not clear this helps
-						// Specifies the start and end points of the usage.
-						// range: [minR, maxR],
 						showgrid: true,
 						gridcolor: '#ddd'
 					},
 					angularaxis: {
+						// TODO Attempts to format the dates to remove the time did not work with plotly
+						// choosing the tick values which is desirable.
 						direction: 'clockwise',
-						// TODO why does this not seem to matter?
-						// type: 'date',
-						// TODO not clear this helps
-						// range: [minTheta.format(), maxTheta.format()],
 						showgrid: true,
 						gridcolor: '#ddd',
-						// tickmode: 'auto',
-						// TODO adjust
-						// nticks: 31
-						// TODO does not work
-						// tickformat: '%Y-%m-%d',
-						// tickformat: '%B',
-						nticks: numTicks
-						// tick0: minTheta,
-						// dtick: (maxTheta.diff(minTheta)) / (7 * 86400000)
-						// dtick: (maxTheta.diff(minTheta)) / (numTicks * 86400000.0)
-						// tick0: datasets[0].theta[0],
-						// tick0: '2020-05-15',
-						// dtick: 86400000.0
-						// dtick: 4000000.0
-						// tickvals: tickVals,
-						// ticktext: tickTexts,
-						// tickmode: 'array'
+						nticks: maxTicks
 					}
 				},
 				margin: {
