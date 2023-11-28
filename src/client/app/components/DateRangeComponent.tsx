@@ -36,13 +36,14 @@ export default function DateRangeComponent() {
 	const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
 	const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
 
-	// Only Render if a 3D Graphic Type Selected.
+	// Only Render if a radar Graphic Type Selected.
+	// TODO Should include 3D when merged with that.
 	if (chartToRender === ChartTypes.radar)
 		return (
 			<div style={{ width: '100%' }}>
 				<p style={labelStyle}>
 					{translate('date.range')}:
-					<TooltipMarkerComponent page='home' helpTextId={translate('select.dateRange')} />
+					<TooltipMarkerComponent page='home' helpTextId='help.home.select.dateRange' />
 				</p>
 				<DateRangePicker
 					value={dateRange}
