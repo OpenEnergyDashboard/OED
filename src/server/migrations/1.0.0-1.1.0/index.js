@@ -12,5 +12,6 @@ module.exports = {
         await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/readings/create_reading_views.sql'));
         await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/meter/add_meter_pipeline_checks.sql'));
         await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/preferences/add_preferences_pipeline_checks.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-1.1.0/sql/preferences/add_graph_type.sql'));
     }
 };
