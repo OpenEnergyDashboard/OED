@@ -156,10 +156,20 @@ function mapStateToProps(state: State) {
 	}
 
 	let layout: any;
-	// Customize the layout of the plot
-	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+	// See if any meters/groups have readings
+	let numReadings = 0;
+	for (let i = 0; i < datasets.length; i++) {
+		// In case the data is not yet available.
+		if (datasets[i] && datasets[i].r) {
+			numReadings += datasets[i].r.length;
+		}
+	}
+
+	// TODO See 3D code for functions that can be used for this.
 	if (datasets.length === 0) {
-		// There is no data so tell user.
+		// Customize the layout of the plot
+		// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+		// There are no meters so tell user.
 		layout = {
 			'xaxis': {
 				'visible': false
@@ -170,6 +180,31 @@ function mapStateToProps(state: State) {
 			'annotations': [
 				{
 					'text': `${translate('select.meter.group')}`,
+					'xref': 'paper',
+					'yref': 'paper',
+					'showarrow': false,
+					'font': {
+						'size': 28
+					}
+				}
+			]
+		}
+	} else if (numReadings === 0) {
+		// Customize the layout of the plot
+		// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+		// There is no data so tell user - likely due to date range outside where readings.
+		// Remove plotting data even though none there is an empty r & theta that ives empty graphic.
+		datasets.splice(0, datasets.length);
+		layout = {
+			'xaxis': {
+				'visible': false
+			},
+			'yaxis': {
+				'visible': false
+			},
+			'annotations': [
+				{
+					'text': `${translate('radar.no.data')}`,
 					'xref': 'paper',
 					'yref': 'paper',
 					'showarrow': false,
