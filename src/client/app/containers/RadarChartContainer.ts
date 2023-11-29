@@ -57,15 +57,15 @@ function mapStateToProps(state: State) {
 					if (readingsData.readings === undefined) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
-
-					// Create two arrays for the x and y values. Fill the array with the data from the line readings
+					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
+					// HoverText is the popup value show for each reading.
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
-					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
+					// The scaling is the factor to change the reading by. It divides by the area which will be 1 if no scaling by area.
 					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
@@ -76,7 +76,7 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
 
-					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
+					// This variable contains all the elements (plot values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
 						name: label,
 						theta: thetaData,
@@ -96,7 +96,6 @@ function mapStateToProps(state: State) {
 		}
 	}
 
-	// TODO Add groups for radar chart.
 	// Add all valid data from existing groups to the radar plot
 	for (const groupID of state.graph.selectedGroups) {
 		const byGroupID = state.readings.line.byGroupID[groupID];
@@ -116,15 +115,15 @@ function mapStateToProps(state: State) {
 					if (readingsData.readings === undefined) {
 						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					}
-
-					// Create two arrays for the x and y values. Fill the array with the data from the line readings
+					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
+					// HoverText is the popup value show for each reading.
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
-					// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
+					// The scaling is the factor to change the reading by. It divides by the area which will be 1 if no scaling by area.
 					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
+						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
@@ -135,7 +134,7 @@ function mapStateToProps(state: State) {
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
 					});
 
-					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
+					// This variable contains all the elements (plot values, line type, etc.) assigned to the data parameter of the Plotly object
 					datasets.push({
 						name: label,
 						theta: thetaData,
@@ -156,20 +155,11 @@ function mapStateToProps(state: State) {
 	}
 
 	let layout: any;
-	// See if any meters/groups have readings
-	let numReadings = 0;
-	for (let i = 0; i < datasets.length; i++) {
-		// In case the data is not yet available.
-		if (datasets[i] && datasets[i].r) {
-			numReadings += datasets[i].r.length;
-		}
-	}
-
-	// TODO See 3D code for functions that can be used for this.
+	// TODO See 3D code for functions that can be used for layout and notices.
 	if (datasets.length === 0) {
+		// There are no meters so tell user.
 		// Customize the layout of the plot
 		// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-		// There are no meters so tell user.
 		layout = {
 			'xaxis': {
 				'visible': false
@@ -189,58 +179,22 @@ function mapStateToProps(state: State) {
 				}
 			]
 		}
-	} else if (numReadings === 0) {
-		// Customize the layout of the plot
-		// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-		// There is no data so tell user - likely due to date range outside where readings.
-		// Remove plotting data even though none there is an empty r & theta that ives empty graphic.
-		datasets.splice(0, datasets.length);
-		layout = {
-			'xaxis': {
-				'visible': false
-			},
-			'yaxis': {
-				'visible': false
-			},
-			'annotations': [
-				{
-					'text': `${translate('radar.no.data')}`,
-					'xref': 'paper',
-					'yref': 'paper',
-					'showarrow': false,
-					'font': {
-						'size': 28
-					}
-				}
-			]
-		}
 	} else {
-		// Check if all the values for the dates are compatible. Plotly does not like having different dates in different
-		// scatterpolar lines. Lots of attempts to get this to work failed so not going to allow since not that common.
-		// First find the line with the most points. If same, use the first one found with that number of points.
-		let maxLinePoints = Number.MIN_VALUE;
-		let index = -1;
-		for (let i = 0; i < datasets.length; i++) {
-			if (datasets[i].theta.length > maxLinePoints) {
-				maxLinePoints = datasets[i].theta.length;
-				index = i;
-			}
-		}
-		// Second, compare the dates (theta) for line with the max point to see if it has all the points in all other lines.
-		let ok = true;
-		for (let i = 0; i < datasets.length; i++) {
-			// Don't compare to self
-			if (i !== index) {
-				// Current line to consider.
-				const currentLine: string[] = datasets[i].theta;
-				// See if all points in current line are in max length line. && means get false if any false.
-				ok = ok && currentLine.every(v => datasets[index].theta.includes(v));
-			}
-		}
-		if (!ok) {
-			// Remove plotting data.
+		// Plotly scatterpolar plots have the unfortunate attribute that if a smaller number of plotting
+		// points is done first then that impacts the labeling of the polar coordinate where you can get
+		// duplicated labels and the points on the separate lines are separated. It is unclear if this is
+		// intentional or a bug that will go away. To deal with this, the lines are ordered by size.
+		// Descending (reverse) sort datasets by size of readings. Use r but theta should be the same.
+		datasets.sort((a, b) => {
+			return b.r.length - a.r.length;
+		});
+		if (datasets[0].r.length === 0) {
+			// The longest line (first one) has no data so there is not data in any of the lines.
+			// Customize the layout of the plot
+			// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
+			// There is no data so tell user - likely due to date range outside where readings.
+			// Remove plotting data even though none there is an empty r & theta that gives empty graphic.
 			datasets.splice(0, datasets.length);
-			// The lines are not compatible so tell user.
 			layout = {
 				'xaxis': {
 					'visible': false
@@ -250,7 +204,7 @@ function mapStateToProps(state: State) {
 				},
 				'annotations': [
 					{
-						'text': `${translate('radar.lines.incompatible')}`,
+						'text': `${translate('radar.no.data')}`,
 						'xref': 'paper',
 						'yref': 'paper',
 						'showarrow': false,
@@ -261,40 +215,75 @@ function mapStateToProps(state: State) {
 				]
 			}
 		} else {
-			// Data available and okay so plot.
-			// Maximum number of ticks, represent 12 months. Too many is cluttered so this seems good value.
-			// Plotly shows less if only a few points.
-			const maxTicks = 12;
-			layout = {
-				autosize: true,
-				showlegend: true,
-				height: 800,
-				legend: {
-					x: 0,
-					y: 1.1,
-					orientation: 'h'
-				},
-
-				polar: {
-					radialaxis: {
-						title: unitLabel,
-						showgrid: true,
-						gridcolor: '#ddd'
+			// Check if all the values for the dates are compatible. Plotly does not like having different dates in different
+			// scatterpolar lines. Lots of attempts to get this to work failed so not going to allow since not that common.
+			// Compare the dates (theta) for line with the max points (index 0) to see if it has all the points in all other lines.
+			let ok = true;
+			for (let i = 1; i < datasets.length; i++) {
+				// Current line to consider.
+				const currentLine: string[] = datasets[i].theta;
+				// See if all points in current line are in max length line. && means get false if any false.
+				ok = ok && currentLine.every(v => datasets[0].theta.includes(v));
+			}
+			if (!ok) {
+				// Not all points align on all lines so inform user.
+				// Remove plotting data.
+				datasets.splice(0, datasets.length);
+				// The lines are not compatible so tell user.
+				layout = {
+					'xaxis': {
+						'visible': false
 					},
-					angularaxis: {
-						// TODO Attempts to format the dates to remove the time did not work with plotly
-						// choosing the tick values which is desirable.
-						direction: 'clockwise',
-						showgrid: true,
-						gridcolor: '#ddd',
-						nticks: maxTicks
-					}
-				},
-				margin: {
-					t: 10,
-					b: -20
+					'yaxis': {
+						'visible': false
+					},
+					'annotations': [
+						{
+							'text': `${translate('radar.lines.incompatible')}`,
+							'xref': 'paper',
+							'yref': 'paper',
+							'showarrow': false,
+							'font': {
+								'size': 28
+							}
+						}
+					]
 				}
-			};
+			} else {
+				// Data available and okay so plot.
+				// Maximum number of ticks, represents 12 months. Too many is cluttered so this seems good value.
+				// Plotly shows less if only a few points.
+				const maxTicks = 12;
+				layout = {
+					autosize: true,
+					showlegend: true,
+					height: 800,
+					legend: {
+						x: 0,
+						y: 1.1,
+						orientation: 'h'
+					},
+					polar: {
+						radialaxis: {
+							title: unitLabel,
+							showgrid: true,
+							gridcolor: '#ddd'
+						},
+						angularaxis: {
+							// TODO Attempts to format the dates to remove the time did not work with plotly
+							// choosing the tick values which is desirable. Also want time if limited time range.
+							direction: 'clockwise',
+							showgrid: true,
+							gridcolor: '#ddd',
+							nticks: maxTicks
+						}
+					},
+					margin: {
+						t: 10,
+						b: -20
+					}
+				};
+			}
 		}
 	}
 
