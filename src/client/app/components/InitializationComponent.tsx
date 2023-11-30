@@ -47,7 +47,6 @@ export default function InitializationComponent() {
 
 	return (
 		<div>
-			{/* <NotificationSystem ref={(c: NotificationSystem) => { notificationSystem = c; }} /> */}
 			<ToastContainer transition={Slide} />
 		</div>
 	);
