@@ -7,7 +7,8 @@
 import * as _ from 'lodash';
 import ApiBackend from './ApiBackend';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { BarReadings, LineReading, LineReadings} from '../../types/readings';
+import { BarReadings, LineReading, LineReadings, ThreeDReading } from '../../types/readings';
+import { ReadingInterval } from 'types/redux/graph';
 
 export default class ReadingsApi {
 	private readonly backend: ApiBackend;
@@ -124,4 +125,35 @@ export default class ReadingsApi {
 		return readings;
 	}
 
+	/**
+	 * Gets 3D readings for a single meter in the given time range.
+	 * @param meterID Meter to query
+	 * @param timeInterval Range of time to get readings from
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingInterval Determines the reading intervals for 3d graphs, 1hour, two hour, etc.
+	 * @returns ThreeDReadings in sorted order
+	 */
+	public async meterThreeDReadings(meterID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
+		: Promise<ThreeDReading> {
+		return await this.backend.doGetRequest<ThreeDReading>(
+			`/api/unitReadings/threeD/meters/${meterID}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), readingInterval: readingInterval.toString() }
+		);
+	}
+
+	/**
+	 * Gets 3D readings for a single group in the given time range.
+	 * @param groupID groupID to query
+	 * @param timeInterval Range of time to get readings from
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param readingInterval Determines the reading intervals for 3d graphs, 1hour, two hour, etc.
+	 * @returns ThreeDReadings in sorted order
+	 */
+	public async groupThreeDReadings(groupID: number, timeInterval: TimeInterval, unitID: number, readingInterval: ReadingInterval)
+		: Promise<ThreeDReading> {
+		return await this.backend.doGetRequest<ThreeDReading>(
+			`/api/unitReadings/threeD/groups/${groupID}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), readingInterval: readingInterval.toString() }
+		);
+	}
 }

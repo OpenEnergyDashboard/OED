@@ -7,7 +7,7 @@
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
@@ -81,6 +81,17 @@ mocha.describe('readings API', () => {
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
                     const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
                         .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:15:00'), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected);
+                });
+                // 14 days barely gives raw points & middle readings
+                mocha.it('L6: 14 days barely gives raw points & middle readings', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected);
                 });
 

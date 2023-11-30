@@ -23,7 +23,7 @@ mocha.describe('readings API', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('basic for meters', () => {
                  // A reading response should have a reading, startTimestamp, and endTimestamp key
-                mocha.it('response should have valid reading and timestamps,', async () => {
+                mocha.it('response should have valid reading and timestamps', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.

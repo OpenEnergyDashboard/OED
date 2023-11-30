@@ -108,6 +108,8 @@ async function createSchema(conn) {
 	await LogEmail.createTable(conn);
 	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
+	// For 3D reading
+	await Reading.create3DReadingsFunction(conn); 
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));

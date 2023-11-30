@@ -22,7 +22,7 @@ mocha.describe('readings API', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('basic for groups', () => {
                 // A reading response should have a reading, startTimestamp, and endTimestamp key
-                mocha.it('response should have valid reading and timestamps,', async () => {
+                mocha.it('response should have valid reading and timestamps', async () => {
                     // Create 2D array for meter to feed into the database
                     // Note the meter ID is set so we know what to expect when a query is made.
                     const meterData = [
@@ -51,7 +51,18 @@ mocha.describe('readings API', () => {
                             id: (METER_ID + 1)
                         }
                     ];
-                    const groupData = [['Electric Utility 1-5 + 2-6 kWh', 'kWh', true, undefined, 'special group', ['Electric Utility kWh', 'Electric Utility kWh 2-6'], [], GROUP_ID]];
+                    const groupData = [
+                        {
+                            name: 'Electric Utility 1-5 + 2-6 kWh',
+                            defaultGraphicUnit: 'kWh',
+                            displayable: true,
+                            note: 'special group',
+                            areaUnit: 'meters',
+                            childMeters: ['Electric Utility kWh', 'Electric Utility kWh 2-6'],
+                            childGroups: [],
+                            id: GROUP_ID
+                        }
+                    ];
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterData, groupData);
                     // Get the unit ID since the DB could use any value.

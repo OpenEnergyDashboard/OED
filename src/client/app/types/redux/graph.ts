@@ -13,7 +13,8 @@ export enum ChartTypes {
 	bar = 'bar',
 	compare = 'compare',
 	map = 'map',
-	radar = 'radar'
+	radar = 'radar',
+	threeD = '3D'
 }
 
 export enum MeterOrGroup {
@@ -27,6 +28,21 @@ export const LineGraphRates = {
 	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
+}
+
+// Use to determine readings per day on 3D Graphs
+// 24 / ReadingInterval.Hourly(1) = 24 readings per day @ 1 hour intervals
+// 24 / ReadingInterval.TwoHour(2) = 12 readings per day @ 2 hour intervals
+// and so on.
+export enum ReadingInterval {
+	Hourly = 1,
+	TwoHour = 2,
+	ThreeHour = 3,
+	FourHour = 4,
+	SixHour = 6,
+	EightHour = 8,
+	TwelveHour = 12,
+	Incompatible = -999
 }
 
 export interface UpdateSelectedMetersAction {
@@ -114,6 +130,17 @@ export interface ConfirmGraphRenderOnce {
 	type: ActionType.ConfirmGraphRenderOnce;
 }
 
+export interface UpdateThreeDReadingInterval {
+	type: ActionType.UpdateThreeDReadingInterval;
+	readingInterval: ReadingInterval;
+}
+
+export interface UpdateThreeDMeterOrGroupInfo {
+	type: ActionType.UpdateThreeDMeterOrGroupInfo;
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
+}
+
 export type GraphAction =
 	| ChangeGraphZoomAction
 	| ChangeSliderRangeAction
@@ -132,11 +159,24 @@ export type GraphAction =
 	| ChangeCompareSortingOrderAction
 	| ToggleOptionsVisibility
 	| UpdateLineGraphRate
-	| ConfirmGraphRenderOnce;
+	| ConfirmGraphRenderOnce
+	| UpdateThreeDReadingInterval
+	| UpdateThreeDMeterOrGroupInfo;
 
 export interface LineGraphRate {
 	label: string,
 	rate: number
+}
+
+export type MeterOrGroupID = number | null;
+export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
+export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
+export type MeterOrGroupPill = {meterOrGroupID: number, isDisabled: boolean, meterOrGroup: MeterOrGroup}
+
+export interface ThreeDState {
+	meterOrGroupID: MeterOrGroupID;
+	meterOrGroup: MeterOrGroup;
+	readingInterval: ReadingInterval;
 }
 
 export interface GraphState {
@@ -158,4 +198,5 @@ export interface GraphState {
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
 	showMinMax: boolean;
+	threeD: ThreeDState;
 }

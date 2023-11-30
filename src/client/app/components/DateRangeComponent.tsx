@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import { CloseReason, Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import 'react-calendar/dist/Calendar.css';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
-import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/DateRangeCompatibility';
+import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import translate from '../utils/translate';
 import { State } from '../types/redux/state';
@@ -36,9 +36,8 @@ export default function DateRangeComponent() {
 	const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
 	const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
 
-	// Only Render if a radar Graphic Type Selected.
-	// TODO Should include 3D when merged with that.
-	if (chartToRender === ChartTypes.radar)
+	// Only Render if a radar or 3D Graphic Type Selected.
+	if (chartToRender === ChartTypes.radar || chartToRender === ChartTypes.threeD)
 		return (
 			<div style={{ width: '100%' }}>
 				<p style={labelStyle}>
@@ -61,6 +60,5 @@ export default function DateRangeComponent() {
 	else
 		return null;
 }
-
 
 const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };

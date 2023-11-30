@@ -10,7 +10,7 @@ import { defineMessages, FormattedMessage, useIntl } from 'react-intl';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { DataType } from '../types/Datasources';
 import {
 	CartesianPoint, Dimensions, normalizeImageDimensions, calculateScaleFromEndpoints,
@@ -18,7 +18,7 @@ import {
 } from '../utils/calibration';
 import {
 	changeSelectedGroups, changeSelectedMeters, changeSelectedUnit, updateSelectedMeters,
-	updateSelectedGroups, updateSelectedUnit
+	updateSelectedGroups, updateSelectedUnit, changeMeterOrGroupInfo
 } from '../actions/graph';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../types/redux/units'
 import { metersInGroup, unitsCompatibleWithMeters } from '../utils/determineCompatibleUnits';
@@ -85,6 +85,7 @@ export default function ChartDataSelectComponent() {
 		// ony run this check if we are displaying a map chart
 		const chartToRender = state.graph.chartToRender;
 		const selectedMap = state.maps.selectedMap;
+		const threeDState = state.graph.threeD;
 		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
 			const mp = state.maps.byMapID[selectedMap];
 			// filter meters;
@@ -281,7 +282,11 @@ export default function ChartDataSelectComponent() {
 			allSelectedMeters,
 			allSelectedGroups,
 			// currently selected unit
-			selectedUnit
+			selectedUnit,
+			// chart currently being rendered
+			chartToRender,
+			// current state of threeD
+			threeDState
 		}
 	});
 
@@ -312,6 +317,9 @@ export default function ChartDataSelectComponent() {
 								allSelectedGroupIDs.splice(allSelectedGroupIDs.indexOf(difference), 1);
 							}
 							dispatch(changeSelectedGroups(allSelectedGroupIDs));
+
+							// Do additional things relevant to 3D graphics
+							syncThreeDState(dataProps, allSelectedGroupIDs, oldSelectedGroupIDs, difference, MeterOrGroup.groups, dispatch);
 						}
 					}}
 				/>
@@ -346,6 +354,10 @@ export default function ChartDataSelectComponent() {
 								allSelectedMeterIDs.splice(allSelectedMeterIDs.indexOf(difference), 1);
 							}
 							dispatch(changeSelectedMeters(allSelectedMeterIDs));
+
+							// Do additional things relevant to 3D graphics
+							syncThreeDState(dataProps, allSelectedMeterIDs, oldSelectedMeterIDs, difference, MeterOrGroup.meters, dispatch);
+
 						}
 					}}
 				/>
@@ -370,6 +382,8 @@ export default function ChartDataSelectComponent() {
 							dispatch(updateSelectedGroups([]));
 							dispatch(updateSelectedMeters([]));
 							dispatch(updateSelectedUnit(-99));
+							// Sync threeD state.
+							dispatch(changeMeterOrGroupInfo(null));
 						}
 						else if (newSelectedUnitOptions.length === 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[0].value)); }
 						else if (newSelectedUnitOptions.length > 1) { dispatch(changeSelectedUnit(newSelectedUnitOptions[1].value)); }
@@ -692,15 +706,52 @@ export function getSelectOptionsByItem(compatibleItems: Set<number>, incompatibl
  * @returns Whether or not this is a UnitsState
  */
 function instanceOfUnitsState(state: any): state is UnitsState { return 'units' in state; }
+
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a MetersState
  */
 function instanceOfMetersState(state: any): state is MetersState { return 'byMeterID' in state; }
+
 /**
  * Helper function to determine what type of state was passed in
  * @param state The state to check
  * @returns Whether or not this is a GroupsState
  */
 function instanceOfGroupsState(state: any): state is GroupsState { return 'byGroupID' in state; }
+
+/**
+ * 3D helper function used to keep 3D redux state in sync with dropdown menus
+ * @param dataProps used to extract relevant useSelect state values
+ * @param allSelected all selected meters
+ * @param oldSelected previously selected meters
+ * @param difference integer value that represents the removed meter Or Group
+ * @param meterOrGroup used to set whether a meter or group is currently active.
+ * @param dispatch instance of the dispatch for altering redux state.
+ */
+function syncThreeDState(
+	dataProps: any,
+	allSelected: number[],
+	oldSelected: number[],
+	difference: number,
+	meterOrGroup: MeterOrGroup,
+	dispatch: Dispatch): void {
+
+	// checks to see if meter has been removed
+	const meterOrGroupAdded = allSelected.length > oldSelected.length;
+	const meterOrGroupRemoved = !meterOrGroupAdded;
+
+	//Check to see if potentially removed meterOrGroup is currently active.
+	const meterOrGroupIsSelected = difference === dataProps.threeDState.meterOrGroupID;
+
+	if (meterOrGroupAdded && dataProps.chartToRender === ChartTypes.threeD) {
+		// when a meter or group is selected, make it the currently active in 3D state.
+		// only tracks when on 3d page.
+		const addedMeterOrGroup = allSelected[allSelected.length - 1];
+		dispatch(changeMeterOrGroupInfo(addedMeterOrGroup, meterOrGroup));
+	} else if (meterOrGroupRemoved && meterOrGroupIsSelected) {
+		// reset currently active threeD Meter or group when it is removed and is currently active.
+		dispatch(changeMeterOrGroupInfo(null));
+	}
+}
