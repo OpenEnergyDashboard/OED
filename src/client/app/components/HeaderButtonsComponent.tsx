@@ -18,7 +18,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navbar, Nav, NavLink, UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import { toggleOptionsVisibility } from '../actions/graph';
-import { BASE_URL } from './TooltipHelpComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import TooltipHelpContainer from '../containers/TooltipHelpContainer';
 
@@ -34,6 +33,7 @@ export default function HeaderButtonsComponent() {
 
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
+	const BASE_URL = useSelector((state: State) => state.admin.defaultHelpUrl);
 	// Help URL location
 	let helpUrl = BASE_URL + version;
 	// options help

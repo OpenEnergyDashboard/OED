@@ -7,32 +7,32 @@ import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import '../styles/tooltip.css';
 import translate from '../utils/translate';
-
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
 	version: string;
+	BASE_URL: string;
 	fetchVersionIfNeeded(): Promise<any>;
 }
 
 // Normal/live URL for OED help pages
 // Exported to HeaderButtonsComponent and LanguageSelectorComponent
-export const BASE_URL = 'https://openenergydashboard.github.io/help/'
 
 export default class TooltipHelpComponent extends React.Component<TooltipHelpProps> {
 	constructor(props: TooltipHelpProps) {
 		super(props);
 		this.props.fetchVersionIfNeeded();
 	}
-
 	/**
 	 * @returns JSX to create the help icons with links
 	 */
+
 	public render() {
 		const divStyle = {
 			display: 'inline-block'
 		};
 
 		const version = this.props.version
+		const BASE_URL = this.props.BASE_URL
 
 		const HELP_URL = BASE_URL + version;
 
