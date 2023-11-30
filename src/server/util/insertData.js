@@ -456,9 +456,11 @@ async function insertGroups(groupsToInsert, conn) {
 	// Check that needed keys are there.
 	const requiredKeys = ['name', 'displayable', 'childMeters', 'childGroups'];
 	// We don't use Promise.all since one group may include another group.
+	// Loop over the array of groups provided.
 	for (let i = 0; i < groupsToInsert.length; ++i) {
 		// Group currently working on
 		const groupData = groupsToInsert[i];
+		// Check that all required keys are present for this group.
 		let ok = true;
 		requiredKeys.forEach(key => {
 			if (!groupData.hasOwnProperty(key)) {
@@ -471,10 +473,11 @@ async function insertGroups(groupsToInsert, conn) {
 			// Group values from above.
 			const groupName = groupData.name;
 			console.log(`            creating group ${groupName}`);
-			// We get the needed unit id from the name given.
+			// We get the needed unit id from the name given of the default graphic unit.
 			let groupDefaultGraphicUnit;
 			if (groupData.hasOwnProperty('defaultGraphicUnit')) {
-				// Find the unit id for this unit name.
+				// This group provided a default graphic unit name so use to get the existing unit id.
+				// This simply fails if the name does not exist since this is special code and not for users.
 				groupDefaultGraphicUnit = (await Unit.getByName(groupData.defaultGraphicUnit, conn)).id;
 			} else {
 				// No unit so make it -99, i.e., no unit.
