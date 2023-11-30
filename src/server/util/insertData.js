@@ -454,15 +454,17 @@ async function insertMeters(metersToInsert, conn) {
  */
 async function insertGroups(groupsToInsert, conn) {
 	// Check that needed keys are there.
-	const requiredKeys = ['name', 'childMeters', 'childGroups'];
+	const requiredKeys = ['name', 'displayable', 'childMeters', 'childGroups'];
 	// We don't use Promise.all since one group may include another group.
+	// Loop over the array of groups provided.
 	for (let i = 0; i < groupsToInsert.length; ++i) {
 		// Group currently working on
 		const groupData = groupsToInsert[i];
+		// Check that all required keys are present for this group.
 		let ok = true;
 		requiredKeys.forEach(key => {
 			if (!groupData.hasOwnProperty(key)) {
-				console.log(`********key "${key}" is required but missing so group number ${index} not processed with values:`, groupData);
+				console.log(`********key "${key}" is required but missing so group number ${i} not processed with values:`, groupData);
 				// Don't insert
 				ok = false;
 			}
@@ -471,15 +473,20 @@ async function insertGroups(groupsToInsert, conn) {
 			// Group values from above.
 			const groupName = groupData.name;
 			console.log(`            creating group ${groupName}`);
-			// displayable is false by default.*********************
-			 const groupDisplayable = groupData.displayable ? groupData.displayable : false;
-			// Get the unit by name if provided or -99 if not
-			let groupDefaultGraphicUnit = groupData.hasOwnProperty('defaultGraphicUnit') ?
-				(await Unit.getByName(groupData.defaultGraphicUnit, conn)).id :-99;
+			// We get the needed unit id from the name given of the default graphic unit.
+			let groupDefaultGraphicUnit;
+			if (groupData.hasOwnProperty('defaultGraphicUnit')) {
+				// This group provided a default graphic unit name so use to get the existing unit id.
+				// This simply fails if the name does not exist since this is special code and not for users.
+				groupDefaultGraphicUnit = (await Unit.getByName(groupData.defaultGraphicUnit, conn)).id;
+			} else {
+				// No unit so make it -99, i.e., no unit.
+				groupDefaultGraphicUnit = -99;
+			}
 			const group = new Group(
 				undefined, // id
 				groupName,
-				groupDisplayable,
+				groupData.displayable,
 				groupData.gps,
 				groupData.note,
 				groupData.area,

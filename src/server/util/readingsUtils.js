@@ -231,6 +231,7 @@ const groupDatakWh = [
     {
         id: GROUP_ID,
         name: 'Electric Utility kWh + Other',
+        displayable: true,
         note: 'special group',
         defaultGraphicUnit: 'kWh',
         childMeters: ['Electric Utility kWh', 'Electric Utility Other'],

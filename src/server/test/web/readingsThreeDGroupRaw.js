@@ -89,6 +89,7 @@ mocha.describe('readings API', () => {
                         {
                             id: GROUP_ID,
                             name: 'Temperature both',
+                            displayable: true,
                             note: 'special group',
                             defaultGraphicUnit: 'C',
                             childMeters: ['Temperature C', 'Temperature C Other'],

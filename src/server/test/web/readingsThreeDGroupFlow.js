@@ -89,6 +89,7 @@ mocha.describe('readings API', () => {
                         {
                             id: GROUP_ID,
                             name: 'Electric both',
+                            displayable: true,
                             note: 'special group',
                             defaultGraphicUnit: 'kW',
                             childMeters: ['Electric kW', 'Electric kW Other'],

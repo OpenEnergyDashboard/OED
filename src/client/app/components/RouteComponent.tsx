@@ -32,7 +32,7 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
-import * as queryString from 'query-string';
+import queryString from 'query-string';
 import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
