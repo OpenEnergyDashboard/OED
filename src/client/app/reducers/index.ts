@@ -7,6 +7,7 @@ import meters from './meters';
 import lineReadings from './lineReadings';
 import barReadings from './barReadings';
 import compareReadings from './compareReadings';
+import threeDReadings from './threeDReadings';
 import graph from './graph';
 import groups from './groups';
 import maps from './maps';
@@ -24,7 +25,8 @@ export default combineReducers({
 	readings: combineReducers({
 		line: lineReadings,
 		bar: barReadings,
-		compare: compareReadings
+		compare: compareReadings,
+		threeD: threeDReadings
 	}),
 	graph,
 	maps,

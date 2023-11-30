@@ -22,7 +22,7 @@ mocha.describe('readings API', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('basic for groups', () => {
                 // A reading response should have a reading, startTimestamp, and endTimestamp key
-                mocha.it('response should have valid reading and timestamps,', async () => {
+                mocha.it('response should have valid reading and timestamps', async () => {
                     // Create 2D array for meter to feed into the database
                     // Note the meter ID is set so we know what to expect when a query is made.
                     const meterData = [
