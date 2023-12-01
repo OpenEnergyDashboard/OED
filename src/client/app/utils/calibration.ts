@@ -5,7 +5,6 @@
 import { MapMetadata } from '../types/redux/map';
 import { logToServer } from '../actions/logs';
 import { DataType } from '../types/Datasources';
-import { showErrorNotification } from './notifications';
 import translate from './translate';
 import { notifyUser } from './input';
 
