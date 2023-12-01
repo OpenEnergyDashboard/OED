@@ -5,7 +5,9 @@
 import { MapMetadata } from '../types/redux/map';
 import { logToServer } from '../actions/logs';
 import { DataType } from '../types/Datasources';
+import { showErrorNotification } from './notifications';
 import translate from './translate';
+import { notifyUser } from './input';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -121,7 +123,7 @@ export function isValidGPSInput(input: string): boolean {
 	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
 		// TODO It would be nice to return the error and then notify as desired.
-		window.alert(translate('input.gps.range') + input);
+		notifyUser(translate('input.gps.range') + input);
 	}
 	return result;
 }

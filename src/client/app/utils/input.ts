@@ -5,6 +5,7 @@
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
 import translate from './translate';
+import { showErrorNotification } from './notifications';
 import * as _ from 'lodash';
 
 // Notifies user of msg.
@@ -16,7 +17,8 @@ import * as _ from 'lodash';
  * @param msg message to display
  */
 export function notifyUser(msg: string) {
-	window.alert(msg);
+	// window.alert(msg);
+	showErrorNotification(msg);
 }
 
 /**

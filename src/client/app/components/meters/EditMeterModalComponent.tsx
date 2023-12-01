@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { showErrorNotification} from '../../utils/notifications';
+import { showErrorNotification } from '../../utils/notifications';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState, useEffect } from 'react';
 import { State } from 'types/redux/state';
@@ -250,18 +250,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			for (const value of Object.values(groups)) {
 				for (let i = 0; i < value.deepMeters.length; i++) {
 					if (value.deepMeters[i] == props.meter.id) {
+						inputOk = false;
 						error_message += translate('group') + value.name + translate('uses') + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
 					}
 				}
 			}
 		}
-		state.unitId = props.meter.unitId;
-		// Display an error message if there are dependent deep meters
-		if (error_message) {
-			error_message = translate('meter.is.not.editable') + '\n' + error_message;
-			showErrorNotification(error_message);
-		}
-
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
@@ -292,6 +286,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					// so leaving code commented out.
 					// notifyUser(translate('input.gps.range') + state.gps + '.');
 					inputOk = false;
+					setState({...state, ['gps']: props.meter.gps});
 				}
 			}
 
@@ -313,7 +308,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// Submit new meter if checks where ok.
 				dispatch(submitEditedMeter(submitState, shouldRefreshReadingViews));
 				dispatch(removeUnsavedChanges());
-			} else {
+			} else if (error_message) {
+				// Display an error message if there are dependent deep meters
+				// state.unitId = props.meter.unitId;
+				setState({...state, ['unitId']: props.meter.unitId});
+				error_message = translate('meter.is.not.editable') + '\n' + error_message;
+				showErrorNotification(error_message);
+			} else{
 				// Tell user that not going to update due to input issues.
 				notifyUser(translate('meter.input.error'));
 			}
