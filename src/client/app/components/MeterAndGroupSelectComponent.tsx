@@ -3,8 +3,13 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import Select, { ActionMeta, MultiValue, StylesConfig } from 'react-select';
+import Select, {
+	ActionMeta, MultiValue,
+	MultiValueGenericProps, MultiValueProps,
+	StylesConfig, components
+} from 'react-select';
 import makeAnimated from 'react-select/animated';
+import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { graphSlice } from '../reducers/graph';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
@@ -22,12 +27,12 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
-	const { meterGroupedOptions, groupsGroupedOptions, selectedMeterOptions, selectedGroupOptions } = useAppSelector(selectMeterGroupSelectData);
+	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
 	const somethingIsFetching = useAppSelector(selectAnythingLoading)
 	const { meterOrGroup } = props;
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
 
-	const value = meterOrGroup === MeterOrGroup.meters ? selectedMeterOptions.compatible : selectedGroupOptions.compatible;
+	const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
 	// Set the current component's appropriate meter or group SelectOption
 	const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
@@ -73,21 +78,42 @@ const formatGroupLabel = (data: GroupedOption) => {
 			<span>{data.label}</span>
 			<Badge pill color="primary">{data.options.length}</Badge>
 		</div >
-
 	)
 }
 
 interface MeterAndGroupSelectProps {
 	meterOrGroup: MeterOrGroup;
 }
-const divBottomPadding: React.CSSProperties = {
-	paddingBottom: '15px'
-};
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
-const animatedComponents = makeAnimated();
+
+const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, GroupedOption>) => {
+	// Types for makeAnimated are generic, and does not offer completion, so type assert
+	const typedProps = props as MultiValueProps<SelectOption, true, GroupedOption>
+	const ref = React.useRef<HTMLDivElement | null>(null);
+	// TODO would be nice if relevant message was derived from uiSelectors, which currently only tracks / trims non-compatible ids
+	// TODO Add meta data along chain? i.e. disabled due to chart type, area norm... etc. and display relevant message.
+	return typedProps.data.isDisabled ?
+		// TODO Verify behavior, and set proper message/ translate
+		< div ref={ref} data-for={'home'} data-tip={'help.home.area.normalize'}
+			onMouseDown={e => e.stopPropagation()}
+			onClick={e => {
+				ReactTooltip.rebuild()
+				e.stopPropagation()
+				ref.current && ReactTooltip.show(ref.current)
+			}}
+			style={{ overflow: 'hidden' }}
+		>
+			<components.MultiValueLabel {...props} />
+		</div >
+		:
+		<components.MultiValueLabel {...props} />
+}
+
+const animatedComponents = makeAnimated({
+	...components,
+	MultiValueLabel
+});
+
+
 const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 	valueContainer: base => ({
 		...base,
@@ -99,9 +125,17 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 		'msOverflowStyle': 'none',
 		'scrollbarWidth': 'none'
 	}),
-	multiValue: base => ({
-		...base
+	multiValue: (base, props) => ({
+		...base,
+		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
 	})
 
 };
 
+const divBottomPadding: React.CSSProperties = {
+	paddingBottom: '15px'
+};
+const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};

@@ -150,8 +150,8 @@ export const graphSlice = createSlice({
 			// Destructure payload
 			const { newMetersOrGroups, meta } = action.payload;
 			const cleared = meta.action === 'clear'
-			const valueRemoved = meta.action === 'pop-value' || meta.action === 'remove-value'
-			const valueAdded = meta.action === 'select-option'
+			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue
+			const valueAdded = meta.action === 'select-option' && meta.option
 			let isAMeter = true
 
 			if (cleared) {
@@ -163,8 +163,8 @@ export const graphSlice = createSlice({
 				isAMeter ? current.selectedMeters = [] : current.selectedGroups = []
 
 			}
-			if (valueRemoved && meta.option) {
-				const isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
+			if (valueRemoved) {
+				isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
 				// An entry was deleted.
 				// Update either selected meters or groups
 
@@ -173,9 +173,9 @@ export const graphSlice = createSlice({
 					: current.selectedGroups = newMetersOrGroups
 			}
 
-			if (valueAdded && meta.option) {
-				isAMeter = meta.option.meterOrGroup === MeterOrGroup.meters;
-				const addedMeterOrGroupUnit = meta.option.defaultGraphicUnit;
+			if (valueAdded) {
+				isAMeter = meta.option?.meterOrGroup === MeterOrGroup.meters;
+				const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
 				// An entry was added,
 				// Update either selected meters or groups
 				isAMeter ?
