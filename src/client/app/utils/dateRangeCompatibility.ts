@@ -46,8 +46,6 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 	}
 	if (start && end) {
 		start = moment(toUTC(start));
-		// TODO This was in radar and must decide which to use.
-		// end = moment(toUTC(end)).add(1, 'second');
 		end = moment(toUTC(end));
 		return new TimeInterval(start, end);
 	}
