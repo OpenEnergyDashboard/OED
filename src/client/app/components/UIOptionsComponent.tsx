@@ -89,8 +89,6 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
 				<ThreeDSelectComponent />
-				<DateRangeComponent />
-
 				<AreaUnitSelectComponent />
 				<DateRangeComponent />
 				{/* Controls error bar, specifically for the line chart. */}
