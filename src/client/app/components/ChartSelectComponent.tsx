@@ -45,11 +45,6 @@ export default function ChartSelectComponent() {
 				</DropdownToggle>
 				<DropdownMenu>
 					<DropdownItem
-						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.line })}
-					>
-						<FormattedMessage id='line' />
-					</DropdownItem>
-					<DropdownItem
 						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.bar })}
 					>
 						<FormattedMessage id='bar' />
@@ -58,6 +53,11 @@ export default function ChartSelectComponent() {
 						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.compare })}
 					>
 						<FormattedMessage id='compare' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.line })}
+					>
+						<FormattedMessage id='line' />
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => {
@@ -69,6 +69,11 @@ export default function ChartSelectComponent() {
 						}}
 					>
 						<FormattedMessage id='map' />
+					</DropdownItem>
+					<DropdownItem
+						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.radar })}
+					>
+						<FormattedMessage id='radar' />
 					</DropdownItem>
 					<DropdownItem
 						onClick={() => dispatch({ type: 'CHANGE_CHART_TO_RENDER', chartType: ChartTypes.threeD })}

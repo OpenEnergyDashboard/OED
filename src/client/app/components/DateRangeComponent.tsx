@@ -36,8 +36,8 @@ export default function DateRangeComponent() {
 	const shouldCloseCalendar = (props: { reason: CloseReason }) => { return props.reason === 'select' ? false : true; };
 	const onCalClose = () => { dispatch(changeGraphZoomIfNeeded(dateRangeToTimeInterval(dateRange))) };
 
-	// Only Render if a 3D Graphic Type Selected.
-	if (chartToRender === ChartTypes.threeD)
+	// Only Render if a radar or 3D Graphic Type Selected.
+	if (chartToRender === ChartTypes.radar || chartToRender === ChartTypes.threeD)
 		return (
 			<div style={{ width: '100%' }}>
 				<p style={labelStyle}>

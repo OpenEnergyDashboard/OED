@@ -13,6 +13,7 @@ export enum ChartTypes {
 	bar = 'bar',
 	compare = 'compare',
 	map = 'map',
+	radar = 'radar',
 	threeD = '3D'
 }
 

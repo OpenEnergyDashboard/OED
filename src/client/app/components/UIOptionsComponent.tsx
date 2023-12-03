@@ -89,9 +89,8 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 				<ChartDataSelectComponent />
 				<GraphicRateMenuComponent />
 				<ThreeDSelectComponent />
-				<DateRangeComponent />
-
 				<AreaUnitSelectComponent />
+				<DateRangeComponent />
 				{/* Controls error bar, specifically for the line chart. */}
 				{this.props.chartToRender === ChartTypes.line &&
 					<ErrorBarComponent />
@@ -253,8 +252,9 @@ class UIOptionsComponent extends React.Component<UIOptionsPropsWithIntl, UIOptio
 					</div>
 				}
 
-				{/* We can't export compare data or map data */}
-				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map && this.props.chartToRender !== ChartTypes.threeD &&
+				{/* We can't export compare, map, radar or 3D data */}
+				{this.props.chartToRender !== ChartTypes.compare && this.props.chartToRender !== ChartTypes.map &&
+					this.props.chartToRender != ChartTypes.radar && this.props.chartToRender !== ChartTypes.threeD &&
 					< div style={divTopPadding}>
 						<ExportComponent />
 					</div>
