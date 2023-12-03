@@ -537,7 +537,6 @@ mocha.describe('readings API', () => {
                 mocha.it('L20: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as lbs of CO2 & chained & reversed', async () => {
                     const unitData = [
                         {
-                            // u2
                             name: 'Electric_Utility',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -549,7 +548,6 @@ mocha.describe('readings API', () => {
                             note: 'special unit'
                         },
                         {
-                            // u10
                             name: 'kg',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -561,7 +559,6 @@ mocha.describe('readings API', () => {
                             note: 'OED created standard unit'
                         },
                         {
-                            // u11
                             name: 'metric ton',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -573,7 +570,6 @@ mocha.describe('readings API', () => {
                             note: 'OED created standard unit'
                         },
                         {
-                            // u12
                             name: 'kg CO₂',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -585,7 +581,6 @@ mocha.describe('readings API', () => {
                             note: 'special unit'
                         },
                         {
-                            // u13
                             name: 'pound',
                             identifier: 'lb',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -598,7 +593,6 @@ mocha.describe('readings API', () => {
                     ];
                     const conversionData = [
                         {
-                            // c11
                             sourceName: 'Electric_Utility',
                             destinationName: 'kg CO₂',
                             bidirectional: false,
@@ -607,7 +601,6 @@ mocha.describe('readings API', () => {
                             note: 'Electric_Utility → kg CO₂'
                         },
                         {
-                            // c12
                             sourceName: 'kg CO₂',
                             destinationName: 'kg',
                             bidirectional: false,
@@ -616,7 +609,6 @@ mocha.describe('readings API', () => {
                             note: 'CO₂ → kg'
                         },
                         {
-                            // c13
                             sourceName: 'kg',
                             destinationName: 'metric ton',
                             bidirectional: true,
@@ -625,7 +617,6 @@ mocha.describe('readings API', () => {
                             note: 'kg → Metric ton'
                         },
                         {
-                            // c14
                             sourceName: 'pound',
                             destinationName: 'metric ton',
                             bidirectional: true,
