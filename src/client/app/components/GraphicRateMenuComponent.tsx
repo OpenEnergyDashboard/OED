@@ -10,7 +10,7 @@ import { SelectOption } from '../types/items';
 import Select from 'react-select';
 import translate from '../utils/translate';
 import { updateLineGraphRate } from '../actions/graph'
-import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { UnitRepresentType } from '../types/redux/units'
 
@@ -39,8 +39,8 @@ export default function GraphicRateMenuComponent() {
 			shouldRender = false;
 		}
 	}
-	// Also don't show if not the line graphic.
-	if (graphState.chartToRender !== 'line'){
+	// Also don't show if not the line graphic, or three-d.
+	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD ) {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates

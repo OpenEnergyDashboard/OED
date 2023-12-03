@@ -5,6 +5,7 @@
 import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
 import { State } from '../types/redux/state';
+import { ChartTypes } from '../types/redux/graph';
 
 /**
  * Passes the current redux state of the chart link text, and turns it into props for the React
@@ -38,21 +39,26 @@ function mapStateToProps(state: State) {
 	// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
 	linkText += `&serverRange=${state.graph.timeInterval.toString()}`;
 	switch (chartType) {
-		case 'bar':
+		case ChartTypes.bar:
 			linkText += `&barDuration=${state.graph.barDuration.asDays()}`;
 			linkText += `&barStacking=${state.graph.barStacking}`;
 			break;
-		case 'line':
+		case ChartTypes.line:
 			// no code for this case
 			// under construction;
 			// linkText += `&displayRange=${state.graph.timeInterval.toString().split('_')}`;
 			break;
-		case 'compare':
+		case ChartTypes.compare:
 			linkText += `&comparePeriod=${state.graph.comparePeriod}`;
 			linkText += `&compareSortingOrder=${state.graph.compareSortingOrder}`;
 			break;
-		case 'map':
+		case ChartTypes.map:
 			linkText += `&mapID=${state.maps.selectedMap.toString()}`;
+			break;
+		case ChartTypes.threeD:
+			linkText += `&meterOrGroup=${state.graph.threeD.meterOrGroup}`;
+			linkText += `&meterOrGroupID=${state.graph.threeD.meterOrGroupID}`;
+			linkText += `&readingInterval=${state.graph.threeD.readingInterval}`;
 			break;
 		default:
 			break;

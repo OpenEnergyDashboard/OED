@@ -6,8 +6,10 @@ import * as React from 'react';
 import UIOptionsContainer from '../containers/UIOptionsContainer';
 import LineChartContainer from '../containers/LineChartContainer';
 import BarChartContainer from '../containers/BarChartContainer';
+import RadarChartContainer from '../containers/RadarChartContainer';
 import MultiCompareChartContainer from '../containers/MultiCompareChartContainer';
 import MapChartContainer from '../containers/MapChartContainer';
+import ThreeDComponent from './ThreeDComponent';
 import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
 import * as moment from 'moment';
@@ -23,6 +25,7 @@ interface DashboardProps {
 	barLoading: false;
 	compareLoading: false;
 	mapLoading: false;
+	radarLoading: false;
 	selectedTimeInterval: TimeInterval;
 	changeTimeInterval(timeInterval: TimeInterval): Promise<any>;
 }
@@ -38,7 +41,13 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 	}
 
 	public render() {
-		let ChartToRender: typeof LineChartContainer | typeof MultiCompareChartContainer | typeof BarChartContainer | typeof MapChartContainer;
+		let ChartToRender:
+			typeof LineChartContainer |
+			typeof MultiCompareChartContainer |
+			typeof BarChartContainer |
+			typeof MapChartContainer |
+			typeof RadarChartContainer |
+			typeof ThreeDComponent;
 		let showSpinner = false;
 		if (this.props.chartToRender === ChartTypes.line) {
 			if (this.props.lineLoading) {
@@ -60,6 +69,16 @@ export default class DashboardComponent extends React.Component<DashboardProps> 
 				showSpinner = true;
 			}
 			ChartToRender = MapChartContainer;
+		} else if (this.props.chartToRender === ChartTypes.radar) {
+			if (this.props.radarLoading) {
+				showSpinner = true;
+			}
+			ChartToRender = RadarChartContainer;
+		} else if (this.props.chartToRender === ChartTypes.threeD) {
+			/* To avoid the spinner rendering over UI elements (PillBadges) in the 3d component,
+			the spinner and logic now lives inside the 3dComponent instead. 'showSpinner' is hardcoded to false here.*/
+			showSpinner = false;
+			ChartToRender = ThreeDComponent;
 		} else {
 			throw new Error('unrecognized type of chart');
 		}
