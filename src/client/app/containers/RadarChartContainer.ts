@@ -15,10 +15,10 @@ import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 
 function mapStateToProps(state: State) {
-	const timeInterval = state.graph.timeInterval;
-	const unitID = state.graph.selectedUnit;
 	const datasets: any[] = [];
-	// The unit label depends on the unit which is in selectUnit state.
+	// Time range selected
+	const timeInterval = state.graph.timeInterval;
+	// graphic unit selected
 	const graphingUnit = state.graph.selectedUnit;
 	// The current selected rate
 	const currentSelectedRate = state.graph.lineGraphRate;
@@ -27,7 +27,7 @@ function mapStateToProps(state: State) {
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
 	if (graphingUnit !== -99) {
-		const selectUnitState = state.units.units[state.graph.selectedUnit];
+		const selectUnitState = state.units.units[graphingUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the r-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, state.graph.areaNormalization, state.graph.selectedAreaUnit);
@@ -50,7 +50,7 @@ function mapStateToProps(state: State) {
 					meterArea * getAreaUnitConversion(state.meters.byMeterID[meterID].areaUnit, state.graph.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				const readingsData = byMeterID[timeInterval.toString()][unitID];
+				const readingsData = byMeterID[timeInterval.toString()][graphingUnit];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.meters.byMeterID[meterID].identifier;
 					const colorID = meterID;
@@ -63,14 +63,15 @@ function mapStateToProps(state: State) {
 					const rData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
-					// The scaling is the factor to change the reading by. It divides by the area which will be 1 if no scaling by area.
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						// The angular value is the date, internationalized.
 						thetaData.push(timeReading.format('ddd, ll LTS'));
+						// The scaling is the factor to change the reading by.
 						const readingValue = reading.reading * scaling;
 						rData.push(readingValue);
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
@@ -108,7 +109,7 @@ function mapStateToProps(state: State) {
 					groupArea * getAreaUnitConversion(state.groups.byGroupID[groupID].areaUnit, state.graph.selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				const readingsData = byGroupID[timeInterval.toString()][unitID];
+				const readingsData = byGroupID[timeInterval.toString()][graphingUnit];
 				if (readingsData !== undefined && !readingsData.isFetching) {
 					const label = state.groups.byGroupID[groupID].name;
 					const colorID = groupID;
@@ -121,14 +122,15 @@ function mapStateToProps(state: State) {
 					const rData: number[] = [];
 					const hoverText: string[] = [];
 					const readings = _.values(readingsData.readings);
-					// The scaling is the factor to change the reading by. It divides by the area which will be 1 if no scaling by area.
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
 						const st = moment.utc(reading.startTimestamp);
 						// Time reading is in the middle of the start and end timestamp
 						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
+						// The angular value is the date, internationalized.
 						thetaData.push(timeReading.format('ddd, ll LTS'));
+						// The scaling is the factor to change the reading by.
 						const readingValue = reading.reading * scaling;
 						rData.push(readingValue);
 						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
@@ -189,7 +191,7 @@ function mapStateToProps(state: State) {
 			return b.r.length - a.r.length;
 		});
 		if (datasets[0].r.length === 0) {
-			// The longest line (first one) has no data so there is not data in any of the lines.
+			// The longest line (first one) has no data so there is no data in any of the lines.
 			// Customize the layout of the plot
 			// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 			// There is no data so tell user - likely due to date range outside where readings.
