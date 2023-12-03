@@ -89,7 +89,7 @@ export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boole
 }
 
 export function updateDefaultHelpUrl(defaultHelpUrl: string): t.UpdateDefaultHelpUrlAction {
-	return {type: ActionType.UpdateDefaultHelpUrl, defaultHelpUrl}
+	return { type: ActionType.UpdateDefaultHelpUrl, defaultHelpUrl }
 }
 
 function requestPreferences(): t.RequestPreferencesAction {

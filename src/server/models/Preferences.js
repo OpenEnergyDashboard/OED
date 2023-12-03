@@ -29,8 +29,8 @@ class Preferences {
 	 * @param {String} defaultHelpUrl - Option to set the default help page url
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
-		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency, 
-		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate, 
+		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency,
+		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate,
 		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultMeterDisableChecks, defaultHelpUrl) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;

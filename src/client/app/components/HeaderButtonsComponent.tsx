@@ -33,9 +33,9 @@ export default function HeaderButtonsComponent() {
 
 	// OED version is needed for help redirect
 	const version = useSelector((state: State) => state.version.version);
-	const BASE_URL = useSelector((state: State) => state.admin.defaultHelpUrl);
+	const baseHelpUrl = useSelector((state: State) => state.admin.defaultHelpUrl);
 	// Help URL location
-	let helpUrl = BASE_URL + version;
+	let helpUrl = baseHelpUrl + version;
 	// options help
 	const optionsHelp = helpUrl + '/optionsMenu.html';
 
@@ -85,7 +85,7 @@ export default function HeaderButtonsComponent() {
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {
-		helpUrl = BASE_URL + version;
+		helpUrl = baseHelpUrl + version;
 		setState(prevState => ({
 			...prevState,
 			pageChoicesHelp: helpUrl

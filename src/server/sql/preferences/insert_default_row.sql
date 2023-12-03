@@ -22,7 +22,7 @@ IF NOT EXISTS(SELECT *
 	VALUES ('', 'line', FALSE, 'en', NULL, 5, 25, FALSE, 'meters', '00:15:00', 
 	-9007199254740991, 9007199254740991, '1970-01-01 00:00:00+00:00', '6970-01-01 00:00:00+00:00',
 	0, 75, FALSE, 'https://openenergydashboard.github.io/help/');
-    END IF ;
+END IF ;
 
 END;
 $$

@@ -14,7 +14,7 @@ import { Dispatch } from '../types/redux/actions';
 function mapStateToProps(state: State) {
 	return {
 		version: state.version.version,
-		BASE_URL: state.admin.defaultHelpUrl
+		baseHelpUrl: state.admin.defaultHelpUrl
 	};
 }
 

@@ -30,7 +30,7 @@ import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsave
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
-import { store }  from '../../store';
+import { store } from '../../store';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import translate from '../../utils/translate';
@@ -67,7 +67,7 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): UpdateDefaultMeterMinimumValueAction;
 	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
 	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
 	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;

@@ -1,4 +1,3 @@
-
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -20,9 +19,9 @@ export default function LanguageSelectorComponent() {
 
 	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
 	const version = useSelector((state: State) => state.version.version);
-	const BASE_URL = useSelector((state: State) => state.admin.defaultHelpUrl);
+	const baseHelpUrl = useSelector((state: State) => state.admin.defaultHelpUrl);
 
-	const HELP_URL = BASE_URL + version;
+	const helpUrl = baseHelpUrl + version;
 
 	return (
 		<>
@@ -48,7 +47,7 @@ export default function LanguageSelectorComponent() {
 					</DropdownItem>
 					<DropdownItem divider />
 					<DropdownItem
-						href={HELP_URL + '/language.html'}>
+						href={helpUrl + '/language.html'}>
 						<FormattedMessage id="help" />
 					</DropdownItem>
 				</DropdownMenu>

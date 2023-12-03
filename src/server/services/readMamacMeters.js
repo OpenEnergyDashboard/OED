@@ -104,7 +104,6 @@ async function getMeterInfo(url, ip, csvLine) {
 				preferences.defaultMeterMaximumDate, // maxDate
 				preferences.defaultMeterMaximumErrors, // maxError
 				preferences.defaultMeterDisableChecks  // disableChecks
-				
 			);
 		});
 }
