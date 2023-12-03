@@ -22,14 +22,15 @@ import {
 	UpdateDefaultMeterMaximumDateAction,
 	UpdateDefaultMeterReadingGapAction,
 	UpdateDefaultMeterMaximumErrorsAction,
-	UpdateDefaultMeterDisableChecksAction
+	UpdateDefaultMeterDisableChecksAction,
+	UpdateDefaultHelpUrlAction
 
 } from '../../types/redux/admin';
 import { removeUnsavedChanges, updateUnsavedChanges } from '../../actions/unsavedWarning';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
-import { store }  from '../../store';
+import { store } from '../../store';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import translate from '../../utils/translate';
@@ -54,6 +55,7 @@ interface PreferencesProps {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
+	defaultHelpUrl: string;
 	updateDisplayTitle(title: string): UpdateDisplayTitleAction;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): UpdateDefaultChartToRenderAction;
 	toggleDefaultBarStacking(): ToggleDefaultBarStackingAction;
@@ -65,13 +67,14 @@ interface PreferencesProps {
 	updateDefaultFileSizeLimit(defaultFileSizeLimit: number): UpdateDefaultFileSizeLimit;
 	updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): UpdateDefaultAreaUnitAction;
 	updateDefaultMeterReadingFrequency(defaultMeterReadingFrequency: string): UpdateDefaultMeterReadingFrequencyAction;
-	updateDefaultMeterMinimumValue(defaultMeterMinimumValue : number): UpdateDefaultMeterMinimumValueAction;
+	updateDefaultMeterMinimumValue(defaultMeterMinimumValue: number): UpdateDefaultMeterMinimumValueAction;
 	updateDefaultMeterMaximumValue(defaultMeterMaximumValue: number): UpdateDefaultMeterMaximumValueAction;
 	updateDefaultMeterMinimumDate(defaultMeterMinimumDate: string): UpdateDefaultMeterMinimumDateAction;
 	updateDefaultMeterMaximumDate(defaultMeterMaximumDate: string): UpdateDefaultMeterMaximumDateAction;
 	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): UpdateDefaultMeterReadingGapAction;
 	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): UpdateDefaultMeterMaximumErrorsAction;
 	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): UpdateDefaultMeterDisableChecksAction;
+	updateDefaultHelpUrl(defaultHelpUrl: string): UpdateDefaultHelpUrlAction;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -98,6 +101,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultMeterReadingGapChange = this.handleDefaultMeterReadingGapChange.bind(this);
 		this.handleDefaultMeterMaximumErrorsChange = this.handleDefaultMeterMaximumErrorsChange.bind(this);
 		this.handleDefaultMeterDisableChecksChange = this.handleDefaultMeterDisableChecksChange.bind(this);
+		this.handleDefaultHelpUrlChange = this.handleDefaultHelpUrlChange.bind(this);
 	}
 
 	public render() {
@@ -418,6 +422,16 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						})}
 					</Input>
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.help.url' />:
+					</p>
+					<Input
+						type='text'
+						value={this.props.defaultHelpUrl}
+						onChange={this.handleDefaultHelpUrlChange}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -536,6 +550,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultMeterDisableChecksChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultMeterDisableChecks(JSON.parse(e.target.value))
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultHelpUrlChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultHelpUrl(e.target.value);
 		this.updateUnsavedChanges();
 	}
 
