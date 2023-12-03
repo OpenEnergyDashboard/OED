@@ -5,6 +5,8 @@
 import { RadarReadingsAction, RadarReadingsState } from '../types/redux/radarReadings';
 import { ActionType } from '../types/redux/actions';
 
+// TODO Since radar is using line values in the end, should it have separate state/actions/reducers?
+
 const defaultState: RadarReadingsState = {
 	byMeterID: {},
 	byGroupID: {},

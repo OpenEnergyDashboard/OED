@@ -43,12 +43,6 @@ export type RadarReadingsAction =
 	ReceiveGroupRadarReadingAction;
 
 
-export type RadarReadingState =
-    RequestMeterRadarReadingAction |
-    RequestGroupRadarReadingAction |
-    ReceiveMeterRadarReadingAction |
-    ReceiveGroupRadarReadingAction;
-
 export interface RadarReadingsState {
 	byMeterID: {
 		[meterID: number]: {
