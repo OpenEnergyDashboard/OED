@@ -17,6 +17,8 @@ export default class ReadingsApi {
 		this.backend = backend;
 	}
 
+	// TODO The line (and therefore radar) sort here but seems DB query does that. Can it be removed?
+
 	/**
 	 * Gets line readings for meters for the given time range
 	 * @param meterIDs The meter IDs to get readings for
