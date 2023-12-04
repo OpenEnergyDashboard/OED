@@ -15,6 +15,7 @@ const { refreshAllReadingViews } = require('../services/refreshAllReadingViews')
 const { getConnection } = require('../db');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { shiftReadings } = require('../util/developer');
+const { specialUnitsGeneral, specialConversionsGeneral } = require('./automatedTestingData');
 /*
 If you want to remove all the data and restart from fresh you can do this in the psql shell:
 delete from readings; delete from groups_immediate_meters; delete from groups_immediate_children; delete from groups; delete from meters; delete from conversions; delete from units;
@@ -346,88 +347,400 @@ async function insertWebsiteData() {
 	// since it goes backward through the color array.
 	// TODO: When this is converted to key/value pairs, the area should be set to the comparable meter(s) and campus is the sum of all 121,000.
 	const groups = [
-		['Dining Hall Energy', 'kWh', true, '-87.99913, 40.002', 'Dining Hall Electric and Gas', ['Dining Hall Electric', 'Dining Hall Gas'], [], 10012],
-		['Dining Hall All', 'short ton of CO₂', true, '-87.99913, 40.002', 'Dining Hall All', ['Dining Hall Water'], ['Dining Hall Energy'], 10013],
-		['Theater Energy', 'kWh', true, ' -87.9975, 40.0027', 'Theater Electric and Gas', ['Theater Electric', 'Theater Gas'], [], 10014],
-		['Theater All', 'short ton of CO₂', true, ' -87.9975, 40.0027', 'Theater All', [], ['Theater Energy'], 10015],
-		['Dining & Theater Electric Power', 'kW', true, undefined, 'Dining & Theater Electric Power', ['Dining Hall Electric Power', 'Theater Electric Power'], [], 10016],
-		['Library Energy', 'kWh', true, '-87.99916, 40.00419', 'Library Electric', ['Library Electric'], [], 10017],
+		{
+			name: 'Dining Hall Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: 'Dining Hall Electric and Gas',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric', 'Dining Hall Gas'],
+			childGroups: [],
+			id: 10012
+		},
+		{
+			name: 'Dining Hall All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: '-87.99913, 40.002',
+			note: 'Dining Hall All',
+			area: 1000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Water'],
+			childGroups: ['Dining Hall Energy'],
+			id: 10013
+		},
+		{
+			name: 'Theater Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: ' -87.9975, 40.0027',
+			note: 'Theater Electric and Gas',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Theater Electric', 'Theater Gas'],
+			childGroups: [],
+			id: 10014
+		},
+		{
+			name: 'Theater All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: ' -87.9975, 40.0027',
+			note: 'Theater All',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [],
+			childGroups: ['Theater Energy'],
+			id: 10015
+		},
+		{
+			name: 'Dining & Theater Electric Power',
+			defaultGraphicUnit: 'kW',
+			displayable: true,
+			note: 'Dining & Theater Electric Power',
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric Power', 'Theater Electric Power'],
+			childGroups: [],
+			id: 10016
+		},
+		{
+			name: 'Library Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99916, 40.00419',
+			note: 'Library Electric',
+			area: 100000,
+			areaUnit: 'meters',
+			childMeters: ['Library Electric'],
+			childGroups: [],
+			id: 10017
+		},
 		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric
-		[compareGroups[0], 'kWh', true, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareMeters[3], compareMeters[4]], [], 10018],
-		[compareName(compareGroups[0]), 'kWh', false, '-87.99817, 40.00057', 'Great Dorm 1st & 2nd Electric', [compareName(compareMeters[3]), compareName(compareMeters[4])], [], compareId(10018)],
-		['Great Dorm Energy', 'kWh', true, '-87.99817, 40.00057', 'Great Dorm Electric and Gas', ['Great Dorm Gas'], ['Great Dorm Electric'], 10019],
-		['Great Dorm All', 'short ton of CO₂', true, '-87.99817, 40.00057', 'Great Dorm All', ['Great Dorm Water'], ['Great Dorm Energy'], 10020],
-		['Campus Electric', 'kWh', true, undefined, 'Campus Electric', ['Dining Hall Electric', 'Theater Electric', 'Library Electric'], ['Great Dorm Electric'], 10021],
-		['Campus Gas', 'BTU', true, undefined, 'Campus Gas', ['Dining Hall Gas', 'Theater Gas', 'Great Dorm Gas'], [], 10022],
-		['Campus Energy', 'kWh', true, undefined, 'Campus Energy', [], ['Campus Electric', 'Campus Gas'], 10023],
-		['Campus All', 'short ton of CO₂', true, undefined, 'Campus All', ['Dining Hall Water', 'Great Dorm Water'], ['Campus Energy'], 10024],
-		['Campus All - Another', 'short ton of CO₂', true, undefined, 'Campus All done another way with duplicate meter', ['Library Electric', 'Dining Hall Electric'], ['Dining Hall All', 'Theater All', 'Great Dorm All'], 10025]
+		{
+			name: compareGroups[0],
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm 1st & 2nd Electric',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareMeters[3], compareMeters[4]],
+			childGroups: [],
+			id: 10018
+		},
+		{
+			name: compareName(compareGroups[0]),
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm 1st & 2nd Electric',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareName(compareMeters[3]), compareName(compareMeters[4])],
+			childGroups: [],
+			id: compareId(10018)
+		},
+		{
+			name: 'Great Dorm Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm Electric and Gas',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Great Dorm Gas'],
+			childGroups: ['Great Dorm Electric'],
+			id: 10019
+		},
+		{
+			name: 'Great Dorm All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm All',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: ['Great Dorm Water'],
+			childGroups: ['Great Dorm Energy'],
+			id: 10020
+		},
+		{
+			name: 'Campus Electric',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'Campus Electric',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Electric', 'Theater Electric', 'Library Electric'],
+			childGroups: ['Great Dorm Electric'],
+			id: 10021
+		},
+		{
+			name: 'Campus Gas',
+			defaultGraphicUnit: 'BTU',
+			displayable: true,
+			note: 'Campus Gas',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Gas', 'Theater Gas', 'Great Dorm Gas'],
+			childGroups: [],
+			id: 10022
+		},
+		{
+			name: 'Campus Energy',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			note: 'Campus Energy',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: [],
+			childGroups: ['Campus Electric', 'Campus Gas'],
+			id: 10023
+		},
+		{
+			name: 'Campus All',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			note: 'Campus All',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Dining Hall Water', 'Great Dorm Water'],
+			childGroups: ['Campus Energy'],
+			id: 10024
+		},
+		{
+			name: 'Campus All - Another',
+			defaultGraphicUnit: 'short ton of CO₂',
+			displayable: true,
+			note: 'Campus All done another way with duplicate meter',
+			area: 121000,
+			areaUnit: 'meters',
+			childMeters: ['Library Electric', 'Dining Hall Electric'],
+			childGroups: ['Dining Hall All', 'Theater All', 'Great Dorm All'],
+			id: 10025
+		},
+		// Great Dorm Electric with 1st and 2nd floor Great Dorm Electric special vary
+		{
+			name: 'Great Dorm Electric Vary',
+			defaultGraphicUnit: 'kWh',
+			displayable: false,
+			gps: '-87.99817, 40.00057',
+			note: 'Great Dorm Electric for use when shift 2nd floor to current',
+			area: 10000,
+			areaUnit: 'meters',
+			childMeters: [compareMeters[3], compareName(compareMeters[4])],
+			childGroups: [],
+			id: 10026
+		}
 	];
 
-	// The table contains special units' data.
-	// TODO some of these should probably be standard units (and related conversions)
-	const units = [
-		// These come from the standard units but we need to make them visible so it works.
-		['BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit'],
-		['m³ gas', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit but visible'],
-		['kg', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit but visible'],
-		['metric ton', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit but visible'],
-		['gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit but visible'],
-		['liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'OED created standard unit but visible'],
-		['Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit but visible'],
-		['Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'OED created standard unit but visible'],
-		// New units
-		['Electric_Utility', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Electric_Solar', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Natural_Gas_BTU', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Natural_Gas_M3', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Water_Gallon', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Water_Liter', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Recycling', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Electric_kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Temperature_Fahrenheit', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['Temperature_Celsius', '', Unit.unitRepresentType.RAW, 3600, Unit.unitType.METER, '', Unit.displayableType.NONE, false, 'special unit'],
-		['US dollar', 'US $', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['pound', 'lb', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['short ton', 'ton', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, false, 'special unit'],
-		['kW', '', Unit.unitRepresentType.FLOW, 3600, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'special unit'],
-		['kg CO₂', '', Unit.unitRepresentType.QUANTITY, 3600, Unit.unitType.UNIT, 'CO₂', Unit.displayableType.ALL, false, 'special unit'],
-	];
+	// This array contains web unit data. It adds on the ones for web from the general special units.
+	const units = specialUnitsGeneral.concat([
+		{
+			name: 'Electric_Solar',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Water_Liter',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Recycling',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'Temperature_Celsius',
+			identifier: '',
+			unitRepresent: Unit.unitRepresentType.RAW,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.METER,
+			suffix: '',
+			displayable: Unit.displayableType.NONE,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'pound',
+			identifier: 'lb',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+		{
+			name: 'short ton',
+			identifier: 'ton',
+			unitRepresent: Unit.unitRepresentType.QUANTITY,
+			secInRate: 3600,
+			typeOfUnit: Unit.unitType.UNIT,
+			suffix: '',
+			displayable: Unit.displayableType.ALL,
+			preferredDisplay: false,
+			note: 'special unit'
+		},
+	]);
 
 	// The table contains special conversions' data.
-	const conversions = [
-		['Electric_Utility', 'kWh', false, 1, 0, 'Electric_Utility → kWh'],
-		['Electric_Utility', 'US dollar', false, 0.115, 0, 'Electric_Utility → US dollar'],
-		['Electric_Utility', 'kg CO₂', false, 1.9, 0, 'Electric_Utility → kg CO₂'],
-		['Electric_Solar', 'kWh', false, 1, 0, 'Electric_Solar → kWh'],
-		['Electric_Solar', 'US dollar', false, 0.7, 0, 'Electric_Solar → US dollar'],
-		['Electric_Solar', 'kg CO₂', false, 0, 0, 'Electric_Solar → kg CO₂ (zero value)'],
-		['Natural_Gas_BTU', 'BTU', false, 1, 0, 'Natural_Gas_BTU → BTU'],
-		['Natural_Gas_BTU', 'US dollar', false, 6.75e-6, 0, 'Natural_Gas_BTU → US dollar'],
-		['Natural_Gas_BTU', 'kg CO₂', false, 5.29e-5, 0, 'Natural_Gas_BTU → kg CO₂'],
-		['Natural_Gas_M3', 'm³ gas', false, 1, 0, 'Natural_Gas_M3 → m^3 gas'],
-		['Natural_Gas_M3', 'US dollar', false, 0.25, 0, 'Natural_Gas_M3 → US dollar'],
-		['Natural_Gas_M3', 'kg CO₂', false, 1.94, 0, 'Natural_Gas_M3 → kg CO₂'],
-		['Water_Gallon', 'gallon', false, 1, 0, 'Water_Gallon → gallon'],
+	const conversions = specialConversionsGeneral.concat([
+		{
+			sourceName: 'Electric_Solar',
+			destinationName: 'kWh',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Electric_Solar → kWh'
+		},
+		{
+			sourceName: 'Electric_Solar',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0.7,
+			intercept: 0,
+			note: 'Electric_Solar → US dollar'
+		},
+		{
+			sourceName: 'Electric_Solar',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 0,
+			intercept: 0,
+			note: 'Electric_Solar → kg CO₂ (zero value)'
+		},
+		{
+			sourceName: 'Natural_Gas_BTU',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 6.75e-6,
+			intercept: 0,
+			note: 'Natural_Gas_BTU → US dollar'
+		},
+		{
+			sourceName: 'Natural_Gas_M3',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 1.94,
+			intercept: 0,
+			note: 'Natural_Gas_M3 → kg CO₂'
+		},
 		// Average of https://www.danfoss.com/en/about-danfoss/articles/dhs/the-carbon-footprint-of-potable-water/
 		// and https://www.brightest.io/calculate-carbon-footprint-water-emissions for water CO2.
-		['Water_Gallon', 'kg CO₂', false, 1.2e-3, 0, 'Water_Gallon → kg CO₂'],
-		['Water_Gallon', 'US dollar', false, 0.011, 0, 'Water_Gallon → US dollar'],
-		['Water_Liter', 'liter', false, 1, 0, 'Water_Liter → liter'],
-		['Water_Liter', 'kg CO₂', false, 3.1e-4, 0, 'Water_Liter → kg CO₂'],
-		['Water_Liter', 'US dollar', false, 0.00291, 0, 'Water_Liter → US dollar'],
-		['Temperature_Fahrenheit', 'Fahrenheit', false, 1, 0, 'Temperature_Fahrenheit → Fahrenheit'],
-		['Temperature_Celsius', 'Celsius', false, 1, 0, 'Temperature_Celsius → Celsius'],
-		['Electric_kW', 'kW', false, 1, 0, 'Electric kW → kW'],
-		['Recycling', 'short ton', false, 1, 0, 'Recycling → short ton'],
+		{
+			sourceName: 'Water_Gallon',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 1.2e-3,
+			intercept: 0,
+			note: 'Water_Gallon → kg CO₂'
+		},
+		{
+			sourceName: 'Water_Gallon',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0.011,
+			intercept: 0,
+			note: 'Water_Gallon → US dollar'
+		},
+		{
+			sourceName: 'Water_Liter',
+			destinationName: 'liter',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Water_Liter → liter'
+		},
+		{
+			sourceName: 'Water_Liter',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: 3.1e-4,
+			intercept: 0,
+			note: 'Water_Liter → kg CO₂'
+		},
+		{
+			sourceName: 'Water_Liter',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0.00291,
+			intercept: 0,
+			note: 'Water_Liter → US dollar'
+		},
+		{
+			sourceName: 'Temperature_Celsius',
+			destinationName: 'Celsius',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Temperature_Celsius → Celsius'
+		},
+		{
+			sourceName: 'Recycling',
+			destinationName: 'short ton',
+			bidirectional: false,
+			slope: 1,
+			intercept: 0,
+			note: 'Recycling → short ton'
+		},
 		// This is what recycling saves and not the actual CO2 produced.
-		['Recycling', 'kg CO₂', false, -2.89e3, 0, 'Recycling → kg CO₂'],
+		{
+			sourceName: 'Recycling',
+			destinationName: 'kg CO₂',
+			bidirectional: false,
+			slope: -2.89e3,
+			intercept: 0,
+			note: 'Recycling → kg CO₂'
+		},
 		// This assumes it costs the same to recycle as trash and you want the net cost as was done for Recycle CO2.
-		['Recycling', 'US dollar', false, 0, 0, 'Recycling → US dollar'],
-		['kg', 'pound', true, 2.2, 0, 'kg ↔ lbs'],
-		['short ton', 'pound', true, 2000, 0, 'ton ↔ lbs'],
-		['kg CO₂', 'kg', false, 1, 0, 'CO₂ → kg'],
-	];
+		{
+			sourceName: 'Recycling',
+			destinationName: 'US dollar',
+			bidirectional: false,
+			slope: 0,
+			intercept: 0,
+			note: 'Recycling → US dollar'
+		},
+		{
+			sourceName: 'kg',
+			destinationName: 'pound',
+			bidirectional: true,
+			slope: 2.2,
+			intercept: 0,
+			note: 'kg ↔ lbs'
+		},
+		{
+			sourceName: 'short ton',
+			destinationName: 'pound',
+			bidirectional: true,
+			slope: 2000,
+			intercept: 0,
+			note: 'ton ↔ lbs'
+		},
+	]);
 
 	const conn = getConnection();
 	// These should be there after createDB but do it to be safe in case they are not present.
@@ -447,7 +760,6 @@ async function insertWebsiteData() {
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
-	// await Group.insertMany(groups, conn);
 	await insertGroups(groups, conn);
 }
 
