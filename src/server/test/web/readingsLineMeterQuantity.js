@@ -585,7 +585,8 @@ mocha.describe('readings API', () => {
                             identifier: 'lb',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
                             secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT, suffix: '',
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
                             displayable: Unit.displayableType.ALL,
                             preferredDisplay: false,
                             note: 'special unit'
@@ -623,6 +624,20 @@ mocha.describe('readings API', () => {
                             slope: 454.545454,
                             intercept: 0,
                             note: 'lbs → metric tons'
+                        }
+                    ];
+
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility pound of CO₂',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
                         }
                     ];
                     
