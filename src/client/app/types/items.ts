@@ -54,6 +54,7 @@ export interface PreferenceRequestItem {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
+	defaultHelpUrl: string;
 }
 
 /**

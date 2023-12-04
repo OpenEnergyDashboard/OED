@@ -15,7 +15,7 @@ import AdminComponent from './admin/AdminComponent';
 import { LinkOptions } from '../actions/graph';
 import { hasToken, deleteToken } from '../utils/token';
 import { showErrorNotification } from '../utils/notifications';
-import { ChartTypes, LineGraphRate } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate, MeterOrGroup } from '../types/redux/graph';
 import { LanguageTypes } from '../types/redux/i18n';
 import { verificationApi } from '../utils/api';
 import translate from '../utils/translate';
@@ -32,7 +32,7 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
-import * as queryString from 'query-string';
+import queryString from 'query-string';
 import InitializationComponent from './InitializationComponent';
 
 interface RouteProps {
@@ -182,6 +182,7 @@ export default class RouteComponent extends React.Component<RouteProps> {
 						const info: string = fixTypeIssue.toString();
 						// ESLint does not want const params in the one case it is used so put here.
 						let params;
+						//TODO validation could be implemented across all cases similar to compare period and sorting order
 						switch (key) {
 							case 'meterIDs':
 								options.meterIDs = info.split(',').map(s => parseInt(s));
@@ -248,6 +249,15 @@ export default class RouteComponent extends React.Component<RouteProps> {
 								break;
 							case 'sliderRange':
 								options.sliderRange = TimeInterval.fromString(info);
+								break;
+							case 'meterOrGroupID':
+								options.meterOrGroupID = parseInt(info);
+								break;
+							case 'meterOrGroup':
+								options.meterOrGroup = info as MeterOrGroup;
+								break;
+							case 'readingInterval':
+								options.readingInterval = parseInt(info);
 								break;
 							default:
 								throw new Error('Unknown query parameter');

@@ -92,7 +92,7 @@
 				"@typescript-eslint"
 			],
 			"rules": {
-				// only to be used when declaring props as {}. Example is in UIModalComponent, ie; extends React.Component<{}>
+				// only to be used when declaring props as {}.
 				// is used in conjunction with overrides
 				// https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-based-on-glob-patterns
 				"@typescript-eslint/ban-types": [

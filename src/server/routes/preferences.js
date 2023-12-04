@@ -87,6 +87,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultMeterDisableChecks: {
 					type: 'boolean'
+				},
+				defaultHelpUrl: {
+					type: 'string'
 				}
 			}
 		}

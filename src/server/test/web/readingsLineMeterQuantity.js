@@ -7,7 +7,7 @@
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
@@ -83,8 +83,29 @@ mocha.describe('readings API', () => {
                         .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:15:00'), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected);
                 });
- 
-				// Add L7 here
+                // 14 days barely gives raw points & middle readings
+                mocha.it('L6: 14 days barely gives raw points & middle readings', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected);
+                });
+
+                //partial days/hours for daily gives only full days
+                mocha.it('L7: partial days/hours for daily gives only full days', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28.csv');
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected);
+                });
 
                 mocha.it('L10: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
                     const unitData = unitDatakWh.concat([
@@ -334,7 +355,90 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected)
                 });
 
-                // Add L18 here
+                mocha.it('L18: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () => {
+                    const unitData = [
+                        {
+                            // u2 
+                            name: 'Electric_Utility',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        },
+                        {
+                            // u10
+                            name: 'kg',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'OED created standard unit'
+                        },
+                        {
+                            // u12
+                            name: 'kg CO₂',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: 'CO₂',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
+                    ];
+                    const conversionData = [
+                        {
+                            // c11
+                            sourceName: 'Electric_Utility',
+                            destinationName: 'kg CO₂',
+                            bidirectional: false,
+                            slope: 0.709,
+                            intercept: 0,
+                            note: 'Electric_Utility → kg CO₂'
+                        },
+                        {
+                            // c12
+                            sourceName: 'kg CO₂',
+                            destinationName: 'kg',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'CO₂ → kg'
+                        },
+                       
+                    ];
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility kg of CO₂',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+
+                    await prepareTest(unitData, conversionData, meterData);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kg of CO₂');
+                    // Reuse same file as flow since value should be the same values.
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kgCO2_st_-inf_et_inf.csv');
+
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected)
+                });
 
                 mocha.it('L19: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
                     const unitData = [

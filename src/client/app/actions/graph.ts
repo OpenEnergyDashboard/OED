@@ -8,6 +8,7 @@ import { fetchGroupsDetailsIfNeeded } from './groups';
 import { fetchNeededLineReadings } from './lineReadings';
 import { fetchNeededBarReadings } from './barReadings';
 import { fetchNeededCompareReadings } from './compareReadings';
+import { fetchNeededRadarReadings } from './radarReadings';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Dispatch, Thunk, ActionType, GetState } from '../types/redux/actions';
 import { State } from '../types/redux/state';
@@ -18,6 +19,7 @@ import { fetchNeededMapReadings } from './mapReadings';
 import { changeSelectedMap, fetchMapsDetails } from './map';
 import { fetchUnitsDetailsIfNeeded } from './units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { fetchNeededThreeDReadings } from './threeDReadings';
 
 export function changeRenderOnce() {
 	return { type: ActionType.ConfirmGraphRenderOnce };
@@ -124,6 +126,8 @@ export function changeSelectedMeters(meterIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -138,6 +142,8 @@ export function changeSelectedGroups(groupIDs: number[]): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, getState().graph.selectedUnit));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, getState().graph.selectedUnit));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	};
@@ -151,6 +157,8 @@ export function changeSelectedUnit(unitID: number): Thunk {
 			dispatch2(fetchNeededBarReadings(getState().graph.timeInterval, unitID));
 			dispatch2(fetchNeededCompareReadings(getState().graph.comparePeriod, unitID));
 			dispatch2(fetchNeededMapReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededRadarReadings(getState().graph.timeInterval, unitID));
+			dispatch2(fetchNeededThreeDReadings());
 		});
 		return Promise.resolve();
 	}
@@ -161,6 +169,8 @@ function fetchNeededReadingsForGraph(timeInterval: TimeInterval, unitID: number)
 		dispatch(fetchNeededLineReadings(timeInterval, unitID));
 		dispatch(fetchNeededBarReadings(timeInterval, unitID));
 		dispatch(fetchNeededMapReadings(timeInterval, unitID));
+		dispatch(fetchNeededRadarReadings(timeInterval, unitID));
+		dispatch(fetchNeededThreeDReadings());
 		return Promise.resolve();
 	};
 }
@@ -205,6 +215,25 @@ function changeRangeSliderIfNeeded(interval: TimeInterval): Thunk {
 	};
 }
 
+export function updateThreeDReadingInterval(readingInterval: t.ReadingInterval): Thunk {
+	return (dispatch: Dispatch) => {
+		dispatch({ type: ActionType.UpdateThreeDReadingInterval, readingInterval });
+		return dispatch(fetchNeededThreeDReadings());
+	};
+}
+
+export function updateThreeDMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup): t.UpdateThreeDMeterOrGroupInfo {
+	return { type: ActionType.UpdateThreeDMeterOrGroupInfo, meterOrGroupID, meterOrGroup };
+}
+
+export function changeMeterOrGroupInfo(meterOrGroupID: t.MeterOrGroupID, meterOrGroup: t.MeterOrGroup = t.MeterOrGroup.meters): Thunk {
+	// Meter ID can be null, however meterOrGroup defaults to meters a null check on ID can be sufficient
+	return (dispatch: Dispatch) => {
+		dispatch(updateThreeDMeterOrGroupInfo(meterOrGroupID, meterOrGroup));
+		return dispatch(fetchNeededThreeDReadings());
+	};
+}
+
 export interface LinkOptions {
 	meterIDs?: number[];
 	groupIDs?: number[];
@@ -222,6 +251,9 @@ export interface LinkOptions {
 	compareSortingOrder?: SortingOrder;
 	optionsVisibility?: boolean;
 	mapID?: number;
+	meterOrGroupID?: number;
+	meterOrGroup?: t.MeterOrGroup;
+	readingInterval?: t.ReadingInterval;
 }
 
 /**
@@ -235,7 +267,8 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	const dispatchSecond: Array<Thunk | t.ChangeChartToRenderAction | t.ChangeBarStackingAction |
 		t.ChangeGraphZoomAction | t.ChangeCompareSortingOrderAction | t.ToggleOptionsVisibility |
 		m.UpdateSelectedMapAction | t.UpdateLineGraphRate | t.ToggleAreaNormalizationAction |
-		t.UpdateSelectedAreaUnitAction | t.ToggleShowMinMaxAction> = [];
+		t.UpdateSelectedAreaUnitAction | t.UpdateThreeDMeterOrGroupInfo |
+		t.ToggleShowMinMaxAction> = [];
 	/* eslint-enable @typescript-eslint/indent */
 
 	if (options.meterIDs) {
@@ -245,6 +278,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 	if (options.groupIDs) {
 		dispatchFirst.push(fetchGroupsDetailsIfNeeded());
 		dispatchSecond.push(changeSelectedGroups(options.groupIDs));
+	}
+	if (options.meterOrGroupID && options.meterOrGroup) {
+		dispatchSecond.push(updateThreeDMeterOrGroupInfo(options.meterOrGroupID, options.meterOrGroup));
 	}
 	if (options.chartType) {
 		dispatchSecond.push(changeChartToRender(options.chartType));
@@ -290,6 +326,9 @@ export function changeOptionsFromLink(options: LinkOptions) {
 		// TODO here and elsewhere should be IfNeeded but need to check that all state updates are done when edit, etc.
 		dispatchFirst.push(fetchMapsDetails());
 		dispatchSecond.push(changeSelectedMap(options.mapID));
+	}
+	if (options.readingInterval) {
+		dispatchSecond.push(updateThreeDReadingInterval(options.readingInterval));
 	}
 	return (dispatch: Dispatch) => Promise.all(dispatchFirst.map(dispatch))
 		.then(() => Promise.all(dispatchSecond.map(dispatch)));

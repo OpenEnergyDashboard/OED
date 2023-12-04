@@ -58,8 +58,8 @@ packageLockFile="package-lock.json"
 nodeHiddenLockFile="node_modules/.package-lock.json"
 # See if hidden node lock file exists and is newer than the two package files.
 if [ -f "$nodeHiddenLockFile" ] && [ "$nodeHiddenLockFile" -nt "$packageFile" ] && [ "$nodeHiddenLockFile" -nt "$packageLockFile" ] ; then
-    # The node install happened after the package files were created so don't redo
-    keep_node_modules=yes
+	# The node install happened after the package files were created so don't redo
+	keep_node_modules=yes
 fi
 
 # Install NPM dependencies

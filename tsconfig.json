@@ -8,14 +8,14 @@
 		"baseUrl": "./src/client/app/",
 		"outDir": "./src/client/public/app/",
 		"sourceMap": true,
-		"module": "CommonJS",
-		"target": "ES5",
+		"module": "commonjs",
+		"target": "es5",
 		"jsx": "react",
 		"allowJs": true,
 		"lib": [
-			"ES6",
-			"DOM",
-			"ES2021"
+			"es6",
+			"dom",
+			"es2021"
 		],
 		"moduleResolution": "node",
 		"rootDir": "src",
@@ -27,7 +27,7 @@
 		"noUnusedLocals": true,
 	},
 	"include": [
-		"./src/client/app/**/*",
+		"./src/client/app/**/*"
 	],
 	"exclude": [
 		"node_modules"

@@ -96,7 +96,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
     expect(res.body, 'xData length').to.have.property(`xData`).to.have.lengthOf(readingsPerDay);
     expect(res.body, 'yData length').to.have.property(`yData`).to.have.lengthOf(days);
     expect(res.body, 'zData length').to.have.property(`zData`).to.have.lengthOf(days);
-    // Only check the first one but the others have checked in the loop for value.
+    // Only check the first one but the others are checked in the loop for value.
     expect(res.body.zData[0], 'zData[0] length').to.have.lengthOf(readingsPerDay);
 
     // xData should have readingsPerDay values with the start/end time of each point in the day.
@@ -211,6 +211,33 @@ const meterDatakWh = [
         id: METER_ID
     }
 ];
+const meterDatakWhOther = [
+    {
+        name: 'Electric Utility Other',
+        unit: 'Electric_Utility',
+        defaultGraphicUnit: 'kWh',
+        displayable: true,
+        gps: undefined,
+        note: 'special meter',
+        file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+        deleteFile: false,
+        readingFrequency: '20 minutes',
+        id: (METER_ID + 1)
+    }
+];
+const meterDatakWhGroups = meterDatakWh.concat(meterDatakWhOther);
+
+const groupDatakWh = [
+    {
+        id: GROUP_ID,
+        name: 'Electric Utility kWh + Other',
+        displayable: true,
+        note: 'special group',
+        defaultGraphicUnit: 'kWh',
+        childMeters: ['Electric Utility kWh', 'Electric Utility Other'],
+        childGroups: [],
+    }
+];
 
 module.exports = {
     prepareTest,
@@ -226,5 +253,7 @@ module.exports = {
     HTTP_CODE,
     unitDatakWh,
     conversionDatakWh,
-    meterDatakWh
+    meterDatakWh,
+    meterDatakWhGroups,
+    groupDatakWh
 };
