@@ -545,7 +545,123 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected)
                 });
 
-                // Add L20 here
+                mocha.it('L20: should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as lbs of CO2 & chained & reversed', async () => {
+                    const unitData = [
+                        {
+                            name: 'Electric_Utility',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        },
+                        {
+                            name: 'kg',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'OED created standard unit'
+                        },
+                        {
+                            name: 'metric ton',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'OED created standard unit'
+                        },
+                        {
+                            name: 'kg CO₂',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: 'CO₂',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        },
+                        {
+                            name: 'pound',
+                            identifier: 'lb',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
+                    ];
+                    const conversionData = [
+                        {
+                            sourceName: 'Electric_Utility',
+                            destinationName: 'kg CO₂',
+                            bidirectional: false,
+                            slope: 0.709,
+                            intercept: 0,
+                            note: 'Electric_Utility → kg CO₂'
+                        },
+                        {
+                            sourceName: 'kg CO₂',
+                            destinationName: 'kg',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'CO₂ → kg'
+                        },
+                        {
+                            sourceName: 'kg',
+                            destinationName: 'metric ton',
+                            bidirectional: true,
+                            slope: 1e-3,
+                            intercept: 0,
+                            note: 'kg → Metric ton'
+                        },
+                        {
+                            sourceName: 'pound',
+                            destinationName: 'metric ton',
+                            bidirectional: true,
+                            slope: 454.545454,
+                            intercept: 0,
+                            note: 'lbs → metric tons'
+                        }
+                    ];
+
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility pound of CO₂',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+                    
+                    await prepareTest(unitData, conversionData, meterData);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('pound of CO₂');
+                    // Reuse same file as flow since value should be the same values.
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_lbsCO2_st_-inf_et_inf.csv');
+
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    expectReadingToEqualExpected(res, expected)
+                });
 
                 mocha.it('L21: should have hourly points for middle readings of 15 minute for a 60 day period and quantity units & kWh as MJ', async () => {
                     const unitData = unitDatakWh.concat([
