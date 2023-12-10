@@ -151,18 +151,6 @@ mocha.describe('readings API', () => {
                             note: 'OED created standard unit'
                         },
                         {
-                            // u11
-                            name: 'metric ton',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.QUANTITY,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: false,
-                            note: 'OED created standard unit'
-                        },
-                        {
                             // u12
                             name: 'kg CO₂',
                             identifier: '',
