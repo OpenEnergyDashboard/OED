@@ -204,8 +204,10 @@ mocha.describe('readings API', () => {
                     // Create a request to the API with specific parameters for B12 and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
                         .query({
-                            timeInterval: ETERNITY.toString(), // Replace with the specific time interval for B12
-                            barWidthDays: 1, // Replace with the specific bar width for B12
+							// Replace with the specific time interval for B12
+                            timeInterval: ETERNITY.toString(), 
+							// Replace with the specific bar width for B12
+                            barWidthDays: 1, 
                             graphicUnitId: unitId
                         });
                     // Check that the API reading is equal to what it is expected to equal
