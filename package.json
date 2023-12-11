@@ -74,7 +74,7 @@
 		"body-parser": "~1.20.2",
 		"bootstrap": "~5.2.3",
 		"csv": "~5.3.2",
-		"csv-parse": "~4.16.3",
+		"csv-parse": "~5.5.3",
 		"csv-stringify": "~5.6.5",
 		"dotenv": "~16.0.3",
 		"express": "~4.17.3",
