@@ -251,7 +251,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				for (let i = 0; i < value.deepMeters.length; i++) {
 					if (value.deepMeters[i] == props.meter.id) {
 						inputOk = false;
-						error_message += translate('group') + value.name + translate('uses') + translate('meter') + ' "' + metersByID[value.deepMeters[i]].name + '" \n';
+						// error_message += `${translate('group')} ${value.name} ${translate('uses')} ${translate('meter')} "${metersByID[value.deepMeters[i]].name}"\n`;
+						error_message += `${translate('group')} ${value.name} ${translate('uses')} ${translate('meter')} "${metersByID[value.deepMeters[i]].name}"; `;
 					}
 				}
 			}
@@ -286,7 +287,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					// so leaving code commented out.
 					// notifyUser(translate('input.gps.range') + state.gps + '.');
 					inputOk = false;
-					setState({...state, ['gps']: props.meter.gps});
+					setState({ ...state, ['gps']: props.meter.gps });
 				}
 			}
 
@@ -311,10 +312,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			} else if (error_message) {
 				// Display an error message if there are dependent deep meters
 				// state.unitId = props.meter.unitId;
-				setState({...state, ['unitId']: props.meter.unitId});
-				error_message = translate('meter.is.not.editable') + '\n' + error_message;
+				setState({ ...state, ['unitId']: props.meter.unitId });
+				// error_message = translate('meter.is.not.editable') + '\n' + error_message;
+				error_message = translate('meter.is.not.editable') + ': ' + error_message;
+				// TODO Attempts to add a line break with \n, <br />, etc. failed when using showErrorNotification.
+				// This is going to be a general problem.
 				showErrorNotification(error_message);
-			} else{
+			} else {
 				// Tell user that not going to update due to input issues.
 				notifyUser(translate('meter.input.error'));
 			}
