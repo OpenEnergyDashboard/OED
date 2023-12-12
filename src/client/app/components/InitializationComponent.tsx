@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { ConversionArray } from '../types/conversionArray';
+// import { ConversionArray } from '../types/conversionArray';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
@@ -35,7 +35,7 @@ export default function InitializationComponent() {
 		dispatch(fetchUnitsDetailsIfNeeded());
 		dispatch(fetchConversionsDetailsIfNeeded());
 		dispatch(fetchCiksIfNeeded());
-		ConversionArray.fetchPik();
+		// ConversionArray.fetchPik();
 	}, []);
 
 	// Rerender the route component if the user state changes
