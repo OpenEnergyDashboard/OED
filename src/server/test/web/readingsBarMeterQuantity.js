@@ -191,10 +191,9 @@ mocha.describe('readings API', () => {
                 });
                 mocha.it('B9:1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
                     // Load the data into the database
-
                     const unitData = unitDatakWh.concat([
                         {
-                            //u3
+                            // u3
                             name: 'MJ',
                             identifier: 'megaJoules',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
