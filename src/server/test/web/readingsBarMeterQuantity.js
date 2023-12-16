@@ -230,13 +230,13 @@ mocha.describe('readings API', () => {
                             id: METER_ID
                         }
                     ];
-                    // Load the data into the database
+                    // Load the data into the database 
                     await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('MJ');
-                    // Load the expected response data from the corresponding csv file
+                    // Load the expected response data from the corresponding csv file 
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_MJ_st_-inf_et_inf_bd_1.csv');
-                    // Create a request to the API for unbounded reading times and save the response
+                    // Create a request to the API for unbounded reading times and save the response 
                     const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
                         .query({
                             timeInterval: ETERNITY.toString(),
