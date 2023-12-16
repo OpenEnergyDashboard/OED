@@ -189,12 +189,12 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-
-                mocha.it('B9: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
+                mocha.it('B9:1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
                     // Load the data into the database
+
                     const unitData = unitDatakWh.concat([
                         {
-                            // u3
+                            //u3
                             name: 'MJ',
                             identifier: 'megaJoules',
                             unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -208,22 +208,22 @@ mocha.describe('readings API', () => {
                     ]);
                     const conversionData = conversionDatakWh.concat([
                         {
-                            // c6
+                            //c6
                             sourceName: 'MJ',
                             destinationName: 'kWh',
                             bidirectional: true,
                             slope: 1 / 3.6,
                             intercept: 0,
-                            note: 'MJ → kWh reverse conversion'
+                            note: 'MJ → KWh'
                         }
                     ]);
                     const meterData = [
                         {
-                            name: 'Electric_Utility MJ Reverse',
+                            name: 'Electric Utility MJ',
                             unit: 'Electric_Utility',
+                            defaultGraphicUnit: 'MJ',
                             displayable: true,
                             gps: undefined,
-                            defaultGraphicUnit: 'MJ',
                             note: 'special meter',
                             file: 'test/web/readingsData/readings_ri_15_days_75.csv',
                             deleteFile: false,
@@ -231,6 +231,7 @@ mocha.describe('readings API', () => {
                             id: METER_ID
                         }
                     ];
+                    // Load the data into the database
                     await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('MJ');
