@@ -27,7 +27,6 @@ import {
 	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup,
 	getCompatibilityChangeCase, GroupCase
 } from '../../utils/determineCompatibleUnits';
-import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString, nullToEmptyString } from '../../utils/input';
 import { GroupDefinition } from '../../types/redux/groups';
@@ -58,6 +57,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Meter state
 	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	// Cik state
+	const ciksState = useSelector((state: State) => state.ciks.ciks);
 	// Group state used on other pages
 	const globalGroupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Make a local copy of the group data so we can update during the edit process.
@@ -354,7 +355,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// globalGroupsState can change if another group is created/edited and this can change ones displayed in menus.
-	}, [ConversionArray.pikAvailable(), metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters]);
+	}, [metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -391,7 +392,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// If another group that is included in this group is changed then it must be redone
 		// but we currently do a refresh so it is covered. It should still be okay if
 		// the deep meters of this group are properly updated.
-	}, [ConversionArray.pikAvailable(), metersState, groupState.deepMeters]);
+	}, [metersState, groupState.deepMeters, ciksState]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

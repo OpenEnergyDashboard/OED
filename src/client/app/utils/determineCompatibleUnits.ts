@@ -5,8 +5,6 @@
 import store from '../index';
 import * as _ from 'lodash';
 import { MeterData } from '../types/redux/meters';
-// import { ConversionArray } from '../types/conversionArray';
-// import { UnitData, UnitType } from '../types/redux/units';
 import { GroupDefinition, GroupEditData } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
