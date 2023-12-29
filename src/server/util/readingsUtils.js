@@ -60,18 +60,18 @@ async function parseExpectedCsv(fileName) {
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
  */
-function expectReadingToEqualExpected(res, expected) {
+function expectReadingToEqualExpected(res, expected, id = METER_ID) {
     expect(res).to.be.json;
     expect(res).to.have.status(HTTP_CODE.OK);
     // Did the response have the correct number of readings.
-    expect(res.body).to.have.property(`${METER_ID}`).to.have.lengthOf(expected.length);
+    expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
     // Loop over each reading
     for (let i = 0; i < expected.length; i++) {
         // Check that the reading's value is within the expected tolerance (DELTA).
-        expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), DELTA);
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), DELTA);
         // Reading has correct start/end date and time.
-        expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][1]));
-        expect(res.body).to.have.property(`${METER_ID}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][1]));
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
     }
 }
 
