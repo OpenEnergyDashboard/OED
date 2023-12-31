@@ -40,6 +40,35 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
+
+                // Add LG2 here
+
+                // Add LG3 here
+
+                // Add LG4 here
+
+                // Add LG5 here
+
+                // Add LG6 here
+
+                // Add LG7 here
+
+                // Add LG10 here
+
+                // Add LG11 here
+
+                // Add LG12 here
+
+                // Add LG13 here
+
+                // Add LG18 here
+
+                // Add LG19 here
+
+                // Add LG20 here
+
+                // Add LG21 here
+
             });
         });
     });
