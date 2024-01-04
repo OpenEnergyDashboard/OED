@@ -38,7 +38,7 @@ mocha.describe('readings API', () => {
                         const unitId = await getUnitId('kWh');
                         // Load and parse the corresponding expected values from csv
                         const expected = await parseExpectedCsv(
-                            `src/server/test/web/readingsData/expected_3d_group_hp_${currentTimePerReading}_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv`);
+                            `src/server/test/web/readingsData/expected_3d_group_hp_${currentTimePerReading}_ri_15-20_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv`);
                         // Create a request to the API and save the response
                         const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                             .query({
@@ -57,7 +57,7 @@ mocha.describe('readings API', () => {
                     const timePerReading = 3;
                     // Load and parse the corresponding expected values from csv.
                     const expected = await parseExpectedCsv(
-                        'src/server/test/web/readingsData/expected_3d_group_hp_3_ri_15_mu_kWh_gu_kWh_st_2022-09-19%00#00#00_et_2022-09-23%00#00#00.csv');
+                        'src/server/test/web/readingsData/expected_3d_group_hp_3_ri_15-20_mu_kWh_gu_kWh_st_2022-09-19%00#00#00_et_2022-09-23%00#00#00.csv');
                     // Create a request to the API and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({
@@ -122,7 +122,7 @@ mocha.describe('readings API', () => {
                     const timePerReading = 4;
                     // Load and parse the corresponding expected values from csv.
                     const expected = await parseExpectedCsv(
-                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15_mu_kWh_gu_BTU_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
+                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15-20_mu_kWh_gu_BTU_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
                     // Create a request to the API and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({
@@ -166,7 +166,7 @@ mocha.describe('readings API', () => {
                     const unitId = await getUnitId('kWh');
                     // Load and parse the corresponding expected values from csv. 4 hours not 3.
                     const expected = await parseExpectedCsv(
-                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
+                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15-20_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
                     // Create a request to the API and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({
@@ -220,7 +220,7 @@ mocha.describe('readings API', () => {
                     // Use 24 for timePerReading since unusual return data.
                     expectThreeDReadingToEqualExpected(res, expected, 24, true);
                 });
-                mocha.it('3DG12: 15 minute readings, 8 hours/point with holes, extended time range and quantity units of kWh as kWh', async () => {
+                mocha.it('3DG12: 15 + 20 minute readings, 8 hours/point with holes, extended time range and quantity units of kWh as kWh', async () => {
                     const meterData = [
                         {
                             name: 'Electric Utility kWh',
@@ -255,7 +255,7 @@ mocha.describe('readings API', () => {
                     const timePerReading = 8;
                     // Load and parse the corresponding expected values from csv.
                     const expected = await parseExpectedCsv(
-                        'src/server/test/web/readingsData/expected_3d_group_hp_8_ri_15_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00_holes.csv');
+                        'src/server/test/web/readingsData/expected_3d_group_hp_8_ri_15-20_mu_kWh_gu_kWh_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00_holes.csv');
                     // Create a request to the API and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({

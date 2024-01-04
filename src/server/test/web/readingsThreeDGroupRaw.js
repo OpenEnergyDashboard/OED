@@ -21,7 +21,7 @@ mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for 3D charts', () => {
             mocha.describe('for raw groups', () => {
-                mocha.it('3DG14: 15 minute readings, 4 hours/point, full time range and raw units of Celsius as Celsius', async () => {
+                mocha.it('3DG14: 15 + 20 minute readings, 4 hours/point, full time range and raw units of Celsius as Celsius', async () => {
                     const unitData = [
                         {
                             // u6
@@ -103,7 +103,7 @@ mocha.describe('readings API', () => {
                     const timePerReading = 4;
                     // Reuse same file as flow since value should be the same values.
                     const expected = await parseExpectedCsv(
-                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15_mu_kW_gu_kW_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
+                        'src/server/test/web/readingsData/expected_3d_group_hp_4_ri_15-20_mu_kW_gu_kW_st_2022-08-18%00#00#00_et_2022-11-01%00#00#00.csv');
                     // Create a request to the API and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({
