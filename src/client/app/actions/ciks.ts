@@ -20,10 +20,15 @@ export function confirmCiksFetchedOnce(): t.ConfirmCiksFetchedOneAction {
 
 export function fetchCiksData(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
+		// make sure ciks is not being fetched
 		if (!getState().ciks.isFetching) {
+			// set isFetching to true
 			dispatch(requestCiksDetails());
+			// retrieve ciks data from database
 			const ciks = await ciksApi.getCiksDetails();
+			// update the state with the Cik details and set isFetching to false
 			dispatch(receiveCiksDetails(ciks));
+			// If this is the first fetch, inform the store that the first fetch has been made
 			if (!getState().ciks.hasBeenFetchedOne) {
 				dispatch(confirmCiksFetchedOnce());
 			}
@@ -31,12 +36,16 @@ export function fetchCiksData(): Thunk {
 	}
 }
 
+/**
+ * Fetch the ciks details from the database if they have not already been fetched once
+ */
 export function fetchCiksIfNeeded(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
+		// If ciks have not been fetched once, call the fetchCiksData
 		if (!getState().ciks.hasBeenFetchedOne) {
 			dispatch(fetchCiksData());
 		}
-
+		// If ciks have already been fetched, return a resolved promise
 		return Promise.resolve();
 	}
 }
