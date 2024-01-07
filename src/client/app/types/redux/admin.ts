@@ -31,7 +31,8 @@ export type AdminAction =
 	| UpdateDefaultMeterMaximumDateAction
 	| UpdateDefaultMeterReadingGapAction
 	| UpdateDefaultMeterMaximumErrorsAction
-	| UpdateDefaultMeterDisableChecksAction;
+	| UpdateDefaultMeterDisableChecksAction
+	| UpdateDefaultHelpUrlAction;
 
 export interface UpdateImportMeterAction {
 	type: ActionType.UpdateImportMeter;
@@ -144,6 +145,11 @@ export interface UpdateDefaultMeterDisableChecksAction {
 	defaultMeterDisableChecks: boolean;
 }
 
+export interface UpdateDefaultHelpUrlAction {
+	type: ActionType.UpdateDefaultHelpUrl;
+	defaultHelpUrl: string;
+}
+
 export interface AdminState {
 	selectedMeter: number | null;
 	displayTitle: string;
@@ -166,4 +172,5 @@ export interface AdminState {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
+	defaultHelpUrl: string;
 }

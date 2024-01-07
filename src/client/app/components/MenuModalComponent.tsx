@@ -23,29 +23,37 @@ export default function MenuModalComponent() {
 		display: 'inline',
 		paddingLeft: '5px'
 	};
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
 
 	return (
 		<div style={inlineStyle}>
 			<Button color='secondary' outline onClick={toggleModal}>
-				<FormattedMessage id='menu'/>
+				<FormattedMessage id='menu' />
 			</Button>
 			<Modal isOpen={showModal} toggle={toggleModal} onOpened={ReactTooltip.rebuild} onClick={() => ReactTooltip.hide()}>
-				<ModalHeader>
-					<FormattedMessage id='menu' />
-				</ModalHeader>
+				<ModalHeader tag={customModalHeader} style={{ padding: '0.25rem 1rem' }} />
 				<ModalBody>
-					<div style={labelStyle}><FormattedMessage id='navigation' /></div>
-					<HeaderButtonsComponent />
 					{/* Only render graph options if on the graph page */}
 					{getPage() === '' &&
 						<UIOptionsContainer />
 					}
 				</ModalBody>
 			</Modal>
-		</div>
+		</div >
 	)
+}
+
+const customModalHeader = () => {
+	return (
+		<div style={{
+			width: '100%',
+			display: 'flex', flexDirection: 'row',
+			justifyContent: 'space-between', alignItems: 'center'
+		}}>
+			<h5>
+				<FormattedMessage id='menu' />
+			</h5>
+			<h6>
+				<HeaderButtonsComponent />
+			</h6>
+		</div>)
 }

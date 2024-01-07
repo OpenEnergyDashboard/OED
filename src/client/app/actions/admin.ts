@@ -45,7 +45,6 @@ export function updateDefaultAreaUnit(defaultAreaUnit: AreaUnitType): t.UpdateDe
 }
 
 export function updateDefaultLanguage(defaultLanguage: LanguageTypes): t.UpdateDefaultLanguageAction {
-	moment.locale(defaultLanguage);
 	return { type: ActionType.UpdateDefaultLanguage, defaultLanguage };
 }
 
@@ -89,6 +88,10 @@ export function updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boole
 	return { type: ActionType.UpdateDefaultMeterDisableChecks, defaultMeterDisableChecks };
 }
 
+export function updateDefaultHelpUrl(defaultHelpUrl: string): t.UpdateDefaultHelpUrlAction {
+	return { type: ActionType.UpdateDefaultHelpUrl, defaultHelpUrl }
+}
+
 function requestPreferences(): t.RequestPreferencesAction {
 	return { type: ActionType.RequestPreferences };
 }
@@ -113,7 +116,6 @@ function fetchPreferences(): Thunk {
 		dispatch(requestPreferences());
 		const preferences = await preferencesApi.getPreferences();
 		dispatch(receivePreferences(preferences));
-		moment.locale(getState().admin.defaultLanguage);
 		if (!getState().graph.hotlinked) {
 			dispatch((dispatch2: Dispatch) => {
 				const state = getState();
@@ -125,7 +127,12 @@ function fetchPreferences(): Thunk {
 					dispatch2(toggleAreaNormalization());
 				}
 				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
+					// if the site default differs from the selected language, update the selected language and the locale
 					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
+					moment.locale(preferences.defaultLanguage);
+				} else {
+					// else set moment locale to site default
+					moment.locale(getState().admin.defaultLanguage);
 				}
 			});
 		}
@@ -192,7 +199,8 @@ export function submitPreferences() {
 				defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 				defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
+				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
+				defaultHelpUrl: state.admin.defaultHelpUrl
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

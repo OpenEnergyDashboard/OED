@@ -37,8 +37,18 @@ MeterTimeSortTypesJS = Object.freeze({
  * @enum {string}
  */
 BooleanTypesJS = Object.freeze({
-	true: 'true',
-	false: 'false',
+	true: 'yes',
+	false: 'no',
+});
+
+/**
+ * Enum of Boolean types.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
+ * @enum {string}
+ */
+BooleanMeterTypesJS = Object.freeze({
+	true: 'yes',
+	false: 'no',
 	// meter means to use value stored on meter or the default if not.
 	meter: 'meter value or default'
 });
@@ -56,27 +66,27 @@ BooleanTypesJS = Object.freeze({
 // we should change these strings to booleans.
 const DEFAULTS = {
 	common: {
-		gzip: 'true',
-		headerRow: 'false',
-		update: 'false'
+		gzip: BooleanTypesJS.true,
+		headerRow: BooleanTypesJS.false,
+		update: BooleanTypesJS.false
 	},
 	meters: {
 	},
 	readings: {
 		timeSort: undefined,
 		duplications: undefined,
-		cumulative: BooleanTypesJS.meter,
-		cumulativeReset: BooleanTypesJS.meter,
+		cumulative: BooleanMeterTypesJS.meter,
+		cumulativeReset: BooleanMeterTypesJS.meter,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		lengthGap: undefined,
 		lengthVariation: undefined,
 		endOnly: undefined,
-		createMeter: 'false',
-		refreshReadings: 'false',
-		refreshHourlyReadings: 'false',
-		honorDst: 'false',
-		relaxedParsing: 'false'
+		createMeter: BooleanTypesJS.false,
+		refreshReadings: BooleanTypesJS.false,
+		refreshHourlyReadings: BooleanTypesJS.false,
+		honorDst: BooleanTypesJS.false,
+		relaxedParsing: BooleanTypesJS.false
 	}
 }
 
@@ -111,22 +121,18 @@ const VALIDATION = {
 			...COMMON_PROPERTIES,
 			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
 			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
-			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
-			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			cumulative: new EnumParam('cumulative', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
+			cumulativeReset: new EnumParam('cumulativeReset', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false, BooleanTypesJS.meter]),
+			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
 			createMeter: new BooleanParam('createMeter'),
 			refreshReadings: new BooleanParam('refreshReadings'),
 			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
-			honorDst: {
-				type: 'string'
-			},
-			relaxedParsing: {
-				type: 'string'
-			}
+			honorDst: new BooleanParam('honorDst'),
+			relaxedParsing: new BooleanParam('relaxedParsing')
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -141,13 +147,13 @@ function validateRequestParams(body, schema) {
 	if (errors.length !== 0) {
 		errors.forEach(err => {
 			if (err.schema instanceof Param) {
-				responseMessage = 'User Error: ' + responseMessage + err.schema.message(err.instance) + '\n';
+				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + err.schema.message(err.instance) + '\n';
 			} else if (err.name === 'required') {
-				responseMessage = 'User Error: ' + responseMessage + `${err.argument} must be provided as the field ${err.argument}=.\n`;
+				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + `${err.argument} must be provided as the field ${err.argument}=.\n`;
 			} else if (err.name === 'additionalProperties') {
-				responseMessage = 'User Error: ' + responseMessage + err.argument + ' is an unexpected argument.\n';
+				responseMessage = 'User Error: ' + responseMessage  + err.path + ': '+ err.argument + ' is an unexpected argument.\n';
 			} else {
-				responseMessage = responseMessage + err.message;
+				responseMessage = responseMessage + err.path + ': ' + 'has message: ' + err.message;
 			}
 		});
 		return {
@@ -160,6 +166,7 @@ function validateRequestParams(body, schema) {
 		success: true
 	}
 }
+
 
 /**
  * Middleware that validates a request to upload readings via the CSV Pipeline and sets defaults for upload parameters.
@@ -200,10 +207,10 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		req.body.update = DEFAULTS.common.update;
 	}
 	if (!honorDst) {
-		req.body.honorDst = DEFAULTS.common.honorDst;
+		req.body.honorDst = DEFAULTS.readings.honorDst;
 	}
 	if (!relaxedParsing) {
-		req.body.relaxedParsing = DEFAULTS.common.relaxedParsing;
+		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
 	}
 	next();
 }
@@ -242,5 +249,6 @@ module.exports = {
 	validateReadingsCsvUploadParams,
 	TimeSortTypesJS,
 	MeterTimeSortTypesJS,
+	BooleanMeterTypesJS,
 	BooleanTypesJS
 };

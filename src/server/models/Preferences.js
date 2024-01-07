@@ -26,11 +26,12 @@ class Preferences {
 	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
 	 * @param {Boolean} defaultMeterDisableChecks - Option to set the default meter disable checks
+	 * @param {String} defaultHelpUrl - Option to set the default help page url
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
-		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency, 
-		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate, 
-		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultMeterDisableChecks) {
+		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency,
+		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate,
+		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultMeterDisableChecks, defaultHelpUrl) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -48,6 +49,7 @@ class Preferences {
 		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
 		this.defaultMeterDisableChecks = defaultMeterDisableChecks;
+		this.defaultHelpUrl = defaultHelpUrl;
 	}
 
 	/**
@@ -86,7 +88,8 @@ class Preferences {
 			row.default_meter_maximum_date,
 			row.default_meter_reading_gap,
 			row.default_meter_maximum_errors,
-			row.default_meter_disable_checks
+			row.default_meter_disable_checks,
+			row.default_help_url
 		);
 	}
 
@@ -125,7 +128,8 @@ class Preferences {
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
 				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: preferences.defaultMeterDisableChecks
+				defaultMeterDisableChecks: preferences.defaultMeterDisableChecks,
+				defaultHelpUrl: preferences.defaultHelpUrl
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
 		// input so return the new preferences. Easier just to return them all and only
