@@ -9,7 +9,7 @@ import ReactTooltip from 'react-tooltip';
 import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import UIOptionsComponent from './UIOptionsComponent';
-import { useLocation } from 'react-router-dom-v5-compat';
+import { useLocation } from 'react-router-dom';
 
 /**
  * React component to define the collapsed menu modal

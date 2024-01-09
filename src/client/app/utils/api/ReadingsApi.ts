@@ -17,6 +17,8 @@ export default class ReadingsApi {
 		this.backend = backend;
 	}
 
+	// TODO The line (and therefore radar) sort here but seems DB query does that. Can it be removed?
+
 	/**
 	 * Gets line readings for meters for the given time range
 	 * @param meterIDs The meter IDs to get readings for
@@ -88,6 +90,44 @@ export default class ReadingsApi {
 	}
 
 	/**
+	 * Gets radar readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns RadarReadings in sorted order
+	 */
+	public async meterRadarReadings(meterIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
+		const stringifiedIDs = meterIDs.join(',');
+		const readings = await this.backend.doGetRequest<LineReadings>(
+			`/api/unitReadings/radar/meters/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
+	}
+
+	/**
+	 * Gets radar readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param timeInterval The range of time to get readings for
+	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @returns RadarReadings in sorted order
+	 */
+	public async groupRadarReadings(groupIDs: number[], timeInterval: TimeInterval, unitID: number): Promise<LineReadings> {
+		const stringifiedIDs = groupIDs.join(',');
+		const readings = await this.backend.doGetRequest<LineReadings>(
+			`/api/unitReadings/radar/groups/${stringifiedIDs}`,
+			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString() }
+		);
+		// Ensure everything is sorted
+		_.values(readings)
+			.forEach((value: LineReading[]) => value.sort((a, b) => a.startTimestamp - b.startTimestamp));
+		return readings;
+	}
+
+	/**
 	 * Gets 3D readings for a single meter in the given time range.
 	 * @param meterID Meter to query
 	 * @param timeInterval Range of time to get readings from
@@ -104,7 +144,7 @@ export default class ReadingsApi {
 	}
 
 	/**
-	 * Gets 3D readings for a single meter in the given time range.
+	 * Gets 3D readings for a single group in the given time range.
 	 * @param groupID groupID to query
 	 * @param timeInterval Range of time to get readings from
 	 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
@@ -118,5 +158,4 @@ export default class ReadingsApi {
 			{ timeInterval: timeInterval.toString(), graphicUnitId: unitID.toString(), readingInterval: readingInterval.toString() }
 		);
 	}
-
 }

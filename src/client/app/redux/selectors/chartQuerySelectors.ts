@@ -25,6 +25,7 @@ export interface commonQueryArgs {
 export interface LineReadingApiArgs extends commonQueryArgs { }
 export interface BarReadingApiArgs extends commonQueryArgs { barWidthDays: number }
 
+// ThreeD only queries a single id so extend common, but omit ids array
 export interface ThreeDReadingApiArgs extends Omit<commonQueryArgs, 'ids'> { id: number, readingInterval: ReadingInterval }
 export interface CompareReadingApiArgs extends Omit<commonQueryArgs, 'timeInterval'> {
 	// compare breaks the timeInterval pattern query pattern therefore omit and add required for api.
@@ -34,7 +35,7 @@ export interface CompareReadingApiArgs extends Omit<commonQueryArgs, 'timeInterv
 }
 // Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 export interface MapReadingApiArgs extends BarReadingApiArgs { }
-
+export interface RadarReadingApiArgs extends commonQueryArgs { }
 
 export const selectCommonQueryArgs = createSelector(
 	selectSelectedMeters,
@@ -57,9 +58,11 @@ export const selectCommonQueryArgs = createSelector(
 			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.groups
 		}
+		// skip fetch if no meters or groups selected respectively
 		const meterSkip = !meterArgs.ids.length;
 		const groupSkip = !groupArgs.ids.length;
 
+		// Most Queries share these arguments, however values can be appended, or omitted per endpoint specification
 		return { meterArgs, groupArgs, meterSkip, groupSkip }
 	}
 )
@@ -67,12 +70,20 @@ export const selectCommonQueryArgs = createSelector(
 export const selectLineChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
 	common => {
-		// Args to pass into the line chart component
+		// Use the commonQuery args to populate the args to pass into the line chart component
 		const meterArgs: LineReadingApiArgs = common.meterArgs;
 		const groupArgs: LineReadingApiArgs = common.groupArgs;
 		const meterShouldSkip = common.meterSkip;
 		const groupShouldSkip = common.groupSkip;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
+	}
+)
+
+export const selectRadarChartQueryArgs = createSelector(
+	selectLineChartQueryArgs,
+	lineChartArgs => {
+		// Radar uses the same args as line, so copy
+		return lineChartArgs
 	}
 )
 
@@ -82,6 +93,7 @@ export const selectBarChartQueryArgs = createSelector(
 	(common, barWidthDays) => {
 		// QueryArguments to pass into the bar chart component
 		const barWidthAsDays = Math.round(barWidthDays.asDays())
+		// copy common args, then add bar chart args
 		const meterArgs: BarReadingApiArgs = {
 			...common.meterArgs,
 			barWidthDays: barWidthAsDays
@@ -107,11 +119,13 @@ export const selectCompareChartQueryArgs = createSelector(
 			curr_end: compareTimeInterval.getEndTimestamp()?.toISOString()
 		}
 		const meterArgs: CompareReadingApiArgs = {
+			// compare currently doesn't use the global time interval, so omit
 			..._.omit(common.meterArgs, 'timeInterval'),
 			...compareArgs
 
 		}
 		const groupArgs: CompareReadingApiArgs = {
+			// compare currently doesn't use the global time interval, so omit
 			..._.omit(common.groupArgs, 'timeInterval'),
 			...compareArgs
 		}

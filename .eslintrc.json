@@ -4,175 +4,174 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 {
-    "env": {
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "plugin:jsdoc/recommended-typescript",
-        "plugin:react-hooks/recommended"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
-    "plugins": [
-        "@typescript-eslint",
-        "jsdoc"
-    ],
-    "rules": {
-        //https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
-        "indent": [
-            "off"
-        ],
-        "@typescript-eslint/indent": [
-            "error",
-            "tab",
-            {
-                "SwitchCase": 1
-            }
-        ],
-        "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-inferrable-types": "off",
-        "no-trailing-spaces": [
-            2
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            "error",
-            "single",
-            {
-                "avoidEscape": true
-            }
-        ],
-        "max-len": [
-            "error",
-            {
-                "code": 150,
-                "tabWidth": 0
-            }
-        ],
-        "comma-dangle": [
-            "error",
-            "never"
-        ],
-        "arrow-parens": [
-            "error",
-            "as-needed"
-        ]
-    },
-    "overrides": [
-        {
-            // TODO: Remove this override once these components have been converted to use hooks
-            "files": [
-                "src/client/app/containers/admin/CreateUserContainer.tsx",
-                "src/client/app/containers/csv/UploadCSVContainer.tsx"
-            ],
-            "extends": [
-                "eslint:recommended",
-                "plugin:@typescript-eslint/recommended"
-            ],
-            "parser": "@typescript-eslint/parser",
-            "parserOptions": {
-                "ecmaFeatures": {
-                    "jsx": true
-                },
-                "ecmaVersion": "latest",
-                "sourceType": "module"
-            },
-            "plugins": [
-                "@typescript-eslint"
-            ],
-            "rules": {
-                // only to be used when declaring props as {}.
-                // is used in conjunction with overrides
-                // https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-based-on-glob-patterns
-                "@typescript-eslint/ban-types": [
-                    "error",
-                    {
-                        "extendDefaults": true,
-                        "types": {
-                            "{}": false
-                        }
-                    }
-                ],
-                // same rules need to be added.
-                "indent": [
-                    "off"
-                ],
-                "@typescript-eslint/indent": [
-                    "error",
-                    "tab",
-                    {
-                        "SwitchCase": 1
-                    }
-                ],
-                "@typescript-eslint/no-explicit-any": "off",
-                "@typescript-eslint/no-inferrable-types": "off",
-                "no-trailing-spaces": [
-                    2
-                ],
-                "linebreak-style": [
-                    "error",
-                    "unix"
-                ],
-                "quotes": [
-                    "error",
-                    "single",
-                    {
-                        "avoidEscape": true
-                    }
-                ],
-                "max-len": [
-                    "error",
-                    {
-                        "code": 150,
-                        "tabWidth": 0
-                    }
-                ],
-                "comma-dangle": [
-                    "error",
-                    "never"
-                ],
-                "arrow-parens": [
-                    "error",
-                    "as-needed"
-                ]
-            }
-        },
-        {
-            // disable jsdoc requirement for reducers and actions
-            "files": [
-                "src/client/app/reducers/*.ts",
-                "src/client/app/actions/*.ts"
-            ],
-            "rules": {
-                "jsdoc/require-jsdoc": "off",
-                "jsdoc/require-returns": "off"
-            }
-        },
-        {
-            // disable jsdoc for containers separately
-            // jsdoc makes sense for containers but we are working on removing them from the codebase
-            // TODO: Remove this override once containers have been converted
-            "files": [
-                "src/client/app/containers/*/*",
-                "src/client/app/containers/*"
-            ],
-            "rules": {
-                "jsdoc/require-jsdoc": "off",
-                "jsdoc/require-returns": "off",
-                "jsdoc/require-param": "off"
-            }
-        }
-    ]
+	"env": {
+		"browser": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:jsdoc/recommended-typescript"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": "latest",
+		"sourceType": "module"
+	},
+	"plugins": [
+		"@typescript-eslint",
+		"jsdoc"
+	],
+	"rules": {
+		//https://github.com/typescript-eslint/typescript-eslint/issues/1824, indent is therefore turned off and we use typescript-eslint/indent instead
+		"indent": [
+			"off"
+		],
+		"@typescript-eslint/indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/no-inferrable-types": "off",
+		"no-trailing-spaces": [
+			2
+		],
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"quotes": [
+			"error",
+			"single",
+			{
+				"avoidEscape": true
+			}
+		],
+		"max-len": [
+			"error",
+			{
+				"code": 150,
+				"tabWidth": 0
+			}
+		],
+		"comma-dangle": [
+			"error",
+			"never"
+		],
+		"arrow-parens": [
+			"error",
+			"as-needed"
+		]
+	},
+	"overrides": [
+		{
+			// TODO: Remove this override once these components have been converted to use hooks
+			"files": [
+				"src/client/app/containers/admin/CreateUserContainer.tsx",
+				"src/client/app/containers/csv/UploadCSVContainer.tsx"
+			],
+			"extends": [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/recommended"
+			],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"ecmaFeatures": {
+					"jsx": true
+				},
+				"ecmaVersion": "latest",
+				"sourceType": "module"
+			},
+			"plugins": [
+				"@typescript-eslint"
+			],
+			"rules": {
+				// only to be used when declaring props as {}.
+				// is used in conjunction with overrides
+				// https://eslint.org/docs/user-guide/configuring/configuration-files#configuration-based-on-glob-patterns
+				"@typescript-eslint/ban-types": [
+					"error",
+					{
+						"extendDefaults": true,
+						"types": {
+							"{}": false
+						}
+					}
+				],
+				// same rules need to be added.
+				"indent": [
+					"off"
+				],
+				"@typescript-eslint/indent": [
+					"error",
+					"tab",
+					{
+						"SwitchCase": 1
+					}
+				],
+				"@typescript-eslint/no-explicit-any": "off",
+				"@typescript-eslint/no-inferrable-types": "off",
+				"no-trailing-spaces": [
+					2
+				],
+				"linebreak-style": [
+					"error",
+					"unix"
+				],
+				"quotes": [
+					"error",
+					"single",
+					{
+						"avoidEscape": true
+					}
+				],
+				"max-len": [
+					"error",
+					{
+						"code": 150,
+						"tabWidth": 0
+					}
+				],
+				"comma-dangle": [
+					"error",
+					"never"
+				],
+				"arrow-parens": [
+					"error",
+					"as-needed"
+				]
+			}
+		},
+		{
+			// disable jsdoc requirement for reducers and actions
+			"files": [
+				"src/client/app/reducers/*.ts",
+				"src/client/app/actions/*.ts"
+			],
+			"rules": {
+				"jsdoc/require-jsdoc": "off",
+				"jsdoc/require-returns": "off"
+			}
+		},
+		{
+			// disable jsdoc for containers separately
+			// jsdoc makes sense for containers but we are working on removing them from the codebase
+			// TODO: Remove this override once containers have been converted
+			"files": [
+				"src/client/app/containers/*/*",
+				"src/client/app/containers/*"
+			],
+			"rules": {
+				"jsdoc/require-jsdoc": "off",
+				"jsdoc/require-returns": "off",
+				"jsdoc/require-param": "off"
+			}
+		}
+	]
 }

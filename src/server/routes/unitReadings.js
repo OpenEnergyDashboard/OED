@@ -202,8 +202,93 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
 	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
+function validateMeterRadarReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['meter_ids'],
+		properties: {
+			meter_ids: {
+				type: 'string',
+				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+function validateRadarReadingsQueryParams(queryParams) {
+	const validQuery = {
+		type: 'object',
+		maxProperties: 2,
+		required: ['timeInterval', 'graphicUnitId'],
+		properties: {
+			timeInterval: {
+				type: 'string'
+			},
+			graphicUnitId: {
+				type: 'string',
+				pattern: '^\\d+$'
+			}
+		}
+	};
+	const queryValidationResult = validate(queryParams, validQuery);
+	return queryValidationResult.valid;
+}
+
+function formatRadarReadingRow(readingRow) {
+	return {
+		reading: readingRow.reading_rate,
+		startTimestamp: readingRow.start_timestamp.valueOf(),
+		endTimestamp: readingRow.end_timestamp.valueOf()
+	};
+}
+
 /**
- * Gets hourly line readings for meters for the given time range
+ * Gets radar readings for meters for the given time range
+ * @param meterIDs The meter IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function meterRadarReadings(meterIDs, graphicUnitId, timeInterval) {
+	const conn = getConnection();
+	const rawReadings = await Reading.getMeterRadarReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatRadarReadingRow));
+}
+
+function validateGroupRadarReadingsParams(params) {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['group_ids'],
+		properties: {
+			group_ids: {
+				type: 'string',
+				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+			}
+		}
+	};
+	const paramsValidationResult = validate(params, validParams);
+	return paramsValidationResult.valid;
+}
+
+/**
+ * Gets radar readings for groups for the given time range
+ * @param groupIDs The group IDs to get readings for
+ * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+ * @param timeInterval The range of time to get readings for
+ * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+ */
+async function groupRadarReadings(groupIDs, graphicUnitId, timeInterval) {
+	const conn = getConnection();
+	const rawReadings = await Reading.getGroupRadarReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatRadarReadingRow));
+}
+
+/**
+ * Gets hour or multiple hour readings for meters for the given time range
  * @param meterIDs The meter IDs to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
@@ -217,8 +302,8 @@ async function meterThreeDReadings(meterIDs, graphicUnitId, timeInterval, readin
 }
 
 /**
- * Gets line readings for groups for the given time range
- * @param groupIDs The group IDs to get readings for
+ * Gets hour or multiple hour readings for group for the given time range
+ * @param groupID The group ID to get readings for
  * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
  * @param timeInterval The range of time to get readings for
  * @param readingInterval rate of hours per reading
@@ -342,6 +427,30 @@ function createRouter() {
 		}
 	});
 
+	router.get('/radar/meters/:meter_ids', async (req, res) => {
+		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const forJson = await meterRadarReadings(meterIDs, graphicUnitID, timeInterval);
+			res.json(forJson);
+		}
+	});
+
+	router.get('/radar/groups/:group_ids', async (req, res) => {
+		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
+			res.sendStatus(400);
+		} else {
+			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+			const graphicUnitID = req.query.graphicUnitId;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const forJson = await groupRadarReadings(groupIDs, graphicUnitID, timeInterval);
+			res.json(forJson);
+		}
+	});
+
 	router.get('/threeD/meters/:meter_ids', async (req, res) => {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -401,6 +510,7 @@ function createRouter() {
 
 module.exports = {
 	meterLineReadings,
+	meterRadarReadings,
 	validateLineReadingsParams: validateMeterLineReadingsParams,
 	validateLineReadingsQueryParams,
 	meterBarReadings,

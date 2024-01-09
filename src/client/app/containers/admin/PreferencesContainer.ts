@@ -16,7 +16,7 @@ function mapStateToProps(state: State) {
 	return {
 		displayTitle: state.admin.displayTitle,
 		defaultChartToRender: state.admin.defaultChartToRender,
-		defaultTimeZone: state.admin.defaultTimeZone,
+		defaultTimeZone: state.admin.defaultTimezone,
 		defaultBarStacking: state.admin.defaultBarStacking,
 		defaultLanguage: state.admin.defaultLanguage,
 		disableSubmitPreferences: state.admin.submitted,
@@ -31,7 +31,8 @@ function mapStateToProps(state: State) {
 		defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 		defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
-		defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
+		defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
+		defaultHelpUrl: state.admin.defaultHelpUrl
 	};
 }
 
@@ -79,7 +80,10 @@ function mapDispatchToProps(dispatch: Dispatch) {
 			dispatch(adminSlice.actions.updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors)),
 
 		updateDefaultMeterDisableChecks: (defaultMeterDisableChecks: boolean) =>
-			dispatch(adminSlice.actions.updateDefaultMeterDisableChecks(defaultMeterDisableChecks))
+			dispatch(adminSlice.actions.updateDefaultMeterDisableChecks(defaultMeterDisableChecks)),
+
+		updateDefaultHelpUrl: (defaultHelpUrl: string) =>
+			dispatch(adminSlice.actions.updateDefaultHelpUrl(defaultHelpUrl))
 	};
 }
 

@@ -30,12 +30,12 @@ const isHistoryTrigger = isAnyOf(
 		.filter(action => !(
 			// filter out the ones don't directly alter the graph, or ones which can cause infinite recursion
 			// we use updateHistory here, so listening for updateHistory would cause infinite loops etc.
-			toggleOptionsVisibility.match(action) ||
-			setOptionsVisibility.match(action) ||
-			setHotlinked.match(action) ||
-			setGraphState.match(action) ||
-			updateHistory.match(action) ||
-			traverseNextHistory.match(action) ||
-			traversePrevHistory.match(action)
+			action === toggleOptionsVisibility ||
+			action === setOptionsVisibility ||
+			action === setHotlinked ||
+			action === setGraphState ||
+			action === updateHistory ||
+			action === traverseNextHistory ||
+			action === traversePrevHistory
 		))
 )

@@ -12,12 +12,12 @@ import { LanguageTypes } from '../types/redux/i18n';
 import { durationFormat } from '../utils/durationFormat';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
-const defaultState: AdminState = {
+export const defaultAdminState: AdminState = {
 	selectedMeter: null,
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
-	defaultTimeZone: '',
+	defaultTimezone: '',
 	defaultLanguage: LanguageTypes.en,
 	isFetching: false,
 	submitted: true,
@@ -33,12 +33,13 @@ const defaultState: AdminState = {
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
-	defaultMeterDisableChecks: false
+	defaultMeterDisableChecks: false,
+	defaultHelpUrl: ''
 };
 
 export const adminSlice = createSlice({
 	name: 'admin',
-	initialState: defaultState,
+	initialState: defaultAdminState,
 	reducers: {
 		updateImportMeter: (state, action: PayloadAction<number>) => {
 			state.selectedMeter = action.payload;
@@ -64,7 +65,7 @@ export const adminSlice = createSlice({
 			state.submitted = false;
 		},
 		updateDefaultTimeZone: (state, action: PayloadAction<string>) => {
-			state.defaultTimeZone = action.payload;
+			state.defaultTimezone = action.payload;
 			state.submitted = false;
 		},
 		updateDefaultLanguage: (state, action: PayloadAction<LanguageTypes>) => {
@@ -131,6 +132,10 @@ export const adminSlice = createSlice({
 		updateDefaultMeterDisableChecks: (state, action: PayloadAction<boolean>) => {
 			state.defaultMeterDisableChecks = action.payload;
 			state.submitted = false;
+		},
+		updateDefaultHelpUrl: (state, action: PayloadAction<string>) => {
+			state.defaultHelpUrl = action.payload
+			state.submitted = false;
 		}
 	},
 	extraReducers: builder => {
@@ -142,7 +147,8 @@ export const adminSlice = createSlice({
 	},
 	selectors: {
 		selectAdminState: state => state,
-		selectDisplayTitle: state => state.displayTitle
+		selectDisplayTitle: state => state.displayTitle,
+		selectBaseHelpUrl: state => state.defaultHelpUrl
 	}
 });
 
@@ -166,5 +172,6 @@ export const {
 
 export const {
 	selectAdminState,
-	selectDisplayTitle
+	selectDisplayTitle,
+	selectBaseHelpUrl
 } = adminSlice.selectors

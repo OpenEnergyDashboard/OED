@@ -23,7 +23,7 @@ export const selectAdminPreferences = createSelector(
 		defaultChartToRender: adminState.defaultChartToRender,
 		defaultBarStacking: adminState.defaultBarStacking,
 		defaultLanguage: adminState.defaultLanguage,
-		defaultTimezone: adminState.defaultTimeZone,
+		defaultTimezone: adminState.defaultTimezone,
 		defaultWarningFileSize: adminState.defaultWarningFileSize,
 		defaultFileSizeLimit: adminState.defaultFileSizeLimit,
 		defaultAreaNormalization: adminState.defaultAreaNormalization,
@@ -35,7 +35,8 @@ export const selectAdminPreferences = createSelector(
 		defaultMeterMaximumDate: adminState.defaultMeterMaximumDate,
 		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
-		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks
+		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
+		defaultHelpUrl:adminState.defaultHelpUrl
 	})
 )
 

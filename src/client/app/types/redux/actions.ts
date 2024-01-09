@@ -34,6 +34,11 @@ export enum ActionType {
 	RequestMeterCompareReadings = 'REQUEST_METER_COMPARE_READINGS',
 	ReceiveMeterCompareReadings = 'RECEIVE_METER_COMPARE_READINGS',
 
+	RequestGroupRadarReadings = 'REQUEST_GROUP_RADAR_READINGS',
+	ReceiveGroupRadarReadings = 'RECEIVE_GROUP_RADAR_READINGS',
+	RequestMeterRadarReadings = 'REQUEST_METER_RADAR_READINGS',
+	ReceiveMeterRadarReadings = 'RECEIVE_METER_RADAR_READINGS',
+
 	RequestMeterThreeDReadings = 'REQUEST_METER_THREED_READINGS',
 	ReceiveMeterThreeDReadings = 'RECEIVE_METER_THREED_READINGS',
 	RequestGroupThreeDReadings = 'REQUEST_GROUP`_THREED_READINGS',
@@ -95,6 +100,7 @@ export enum ActionType {
 	UpdateDefaultMeterReadingGap = 'UPDATE_DEFAULT_METER_READING_GAP',
 	UpdateDefaultMeterMaximumErrors = 'UPDATE_DEFAULT_METER_MAXIMUM_ERRORS',
 	UpdateDefaultMeterDisableChecks = 'UPDATE_DEFAULT_METER_DISABLE_CHECKS',
+	UpdateDefaultHelpUrl = 'UPDATE_DEFAULT_HELP_URL',
 
 	UpdateSelectedLanguage = 'UPDATE_SELECTED_LANGUAGE',
 

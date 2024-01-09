@@ -8,7 +8,7 @@ import { ChartTypes } from '../../types/redux/graph';
 import { defineMessages, FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { LanguageTypes } from '../../types/redux/i18n';
 import TimeZoneSelect from '../TimeZoneSelect';
-import {store} from '../../store';
+import { store } from '../../store';
 import { fetchPreferencesIfNeeded, submitPreferences } from '../../actions/admin';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import translate from '../../utils/translate';
@@ -35,6 +35,7 @@ interface PreferencesProps {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
+	defaultHelpUrl: string;
 	updateDisplayTitle(title: string): ReturnType<typeof adminSlice.actions.updateDisplayTitle>;
 	updateDefaultChartType(defaultChartToRender: ChartTypes): ReturnType<typeof adminSlice.actions.updateDefaultChartToRender>;
 	toggleDefaultBarStacking(): ReturnType<typeof adminSlice.actions.toggleDefaultBarStacking>;
@@ -53,6 +54,7 @@ interface PreferencesProps {
 	updateDefaultMeterReadingGap(defaultMeterReadingGap: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterReadingGap>;
 	updateDefaultMeterMaximumErrors(defaultMeterMaximumErrors: number): ReturnType<typeof adminSlice.actions.updateDefaultMeterMaximumErrors>;
 	updateDefaultMeterDisableChecks(defaultMeterDisableChecks: boolean): ReturnType<typeof adminSlice.actions.updateDefaultMeterDisableChecks>;
+	updateDefaultHelpUrl(defaultHelpUrl: string): ReturnType<typeof adminSlice.actions.updateDefaultHelpUrl>;
 }
 
 type PreferencesPropsWithIntl = PreferencesProps & WrappedComponentProps;
@@ -79,6 +81,7 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 		this.handleDefaultMeterReadingGapChange = this.handleDefaultMeterReadingGapChange.bind(this);
 		this.handleDefaultMeterMaximumErrorsChange = this.handleDefaultMeterMaximumErrorsChange.bind(this);
 		this.handleDefaultMeterDisableChecksChange = this.handleDefaultMeterDisableChecksChange.bind(this);
+		this.handleDefaultHelpUrlChange = this.handleDefaultHelpUrlChange.bind(this);
 	}
 
 	public render() {
@@ -152,6 +155,19 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 								checked={this.props.defaultChartToRender === ChartTypes.compare}
 							/>
 							<FormattedMessage id='compare' />
+						</label>
+					</div>
+					<div className='radio'>
+						<label>
+							<input
+								type='radio'
+								name='chartTypes'
+								style={{ marginRight: '10px' }}
+								value={ChartTypes.radar}
+								onChange={this.handleDefaultChartToRenderChange}
+								checked={this.props.defaultChartToRender === ChartTypes.radar}
+							/>
+							<FormattedMessage id='radar' />
 						</label>
 					</div>
 					<div className='radio'>
@@ -386,6 +402,16 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 						})}
 					</Input>
 				</div>
+				<div style={bottomPaddingStyle}>
+					<p style={titleStyle}>
+						<FormattedMessage id='default.help.url' />:
+					</p>
+					<Input
+						type='text'
+						value={this.props.defaultHelpUrl}
+						onChange={this.handleDefaultHelpUrlChange}
+					/>
+				</div>
 				<Button
 					type='submit'
 					onClick={this.handleSubmitPreferences}
@@ -507,6 +533,11 @@ class PreferencesComponent extends React.Component<PreferencesPropsWithIntl> {
 
 	private handleDefaultMeterDisableChecksChange(e: { target: HTMLInputElement; }) {
 		this.props.updateDefaultMeterDisableChecks(JSON.parse(e.target.value))
+		this.updateUnsavedChanges();
+	}
+
+	private handleDefaultHelpUrlChange(e: { target: HTMLInputElement; }) {
+		this.props.updateDefaultHelpUrl(e.target.value);
 		this.updateUnsavedChanges();
 	}
 

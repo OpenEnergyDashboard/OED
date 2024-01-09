@@ -1,5 +1,11 @@
 import * as _ from 'lodash';
-import { BarReadingApiArgs, CompareReadingApiArgs, LineReadingApiArgs, ThreeDReadingApiArgs } from '../selectors/chartQuerySelectors';
+import {
+	BarReadingApiArgs,
+	CompareReadingApiArgs,
+	LineReadingApiArgs,
+	RadarReadingApiArgs,
+	ThreeDReadingApiArgs
+} from '../selectors/chartQuerySelectors';
 import { RootState } from '../../store';
 import { BarReadings, CompareReadings, LineReadings, ThreeDReading } from '../../types/readings';
 import { baseApi } from './baseApi';
@@ -11,7 +17,7 @@ export const readingsApi = baseApi.injectEndpoints({
 			// No other properties are necessary for this endpoint
 			// Refer to the line endpoint for an example of an endpoint with custom cache behavior
 			query: ({ id, timeInterval, graphicUnitId, readingInterval, meterOrGroup }) => ({
-				// destructure args that are passed into the callback, and generate the API url for the request.
+				// destructure args that are passed into the callback, and generate/ implicitly return the API url for the request.
 				url: `api/unitReadings/threeD/${meterOrGroup}/${id}?`,
 				params: { timeInterval, graphicUnitId, readingInterval }
 			})
@@ -19,10 +25,10 @@ export const readingsApi = baseApi.injectEndpoints({
 		line: builder.query<LineReadings, LineReadingApiArgs>({
 			// Customize Cache Behavior by utilizing (serializeQueryArgs, merge, forceRefetch)
 			serializeQueryArgs: ({ queryArgs }) => {
-				// Modify the default serialization behavior to better suit our use case, to avoid querying already cached data.
-				// We omit the ids so that any query with the same timeInterval,GraphicUnitId, and meterOrGroup will hit the same cache
+				// Modify the default serialization behavior to better suit our use case, and avoid querying already cached data.
+				// We omit the ids so that any query with the same timeInterval, graphicUnitId, and meterOrGroup will hit the same cache
 				// if we didn't omit id's there would be separate cache entries for queries with ids [1], [1,2], [1,2,3], [1,3], etc..
-				// an entry fore each means requesting the same data again for ALL meters. which results in too much duplicate data requests
+				// an entry for each means requesting the same data again for ALL meters. which results in too much duplicate data requests
 
 				// We keep all args other than the ids.
 				return _.omit(queryArgs, 'ids')
@@ -33,6 +39,8 @@ export const readingsApi = baseApi.injectEndpoints({
 
 				// it is important to note,
 				// Since this is wrapped with Immer, you may either mutate the currentCacheValue directly, or return a new value, but not both at once.
+
+				// mutate current cache draft
 				Object.assign(currentCacheData, responseData)
 			},
 			forceRefetch: ({ currentArg, endpointState }) => {
@@ -78,7 +86,7 @@ export const readingsApi = baseApi.injectEndpoints({
 				if (error) {
 					return { error }
 				}
-				// since we define custom merge behavior, incoming data will merge with the existing cache
+				// since we define custom merge behavior, incoming data will merge with the existing cache if any
 				return { data: data as LineReadings }
 
 			}
@@ -88,12 +96,9 @@ export const readingsApi = baseApi.injectEndpoints({
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
 			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
 			forceRefetch: ({ currentArg, endpointState }) => {
-				// const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : undefined
-				// if (!currentData) { return true }
-				// const dataInCache = currentArg?.ids.every(id => currentData.includes(id))
-				// return !dataInCache ? true : false
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
-				return !currentArg?.ids.every(id => currentData.includes(id));
+				const dataInCache = currentArg?.ids.every(id => currentData.includes(id));
+				return !dataInCache
 			},
 			queryFn: async (args, queryApi, _extra, baseQuery) => {
 				const { ids, meterOrGroup, ...params } = args
@@ -130,8 +135,26 @@ export const readingsApi = baseApi.injectEndpoints({
 				const { data, error } = await baseQuery({ url: `/api/compareReadings/${meterOrGroup}/${idsToFetch}`, params })
 				return error ? { error } : { data: data as CompareReadings }
 			}
+		}),
+		radar: builder.query<LineReadings, RadarReadingApiArgs>({
+			// Refer to line endpoint for detailed explanation as the logic is identical
+			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
+			forceRefetch: ({ currentArg, endpointState }) => {
+				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
+				const dataInCache = currentArg?.ids.every(id => currentData.includes(id));
+				return !dataInCache
+			},
+			queryFn: async (args, queryApi, _extra, baseQuery) => {
+				const { ids, meterOrGroup, ...params } = args
+				const state = queryApi.getState() as RootState
+				const cachedData = readingsApi.endpoints.radar.select(args)(state).data
+				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : []
+				const idsToFetch = _.difference(ids, cachedIDs).join(',')
+				const { data, error } = await baseQuery({ url: `api/unitReadings/radar/${meterOrGroup}/${idsToFetch}`, params })
+				return error ? { error } : { data: data as LineReadings }
+			}
 		})
 
 	})
-
 })

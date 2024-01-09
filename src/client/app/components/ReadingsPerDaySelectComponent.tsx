@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
- * A component which allows users to select date ranges for the graphic
+ * A component which allows users to select number of reading per day for the graphic
  * @returns A Select menu with Readings per day options.
  */
 export default function ReadingsPerDaySelect() {
@@ -33,6 +33,7 @@ export default function ReadingsPerDaySelect() {
 		} else {
 			const startTS = moment.utc(data.xData[0].startTimestamp);
 			const endTS = moment.utc(data.xData[0].endTimestamp);
+			// This should be the number of hours between readings.
 			actualReadingInterval = endTS.diff(startTS) / 3600000;
 		}
 

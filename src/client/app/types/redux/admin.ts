@@ -12,7 +12,7 @@ export interface AdminState {
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
-	defaultTimeZone: string;
+	defaultTimezone: string;
 	defaultLanguage: LanguageTypes;
 	isFetching: boolean;
 	submitted: boolean;
@@ -29,4 +29,5 @@ export interface AdminState {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultMeterDisableChecks: boolean;
+	defaultHelpUrl: string;
 }

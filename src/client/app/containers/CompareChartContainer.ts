@@ -125,7 +125,6 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
-	console.log(entity)
 	const areaNormalization = selectGraphAreaNormalization(state)
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {

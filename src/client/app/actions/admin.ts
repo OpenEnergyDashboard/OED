@@ -92,7 +92,7 @@ export function submitPreferences() {
 				defaultChartToRender: state.admin.defaultChartToRender,
 				defaultBarStacking: state.admin.defaultBarStacking,
 				defaultLanguage: state.admin.defaultLanguage,
-				defaultTimezone: state.admin.defaultTimeZone,
+				defaultTimezone: state.admin.defaultTimezone,
 				defaultWarningFileSize: state.admin.defaultWarningFileSize,
 				defaultFileSizeLimit: state.admin.defaultFileSizeLimit,
 				defaultAreaNormalization: state.admin.defaultAreaNormalization,
@@ -104,7 +104,8 @@ export function submitPreferences() {
 				defaultMeterMaximumDate: state.admin.defaultMeterMaximumDate,
 				defaultMeterReadingGap: state.admin.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: state.admin.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks
+				defaultMeterDisableChecks: state.admin.defaultMeterDisableChecks,
+				defaultHelpUrl: state.admin.defaultHelpUrl
 			});
 			// Only return the defaultMeterReadingFrequency because the value from the DB
 			// generally differs from what the user input so update state with DB value.

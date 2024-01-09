@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Link, useLocation } from 'react-router-dom-v5-compat';
+import { Link, useLocation } from 'react-router-dom';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../reducers/graph';
@@ -17,9 +17,9 @@ import { UserRole } from '../types/items';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
-import { BASE_URL } from './TooltipHelpComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectCurrentUser } from '../reducers/currentUser';
+import { selectBaseHelpUrl } from '../reducers/admin';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -33,8 +33,9 @@ export default function HeaderButtonsComponent() {
 
 	// OED version is needed for help redirect
 	const version = useAppSelector(selectOEDVersion);
+	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
 	// Help URL location
-	const helpUrl = BASE_URL + version;
+	const helpUrl = baseHelpUrl + version;
 	// options help
 	const optionsHelp = helpUrl + '/optionsMenu.html';
 
@@ -86,7 +87,7 @@ export default function HeaderButtonsComponent() {
 	useEffect(() => {
 		setState(prevState => ({
 			...prevState,
-			pageChoicesHelp: BASE_URL + version
+			pageChoicesHelp: helpUrl
 		}));
 	}, [version]);
 

@@ -15,6 +15,7 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
+import { defaultAdminState } from '../../reducers/admin';
 
 
 // TODO: Add warning for invalid data
@@ -22,7 +23,7 @@ import TimeZoneSelect from '../TimeZoneSelect';
  * @returns Preferences Component for Administrative use
  */
 export default function PreferencesComponentWIP() {
-	const { data: adminPreferences = {} as PreferenceRequestItem } = preferencesApi.useGetPreferencesQuery();
+	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
 	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(_.cloneDeep(adminPreferences))
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
@@ -62,58 +63,23 @@ export default function PreferencesComponentWIP() {
 				<p style={labelStyle}>
 					<FormattedMessage id='default.graph.type' />:
 				</p>
-				<div className='radio'>
-					<label >
-						<input
-							type='radio'
-							name='chartTypes'
-							style={{ marginRight: '10px' }}
-							value={ChartTypes.line}
-							onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-							checked={localAdminPref.defaultChartToRender === ChartTypes.line}
-						/>
-						{translate('line')}
-					</label>
-				</div>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='chartTypes'
-							style={{ marginRight: '10px' }}
-							value={ChartTypes.bar}
-							onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-							checked={localAdminPref.defaultChartToRender === ChartTypes.bar}
-						/>
-						{translate('bar')}
-					</label>
-				</div>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='chartTypes'
-							style={{ marginRight: '10px' }}
-							value={ChartTypes.compare}
-							onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-							checked={localAdminPref.defaultChartToRender === ChartTypes.compare}
-						/>
-						<FormattedMessage id='compare' />
-					</label>
-				</div>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='chartTypes'
-							style={{ marginRight: '10px' }}
-							value={ChartTypes.map}
-							onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-							checked={localAdminPref.defaultChartToRender === ChartTypes.map}
-						/>
-						{translate('map')}
-					</label>
-				</div>
+				{
+					Object.values(ChartTypes).map(chartType => (
+						<div className='radio' key={chartType}>
+							<label >
+								<input
+									type='radio'
+									name='chartTypes'
+									style={{ marginRight: '10px' }}
+									value={chartType}
+									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
+									checked={localAdminPref.defaultChartToRender === chartType}
+								/>
+								{translate(chartType)}
+							</label>
+						</div>
+					))
+				}
 			</div>
 			<p style={labelStyle}>
 				<FormattedMessage id='default.graph.settings' />:
@@ -338,6 +304,16 @@ export default function PreferencesComponentWIP() {
 					})}
 				</Input>
 			</div>
+			<div style={bottomPaddingStyle}>
+				<p style={titleStyle}>
+					<FormattedMessage id='default.help.url' />:
+				</p>
+				<Input
+					type='text'
+					value={localAdminPref.defaultHelpUrl}
+					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
+				/>
+			</div>
 			<Button
 				type='submit'
 				onClick={() =>
@@ -354,7 +330,7 @@ export default function PreferencesComponentWIP() {
 			>
 				{translate('submit')}
 			</Button>
-		</div>
+		</div >
 	);
 }
 

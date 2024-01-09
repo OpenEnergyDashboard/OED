@@ -14,6 +14,7 @@ import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { UnitRepresentType } from '../types/redux/units';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { ChartTypes } from '../types/redux/graph';
 
 /**
  * React component that controls the line graph rate menu
@@ -40,8 +41,8 @@ export default function GraphicRateMenuComponent() {
 			shouldRender = false;
 		}
 	}
-	// Also don't show if not the line graphic.
-	if (graphState.chartToRender !== 'line') {
+	// Also don't show if not the line graphic, or three-d.
+	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD ) {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates

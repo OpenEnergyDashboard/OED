@@ -48,8 +48,12 @@ export default function UIOptionsComponent() {
 				chartToRender === ChartTypes.map && <MapControlsComponent />}
 
 
-			{/* We can't export compare data or map data */
-				chartToRender !== ChartTypes.compare && chartToRender !== ChartTypes.map && chartToRender !== ChartTypes.threeD &&
+			{ /* We can't export compare, map, radar or 3D data */
+				chartToRender !== ChartTypes.compare &&
+				chartToRender !== ChartTypes.map &&
+				chartToRender !== ChartTypes.threeD &&
+				chartToRender !== ChartTypes.radar &&
+
 				< div style={divTopPadding}>
 					<ExportComponent />
 				</div>}

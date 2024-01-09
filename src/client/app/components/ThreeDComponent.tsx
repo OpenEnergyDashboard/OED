@@ -157,7 +157,7 @@ function formatThreeDData(
 
 		// Use first day's values to populate xData Labels
 		if (i === 0) {
-			xDataToRender.push(midpointTS.format('h:mm A'));
+			xDataToRender.push(midpointTS.format('LT'));
 		}
 
 		// Use the first index of each row/day to extract the dates for the yLabels
@@ -167,7 +167,7 @@ function formatThreeDData(
 			yDataToRender.push(dateTS.format(moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY')));
 		}
 
-		const time = midpointTS.format('h:mm A');
+		const time = midpointTS.format('LT');
 		const date = dateTS.format('LL');
 		// ThreeD graphic readings can be null. If not null round to a precision.
 		const readingValue = readings === null ? null : readings.toPrecision(6);
@@ -178,7 +178,6 @@ function formatThreeDData(
 		type: 'surface',
 		showlegend: false,
 		showscale: false,
-		// zmin: 0,
 		x: xDataToRender,
 		y: yDataToRender,
 		z: zDataToRender,

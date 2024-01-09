@@ -5,8 +5,7 @@
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import { LocaleDataKey, TranslationKey } from '../translations/data';
 import localeData from '../translations/data';
-
-import { store } from '../store';
+import { store }  from '../store';
 
 // Function overloads to add TS Completions support
 function translate(messageID: LocaleDataKey): string;

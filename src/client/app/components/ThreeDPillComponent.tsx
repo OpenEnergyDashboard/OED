@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from '../redux/hooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';
+import translate from '../utils/translate';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
@@ -50,7 +51,7 @@ export default function ThreeDPillComponent() {
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
 		return meterOrGroupPillData.map(pillData => {
-			//retrieve data from appropriate state slice .meters or .group
+			// retrieve data from appropriate state slice .meters or .group
 			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
 				meterDataById[pillData.meterOrGroupID].identifier
 				:
@@ -85,7 +86,7 @@ export default function ThreeDPillComponent() {
 		<div style={pillContainer}>
 			{meterPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>Meters</p>
+					<p style={pillBoxLabel}>{translate('meters')}</p>
 					<div style={pills}>
 						{populatePills(meterPillData)}
 					</div>
@@ -94,7 +95,7 @@ export default function ThreeDPillComponent() {
 
 			{groupPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>Groups</p>
+					<p style={pillBoxLabel}>{translate('groups')}</p>
 					<div style={pills} >
 						{populatePills(groupPillData)}
 					</div>

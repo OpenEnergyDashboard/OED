@@ -6,7 +6,7 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
-import { Navigate, Outlet, RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom-v5-compat';
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, useSearchParams } from 'react-router-dom';
 import { TimeInterval } from '../../../common/TimeInterval';
 import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';

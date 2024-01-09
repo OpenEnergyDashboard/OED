@@ -13,6 +13,7 @@ import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
 import { selectChartToRender, selectOptionsVisibility } from '../reducers/graph';
+import RadarChartComponent from '../containers/RadarChartComponent';
 
 /**
  * React component that controls the dashboard
@@ -40,6 +41,7 @@ export default function DashboardComponent() {
 						{chartToRender === ChartTypes.compare && <MultiCompareChartComponentWIP />}
 						{chartToRender === ChartTypes.map && <MapChartComponent />}
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
+						{chartToRender === ChartTypes.radar && <RadarChartComponent />}
 					</div>
 
 				</div>

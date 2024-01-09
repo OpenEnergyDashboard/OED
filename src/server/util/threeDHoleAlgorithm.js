@@ -16,8 +16,7 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 	const numOfReadings = meterOrGroupReadings.length;
 	// If readings exist, and first index is not the 'special case'(requested frequency exceeds meter reading frequency)
 	// find/replace missing readings if any, and format for plotly,
-	// Otherwise, return empty z,y,z data
-	// if (numOfReadings > 0 && meterOrGroupReadings[0].reading_rate !== -999) {
+	// Otherwise, return empty x,y,z data
 	if (numOfReadings > 0) {
 		// If the meter is low frequency then the DB may return readings with larger time ranges than requested.
 		// All readings have same range so use the first one to determine the range. diff gives milliseconds
@@ -28,11 +27,11 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 		// Assume no missing readings, replace if needed.
 		let readingsToReturn = meterOrGroupReadings;
 
-		// get the number of days days between start and end timestamps * readings per day.
+		// get the number of days between start and end timestamps * readings per day.
 		const readingsPerDay = 24 / readingIntervalUse;
 		const intervalDuration = moment.duration({ 'hour': readingIntervalUse });
 		const expectedNumOfReadings = toTimestamp.diff(fromTimestamp, 'days') * readingsPerDay;
-		// Run Fill holes algorithm if expected num of readings to not match received reading count.
+		// Run Fill holes algorithm if expected num of readings do not match received reading count.
 		if (meterOrGroupReadings.length !== expectedNumOfReadings) {
 			const missingReadings = [];
 

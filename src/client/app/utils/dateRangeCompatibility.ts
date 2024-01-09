@@ -60,7 +60,7 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
  */
 export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInterval {
 	if (timeInterval.getIsBounded()) {
-		// clone() prevents startOf/EndOf from mutating the original timeInterval which will cause issues down the nested dispatch chain
+		// clone() prevents startOf/endOf from mutating the original timeInterval which will cause issues down the nested dispatch chain
 		const startTS = timeInterval.getStartTimestamp().clone();
 		const endTS = timeInterval.getEndTimestamp().clone();
 		startTS.startOf('day');
@@ -79,5 +79,5 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
  * @returns the a time interval into a dateRange compatible for a date-picker.
  */
 export function isValidThreeDInterval(timeInterval: TimeInterval): boolean {
-	return (timeInterval.getIsBounded() && timeInterval.duration('days') <= 367) ? true : false;
+	return timeInterval.getIsBounded() && timeInterval.duration('days') <= 367;
 }

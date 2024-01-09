@@ -5,7 +5,7 @@
 import { MutationTrigger } from '@reduxjs/toolkit/dist/query/react/buildHooks';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { unstable_useBlocker as useBlocker } from 'react-router-dom-v5-compat';
+import { useBlocker } from 'react-router-dom';
 // TODO migrate ReactRouter v6 & hooks
 import { Button, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import { LocaleDataKey } from '../translations/data';

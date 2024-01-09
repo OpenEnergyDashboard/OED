@@ -7,7 +7,7 @@ import { rootReducer } from './reducers';
 import { baseApi } from './redux/api/baseApi';
 import { Dispatch } from './types/redux/actions';
 import { listenerMiddleware } from './redux/middleware/middleware';
-import { setInputStabilityCheckEnabled } from 'reselect'
+import { setGlobalDevModeChecks } from 'reselect'
 
 export const store = configureStore({
 	reducer: rootReducer,
@@ -18,8 +18,9 @@ export const store = configureStore({
 		.prepend(listenerMiddleware.middleware)
 		.concat(baseApi.middleware)
 });
-// TODO determine where to place this, and only set for dev env
-setInputStabilityCheckEnabled('always')
+
+// stability check for ALL createSelector instances.
+setGlobalDevModeChecks({ inputStabilityCheck: 'always' })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 // https://react-redux.js.org/using-react-redux/usage-with-typescript#define-root-state-and-dispatch-types

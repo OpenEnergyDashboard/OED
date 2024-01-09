@@ -5,7 +5,6 @@
 const database = require('./database');
 const { mapToObject, threeDHoleAlgorithm } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
-const moment = require('moment');
 const _ = require('lodash');
 const log = require('../log');
 
@@ -384,7 +383,63 @@ class Reading {
 	}
 
 	/**
-	 * Gets hourly line readings for a meter for the given time range
+	 * Gets radar line readings for meters for the given time range
+	 * @param meterIDs The meter IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param conn the connection to use.
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getMeterRadarReadings(meterIDs, graphicUnitId, fromTimestamp = null, toTimestamp = null, conn) {
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
+		/**
+		 * @type {array<{meter_id: int, reading_rate: Number, max_rate: Number, min_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		//Using the same data from meter line readings because they are identical to radar readings.
+		const allMeterRadarReadings = await conn.func('meter_line_readings_unit',
+			[meterIDs, graphicUnitId, fromTimestamp || '-infinity', toTimestamp || 'infinity', 'auto', maxRawPoints, maxHourlyPoints]
+		);
+		const radarReadingsByMeterID = mapToObject(meterIDs, () => []);
+		for (const row of allMeterRadarReadings) {
+			radarReadingsByMeterID[row.meter_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return radarReadingsByMeterID;
+	}
+
+	/**
+	 * Gets radar readings for groups for the given time range
+	 * @param groupIDs The group IDs to get readings for
+	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
+	 * @param fromTimestamp An optional start point for the time range of readings returned
+	 * @param toTimestamp An optional end point for the time range of readings returned
+	 * @param conn the connection to use.
+	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
+	 */
+	static async getGroupRadarReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, conn) {
+		// maxRawPoints is not used for groups.
+		const [maxRawPoints, maxHourlyPoints] = determineMaxPoints();
+		/**
+		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
+		 */
+		//Using the same data from group line readings because they are identical to group radar readings.
+		const allGroupRadarReadings = await conn.func('group_line_readings_unit',
+			[groupIDs, graphicUnitId, fromTimestamp, toTimestamp, 'auto', maxHourlyPoints]
+		);
+
+		const radarReadingsByGroupID = mapToObject(groupIDs, () => []);
+		for (const row of allGroupRadarReadings) {
+			radarReadingsByGroupID[row.group_id].push(
+				{ reading_rate: row.reading_rate, start_timestamp: row.start_timestamp, end_timestamp: row.end_timestamp }
+			);
+		}
+		return radarReadingsByGroupID;
+	}
+
+	/**
+	 * Gets hour or multiple hour readings for meters for the given time range
 	 * @param meterIDs The meter IDs to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp Start point for the time range of readings returned
@@ -403,8 +458,8 @@ class Reading {
 	}
 
 	/**
-	 * Gets hourly readings for groups for the given time range
-	 * @param groupIDs The group IDs to get readings for
+	 * Gets hour or multiple hour readings for groups for the given time range
+	 * @param groupID The group ID to get readings for
 	 * @param graphicUnitId The unit id that the reading should be returned in, i.e., the graphic unit
 	 * @param fromTimestamp Start point for the time range of readings returned
 	 * @param toTimestamp End point for the time range of readings returned
@@ -412,11 +467,11 @@ class Reading {
 	 * @param conn the connection to use.
 	 * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
 	 */
-	static async getGroupThreeDReadings(groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
+	static async getGroupThreeDReadings(groupID, graphicUnitId, fromTimestamp, toTimestamp, readingInterval, conn) {
 		/**
 		 * @type {array<{group_id: int, reading_rate: Number, start_timestamp: Moment, end_timestamp: Moment}>}
 		 */
-		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupIDs, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
+		const allGroupThreeDReadings = await conn.func('group_3d_readings_unit', [groupID, graphicUnitId, fromTimestamp, toTimestamp, readingInterval]);
 		const groupThreeDData = threeDHoleAlgorithm(allGroupThreeDReadings, fromTimestamp, toTimestamp);
 		return groupThreeDData;
 	}
