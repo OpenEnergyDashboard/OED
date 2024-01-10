@@ -24,8 +24,6 @@ export default function DashboardComponent() {
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
 	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
-	// const optionsClassName = optionsVisibility ? 'col-3 d-none d-lg-block' : 'd-none';
-	// const chartClassName = optionsVisibility ? 'col-12 col-lg-9' : 'col-12';
 
 	return (
 		<div className='container-fluid'>

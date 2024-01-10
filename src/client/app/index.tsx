@@ -7,7 +7,7 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import RouteComponentWIP from './components/RouteComponentWIP';
+import RouteComponent from './components/RouteComponent';
 import { initApp } from './reducers/appStateSlice';
 import './styles/index.css';
 
@@ -20,6 +20,6 @@ const root = createRoot(container);
 root.render(
 	//  Provides the Redux store to all child components
 	< Provider store={store} stabilityCheck='always' >
-		< RouteComponentWIP />
+		< RouteComponent />
 	</Provider >
 );
