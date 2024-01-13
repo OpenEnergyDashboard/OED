@@ -12,7 +12,8 @@ import MapChartComponent from './MapChartComponent';
 import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
-import { selectChartToRender, selectOptionsVisibility } from '../reducers/graph';
+import { selectChartToRender } from '../reducers/graph';
+import { selectOptionsVisibility } from '../reducers/appStateSlice';
 import RadarChartComponent from '../containers/RadarChartComponent';
 
 /**

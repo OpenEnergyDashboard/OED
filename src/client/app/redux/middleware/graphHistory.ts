@@ -1,20 +1,15 @@
 // https://redux-toolkit.js.org/api/createListenerMiddleware#typescript-usage
 import { isAnyOf } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
-import {
-	graphSlice, setGraphState,
-	setHotlinked, setOptionsVisibility, toggleOptionsVisibility,
-	traverseNextHistory, traversePrevHistory, updateHistory
-} from '../../reducers/graph';
+import { graphSlice, updateHistory } from '../../reducers/graph';
 import { AppStartListening } from './middleware';
 
 export const historyMiddleware = (startListening: AppStartListening) => {
 
 	startListening({
 		predicate: (action, currentState, previousState) => {
-			// deep compare of previous state added mostly due to potential state triggers/ dispatches that may not actually alter state
-			// For example 'popping' values from react-select w/ backspace when empty
-			return isHistoryTrigger(action) && !_.isEqual(currentState.graph, previousState.graph)
+			// compare of previous state added due to potential no-op dispatches
+			// i.e. 'popping' values from react-select w/ backspace when empty, or clearing already unbounded time interval, etc.
+			return isHistoryTrigger(action) && currentState.graph !== previousState.graph
 		},
 		effect: (_action, { dispatch, getOriginalState }) => {
 			const prev = getOriginalState().graph.current
@@ -25,17 +20,4 @@ export const historyMiddleware = (startListening: AppStartListening) => {
 }
 
 // listen to all graphSlice actions
-const isHistoryTrigger = isAnyOf(
-	...Object.values(graphSlice.actions)
-		.filter(action => !(
-			// filter out the ones don't directly alter the graph, or ones which can cause infinite recursion
-			// we use updateHistory here, so listening for updateHistory would cause infinite loops etc.
-			action === toggleOptionsVisibility ||
-			action === setOptionsVisibility ||
-			action === setHotlinked ||
-			action === setGraphState ||
-			action === updateHistory ||
-			action === traverseNextHistory ||
-			action === traversePrevHistory
-		))
-)
+const isHistoryTrigger = isAnyOf(...Object.values(graphSlice.actions))

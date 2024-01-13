@@ -3,20 +3,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { PayloadAction } from '@reduxjs/toolkit';
-import InitializingComponent from 'components/InitializingComponent';
+import InitializingComponent from '../router/InitializingComponent';
 import moment from 'moment';
 import * as React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { graphSlice } from 'reducers/graph';
-import { useWaitForInit } from 'redux/componentHooks';
-import { useAppDispatch } from 'redux/hooks';
-import { validateComparePeriod, validateSortingOrder } from 'utils/calculateCompare';
-import { AreaUnitType } from 'utils/getAreaUnitConversion';
-import { showErrorNotification } from 'utils/notifications';
-import translate from 'utils/translate';
+import { graphSlice } from '../../reducers/graph';
+import { useWaitForInit } from '../../redux/componentHooks';
+import { useAppDispatch } from '../../redux/hooks';
+import { validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ChartTypes, LineGraphRate, MeterOrGroup } from '../../types/redux/graph';
-import { changeSelectedMap } from 'actions/map';
+import { changeSelectedMap } from '../../actions/map';
+import { appStateSlice } from '../../reducers/appStateSlice';
 
 export const GraphLink = () => {
 	const dispatch = useAppDispatch();
@@ -69,7 +70,7 @@ export const GraphLink = () => {
 					dispatchQueue.push(graphSlice.actions.changeCompareSortingOrder(validateSortingOrder(value)))
 					break;
 				case 'optionsVisibility':
-					dispatchQueue.push(graphSlice.actions.setOptionsVisibility(value === 'true' ? true : false))
+					dispatchQueue.push(appStateSlice.actions.setOptionsVisibility(value === 'true' ? true : false))
 					break;
 				case 'mapID':
 					// 'TODO, Verify Behavior & FIXME! MapLink not working as expected

@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { selectOptionsVisibility, toggleOptionsVisibility } from '../reducers/graph';
+import { selectOptionsVisibility, toggleOptionsVisibility } from '../reducers/appStateSlice';
 import { unsavedWarningSlice } from '../reducers/unsavedWarning';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';

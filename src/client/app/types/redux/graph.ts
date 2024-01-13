@@ -69,8 +69,6 @@ export interface GraphState {
 	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
-	hotlinked: boolean;
-	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
 	renderOnce: boolean;
 	showMinMax: boolean;

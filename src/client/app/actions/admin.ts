@@ -21,26 +21,28 @@ function fetchPreferences(): Thunk {
 		const preferences = await preferencesApi.getPreferences();
 		dispatch(adminSlice.actions.receivePreferences(preferences));
 		moment.locale(getState().admin.defaultLanguage);
-		if (!getState().graph.hotlinked) {
-			dispatch((dispatch2: Dispatch) => {
-				const state = getState();
-				dispatch2(graphSlice.actions.changeChartToRender(state.admin.defaultChartToRender));
-				if (preferences.defaultBarStacking !== state.graph.barStacking) {
-					dispatch2(graphSlice.actions.changeBarStacking());
-				}
-				if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
-					dispatch2(graphSlice.actions.toggleAreaNormalization());
-				}
-				if (preferences.defaultLanguage !== state.options.selectedLanguage) {
-					// if the site default differs from the selected language, update the selected language and the locale
-					dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
-					moment.locale(preferences.defaultLanguage);
-				} else {
-					// else set moment locale to site default
-					moment.locale(getState().admin.defaultLanguage);
-				}
-			});
-		}
+		//  TODO reference only DELETE ME
+		// if (!getState().graph.hotlinked) {
+		// hotlink removed in rtk migration
+		dispatch((dispatch2: Dispatch) => {
+			const state = getState();
+			dispatch2(graphSlice.actions.changeChartToRender(state.admin.defaultChartToRender));
+			if (preferences.defaultBarStacking !== state.graph.barStacking) {
+				dispatch2(graphSlice.actions.changeBarStacking());
+			}
+			if (preferences.defaultAreaNormalization !== state.graph.areaNormalization) {
+				dispatch2(graphSlice.actions.toggleAreaNormalization());
+			}
+			if (preferences.defaultLanguage !== state.options.selectedLanguage) {
+				// if the site default differs from the selected language, update the selected language and the locale
+				dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
+				moment.locale(preferences.defaultLanguage);
+			} else {
+				// else set moment locale to site default
+				moment.locale(getState().admin.defaultLanguage);
+			}
+		});
+		// }
 	};
 }
 // TODO: Add warning for invalid data in admin panel src/client/app/components/admin/PreferencesComponent.tsx

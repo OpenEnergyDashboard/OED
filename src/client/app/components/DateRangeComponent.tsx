@@ -27,13 +27,7 @@ export default function DateRangeComponent() {
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(state => state.options.selectedLanguage);
 
-	const handleChange = (value: Value) => {
-		// Dispatch in all cases except when value have been cleared and time interval already unbounded
-		// A null value indicates that the picker has been cleared
-		if (!(!value && !queryTimeInterval.getIsBounded())) {
-			dispatch(updateTimeInterval(dateRangeToTimeInterval(value)))
-		}
-	}
+	const handleChange = (value: Value) => { dispatch(updateTimeInterval(dateRangeToTimeInterval(value))) }
 
 
 	return (

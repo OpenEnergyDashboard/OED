@@ -13,10 +13,13 @@ import { currentUserSlice } from './currentUser';
 
 interface appStateSlice {
 	initComplete: boolean;
+	optionsVisibility: boolean;
+
 }
 
 const defaultState: appStateSlice = {
-	initComplete: false
+	initComplete: false,
+	optionsVisibility: true
 }
 
 export const appStateSlice = createThunkSlice({
@@ -27,6 +30,12 @@ export const appStateSlice = createThunkSlice({
 		// Allows thunks inside of reducers, and prepareReducers with 'create' builder notation
 		setInitComplete: create.reducer<boolean>((state, action) => {
 			state.initComplete = action.payload
+		}),
+		toggleOptionsVisibility: create.reducer(state => {
+			state.optionsVisibility = !state.optionsVisibility
+		}),
+		setOptionsVisibility: create.reducer<boolean>((state, action) => {
+			state.optionsVisibility = action.payload
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
@@ -80,15 +89,19 @@ export const appStateSlice = createThunkSlice({
 
 	}),
 	selectors: {
-		selectInitComplete: state => state.initComplete
+		selectInitComplete: state => state.initComplete,
+		selectOptionsVisibility: state => state.optionsVisibility
 	}
 })
 
 export const {
+	initApp,
 	setInitComplete,
-	initApp
+	toggleOptionsVisibility,
+	setOptionsVisibility
 } = appStateSlice.actions
 
 export const {
-	selectInitComplete
+	selectInitComplete,
+	selectOptionsVisibility
 } = appStateSlice.selectors

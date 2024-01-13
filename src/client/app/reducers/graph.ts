@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, SliceCaseReducers, ValidateSliceCaseReducers, createAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -26,8 +26,6 @@ const defaultState: GraphState = {
 	chartToRender: ChartTypes.line,
 	barStacking: false,
 	areaNormalization: false,
-	hotlinked: false,
-	optionsVisibility: true,
 	lineGraphRate: { label: 'hour', rate: 1 },
 	renderOnce: false,
 	showMinMax: false,
@@ -81,7 +79,11 @@ export const graphSlice = createSlice({
 			state.current.barDuration = action.payload
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.queryTimeInterval = action.payload
+			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
+			// clearing when already unbounded should be a no-op
+			if (action.payload.getIsBounded() || state.current.queryTimeInterval.getIsBounded()) {
+				state.current.queryTimeInterval = action.payload
+			}
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.rangeSliderInterval = action.payload
@@ -114,17 +116,8 @@ export const graphSlice = createSlice({
 		setBarStacking: (state, action: PayloadAction<boolean>) => {
 			state.current.barStacking = action.payload
 		},
-		setHotlinked: (state, action: PayloadAction<boolean>) => {
-			state.current.hotlinked = action.payload
-		},
 		changeCompareSortingOrder: (state, action: PayloadAction<SortingOrder>) => {
 			state.current.compareSortingOrder = action.payload
-		},
-		toggleOptionsVisibility: state => {
-			state.current.optionsVisibility = !state.current.optionsVisibility
-		},
-		setOptionsVisibility: (state, action: PayloadAction<boolean>) => {
-			state.current.optionsVisibility = action.payload
 		},
 		updateLineGraphRate: (state, action: PayloadAction<LineGraphRate>) => {
 			state.current.lineGraphRate = action.payload
@@ -150,7 +143,7 @@ export const graphSlice = createSlice({
 			// Destructure payload
 			const { newMetersOrGroups, meta } = action.payload;
 			const cleared = meta.action === 'clear'
-			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue
+			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue !== undefined
 			const valueAdded = meta.action === 'select-option' && meta.option
 			let isAMeter = true
 
@@ -225,39 +218,37 @@ export const graphSlice = createSlice({
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
 			state.current = action.payload
-		},
-		updateHistory: (state, action: PayloadAction<GraphState>) => {
-			state.next = [];
-			state.prev.push(action.payload)
-		},
-		traversePrevHistory: state => {
-			const prev = state.prev.pop()
-			if (prev) {
-				state.next.push(state.current)
-				state.current = prev
-			}
-		},
-		traverseNextHistory: state => {
-			const next = state.next.pop()
-			if (next) {
-				state.prev.push(state.current)
-				state.current = next
-			}
 		}
+
 	},
 	extraReducers: builder => {
-		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
-			if (current.selectedAreaUnit === AreaUnitType.none) {
-				current.selectedAreaUnit = action.payload.defaultAreaUnit;
-			}
-			if (!current.hotlinked) {
-				current.chartToRender = action.payload.defaultChartToRender
-				current.barStacking = action.payload.defaultBarStacking
-				current.areaNormalization = action.payload.defaultAreaNormalization
-			}
-		})
+		builder
+			.addCase(updateHistory, (state, action) => {
+				state.next = [];
+				state.prev.push(action.payload)
+			})
+			.addCase(historyStepBack, state => {
+				const prev = state.prev.pop()
+				if (prev) {
+					state.next.push(state.current)
+					state.current = prev
+				}
+			})
+			.addCase(historyStepForward, state => {
+				const next = state.next.pop()
+				if (next) {
+					state.prev.push(state.current)
+					state.current = next
+				}
+			})
+			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
+				const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload
+				current.selectedAreaUnit = defaultAreaUnit
+				current.chartToRender = defaultChartToRender
+				current.barStacking = defaultBarStacking
+				current.areaNormalization = defaultAreaNormalization
+			})
 	},
-	// New Feature as of 2.0.0 Beta.
 	selectors: {
 		selectGraphState: state => state.current,
 		selectPrevHistory: state => state.prev,
@@ -275,7 +266,6 @@ export const graphSlice = createSlice({
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
 		selectQueryTimeInterval: state => state.current.queryTimeInterval,
-		selectOptionsVisibility: state => state.current.optionsVisibility,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
@@ -301,7 +291,6 @@ export const {
 	selectForwardHistory,
 	selectSelectedMeters,
 	selectSelectedGroups,
-	selectOptionsVisibility,
 	selectQueryTimeInterval,
 	selectThreeDMeterOrGroup,
 	selectCompareTimeInterval,
@@ -312,10 +301,8 @@ export const {
 
 // actionCreators exports
 export const {
-	setHotlinked,
 	setShowMinMax,
 	setGraphState,
-	updateHistory,
 	setBarStacking,
 	toggleShowMinMax,
 	changeBarStacking,
@@ -324,19 +311,15 @@ export const {
 	changeSliderRange,
 	updateTimeInterval,
 	updateSelectedUnit,
-	traverseNextHistory,
-	traversePrevHistory,
 	changeChartToRender,
 	updateComparePeriod,
 	updateSelectedMeters,
 	updateLineGraphRate,
 	setAreaNormalization,
-	setOptionsVisibility,
 	updateSelectedGroups,
 	resetRangeSliderStack,
 	updateSelectedAreaUnit,
 	confirmGraphRenderOnce,
-	toggleOptionsVisibility,
 	toggleAreaNormalization,
 	updateThreeDMeterOrGroup,
 	changeCompareSortingOrder,
@@ -346,56 +329,6 @@ export const {
 	updateSelectedMetersOrGroups
 } = graphSlice.actions
 
-export const historyStepBack = createAction('graph/HistoryStepBack')
-export const HistoryStepForward = createAction('graph/HistoryStepForward')
-
-
-const createGenericSlice = <
-	T,
-	Reducers extends SliceCaseReducers<History<T>>
->({
-	name = '',
-	initialState,
-	reducers
-}: {
-	name: string
-	initialState: History<T>
-	reducers: ValidateSliceCaseReducers<History<T>, Reducers>
-}) => {
-	return createSlice({
-		name,
-		initialState,
-		reducers: {
-			updateHistory: (state: History<T>, action: PayloadAction<T>) => {
-				state.next = [];
-				state.prev.push(action.payload)
-			},
-			traversePrevHistory: state => {
-				const prev = state.prev.pop()
-				if (prev) {
-					state.next.push(state.current)
-					state.current = prev
-				}
-			},
-			traverseNextHistory: state => {
-				const next = state.next.pop()
-				if (next) {
-					state.prev.push(state.current)
-					state.current = next
-				}
-			},
-			...reducers
-
-		}
-	})
-}
-
-export const wrappedSlice = createGenericSlice({
-	name: 'test',
-	initialState: initialState,
-	reducers: {
-		toggleAreaNormalization: state => {
-			state.current.areaNormalization = !state.current.areaNormalization
-		}
-	}
-})
+export const historyStepBack = createAction('graph/historyStepBack')
+export const historyStepForward = createAction('graph/historyStepForward')
+export const updateHistory = createAction<GraphState>('graph/updateHistory')

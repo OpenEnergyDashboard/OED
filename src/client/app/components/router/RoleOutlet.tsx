@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useWaitForInit } from '../../redux/componentHooks';
 import InitializingComponent from './InitializingComponent';
-import { UserRole } from 'types/items';
+import { UserRole } from '../../types/items';
 
 interface RoleOutletProps {
 	role: UserRole
