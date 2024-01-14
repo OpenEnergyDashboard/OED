@@ -6,16 +6,16 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import EditConversionModalComponent from './EditConversionModalComponent';
-import '../../styles/card-page.css';
-import { ConversionData } from 'types/redux/conversions';
-import { UnitDataById } from 'types/redux/units';
-import translate from '../../utils/translate';
 import { Button } from 'reactstrap';
+import { ConversionData } from 'types/redux/conversions';
+import '../../styles/card-page.css';
+import translate from '../../utils/translate';
+import EditConversionModalComponentWIP from './EditConversionModalComponent';
+import { useAppSelector } from '../../redux/hooks';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
-	units: UnitDataById;
 }
 
 /**
@@ -28,6 +28,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
+	const unitDataById = useAppSelector(selectUnitDataById)
 
 	const handleShow = () => {
 		setShowEditModal(true);
@@ -36,7 +37,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	const handleClose = () => {
 		setShowEditModal(false);
 	}
-
+	React.useEffect(() => undefined, [props.conversion])
 	// Create header from sourceId, destinationId identifiers
 	// Arrow is bidirectional if conversion is bidirectional and one way if not.
 	let arrowShown: string;
@@ -45,7 +46,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	} else {
 		arrowShown = ' → ';
 	}
-	const header = String(props.units[props.conversion.sourceId].identifier + arrowShown + props.units[props.conversion.destinationId].identifier);
+	const header = String(unitDataById[props.conversion.sourceId].identifier + arrowShown + unitDataById[props.conversion.destinationId].identifier);
 
 	// Unlike the details component, we don't check if units are loaded since must come through that page.
 
@@ -55,10 +56,10 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				{header}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="conversion.source" /></b> {props.units[props.conversion.sourceId].identifier}
+				<b><FormattedMessage id="conversion.source" /></b> {unitDataById[props.conversion.sourceId].identifier}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="conversion.destination" /></b> {props.units[props.conversion.destinationId].identifier}
+				<b><FormattedMessage id="conversion.destination" /></b> {unitDataById[props.conversion.destinationId].identifier}
 			</div>
 			<div className={props.conversion.bidirectional.toString()}>
 				<b><FormattedMessage id="conversion.bidirectional" /></b> {translate(`TrueFalseType.${props.conversion.bidirectional.toString()}`)}
@@ -78,10 +79,9 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 					<FormattedMessage id="conversion.edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}
-				<EditConversionModalComponent
+				<EditConversionModalComponentWIP
 					show={showEditModal}
 					conversion={props.conversion}
-					unitsState={props.units}
 					header={header}
 					handleShow={handleShow}
 					handleClose={handleClose} />

@@ -9,12 +9,12 @@ import BarChartComponent from './BarChartComponent';
 import HistoryComponent from './HistoryComponent';
 import LineChartComponent from './LineChartComponent';
 import MapChartComponent from './MapChartComponent';
-import MultiCompareChartComponentWIP from './MultiCompareChartComponentWIP';
+import MultiCompareChartComponent from './MultiCompareChartComponent';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
 import { selectChartToRender } from '../reducers/graph';
 import { selectOptionsVisibility } from '../reducers/appStateSlice';
-import RadarChartComponent from '../containers/RadarChartComponent';
+import RadarChartComponent from './RadarChartComponent';
 
 /**
  * React component that controls the dashboard
@@ -37,7 +37,7 @@ export default function DashboardComponent() {
 						<HistoryComponent />
 						{chartToRender === ChartTypes.line && <LineChartComponent />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent />}
-						{chartToRender === ChartTypes.compare && <MultiCompareChartComponentWIP />}
+						{chartToRender === ChartTypes.compare && <MultiCompareChartComponent />}
 						{chartToRender === ChartTypes.map && <MapChartComponent />}
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
 						{chartToRender === ChartTypes.radar && <RadarChartComponent />}

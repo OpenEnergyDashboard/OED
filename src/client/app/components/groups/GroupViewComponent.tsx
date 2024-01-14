@@ -6,22 +6,18 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
 import { Button } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
-import { State } from 'types/redux/state';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { useAppSelector } from '../../redux/hooks';
+import { selectIsAdmin } from '../../reducers/currentUser';
 import '../../styles/card-page.css';
-import { UnitData } from '../../types/redux/units';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 import { noUnitTranslated } from '../../utils/input';
 import translate from '../../utils/translate';
-import EditGroupModalComponent from './EditGroupModalComponent';
+import EditGroupModalComponentWIP from './EditGroupModalComponent';
 
 interface GroupViewComponentProps {
 	group: GroupData;
-	// This isn't used in this component but are passed to the edit component
-	// This is done to avoid having to recalculate the possible units sets in each view component
-	possibleGraphicUnits: Set<UnitData>;
 }
 
 /**
@@ -29,8 +25,9 @@ interface GroupViewComponentProps {
  * @param props variables passed in to define
  * @returns Group info card element
  */
-export default function GroupViewComponent(props: GroupViewComponentProps) {
+export default function GroupViewComponentWIP(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.
+
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -43,14 +40,13 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 		setShowEditModal(false);
 	}
 
-	// current user state
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
 	// Check for admin status
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state
-	const unitState = useSelector((state: State) => state.units.units);
+	const unitDataById = useAppSelector(selectUnitDataById);
+
 
 	return (
 		<div className="card">
@@ -62,7 +58,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 				{/* Use meter translation id string since same one wanted. */}
 				<b><FormattedMessage id="defaultGraphicUnit" /></b>
 				{/* This is the default graphic unit associated with the group or no unit if none. */}
-				{props.group.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitState[props.group.defaultGraphicUnit].identifier}
+				{props.group.defaultGraphicUnit === -99 ? ' ' + noUnitTranslated().identifier : ' ' + unitDataById[props.group.defaultGraphicUnit].identifier}
 			</div>
 			{loggedInAsAdmin &&
 				<div className={props.group.displayable.toString()}>
@@ -81,10 +77,9 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>
 				{/* Creates a child GroupModalEditComponent */}
-				<EditGroupModalComponent
+				<EditGroupModalComponentWIP
 					show={showEditModal}
 					groupId={props.group.id}
-					possibleGraphicUnits={props.possibleGraphicUnits}
 					handleShow={handleShow}
 					handleClose={handleClose} />
 			</div>

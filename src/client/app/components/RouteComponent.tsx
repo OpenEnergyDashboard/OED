@@ -16,9 +16,9 @@ import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponentWIP from './admin/UsersDetailComponentWIP';
-import ConversionsDetailComponentWIP from './conversion/ConversionsDetailComponentWIP';
-import GroupsDetailComponentWIP from './groups/GroupsDetailComponentWIP';
-import MetersDetailComponentWIP from './meters/MetersDetailComponentWIP';
+import ConversionsDetailComponentWIP from './conversion/ConversionsDetailComponent';
+import GroupsDetailComponent from './groups/GroupsDetailComponent';
+import MetersDetailComponentWIP from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
 import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
 		children: [
 			{ index: true, element: <HomeComponent /> },
 			{ path: 'login', element: <LoginComponent /> },
-			{ path: 'groups', element: <GroupsDetailComponentWIP /> },
+			{ path: 'groups', element: <GroupsDetailComponent /> },
 			{ path: 'meters', element: <MetersDetailComponentWIP /> },
 			{ path: 'graph', element: <GraphLink /> },
 			{

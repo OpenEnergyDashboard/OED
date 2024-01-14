@@ -3,19 +3,15 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
-import { ConversionData } from 'types/redux/conversions';
-import { fetchConversionsDetailsIfNeeded } from '../../actions/conversions';
-import SpinnerComponent from '../../components/SpinnerComponent';
-import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { selectConversionsDetails } from '../../redux/api/conversionsApi';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { State } from '../../types/redux/state';
+import SpinnerComponent from '../SpinnerComponent';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import { conversionsApi } from '../../redux/api/conversionsApi';
+import { unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
+import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import ConversionViewComponent from './ConversionViewComponent';
-import CreateConversionModalComponent from './CreateConversionModalComponent';
+import ConversionViewComponentWIP from './ConversionViewComponent';
+import CreateConversionModalComponentWIP from './CreateConversionModalComponent';
 
 /**
  * Defines the conversions page card view
@@ -24,24 +20,22 @@ import CreateConversionModalComponent from './CreateConversionModalComponent';
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
-	const dispatch = useAppDispatch();
-
-	useEffect(() => {
-		// Makes async call to conversions API for conversions details if one has not already been made somewhere else, stores conversion by ids in state
-		dispatch(fetchConversionsDetailsIfNeeded());
-	}, [dispatch]);
-
 	// Conversions state
-	const conversionsState = useAppSelector(selectConversionsDetails);
+	const { data: conversionsState = [], isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
+	// Units DataById
+	const { unitDataById = {}, isFetching: unitsFetching } = unitsApi.useGetUnitsDetailsQuery(undefined, {
+		selectFromResult: ({ data, ...result }) => ({
+			...result,
+			unitDataById: data && unitsAdapter.getSelectors().selectEntities(data)
+		})
+	})
+	// const x = useAppSelector(state => conversionsApi.endpoints.refresh.select()(state))
 
+	// unnecessary? Currently this occurs as a side effect of the mutation which will invalidate meters/group
+	// unused for now, until decided
+	// const isUpdatingCikAndDBViews = useAppSelector(state => state.admin.isUpdatingCikAndDBViews);
 
-	const isUpdatingCikAndDBViews = useSelector((state: State) => state.admin.isUpdatingCikAndDBViews);
-
-	// Units state
-	const unitsState = useSelector((state: State) => state.units.units);
-	const unitsFetchedOnce = useSelector((state: State) => state.units.hasBeenFetchedOnce);
 	// Check if the units state is fully loaded
-	const unitsStateLoaded = unitsFetchedOnce && Object.keys(unitsState).length > 0;
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -56,7 +50,7 @@ export default function ConversionsDetailComponent() {
 
 	return (
 		<div>
-			{isUpdatingCikAndDBViews ? (
+			{(conversionsFetching || unitsFetching) ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
@@ -72,24 +66,25 @@ export default function ConversionsDetailComponent() {
 								<TooltipMarkerComponent page='conversions' helpTextId={tooltipStyle.tooltipConversionView} />
 							</div>
 						</h2>
-						{unitsStateLoaded &&
-							<div className="edit-btn">
-								<CreateConversionModalComponent
-									conversionsState={conversionsState}
-									unitsState={unitsState} />
-							</div>}
+						<div className="edit-btn">
+							<CreateConversionModalComponentWIP />
+						</div>
 						<div className="card-container">
 							{/* Attempt to create a ConversionViewComponent for each ConversionData in Conversions State after sorting by
 					the combination of the identifier of the source and destination of the conversion. */}
-							{unitsStateLoaded && Object.values(conversionsState)
-								.sort((conversionA: ConversionData, conversionB: ConversionData) =>
-									((unitsState[conversionA.sourceId].identifier + unitsState[conversionA.destinationId].identifier).toLowerCase() >
-										(unitsState[conversionB.sourceId].identifier + unitsState[conversionB.destinationId].identifier).toLowerCase()) ? 1 :
-										(((unitsState[conversionB.sourceId].identifier + unitsState[conversionB.destinationId].identifier).toLowerCase() >
-											(unitsState[conversionA.sourceId].identifier + unitsState[conversionA.destinationId].identifier).toLowerCase()) ? -1 : 0))
-								.map(conversionData => (<ConversionViewComponent conversion={conversionData as ConversionData}
-									key={String((conversionData as ConversionData).sourceId + '>' + (conversionData as ConversionData).destinationId)}
-									units={unitsState} />))}
+							{
+								Object.values(conversionsState)
+									.sort((conversionA: ConversionData, conversionB: ConversionData) =>
+										((unitDataById[conversionA.sourceId].identifier + unitDataById[conversionA.destinationId].identifier).toLowerCase() >
+											(unitDataById[conversionB.sourceId].identifier + unitDataById[conversionB.destinationId].identifier).toLowerCase()) ? 1 :
+											(((unitDataById[conversionB.sourceId].identifier + unitDataById[conversionB.destinationId].identifier).toLowerCase() >
+												(unitDataById[conversionA.sourceId].identifier + unitDataById[conversionA.destinationId].identifier).toLowerCase()) ? -1 : 0))
+									.map(conversionData => (
+										<ConversionViewComponentWIP
+											conversion={conversionData}
+											key={conversionData.sourceId + '>' + conversionData.destinationId}
+										/>
+									))}
 						</div>
 					</div>
 				</div>

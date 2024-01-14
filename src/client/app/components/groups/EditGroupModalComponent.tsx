@@ -7,22 +7,23 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useSelector } from 'react-redux';
 import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import { State } from 'types/redux/state';
-import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
+import { useAppSelector } from '../../redux/hooks';
+import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
+import { selectIsAdmin } from '../../reducers/currentUser';
+import { store } from '../../store';
 import '../../styles/card-page.css';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { DataType } from '../../types/Datasources';
-import { ConversionArray } from '../../types/conversionArray';
 import { SelectOption, TrueFalseType } from '../../types/items';
 import { GroupData } from '../../types/redux/groups';
 import { UnitData } from '../../types/redux/units';
-import { groupsApi } from '../../utils/api';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import {
 	GroupCase,
@@ -32,18 +33,17 @@ import {
 	unitsCompatibleWithMeters
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
-import { isRoleAdmin } from '../../utils/hasPermissions';
 import { getGPSString, notifyUser, nullToEmptyString } from '../../utils/input';
 import translate from '../../utils/translate';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
 	groupId: number;
-	possibleGraphicUnits: Set<UnitData>;
 	// passed in to handle opening the modal
 	handleShow: () => void;
 	// passed in to handle closing the modal
@@ -55,23 +55,24 @@ interface EditGroupModalComponentProps {
  * @param props state variables needed to define the component
  * @returns Group edit element
  */
-export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
-	// const dispatch: Dispatch = useDispatch();
-
+export default function EditGroupModalComponentWIP(props: EditGroupModalComponentProps) {
+	const [submitGroupEdits] = groupsApi.useEditGroupMutation()
+	const [deleteGroup] = groupsApi.useDeleteGroupMutation()
 	// Meter state
-	const metersState = useSelector((state: State) => state.meters.byMeterID);
+	const meterDataById = useAppSelector(selectMeterDataById);
 	// Group state used on other pages
-	const globalGroupsState = useSelector((state: State) => state.groups.byGroupID);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	// Make a local copy of the group data so we can update during the edit process.
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
-	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(globalGroupsState));
+	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
+	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
+
 	// The current groups state of group being edited of the local copy. It should always be valid.
 	const groupState = editGroupsState[props.groupId];
 
 	// Check for admin status
-	const currentUser = useSelector((state: State) => state.currentUser.profile);
-	const loggedInAsAdmin = (currentUser !== null) && isRoleAdmin(currentUser.role);
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 
 	// The information on the allowed children of this group that can be selected in the menus.
 	const groupChildrenDefaults = {
@@ -83,8 +84,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
-		possibleGraphicUnits: props.possibleGraphicUnits,
-		compatibleGraphicUnits: props.possibleGraphicUnits,
+		possibleGraphicUnits: possibleGraphicUnits,
+		compatibleGraphicUnits: possibleGraphicUnits,
 		incompatibleGraphicUnits: new Set<UnitData>()
 	}
 
@@ -167,7 +168,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 		// Delete the group using the state object where only really need id.
-		// dispatch(deleteGroup(groupState));
+		deleteGroup(groupState.id)
 	}
 	/* End Confirm Delete Modal */
 
@@ -179,7 +180,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				let areaSum = 0;
 				let notifyMsg = '';
 				groupState.deepMeters.forEach(meterID => {
-					const meter = metersState[meterID];
+					const meter = meterDataById[meterID];
 					if (meter.area > 0) {
 						if (meter.areaUnit != AreaUnitType.none) {
 							areaSum += meter.area * getAreaUnitConversion(meter.areaUnit, groupState.areaUnit);
@@ -221,7 +222,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		// Set back to the global group values for this group. As before, need a deep copy.
-		setEditGroupsState(_.cloneDeep(globalGroupsState));
+		setEditGroupsState(_.cloneDeep(groupDataById));
 		// Set back to the default values for the menus.
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
@@ -252,7 +253,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 		// Check for changes by comparing the original, global state to edited state.
 		// This is the unedited state of the group being edited to compare to for changes.
-		const originalGroupState = globalGroupsState[groupState.id];
+		const originalGroupState = groupDataById[groupState.id];
 		// Check children separately since lists.
 		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
 		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
@@ -303,7 +304,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// been made in the edit state.
 				const groupsChanged: number[] = [];
 				Object.values(editGroupsState).forEach(group => {
-					if (group.defaultGraphicUnit !== globalGroupsState[group.id].defaultGraphicUnit) {
+					if (group.defaultGraphicUnit !== groupDataById[group.id].defaultGraphicUnit) {
 						groupsChanged.push(group.id);
 					}
 				});
@@ -326,7 +327,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					console.log(submitState, 'removeme')
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
-					// dispatch(submitGroupEdits(submitState, (i === groupsChanged.length ? true : false) && (childMeterChanges || childGroupChanges)));
+					submitGroupEdits(submitState)
 				});
 				// The next line is unneeded since do refresh.
 				// dispatch(removeUnsavedChanges());
@@ -345,16 +346,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Get groups okay for this group. Similar to meters.
 			const possibleGroups = getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters);
 			// Update the state
-			setGroupChildrenState({
+			setGroupChildrenState(groupChildrenState => ({
 				...groupChildrenState,
 				meterSelectOptions: possibleMeters,
 				groupSelectOptions: possibleGroups
-			});
+			}));
 		}
 		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// globalGroupsState can change if another group is created/edited and this can change ones displayed in menus.
-	}, [ConversionArray.pikAvailable(), metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters]);
+	}, [groupState.deepMeters, groupState.defaultGraphicUnit, groupState.id, loggedInAsAdmin]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -379,11 +380,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				}
 			});
 			// Update the state
-			setGraphicUnitsState({
+			setGraphicUnitsState(graphicUnitsState => ({
 				...graphicUnitsState,
 				compatibleGraphicUnits: compatibleGraphicUnits,
 				incompatibleGraphicUnits: incompatibleGraphicUnits
-			});
+			}));
 		}
 		// If any of these change then it needs to be updated.
 		// pik is needed since the compatible units is not correct until pik is available.
@@ -391,7 +392,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// If another group that is included in this group is changed then it must be redone
 		// but we currently do a refresh so it is covered. It should still be okay if
 		// the deep meters of this group are properly updated.
-	}, [ConversionArray.pikAvailable(), metersState, groupState.deepMeters]);
+	}, [graphicUnitsState.possibleGraphicUnits, groupState.deepMeters, loggedInAsAdmin]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -606,7 +607,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											// The new child meter removal was rejected so put it back. Should only be one item so no need to sort.
 											newSelectedMeterOptions.push({
 												value: removedMeterId,
-												label: metersState[removedMeterId].identifier
+												label: meterDataById[removedMeterId].identifier
 												// isDisabled not needed since only used for selected and not display.
 											} as SelectOption
 											);
@@ -747,7 +748,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Only do next step if update is still possible.
 		if (shouldUpdate) {
 			// Get all parent groups of this group.
-			const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
+			const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }))
 			// Check for group changes and have admin agree or not.
 			shouldUpdate = await validateGroupPostAddChild(groupState.id, parentGroupIDs, tempGroupsState);
 		}
@@ -892,7 +893,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 */
 	async function validateDelete() {
 		// Get all parent groups of this group.
-		const parentGroupIDs = await groupsApi.getParentIDs(groupState.id);
+		const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }))
+
 		// If there are parents then you cannot delete this group. Notify admin.
 		if (parentGroupIDs.length !== 0) {
 			// This will hold the overall message for the admin alert.
@@ -918,7 +920,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		groupState.childMeters.forEach(groupId => {
 			selectedMetersUnsorted.push({
 				value: groupId,
-				label: metersState[groupId].identifier
+				label: meterDataById[groupId].identifier
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -939,7 +941,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				value: groupId,
 				// Use globalGroupsState so see edits in other groups. You would miss an update
 				// in this group but it cannot be on the menu so that is okay.
-				label: globalGroupsState[groupId].name
+				label: groupDataById[groupId].name
 				// isDisabled not needed since only used for selected and not display.
 			} as SelectOption
 			);
@@ -959,7 +961,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Tells if any meter is not visible to user.
 		let hasHidden = false;
 		groupState.childMeters.forEach(meterId => {
-			const meterIdentifier = metersState[meterId].identifier;
+			const meterIdentifier = meterDataById[meterId].identifier;
 			// The identifier is null if the meter is not visible to this user. If hidden then do
 			// not list and otherwise label.
 			if (meterIdentifier === null) {
@@ -1018,7 +1020,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		const listedDeepMeters: string[] = [];
 		let hasHidden = false;
 		groupState.deepMeters.forEach(meterId => {
-			const meterIdentifier = metersState[meterId].identifier;
+			const meterIdentifier = meterDataById[meterId].identifier;
 			if (meterIdentifier === null) {
 				// The identifier is null if the meter is not visible to this user.
 				hasHidden = true;

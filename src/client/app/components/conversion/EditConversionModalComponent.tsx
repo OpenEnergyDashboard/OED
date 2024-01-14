@@ -4,27 +4,24 @@
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import { conversionsApi } from '../../redux/api/conversionsApi';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { useAppSelector } from '../../redux/hooks';
 import '../../styles/modal.css';
-import { submitEditedConversion, deleteConversion } from '../../actions/conversions';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
-import { UnitDataById } from 'types/redux/units';
-import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
-import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { Dispatch } from 'types/redux/actions';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
+import translate from '../../utils/translate';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
-	unitsState: UnitDataById;
 	header: string;
 	// passed in to handle opening the modal
 	handleShow: () => void;
@@ -38,17 +35,12 @@ interface EditConversionModalComponentProps {
  * @returns Conversion edit element
  */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
-	const dispatch: Dispatch = useDispatch();
+	const [editConversion] = conversionsApi.useEditConversionMutation()
+	const [deleteConversion] = conversionsApi.useDeleteConversionMutation()
+	const unitDataById = useAppSelector(selectUnitDataById)
 
 	// Set existing conversion values
-	const values = {
-		sourceId: props.conversion.sourceId,
-		destinationId: props.conversion.destinationId,
-		bidirectional: props.conversion.bidirectional,
-		slope: props.conversion.slope,
-		intercept: props.conversion.intercept,
-		note: props.conversion.note
-	}
+	const values = { ...props.conversion }
 
 	/* State */
 	// Handlers for each type of input change
@@ -90,8 +82,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
+
 		// Delete the conversion using the state object, it should only require the source and destination ids set
-		dispatch(deleteConversion(state as ConversionData));
+		deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId })
+
 	}
 	/* End Confirm Delete Modal */
 
@@ -109,8 +103,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	}
 
 	const handleClose = () => {
-		props.handleClose();
 		resetState();
+		props.handleClose();
 	}
 
 	// Save changes
@@ -131,8 +125,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
-			dispatch(submitEditedConversion(state, shouldRedoCik));
-			dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
+			// dispatch(submitEditedConversion(state, shouldRedoCik));
+			editConversion({ conversionData: state, shouldRedoCik })
+			// dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 		}
 	}
 
@@ -170,7 +165,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										id='sourceId'
 										name='sourceId'
 										type='text'
-										defaultValue={props.unitsState[state.sourceId].identifier}
+										defaultValue={unitDataById[state.sourceId].identifier}
 										// Disable input to prevent changing ID value
 										disabled>
 									</Input>
@@ -184,7 +179,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										id='destinationId'
 										name='destinationId'
 										type='text'
-										defaultValue={props.unitsState[state.destinationId].identifier}
+										defaultValue={unitDataById[state.destinationId].identifier}
 										// Disable input to prevent changing ID value
 										disabled>
 									</Input>
