@@ -8,12 +8,13 @@ import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as React from 'react';
 import 'react-calendar/dist/Calendar.css';
 import { useDispatch } from 'react-redux';
-import { selectQueryTimeInterval, updateTimeInterval } from '../reducers/graph';
-import { useAppSelector } from '../redux/hooks';
+import { selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
+import { useAppSelector } from '../redux/reduxHooks';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 
 // Potential Fixes, for now omitted
 // import '../styles/DateRangeCustom.css'
@@ -25,7 +26,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 export default function DateRangeComponent() {
 	const dispatch: Dispatch = useDispatch();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
-	const locale = useAppSelector(state => state.options.selectedLanguage);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 	const handleChange = (value: Value) => { dispatch(updateTimeInterval(dateRangeToTimeInterval(value))) }
 
@@ -43,7 +44,7 @@ export default function DateRangeComponent() {
 				minDate={new Date(1970, 0, 1)}
 				maxDate={new Date()}
 				locale={locale} // Formats Dates, and Calendar months base on locale
-				calendarIcon={null} // TODO Verify Behavior
+				calendarIcon={null}
 			/>
 		</div>
 	);

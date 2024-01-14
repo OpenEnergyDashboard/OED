@@ -13,9 +13,9 @@ import {
 } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { store } from '../../store';
 import '../../styles/card-page.css';
 import '../../styles/modal.css';
@@ -55,7 +55,7 @@ interface EditGroupModalComponentProps {
  * @param props state variables needed to define the component
  * @returns Group edit element
  */
-export default function EditGroupModalComponentWIP(props: EditGroupModalComponentProps) {
+export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const [submitGroupEdits] = groupsApi.useEditGroupMutation()
 	const [deleteGroup] = groupsApi.useDeleteGroupMutation()
 	// Meter state

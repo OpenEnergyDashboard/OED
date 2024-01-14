@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { LogData } from '../types/redux/logs';
-import { logsApi } from '../utils/api';
+import { LogData } from '../../types/redux/logs';
+import { logsApi } from '../../utils/api';
 
 /**
  * pass client-side information to server console using logsApi on server-side, mainly for debugging purposes

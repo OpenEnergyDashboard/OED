@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import ChartLinkComponent from '../components/ChartLinkComponent';
 import { ChartTypes } from '../types/redux/graph';
 import { RootState } from '../store';
-import { selectChartToRender, selectGraphState } from '../reducers/graph';
+import { selectChartToRender, selectGraphState } from '../redux/slices/graphSlice';
 
 /**
  * Passes the current redux state of the chart link text, and turns it into props for the React

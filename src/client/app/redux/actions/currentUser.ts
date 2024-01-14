@@ -2,13 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { usersApi, verificationApi } from '../utils/api';
-import { Thunk,  Dispatch, GetState } from '../types/redux/actions';
-import { State } from '../types/redux/state';
-import { deleteToken, hasToken } from '../utils/token';
-import { currentUserSlice } from '../reducers/currentUser';
+import { usersApi, verificationApi } from '../../utils/api';
+import { Thunk,  Dispatch, GetState } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
+import { deleteToken, hasToken } from '../../utils/token';
+import { currentUserSlice } from '../slices/currentUserSlice';
 
-
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+/* eslint-disable jsdoc/require-param */
 /**
  * Check if we should fetch the current user's data. This function has the side effect of deleting an invalid token from local storage.
  * @param state The redux state

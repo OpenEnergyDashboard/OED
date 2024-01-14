@@ -17,7 +17,7 @@ export const userApi = baseApi.injectEndpoints({
 			query: user => ({
 				url: 'api/users/create',
 				method: 'POST',
-				body: { user }
+				body: { ...user }
 			}),
 			invalidatesTags: ['Users']
 		}),

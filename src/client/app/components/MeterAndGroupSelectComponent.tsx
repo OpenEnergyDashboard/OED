@@ -11,8 +11,8 @@ import Select, {
 import makeAnimated from 'react-select/animated';
 import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
-import { graphSlice } from '../reducers/graph';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { graphSlice } from '../redux/slices/graphSlice';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectAnythingLoading, selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';

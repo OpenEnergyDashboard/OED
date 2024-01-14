@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { MapMetadata } from '../types/redux/map';
-import { logToServer } from '../actions/logs';
+import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
 import translate from './translate';
 

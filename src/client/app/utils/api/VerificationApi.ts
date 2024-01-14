@@ -3,7 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import ApiBackend from './ApiBackend';
 import { getToken } from '../token';
 import { User } from '../../types/items';
@@ -21,7 +25,7 @@ export default class VerificationApi {
 
 	public async checkTokenValid(): Promise<boolean> {
 		// This will not throw an error if the status code is 401 unauthorized or 403 forbidden
-		const { success } = await this.backend.doPostRequest<{success: boolean}>(
+		const { success } = await this.backend.doPostRequest<{ success: boolean }>(
 			'/api/verification',
 			{ token: getToken() },
 			undefined,
@@ -31,7 +35,7 @@ export default class VerificationApi {
 	}
 
 	public async login(email: string, password: string): Promise<LoginResponse> {
-		const response = await this.backend.doPostRequest<LoginResponse>('/api/login/', {email, password});
+		const response = await this.backend.doPostRequest<LoginResponse>('/api/login/', { email, password });
 		return response;
 	}
 }

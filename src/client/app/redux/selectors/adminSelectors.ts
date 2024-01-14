@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
-import { selectAdminState } from '../../reducers/admin'
+import { selectAdminState } from '../slices/adminSlice'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
 import { selectAllGroups } from '../../redux/api/groupsApi'
 import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi'

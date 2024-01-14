@@ -4,8 +4,8 @@
 
 import * as React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { selectOptionsVisibility } from '../reducers/appStateSlice';
-import { useAppSelector } from '../redux/hooks';
+import { selectOptionsVisibility } from '../redux/slices/appStateSlice';
+import { useAppSelector } from '../redux/reduxHooks';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';

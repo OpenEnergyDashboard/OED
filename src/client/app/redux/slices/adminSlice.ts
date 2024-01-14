@@ -4,13 +4,13 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
-import { preferencesApi } from '../redux/api/preferencesApi';
-import { PreferenceRequestItem } from '../types/items';
-import { AdminState } from '../types/redux/admin';
-import { ChartTypes } from '../types/redux/graph';
-import { LanguageTypes } from '../types/redux/i18n';
-import { durationFormat } from '../utils/durationFormat';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { preferencesApi } from '../api/preferencesApi';
+import { PreferenceRequestItem } from '../../types/items';
+import { AdminState } from '../../types/redux/admin';
+import { ChartTypes } from '../../types/redux/graph';
+import { LanguageTypes } from '../../types/redux/i18n';
+import { durationFormat } from '../../utils/durationFormat';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export const defaultAdminState: AdminState = {
 	selectedMeter: null,

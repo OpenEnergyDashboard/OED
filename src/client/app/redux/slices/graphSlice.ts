@@ -5,12 +5,12 @@
 import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
-import { TimeInterval } from '../../../common/TimeInterval';
-import { preferencesApi } from '../redux/api/preferencesApi';
-import { SelectOption } from '../types/items';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../types/redux/graph';
-import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../utils/calculateCompare';
-import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import { preferencesApi } from '../api/preferencesApi';
+import { SelectOption } from '../../types/items';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../../utils/calculateCompare';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 const defaultState: GraphState = {
 	selectedMeters: [],

@@ -1,6 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { selectIsAdmin } from '../slices/currentUserSlice';
 import { selectAllMeters } from '../../redux/api/metersApi';
 import { DisplayableType, UnitType } from '../../types/redux/units';
 import { selectAllGroups } from '../api/groupsApi';

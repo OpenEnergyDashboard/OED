@@ -4,9 +4,9 @@
 
 import * as React from 'react';
 import { Badge } from 'reactstrap';
-import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../reducers/graph';
+import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';

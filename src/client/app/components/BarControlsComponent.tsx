@@ -3,8 +3,8 @@ import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import * as React from 'react';
 import { Button, ButtonGroup } from 'reactstrap';
-import { graphSlice, selectBarStacking, selectBarWidthDays } from '../reducers/graph';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { graphSlice, selectBarStacking, selectBarWidthDays } from '../redux/slices/graphSlice';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 

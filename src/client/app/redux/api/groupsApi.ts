@@ -1,8 +1,6 @@
-import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
+import { EntityState, Update, createEntityAdapter } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { CompareReadings } from 'types/readings';
-import { TimeInterval } from '../../../../common/TimeInterval';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { selectIsAdmin } from '../slices/currentUserSlice';
 import { RootState } from '../../store';
 import { GroupChildren, GroupData } from '../../types/redux/groups';
 import { baseApi } from './baseApi';
@@ -32,9 +30,9 @@ export const groupsApi = baseApi.injectEndpoints({
 					const state = getState() as RootState
 					// if user is an admin, automatically fetch allGroupChildren and update the
 					if (selectIsAdmin(state)) {
-						const { data = [] } = await dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate())
+						const { data = [] } = await dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate(undefined, { subscribe: false }))
 						// Map the data to the format needed for updateMany
-						const updates = data.map(childrenInfo => ({
+						const updates: Update<GroupData, number>[] = data.map(childrenInfo => ({
 							id: childrenInfo.groupId,
 							changes: {
 								childMeters: childrenInfo.childMeters,
@@ -79,27 +77,7 @@ export const groupsApi = baseApi.injectEndpoints({
 		}),
 		getParentIDs: builder.query<number[], number>({
 			query: groupId => `api/groups/parents/${groupId}`
-		}),
-		/**
-		 * Gets compare readings for groups for the given current time range and a shift for previous time range
-		 * @param groupIDs The group IDs to get readings for
-		 * @param timeInterval  start and end of current/this compare period
-		 * @param shift how far to shift back in time from current period to previous period
-		 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-		 * @returns CompareReadings in sorted order
-		 */
-		getCompareReadingsForGroups:
-			builder.query<CompareReadings, { groupIDs: number[], timeInterval: TimeInterval, shift: moment.Duration, unitID: number }>({
-				query: ({ groupIDs, timeInterval, shift, unitID }) => ({
-					url: `/api/compareReadings/groups/${groupIDs.join(',')}`,
-					params: {
-						curr_start: timeInterval.getStartTimestamp().toISOString(),
-						curr_end: timeInterval.getEndTimestamp().toISOString(),
-						shift: shift.toISOString(),
-						graphicUnitId: unitID.toString()
-					}
-				})
-			})
+		})
 	})
 })
 

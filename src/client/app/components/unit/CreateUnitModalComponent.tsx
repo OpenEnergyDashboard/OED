@@ -2,26 +2,26 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
-import { addUnit } from '../../actions/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { Dispatch } from 'types/redux/actions';
+import { unitsApi } from '../../redux/api/unitsApi';
+import { useTranslate } from '../../redux/componentHooks';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
 /**
  * Defines the create unit modal form
  * @returns Unit create element
  */
 export default function CreateUnitModalComponent() {
-	const dispatch: Dispatch = useDispatch();
+	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
+	const translate = useTranslate()
 
 	const defaultValues = {
 		name: '',
@@ -101,7 +101,14 @@ export default function CreateUnitModalComponent() {
 			state.typeOfUnit = UnitType.suffix;
 		}
 		// Add the new unit and update the store
-		dispatch(addUnit(state));
+		submitCreateUnit(state)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('unit.successfully.create.unit'));
+			})
+			.catch(() => {
+				showErrorNotification(translate('unit.failed.to.create.unit'));
+			})
 		resetState();
 	};
 

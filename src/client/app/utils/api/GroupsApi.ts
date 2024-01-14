@@ -4,6 +4,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+
 import ApiBackend from './ApiBackend';
 import * as moment from 'moment';
 import { CompareReadings } from '../../types/readings';

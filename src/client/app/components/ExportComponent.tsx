@@ -11,7 +11,7 @@ import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { selectAllChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { UserRole } from '../types/items';
 import { ConversionData } from '../types/redux/conversions';
@@ -23,7 +23,7 @@ import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
 import { hasToken } from '../utils/token';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectGraphState, selectShowMinMax } from '../reducers/graph';
+import { selectGraphState, selectShowMinMax } from '../redux/slices/graphSlice';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.

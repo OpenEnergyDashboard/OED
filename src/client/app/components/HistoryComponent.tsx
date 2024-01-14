@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import {
 	selectForwardHistory, selectPrevHistory,
 	historyStepBack, historyStepForward
-} from '../reducers/graph';
+} from '../redux/slices/graphSlice';
 /**
  * @returns Renders a history component with previous and next buttons.
  */

@@ -13,7 +13,7 @@ import { baseApi } from './baseApi';
 export const readingsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		threeD: builder.query<ThreeDReading, ThreeDReadingApiArgs>({
-			// ThreeD request only single meters at a time which plays well with default cache behavior
+			// ThreeD requests only single meters at a time which plays well with default cache behavior
 			// No other properties are necessary for this endpoint
 			// Refer to the line endpoint for an example of an endpoint with custom cache behavior
 			query: ({ id, timeInterval, graphicUnitId, readingInterval, meterOrGroup }) => ({
@@ -110,14 +110,6 @@ export const readingsApi = baseApi.injectEndpoints({
 				return error ? { error } : { data: data as BarReadings }
 			}
 		}),
-		/**
-		 * Gets compare readings for meters for the given current time range and a shift for previous time range
-		 * @param meterIDs The meter IDs to get readings for
-		 * @param timeInterval  start and end of current/this compare period
-		 * @param shift how far to shift back in time from current period to previous period
-		 * @param unitID The unit id that the reading should be returned in, i.e., the graphic unit
-		 * @returns CompareReadings in sorted order
-		 */
 		compare: builder.query<CompareReadings, CompareReadingApiArgs>({
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
 			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },

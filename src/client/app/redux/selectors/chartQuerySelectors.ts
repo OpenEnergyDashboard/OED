@@ -8,7 +8,7 @@ import {
 	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState
-} from '../../reducers/graph';
+} from '../slices/graphSlice';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';

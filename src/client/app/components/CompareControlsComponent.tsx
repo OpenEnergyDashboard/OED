@@ -1,8 +1,8 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import { Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { graphSlice, selectComparePeriod, selectSortingOrder } from '../reducers/graph';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { graphSlice, selectComparePeriod, selectSortingOrder } from '../redux/slices/graphSlice';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';

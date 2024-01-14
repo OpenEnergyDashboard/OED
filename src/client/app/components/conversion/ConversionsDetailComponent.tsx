@@ -10,8 +10,8 @@ import { conversionsApi } from '../../redux/api/conversionsApi';
 import { unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
 import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import ConversionViewComponentWIP from './ConversionViewComponent';
-import CreateConversionModalComponentWIP from './CreateConversionModalComponent';
+import ConversionViewComponent from './ConversionViewComponent';
+import CreateConversionModalComponent from './CreateConversionModalComponent';
 
 /**
  * Defines the conversions page card view
@@ -67,7 +67,7 @@ export default function ConversionsDetailComponent() {
 							</div>
 						</h2>
 						<div className="edit-btn">
-							<CreateConversionModalComponentWIP />
+							<CreateConversionModalComponent />
 						</div>
 						<div className="card-container">
 							{/* Attempt to create a ConversionViewComponent for each ConversionData in Conversions State after sorting by
@@ -80,7 +80,7 @@ export default function ConversionsDetailComponent() {
 											(((unitDataById[conversionB.sourceId].identifier + unitDataById[conversionB.destinationId].identifier).toLowerCase() >
 												(unitDataById[conversionA.sourceId].identifier + unitDataById[conversionA.destinationId].identifier).toLowerCase()) ? -1 : 0))
 									.map(conversionData => (
-										<ConversionViewComponentWIP
+										<ConversionViewComponent
 											conversion={conversionData}
 											key={conversionData.sourceId + '>' + conversionData.destinationId}
 										/>

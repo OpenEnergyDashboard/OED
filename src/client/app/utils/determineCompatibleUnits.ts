@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { store }  from '../store';
+// TODO it is a bad practice to import store anywhere other than index.tsx These utils need to be converted into selectors.
+
+import { store } from '../store';
 import * as _ from 'lodash';
 import React from 'react';
 import { selectPik } from '../redux/api/conversionsApi';

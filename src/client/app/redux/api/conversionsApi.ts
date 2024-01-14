@@ -9,7 +9,9 @@ export const conversionsApi = baseApi.injectEndpoints({
 			providesTags: ['ConversionDetails']
 		}),
 		getConversionArray: builder.query<boolean[][], void>({
-			query: () => 'api/conversion-array'
+			query: () => 'api/conversion-array',
+			providesTags: ['ConversionDetails']
+
 		}),
 		addConversion: builder.mutation<void, ConversionData>({
 			query: conversion => ({
@@ -18,8 +20,6 @@ export const conversionsApi = baseApi.injectEndpoints({
 				body: conversion
 			}),
 			onQueryStarted: async (_arg, api) => {
-				// TODO write more robust logic for error handling, and manually invalidate tags instead?
-				// TODO Verify Behavior w/ Maintainers
 				api.queryFulfilled
 					.then(() => {
 						api.dispatch(
@@ -72,13 +72,10 @@ export const conversionsApi = baseApi.injectEndpoints({
 			}
 		}),
 		refresh: builder.mutation<void, { redoCik: boolean, refreshReadingViews: boolean }>({
-			query: args => ({
+			query: ({ redoCik, refreshReadingViews }) => ({
 				url: 'api/conversion-array/refresh',
 				method: 'POST',
-				body: {
-					redoCik: args.redoCik,
-					refreshReadingViews: args.refreshReadingViews
-				}
+				body: { redoCik, refreshReadingViews }
 			}),
 			// TODO check behavior with maintainers, always invalidates, should be conditional?
 			invalidatesTags: ['ConversionDetails']

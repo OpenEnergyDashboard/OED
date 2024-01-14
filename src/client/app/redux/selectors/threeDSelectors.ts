@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import {
 	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID
-} from '../../reducers/graph';
+} from '../slices/graphSlice';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';

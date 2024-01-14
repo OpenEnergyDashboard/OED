@@ -5,7 +5,7 @@
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import { LocaleDataKey, TranslationKey } from '../translations/data';
 import localeData from '../translations/data';
-import { store }  from '../store';
+import { store } from '../store';
 
 // Function overloads to add TS Completions support
 function translate(messageID: LocaleDataKey): string;
@@ -23,7 +23,9 @@ function translate(messageID: LocaleDataKey | string): string {
 	// For now, set the default language to english and any component subscribed to the language state should properly re-render if the language changes
 	let lang: TranslationKey = 'en';
 	if (store) {
-		lang = store.getState().options.selectedLanguage;
+		// TODO Its a bad practice to import store anywhere other than index.tsx
+		// migrate to useTranslate() from componentHooks.ts
+		lang = store.getState().appState.selectedLanguage;
 	}
 	/*
 	const state: any = store.getState();

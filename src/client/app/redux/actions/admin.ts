@@ -2,16 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import { Dispatch, GetState, Thunk } from '../types/redux/actions';
-import { State } from '../types/redux/state';
-import { conversionArrayApi, preferencesApi } from '../utils/api';
-import translate from '../utils/translate';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import { Dispatch, GetState, Thunk } from '../../types/redux/actions';
+import { State } from '../../types/redux/state';
+import { conversionArrayApi, preferencesApi } from '../../utils/api';
+import translate from '../../utils/translate';
 import * as moment from 'moment';
-import { updateSelectedLanguage } from './options';
-import { graphSlice } from '../reducers/graph';
-import { adminSlice } from '../reducers/admin';
-
+// import { updateSelectedLanguage } from './options';
+import { graphSlice } from '../slices/graphSlice';
+import { adminSlice } from '../slices/adminSlice';
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+/* eslint-disable jsdoc/require-param */
 /**
  * Dispatches a fetch for admin preferences and sets the state based upon the result
  */
@@ -35,7 +40,7 @@ function fetchPreferences(): Thunk {
 			}
 			if (preferences.defaultLanguage !== state.options.selectedLanguage) {
 				// if the site default differs from the selected language, update the selected language and the locale
-				dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
+				// dispatch2(updateSelectedLanguage(preferences.defaultLanguage));
 				moment.locale(preferences.defaultLanguage);
 			} else {
 				// else set moment locale to site default

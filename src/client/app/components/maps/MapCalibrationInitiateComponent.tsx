@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { ChangeEvent } from 'react';
-import { logToServer } from '../../actions/logs';
+import { logToServer } from '../../redux/actions/logs';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 
 /**

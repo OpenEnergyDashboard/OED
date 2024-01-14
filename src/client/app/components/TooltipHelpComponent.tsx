@@ -7,9 +7,9 @@ import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import '../styles/tooltip.css';
 import translate from '../utils/translate';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { selectOEDVersion } from '../redux/api/versionApi';
-import { selectBaseHelpUrl } from '../reducers/admin';
+import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.

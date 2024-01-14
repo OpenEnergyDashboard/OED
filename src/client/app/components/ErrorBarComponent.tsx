@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { State } from '../types/redux/state';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { graphSlice } from '../reducers/graph';
+import { graphSlice } from '../redux/slices/graphSlice';
 
 /**
  * React Component rendering an Error Bar checkbox for toggle operation.

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { ChartTypes } from '../types/redux/graph';
 import BarChartComponent from './BarChartComponent';
 import HistoryComponent from './HistoryComponent';
@@ -12,8 +12,8 @@ import MapChartComponent from './MapChartComponent';
 import MultiCompareChartComponent from './MultiCompareChartComponent';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
-import { selectChartToRender } from '../reducers/graph';
-import { selectOptionsVisibility } from '../reducers/appStateSlice';
+import { selectChartToRender } from '../redux/slices/graphSlice';
+import { selectOptionsVisibility } from '../redux/slices/appStateSlice';
 import RadarChartComponent from './RadarChartComponent';
 
 /**

@@ -1,6 +1,6 @@
 // https://redux-toolkit.js.org/api/createListenerMiddleware#typescript-usage
 import { isAnyOf } from '@reduxjs/toolkit';
-import { graphSlice, updateHistory } from '../../reducers/graph';
+import { graphSlice, updateHistory } from '../slices/graphSlice';
 import { AppStartListening } from './middleware';
 
 export const historyMiddleware = (startListening: AppStartListening) => {

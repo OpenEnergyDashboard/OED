@@ -5,7 +5,7 @@
 import MapCalibrationInitiateComponent from '../../components/maps/MapCalibrationInitiateComponent';
 import { connect } from 'react-redux';
 import { Dispatch } from '../../types/redux/actions';
-import {updateMapMode, updateMapSource} from '../../actions/map';
+import {updateMapMode, updateMapSource} from '../../redux/actions/map';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
 import {State} from '../../types/redux/state';
 

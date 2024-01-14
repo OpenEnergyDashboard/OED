@@ -2,27 +2,24 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
-import { store }  from '../../store';
+import { store } from '../../store';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { Dispatch } from 'types/redux/actions';
-import { submitEditedUnit } from '../../actions/units';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { notifyUser } from '../../utils/input';
-import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-
+import { unitsApi } from '../../redux/api/unitsApi';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import { useTranslate } from '../../redux/componentHooks';
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
@@ -36,7 +33,8 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
-	const dispatch: Dispatch = useDispatch();
+	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
+	const translate = useTranslate();
 
 	// Set existing unit values
 	const values = {
@@ -105,7 +103,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
-		const meterDataByID  = selectMeterDataById(store.getState())
+		const meterDataByID = selectMeterDataById(store.getState())
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
@@ -163,14 +161,20 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			if (state.typeOfUnit != UnitType.suffix && state.suffix != '') {
 				state.typeOfUnit = UnitType.suffix;
 			}
-			// Save our changes by dispatching the submitEditedUnit action
-			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
+			// Save our changes by dispatching the submitEditedUnit mutation
+			submitEditedUnit({ editedUnit: state, shouldRedoCik, shouldRefreshReadingViews })
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(translate('unit.successfully.edited.unit'));
+				})
+				.catch(() => {
+					showErrorNotification(translate('unit.failed.to.edit.unit'));
+				})
 			// The updated unit is not fetched to save time. However, the identifier might have been
 			// automatically set if it was empty. Mimic that here.
 			if (state.identifier === '') {
 				state.identifier = state.name;
 			}
-			dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 		}
 	}
 

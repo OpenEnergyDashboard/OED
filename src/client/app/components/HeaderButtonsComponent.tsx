@@ -8,18 +8,17 @@ import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { selectOptionsVisibility, toggleOptionsVisibility } from '../reducers/appStateSlice';
-import { unsavedWarningSlice } from '../reducers/unsavedWarning';
+import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { UserRole } from '../types/items';
 import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectCurrentUser } from '../reducers/currentUser';
-import { selectBaseHelpUrl } from '../reducers/admin';
+import { selectCurrentUser } from '../redux/slices/currentUserSlice';
+import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -79,7 +78,9 @@ export default function HeaderButtonsComponent() {
 	// Information on the current user.
 	const { profile: currentUser } = useAppSelector(selectCurrentUser);
 	// Tracks unsaved changes.
-	const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
+	// TODO Re-implement AFTER RTK Migration
+	// const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
+	const unsavedChangesState = false
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 
@@ -169,7 +170,8 @@ export default function HeaderButtonsComponent() {
 	const handleLogOut = () => {
 		if (unsavedChangesState) {
 			// Unsaved changes so deal with them and then it takes care of logout.
-			dispatch(unsavedWarningSlice.actions.flipLogOutState());
+			// TODO Re-implement AFTER RTK Migration
+			// dispatch(unsavedWarningSlice.actions.flipLogOutState());
 		} else {
 			logout()
 		}

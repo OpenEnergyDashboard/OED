@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { NamedIDItem } from '../types/items';
-import { adminSlice } from '../reducers/admin';
+import { adminSlice } from '../redux/slices/adminSlice';
 
 export interface MeterDropDownProps {
 	meters: NamedIDItem[];

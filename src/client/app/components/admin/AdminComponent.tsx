@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 // import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import PreferencesComponentWIP from './PreferencesComponentWIP';
+import PreferencesComponent from './PreferencesComponent';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 
 /**
@@ -50,8 +50,7 @@ export default function AdminComponent() {
 								<ManageUsersLinkButtonComponent />
 							</div>
 						</div>
-						{/* <PreferencesContainer /> */}
-						<PreferencesComponentWIP />
+						<PreferencesComponent />
 					</div>
 				</div>
 			</div>

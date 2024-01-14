@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
-import * as t from '../types/redux/graph';
-import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
+import { TimeInterval } from '../../../../common/TimeInterval';
+import * as t from '../../types/redux/graph';
+import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 
 export interface LinkOptions {
 	meterIDs?: number[];

@@ -3,22 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { combineReducers } from 'redux';
-import maps from './maps';
-import { adminSlice } from './admin';
-import { currentUserSlice } from './currentUser';
-import { unsavedWarningSlice } from './unsavedWarning';
-import { optionsSlice } from './options';
-import { baseApi } from '../redux/api/baseApi';
-import { graphSlice } from './graph';
-import { appStateSlice } from './appStateSlice';
+import { baseApi } from './api/baseApi';
+import { adminSlice } from './slices/adminSlice';
+import { appStateSlice } from './slices/appStateSlice';
+import { currentUserSlice } from './slices/currentUserSlice';
+import { graphSlice } from './slices/graphSlice';
+import maps from './reducers/maps';
 
 export const rootReducer = combineReducers({
 	appState: appStateSlice.reducer,
 	graph: graphSlice.reducer,
 	admin: adminSlice.reducer,
 	currentUser: currentUserSlice.reducer,
-	unsavedWarning: unsavedWarningSlice.reducer,
-	options: optionsSlice.reducer,
 	// RTK Query's Derived Reducers
 	[baseApi.reducerPath]: baseApi.reducer,
 	maps

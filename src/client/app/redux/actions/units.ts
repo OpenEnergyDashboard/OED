@@ -1,12 +1,19 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+	* License, v. 2.0. If a copy of the MPL was not distributed with this
+	* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Thunk, Dispatch, GetState } from '../types/redux/actions';
-import { showSuccessNotification, showErrorNotification } from '../utils/notifications';
-import translate from '../utils/translate';
-import * as t from '../types/redux/units';
-import { unitsApi } from '../utils/api';
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+/* eslint-disable jsdoc/require-param */
+
+import { Thunk, Dispatch, GetState } from '../../types/redux/actions';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import * as t from '../../types/redux/units';
+import { unitsApi } from '../../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 import { unitsSlice } from '../reducers/units';
 

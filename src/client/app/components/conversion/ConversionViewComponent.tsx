@@ -10,8 +10,8 @@ import { Button } from 'reactstrap';
 import { ConversionData } from 'types/redux/conversions';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
-import EditConversionModalComponentWIP from './EditConversionModalComponent';
-import { useAppSelector } from '../../redux/hooks';
+import EditConversionModalComponent from './EditConversionModalComponent';
+import { useAppSelector } from '../../redux/reduxHooks';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 interface ConversionViewComponentProps {
@@ -79,7 +79,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 					<FormattedMessage id="conversion.edit.conversion" />
 				</Button>
 				{/* Creates a child ConversionModalEditComponent */}
-				<EditConversionModalComponentWIP
+				<EditConversionModalComponent
 					show={showEditModal}
 					conversion={props.conversion}
 					header={header}

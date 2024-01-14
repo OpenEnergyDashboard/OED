@@ -8,7 +8,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import RouteComponent from './components/RouteComponent';
-import { initApp } from './reducers/appStateSlice';
+import { initApp } from './redux/slices/appStateSlice';
 import './styles/index.css';
 
 store.dispatch(initApp())

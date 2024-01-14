@@ -1,25 +1,29 @@
 import { fetchMapsDetails } from '../actions/map';
-import { authApi } from '../redux/api/authApi';
-import { conversionsApi } from '../redux/api/conversionsApi';
-import { groupsApi } from '../redux/api/groupsApi';
-import { metersApi } from '../redux/api/metersApi';
-import { preferencesApi } from '../redux/api/preferencesApi';
-import { unitsApi } from '../redux/api/unitsApi';
-import { userApi } from '../redux/api/userApi';
-import { versionApi } from '../redux/api/versionApi';
-import { createThunkSlice } from '../redux/slices/thunkSlice';
-import { deleteToken, getToken, hasToken } from '../utils/token';
-import { currentUserSlice } from './currentUser';
+import { authApi } from '../api/authApi';
+import { conversionsApi } from '../api/conversionsApi';
+import { groupsApi } from '../api/groupsApi';
+import { metersApi } from '../api/metersApi';
+import { preferencesApi } from '../api/preferencesApi';
+import { unitsApi } from '../api/unitsApi';
+import { userApi } from '../api/userApi';
+import { versionApi } from '../api/versionApi';
+import { createThunkSlice } from '../sliceCreators';
+import { deleteToken, getToken, hasToken } from '../../utils/token';
+import { currentUserSlice } from './currentUserSlice';
+import { LanguageTypes } from '../../types/redux/i18n';
+import * as moment from 'moment';
 
 interface appStateSlice {
 	initComplete: boolean;
 	optionsVisibility: boolean;
-
+	selectedLanguage: LanguageTypes;
 }
 
 const defaultState: appStateSlice = {
 	initComplete: false,
-	optionsVisibility: true
+	optionsVisibility: true,
+	selectedLanguage: LanguageTypes.en
+
 }
 
 export const appStateSlice = createThunkSlice({
@@ -36,6 +40,9 @@ export const appStateSlice = createThunkSlice({
 		}),
 		setOptionsVisibility: create.reducer<boolean>((state, action) => {
 			state.optionsVisibility = action.payload
+		}),
+		updateSelectedLanguage: create.reducer<LanguageTypes>((state, action) => {
+			state.selectedLanguage = action.payload
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
@@ -71,7 +78,7 @@ export const appStateSlice = createThunkSlice({
 						// User had a token that isn't valid or getUserDetails threw an error.
 						// Assume token is invalid. Delete if any
 						deleteToken()
-						dispatch(currentUserSlice.actions.setUserToken(null))
+						dispatch(currentUserSlice.actions.clearCurrentUser())
 					}
 
 				}
@@ -86,11 +93,17 @@ export const appStateSlice = createThunkSlice({
 			}
 
 		)
-
 	}),
+	extraReducers: builder => {
+		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
+			state.selectedLanguage = action.payload.defaultLanguage
+			moment.locale(action.payload.defaultLanguage);
+		})
+	},
 	selectors: {
 		selectInitComplete: state => state.initComplete,
-		selectOptionsVisibility: state => state.optionsVisibility
+		selectOptionsVisibility: state => state.optionsVisibility,
+		selectSelectedLanguage: state => state.selectedLanguage
 	}
 })
 
@@ -98,10 +111,12 @@ export const {
 	initApp,
 	setInitComplete,
 	toggleOptionsVisibility,
-	setOptionsVisibility
+	setOptionsVisibility,
+	updateSelectedLanguage
 } = appStateSlice.actions
 
 export const {
 	selectInitComplete,
-	selectOptionsVisibility
+	selectOptionsVisibility,
+	selectSelectedLanguage
 } = appStateSlice.selectors

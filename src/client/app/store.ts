@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { configureStore } from '@reduxjs/toolkit'
-import { rootReducer } from './reducers';
+import { rootReducer } from './redux/rootReducer';
 import { baseApi } from './redux/api/baseApi';
 import { Dispatch } from './types/redux/actions';
 import { listenerMiddleware } from './redux/middleware/middleware';

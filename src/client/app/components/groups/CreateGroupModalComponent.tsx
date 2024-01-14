@@ -13,7 +13,7 @@ import { GroupData } from 'types/redux/groups';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -38,7 +38,7 @@ import { selectMeterDataById } from '../../redux/api/metersApi';
  * Defines the create group modal form
  * @returns Group create element
  */
-export default function CreateGroupModalComponentWIP() {
+export default function CreateGroupModalComponent() {
 	const [createGroup] = groupsApi.useCreateGroupMutation()
 
 	// Meters state

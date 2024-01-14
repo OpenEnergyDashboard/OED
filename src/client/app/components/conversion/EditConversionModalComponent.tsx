@@ -9,7 +9,7 @@ import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, Moda
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';

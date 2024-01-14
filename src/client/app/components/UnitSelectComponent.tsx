@@ -4,13 +4,13 @@
 
 import * as React from 'react';
 import Select from 'react-select';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectUnitSelectData } from '../redux/selectors/uiSelectors';
 import { GroupedOption, SelectOption } from '../types/items';
 // import TooltipMarkerComponent from './TooltipMarkerComponent';
 // import { FormattedMessage } from 'react-intl';
 import { Badge } from 'reactstrap';
-import { graphSlice, selectSelectedUnit } from '../reducers/graph';
+import { graphSlice, selectSelectedUnit } from '../redux/slices/graphSlice';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectUnitDataById, unitsApi } from '../redux/api/unitsApi';

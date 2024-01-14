@@ -11,12 +11,12 @@ import {
 	selectAreaUnit, selectBarWidthDays,
 	selectGraphAreaNormalization, selectSelectedGroups,
 	selectSelectedMeters, selectSelectedUnit
-} from '../reducers/graph';
+} from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { selectMapChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';

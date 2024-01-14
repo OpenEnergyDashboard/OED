@@ -4,33 +4,34 @@
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import CreateUserContainer from '../containers/admin/CreateUserContainer';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import UsersDetailComponentWIP from './admin/UsersDetailComponentWIP';
-import ConversionsDetailComponentWIP from './conversion/ConversionsDetailComponent';
+import UsersDetailComponent from './admin/UsersDetailComponent';
+import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
-import MetersDetailComponentWIP from './meters/MetersDetailComponent';
+import MetersDetailComponent from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
 import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import ErrorComponent from './router/ErrorComponent';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import CreateUserComponent from './admin/CreateUserComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
  */
 export default function RouteComponent() {
-	const lang = useAppSelector(state => state.options.selectedLanguage)
+	const lang = useAppSelector(selectSelectedLanguage)
 	const messages = (LocaleTranslationData)[lang];
 	return (
 		<IntlProvider locale={lang} messages={messages} key={lang}>
@@ -48,7 +49,7 @@ const router = createBrowserRouter([
 			{ index: true, element: <HomeComponent /> },
 			{ path: 'login', element: <LoginComponent /> },
 			{ path: 'groups', element: <GroupsDetailComponent /> },
-			{ path: 'meters', element: <MetersDetailComponentWIP /> },
+			{ path: 'meters', element: <MetersDetailComponent /> },
 			{ path: 'graph', element: <GraphLink /> },
 			{
 				element: <AdminOutlet />,
@@ -56,10 +57,10 @@ const router = createBrowserRouter([
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'maps', element: <MapsDetailContainer /> },
-					{ path: 'users/new', element: <CreateUserContainer /> },
+					{ path: 'users/new', element: <CreateUserComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
-					{ path: 'conversions', element: <ConversionsDetailComponentWIP /> },
-					{ path: 'users', element: <UsersDetailComponentWIP /> }
+					{ path: 'conversions', element: <ConversionsDetailComponent /> },
+					{ path: 'users', element: <UsersDetailComponent /> }
 				]
 			},
 			{

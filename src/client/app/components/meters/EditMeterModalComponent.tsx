@@ -9,10 +9,9 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 import { metersApi, selectMeterById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -38,7 +37,6 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
-	const dispatch = useAppDispatch();
 	const [editMeter] = metersApi.useEditMeterMutation()
 	// since this selector is shared amongst many other modals, we must use a selector factory in order
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
@@ -130,7 +128,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// Submit new meter if checks where ok.
 				// dispatch(submitEditedMeter(submitState, shouldRefreshReadingViews) as ThunkAction<void, RootState, unknown, AnyAction>);
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
-				dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 			} else {
 				// Tell user that not going to update due to input issues.
 				notifyUser(translate('meter.input.error'));

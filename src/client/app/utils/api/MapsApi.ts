@@ -4,8 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+// TODO Marked For Deletion after RTK migration solidified
+/* eslint-disable jsdoc/check-param-names */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
+
 import ApiBackend from './ApiBackend';
-import {MapData} from '../../types/redux/map';
+import { MapData } from '../../types/redux/map';
 
 export default class MapsApi {
 	private readonly backend: ApiBackend;
@@ -27,7 +33,7 @@ export default class MapsApi {
 	}
 
 	public async delete(id: number): Promise<void> {
-		return await this.backend.doPostRequest<void>('/api/maps/delete', {id});
+		return await this.backend.doPostRequest<void>('/api/maps/delete', { id });
 	}
 
 	public async getMapById(id: number): Promise<MapData> {
@@ -35,6 +41,6 @@ export default class MapsApi {
 	}
 
 	public async getMapByName(name: string): Promise<MapData> {
-		return await this.backend.doGetRequest<MapData>('/api/maps/getByName', {'name':name});
+		return await this.backend.doGetRequest<MapData>('/api/maps/getByName', { 'name': name });
 	}
 }

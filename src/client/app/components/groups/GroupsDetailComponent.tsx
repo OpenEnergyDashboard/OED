@@ -5,12 +5,12 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { useAppSelector } from '../../redux/hooks';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateGroupModalComponentWIP from './CreateGroupModalComponent';
-import GroupViewComponentWIP from './GroupViewComponent';
+import CreateGroupModalComponent from './CreateGroupModalComponent';
+import GroupViewComponent from './GroupViewComponent';
 
 /**
  * Defines the groups page card view
@@ -52,14 +52,14 @@ export default function GroupsDetailComponent() {
 					{isAdmin &&
 						<div className="edit-btn">
 							{/* The actual button for create is inside this component. */}
-							< CreateGroupModalComponentWIP
+							< CreateGroupModalComponent
 							/>
 						</div>
 					}
 					{
 						<div className="card-container">
 							{Object.values(visibleGroups)
-								.map(groupData => (<GroupViewComponentWIP
+								.map(groupData => (<GroupViewComponent
 									group={groupData}
 									key={groupData.id}
 								/>))}

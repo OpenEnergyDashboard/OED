@@ -4,7 +4,7 @@
 
 import { createSelector } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { selectMapState } from '../../reducers/maps';
+import { selectMapState } from '../reducers/maps';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
@@ -19,7 +19,7 @@ import {
 	selectChartToRender, selectGraphAreaNormalization,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit
-} from '../../reducers/graph';
+} from '../slices/graphSlice';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';

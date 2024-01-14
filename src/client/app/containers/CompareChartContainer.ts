@@ -16,7 +16,12 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { RootState } from '../store';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
-import { selectAreaUnit, selectComparePeriod, selectCompareTimeInterval, selectGraphAreaNormalization, selectSelectedUnit } from '../reducers/graph';
+import {
+	selectAreaUnit, selectComparePeriod,
+	selectCompareTimeInterval, selectGraphAreaNormalization,
+	selectSelectedUnit
+} from '../redux/slices/graphSlice';
+
 export interface CompareEntity {
 	id: number;
 	isGroup: boolean;
@@ -227,7 +232,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 			locales: Locales // makes locales available for use
 		}
 	};
-	props.config.locale = state.options.selectedLanguage;
+	props.config.locale = state.appState.selectedLanguage;
 	return props;
 }
 

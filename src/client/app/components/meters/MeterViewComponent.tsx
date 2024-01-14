@@ -7,12 +7,12 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { MeterData } from 'types/redux/meters';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import { selectGraphicName, selectUnitName } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
-import EditMeterModalComponentWIP from './EditMeterModalComponent';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import EditMeterModalComponent from './EditMeterModalComponent';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 
 interface MeterViewComponentProps {
 	meter: MeterData;
@@ -80,7 +80,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 						<FormattedMessage id="edit.meter" />
 					</Button>
 					{/* Creates a child MeterModalEditComponent */}
-					<EditMeterModalComponentWIP
+					<EditMeterModalComponent
 						show={showEditModal}
 						meter={props.meter}
 						handleClose={handleClose}

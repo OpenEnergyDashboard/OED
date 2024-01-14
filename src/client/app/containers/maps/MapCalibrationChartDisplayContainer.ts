@@ -7,7 +7,7 @@ import Plot from 'react-plotly.js';
 import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
 import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
-import { updateCurrentCartesian } from '../../actions/map';
+import { updateCurrentCartesian } from '../../redux/actions/map';
 import { store }  from '../../store';
 import { CalibrationSettings } from '../../types/redux/map';
 import Locales from '../../types/locales'

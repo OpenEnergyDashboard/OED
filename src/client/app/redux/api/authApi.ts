@@ -1,4 +1,4 @@
-import { currentUserSlice } from '../../reducers/currentUser';
+import { currentUserSlice } from '../slices/currentUserSlice';
 import { User } from '../../types/items';
 import { deleteToken } from '../../utils/token';
 import { baseApi } from './baseApi';

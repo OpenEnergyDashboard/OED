@@ -5,9 +5,9 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import Select from 'react-select';
-import { selectGraphState, selectThreeDReadingInterval, updateThreeDReadingInterval } from '../reducers/graph';
+import { selectGraphState, selectThreeDReadingInterval, updateThreeDReadingInterval } from '../redux/slices/graphSlice';
 import { readingsApi } from '../redux/api/readingsApi';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { ChartTypes, ReadingInterval } from '../types/redux/graph';
 import translate from '../utils/translate';

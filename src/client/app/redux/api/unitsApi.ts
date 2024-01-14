@@ -2,6 +2,7 @@ import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 import { UnitData } from '../../types/redux/units';
 import { baseApi } from './baseApi';
+import { conversionsApi } from './conversionsApi';
 export const unitsAdapter = createEntityAdapter<UnitData>({
 	sortComparer: (unitA, unitB) => unitA.identifier?.localeCompare(unitB.identifier, undefined, { sensitivity: 'accent' })
 });
@@ -14,36 +15,48 @@ export const unitsApi = baseApi.injectEndpoints({
 			query: () => 'api/units',
 			transformResponse: (response: UnitData[]) => {
 				return unitsAdapter.setAll(unitsInitialState, response)
-			}
+			},
+			providesTags: ['Units']
 		}),
 		addUnit: builder.mutation<void, UnitData>({
 			query: unitDataArgs => ({
 				url: 'api/units/addUnit',
 				method: 'POST',
 				body: { ...unitDataArgs }
-			})
+			}),
+			onQueryStarted: (_arg, api) => {
+				api.queryFulfilled
+					.then(() => {
+						api.dispatch(
+							conversionsApi.endpoints.refresh.initiate({
+								redoCik: true,
+								refreshReadingViews: false
+							}))
+					})
+			},
+			invalidatesTags: ['Units']
 		}),
-		editUnit: builder.mutation<void, UnitData>({
-			//TODO VALIDATE BEHAVIOR should invalidate?
-			query: unitDataArgs => ({
+		editUnit: builder.mutation<void, { editedUnit: UnitData, shouldRedoCik: boolean, shouldRefreshReadingViews: boolean }>({
+			query: ({ editedUnit }) => ({
 				url: 'api/units/edit',
 				method: 'POST',
-				body: { ...unitDataArgs }
-			})
+				body: { ...editedUnit }
+			}),
+			onQueryStarted: ({ shouldRedoCik, shouldRefreshReadingViews }, api) => {
+				api.queryFulfilled
+					.then(() => {
+						api.dispatch(
+							conversionsApi.endpoints.refresh.initiate({
+								redoCik: shouldRedoCik,
+								refreshReadingViews: shouldRefreshReadingViews
+							}))
+					})
+			},
+			invalidatesTags: ['Units']
 		})
 	})
 })
 
-
-/**
- * Selects the most recent query status
- * @param state - The complete state of the redux store.
- * @returns The unit data corresponding to the `unitID` if found, or undefined if not.
- * @example
- *
- * const queryState = useAppSelector(state => selectUnitDataByIdQueryState(state))
- * const {data: unitDataById = {}} = useAppSelector(state => selectUnitDataById(state))
- */
 export const selectUnitDataResult = unitsApi.endpoints.getUnitsDetails.select()
 export const {
 	selectAll: selectAllUnits,

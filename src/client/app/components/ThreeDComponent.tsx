@@ -5,12 +5,12 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
-import { selectGraphState } from '../reducers/graph';
+import { selectGraphState } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { ThreeDReading } from '../types/readings';

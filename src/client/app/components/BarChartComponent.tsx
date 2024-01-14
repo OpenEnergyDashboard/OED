@@ -11,12 +11,12 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import {
 	graphSlice, selectAreaUnit, selectBarStacking, selectBarWidthDays,
 	selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
-} from '../reducers/graph';
+} from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { DataType } from '../types/Datasources';
 import { UnitRepresentType } from '../types/redux/units';

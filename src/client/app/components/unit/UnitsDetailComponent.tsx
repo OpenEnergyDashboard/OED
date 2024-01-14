@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectAllUnits, selectUnitDataResult } from '../../redux/api/unitsApi';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';

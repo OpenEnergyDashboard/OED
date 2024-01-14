@@ -28,7 +28,8 @@ export const baseApi = createApi({
 		'GroupChildrenData',
 		'Preferences',
 		'Users',
-		'ConversionDetails'
+		'ConversionDetails',
+		'Units'
 	],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({})

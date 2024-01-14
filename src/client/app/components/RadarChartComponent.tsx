@@ -13,11 +13,11 @@ import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import {
 	selectAreaUnit, selectGraphAreaNormalization, selectLineGraphRate,
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
-} from '../reducers/graph';
+} from '../redux/slices/graphSlice';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';

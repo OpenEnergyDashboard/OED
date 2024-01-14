@@ -8,8 +8,6 @@ import { Link } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
-import { store } from '../../store';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -110,7 +108,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	private removeUnsavedChanges() {
-		store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
+		// store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 	}
 
 	private handleSubmitClicked() {

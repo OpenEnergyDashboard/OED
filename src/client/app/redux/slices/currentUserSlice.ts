@@ -4,11 +4,11 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../redux/api/authApi';
-import { userApi } from '../redux/api/userApi';
-import { User, UserRole } from '../types/items';
-import { CurrentUserState } from '../types/redux/currentUser';
-import { setToken } from '../utils/token';
+import { authApi } from '../api/authApi';
+import { userApi } from '../api/userApi';
+import { User, UserRole } from '../../types/items';
+import { CurrentUserState } from '../../types/redux/currentUser';
+import { setToken } from '../../utils/token';
 
 /*
 * Defines store interactions when version related actions are dispatched to the store.
@@ -32,6 +32,7 @@ export const currentUserSlice = createSlice({
 		},
 		clearCurrentUser: state => {
 			state.profile = null
+			state.token = null
 		},
 		setUserToken: (state, action: PayloadAction<string | null>) => {
 			state.token = action.payload

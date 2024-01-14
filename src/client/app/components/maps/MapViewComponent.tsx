@@ -9,9 +9,6 @@ import { hasToken } from '../../utils/token';
 import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
-import { store } from '../../store';
-import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
-import { unsavedWarningSlice } from '../../reducers/unsavedWarning';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -93,24 +90,28 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		}
 	}
 
-	private removeUnsavedChangesFunction(callback: () => void) {
-		// This function is called to reset all the inputs to the initial state
-		store.dispatch<any>(confirmEditedMaps()).then(() => {
-			store.dispatch<any>(fetchMapsDetails()).then(callback);
-		});
-	}
+	// Re-implement After RTK migration
+	// private removeUnsavedChangesFunction(callback: () => void) {
+	// 	// This function is called to reset all the inputs to the initial state
+	// 	store.dispatch<any>(confirmEditedMaps()).then(() => {
+	// 		store.dispatch<any>(fetchMapsDetails()).then(callback);
+	// 	});
+	// }
 
-	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
-		// This function is called to submit the unsaved changes
-		store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
-	}
+	// Re-implement After RTK migration
+	// private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+	// 	// This function is called to submit the unsaved changes
+	// 	store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
+	// }
 
 	private updateUnsavedChanges() {
+		// Re-implement After RTK migration
 		// Notify that there are unsaved changes
-		store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
-			removeFunction: this.removeUnsavedChangesFunction,
-			submitFunction: this.submitUnsavedChangesFunction
-		}));
+		// store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+		// 	removeFunction: this.removeUnsavedChangesFunction,
+		// 	submitFunction: this.submitUnsavedChangesFunction
+		// }));
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	}
 
 	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {

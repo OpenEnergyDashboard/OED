@@ -3,8 +3,8 @@ import translate from '../utils/translate';
 import { Button, ButtonGroup } from 'reactstrap';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import MapChartSelectComponent from './MapChartSelectComponent';
-import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import { graphSlice, selectBarWidthDays } from '../reducers/graph';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { graphSlice, selectBarWidthDays } from '../redux/slices/graphSlice';
 import * as moment from 'moment';
 /**
  * @returns Map page controls

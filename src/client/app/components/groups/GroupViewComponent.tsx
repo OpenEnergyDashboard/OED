@@ -9,12 +9,12 @@ import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { useAppSelector } from '../../redux/hooks';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import '../../styles/card-page.css';
 import { noUnitTranslated } from '../../utils/input';
 import translate from '../../utils/translate';
-import EditGroupModalComponentWIP from './EditGroupModalComponent';
+import EditGroupModalComponent from './EditGroupModalComponent';
 
 interface GroupViewComponentProps {
 	group: GroupData;
@@ -25,7 +25,7 @@ interface GroupViewComponentProps {
  * @param props variables passed in to define
  * @returns Group info card element
  */
-export default function GroupViewComponentWIP(props: GroupViewComponentProps) {
+export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.
 
 
@@ -77,7 +77,7 @@ export default function GroupViewComponentWIP(props: GroupViewComponentProps) {
 					{loggedInAsAdmin ? <FormattedMessage id="edit.group" /> : <FormattedMessage id="group.details" />}
 				</Button>
 				{/* Creates a child GroupModalEditComponent */}
-				<EditGroupModalComponentWIP
+				<EditGroupModalComponent
 					show={showEditModal}
 					groupId={props.group.id}
 					handleShow={handleShow}

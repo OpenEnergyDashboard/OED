@@ -5,13 +5,13 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { useAppSelector } from '../../redux/hooks';
-import { selectIsAdmin } from '../../reducers/currentUser';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import CreateMeterModalComponentWIP from './CreateMeterModalComponent';
-import MeterViewComponentWIP from './MeterViewComponent';
+import CreateMeterModalComponent from './CreateMeterModalComponent';
+import MeterViewComponent from './MeterViewComponent';
 
 /**
  * Defines the meters page card view
@@ -38,7 +38,7 @@ export default function MetersDetailComponent() {
 				</h2>
 				{isAdmin &&
 					<div className="edit-btn">
-						<CreateMeterModalComponentWIP />
+						<CreateMeterModalComponent />
 					</div>
 				}
 				{
@@ -47,7 +47,7 @@ export default function MetersDetailComponent() {
 						{/*  Optional Chaining to prevent from crashing upon startup race conditions*/}
 						{Object.values(visibleMeters)
 							.map(MeterData => (
-								<MeterViewComponentWIP
+								<MeterViewComponent
 									key={`${MeterData.id}:${MeterData.identifier}`}
 									meter={MeterData}
 								/>

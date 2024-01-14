@@ -7,17 +7,17 @@ import InitializingComponent from '../router/InitializingComponent';
 import moment from 'moment';
 import * as React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
-import { graphSlice } from '../../reducers/graph';
+import { graphSlice } from '../../redux/slices/graphSlice';
 import { useWaitForInit } from '../../redux/componentHooks';
-import { useAppDispatch } from '../../redux/hooks';
+import { useAppDispatch } from '../../redux/reduxHooks';
 import { validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ChartTypes, LineGraphRate, MeterOrGroup } from '../../types/redux/graph';
-import { changeSelectedMap } from '../../actions/map';
-import { appStateSlice } from '../../reducers/appStateSlice';
+import { changeSelectedMap } from '../../redux/actions/map';
+import { appStateSlice } from '../../redux/slices/appStateSlice';
 
 export const GraphLink = () => {
 	const dispatch = useAppDispatch();
