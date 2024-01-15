@@ -151,8 +151,7 @@
 		{
 			// disable jsdoc requirement for reducers and actions
 			"files": [
-				"src/client/app/reducers/*.ts",
-				"src/client/app/actions/*.ts"
+				"src/client/app/redux/actions/*.ts"
 			],
 			"rules": {
 				"jsdoc/require-jsdoc": "off",
