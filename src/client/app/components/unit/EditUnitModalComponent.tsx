@@ -5,11 +5,11 @@ import * as React from 'react';
 import store from '../../index';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
-import { useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import translate from '../../utils/translate';
-import { showErrorNotification} from '../../utils/notifications';
+import { showErrorNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
 import '../../styles/modal.css';
@@ -74,34 +74,42 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Log the Redux state to the console
 	const meterState = useSelector((state: State) => state.meters.byMeterID);
 	const conversions = useSelector((state: State) => state.conversions.conversions);
+	const units = useSelector((state: State) => state.units.units);
 
 	const handleDeleteUnit = () => {
-		// Access the Redux store state
 		let error_message = '';
 		for (const value of Object.values(meterState)) {
-			if(value.unitId==state.id){
-				error_message += translate('meter') + value.name + ' uses ' + translate('unit') + ' "' + state.identifier+ '" \n';
+			// This unit is used by a meter so cannot be deleted.
+			if (value.unitId == state.id) {
+				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
+				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} "${state.name}";`;
 			}
+			// TODO check default graphic unit**************
 		}
-		for(let i=0;i<conversions.length;i++){
-			if(conversions[i].sourceId==state.id){
-				error_message += translate('conversion') + conversions[i].note + 'uses ' + translate('unit') + ' "' + state.identifier+ '"as a source unit\n';
+		for (let i = 0; i < conversions.length; i++) {
+			if (conversions[i].sourceId == state.id) {
+				// This unit is the source of a conversion so cannot be deleted.
+				error_message += ` ${translate('conversion')} ${units[conversions[i].sourceId].name} ${translate('uses')} ${translate('unit')}` +
+					` "${state.name}" ${translate('unit.source.error')};`;
 			}
 
-			if(conversions[i].destinationId==state.id){
-				error_message += translate('conversion') + conversions[i].sourceId + '→' + conversions[i].destinationId + ' uses '
-				+ translate('unit') + ' "' + state.id+ '" as a destination unit\n';
+			if (conversions[i].destinationId == state.id) {
+				// This unit is the destination of a conversion so cannot be deleted.
+				// TODO use source -> destination to identify*****************
+				error_message += ` ${translate('conversion')} ${units[conversions[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
+					` "${state.name}" ${translate('unit.destination.error')};`;
 			}
 		}
-		if(error_message)
-		{
-			error_message = translate('unit.failed.to.delete.unit') + '\n' +  error_message;
+		if (error_message) {
+			// TODO see EditMeterModalComponent for issue with line breaks.
+			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
 			showErrorNotification(error_message);
+		} else {
+			// It is okay to delete this unit.
+			// TODO delete unit
 		}
-
-
-
 	};
+
 	/* Edit Unit Validation:
 		Name cannot be blank
 		Sec in Rate must be greater than zero
@@ -366,7 +374,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				</Container></ModalBody>
 				<ModalFooter>
 					<Button variant="warning" color='danger' onClick={handleDeleteUnit}>
-						<FormattedMessage id="Delete Changes" />
+						<FormattedMessage id="unit.delete.unit" />
 					</Button>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
