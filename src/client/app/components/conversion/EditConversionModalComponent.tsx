@@ -19,7 +19,7 @@ import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
-import { fetchCiksData } from 'actions/ciks';
+import { fetchCiksData } from '../../actions/ciks';
 
 interface EditConversionModalComponentProps {
 	show: boolean;

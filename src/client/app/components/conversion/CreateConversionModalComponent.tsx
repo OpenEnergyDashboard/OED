@@ -20,7 +20,7 @@ import { notifyUser } from '../../utils/input'
 import * as _ from 'lodash';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
-import { fetchCiksData } from 'actions/ciks';
+import { fetchCiksData } from '../../actions/ciks';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
