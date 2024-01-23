@@ -373,8 +373,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			compatibleUnits: new Set(compatibleUnits),
 			incompatibleUnits: new Set(incompatibleUnits)
 		});
-		// If either unit or the status of pik changes then this needs to be done.
-		// cik is needed since the compatible units is not correct until cik is available.
+		// If either unit changes then this needs to be done.
+		// make sure ciksState is available.
 	}, [state.unitId, state.defaultGraphicUnit, ciksState]);
 
 	// If you edit and return to this page then want to see the DB result formatted for users

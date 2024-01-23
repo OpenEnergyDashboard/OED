@@ -353,10 +353,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				groupSelectOptions: possibleGroups
 			});
 		}
-		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// globalGroupsState can change if another group is created/edited and this can change ones displayed in menus.
-	}, [metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters]);
+		// make sure ciksState is available.
+	}, [metersState, globalGroupsState, groupState.defaultGraphicUnit, groupState.deepMeters, ciksState]);
 
 	// Update default graphic units set.
 	useEffect(() => {
@@ -388,11 +388,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			});
 		}
 		// If any of these change then it needs to be updated.
-		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// If another group that is included in this group is changed then it must be redone
 		// but we currently do a refresh so it is covered. It should still be okay if
 		// the deep meters of this group are properly updated.
+		// Make sure ciksState is available.
 	}, [metersState, groupState.deepMeters, ciksState]);
 
 	const tooltipStyle = {

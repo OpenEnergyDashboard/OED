@@ -250,6 +250,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 		// metersState normally does not change but can so include.
 		// groupState can change if another group is created/edited and this can change ones displayed in menus.
+		// make sure ciksState is available.
 	}, [metersState, groupsState, state.defaultGraphicUnit, state.deepMeters, ciksState]);
 
 	// Update compatible default graphic units set.
@@ -283,6 +284,7 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 		// If any of these change then it needs to be updated.
 		// metersState normally does not change but can so include.
+		// make sure ciksState is available.
 	}, [metersState, state.deepMeters, ciksState]);
 
 	const tooltipStyle = {

@@ -20,6 +20,7 @@ import { notifyUser } from '../../utils/input'
 import * as _ from 'lodash';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
+import { fetchCiksData } from 'actions/ciks';
 
 interface CreateConversionModalComponentProps {
 	conversionsState: ConversionData[];
@@ -181,11 +182,13 @@ export default function CreateConversionModalComponent(props: CreateConversionMo
 	// that create starts from an empty template.
 
 	// Submit
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
 		// Add the new conversion and update the store
-		dispatch(addConversion(state));
+		await dispatch(addConversion(state));
+		// Update the Cik state from the database on a successful call.
+		dispatch(fetchCiksData());
 		resetState();
 	};
 

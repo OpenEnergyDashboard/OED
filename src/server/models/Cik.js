@@ -36,7 +36,7 @@ class Cik {
 	/**
 	 * Create a new Cik object from row's data.
 	 * @param {*} row The row from which Cik will be created.
-	 * @returns {Promise.<Array.<Cik>>}
+	 * @returns the created Cik object
 	 */
 	static mapRow(row) {
 		return new Cik(row.meter_unit_id, row.non_meter_unit_id, row.slope, row.intercept);
@@ -80,25 +80,6 @@ class Cik {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns Pik array based on Cik values in the database.
-	 */
-	static async getPik(conn) {
-		// Get the max index for pik rows and columns. Length is one greater.
-		let temp;
-		temp = await conn.one(sqlFile('unit/get_max_meter_row_index.sql'));
-		const numRows = temp.max + 1;
-		temp = await conn.one(sqlFile('unit/get_max_non_meter_row_index.sql'));
-		const numColumns = temp.max + 1;
-		// Fill the Pik with false values.
-		let pik = new Array(numRows).fill(0).map(() => new Array(numColumns).fill(false));
-		// Get all the Cik values from the database.
-		const rows = await conn.any(sqlFile('cik/get_all_conversions.sql'));
-		// pik is true if there is a conversion for cik.
-		rows.map(row => { pik[row.row_index][row.column_index] = true; });
-		return pik;
 	}
 }
 
