@@ -56,8 +56,8 @@ export const currentUserSlice = createSlice({
 	selectors: {
 		selectCurrentUser: state => state,
 		selectCurrentUserRole: state => state.profile?.role,
-		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN)
 		// Should resolve to a boolean, Typescript doesn't agree so type assertion 'as boolean'
+		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN)
 	}
 })
 

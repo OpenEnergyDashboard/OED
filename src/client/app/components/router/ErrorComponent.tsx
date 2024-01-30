@@ -6,6 +6,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import AppLayout from '../../components/AppLayout';
+import translate from '../../utils/translate';
 
 /**
  * @returns A simple loading spinner used to indicate that the startup init sequence is in progress
@@ -21,11 +22,11 @@ export default function ErrorComponent() {
 			}}>
 				{/* TODO make a good looking error page. This is a placeholder for now. */}
 				<p>
-					Oops! An error has occurred.
+					{translate('error.unknown')}
 				</p>
 				<Button color='primary'
 					onClick={() => nav('/')}>
-					Return To Dashboard
+					{translate('return.dashboard')}
 				</Button>
 			</div>
 		</AppLayout>

@@ -212,7 +212,6 @@ export const selectIsValidConversion = createSelector(
 	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.destinationId,
 	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.bidirectional,
 	(unitDataById, conversions, sourceId, destinationId, bidirectional): [boolean, string] => {
-		console.log('Validating Conversion Details!')
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion
@@ -223,7 +222,6 @@ export const selectIsValidConversion = createSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
-		// console.log(sourceId, destinationId, bidirectional)
 
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
@@ -234,7 +232,7 @@ export const selectIsValidConversion = createSelector(
 		// Source or destination not set
 		if (sourceId == -999 || destinationId == -999) {
 			// TODO Translate Me!
-			return [false, 'Source or destination not set']
+			return [false, translate('conversion.create.source.destination.not')];
 		}
 
 		// Conversion already exists
@@ -252,8 +250,6 @@ export const selectIsValidConversion = createSelector(
 			return [false, translate('conversion.create.mixed.represent')];
 		}
 
-
-		console.log('Seems to Break about here!')
 		// If there is a non bidirectional inverse, then it is a valid conversion
 
 		for (const conversion of Object.values(conversions)) {
@@ -267,7 +263,6 @@ export const selectIsValidConversion = createSelector(
 			}
 		}
 
-		console.log('Conversion never seems to get here? ')
 		return [true, 'Conversion is Valid']
 	}
 )

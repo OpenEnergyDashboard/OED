@@ -4,6 +4,7 @@
 
 import * as React from 'react';
 import SpinnerComponent from '../SpinnerComponent';
+import translate from '../../utils/translate';
 
 /**
  * @returns A simple loading spinner used to indicate that the startup init sequence is in progress
@@ -15,7 +16,9 @@ export default function InitializingComponent() {
 			display: 'flex', flexDirection: 'column',
 			alignContent: 'center', alignItems: 'center'
 		}}>
-			<p>Initializing</p>
+			<p>
+				{translate('initializing')}
+			</p>
 			<SpinnerComponent loading width={50} height={50} />
 		</div>
 

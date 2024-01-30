@@ -28,7 +28,6 @@ interface GroupViewComponentProps {
 export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Don't check if admin since only an admin is allowed to route to this page.
 
-
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
 

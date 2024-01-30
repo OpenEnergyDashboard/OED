@@ -35,11 +35,48 @@ export const GraphLink = () => {
 			// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
 			// TODO validation could be implemented across all cases similar to compare period and sorting order
 			switch (key) {
+				case 'areaNormalization':
+					dispatchQueue.push(graphSlice.actions.setAreaNormalization(value === 'true'))
+					break;
+				case 'areaUnit':
+					dispatchQueue.push(graphSlice.actions.updateSelectedAreaUnit(value as AreaUnitType))
+					break;
+				case 'barDuration':
+					dispatchQueue.push(graphSlice.actions.updateBarDuration(moment.duration(parseInt(value), 'days')))
+					break;
+				case 'barStacking':
+					dispatchQueue.push(graphSlice.actions.setBarStacking(Boolean(value)))
+					break;
 				case 'chartType':
 					dispatchQueue.push(graphSlice.actions.changeChartToRender(value as ChartTypes))
 					break;
-				case 'unitID':
-					dispatchQueue.push(graphSlice.actions.updateSelectedUnit(parseInt(value)))
+				case 'comparePeriod':
+					dispatchQueue.push(graphSlice.actions.updateComparePeriod({ comparePeriod: validateComparePeriod(value), currentTime: moment() }))
+					break;
+				case 'compareSortingOrder':
+					dispatchQueue.push(graphSlice.actions.changeCompareSortingOrder(validateSortingOrder(value)))
+					break;
+				case 'groupIDs':
+					dispatchQueue.push(graphSlice.actions.updateSelectedGroups(value.split(',').map(s => parseInt(s))))
+					break;
+				case 'mapID':
+					// 'TODO, Verify Behavior & FIXME! MapLink not working as expected
+					dispatch(changeSelectedMap(parseInt(value)))
+					break;
+				case 'meterIDs':
+					dispatchQueue.push(graphSlice.actions.updateSelectedMeters(value.split(',').map(s => parseInt(s))))
+					break;
+				case 'meterOrGroup':
+					dispatchQueue.push(graphSlice.actions.updateThreeDMeterOrGroup(value as MeterOrGroup));
+					break;
+				case 'meterOrGroupID':
+					dispatchQueue.push(graphSlice.actions.updateThreeDMeterOrGroupID(parseInt(value)));
+					break;
+				case 'minMax':
+					dispatchQueue.push(graphSlice.actions.setShowMinMax(value === 'true' ? true : false))
+					break;
+				case 'optionsVisibility':
+					dispatchQueue.push(appStateSlice.actions.setOptionsVisibility(value === 'true' ? true : false))
 					break;
 				case 'rate':
 					{
@@ -48,54 +85,28 @@ export const GraphLink = () => {
 						dispatchQueue.push(graphSlice.actions.updateLineGraphRate(rate))
 					}
 					break;
-				case 'barDuration':
-					dispatchQueue.push(graphSlice.actions.updateBarDuration(moment.duration(parseInt(value), 'days')))
-					break;
-				case 'barStacking':
-					dispatchQueue.push(graphSlice.actions.setBarStacking(Boolean(value)))
-					break;
-				case 'areaNormalization':
-					dispatchQueue.push(graphSlice.actions.setAreaNormalization(value === 'true' ? true : false))
-					break;
-				case 'areaUnit':
-					dispatchQueue.push(graphSlice.actions.updateSelectedAreaUnit(value as AreaUnitType))
-					break;
-				case 'minMax':
-					dispatchQueue.push(graphSlice.actions.setShowMinMax(value === 'true' ? true : false))
-					break;
-				case 'comparePeriod':
-					dispatchQueue.push(graphSlice.actions.updateComparePeriod({ comparePeriod: validateComparePeriod(value), currentTime: moment() }))
-					break;
-				case 'compareSortingOrder':
-					dispatchQueue.push(graphSlice.actions.changeCompareSortingOrder(validateSortingOrder(value)))
-					break;
-				case 'optionsVisibility':
-					dispatchQueue.push(appStateSlice.actions.setOptionsVisibility(value === 'true' ? true : false))
-					break;
-				case 'mapID':
-					// 'TODO, Verify Behavior & FIXME! MapLink not working as expected
-					dispatch(changeSelectedMap(parseInt(value)))
+				case 'readingInterval':
+					dispatchQueue.push(graphSlice.actions.updateThreeDReadingInterval(parseInt(value)));
 					break;
 				case 'serverRange':
 					dispatchQueue.push(graphSlice.actions.updateTimeInterval(TimeInterval.fromString(value)));
+					/**
+					 * commented out since days from present feature is not currently used
+					 */
+					// const index = info.indexOf('dfp');
+					// if (index === -1) {
+					// 	options.serverRange = TimeInterval.fromString(info);
+					// } else {
+					// 	const message = info.substring(0, index);
+					// 	const stringField = this.getNewIntervalFromMessage(message);
+					// 	options.serverRange = TimeInterval.fromString(stringField);
+					// }
 					break;
 				case 'sliderRange':
 					dispatchQueue.push(graphSlice.actions.changeSliderRange(TimeInterval.fromString(value)));
 					break;
-				case 'meterOrGroupID':
-					dispatchQueue.push(graphSlice.actions.updateThreeDMeterOrGroupID(parseInt(value)));
-					break;
-				case 'meterOrGroup':
-					dispatchQueue.push(graphSlice.actions.updateThreeDMeterOrGroup(value as MeterOrGroup));
-					break;
-				case 'readingInterval':
-					dispatchQueue.push(graphSlice.actions.updateThreeDReadingInterval(parseInt(value)));
-					break;
-				case 'meterIDs':
-					dispatchQueue.push(graphSlice.actions.updateSelectedMeters(value.split(',').map(s => parseInt(s))))
-					break;
-				case 'groupIDs':
-					dispatchQueue.push(graphSlice.actions.updateSelectedGroups(value.split(',').map(s => parseInt(s))))
+				case 'unitID':
+					dispatchQueue.push(graphSlice.actions.updateSelectedUnit(parseInt(value)))
 					break;
 				default:
 					throw new Error('Unknown query parameter');
@@ -109,5 +120,4 @@ export const GraphLink = () => {
 	// All appropriate state updates should've been executed
 	// redirect to root clear the link in the search bar
 	return <Navigate to='/' replace />
-
 }

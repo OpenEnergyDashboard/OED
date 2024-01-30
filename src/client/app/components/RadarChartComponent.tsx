@@ -323,7 +323,6 @@ export default function RadarChartComponent() {
 		<div style={{ width: '100%', height: '100%' }}>
 			<Plot
 				data={datasets}
-				onClick={e => console.log(e)}
 				style={{ width: '100%', height: '80%' }}
 				useResizeHandler={true}
 				config={{

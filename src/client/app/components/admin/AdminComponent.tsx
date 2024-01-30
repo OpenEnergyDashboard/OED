@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-// import PreferencesContainer from '../../containers/admin/PreferencesContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import PreferencesComponent from './PreferencesComponent';
 import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';

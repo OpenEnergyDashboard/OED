@@ -84,11 +84,10 @@ export default function CreateConversionModalComponent() {
 		if (validConversion) {
 			// Close modal first to avoid repeat clicks
 			setShowModal(false);
-			//5 Add the new conversion and update the store
+			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			//
 			addConversionMutation(_.omit(conversionState, 'sourceOptions'))
-			// dispatch(addConversion(conversionState));
 			resetState();
 		} else {
 			showErrorNotification(reason)

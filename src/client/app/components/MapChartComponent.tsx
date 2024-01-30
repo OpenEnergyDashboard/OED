@@ -43,7 +43,6 @@ export default function MapChartComponent() {
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectMapChartQueryArgs)
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, { skip: groupShouldSkip });
-	console.log(meterShouldSkip, groupShouldSkip, meterReadings, groupData)
 
 	// converting maps to RTK has been proving troublesome, therefore using a combination of old/new stateSelectors
 	const unitID = useAppSelector(selectSelectedUnit);

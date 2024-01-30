@@ -194,7 +194,6 @@ export default function PreferencesComponent() {
 			<div style={bottomPaddingStyle}>
 				<p style={titleStyle}>
 					{`${translate('default.warning.file.size')}:`}
-
 				</p>
 				<Input
 					type='number'
@@ -214,7 +213,6 @@ export default function PreferencesComponent() {
 					maxLength={50}
 				/>
 			</div>
-			{/* Reuse same style as title. */}
 			<div style={bottomPaddingStyle}>
 				<p style={titleStyle}>
 					{`${translate('default.meter.reading.frequency')}:`}
@@ -333,10 +331,6 @@ export default function PreferencesComponent() {
 		</div >
 	);
 }
-
-
-
-
 
 const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',

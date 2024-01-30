@@ -17,14 +17,11 @@ import GroupViewComponent from './GroupViewComponent';
  * @returns Groups page element
  */
 export default function GroupsDetailComponent() {
-
 	// Check for admin status
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
-
-
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
@@ -52,8 +49,7 @@ export default function GroupsDetailComponent() {
 					{isAdmin &&
 						<div className="edit-btn">
 							{/* The actual button for create is inside this component. */}
-							< CreateGroupModalComponent
-							/>
+							< CreateGroupModalComponent />
 						</div>
 					}
 					{

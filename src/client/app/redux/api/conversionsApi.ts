@@ -46,7 +46,6 @@ export const conversionsApi = baseApi.injectEndpoints({
 				// TODO Verify Behavior w/ Maintainers
 				queryFulfilled
 					.then(() => {
-						console.log('Refreshing')
 						dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: true, refreshReadingViews: false }))
 					})
 

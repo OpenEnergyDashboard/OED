@@ -27,9 +27,8 @@ export default function UserDetailComponent() {
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
-
 	React.useEffect(() => { setLocalUsersChanges(users) }, [users])
-	React.useEffect(() => { !_.isEqual(users, localUsersChanges) ? setHasChanges(true) : setHasChanges(false) }, [localUsersChanges, users])
+	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)) }, [localUsersChanges, users])
 	const submitChanges = async () => {
 		submitUserEdits(localUsersChanges)
 			.unwrap()

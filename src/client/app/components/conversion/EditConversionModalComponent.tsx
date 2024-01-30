@@ -18,7 +18,6 @@ import translate from '../../utils/translate';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
-
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
@@ -124,10 +123,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 		// Only do work if there are changes
 		if (conversionHasChanges) {
-			// Save our changes by dispatching the submitEditedConversion action
-			// dispatch(submitEditedConversion(state, shouldRedoCik));
+			// Save our changes
 			editConversion({ conversionData: state, shouldRedoCik })
-			// dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 		}
 	}
 

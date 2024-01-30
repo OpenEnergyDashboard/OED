@@ -245,7 +245,6 @@ export default function LineChartComponent() {
 			return
 		}
 	})
-	// console.log(datasets.length, datasets)
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (datasets.length === 0) {
@@ -263,7 +262,6 @@ export default function LineChartComponent() {
 				<Plot
 					data={datasets as Plotly.Data[]}
 					onRelayout={handleRelayout}
-					onClick={e => console.log(e)}
 					style={{ width: '100%', height: '80%' }}
 					useResizeHandler={true}
 					config={{

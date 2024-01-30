@@ -47,8 +47,7 @@ export default function CreateGroupModalComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 	// Units state
 	const unitsDataById = useAppSelector(selectUnitDataById);
-
-	// Check for admin status
+	// Which units are possible for graphing state
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
 
 	// Since creating group the initial values are effectively nothing or the desired defaults.
@@ -217,8 +216,6 @@ export default function CreateGroupModalComponent() {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
-			console.log('removeMe', submitState)
-
 			createGroup(submitState)
 			resetState();
 		} else {
@@ -245,9 +242,7 @@ export default function CreateGroupModalComponent() {
 			meterSelectOptions: possibleMeters,
 			groupSelectOptions: possibleGroups
 		}));
-		// pik is needed since the compatible units is not correct until pik is available.
-		// metersState normally does not change but can so include.
-		// groupState can change if another group is created/edited and this can change ones displayed in menus.
+		// meters and groups changes will update page due to useAppSelector above.
 	}, [state]);
 
 	// Update compatible default graphic units set.

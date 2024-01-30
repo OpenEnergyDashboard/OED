@@ -165,7 +165,6 @@ export default function CreateMeterModalComponent() {
 				})
 				.catch(err => {
 					// TODO Better way than popup with React but want to stay so user can read/copy.
-					console.log(err)
 					window.alert(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
 				})
 		} else {
