@@ -11,8 +11,8 @@ import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import TooltipHelpComponent from '../TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
@@ -33,13 +33,14 @@ import {
 	unitsCompatibleWithMeters
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
-import { getGPSString, notifyUser, nullToEmptyString } from '../../utils/input';
+import { getGPSString, nullToEmptyString } from '../../utils/input';
+import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -208,10 +209,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					});
 				}
 			} else {
-				notifyUser(translate('group.area.calculate.error.group.unit'));
+				showErrorNotification(translate('group.area.calculate.error.group.unit'));
 			}
 		} else {
-			notifyUser(translate('group.area.calculate.error.no.meters'));
+			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
 	}
 
@@ -291,7 +292,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					// GPS not okay and there since non-zero length value.
 					// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 					// so leaving code commented out.
-					// notifyUser(translate('input.gps.range') + groupState.gps + '.');
+					// showErrorNotification(translate('input.gps.range') + groupState.gps + '.');
 					inputOk = false;
 				}
 			}
@@ -331,7 +332,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// The next line is unneeded since do refresh.
 				// dispatch(removeUnsavedChanges());
 			} else {
-				notifyUser(translate('group.input.error'));
+				showErrorNotification(translate('group.input.error'));
 			}
 		}
 	};
@@ -733,7 +734,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				// There is a circular dependency so this change is not allowed.
 				// Cannot be case of no children since adding child.
 				// Let the user know.
-				notifyUser(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
+				showErrorNotification(`${translate('group.edit.circular')}\n\n${translate('group.edit.cancelled')}`);
 				// Stops processing and will return this result (negated).
 				return true;
 			} else {
@@ -813,7 +814,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			if (cancel) {
 				// If cancel is true, doesn't allow the admin to apply changes.
 				msg += `\n${translate('group.edit.cancelled')}`;
-				notifyUser(msg);
+				showErrorNotification(msg);
 			} else {
 				// If msg is not empty, warns the admin and asks if they want to apply changes.
 				msg += `\n${translate('group.edit.verify')}`;
@@ -864,7 +865,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// This should only happen for the group being edited but check for all since easier.
 			if (newDeepMeters.length === 0) {
 				// Let the user know.
-				notifyUser(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
+				showErrorNotification(`${translate('group.edit.empty')}\n\n${translate('group.edit.cancelled')}`);
 				// Indicate issue and stop processing.
 				return true;
 			} else {
@@ -902,7 +903,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				msg += `${editGroupsState[groupId].name}\n`;
 			})
 			msg += `\n${translate('group.edit.cancelled')}`;
-			notifyUser(msg);
+			showErrorNotification(msg);
 		} else {
 			// The group can be deleted.
 			handleDeleteConfirmationModalOpen();

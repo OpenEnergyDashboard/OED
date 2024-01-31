@@ -7,18 +7,6 @@ import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } 
 import translate from './translate';
 import * as _ from 'lodash';
 
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-/**
- * Causes a window popup with msg
- * @param msg message to display
- */
-export function notifyUser(msg: string) {
-	window.alert(msg);
-}
-
 /**
  * get string value from GPSPoint or null.
  * @param gps GPS point to get value from and can be null

@@ -124,7 +124,7 @@
 // 		} catch (err) {
 // 			// Failure! ):
 // 			// TODO Better way than popup with React but want to stay so user can read/copy.
-// 			window.alert(translate('group.failed.to.edit.group') + '"' + err.response.data as string + '"');
+// 			showErrorNotification(translate('group.failed.to.edit.group') + '"' + err.response.data as string + '"');
 // 			// Clear our changes from to the submitting meters state
 // 			// We must do this in case fetch failed to keep the store in sync with the database
 // 		}

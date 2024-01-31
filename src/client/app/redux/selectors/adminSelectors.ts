@@ -225,7 +225,6 @@ export const selectIsValidConversion = createSelector(
 
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
-			// notifyUser(translate('conversion.create.destination.meter'));
 			return [false, translate('conversion.create.destination.meter')];
 		}
 
@@ -239,14 +238,12 @@ export const selectIsValidConversion = createSelector(
 		if ((conversions.findIndex(conversion => ((
 			conversion.sourceId === sourceId) &&
 			conversion.destinationId === destinationId))) !== -1) {
-			// notifyUser(translate('conversion.create.exists'));
 			return [false, translate('conversion.create.exists')];
 		}
 
 		// You cannot have a conversion between units that differ in unit_represent.
 		// This means you cannot mix quantity, flow & raw.
 		if (unitDataById[sourceId].unitRepresent !== unitDataById[destinationId].unitRepresent) {
-			// notifyUser(translate('conversion.create.mixed.represent'));
 			return [false, translate('conversion.create.mixed.represent')];
 		}
 

@@ -7,7 +7,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpComponent from '../TooltipHelpComponent';
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { makeSelectGraphicUnitCompatibility, selectDefaultCreateMeterValues } from '../../redux/selectors/adminSelectors';
@@ -15,22 +14,13 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
-import { UnitData } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { notifyUser } from '../../utils/input';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { showSuccessNotification } from '../../utils/notifications';
-
-
-// TODO Moved the possible meters/graphic units calculations up to the details component
-// This was to prevent the calculations from being done on every load, but now requires them to be passed as props
-export interface CreateMeterModalComponentProps {
-	possibleMeterUnits: Set<UnitData>;
-	possibleGraphicUnits: Set<UnitData>;
-}
 
 /**
  * Defines the create meter modal form
@@ -39,14 +29,11 @@ export interface CreateMeterModalComponentProps {
 export default function CreateMeterModalComponent() {
 
 	const [addMeter] = metersApi.endpoints.addMeter.useMutation()
-	// Admin state so can get the default reading frequency.
 	// Memo'd memoized selector
 	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
 	const defaultValues = useAppSelector(selectDefaultCreateMeterValues)
 
 	/* State */
-	// To make this consistent with EditUnitModalComponent, we don't pass show and close via props
-	// even this one does have other props.
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 
@@ -54,12 +41,13 @@ export default function CreateMeterModalComponent() {
 	// Handlers for each type of input change
 	const [meterDetails, setMeterDetails] = useState(defaultValues);
 	const {
-		incompatibleGraphicUnits,
 		compatibleGraphicUnits,
+		incompatibleGraphicUnits,
 		compatibleUnits,
 		incompatibleUnits
 		// Type assertion due to conflicting GPS Property
-	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails as unknown as MeterData))
+	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails as unknown as MeterData));
+
 	const handleShow = () => setShowModal(true);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +67,8 @@ export default function CreateMeterModalComponent() {
 	}
 
 	// Dropdowns
-	const [selectedUnitId, setSelectedUnitId] = useState<boolean>(false);
 	const [selectedGraphicId, setSelectedGraphicId] = useState<boolean>(false);
+	const [selectedUnitId, setSelectedUnitId] = useState<boolean>(false);
 
 	const [validMeter, setValidMeter] = useState(false);
 
@@ -91,11 +79,10 @@ export default function CreateMeterModalComponent() {
 	/* End State */
 
 	// Reset the state to default values
-	// This would also benefit from a single state changing function for all state
 	const resetState = () => {
 		setMeterDetails(defaultValues);
-		setSelectedGraphicId(false)
-		setSelectedUnitId(false)
+		setSelectedGraphicId(false);
+		setSelectedUnitId(false);
 	}
 
 	const handleClose = () => {
@@ -126,7 +113,6 @@ export default function CreateMeterModalComponent() {
 		// null came from the DB and it is okay to just leave it - Not a string.
 		if (typeof gpsInput === 'string') {
 			if (isValidGPSInput(gpsInput)) {
-				// Clearly gpsInput is a string but TS complains about the split so cast.
 				const gpsValues = gpsInput.split(',').map(value => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
@@ -137,22 +123,22 @@ export default function CreateMeterModalComponent() {
 				// GPS not okay. Only true if some input.
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
-				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
 			}
 		}
 
 		if (inputOk) {
 			// The input passed validation.
-			// The default value for timeZone is an empty string but that should be null for DB.
-			// See below for usage of timeZoneValue.
-			// GPS may have been updated so create updated state to submit.
 			const submitState = {
 				...meterDetails,
+				// GPS may have been updated so create updated state to submit.
 				gps: gps,
-				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone),
 				// Set default identifier as name if left blank
-				identifier: !meterDetails.identifier || meterDetails.identifier.length === 0 ? meterDetails.name : meterDetails.identifier
+				identifier: !meterDetails.identifier || meterDetails.identifier.length === 0 ? meterDetails.name : meterDetails.identifier,
+				// The default value for timeZone is an empty string but that should be null for DB.
+				// See below for usage of timeZoneValue.
+				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
 			};
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
@@ -164,12 +150,11 @@ export default function CreateMeterModalComponent() {
 					resetState();
 				})
 				.catch(err => {
-					// TODO Better way than popup with React but want to stay so user can read/copy.
-					window.alert(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
+					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
 				})
 		} else {
 			// Tell user that not going to update due to input issues.
-			notifyUser(translate('meter.input.error'));
+			showErrorNotification(translate('meter.input.error'));
 		}
 	};
 
@@ -751,7 +736,6 @@ export default function CreateMeterModalComponent() {
 	);
 }
 
-
 /* Create Meter Validation:
 	Name cannot be blank
 	Area must be positive or zero
@@ -790,9 +774,6 @@ const isValidCreateMeter = (meterDetails: MeterData) => {
 		moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
 		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS)
 }
-
-
-
 
 const MIN_VAL = Number.MIN_SAFE_INTEGER;
 const MAX_VAL = Number.MAX_SAFE_INTEGER;

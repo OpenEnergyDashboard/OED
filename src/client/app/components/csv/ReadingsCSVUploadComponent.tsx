@@ -3,13 +3,14 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button, Col, Input, Form, FormGroup, Label } from 'reactstrap';
-import { ReadingsCSVUploadProps, TimeSortTypes, BooleanMeterTypes } from '../../types/csvUploadForm';
-import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
-import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
+import { Button, Col, Form, FormGroup, Input, Label } from 'reactstrap';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
+import { BooleanMeterTypes, ReadingsCSVUploadProps, TimeSortTypes } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
+import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
+import FormFileUploaderComponent from '../FormFileUploaderComponent';
 
 /**
  * Returns a range of values between the specified lower and upper bounds.
@@ -63,13 +64,14 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 				// dispatch(fetchMetersDetails());
 				// TODO Using an alert is not the best. At some point this should be integrated
 				// with react.
-				window.alert(msg);
+				// There should be a message (not void) but that is not the type so overriding.
+				showInfoNotification(msg as unknown as string);
 				// TODO remove when the above TODO is done.
 				window.location.reload();
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
-			window.alert(error.response.data as string);
+			showErrorNotification(error.response.data as string);
 		}
 	}
 

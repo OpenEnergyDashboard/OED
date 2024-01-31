@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
+import { showErrorNotification } from '../utils/notifications';
 import { selectConversionsDetails } from '../redux/api/conversionsApi';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
@@ -13,6 +14,7 @@ import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectAllChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectGraphState, selectShowMinMax } from '../redux/slices/graphSlice';
 import { UserRole } from '../types/items';
 import { ConversionData } from '../types/redux/conversions';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
@@ -23,7 +25,6 @@ import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
 import { hasToken } from '../utils/token';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectGraphState, selectShowMinMax } from '../redux/slices/graphSlice';
 
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -217,7 +218,7 @@ export default function ExportComponent() {
 				// User not allowed to download.
 				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
 					translate('csv.download.size.limit');
-				window.alert(msg);
+				showErrorNotification(msg);
 			}
 		} else {
 			// Anyone can download if they approve

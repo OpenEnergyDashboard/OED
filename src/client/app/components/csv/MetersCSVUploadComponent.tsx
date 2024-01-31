@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 
 export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
@@ -28,11 +29,11 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 				await this.props.submitCSV(files[0])
 				// TODO Using an alert is not the best. At some point this should be integrated
 				// with react.
-				window.alert('<h1>SUCCESS</h1>The meter upload was a success.');
+				showSuccessNotification('<h1>SUCCESS</h1>The meter upload was a success.');
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
-			window.alert(error.response.data as string);
+			showErrorNotification(error.response.data as string);
 		}
 		// Refetch meters details.
 		// Removed with rtk migration

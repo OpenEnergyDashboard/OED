@@ -22,6 +22,40 @@ export function showSuccessNotification(message: string, position: ToastPosition
 }
 
 /**
+ * Show user the information notification
+ * @param message translation identifier for message to display
+ * @param position screen position for notification where top, right is the default
+ * @param autoDismiss milliseconds until notification goes away with default of 7 seconds
+ */
+export function showInfoNotification(message: string, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 7000) {
+	toast.info(message, {
+		position: position,
+		autoClose: autoDismiss,
+		hideProgressBar: true,
+		pauseOnHover: false,
+		draggable: true,
+		theme: 'colored'
+	});
+}
+
+/**
+ * Show user the warning notification
+ * @param message translation identifier for message to display
+ * @param position screen position for notification where top, right is the default
+ * @param autoDismiss milliseconds until notification goes away with default of 10 seconds
+ */
+export function showWarnNotification(message: string, position: ToastPosition = toast.POSITION.TOP_RIGHT, autoDismiss = 10000) {
+	toast.warn(message, {
+		position: position,
+		autoClose: autoDismiss,
+		hideProgressBar: true,
+		pauseOnHover: false,
+		draggable: true,
+		theme: 'colored'
+	});
+}
+
+/**
  * Show user the error notification
  * @param message translation identifier for message to display
  * @param position screen position for notification where top, right is the default

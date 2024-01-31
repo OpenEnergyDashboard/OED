@@ -8,7 +8,6 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpComponent from '../TooltipHelpComponent';
 import { metersApi, selectMeterById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
@@ -20,9 +19,11 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { UnitRepresentType } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { getGPSString, notifyUser, nullToEmptyString } from '../../utils/input';
+import { getGPSString, nullToEmptyString } from '../../utils/input';
+import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface EditMeterModalComponentProps {
@@ -105,7 +106,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					// GPS not okay.
 					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
 					// so leaving code commented out.
-					// notifyUser(translate('input.gps.range') + state.gps + '.');
+					// showErrorNotification(translate('input.gps.range') + state.gps + '.');
 					inputOk = false;
 				}
 			}
@@ -130,7 +131,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 			} else {
 				// Tell user that not going to update due to input issues.
-				notifyUser(translate('meter.input.error'));
+				showErrorNotification(translate('meter.input.error'));
 			}
 		}
 	};

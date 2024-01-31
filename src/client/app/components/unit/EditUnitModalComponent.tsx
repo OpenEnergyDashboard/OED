@@ -10,16 +10,16 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
+import { unitsApi } from '../../redux/api/unitsApi';
+import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
-import { notifyUser } from '../../utils/input';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { unitsApi } from '../../redux/api/unitsApi';
-import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import { useTranslate } from '../../redux/componentHooks';
+
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
@@ -112,7 +112,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			const meter = meters.find(m => m.unitId === props.unit.id);
 			if (meter) {
 				// There exists a meter that is still linked with this unit
-				notifyUser(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
+				showErrorNotification(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
 				inputOk = false;
 			}
 		}
@@ -130,7 +130,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| props.unit.note != state.note;
 		} else {
 			// Tell user that not going to update due to input issues.
-			notifyUser(`${translate('unit.input.error')}`);
+			showErrorNotification(`${translate('unit.input.error')}`);
 			return false;
 		}
 	}

@@ -10,11 +10,11 @@
 // @ts-nocheck
 /* eslint-disable jsdoc/require-param */
 
-import { Thunk, Dispatch, GetState } from '../../types/redux/actions';
-import { showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { Dispatch, GetState, Thunk } from '../../types/redux/actions';
 import * as t from '../../types/redux/meters';
 import { metersApi } from '../../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 
 
@@ -72,7 +72,7 @@ export function submitEditedMeter(editedMeter: t.MeterData, shouldRefreshReading
 			} catch (err) {
 				// Failure! ):
 				// TODO Better way than popup with React but want to stay so user can read/copy.
-				window.alert(translate('meter.failed.to.edit.meter') + '"' + err.response.data as string + '"');
+				showErrorNotification(translate('meter.failed.to.edit.meter') + '"' + err.response.data as string + '"');
 				// Clear our changes from to the submitting meters state
 				// We must do this in case fetch failed to keep the store in sync with the database
 				dispatch(metersSlice.actions.deleteSubmittedMeter(editedMeter.id));
@@ -93,7 +93,7 @@ export function addMeter(meter: t.MeterData): Thunk {
 			showSuccessNotification(translate('meter.successfully.create.meter'));
 		} catch (err) {
 			// TODO Better way than popup with React but want to stay so user can read/copy.
-			window.alert(translate('meter.failed.to.create.meter') + '"' + err.response.data as string + '"');
+			showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.response.data as string + '"');
 		}
 	}
 }

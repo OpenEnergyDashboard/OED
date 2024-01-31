@@ -3,10 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { ChangeEvent } from 'react';
+import { FormattedMessage, WrappedComponentProps, injectIntl } from 'react-intl';
 import { logToServer } from '../../redux/actions/logs';
-import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { showErrorNotification } from '../../utils/notifications';
 
 /**
  * Accepts image file from user upload,
@@ -32,19 +33,19 @@ type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
 class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
 	private readonly fileInput: any;
 	private notifyBadNumber() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
+		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
 	}
 	private notifyBadDigit360() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digita'})}`);
+		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.digita'})}`);
 	}
 	private notifyBadDigit0() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
+		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
 	}
 	private notifyBadMapLoad() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.load'})}`);
+		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.load'})}`);
 	}
 	private notifyBadName() {
-		window.alert(`${this.props.intl.formatMessage({id: 'map.bad.name'})}`);
+		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.name'})}`);
 	}
 
 	constructor(props: MapInitiatePropsWithIntl) {

@@ -2,13 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
-import { Button } from 'reactstrap';
-import { Link } from 'react-router-dom';
-import { hasToken } from '../../utils/token';
-import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
+import * as React from 'react';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import { Link } from 'react-router-dom';
+import { Button } from 'reactstrap';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { showErrorNotification } from '../../utils/notifications';
+import { hasToken } from '../../utils/token';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -141,7 +142,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			this.setState({ circleFocus: !this.state.circleFocus });
 		}
 		else {
-			window.alert(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
+			showErrorNotification(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
 		}
 	}
 
@@ -273,7 +274,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	// this function throws alert on the browser notifying that map needs calibrating before display
 	private notifyCalibrationNeeded() {
-		window.alert(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
+		showErrorNotification(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
 	}
 
 	private toggleNameInput() {

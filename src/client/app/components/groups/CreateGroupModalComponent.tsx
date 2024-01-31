@@ -10,8 +10,8 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
-import TooltipHelpComponent from '../TooltipHelpComponent';
 import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
@@ -27,12 +27,13 @@ import {
 	unitsCompatibleWithMeters
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
-import { getGPSString, notifyUser } from '../../utils/input';
+import { getGPSString } from '../../utils/input';
+import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { selectMeterDataById } from '../../redux/api/metersApi';
 
 /**
  * Defines the create group modal form
@@ -155,10 +156,10 @@ export default function CreateGroupModalComponent() {
 					setState({ ...state, ['area']: +areaSum.toPrecision(6) });
 				}
 			} else {
-				notifyUser(translate('group.area.calculate.error.group.unit'));
+				showErrorNotification(translate('group.area.calculate.error.group.unit'));
 			}
 		} else {
-			notifyUser(translate('group.area.calculate.error.no.meters'));
+			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
 	}
 
@@ -207,7 +208,7 @@ export default function CreateGroupModalComponent() {
 				// GPS not okay. Only true if some input.
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
-				// notifyUser(translate('input.gps.range') + state.gps + '.');
+				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
 				inputOk = false;
 			}
 		}
@@ -220,7 +221,7 @@ export default function CreateGroupModalComponent() {
 			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
-			notifyUser(translate('group.input.error'));
+			showErrorNotification(translate('group.input.error'));
 		}
 	};
 
@@ -437,7 +438,7 @@ export default function CreateGroupModalComponent() {
 									let dgu = state.defaultGraphicUnit;
 									if (!newAllowedDGU.has(dgu)) {
 										// The current default graphic unit is not compatible so set to no unit and warn admin.
-										notifyUser(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
+										showWarnNotification(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
 										dgu = -99;
 									}
 									// Update the deep meter, child meter & default graphic unit state based on the changes.
@@ -473,7 +474,7 @@ export default function CreateGroupModalComponent() {
 								let dgu = state.defaultGraphicUnit;
 								if (!newAllowedDGU.has(dgu)) {
 									// The current default graphic unit is not compatible so set to no unit and warn admin.
-									notifyUser(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
+									showWarnNotification(`${translate('group.create.nounit')} "${unitsDataById[dgu].identifier}"`);
 									dgu = -99;
 								}
 								// Update the deep meter, child meter & default graphic unit state based on the changes.

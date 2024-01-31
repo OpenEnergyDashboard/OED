@@ -2,9 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { MapMetadata } from '../types/redux/map';
+import { showErrorNotification } from './notifications';
 import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
+import { MapMetadata } from '../types/redux/map';
 import translate from './translate';
 
 /**
@@ -121,7 +122,7 @@ export function isValidGPSInput(input: string): boolean {
 	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
 		// TODO It would be nice to return the error and then notify as desired.
-		window.alert(translate('input.gps.range') + input);
+		showErrorNotification(translate('input.gps.range') + input);
 	}
 	return result;
 }
