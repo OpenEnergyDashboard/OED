@@ -9,7 +9,7 @@ import AppLayout from '../../components/AppLayout';
 import translate from '../../utils/translate';
 
 /**
- * @returns A simple loading spinner used to indicate that the startup init sequence is in progress
+ * @returns A error page that then returns to main dashboard page.
  */
 export default function ErrorComponent() {
 	const nav = useNavigate();

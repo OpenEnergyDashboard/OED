@@ -33,7 +33,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	// Set up to display the units associated with the meter as the unit identifier.
 	// This is the unit associated with the meter.
 	const unitName = useAppSelector(state => selectUnitName(state, props.meter.id))
-	// This is the default graphic unit associated with the meter. See above for how code works.
+	// This is the default graphic unit  name associated with the meter.
 	const graphicName = useAppSelector(state => selectGraphicName(state, props.meter.id))
 	const handleShow = () => {
 		setShowEditModal(true);

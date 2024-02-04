@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
 import { store } from '../../store';
 //Realize that * is already imported from react
@@ -55,7 +56,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
 	const conversionData = useAppSelector(selectConversionsDetails);
-
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });

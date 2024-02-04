@@ -8,8 +8,6 @@ import { useAppSelector } from './reduxHooks';
 import localeData, { LocaleDataKey } from '../translations/data';
 import { createIntlCache, createIntl, defineMessages } from 'react-intl';
 
-
-
 export const useWaitForInit = () => {
 	const isAdmin = useAppSelector(selectIsAdmin);
 	const userRole = useAppSelector(selectCurrentUserRole);

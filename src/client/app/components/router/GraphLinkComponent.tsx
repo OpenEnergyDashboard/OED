@@ -118,6 +118,6 @@ export const GraphLink = () => {
 		showErrorNotification(translate('failed.to.link.graph'));
 	}
 	// All appropriate state updates should've been executed
-	// redirect to root clear the link in the search bar
+	// redirect to root and clear the link in the search bar
 	return <Navigate to='/' replace />
 }

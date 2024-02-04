@@ -28,10 +28,10 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  */
 export default function CreateMeterModalComponent() {
 
-	const [addMeter] = metersApi.endpoints.addMeter.useMutation()
+	const [addMeter] = metersApi.endpoints.addMeter.useMutation();
 	// Memo'd memoized selector
-	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
-	const defaultValues = useAppSelector(selectDefaultCreateMeterValues)
+	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, []);
+	const defaultValues = useAppSelector(selectDefaultCreateMeterValues);
 
 	/* State */
 	// Modal show
@@ -772,7 +772,7 @@ const isValidCreateMeter = (meterDetails: MeterData) => {
 		moment(meterDetails.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
 		moment(meterDetails.minDate).isSameOrBefore(moment(meterDetails.maxDate)) &&
 		moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
-		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS)
+		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS);
 }
 
 const MIN_VAL = Number.MIN_SAFE_INTEGER;

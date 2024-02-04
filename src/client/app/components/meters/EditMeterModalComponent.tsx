@@ -38,10 +38,10 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
-	const [editMeter] = metersApi.useEditMeterMutation()
+	const [editMeter] = metersApi.useEditMeterMutation();
 	// since this selector is shared amongst many other modals, we must use a selector factory in order
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
-	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, [])
+	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, []);
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
 	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
@@ -50,9 +50,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		incompatibleGraphicUnits,
 		compatibleUnits,
 		incompatibleUnits
-	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits))
+	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits));
 
-	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)) }, [meterState])
+	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)) }, [meterState]);
 	/* State */
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -127,7 +127,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
-				// dispatch(submitEditedMeter(submitState, shouldRefreshReadingViews) as ThunkAction<void, RootState, unknown, AnyAction>);
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 			} else {
 				// Tell user that not going to update due to input issues.
@@ -707,7 +706,7 @@ const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
 const MAX_ERRORS = 75;
 const tooltipStyle = {
 	...tooltipBaseStyle,
-	// Only and admin can edit a meter.
+	// Only an admin can edit a meter.
 	tooltipEditMeterView: 'help.admin.meteredit'
 };
 
@@ -742,5 +741,5 @@ const isValidMeter = (localMeterEdits: MeterData) => {
 		moment(localMeterEdits.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
 		moment(localMeterEdits.minDate).isSameOrBefore(moment(localMeterEdits.maxDate)) &&
 		moment(localMeterEdits.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
-		(localMeterEdits.maxError >= 0 && localMeterEdits.maxError <= MAX_ERRORS)
+		(localMeterEdits.maxError >= 0 && localMeterEdits.maxError <= MAX_ERRORS);
 }

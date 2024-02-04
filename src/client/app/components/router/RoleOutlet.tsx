@@ -16,7 +16,6 @@ interface RoleOutletProps {
  * @returns An outlet that is responsible for Role Routes. Routes users away from certain routes if they don't have permissions.
  */
 export default function RoleOutlet(props: RoleOutletProps) {
-
 	// Function that returns a JSX element. Either the requested route's Component, as outlet or back to root
 	const { userRole, initComplete } = useWaitForInit();
 	// // If state contains token it has been validated on startup or login.

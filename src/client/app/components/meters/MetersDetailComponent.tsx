@@ -63,8 +63,6 @@ const titleStyle: React.CSSProperties = {
 	textAlign: 'center'
 };
 
-
-
 const tooltipStyle = {
 	display: 'inline-block',
 	fontSize: '50%'
