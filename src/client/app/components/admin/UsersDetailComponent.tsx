@@ -46,7 +46,6 @@ export default function UserDetailComponent() {
 		// make new list from existing local user state
 		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user)
 		setLocalUsersChanges(updatedList)
-		// editUser(user.email, target.value as UserRole);
 	}
 
 	const deleteUser = (email: string) => {

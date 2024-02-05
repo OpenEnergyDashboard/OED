@@ -4,7 +4,7 @@
 
 import { currentUserSlice } from '../slices/currentUserSlice';
 import { User } from '../../types/items';
-import { deleteToken } from '../../utils/token';
+import { deleteToken, getToken, hasToken } from '../../utils/token';
 import { baseApi } from './baseApi';
 
 type LoginResponse = User & {
@@ -34,6 +34,16 @@ export const authApi = baseApi.injectEndpoints({
 				body: { token: token }
 			})
 		}),
+		tokenPoll: builder.query<null, void>({
+			// Query to be used as a polling utility for admin outlet pages.
+			queryFn: (_args, api) => {
+				if (hasToken()) {
+					api.dispatch(authApi.endpoints.verifyToken.initiate(getToken()))
+				}
+				// don't care about data, middleware will handle failed verifications
+				return { data: null }
+			}
+		}),
 		logout: builder.mutation<null, void>({
 			queryFn: (_, { dispatch }) => {
 				// Opt to use a RTK mutation instead of manually writing a thunk to take advantage mutation invalidations
@@ -45,3 +55,6 @@ export const authApi = baseApi.injectEndpoints({
 		})
 	})
 })
+
+// Poll interval in milliseconds (1 minute)
+export const authPollInterval = 60000

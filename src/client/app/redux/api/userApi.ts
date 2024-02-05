@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { NewUser, User } from '../../types/items';
-// import { authApi } from './authApi';
 import { baseApi } from './baseApi';
 
 export const userApi = baseApi.injectEndpoints({
@@ -43,11 +42,3 @@ export const userApi = baseApi.injectEndpoints({
 		})
 	})
 })
-
-// public async editUsers(users: User[]) {
-// 	return await this.backend.doPostRequest('/api/users/edit', { users });
-// }
-
-// public async deleteUser(email: string) {
-// 	return await this.backend.doPostRequest('/api/users/delete', { email });
-// }

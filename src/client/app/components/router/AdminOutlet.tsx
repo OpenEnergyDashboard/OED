@@ -6,13 +6,14 @@ import * as React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useWaitForInit } from '../../redux/componentHooks';
 import InitializingComponent from './InitializingComponent';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
 
 /**
  * @returns An outlet that is responsible for Admin Routes. Routes non-admin users away from certain routes.
  */
 export default function AdminOutlet() {
 	const { isAdmin, initComplete } = useWaitForInit();
-
+	authApi.useTokenPollQuery(undefined, { pollingInterval: authPollInterval })
 	if (!initComplete) {
 		// Return a spinner until all init queries return and populate cache with data
 		return <InitializingComponent />

@@ -6,7 +6,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { rootReducer } from './redux/rootReducer';
 import { baseApi } from './redux/api/baseApi';
 import { Dispatch } from './types/redux/actions';
-import { listenerMiddleware } from './redux/middleware/middleware';
+import { listenerMiddleware } from './redux/listenerMiddleware';
 import { setGlobalDevModeChecks } from 'reselect'
 
 export const store = configureStore({

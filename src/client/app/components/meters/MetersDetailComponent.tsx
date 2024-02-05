@@ -12,6 +12,7 @@ import '../../styles/card-page.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
 
 /**
  * Defines the meters page card view
@@ -21,6 +22,8 @@ export default function MetersDetailComponent() {
 
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
+	// page may contain admin info so verify admin status while admin is authenticated.
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval })
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
@@ -43,8 +46,7 @@ export default function MetersDetailComponent() {
 				}
 				{
 					<div className="card-container">
-						{/* Create a MeterViewComponent for each MeterData in Meters State after sorting by identifier */}
-						{/*  Optional Chaining to prevent from crashing upon startup race conditions*/}
+						{/* Create a MeterViewComponent for each MeterData in Meters State */}
 						{Object.values(visibleMeters)
 							.map(MeterData => (
 								<MeterViewComponent

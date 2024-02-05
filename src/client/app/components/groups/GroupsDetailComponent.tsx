@@ -11,6 +11,7 @@ import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelec
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
 
 /**
  * Defines the groups page card view
@@ -19,6 +20,9 @@ import GroupViewComponent from './GroupViewComponent';
 export default function GroupsDetailComponent() {
 	// Check for admin status
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
+
+	// page may contain admin info so verify admin status while admin is authenticated.
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval })
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));

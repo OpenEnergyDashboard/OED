@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { isAnyOf } from '@reduxjs/toolkit';
+import { AppListener } from '../listenerMiddleware';
 import { graphSlice, updateHistory } from '../slices/graphSlice';
-import { AppStartListening } from './middleware';
 
-export const historyMiddleware = (startListening: AppStartListening) => {
+export const graphHistoryListener = (startListening: AppListener) => {
 
 	startListening({
 		predicate: (action, currentState, previousState) => {

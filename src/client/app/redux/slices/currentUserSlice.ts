@@ -6,7 +6,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi';
 import { userApi } from '../api/userApi';
-import { User, UserRole } from '../../types/items';
+import {  UserRole } from '../../types/items';
 import { CurrentUserState } from '../../types/redux/currentUser';
 import { setToken } from '../../utils/token';
 
@@ -14,7 +14,6 @@ import { setToken } from '../../utils/token';
 * Defines store interactions when version related actions are dispatched to the store.
 */
 const defaultState: CurrentUserState = {
-	isFetching: false,
 	profile: null,
 	token: null
 };
@@ -23,13 +22,6 @@ export const currentUserSlice = createSlice({
 	name: 'currentUser',
 	initialState: defaultState,
 	reducers: {
-		requestCurrentUser: state => {
-			state.isFetching = true
-		},
-		receiveCurrentUser: (state, action: PayloadAction<User>) => {
-			state.isFetching = false
-			state.profile = action.payload
-		},
 		clearCurrentUser: state => {
 			state.profile = null
 			state.token = null
@@ -66,3 +58,8 @@ export const {
 	selectCurrentUserRole,
 	selectIsAdmin
 } = currentUserSlice.selectors
+
+export const {
+	setUserToken,
+	clearCurrentUser
+} = currentUserSlice.actions

@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { store } from '../../store';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -56,6 +55,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
 	const conversionData = useAppSelector(selectConversionsDetails);
+	const meterDataByID = useAppSelector(selectMeterDataById)
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -103,7 +103,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const shouldUpdateUnit = (): boolean => {
 		// true if inputted values are okay and there are changes.
 		let inputOk = true;
-		const meterDataByID = selectMeterDataById(store.getState())
 
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {

@@ -6,7 +6,6 @@
 import { User } from '../items';
 
 export interface CurrentUserState {
-	isFetching: boolean;
 	profile: User | null;
 	token: string | null;
 }
