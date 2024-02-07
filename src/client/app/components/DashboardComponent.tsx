@@ -23,17 +23,15 @@ import RadarChartComponent from './RadarChartComponent';
 export default function DashboardComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
-	const optionsClassName = optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none';
-	const chartClassName = optionsVisibility ? 'col-12 col-lg-10' : 'col-12';
 
 	return (
-		<div className='container-fluid'>
-			<div className='row'>
-				<div className={optionsClassName}>
+		<div className='container-fluid' style={{ flexGrow: '1' }}>
+			<div className='row' style={{ overflowY: 'hidden', height: '100%' }}>
+				<div className={`${optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none'}`} style={{ height: '100%' }}>
 					<UIOptionsComponent />
 				</div>
-				<div className={`${chartClassName} align-self-auto text-center`}>
-					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+				<div className={`${optionsVisibility ? 'col-12 col-lg-10' : 'col-12'} align-self-auto text-center`} style={{ height: '100%' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
 						<HistoryComponent />
 						{chartToRender === ChartTypes.line && <LineChartComponent />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent />}
@@ -42,7 +40,6 @@ export default function DashboardComponent() {
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
 						{chartToRender === ChartTypes.radar && <RadarChartComponent />}
 					</div>
-
 				</div>
 			</div>
 		</div >

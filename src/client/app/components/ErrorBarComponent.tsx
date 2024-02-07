@@ -3,34 +3,27 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../types/redux/state';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { graphSlice, selectShowMinMax } from '../redux/slices/graphSlice';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { graphSlice } from '../redux/slices/graphSlice';
 
 /**
  * React Component rendering an Error Bar checkbox for toggle operation.
  * @returns Error Bar checkbox with tooltip and label
  */
 export default function ErrorBarComponent() {
-	const dispatch = useDispatch();
-	const graphState = useSelector((state: State) => state.graph);
-
-	/**
-	 * Dispatches an action to toggle visibility of min/max lines on checkbox interaction
-	 */
-	const handleToggleShowMinMax = () => {
-		dispatch(graphSlice.actions.toggleShowMinMax());
-	}
+	const dispatch = useAppDispatch();
+	const showMinMax = useAppSelector(selectShowMinMax);
 
 	return (
 		<div className='checkbox'>
 			<input
 				type='checkbox'
 				style={{ marginRight: '10px' }}
-				onChange={() => handleToggleShowMinMax()}
-				checked={graphState.showMinMax}
+				// Dispatches an action to toggle visibility of min/max lines on checkbox interaction
+				onChange={() => dispatch(graphSlice.actions.toggleShowMinMax())}
+				checked={showMinMax}
 				id='errorBar'
 			/>
 			<label htmlFor='errorBar'>

@@ -225,7 +225,7 @@ export default function BarChartComponent() {
 		return (
 			<Plot
 				data={datasets as Plotly.Data[]}
-				style={{ width: '100%', height: '80%' }}
+				style={{ width: '100%', height: '100%' }}
 				onRelayout={handleRelayout}
 				useResizeHandler={true}
 				config={{
@@ -236,8 +236,6 @@ export default function BarChartComponent() {
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
 					bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
-					autosize: true,
-					height: 700,	// Height is set to 700 for now, but we do need to scale in the future (issue #466)
 					showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
 					yaxis: {
@@ -249,7 +247,7 @@ export default function BarChartComponent() {
 						// rangeselector: { visible: true },
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
-						nticks: 10, automargin: true,
+						nticks: 10,
 						tickfont: { size: 10 }
 					}
 				}}

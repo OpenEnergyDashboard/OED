@@ -20,7 +20,7 @@ export default function HeaderComponent() {
 	const { pathname } = useLocation()
 
 	return (
-		<div className='container-fluid' style={divStyle}>
+		<div className='container-fluid' id='header'>
 			<div className='row'>
 				<div className='d-none d-lg-block col-4'>
 					<Link to='/'><LogoComponent height={80} url='./logo.png' /></Link>
@@ -53,10 +53,6 @@ export default function HeaderComponent() {
 		</div>
 	);
 }
-const divStyle = {
-	marginTop: '5px',
-	paddingBottom: '5px'
-};
 const largeTitleStyle = {
 	display: 'inline-block'
 };

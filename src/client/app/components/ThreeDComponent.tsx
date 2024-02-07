@@ -67,16 +67,15 @@ export default function ThreeDComponent() {
 	}
 
 	return (
-		<div style={{ width: '100%', height: '75vh' }}>
+		<div style={{ width: '100%', height: '100%' }}>
 			<ThreeDPillComponent />
-			{isFetching ?
-				<SpinnerComponent loading width={50} height={50} />
-				:
-				<Plot
+			{isFetching
+				? <SpinnerComponent loading width={50} height={50} />
+				: <Plot
 					data={dataToRender as Plotly.Data[]}
 					layout={layout as Plotly.Layout}
 					config={config}
-					style={{ width: '100%', height: '80%' }}
+					style={{ width: '100%', height: '100%' }}
 					useResizeHandler={true}
 				/>
 			}
@@ -222,7 +221,6 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	// responsible for setting Labels
 	return {
-		autosize: true,
 		//Leaves holes in graph for missing, undefined, NaN, or null values
 		connectgaps: false,
 		scene: {

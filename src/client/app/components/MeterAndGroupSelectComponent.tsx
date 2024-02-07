@@ -43,7 +43,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 	}
 
 	return (
-		<div style={divBottomPadding}>
+		<>
 			<p style={labelStyle}>
 				{translate(`${meterOrGroup}`)}:
 				<TooltipMarkerComponent page='home' helpTextId={`help.home.select.${meterOrGroup}`} />
@@ -62,7 +62,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				styles={customStyles}
 				isLoading={somethingIsFetching}
 			/>
-		</div>
+		</>
 	)
 }
 
@@ -132,9 +132,6 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 
 };
 
-const divBottomPadding: React.CSSProperties = {
-	paddingBottom: '15px'
-};
 const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',
 	margin: 0

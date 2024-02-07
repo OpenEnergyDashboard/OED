@@ -14,9 +14,9 @@ import DashboardComponent from './DashboardComponent';
 export default function HomeComponent() {
 
 	return (
-		<div>
+		<>
 			<TooltipHelpComponent page='home' />
 			<DashboardComponent />
-		</div>
+		</>
 	);
 }

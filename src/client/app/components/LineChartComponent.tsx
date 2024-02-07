@@ -2,229 +2,63 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import * as moment from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import {
-	graphSlice, selectAreaUnit, selectGraphAreaNormalization,
-	selectLineGraphRate, selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
-} from '../redux/slices/graphSlice';
-import { selectGroupDataById } from '../redux/api/groupsApi';
-import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
-import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
-import { DataType } from '../types/Datasources';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-import getGraphColor from '../utils/getGraphColor';
-import { lineUnitLabel } from '../utils/graphics';
+import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData, selectPlotlyUnitLabel } from '../redux/selectors/lineChartSelectors';
+import { graphSlice } from '../redux/slices/graphSlice';
+import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
 
+// Stable reference for when there is not data.
+const stableEmptyReadings: LineReadings = {}
 /**
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
 	const dispatch = useAppDispatch();
+	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs)
-	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
-	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
+	// get data needed to derive/ format data from query response
+	const { plotlyMeterDeps, plotlyGroupDeps } = useAppSelector(selectLineChartDeps)
 
-	const selectedUnit = useAppSelector(selectSelectedUnit);
-	// The unit label depends on the unit which is in selectUnit state.
-	const graphingUnit = useAppSelector(selectSelectedUnit);
-	// The current selected rate
-	const currentSelectedRate = useAppSelector(selectLineGraphRate);
-	const unitDataById = useAppSelector(selectUnitDataById);
-	const selectedAreaNormalization = useAppSelector(selectGraphAreaNormalization);
-	const selectedAreaUnit = useAppSelector(selectAreaUnit);
-	const selectedMeters = useAppSelector(selectSelectedMeters);
-	const selectedGroups = useAppSelector(selectSelectedGroups);
-	const meterDataByID = useAppSelector(selectMeterDataById);
-	const groupDataById = useAppSelector(selectGroupDataById);
+	// Fetch data, and derive plotly points
+	const { data: meterPlotlyData, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs,
+		{
+			skip: meterShouldSkip,
+			// Custom Data Derivation with query hook properties.
+			selectFromResult: ({ data, ...rest }) => ({
+				...rest,
+				// use query data as selector parameter, pass in data dependencies.
+				// Data may still be in transit, so pass a stable empty reference if needed for memoization.
+				data: selectPlotlyMeterData(data ?? stableEmptyReadings, plotlyMeterDeps)
+			})
+		});
 
+	const { data: groupPlotlyData = stableEmptyReadings, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs,
+		{
+			skip: groupShouldSkip,
+			selectFromResult: ({ data, ...rest }) => ({
+				...rest,
+				data: selectPlotlyGroupData(data ?? stableEmptyReadings, plotlyGroupDeps)
+			})
+		});
 
-	// dataFetching Query Hooks
+	// Use Query Data to derive plotly datasets memoized selector
+	const unitLabel = useAppSelector(selectPlotlyUnitLabel)
 
-	const datasets = [];
-
+	const datasets: Partial<Plotly.PlotData>[] = meterPlotlyData.concat(groupPlotlyData);
 	if (meterIsLoading || groupIsLoading) {
 		return <LogoSpinner />
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
-	// The unit label depends on the unit which is in selectUnit state.
-	// The current selected rate
-	let unitLabel = '';
-	let needsRateScaling = false;
-	// variables to determine the slider min and max
-	let minTimestamp: number | undefined;
-	let maxTimestamp: number | undefined;
-	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
-	// This will probably happen when the page is first loaded.
-	if (graphingUnit !== -99) {
-		const selectUnitState = unitDataById[selectedUnit];
-		if (selectUnitState !== undefined) {
-			// Determine the y-axis label and if the rate needs to be scaled.
-			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, selectedAreaNormalization, selectedAreaUnit);
-			unitLabel = returned.unitLabel
-			needsRateScaling = returned.needsRateScaling;
-		}
-	}
-	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
-	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
-	// Add all valid data from existing meters to the line plot
-
-	for (const meterID of selectedMeters) {
-		const byMeterID = meterReadings
-		// Make sure have the meter data. If you already have the meter, unselect, change
-		// the timeInterval via another meter and then reselect then this new timeInterval
-		// may not yet be in state so verify with the second condition on the if.
-		// Note the second part may not be used based on next checks but do here since simple.
-		if (byMeterID) {
-			const meterArea = meterDataByID[meterID].area;
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!selectedAreaNormalization || (meterArea > 0 && meterDataByID[meterID].areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = selectedAreaNormalization ? meterArea * getAreaUnitConversion(meterDataByID[meterID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
-				const readingsData = meterReadings[meterID]
-				if (readingsData !== undefined && !meterIsLoading) {
-					const label = meterDataByID[meterID].identifier;
-					const colorID = meterID;
-					if (readingsData === undefined) {
-						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					}
-
-					// Create two arrays for the x and y values. Fill the array with the data from the line readings
-					const xData: string[] = [];
-					const yData: number[] = [];
-					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.format('YYYY-MM-DD HH:mm:ss'));
-						const readingValue = reading.reading * scaling;
-						yData.push(readingValue);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
-					});
-
-					/*
-					get the min and max timestamp of the meter, and compare it to the global values
-					TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
-					*/
-					if (readings.length > 0) {
-						if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
-							minTimestamp = readings[0]['startTimestamp'];
-						}
-						if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
-							// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
-							maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
-						}
-					}
-
-					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-					datasets.push({
-						name: label,
-						x: xData,
-						y: yData,
-						text: hoverText,
-						hoverinfo: 'text',
-						type: 'scatter',
-						mode: 'lines',
-						line: {
-							shape: 'spline',
-							width: 2,
-							color: getGraphColor(colorID, DataType.Meter)
-						}
-					});
-				}
-			}
-		}
-	}
-
-	// TODO The meters and groups code is very similar and maybe it should be refactored out to create a function to do
-	// both. This would mean future changes would automatically happen to both.
-	// Add all valid data from existing groups to the line plot
-	for (const groupID of selectedGroups) {
-		const byGroupID = groupData
-		// Make sure have the group data. If you already have the group, unselect, change
-		// the timeInterval via another meter and then reselect then this new timeInterval
-		// may not yet be in state so verify with the second condition on the if.
-		// Note the second part may not be used based on next checks but do here since simple.
-		if (byGroupID) {
-			const groupArea = groupDataById[groupID].area;
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!selectedAreaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
-				// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = selectedAreaNormalization ?
-					groupArea * getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
-				const readingsData = byGroupID[groupID];
-				if (readingsData !== undefined && !groupIsLoading) {
-					const label = groupDataById[groupID].name;
-					const colorID = groupID;
-					if (readingsData === undefined) {
-						throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					}
-
-					// Create two arrays for the x and y values. Fill the array with the data from the line readings
-					const xData: string[] = [];
-					const yData: number[] = [];
-					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
-					readings.forEach(reading => {
-						// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp
-						// are equivalent to Unix timestamp in milliseconds.
-						const st = moment.utc(reading.startTimestamp);
-						// Time reading is in the middle of the start and end timestamp
-						const timeReading = st.add(moment.utc(reading.endTimestamp).diff(st) / 2);
-						xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
-						const readingValue = reading.reading * scaling;
-						yData.push(readingValue);
-						hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
-					});
-
-					// get the min and max timestamp of the group, and compare it to the global values
-					if (readings.length > 0) {
-						if (minTimestamp == undefined || readings[0]['startTimestamp'] < minTimestamp) {
-							minTimestamp = readings[0]['startTimestamp'];
-						}
-						if (maxTimestamp == undefined || readings[readings.length - 1]['endTimestamp'] >= maxTimestamp) {
-							// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
-							maxTimestamp = readings[readings.length - 1]['endTimestamp'] + (readings[0]['endTimestamp'] - readings[0]['startTimestamp']);
-						}
-					}
-
-					// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-					datasets.push({
-						name: label,
-						x: xData,
-						y: yData,
-						text: hoverText,
-						hoverinfo: 'text',
-						type: 'scatter',
-						mode: 'lines',
-						line: {
-							shape: 'spline',
-							width: 2,
-							color: getGraphColor(colorID, DataType.Group)
-						}
-					});
-				}
-			}
-		}
-	}
 	const handleRelayout = (e: PlotRelayoutEvent) => {
 		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 		// These values indicate when the user has zoomed or made other changes to the graph.
@@ -237,53 +71,42 @@ export default function LineChartComponent() {
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
 		}
 	}
-
-	let enoughData = false;
-	datasets.forEach(dataset => {
-		if (dataset.x.length > 1) {
-			enoughData = true
-			return
-		}
-	})
+	// Check if there is at least one valid graph
+	const ableToGraph = datasets.find(data => data.x!.length > 1)
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (datasets.length === 0) {
-		return <h1>
-			{`${translate('select.meter.group')}`}
-		</h1>
-	} else if (!enoughData) {
+		return <h1>{`${translate('select.meter.group')}`}	</h1>
+	} else if (!ableToGraph) {
 		// This normal so plot.
-		return <h1>
-			{`${translate('threeD.no.data')}`}
-		</h1>
+		return <h1>{`${translate('threeD.no.data')}`}</h1>
 	} else {
 		return (
-			<div style={{ width: '100%', height: '100%' }}>
-				<Plot
-					data={datasets as Plotly.Data[]}
-					onRelayout={handleRelayout}
-					style={{ width: '100%', height: '80%' }}
-					useResizeHandler={true}
-					config={{
-						responsive: true,
-						displayModeBar: false
-					}}
-					layout={{
-						autosize: true, showlegend: true,
-						legend: { x: 0, y: 1.1, orientation: 'h' },
-						// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
-						yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
-						xaxis: {
-							rangeslider: { visible: true },
-							showgrid: true, gridcolor: '#ddd'
-						}
-					}}
-				/>
-			</div>
+			<Plot
+				data={datasets as Plotly.Data[]}
+				onRelayout={handleRelayout}
+				style={{ width: '100%', height: '100%' }}
+				useResizeHandler={true}
+				config={{
+					responsive: true,
+					displayModeBar: false
+				}}
+				layout={{
+					autosize: true, showlegend: true,
+					legend: { x: 0, y: 1.1, orientation: 'h' },
+					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
+					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
+					xaxis: {
+						rangeslider: { visible: true },
+						showgrid: true, gridcolor: '#ddd'
+					}
+				}}
+			/>
 		)
-	}
 
+	}
 }
+
 
 /**
  * Determines the line graph's slider interval based after the slider is moved
@@ -323,5 +146,3 @@ export function getRangeSliderInterval(): string {
 		throw new Error('unable to get range slider params');
 	}
 }
-
-

@@ -25,10 +25,39 @@ import ChartDataSelectComponent from './ChartDataSelectComponent';
  * @returns the Ui Control panel
  */
 export default function UIOptionsComponent() {
-	const chartToRender = useAppSelector(state => selectChartToRender(state));
+	const chartToRender = useAppSelector(selectChartToRender);
+	const optionsRef = React.useRef<HTMLDivElement>(null);
+
+	// Effect Manipulates Ui Options max height. To allow for dynamic window sizing to work.
+	React.useEffect(() => {
+		const headFootHeight = document.querySelector('#header')!.clientHeight + document.querySelector('#footer')!.clientHeight + 50
+		console.log(document.querySelector('#footer')!.clientHeight)
+		const resizeHandler = () => {
+			// Total window - Header and footer height = dashboard height
+			const maxOptionsHeight = window.innerHeight - headFootHeight
+
+			// May be null for initial render(s)
+			if (optionsRef.current) {
+				const scrollHeight = optionsRef.current.scrollHeight
+				// When options are greater in height  than window real-estate, set max height & overflow properties
+				if (scrollHeight >= maxOptionsHeight) {
+					optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`
+					optionsRef.current.style.overflow = 'scroll'
+				} else {
+					// Clear constraints when enough space. ()
+					optionsRef.current.style.maxHeight = 'none'
+					optionsRef.current.style.overflow = 'visible'
+				}
+			}
+		}
+		resizeHandler()
+		window.addEventListener('resize', resizeHandler)
+		return () => window.removeEventListener('resize', resizeHandler)
+	}, [])
+
 	ReactTooltip.rebuild();
 	return (
-		<div>
+		<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'scroll' }} ref={optionsRef}>
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
 			<GraphicRateMenuComponent />
@@ -47,23 +76,13 @@ export default function UIOptionsComponent() {
 			{	/* Controls specific to the compare chart */
 				chartToRender === ChartTypes.map && <MapControlsComponent />}
 
-
 			{ /* We can't export compare, map, radar or 3D data */
 				chartToRender !== ChartTypes.compare &&
 				chartToRender !== ChartTypes.map &&
 				chartToRender !== ChartTypes.threeD &&
-				chartToRender !== ChartTypes.radar &&
-
-				< div style={divTopPadding}>
-					<ExportComponent />
-				</div>}
-
-			<div style={divTopPadding}>
-				<ChartLinkContainer />
-			</div>
-		</div >
+				chartToRender !== ChartTypes.radar && <ExportComponent />
+			}
+			<ChartLinkContainer />
+		</div>
 	);
 }
-const divTopPadding: React.CSSProperties = {
-	paddingTop: '15px'
-};

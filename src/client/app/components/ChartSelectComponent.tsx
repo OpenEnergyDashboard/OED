@@ -27,7 +27,7 @@ export default function ChartSelectComponent() {
 	// )), 'label');
 
 	return (
-		<div style={divBottomPadding}>
+		<>
 			<p style={labelStyle}>
 				<FormattedMessage id='graph.type' />:
 				<TooltipMarkerComponent page='home' helpTextId='help.home.chart.select' />
@@ -42,6 +42,7 @@ export default function ChartSelectComponent() {
 						Object.values(ChartTypes)
 							// filter out current chart
 							.filter(chartType => chartType !== currentChartToRender)
+							.sort()
 							// map to components
 							.map(chartType =>
 								<DropdownItem
@@ -54,12 +55,9 @@ export default function ChartSelectComponent() {
 					}
 				</DropdownMenu>
 			</Dropdown>
-		</div >
+		</ >
 	);
 }
-const divBottomPadding: React.CSSProperties = {
-	paddingBottom: '15px'
-};
 const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',
 	margin: 0
