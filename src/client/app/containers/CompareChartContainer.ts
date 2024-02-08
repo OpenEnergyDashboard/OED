@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
-import Locales from '../types/locales';
+import locales from '../types/locales';
 import * as moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -229,7 +229,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		layout,
 		config: {
 			displayModeBar: false,
-			locales: Locales // makes locales available for use
+			locales // makes locales available for use
 		}
 	};
 	props.config.locale = state.appState.selectedLanguage;

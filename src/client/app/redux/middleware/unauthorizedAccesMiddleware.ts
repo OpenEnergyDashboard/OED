@@ -13,12 +13,12 @@ export const unauthorizedRequestListener = (startListening: AppListener) => {
 	startListening({
 		predicate: action => {
 			// Listens for rejected async thunks. if no payload then its an RTK internal call that needs to also be filtered.
-			return isAsyncThunkAction(action) &&  isRejected(action) && action.payload !== undefined
+			return isAsyncThunkAction(action) && isRejected(action) && action.payload !== undefined
 		},
-		effect: (action: any, {dispatch}): void => {
+		effect: (action: any, { dispatch }): void => {
 			// Look for token failed responses from server
-			const unAuthorizedTokenRequest = (action.payload.status === 401 || action.payload.data.message === 'Failed to authenticate token.')
-			if(unAuthorizedTokenRequest){
+			const unAuthorizedTokenRequest = (action.payload.status === 401 || action.payload.data?.message === 'Failed to authenticate token.')
+			if (unAuthorizedTokenRequest) {
 				dispatch(authApi.endpoints.logout.initiate())
 				showErrorNotification(translate('invalid.token.login'))
 			}

@@ -101,7 +101,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 						// TODO: Provide default link when there are issues fetching version number
 					});
 					return (
-						<div style={{ width: '300px' }}>
+						<div style={{ maxWidth: '300px' }}>
 							<FormattedMessage
 								id={dataTip}
 								values={links}

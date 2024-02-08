@@ -23,7 +23,7 @@ export const selectThreeDComponentInfo = createSelector(
 		let meterOrGroupName = 'Unselected Meter or Group'
 		let isAreaCompatible = true;
 
-		if (id) {
+		if (id && meterDataById[id]) {
 			// Get Meter or Group's info
 			if (meterOrGroup === MeterOrGroup.meters && meterDataById) {
 				const meterInfo = meterDataById[id]

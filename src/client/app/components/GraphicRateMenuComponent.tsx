@@ -6,15 +6,14 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { useDispatch } from 'react-redux';
 import Select from 'react-select';
-import { selectUnitDataById } from '../redux/api/unitsApi';
-import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedUnitData } from '../redux/selectors/plotlyDataSelectors';
+import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
-import { LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { UnitRepresentType } from '../types/redux/units';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { ChartTypes } from '../types/redux/graph';
 
 /**
  * React component that controls the line graph rate menu
@@ -26,11 +25,8 @@ export default function GraphicRateMenuComponent() {
 	// Graph state
 	const graphState = useAppSelector(selectGraphState);
 
-	// Unit state
-	const unitDataById = useAppSelector(selectUnitDataById);
-
 	// Unit data by Id
-	const selectedUnitData = unitDataById[graphState.selectedUnit];
+	const selectedUnitData = useAppSelector(selectSelectedUnitData)
 
 	// Should the rate drop down menu be rendered.
 	let shouldRender = true;
@@ -42,7 +38,7 @@ export default function GraphicRateMenuComponent() {
 		}
 	}
 	// Also don't show if not the line graphic, or three-d.
-	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD ) {
+	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD) {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates

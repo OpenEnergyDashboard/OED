@@ -5,6 +5,9 @@
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { LanguageTypes } from './redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { MeterData } from './redux/meters';
+import { GroupData } from './redux/groups';
+import { UnitData } from './redux/units';
 
 /**
  * The type of options displayed in Select components.
@@ -17,6 +20,7 @@ export interface SelectOption {
 	style?: React.CSSProperties;
 	meterOrGroup?: MeterOrGroup;
 	defaultGraphicUnit?: number;
+	entity?: MeterData | GroupData | UnitData;
 }
 export interface GroupedOption {
 	label: string;

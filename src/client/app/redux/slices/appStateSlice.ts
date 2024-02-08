@@ -17,13 +17,13 @@ import { currentUserSlice } from './currentUserSlice';
 import { LanguageTypes } from '../../types/redux/i18n';
 import * as moment from 'moment';
 
-interface appStateSlice {
+export interface AppState {
 	initComplete: boolean;
 	optionsVisibility: boolean;
 	selectedLanguage: LanguageTypes;
 }
 
-const defaultState: appStateSlice = {
+const defaultState: AppState = {
 	initComplete: false,
 	optionsVisibility: true,
 	selectedLanguage: LanguageTypes.en
@@ -47,6 +47,7 @@ export const appStateSlice = createThunkSlice({
 		}),
 		updateSelectedLanguage: create.reducer<LanguageTypes>((state, action) => {
 			state.selectedLanguage = action.payload
+			moment.locale(action.payload)
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render

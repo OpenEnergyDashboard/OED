@@ -24,8 +24,8 @@ export default function ThreeDPillComponent() {
 	const graphState = useAppSelector(selectGraphState);
 
 	const meterPillData = graphState.selectedMeters.map(meterID => {
-		const area = meterDataById[meterID].area;
-		const areaUnit = meterDataById[meterID].areaUnit;
+		const area = meterDataById[meterID]?.area;
+		const areaUnit = meterDataById[meterID]?.areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		const isDisabled = !isAreaCompatible && graphState.areaNormalization
 
@@ -33,8 +33,8 @@ export default function ThreeDPillComponent() {
 	})
 
 	const groupPillData = graphState.selectedGroups.map(groupID => {
-		const area = groupDataById[groupID].area;
-		const areaUnit = groupDataById[groupID].areaUnit;
+		const area = groupDataById[groupID]?.area;
+		const areaUnit = groupDataById[groupID]?.areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
 		const isDisabled = !isAreaCompatible && graphState.areaNormalization
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill
@@ -53,9 +53,9 @@ export default function ThreeDPillComponent() {
 		return meterOrGroupPillData.map(pillData => {
 			// retrieve data from appropriate state slice .meters or .group
 			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[pillData.meterOrGroupID].identifier
+				meterDataById[pillData.meterOrGroupID]?.identifier
 				:
-				groupDataById[pillData.meterOrGroupID].name;
+				groupDataById[pillData.meterOrGroupID]?.name;
 
 			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;

@@ -252,5 +252,6 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 }
 
 const config = {
-	responsive: true
+	responsive: true,
+	displayModeBar: false
 };

@@ -10,11 +10,14 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
-import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData, selectPlotlyUnitLabel } from '../redux/selectors/lineChartSelectors';
+import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
+import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { graphSlice } from '../redux/slices/graphSlice';
 import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import locales from '../types/locales';
 
 // Stable reference for when there is not data.
 const stableEmptyReadings: LineReadings = {}
@@ -26,7 +29,7 @@ export default function LineChartComponent() {
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs)
 	// get data needed to derive/ format data from query response
-	const { plotlyMeterDeps, plotlyGroupDeps } = useAppSelector(selectLineChartDeps)
+	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps)
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs,
@@ -37,7 +40,7 @@ export default function LineChartComponent() {
 				...rest,
 				// use query data as selector parameter, pass in data dependencies.
 				// Data may still be in transit, so pass a stable empty reference if needed for memoization.
-				data: selectPlotlyMeterData(data ?? stableEmptyReadings, plotlyMeterDeps)
+				data: selectPlotlyMeterData(data ?? stableEmptyReadings, meterDeps)
 			})
 		});
 
@@ -46,17 +49,17 @@ export default function LineChartComponent() {
 			skip: groupShouldSkip,
 			selectFromResult: ({ data, ...rest }) => ({
 				...rest,
-				data: selectPlotlyGroupData(data ?? stableEmptyReadings, plotlyGroupDeps)
+				data: selectPlotlyGroupData(data ?? stableEmptyReadings, groupDeps)
 			})
 		});
 
 	// Use Query Data to derive plotly datasets memoized selector
-	const unitLabel = useAppSelector(selectPlotlyUnitLabel)
+	const unitLabel = useAppSelector(selectLineUnitLabel)
+	const locale = useAppSelector(selectSelectedLanguage)
 
 	const datasets: Partial<Plotly.PlotData>[] = meterPlotlyData.concat(groupPlotlyData);
 	if (meterIsLoading || groupIsLoading) {
 		return <LogoSpinner />
-		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
 	const handleRelayout = (e: PlotRelayoutEvent) => {
@@ -78,7 +81,6 @@ export default function LineChartComponent() {
 	if (datasets.length === 0) {
 		return <h1>{`${translate('select.meter.group')}`}	</h1>
 	} else if (!ableToGraph) {
-		// This normal so plot.
 		return <h1>{`${translate('threeD.no.data')}`}</h1>
 	} else {
 		return (
@@ -87,10 +89,6 @@ export default function LineChartComponent() {
 				onRelayout={handleRelayout}
 				style={{ width: '100%', height: '100%' }}
 				useResizeHandler={true}
-				config={{
-					responsive: true,
-					displayModeBar: false
-				}}
 				layout={{
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
@@ -100,6 +98,12 @@ export default function LineChartComponent() {
 						rangeslider: { visible: true },
 						showgrid: true, gridcolor: '#ddd'
 					}
+				}}
+				config={{
+					responsive: true,
+					displayModeBar: false,
+					locale,
+					locales
 				}}
 			/>
 		)

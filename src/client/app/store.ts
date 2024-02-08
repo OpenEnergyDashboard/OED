@@ -20,7 +20,7 @@ export const store = configureStore({
 });
 
 // stability check for ALL createSelector instances.
-setGlobalDevModeChecks({ inputStabilityCheck: 'always' })
+setGlobalDevModeChecks({ inputStabilityCheck: 'always', identityFunctionCheck: 'always' })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 // https://react-redux.js.org/using-react-redux/usage-with-typescript#define-root-state-and-dispatch-types

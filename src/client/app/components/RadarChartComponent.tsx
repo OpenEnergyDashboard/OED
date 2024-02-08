@@ -9,7 +9,7 @@ import getGraphColor from '../utils/getGraphColor';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import { Layout } from 'plotly.js';
-import Locales from '../types/locales';
+import locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -328,7 +328,7 @@ export default function RadarChartComponent() {
 				config={{
 					displayModeBar: true,
 					responsive: true,
-					locales: Locales // makes locales available for use
+					locales: locales // makes locales available for use
 				}}
 				layout={layout}
 			/>

@@ -31,7 +31,6 @@ export default function UIOptionsComponent() {
 	// Effect Manipulates Ui Options max height. To allow for dynamic window sizing to work.
 	React.useEffect(() => {
 		const headFootHeight = document.querySelector('#header')!.clientHeight + document.querySelector('#footer')!.clientHeight + 50
-		console.log(document.querySelector('#footer')!.clientHeight)
 		const resizeHandler = () => {
 			// Total window - Header and footer height = dashboard height
 			const maxOptionsHeight = window.innerHeight - headFootHeight

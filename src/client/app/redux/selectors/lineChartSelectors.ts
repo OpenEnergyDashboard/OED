@@ -2,110 +2,42 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { createSelector } from '@reduxjs/toolkit';
 import * as moment from 'moment';
-import { createStructuredSelector } from 'reselect';
-import { selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
-import {
-	selectAreaUnit, selectGraphAreaNormalization,
-	selectLineGraphRate,
-	selectSelectedGroups,
-	selectSelectedMeters, selectSelectedUnit, selectShowMinMax
-} from '../../redux/slices/graphSlice';
+import { selectShowMinMax } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';
-import { LineReadings } from '../../types/readings';
-import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import getGraphColor from '../../utils/getGraphColor';
-import { lineUnitLabel } from '../../utils/graphics';
 import translate from '../../utils/translate';
+import {
+	selectFromLineReadingsResult, selectNameFromEntity,
+	selectPlotlyGroupDeps, selectPlotlyMeterDeps, selectScalingFromEntity
+} from './plotlyDataSelectors';
 import { createAppSelector } from './selectors';
 
-// Line and Groups use these values to derive plotly data, so make selector for them to 'extend'
-export const selectCommonPlotlyDependencies = createStructuredSelector(
-	{
-		selectedUnit: selectSelectedUnit,
-		lineGraphRate: selectLineGraphRate,
-		areaUnit: selectAreaUnit,
-		areaNormalization: selectGraphAreaNormalization,
-		meterDataById: selectMeterDataById,
-		groupDataById: selectGroupDataById,
-		unitDataById: selectUnitDataById
-	},
-	createAppSelector
+type PlotlyLineDeps = ReturnType<typeof selectPlotlyMeterDeps> & { showMinMax: boolean }
+// Common deps + additional values needed to derive meter data in selectFromResult for plotly line chart
+export const selectLineChartDeps = createAppSelector(
+	[selectPlotlyMeterDeps, selectPlotlyGroupDeps, selectShowMinMax],
+	(meterDep, groupDep, showMinMax) => {
+		const meterDeps = { ...meterDep, showMinMax }
+		const groupDeps = { ...groupDep, showMinMax }
+		return { meterDeps, groupDeps }
+	}
 )
-
-// All values needed to derive meter data in selectFromResult for plotly line chart
-export const selectPlotlyMeterDeps = createAppSelector(
-	[selectCommonPlotlyDependencies, selectSelectedMeters, selectShowMinMax],
-	(deps, selectedMeters, showMinMax) => ({ ...deps, selectedMeters, showMinMax })
-)
-
-// All values needed to derive group data in selectFromResult for plotly line chart
-export const selectPlotlyGroupDeps = createAppSelector(
-	[selectCommonPlotlyDependencies, selectSelectedGroups],
-	(deps, selectedGroups) => ({ ...deps, selectedGroups })
-)
-
-// Structured selector from line & group dependencies, as a utility to call in the component.
-export const selectLineChartDeps = createStructuredSelector(
-	{
-		plotlyMeterDeps: selectPlotlyMeterDeps,
-		plotlyGroupDeps: selectPlotlyGroupDeps
-	},
-	createAppSelector
-)
-
-// custom typed selector to handle first arg of select from result. for data of type lineReadings.
-const selectFromLineReadingsResult = createSelector.withTypes<LineReadings>();
 
 // Selector that derives meter data for the line graphic
 export const selectPlotlyMeterData = selectFromLineReadingsResult(
-	[
-		// Query data
-		data => data,
-		// Data derivation dependencies. Use ReturnType inference to get type from dependency selector.
-		(_data, dependencies: ReturnType<typeof selectPlotlyMeterDeps>) => dependencies
-	],
-	(data, deps) => {
-		console.log('Firing Meters')
-		const { selectedUnit, lineGraphRate, areaUnit, areaNormalization, meterDataById, unitDataById, selectedMeters, showMinMax } = deps
-		let unitLabel = '';
-		let needsRateScaling = false;
-		// // variables to determine the slider min and max
-		let minTimestamp: number | undefined;
-		let maxTimestamp: number | undefined;
-		// // If graphingUnit is -99 then none selected and nothing to graph so label is empty.
-		// // This will probably happen when the page is first loaded.
-		if (selectedUnit !== -99) {
-			const selectUnitState = unitDataById[selectedUnit];
-			if (selectUnitState !== undefined) {
-				// Determine the y-axis label and if the rate needs to be scaled.
-				const returned = lineUnitLabel(selectUnitState, lineGraphRate, areaNormalization, areaUnit);
-				unitLabel = returned.unitLabel
-				needsRateScaling = returned.needsRateScaling;
-			}
-		}
-		// // The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
-		const rateScaling = needsRateScaling ? lineGraphRate.rate : 1;
+	// Query data&& Data derivation dependencies. Use ReturnType inference to get type from dependency selector.
+	[data => data, (_data, dependencies: PlotlyLineDeps) => dependencies],
+	(data, { areaUnit, areaNormalization, meterDataById, compatibleEntities, showMinMax, lineUnitLabel, rateScaling }) => {
+		const plotlyLineData = Object.entries(data)
+			// filter entries for requested groups
+			.filter(([groupID]) => compatibleEntities.includes((Number(groupID))))
+			.map(([id, readings]) => {
+				const meterInfo = meterDataById[Number(id)]
 
-		// Add all valid data from existing meters to the line plot
-		const meterReadings = Object.entries(data).filter(([meterID]) => selectedMeters.includes((Number(meterID))))
-
-		const plotlyLineData: Partial<Plotly.PlotData>[] = []
-		meterReadings.forEach(([id, readings]) => {
-			const meterID = Number(id)
-			const meterInfo = meterDataById[meterID]
-			const meterArea = meterInfo.area;
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (meterArea > 0 && meterInfo.areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ? meterArea * getAreaUnitConversion(meterInfo.areaUnit, areaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
-				const label = meterInfo.identifier;
-				const colorID = meterID;
+				const scaling = selectScalingFromEntity(meterInfo, areaUnit, areaNormalization, rateScaling)
+				const label = selectNameFromEntity(meterInfo)
+				const colorID = meterInfo.id
 
 				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
@@ -125,7 +57,7 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 					const readingValue = reading.reading * scaling;
 					yData.push(readingValue);
 					// All hover have the date, meter name and value.
-					const hoverStart = `<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`;
+					const hoverStart = `<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${lineUnitLabel}`;
 					if (showMinMax && reading.max != null) {
 						// We want to show min/max. Note if the data is raw for this meter then all the min/max values are null.
 						// In this case we still push the min/max but plotly will not show them. This is a little extra work
@@ -140,26 +72,8 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 					}
 				});
 
-				/*
-				get the min and max timestamp of the meter, and compare it to the global values
-				TODO: If we know the interval and frequency of meter data, these calculations should be able to be simplified
-				*/
-				if (readings.length > 0) {
-					const startFirstTimestamp = readings[0].startTimestamp
-					const endFirstTimestamp = readings[0].endTimestamp
-					if (!minTimestamp || startFirstTimestamp < minTimestamp) {
-						minTimestamp = startFirstTimestamp;
-					}
-
-					const endTimestamp = readings[readings.length - 1].endTimestamp
-					if (maxTimestamp == undefined || endTimestamp >= maxTimestamp) {
-						// Need to add one extra reading interval to avoid range truncation. The max bound seems to be treated as non-inclusive
-						maxTimestamp = endTimestamp + (endFirstTimestamp - startFirstTimestamp);
-					}
-				}
-
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-				plotlyLineData.push({
+				return {
 					name: label,
 					x: xData,
 					y: yData,
@@ -179,52 +93,23 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 						width: 2,
 						color: getGraphColor(colorID, DataType.Meter)
 					}
-				})
-			}
-		})
+				} as Partial<Plotly.PlotData>
+			})
 		return plotlyLineData
 	}
 )
 
 export const selectPlotlyGroupData = selectFromLineReadingsResult(
-	[
-		data => data,
-		(_data, dependencies: ReturnType<typeof selectPlotlyGroupDeps>) => dependencies
-	],
-	(data, deps) => {
-		console.log('Firing Groups')
-		const { selectedUnit, lineGraphRate, areaUnit, areaNormalization, groupDataById, unitDataById, selectedGroups } = deps
-		// Add all valid data from existing meters to the line plot
-		const groupReadings = Object.entries(data).filter(([meterID]) => selectedGroups.includes((Number(meterID))))
-		let unitLabel = '';
-		let needsRateScaling = false;
-		// // If graphingUnit is -99 then none selected and nothing to graph so label is empty.
-		// // This will probably happen when the page is first loaded.
-		if (selectedUnit !== -99) {
-			const selectUnitState = unitDataById[selectedUnit];
-			if (selectUnitState !== undefined) {
-				// Determine the y-axis label and if the rate needs to be scaled.
-				const returned = lineUnitLabel(selectUnitState, lineGraphRate, areaNormalization, areaUnit);
-				unitLabel = returned.unitLabel
-				needsRateScaling = returned.needsRateScaling;
-			}
-		}
-		// // The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
-		const rateScaling = needsRateScaling ? lineGraphRate.rate : 1;
-
-		const plotlyLineData: Partial<Plotly.PlotData>[] = []
-		groupReadings.forEach(([id, readings]) => {
-			const groupID = Number(id)
-			const groupInfo = groupDataById[groupID]
-			const groupArea = groupInfo.area;
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (groupArea > 0 && groupInfo.areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ? groupArea * getAreaUnitConversion(groupInfo.areaUnit, areaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
-				const label = groupInfo.name;
-				const colorID = groupID;
+	[data => data, (_data, dependencies: PlotlyLineDeps) => dependencies],
+	(data, { areaUnit, areaNormalization, groupDataById, compatibleEntities, rateScaling, lineUnitLabel }) => {
+		const plotlyData = Object.entries(data)
+			// filter entries for requested groups
+			.filter(([groupID]) => compatibleEntities.includes((Number(groupID))))
+			.map(([id, readings]) => {
+				const groupInfo = groupDataById[Number(id)]
+				const scaling = selectScalingFromEntity(groupInfo, areaUnit, areaNormalization, rateScaling)
+				const label = selectNameFromEntity(groupInfo);
+				const colorID = groupInfo.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];
@@ -239,11 +124,11 @@ export const selectPlotlyGroupData = selectFromLineReadingsResult(
 					xData.push(timeReading.utc().format('YYYY-MM-DD HH:mm:ss'));
 					const readingValue = reading.reading * scaling;
 					yData.push(readingValue);
-					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${unitLabel}`);
+					hoverText.push(`<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${lineUnitLabel}`);
 				});
 
 				// This variable contains all the elements (x and y values, line type, etc.) assigned to the data parameter of the Plotly object
-				plotlyLineData.push({
+				return {
 					name: label,
 					x: xData,
 					y: yData,
@@ -256,32 +141,8 @@ export const selectPlotlyGroupData = selectFromLineReadingsResult(
 						width: 2,
 						color: getGraphColor(colorID, DataType.Group)
 					}
-				});
-			}
-		})
-		return plotlyLineData
-
+				} as Partial<Plotly.PlotData>
+			})
+		return plotlyData
 	})
 
-export const selectPlotlyUnitLabel = createAppSelector(
-	[
-		selectSelectedUnit,
-		selectAreaUnit,
-		selectLineGraphRate,
-		selectGraphAreaNormalization,
-		selectUnitDataById
-	],
-	(selectedUnit, selectedAreaUnit, lineGraphRate, areaNormalization, unitDataById) => {
-		let unitLabel = '';
-		if (selectedUnit !== -99) {
-			// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
-			// This will probably happen when the page is first loaded.
-			const selectUnitState = unitDataById[selectedUnit];
-			if (selectUnitState !== undefined) {
-				// Determine the y-axis label and if the rate needs to be scaled.
-				const returned = lineUnitLabel(selectUnitState, lineGraphRate, areaNormalization, selectedAreaUnit);
-				unitLabel = returned.unitLabel
-			}
-		}
-		return unitLabel
-	})

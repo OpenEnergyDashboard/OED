@@ -105,7 +105,22 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 			<components.MultiValueLabel {...props} />
 		</div >
 		:
-		<components.MultiValueLabel {...props} />
+		< div ref={ref} data-for={'home'} data-tip={`${props.data.label}`}
+			onMouseEnter={e => {
+				const multiValueLabel = e.currentTarget.children[0]
+				if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
+					ReactTooltip.rebuild()
+					ref.current && ReactTooltip.show(ref.current)
+				}
+			}}
+			onMouseLeave={() => {
+				ref.current && ReactTooltip.hide(ref.current)
+			}
+			}
+			style={{ overflow: 'hidden' }}
+		>
+			<components.MultiValueLabel {...props} />
+		</div>
 }
 
 const animatedComponents = makeAnimated({
@@ -129,7 +144,6 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 		...base,
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
 	})
-
 };
 
 const labelStyle: React.CSSProperties = {

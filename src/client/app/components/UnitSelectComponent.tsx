@@ -31,7 +31,7 @@ export default function UnitSelectComponent() {
 	if (selectedUnitID !== -99) {
 		selectedUnitOption = {
 			// Units use the identifier to display.
-			label: selectedUnitID ? unitsByID[selectedUnitID].identifier : '',
+			label:  unitsByID[selectedUnitID]?.identifier,
 			value: selectedUnitID,
 			isDisabled: false
 		} as SelectOption;

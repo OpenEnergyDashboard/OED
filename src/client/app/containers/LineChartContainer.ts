@@ -15,7 +15,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { State } from '../types/redux/state';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
-import Locales from '../types/locales';
+import locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -276,7 +276,7 @@ function mapStateToProps(state: State) {
 		config: {
 			displayModeBar: true,
 			responsive: true,
-			locales: Locales // makes locales available for use
+			locales: locales // makes locales available for use
 		}
 	};
 	props.config.locale = state.options.selectedLanguage;

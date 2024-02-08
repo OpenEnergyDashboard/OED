@@ -95,7 +95,7 @@ export const selectUnitName = createSelector(
 	selectMeterById,
 	(unitDataById, meterData) => {
 		const unitName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.unitId === -99) ?
-			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
+			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit]?.identifier
 		return unitName
 	}
 )

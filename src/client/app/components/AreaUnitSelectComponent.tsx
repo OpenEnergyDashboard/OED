@@ -47,7 +47,7 @@ export default function AreaUnitSelectComponent() {
 		margin: 0
 	};
 
-	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
+	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit]?.unitRepresent === UnitRepresentType.raw) {
 		return null;
 	}
 

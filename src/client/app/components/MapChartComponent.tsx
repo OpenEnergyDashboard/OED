@@ -371,12 +371,6 @@ export default function MapChartComponent() {
 		}]
 	};
 
-	/***
-	 * Usage:
-	 *  <Plot data={toJS(this.model_data)}
-	 *               layout={layout}
-	 *               onClick={({points, event}) => console.log(points, event)}>
-	 */
 	return (
 		<Plot
 			data={data as Plotly.Data[]}

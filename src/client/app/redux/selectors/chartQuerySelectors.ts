@@ -87,7 +87,7 @@ export const selectRadarChartQueryArgs = createSelector(
 	selectLineChartQueryArgs,
 	lineChartArgs => {
 		// Radar uses the same args as line, so copy
-		return lineChartArgs
+		return { ...lineChartArgs }
 	}
 )
 

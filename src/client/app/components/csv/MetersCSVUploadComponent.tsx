@@ -9,11 +9,20 @@ import { MODE } from '../../containers/csv/UploadCSVContainer';
 import { MetersCSVUploadProps } from '../../types/csvUploadForm';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-
-export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
+import { AppDispatch } from '../../store';
+import { baseApi } from '../../redux/api/baseApi';
+import { connect } from 'react-redux';
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+	return {
+		resetApiCache: () => dispatch(baseApi.util.invalidateTags(['MeterData']))
+	};
+};
+type ResetProp = { resetApiCache: () => void }
+type MetersCsvUploadPropWithCacheDispatch = MetersCSVUploadProps & ResetProp
+class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCacheDispatch> {
 	private fileInput: React.RefObject<HTMLInputElement>;
 
-	constructor(props: MetersCSVUploadProps) {
+	constructor(props: MetersCsvUploadPropWithCacheDispatch) {
 		super(props);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleSetMeterName = this.handleSetMeterName.bind(this);
@@ -35,10 +44,9 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			// A failed axios request should result in an error.
 			showErrorNotification(error.response.data as string);
 		}
-		// Refetch meters details.
-		// Removed with rtk migration
-		// store.getState().meters.hasBeenFetchedOnce = false;
-		// fetchMetersDetails();
+		// Refetch meters details by invalidating its api cache.
+		this.props.resetApiCache()
+
 	}
 
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
@@ -99,3 +107,4 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 	}
 
 }
+export default connect(null, mapDispatchToProps)(MetersCSVUploadComponent);
