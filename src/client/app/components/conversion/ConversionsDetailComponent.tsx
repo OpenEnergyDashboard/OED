@@ -75,14 +75,14 @@ export default function ConversionsDetailComponent() {
 							{
 								Object.values(conversionsState)
 									.sort((conversionA: ConversionData, conversionB: ConversionData) =>
-										((unitDataById[conversionA.sourceId].identifier + unitDataById[conversionA.destinationId].identifier).toLowerCase() >
-											(unitDataById[conversionB.sourceId].identifier + unitDataById[conversionB.destinationId].identifier).toLowerCase()) ? 1 :
-											(((unitDataById[conversionB.sourceId].identifier + unitDataById[conversionB.destinationId].identifier).toLowerCase() >
-												(unitDataById[conversionA.sourceId].identifier + unitDataById[conversionA.destinationId].identifier).toLowerCase()) ? -1 : 0))
+										((unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase() >
+											(unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase()) ? 1 :
+											(((unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase() >
+												(unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase()) ? -1 : 0))
 									.map(conversionData => (
 										<ConversionViewComponent
 											conversion={conversionData}
-											key={conversionData.sourceId + '>' + conversionData.destinationId}
+											key={conversionData?.sourceId + '>' + conversionData?.destinationId}
 										/>
 									))}
 						</div>

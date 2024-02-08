@@ -11,7 +11,7 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { metersApi, selectMeterById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { makeSelectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
+import { selectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -41,7 +41,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const [editMeter] = metersApi.useEditMeterMutation();
 	// since this selector is shared amongst many other modals, we must use a selector factory in order
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
-	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, []);
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
 	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));

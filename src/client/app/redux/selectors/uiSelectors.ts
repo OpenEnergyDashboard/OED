@@ -440,7 +440,7 @@ const isAreaNormCompatible = (id: number, selectedUnit: number, meterOrGroupData
 	return isAreaNormCompatible
 }
 
-export const selectAnythingLoading = (state: RootState) => {
+export const selectAnythingFetching = (state: RootState) => {
 	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending)
 	return anythingLoading;
 }

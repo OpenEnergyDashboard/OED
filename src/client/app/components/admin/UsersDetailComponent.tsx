@@ -15,13 +15,14 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 
-
+// Provide a stable empty reference for when data is in flight
+const stableEmptyUsers: User[] = []
 /**
  * Component which shows user details
  * @returns User Detail element
  */
 export default function UserDetailComponent() {
-	const { data: users = [] } = userApi.useGetUsersQuery(undefined);
+	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery(undefined);
 	const [submitUserEdits] = userApi.useEditUsersMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);

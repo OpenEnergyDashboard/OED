@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { makeSelectGraphicUnitCompatibility, selectDefaultCreateMeterValues } from '../../redux/selectors/adminSelectors';
+import { selectDefaultCreateMeterValues, selectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -30,7 +30,6 @@ export default function CreateMeterModalComponent() {
 
 	const [addMeter] = metersApi.endpoints.addMeter.useMutation();
 	// Memo'd memoized selector
-	const selectGraphicUnitCompatibility = React.useMemo(makeSelectGraphicUnitCompatibility, []);
 	const defaultValues = useAppSelector(selectDefaultCreateMeterValues);
 
 	/* State */

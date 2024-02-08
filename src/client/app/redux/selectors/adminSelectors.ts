@@ -2,13 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { createSelector } from '@reduxjs/toolkit'
 import * as _ from 'lodash'
-import { selectAdminState } from '../slices/adminSlice'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
 import { selectAllGroups } from '../../redux/api/groupsApi'
 import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi'
-import { RootState } from '../../store'
 import { PreferenceRequestItem } from '../../types/items'
 import { ConversionData } from '../../types/redux/conversions'
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters'
@@ -18,10 +15,12 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion'
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
 import translate from '../../utils/translate'
 import { selectAllUnits, selectUnitDataById } from '../api/unitsApi'
+import { selectAdminState } from '../slices/adminSlice'
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors'
+import { createAppSelector } from './selectors'
 
-export const selectAdminPreferences = createSelector(
-	selectAdminState,
+export const selectAdminPreferences = createAppSelector(
+	[selectAdminState],
 	(adminState): PreferenceRequestItem => ({
 		displayTitle: adminState.displayTitle,
 		defaultChartToRender: adminState.defaultChartToRender,
@@ -40,17 +39,12 @@ export const selectAdminPreferences = createSelector(
 		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
 		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
-		defaultHelpUrl:adminState.defaultHelpUrl
+		defaultHelpUrl: adminState.defaultHelpUrl
 	})
 )
 
 
-/**
- * Calculates the set of all possible graphic units for a meter/group.
- * This is any unit that is of type unit or suffix.
- * @returns The set of all possible graphic units for a meter/group
- */
-export const selectPossibleGraphicUnits = createSelector(
+export const selectPossibleGraphicUnits = createAppSelector(
 	selectUnitDataById,
 	unitDataById => potentialGraphicUnits(unitDataById)
 )
@@ -60,7 +54,7 @@ export const selectPossibleGraphicUnits = createSelector(
  * This is any unit that is of type unit or suffix.
  * @returns The set of all possible graphic units for a meter
  */
-export const selectPossibleMeterUnits = createSelector(
+export const selectPossibleMeterUnits = createAppSelector(
 	selectAllUnits,
 	unitData => {
 		let possibleMeterUnits = new Set<UnitData>();
@@ -77,15 +71,7 @@ export const selectPossibleMeterUnits = createSelector(
 	}
 )
 
-/**
- * Selector that returns a unit associated with a meter given an meterID
- * @param {RootState} state redux global state
- * @param {number} id redux global state
- * @returns {string} Unit Name.
- * @example
- *  const unitName = useAppSelector(state => selectUnitName(state, 42))
- */
-export const selectUnitName = createSelector(
+export const selectUnitName = createAppSelector(
 	// This is the unit associated with the meter.
 	// The first test of length is because the state may not yet be set when loading. This should not be seen
 	// since the state should be set and the page redrawn so just use 'no unit'.
@@ -100,16 +86,7 @@ export const selectUnitName = createSelector(
 	}
 )
 
-
-/**
- * Selector to retrieve the graphic name based on unit and meter data.
- * @param {RootState} state - The global application state.
- * @param {number} id - The ID used to look up unit and meter data.
- * @returns {string}  The identifier for the graphic name, or a default identifier
- * @example
- *  useAppSelector(state => selectGraphicName(state, 42))
- */
-export const selectGraphicName = createSelector(
+export const selectGraphicName = createAppSelector(
 	// This is the default graphic unit associated with the meter. See above for how code works.
 	// notice that this selector is written with inline selectors for demonstration purposes
 	selectUnitDataById,
@@ -122,95 +99,83 @@ export const selectGraphicName = createSelector(
 )
 
 
-/**
- * Selects the graphic unit compatibility data based on the possible graphic and meter units and local edits.
- * @returns - Memoized selector instance The compatible and incompatible graphic and meter units.
- * @example
- * const selectGraphicUnitCompatibility = useMemo(makeSelectGraphicUnitCompatibility, [])
- * useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits.unitId, localMeterEdits.defaultGraphicUnit))
- */
-export const makeSelectGraphicUnitCompatibility = () => {
-	const selectGraphicUnitCompatibilityInstance = createSelector(
+export const selectGraphicUnitCompatibility = createAppSelector(
+	[
 		selectPossibleGraphicUnits,
 		selectPossibleMeterUnits,
-		(_state: RootState, meterDetails: MeterData) => meterDetails.unitId,
-		(_state: RootState, meterDetails: MeterData) => meterDetails.defaultGraphicUnit,
-		(possibleGraphicUnits, possibleMeterUnits, unitId, defaultGraphicUnit) => {
-			// Graphic units compatible with currently selected unit
-			const compatibleGraphicUnits = new Set<UnitData>();
-			// Graphic units incompatible with currently selected unit
-			const incompatibleGraphicUnits = new Set<UnitData>();
-			// If unit is not 'no unit'
-			if (unitId != -99) {
-				// Find all units compatible with the selected unit
-				const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId);
-				possibleGraphicUnits.forEach(unit => {
-					// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
-					if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id === -99) {
-						compatibleGraphicUnits.add(unit);
-					} else {
-						incompatibleGraphicUnits.add(unit);
-					}
-				});
-			} else {
-				// No unit is selected
-				// OED does not allow a default graphic unit if there is no unit so it must be -99.
-				defaultGraphicUnit = -99;
-				possibleGraphicUnits.forEach(unit => {
-					// Only -99 is allowed.
-					if (unit.id === -99) {
-						compatibleGraphicUnits.add(unit);
-					} else {
-						incompatibleGraphicUnits.add(unit);
-					}
-				});
-			}
-
-			// Units compatible with currently selected graphic unit
-			let compatibleUnits = new Set<UnitData>();
-			// Units incompatible with currently selected graphic unit
-			const incompatibleUnits = new Set<UnitData>();
-			// If a default graphic unit is not 'no unit'
-			if (defaultGraphicUnit !== -99) {
-				// Find all units compatible with the selected graphic unit
-				possibleMeterUnits.forEach(unit => {
-					// Graphic units compatible with the current meter unit
-					const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
-					// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
-					// Also add the 'no unit' unit
-					if (compatibleGraphicUnits.has(defaultGraphicUnit) || unit.id === -99) {
-						// add the current meter unit to the list of compatible units
-						compatibleUnits.add(unit.id === -99 ? noUnitTranslated() : unit);
-					} else {
-						// add the current meter unit to the list of incompatible units
-						incompatibleUnits.add(unit);
-					}
-				});
-			} else {
-				// No default graphic unit is selected
-				// All units are compatible
-				compatibleUnits = new Set(possibleMeterUnits);
-			}
-			// return compatibility for current selected unit(s)
-			return { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits, incompatibleUnits }
+		(_state, meterDetails: MeterData) => meterDetails.unitId,
+		(_state, meterDetails: MeterData) => meterDetails.defaultGraphicUnit
+	],
+	(possibleGraphicUnits, possibleMeterUnits, unitId, defaultGraphicUnit) => {
+		// Graphic units compatible with currently selected unit
+		const compatibleGraphicUnits = new Set<UnitData>();
+		// Graphic units incompatible with currently selected unit
+		const incompatibleGraphicUnits = new Set<UnitData>();
+		// If unit is not 'no unit'
+		if (unitId != -99) {
+			// Find all units compatible with the selected unit
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId);
+			possibleGraphicUnits.forEach(unit => {
+				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
+				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id === -99) {
+					compatibleGraphicUnits.add(unit);
+				} else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
+		} else {
+			// No unit is selected
+			// OED does not allow a default graphic unit if there is no unit so it must be -99.
+			defaultGraphicUnit = -99;
+			possibleGraphicUnits.forEach(unit => {
+				// Only -99 is allowed.
+				if (unit.id === -99) {
+					compatibleGraphicUnits.add(unit);
+				} else {
+					incompatibleGraphicUnits.add(unit);
+				}
+			});
 		}
-	)
-	return selectGraphicUnitCompatibilityInstance
-}
+
+		// Units compatible with currently selected graphic unit
+		let compatibleUnits = new Set<UnitData>();
+		// Units incompatible with currently selected graphic unit
+		const incompatibleUnits = new Set<UnitData>();
+		// If a default graphic unit is not 'no unit'
+		if (defaultGraphicUnit !== -99) {
+			// Find all units compatible with the selected graphic unit
+			possibleMeterUnits.forEach(unit => {
+				// Graphic units compatible with the current meter unit
+				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
+				// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
+				// Also add the 'no unit' unit
+				if (compatibleGraphicUnits.has(defaultGraphicUnit) || unit.id === -99) {
+					// add the current meter unit to the list of compatible units
+					compatibleUnits.add(unit.id === -99 ? noUnitTranslated() : unit);
+				} else {
+					// add the current meter unit to the list of incompatible units
+					incompatibleUnits.add(unit);
+				}
+			});
+		} else {
+			// No default graphic unit is selected
+			// All units are compatible
+			compatibleUnits = new Set(possibleMeterUnits);
+		}
+		// return compatibility for current selected unit(s)
+		return { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits, incompatibleUnits }
+	}
+)
 
 
-/**
- * Checks if conversion is valid
- * @param state redux store RootState
- * @param conversionData ConversionState Data
- * @returns boolean representing if new conversion is valid or not
- */
-export const selectIsValidConversion = createSelector(
-	selectUnitDataById,
-	selectConversionsDetails,
-	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.sourceId,
-	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.destinationId,
-	(_state: RootState, conversionDetails: ConversionData) => conversionDetails.bidirectional,
+export const selectIsValidConversion = createAppSelector(
+	[
+		selectUnitDataById,
+		selectConversionsDetails,
+		(_state, conversionDetails: ConversionData) => conversionDetails.sourceId,
+		(_state, conversionDetails: ConversionData) => conversionDetails.destinationId,
+		(_state, conversionDetails: ConversionData) => conversionDetails.bidirectional
+	],
 	(unitDataById, conversions, sourceId, destinationId, bidirectional): [boolean, string] => {
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
@@ -264,10 +229,12 @@ export const selectIsValidConversion = createSelector(
 	}
 )
 
-export const selectVisibleMeterAndGroupData = createSelector(
-	selectVisibleMetersAndGroups,
-	selectAllMeters,
-	selectAllGroups,
+export const selectVisibleMeterAndGroupData = createAppSelector(
+	[
+		selectVisibleMetersAndGroups,
+		selectAllMeters,
+		selectAllGroups
+	],
 	(visible, meterData, groupData) => {
 		const visibleMeters = meterData.filter(meterData => visible.meters.has(meterData.id))
 		const visibleGroups = groupData.filter(groupData => visible.groups.has(groupData.id))
@@ -275,8 +242,8 @@ export const selectVisibleMeterAndGroupData = createSelector(
 	}
 )
 
-export const selectDefaultCreateMeterValues = createSelector(
-	selectAdminPreferences,
+export const selectDefaultCreateMeterValues = createAppSelector(
+	[selectAdminPreferences],
 	adminPreferences => {
 		const defaultValues = {
 			id: -99,
@@ -322,8 +289,8 @@ export const selectDefaultCreateMeterValues = createSelector(
 	}
 )
 
-export const selectDefaultCreateConversionValues = createSelector(
-	selectAllUnits,
+export const selectDefaultCreateConversionValues = createAppSelector(
+	[selectAllUnits],
 	sortedUnitData => {
 		const defaultValues = {
 			// Invalid source/destination ids arbitrarily set to -999.

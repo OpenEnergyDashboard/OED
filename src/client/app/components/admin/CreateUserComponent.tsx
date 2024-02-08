@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Input } from 'reactstrap';
+import { Alert, Button, Input } from 'reactstrap';
 import { userApi } from '../../redux/api/userApi';
 import { NewUser, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -20,23 +20,29 @@ export default function CreateUserComponent() {
 	const [email, setEmail] = React.useState<string>('');
 	const [password, setPassword] = React.useState<string>('');
 	const [confirmPassword, setConfirmPassword] = React.useState<string>('');
+	const [passwordMatch, setPasswordMatch] = React.useState<boolean>(true);
 	const [role, setRole] = React.useState<UserRole>(UserRole.ADMIN);
 	const [createUser] = userApi.useCreateUserMutation();
 	const nav = useNavigate()
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const newUser: NewUser = { email, role, password }
-		createUser(newUser)
-			.unwrap()
-			.then(() => {
-				showSuccessNotification(translate('users.successfully.create.user'))
-				nav('/users')
+		if (password == confirmPassword) {
+			setPasswordMatch(true)
+			const newUser: NewUser = { email, role, password }
+			createUser(newUser)
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(translate('users.successfully.create.user'))
+					nav('/users')
 
-			})
-			.catch(() => {
-				showErrorNotification(translate('users.failed.to.create.user'));
-			})
+				})
+				.catch(() => {
+					showErrorNotification(translate('users.failed.to.create.user'));
+				})
+		} else {
+			setPasswordMatch(false)
+		}
 
 	}
 	return (
@@ -49,6 +55,7 @@ export default function CreateUserComponent() {
 							<label> <FormattedMessage id='email' /> </label><br />
 							<Input type='email' onChange={({ target }) => setEmail(target.value)} required value={email} />
 						</div>
+						{!passwordMatch && <Alert color='danger'>Error: Passwords Do Not Match</Alert>}
 						<div style={formInputStyle}>
 							<label> <FormattedMessage id='password' /> </label><br />
 							<Input type='password' onChange={({ target }) => setPassword(target.value)} required value={password} />
