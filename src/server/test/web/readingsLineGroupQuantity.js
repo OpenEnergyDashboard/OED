@@ -42,9 +42,24 @@ mocha.describe('readings API', () => {
                 });
 
                 // Add LG2 here
-
+ 
                 // Add LG3 here
+                mocha.it('LG3: should have daily points for middle readings of 15 + 20 minute for a 61 day period and quantity units with kWh as kWh', async () => {
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
+ 
 
+                
                 // Add LG4 here
 
                 // Add LG5 here
