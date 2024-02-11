@@ -173,6 +173,7 @@ mocha.describe('readings API', () => {
                         {
                             name: 'Electric_Utility pound of CO₂',
                             unit: 'Electric_Utility',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -188,7 +189,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility Other',
                             unit: 'Electric_Utility',
                             //not sure change the property of GraphicUnit
-                            GraphicUnit: 'pound of CO₂',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -206,7 +207,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility pound of CO₂ + Other',
                             displayable: true,
                             note: 'special group',
-                            GraphicUnit: 'pound of CO₂',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             childMeters: ['Electric Utility pound of CO₂', 'Electric Utility Other'],
                             childGroups: [],
                         }
