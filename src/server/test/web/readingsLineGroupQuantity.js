@@ -116,6 +116,18 @@ mocha.describe('readings API', () => {
                             displayable: Unit.displayableType.ALL,
                             preferredDisplay: false,
                             note: 'special unit'
+                        },
+                        {
+                            // u13
+                            name: 'pound',
+                            identifier: 'lb',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit'
                         }
                     ];
                     const conversionData = [
@@ -156,11 +168,54 @@ mocha.describe('readings API', () => {
                             intercept: 0, 
                             note: 'lbs → metric tons' }
                     ];
+
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility pound of CO₂',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+
+                    const meterDataOther = [
+                        {
+                            name: 'Electric Utility Other',
+                            unit: 'Electric_Utility',
+                            //not sure change the property of GraphicUnit
+                            GraphicUnit: 'pound of CO₂',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '20 minutes',
+                            id: (METER_ID + 1)
+                        }
+                    ];
+                    const meterDataGroups = meterData.concat(meterDataOther);
                     
+                    const groupData = [
+                        {
+                            id: GROUP_ID,
+                            name: 'Electric Utility pound of CO₂ + Other',
+                            displayable: true,
+                            note: 'special group',
+                            GraphicUnit: 'pound of CO₂',
+                            childMeters: ['Electric Utility pound of CO₂', 'Electric Utility Other'],
+                            childGroups: [],
+                        }
+                    ];
+
                     // Load the data into the database
-                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    await prepareTest(unitData, conversionData, meterDataGroups, groupData);
                     // Get the unit ID since the DB could use any value.
-                    const unitId = await getUnitId('kWh');
+                    const unitId = await getUnitId('pound of CO₂');
                     // Load the expected response data from the corresponding csv file
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
                     // Create a request to the API for unbounded reading times and save the response
