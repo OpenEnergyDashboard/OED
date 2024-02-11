@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
-import { LineReading, BarReading, RawReadings } from '../types/readings';
 import * as moment from 'moment';
+import { BarReading, LineReading, RawReadings } from '../types/readings';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
@@ -32,7 +32,7 @@ function convertToCSV(readings: LineReading[] | BarReading[], name: string, unit
 	}
 	// TODO should be internationalized
 	let meterOrGroupString = '';
-	if (meterGroup === MeterOrGroup.meter) {
+	if (meterGroup === MeterOrGroup.meters) {
 		meterOrGroupString = 'Meter'
 	} else {
 		meterOrGroupString = 'Group'

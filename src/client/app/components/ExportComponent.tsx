@@ -78,7 +78,6 @@ export default function ExportComponent() {
 					// Line readings data for this meter.
 					// Get the readings for the time range and unit graphed
 					const readingsData = lineMeterReadings[meterId];
-					// Make sure it exists in case state is not there yet.
 					// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
 					const areaScaling = graphState.areaNormalization ?
 						meterArea * getAreaUnitConversion(meterDataById[meterId].areaUnit, graphState.selectedAreaUnit) : 1;
@@ -153,7 +152,7 @@ export default function ExportComponent() {
 						const meterIdentifier = meterDataById[meterId].identifier;
 						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meters);
 					} else if (!readingsData && !barMeterIsFetching) {
-						throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
+						throw new Error(`Unacceptable condition: bar readingsData.readings is undefined for meter ${meterId}.`);
 					}
 				}
 			}
@@ -181,7 +180,7 @@ export default function ExportComponent() {
 						const groupName = groupDataById[groupId].name;
 						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.groups);
 					} else if (!readingsData && !barGroupIsFetching) {
-						throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
+						throw new Error(`Unacceptable condition: bar readingsData.readings is undefined for group ${groupId}.`);
 					}
 				}
 			}
