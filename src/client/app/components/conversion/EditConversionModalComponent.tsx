@@ -19,7 +19,6 @@ import { UnitDataById } from 'types/redux/units';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
-import { fetchCiksData } from '../../actions/ciks';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -131,14 +130,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes by dispatching the submitEditedConversion action
-			await dispatch(submitEditedConversion(state, shouldRedoCik));
+			dispatch(submitEditedConversion(state, shouldRedoCik));
 			dispatch(removeUnsavedChanges());
-		}
-		// If slope or intercept of the conversion is changed, then Cik change.
-		// Need to fetch the updated Cik from the database.
-		if (props.conversion.slope !== state.slope || props.conversion.intercept !== state.intercept) {
-			// Update the Cik state from the database on a successful call.
-			dispatch(fetchCiksData());
 		}
 	}
 
