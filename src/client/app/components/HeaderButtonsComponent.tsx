@@ -25,7 +25,7 @@ import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
-	const [logout] = authApi.useLogoutMutation()
+	const [logout] = authApi.useLogoutMutation();
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
 	const { pathname } = useLocation();
@@ -80,7 +80,7 @@ export default function HeaderButtonsComponent() {
 	// Tracks unsaved changes.
 	// TODO Re-implement AFTER RTK Migration
 	// const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
-	const unsavedChangesState = false
+	const unsavedChangesState = false;
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 

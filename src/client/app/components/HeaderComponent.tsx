@@ -17,7 +17,7 @@ import MenuModalComponent from './MenuModalComponent';
 export default function HeaderComponent() {
 	const siteTitle = useAppSelector(state => state.admin.displayTitle);
 	const showOptions = useAppSelector(selectOptionsVisibility);
-	const { pathname } = useLocation()
+	const { pathname } = useLocation();
 
 	return (
 		<div className='container-fluid' id='header'>

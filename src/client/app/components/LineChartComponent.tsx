@@ -27,9 +27,9 @@ const stableEmptyReadings: LineReadings = {}
 export default function LineChartComponent() {
 	const dispatch = useAppDispatch();
 	// get current data fetching arguments
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs)
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
 	// get data needed to derive/ format data from query response
-	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps)
+	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs,
@@ -54,8 +54,8 @@ export default function LineChartComponent() {
 		});
 
 	// Use Query Data to derive plotly datasets memoized selector
-	const unitLabel = useAppSelector(selectLineUnitLabel)
-	const locale = useAppSelector(selectSelectedLanguage)
+	const unitLabel = useAppSelector(selectLineUnitLabel);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 	const datasets: Partial<Plotly.PlotData>[] = meterPlotlyData.concat(groupPlotlyData);
 	if (meterIsLoading || groupIsLoading) {
@@ -73,9 +73,9 @@ export default function LineChartComponent() {
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
 		}
-	}
+	};
 	// Check if there is at least one valid graph
-	const ableToGraph = datasets.find(data => data.x!.length > 1)
+	const ableToGraph = datasets.find(data => data.x!.length > 1);
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (datasets.length === 0) {

@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-
 import DashboardComponent from './DashboardComponent';
 
 /**
@@ -12,7 +11,6 @@ import DashboardComponent from './DashboardComponent';
  * @returns JSX to create the home page
  */
 export default function HomeComponent() {
-
 	return (
 		<>
 			<TooltipHelpComponent page='home' />

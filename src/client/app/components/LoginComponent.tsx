@@ -35,14 +35,13 @@ export default function LoginComponent() {
 			.unwrap()
 			.then(() => {
 				// No error, success!
-				// TODO Translate
-				showSuccessNotification('Login Successful')
-				navigate('/')
+				showSuccessNotification(translate('login.success'));
+				navigate('/');
 			})
 			.catch(() => {
 				// Error on login Mutation
-				inputRef.current?.focus()
-				showErrorNotification(translate('failed.logging.in'));
+				inputRef.current?.focus();
+				showErrorNotification(translate('login.failed'));
 			})
 	}
 

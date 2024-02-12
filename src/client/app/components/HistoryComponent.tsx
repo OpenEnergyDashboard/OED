@@ -13,8 +13,8 @@ import {
  */
 export default function HistoryComponent() {
 	const dispatch = useAppDispatch();
-	const backStack = useAppSelector(selectPrevHistory)
-	const forwardStack = useAppSelector(selectForwardHistory)
+	const backStack = useAppSelector(selectPrevHistory);
+	const forwardStack = useAppSelector(selectForwardHistory);
 
 	return (
 		<div style={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
