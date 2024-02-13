@@ -33,7 +33,6 @@ export default function RadarChartComponent() {
 	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
 	const datasets: any[] = [];
-	// Time range selected
 	// graphic unit selected
 	const graphingUnit = useAppSelector(selectSelectedUnit);
 	// The current selected rate
@@ -83,6 +82,8 @@ export default function RadarChartComponent() {
 				if (readingsData) {
 					const label = meterDataById[meterID].identifier;
 					const colorID = meterID;
+					// TODO If we are sure the data is always defined then remove this commented out code.
+					// Be consistent for all graphing and groups below.
 					// if (readingsData.readings === undefined) {
 					// 	throw new Error('Unacceptable condition: readingsData.readings is undefined.');
 					// }

@@ -15,9 +15,6 @@ interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
 }
 
-// Normal/live URL for OED help pages
-// Exported to HeaderButtonsComponent and LanguageSelectorComponent
-
 /**
  * @param props // Specifies which page the tip is in.
  * @returns ToolTipHelpComponent

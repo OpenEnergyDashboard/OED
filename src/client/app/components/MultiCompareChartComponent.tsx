@@ -15,35 +15,31 @@ import { selectCompareChartQueryArgs } from '../redux/selectors/chartQuerySelect
 import { SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 
-export interface MultiCompareChartProps {
-	selectedCompareEntities: CompareEntity[];
-	errorEntities: string[];
-}
-
 /**
  * Component that defines compare chart
  * @returns Multi Compare Chart element
  */
 export default function MultiCompareChartComponent() {
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectCompareChartQueryArgs)
-	const { data: meterReadings = {} } = readingsApi.useCompareQuery(meterArgs, { skip: meterShouldSkip })
-	const { data: groupReadings = {} } = readingsApi.useCompareQuery(groupArgs, { skip: groupShouldSkip })
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectCompareChartQueryArgs);
+	const { data: meterReadings = {} } = readingsApi.useCompareQuery(meterArgs, { skip: meterShouldSkip });
+	const { data: groupReadings = {} } = readingsApi.useCompareQuery(groupArgs, { skip: groupShouldSkip });
 
-	const areaNormalization = useAppSelector(selectGraphAreaNormalization)
-	const sortingOrder = useAppSelector(selectSortingOrder)
-	const selectedMeters = useAppSelector(selectSelectedMeters)
-	const selectedGroups = useAppSelector(selectSelectedGroups)
+	const areaNormalization = useAppSelector(selectGraphAreaNormalization);
+	const sortingOrder = useAppSelector(selectSortingOrder);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
 
-	const meterDataByID = useAppSelector(selectMeterDataById)
-	const groupDataById = useAppSelector(selectGroupDataById)
+	const meterDataByID = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 
 	// TODO SEEMS UNUSED, kept due to uncertainty when migrating to RTK VERIFY BEHAVIOR
 	const errorEntities: string[] = [];
-	let selectedCompareEntities: CompareEntity[] = []
+	let selectedCompareEntities: CompareEntity[] = [];
 
+	// TODO These two blocks for meters & groups could probably be combined.
 	Object.entries(meterReadings).forEach(([key, value]) => {
-		const name = meterDataByID[Number(key)].name
-		const identifier = meterDataByID[Number(key)].identifier
+		const name = meterDataByID[Number(key)].name;
+		const identifier = meterDataByID[Number(key)].identifier;
 
 		const areaNormValid = (!areaNormalization || (meterDataByID[Number(key)].area > 0 && meterDataByID[Number(key)].areaUnit !== AreaUnitType.none))
 		if (areaNormValid && selectedMeters.includes(Number(key))) {
@@ -61,8 +57,8 @@ export default function MultiCompareChartComponent() {
 		}
 	})
 	Object.entries(groupReadings).forEach(([key, value]) => {
-		const identifier = groupDataById[Number(key)].name
-		const areaNormValid = (!areaNormalization || (groupDataById[Number(key)].area > 0 && groupDataById[Number(key)].areaUnit !== AreaUnitType.none))
+		const identifier = groupDataById[Number(key)].name;
+		const areaNormValid = (!areaNormalization || (groupDataById[Number(key)].area > 0 && groupDataById[Number(key)].areaUnit !== AreaUnitType.none));
 		if (areaNormValid && selectedGroups.includes(Number(key))) {
 			const change = calculateChange(value.curr_use, value.prev_use);
 			const entity: CompareEntity = {
@@ -130,9 +126,9 @@ export default function MultiCompareChartComponent() {
 
 /**
  *
- * @param currentPeriodUsage TODO temp to appease linter fix Later
- * @param usedToThisPointLastTimePeriod TODO temp to appease linter fix Later
- * @returns TODO temp to appease linter fix Later
+ * @param currentPeriodUsage The current usage in the compare period
+ * @param usedToThisPointLastTimePeriod The previous usage in the compare period
+ * @returns The fraction change in usage where negative means less usage
  */
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number): number {
 	return -1 + (currentPeriodUsage / usedToThisPointLastTimePeriod);
@@ -141,9 +137,9 @@ function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeri
 
 
 /**
- * @param ids TODO temp to appease linter fix Later
- * @param sortingOrder TODO temp to appease linter fix Later
- * @returns TODO temp to appease linter fix Later
+ * @param ids An array of items being compared that contain but are more than the id
+ * @param sortingOrder The desired order or the comparison items based on change
+ * @returns An array of items being compared in desired sortingOrder
  */
 function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
 	switch (sortingOrder) {

@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
- * A component which allows users to select number of reading per day for the graphic
+ * A component which allows users to select number of reading per day for 3D graphic
  * @returns A Select menu with Readings per day options.
  */
 export default function ReadingsPerDaySelect() {
@@ -25,7 +25,7 @@ export default function ReadingsPerDaySelect() {
 
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 
-	let actualReadingInterval = ReadingInterval.Hourly
+	let actualReadingInterval = ReadingInterval.Hourly;
 	if (data && data.zData.length) {
 		// Special Case:  When no compatible data available, data returned is from api is -999
 		if (data.zData[0][0] && data.zData[0][0] < 0) {

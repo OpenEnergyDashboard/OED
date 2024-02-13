@@ -19,7 +19,6 @@ import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
-
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options
@@ -28,10 +27,9 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
-	const somethingIsFetching = useAppSelector(selectAnythingFetching)
+	const somethingIsFetching = useAppSelector(selectAnythingFetching);
 	const { meterOrGroup } = props;
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
-
 	const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
 	// Set the current component's appropriate meter or group SelectOption
@@ -87,7 +85,7 @@ interface MeterAndGroupSelectProps {
 
 const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, GroupedOption>) => {
 	// Types for makeAnimated are generic, and does not offer completion, so type assert
-	const typedProps = props as MultiValueProps<SelectOption, true, GroupedOption>
+	const typedProps = props as MultiValueProps<SelectOption, true, GroupedOption>;
 	const ref = React.useRef<HTMLDivElement | null>(null);
 	// TODO would be nice if relevant message was derived from uiSelectors, which currently only tracks / trims non-compatible ids
 	// TODO Add meta data along chain? i.e. disabled due to chart type, area norm... etc. and display relevant message.

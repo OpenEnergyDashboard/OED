@@ -20,38 +20,37 @@ import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 
-
 /**
- * @returns the Ui Control panel
+ * @returns the UI Control panel
  */
 export default function UIOptionsComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 
-	// Effect Manipulates Ui Options max height. To allow for dynamic window sizing to work.
+	// Effect Manipulates UI Options max height. To allow for dynamic window sizing to work.
 	React.useEffect(() => {
-		const headFootHeight = document.querySelector('#header')!.clientHeight + document.querySelector('#footer')!.clientHeight + 50
+		const headFootHeight = document.querySelector('#header')!.clientHeight + document.querySelector('#footer')!.clientHeight + 50;
 		const resizeHandler = () => {
 			// Total window - Header and footer height = dashboard height
-			const maxOptionsHeight = window.innerHeight - headFootHeight
+			const maxOptionsHeight = window.innerHeight - headFootHeight;
 
 			// May be null for initial render(s)
 			if (optionsRef.current) {
-				const scrollHeight = optionsRef.current.scrollHeight
-				// When options are greater in height  than window real-estate, set max height & overflow properties
+				const scrollHeight = optionsRef.current.scrollHeight;
+				// When options are greater in height than window real-estate, set max height & overflow properties
 				if (scrollHeight >= maxOptionsHeight) {
-					optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`
-					optionsRef.current.style.overflow = 'scroll'
+					optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`;
+					optionsRef.current.style.overflow = 'scroll';
 				} else {
-					// Clear constraints when enough space. ()
-					optionsRef.current.style.maxHeight = 'none'
-					optionsRef.current.style.overflow = 'visible'
+					// Clear constraints when enough space.
+					optionsRef.current.style.maxHeight = 'none';
+					optionsRef.current.style.overflow = 'visible';
 				}
 			}
 		}
-		resizeHandler()
-		window.addEventListener('resize', resizeHandler)
-		return () => window.removeEventListener('resize', resizeHandler)
+		resizeHandler();
+		window.addEventListener('resize', resizeHandler);
+		return () => window.removeEventListener('resize', resizeHandler);
 	}, [])
 
 	ReactTooltip.rebuild();
