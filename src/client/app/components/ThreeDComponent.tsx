@@ -67,7 +67,7 @@ export default function ThreeDComponent() {
 	}
 
 	return (
-		<div style={{ width: '100%', height: '100%' }}>
+		<>
 			<ThreeDPillComponent />
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
@@ -75,11 +75,11 @@ export default function ThreeDComponent() {
 					data={dataToRender as Plotly.Data[]}
 					layout={layout as Plotly.Layout}
 					config={config}
-					style={{ width: '100%', height: '100%' }}
+					style={{ width: '100%', flexGrow: '1' }}
 					useResizeHandler={true}
 				/>
 			}
-		</div>
+		</>
 	)
 }
 
@@ -221,7 +221,9 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	// responsible for setting Labels
 	return {
-		//Leaves holes in graph for missing, undefined, NaN, or null values
+		// Eliminate margin
+		margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
+		// Leaves gaps / voids in graph for missing, undefined, NaN, or null values
 		connectgaps: false,
 		scene: {
 			xaxis: {
@@ -248,7 +250,7 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 				}
 			}
 		}
-	}
+	} as Partial<Plotly.Layout>
 }
 
 const config = {

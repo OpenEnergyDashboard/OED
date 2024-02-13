@@ -16,8 +16,7 @@ import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 
-// Potential Fixes, for now omitted
-// import '../styles/DateRangeCustom.css'
+import '../styles/DateRangeCustom.css'
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)

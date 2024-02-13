@@ -85,9 +85,25 @@ export const selectBarUnitLabel = (state: RootState) => {
 }
 
 // fallback to name if no identifier
-export const selectNameFromEntity = (entity: MeterData | GroupData | UnitData) => 'identifier' in entity ? entity.identifier : entity.name
+export const selectNameFromEntity = (entity: MeterData | GroupData | UnitData) => {
+	if (entity && 'identifier' in entity && entity.identifier) {
+		return entity.identifier
+	} else if (entity && 'name' in entity && entity.name) {
+		return entity.name
+	} else {
+		// Users May Possibly receive data for meters with neither identifier, or name so empty.
+		return ''
+	}
+}
+
 // Determines if meter or group base on objet distinct properties of each
-export const selectMeterOrGroupFromEntity = (entity: MeterData | GroupData) => 'meterType' in entity ? MeterOrGroup.meters : MeterOrGroup.groups
+export const selectMeterOrGroupFromEntity = (entity: MeterData | GroupData) => {
+	return 'meterType' in entity ? MeterOrGroup.meters : 'childMeters' in entity ? MeterOrGroup.groups : undefined
+}
+
+export const selectDefaultGraphicUnitFromEntity = (entity: MeterData | GroupData) => {
+	return 'defaultGraphicUnit' in entity ? entity.defaultGraphicUnit : undefined
+}
 
 // Line and Groups use these values to derive plotly data, so make selector for them to 'extend'
 export const selectCommonPlotlyDependencies = createStructuredSelector(

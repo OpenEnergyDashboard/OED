@@ -12,7 +12,10 @@ import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
+import { UnitDataById } from 'types/redux/units';
 
+const stableEmptyConversions: ConversionData[] = []
+const stableEmptyUnitDataById: UnitDataById = {}
 /**
  * Defines the conversions page card view
  * @returns Conversion page element
@@ -21,9 +24,9 @@ export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 
 	// Conversions state
-	const { data: conversionsState = [], isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
+	const { data: conversionsState = stableEmptyConversions, isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
 	// Units DataById
-	const { unitDataById = {}, isFetching: unitsFetching } = unitsApi.useGetUnitsDetailsQuery(undefined, {
+	const { unitDataById = stableEmptyUnitDataById, isFetching: unitsFetching } = unitsApi.useGetUnitsDetailsQuery(undefined, {
 		selectFromResult: ({ data, ...result }) => ({
 			...result,
 			unitDataById: data && unitsAdapter.getSelectors().selectEntities(data)

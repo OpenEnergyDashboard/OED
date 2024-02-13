@@ -58,6 +58,9 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				// Included React-Select Animations
 				components={animatedComponents}
 				styles={customStyles}
+				classNames={{
+					valueContainer: () => 'no_scrollbar'
+				}}
 				isLoading={somethingIsFetching}
 			/>
 		</>

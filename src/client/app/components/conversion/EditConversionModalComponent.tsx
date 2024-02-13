@@ -162,7 +162,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										id='sourceId'
 										name='sourceId'
 										type='text'
-										defaultValue={unitDataById[state.sourceId].identifier}
+										defaultValue={unitDataById[state.sourceId]?.identifier}
 										// Disable input to prevent changing ID value
 										disabled>
 									</Input>
@@ -176,7 +176,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										id='destinationId'
 										name='destinationId'
 										type='text'
-										defaultValue={unitDataById[state.destinationId].identifier}
+										defaultValue={unitDataById[state.destinationId]?.identifier}
 										// Disable input to prevent changing ID value
 										disabled>
 									</Input>

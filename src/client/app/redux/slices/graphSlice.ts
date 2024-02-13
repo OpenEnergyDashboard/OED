@@ -9,7 +9,7 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { preferencesApi } from '../api/preferencesApi';
 import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
-import { ComparePeriod, SortingOrder, calculateCompareTimeInterval } from '../../utils/calculateCompare';
+import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 const defaultState: GraphState = {
@@ -33,7 +33,8 @@ const defaultState: GraphState = {
 		meterOrGroupID: undefined,
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
-	}
+	},
+	hotlinked: false
 };
 
 interface History<T> {
@@ -241,12 +242,82 @@ export const graphSlice = createSlice({
 					state.current = next
 				}
 			})
+			.addCase(processGraphLink, ({ current }, { payload }) => {
+				current.hotlinked = true
+				payload.forEach((value, key) => {
+					// TODO Needs to be refactored into a single dispatch/reducer pair.
+					// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
+					// TODO validation could be implemented across all cases similar to compare period and sorting order
+					switch (key) {
+						case 'areaNormalization':
+							current.areaNormalization = value === 'true'
+							break;
+						case 'areaUnit':
+							current.selectedAreaUnit = value as AreaUnitType
+							break;
+						case 'barDuration':
+							current.barDuration = moment.duration(parseInt(value), 'days');
+							break;
+						case 'barStacking':
+							current.barStacking = value === 'true'
+							break;
+						case 'chartType':
+							current.chartToRender = value as ChartTypes
+							break;
+						case 'comparePeriod':
+							{
+								current.comparePeriod = validateComparePeriod(value)
+								current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment())
+							}
+							break;
+						case 'compareSortingOrder':
+							current.compareSortingOrder = validateSortingOrder(value);
+							break;
+						case 'groupIDs':
+							current.selectedGroups = value.split(',').map(s => parseInt(s));
+							break;
+						case 'meterIDs':
+							current.selectedMeters = value.split(',').map(s => parseInt(s));
+							break;
+						case 'meterOrGroup':
+							current.threeD.meterOrGroup = value as MeterOrGroup;
+							break;
+						case 'meterOrGroupID':
+							current.threeD.meterOrGroupID = parseInt(value);
+							break;
+						case 'minMax':
+							current.showMinMax = value === 'true'
+							break;
+						case 'rate':
+							{
+								const params = value.split(',');
+								const rate = { label: params[0], rate: parseFloat(params[1]) } as LineGraphRate;
+								current.lineGraphRate = rate;
+							}
+							break;
+						case 'readingInterval':
+							current.threeD.readingInterval = parseInt(value);
+							break;
+						case 'serverRange':
+							current.queryTimeInterval = TimeInterval.fromString(value);
+							break;
+						case 'sliderRange':
+							current.rangeSliderInterval = TimeInterval.fromString(value);
+							break;
+						case 'unitID':
+							current.selectedUnit = parseInt(value)
+							break;
+					}
+				})
+			})
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
-				const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload
-				current.selectedAreaUnit = defaultAreaUnit
-				current.chartToRender = defaultChartToRender
-				current.barStacking = defaultBarStacking
-				current.areaNormalization = defaultAreaNormalization
+				if (!current.hotlinked) {
+					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload
+					current.selectedAreaUnit = defaultAreaUnit
+					current.chartToRender = defaultChartToRender
+					current.barStacking = defaultBarStacking
+					current.areaNormalization = defaultAreaNormalization
+				}
 			})
 	},
 	selectors: {
@@ -332,3 +403,5 @@ export const {
 export const historyStepBack = createAction('graph/historyStepBack')
 export const historyStepForward = createAction('graph/historyStepForward')
 export const updateHistory = createAction<GraphState>('graph/updateHistory')
+
+export const processGraphLink = createAction<URLSearchParams>('graph/graphLink')

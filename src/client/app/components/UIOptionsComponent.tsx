@@ -55,7 +55,7 @@ export default function UIOptionsComponent() {
 
 	ReactTooltip.rebuild();
 	return (
-		<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'scroll' }} ref={optionsRef}>
+		<div className='no_scrollbar' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'scroll' }} ref={optionsRef}>
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
 			<GraphicRateMenuComponent />

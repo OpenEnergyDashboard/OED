@@ -30,7 +30,8 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 	[data => data, (_data, dependencies: PlotlyLineDeps) => dependencies],
 	(data, { areaUnit, areaNormalization, meterDataById, compatibleEntities, showMinMax, lineUnitLabel, rateScaling }) => {
 		const plotlyLineData = Object.entries(data)
-			// filter entries for requested groups
+			// filter entries for requested compatible groups
+			// compatible entities is using the same data deriving selectors as the select option for group, & meter.
 			.filter(([groupID]) => compatibleEntities.includes((Number(groupID))))
 			.map(([id, readings]) => {
 				const meterInfo = meterDataById[Number(id)]
