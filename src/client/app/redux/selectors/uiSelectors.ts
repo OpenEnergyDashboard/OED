@@ -12,7 +12,7 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { RootState } from '../../store';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
-import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
+import { ChartTypes } from '../../types/redux/graph';
 import { UnitDataById, UnitRepresentType } from '../../types/redux/units';
 import {
 	CartesianPoint, Dimensions, calculateScaleFromEndpoints, gpsToUserGrid,
@@ -27,11 +27,8 @@ import {
 	selectSelectedUnit
 } from '../slices/graphSlice';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
-import { selectNameFromEntity } from './plotlyDataSelectors';
+import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './plotlyDataSelectors';
 import { createAppSelector } from './selectors';
-
-
-
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
@@ -147,8 +144,6 @@ export const selectChartTypeCompatibility = createAppSelector(
 
 		const compatibleGroups = new Set<number>(Array.from(areaCompat.compatibleGroups));
 		const incompatibleGroups = new Set<number>(Array.from(areaCompat.incompatibleGroups));
-
-
 
 		// ony run this check if we are displaying a map chart
 		if (chartToRender === ChartTypes.map && mapState.selectedMap !== 0) {
@@ -350,6 +345,7 @@ export const selectUnitSelectData = createAppSelector(
 				}
 			});
 		}
+
 		// Ready to display unit. Put selectable ones before non-selectable ones.
 		const unitOptions = getSelectOptionsByEntity(compatibleUnits, incompatibleUnits, unitDataById);
 		const unitsGroupedOptions: GroupedOption[] = [
@@ -386,8 +382,8 @@ export function getSelectOptionsByEntity(
 			// Groups unit and meters have identifier, groups doesn't
 			const label = selectNameFromEntity(entity)
 			// MeterAnd Group, undefined for units
-			const defaultGraphicUnit = 'defaultGraphicUnit' in entity ? entity.defaultGraphicUnit : undefined
-			const meterOrGroup = 'meterType' in entity ? MeterOrGroup.meters : 'childMeters' in entity ? MeterOrGroup.groups : undefined
+			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity)
+			const meterOrGroup = selectMeterOrGroupFromEntity(entity)
 			return {
 				value: Number(id),
 				label: label,
@@ -404,8 +400,8 @@ export function getSelectOptionsByEntity(
 		.map(([id, entity]) => {
 			const label = selectNameFromEntity(entity)
 			// MeterAnd Group, undefined for units
-			const defaultGraphicUnit = 'defaultGraphicUnit' in entity ? entity.defaultGraphicUnit : undefined
-			const meterOrGroup = 'meterType' in entity ? MeterOrGroup.meters : 'childMeters' in entity ? MeterOrGroup.groups : undefined
+			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity)
+			const meterOrGroup = selectMeterOrGroupFromEntity(entity)
 			return {
 				value: Number(id),
 				label: label,
@@ -416,11 +412,8 @@ export function getSelectOptionsByEntity(
 			} as SelectOption
 		})
 
-
 	const compatible = _.sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc')
 	const incompatible = _.sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc')
-
-
 	return { compatible, incompatible }
 }
 
@@ -428,7 +421,9 @@ export function getSelectOptionsByEntity(
 
 // Helper function for area compatibility
 // areaNorm should be active when called
-const isAreaNormCompatible = (id: number, selectedUnit: number, meterOrGroupData: MeterDataByID | GroupDataByID, unitDataById: UnitDataById) => {
+export const isAreaNormCompatible = (
+	id: number, selectedUnit: number, meterOrGroupData: MeterDataByID | GroupDataByID, unitDataById: UnitDataById
+) => {
 	const meterGraphingUnit = meterOrGroupData[id].defaultGraphicUnit;
 
 	// If no unit is selected then no meter/group should be selected if meter type is raw

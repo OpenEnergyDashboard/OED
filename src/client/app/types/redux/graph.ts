@@ -74,4 +74,5 @@ export interface GraphState {
 	showMinMax: boolean;
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;
+	hotlinked: boolean;
 }

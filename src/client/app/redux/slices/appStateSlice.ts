@@ -2,6 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
+import { LanguageTypes } from '../../types/redux/i18n';
+import { deleteToken, getToken, hasToken } from '../../utils/token';
 import { fetchMapsDetails } from '../actions/map';
 import { authApi } from '../api/authApi';
 import { conversionsApi } from '../api/conversionsApi';
@@ -12,10 +15,8 @@ import { unitsApi } from '../api/unitsApi';
 import { userApi } from '../api/userApi';
 import { versionApi } from '../api/versionApi';
 import { createThunkSlice } from '../sliceCreators';
-import { deleteToken, getToken, hasToken } from '../../utils/token';
 import { currentUserSlice } from './currentUserSlice';
-import { LanguageTypes } from '../../types/redux/i18n';
-import * as moment from 'moment';
+import { processGraphLink } from './graphSlice';
 
 export interface AppState {
 	initComplete: boolean;
@@ -54,8 +55,8 @@ export const appStateSlice = createThunkSlice({
 			async (_: void, { dispatch }) => {
 				// These queries will trigger a api request, and add a subscription to the store.
 				// Typically they return an unsubscribe method, however we always want to be subscribed to any cache changes for these endpoints.
-				dispatch(versionApi.endpoints.getVersion.initiate())
 				dispatch(preferencesApi.endpoints.getPreferences.initiate())
+				dispatch(versionApi.endpoints.getVersion.initiate())
 				dispatch(unitsApi.endpoints.getUnitsDetails.initiate())
 				dispatch(conversionsApi.endpoints.getConversionsDetails.initiate())
 				dispatch(conversionsApi.endpoints.getConversionArray.initiate())
@@ -100,10 +101,16 @@ export const appStateSlice = createThunkSlice({
 		)
 	}),
 	extraReducers: builder => {
-		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
-			state.selectedLanguage = action.payload.defaultLanguage
-			moment.locale(action.payload.defaultLanguage);
-		})
+		builder
+			.addCase(processGraphLink, (state, { payload }) => {
+				if (payload.has('optionsVisibility')) {
+					state.optionsVisibility = payload.get('optionsVisibility') === 'true'
+				}
+			})
+			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
+				state.selectedLanguage = action.payload.defaultLanguage
+				moment.locale(action.payload.defaultLanguage);
+			})
 	},
 	selectors: {
 		selectInitComplete: state => state.initComplete,

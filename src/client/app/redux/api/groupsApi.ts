@@ -69,7 +69,8 @@ export const groupsApi = baseApi.injectEndpoints({
 				url: 'api/groups/edit',
 				method: 'PUT',
 				body: group
-			})
+			}),
+			invalidatesTags: ['GroupData', 'GroupChildrenData']
 		}),
 		deleteGroup: builder.mutation<void, number>({
 			query: groupId => ({

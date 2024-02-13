@@ -329,8 +329,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					// changes were made to the children. This avoid a reload on name change, etc.
 					submitGroupEdits(submitState)
 				});
-				// The next line is unneeded since do refresh.
-				// dispatch(removeUnsavedChanges());
 			} else {
 				showErrorNotification(translate('group.input.error'));
 			}
