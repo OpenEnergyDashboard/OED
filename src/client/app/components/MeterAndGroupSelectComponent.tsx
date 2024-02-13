@@ -92,9 +92,13 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	const ref = React.useRef<HTMLDivElement | null>(null);
 	// TODO would be nice if relevant message was derived from uiSelectors, which currently only tracks / trims non-compatible ids
 	// TODO Add meta data along chain? i.e. disabled due to chart type, area norm... etc. and display relevant message.
-	return typedProps.data.isDisabled ?
-		// TODO Verify behavior, and set proper message/ translate
-		< div ref={ref} data-for={'home'} data-tip={'help.home.area.normalize'}
+	const isDisabled = typedProps.data.isDisabled
+	// TODO Verify behavior, and set proper message/ translate
+	return (
+		< div ref={ref}
+			key={`${typedProps.data.value}:${typedProps.data.label}`}
+			data-for={isDisabled ? 'home' : 'select-tooltips'}
+			data-tip={isDisabled ? 'help.home.area.normalize' : `${props.data.label}`}
 			onMouseDown={e => e.stopPropagation()}
 			onClick={e => {
 				ReactTooltip.rebuild()
@@ -102,26 +106,23 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				ref.current && ReactTooltip.show(ref.current)
 			}}
 			style={{ overflow: 'hidden' }}
-		>
-			<components.MultiValueLabel {...props} />
-		</div >
-		:
-		< div ref={ref} data-for={'home'} data-tip={`${props.data.label}`}
 			onMouseEnter={e => {
-				const multiValueLabel = e.currentTarget.children[0]
-				if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
-					ReactTooltip.rebuild()
-					ref.current && ReactTooltip.show(ref.current)
+				if (!isDisabled) {
+					const multiValueLabel = e.currentTarget.children[0]
+					if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
+						ReactTooltip.rebuild()
+						ref.current && ReactTooltip.show(ref.current)
+					}
 				}
 			}}
 			onMouseLeave={() => {
 				ref.current && ReactTooltip.hide(ref.current)
-			}
-			}
-			style={{ overflow: 'hidden' }}
+			}}
 		>
 			<components.MultiValueLabel {...props} />
-		</div>
+		</div >
+	)
+
 }
 
 const animatedComponents = makeAnimated({
