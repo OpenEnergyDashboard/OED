@@ -173,7 +173,7 @@ mocha.describe('readings API', () => {
                         {
                             name: 'Electric_Utility pound of CO₂',
                             unit: 'Electric_Utility',
-                            //defaultGraphicUnit: 'pound of CO₂',
+                            defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -189,7 +189,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility Other',
                             unit: 'Electric_Utility',
                             //not sure change the property of GraphicUnit
-                            //defaultGraphicUnit: 'pound of CO₂',
+                            defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -207,7 +207,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility pound of CO₂ + Other',
                             displayable: true,
                             note: 'special group',
-                            //defaultGraphicUnit: 'pound of CO₂',
+                            defaultGraphicUnit: 'pound of CO₂',
                             childMeters: ['Electric Utility pound of CO₂', 'Electric Utility Other'],
                             childGroups: [],
                         }
@@ -218,7 +218,8 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('pound of CO₂');
                     // Load the expected response data from the corresponding csv file
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
+                    //const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf.csv');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_lbsCO2_st_-inf_et_inf.csv');
                     // Create a request to the API for unbounded reading times and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
                         .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
