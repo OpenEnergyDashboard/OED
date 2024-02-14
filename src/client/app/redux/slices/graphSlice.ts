@@ -6,11 +6,11 @@ import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { preferencesApi } from '../api/preferencesApi';
 import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { preferencesApi } from '../api/preferencesApi';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -27,7 +27,6 @@ const defaultState: GraphState = {
 	barStacking: false,
 	areaNormalization: false,
 	lineGraphRate: { label: 'hour', rate: 1 },
-	renderOnce: false,
 	showMinMax: false,
 	threeD: {
 		meterOrGroupID: undefined,
@@ -52,9 +51,6 @@ export const graphSlice = createSlice({
 	name: 'graph',
 	initialState: initialState,
 	reducers: {
-		confirmGraphRenderOnce: state => {
-			state.current.renderOnce = true
-		},
 		updateSelectedMeters: (state, action: PayloadAction<number[]>) => {
 			state.current.selectedMeters = action.payload
 		},
@@ -347,56 +343,33 @@ export const graphSlice = createSlice({
 
 // Selectors that can be imported and used in 'useAppSelectors' and 'createSelectors'
 export const {
-	selectAreaUnit,
-	selectShowMinMax,
-	selectGraphState,
-	selectPrevHistory,
-	selectThreeDState,
-	selectBarStacking,
-	selectSortingOrder,
-	selectBarWidthDays,
-	selectSelectedUnit,
-	selectLineGraphRate,
-	selectComparePeriod,
-	selectChartToRender,
-	selectForwardHistory,
-	selectSelectedMeters,
-	selectSelectedGroups,
-	selectQueryTimeInterval,
-	selectThreeDMeterOrGroup,
-	selectCompareTimeInterval,
-	selectThreeDMeterOrGroupID,
-	selectThreeDReadingInterval,
+	selectAreaUnit, selectShowMinMax,
+	selectGraphState, selectPrevHistory,
+	selectThreeDState, selectBarStacking,
+	selectSortingOrder, selectBarWidthDays,
+	selectSelectedUnit, selectLineGraphRate,
+	selectComparePeriod, selectChartToRender,
+	selectForwardHistory, selectSelectedMeters,
+	selectSelectedGroups, selectQueryTimeInterval,
+	selectThreeDMeterOrGroup, selectCompareTimeInterval,
+	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization
 } = graphSlice.selectors
 
 // actionCreators exports
 export const {
-	setShowMinMax,
-	setGraphState,
-	setBarStacking,
-	toggleShowMinMax,
-	changeBarStacking,
-	resetTimeInterval,
-	updateBarDuration,
-	changeSliderRange,
-	updateTimeInterval,
-	updateSelectedUnit,
-	changeChartToRender,
-	updateComparePeriod,
-	updateSelectedMeters,
-	updateLineGraphRate,
-	setAreaNormalization,
-	updateSelectedGroups,
-	resetRangeSliderStack,
-	updateSelectedAreaUnit,
-	confirmGraphRenderOnce,
-	toggleAreaNormalization,
-	updateThreeDMeterOrGroup,
-	changeCompareSortingOrder,
-	updateThreeDMeterOrGroupID,
-	updateThreeDReadingInterval,
-	updateThreeDMeterOrGroupInfo,
+	setShowMinMax, setGraphState,
+	setBarStacking, toggleShowMinMax,
+	changeBarStacking, resetTimeInterval,
+	updateBarDuration, changeSliderRange,
+	updateTimeInterval, updateSelectedUnit,
+	changeChartToRender, updateComparePeriod,
+	updateSelectedMeters, updateLineGraphRate,
+	setAreaNormalization, updateSelectedGroups,
+	resetRangeSliderStack, updateSelectedAreaUnit,
+	toggleAreaNormalization, updateThreeDMeterOrGroup,
+	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
+	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
 	updateSelectedMetersOrGroups
 } = graphSlice.actions
 

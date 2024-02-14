@@ -4,15 +4,18 @@
 
 import { QueryStatus } from '@reduxjs/toolkit/query';
 import * as _ from 'lodash';
-import { GroupDataByID } from 'types/redux/groups';
-import { MeterDataByID } from 'types/redux/meters';
+import * as moment from 'moment';
+import { TimeInterval } from '../../../../common/TimeInterval';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { selectChartLinkHideOptions } from '../../redux/slices/appStateSlice';
 import { RootState } from '../../store';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes } from '../../types/redux/graph';
+import { GroupDataByID } from '../../types/redux/groups';
+import { MeterDataByID } from '../../types/redux/meters';
 import { UnitDataById, UnitRepresentType } from '../../types/redux/units';
 import {
 	CartesianPoint, Dimensions, calculateScaleFromEndpoints, gpsToUserGrid,
@@ -22,9 +25,8 @@ import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineC
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { selectMapState } from '../reducers/maps';
 import {
-	selectChartToRender, selectGraphAreaNormalization,
-	selectSelectedGroups, selectSelectedMeters,
-	selectSelectedUnit
+	selectChartToRender, selectGraphAreaNormalization, selectGraphState,
+	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../slices/graphSlice';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './plotlyDataSelectors';
@@ -435,7 +437,109 @@ export const isAreaNormCompatible = (
 	return isAreaNormCompatible
 }
 
+export const selectChartLink = createAppSelector(
+	[
+		selectGraphState,
+		selectChartLinkHideOptions,
+		state => state.maps.selectedMap
+	],
+	(current, chartLinkHideOptions, selectedMap) => {
+		// Determine the beginning of the URL to add arguments to.
+		// This is the current URL.
+		const winLocHref = window.location.href;
+		// See if graph? is in URL. We add that when it comes in as a chartlink.
+		// Want to remove so we can start without the current arguments.
+		let startOfParams = winLocHref.indexOf('graph?');
+		// It is -1 if not there. In that case use the full length string.
+		startOfParams = startOfParams === -1 ? winLocHref.length : startOfParams;
+		// Grab the start of URL to what was just determined.
+		const baseURL = winLocHref.substring(0, startOfParams);
+		// Add graph? since we want to route to graph and have a ? before any arguments.
+		let linkText = `${baseURL}graph?`;
+		// let weeklyLink = ''; // reflects graph 7 days from present, with user selected meters and groups;
+		if (current.selectedMeters.length > 0) {
+			linkText += `meterIDs=${current.selectedMeters.toString()}&`;
+		}
+		if (current.selectedGroups.length > 0) {
+			linkText += `groupIDs=${current.selectedGroups.toString()}&`;
+		}
+		linkText += `chartType=${current.chartToRender}`;
+		// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
+		linkText += `&serverRange=${current.queryTimeInterval.toString()}`;
+		switch (current.chartToRender) {
+			case ChartTypes.bar:
+				linkText += `&barDuration=${current.barDuration.asDays()}`;
+				linkText += `&barStacking=${current.barStacking}`;
+				break;
+			case ChartTypes.line:
+				linkText += `&sliderRange=${getRangeSliderInterval()}`;
+				break;
+			case ChartTypes.compare:
+				linkText += `&comparePeriod=${current.comparePeriod}`;
+				linkText += `&compareSortingOrder=${current.compareSortingOrder}`;
+				break;
+			case ChartTypes.map:
+				linkText += `&mapID=${selectedMap.toString()}`;
+				break;
+			case ChartTypes.threeD:
+				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
+				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
+				linkText += `&readingInterval=${current.threeD.readingInterval}`;
+				break;
+		}
+		const unitID = current.selectedUnit;
+		linkText += `&unitID=${unitID.toString()}`;
+		linkText += `&rate=${current.lineGraphRate.label.toString()},${current.lineGraphRate.rate.toString()}`;
+		linkText += `&areaUnit=${current.selectedAreaUnit}&areaNormalization=${current.areaNormalization}`;
+		linkText += `&minMax=${current.showMinMax}`;
+		if (chartLinkHideOptions) {
+			linkText += '&optionsVisibility=false'
+		}
+		return linkText
+	}
+)
+
 export const selectAnythingFetching = (state: RootState) => {
 	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending)
 	return anythingLoading;
+}
+
+
+/**
+ * Determines the line graph's slider interval based after the slider is moved
+ * @returns The slider interval, either 'all' or a TimeInterval
+ */
+export function getRangeSliderInterval() {
+	const sliderContainer: any = document.querySelector('.rangeslider-bg');
+	const sliderBox: any = document.querySelector('.rangeslider-slidebox');
+	const root: any = document.getElementById('root');
+
+	if (sliderContainer && sliderBox && root) {
+		// Attributes of the slider: full width and the min & max values of the box
+		const fullWidth: number = parseInt(sliderContainer.getAttribute('width'));
+		const sliderMinX: number = parseInt(sliderBox.getAttribute('x'));
+		const sliderMaxX: number = sliderMinX + parseInt(sliderBox.getAttribute('width'));
+		if (sliderMaxX - sliderMinX === fullWidth) {
+			return 'all';
+		}
+
+		// From the Plotly line graph, get current min and max times in seconds
+		const minTimeStamp: number = parseInt(root.getAttribute('min-timestamp'));
+		const maxTimeStamp: number = parseInt(root.getAttribute('max-timestamp'));
+
+		// Seconds displayed on graph
+		const deltaSeconds: number = maxTimeStamp - minTimeStamp;
+		const secondsPerPixel: number = deltaSeconds / fullWidth;
+
+		// Get the new min and max times, in seconds, from the slider box
+		const newMinXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMinX));
+		const newMaxXTimestamp = Math.floor(minTimeStamp + (secondsPerPixel * sliderMaxX));
+		// The newMin/MaxTimestamp is equivalent to a Unix time in milliseconds. Thus, it will
+		// shift with timezone. It isn't clear if we want it in local or UTC. It depends on what
+		// plotly does. Here it is assumed that local is what is desired. This seems to work
+		// and not shift the graphs x-axis so using.
+		return new TimeInterval(moment(newMinXTimestamp), moment(newMaxXTimestamp)).toString();
+	} else {
+		return 'all'
+	}
 }

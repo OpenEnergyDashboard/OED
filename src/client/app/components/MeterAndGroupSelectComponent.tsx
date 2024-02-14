@@ -13,12 +13,12 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { graphSlice } from '../redux/slices/graphSlice';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectAnythingFetching, selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-
+import { selectAnythingFetching } from '../redux/selectors/uiSelectors';
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options
