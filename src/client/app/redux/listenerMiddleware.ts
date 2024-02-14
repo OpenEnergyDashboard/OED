@@ -3,18 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // listenerMiddleware.ts
-// https://redux-toolkit.js.org/api/crea teListenerMiddleware#typescript-usage
+// https://redux-toolkit.js.org/api/createListenerMiddleware#typescript-usage
 import { addListener, createListenerMiddleware } from '@reduxjs/toolkit'
 import type { AppDispatch, RootState } from '../store'
 import { graphHistoryListener } from './middleware/graphHistoryMiddleware'
 import { unauthorizedRequestListener } from './middleware/unauthorizedAccesMiddleware'
 
+export const listenerMiddleware = createListenerMiddleware();
 
-export const listenerMiddleware = createListenerMiddleware()
+export const startAppListening = listenerMiddleware.startListening.withTypes< RootState, AppDispatch>();
+export const addAppListener = addListener.withTypes<RootState, AppDispatch>();
+export type AppListener = typeof startAppListening;
 
-export const startAppListening = listenerMiddleware.startListening.withTypes< RootState, AppDispatch>()
-export const addAppListener = addListener.withTypes<RootState, AppDispatch>()
-export type AppListener = typeof startAppListening
-
-graphHistoryListener(startAppListening)
-unauthorizedRequestListener(startAppListening)
+graphHistoryListener(startAppListening);
+unauthorizedRequestListener(startAppListening);
