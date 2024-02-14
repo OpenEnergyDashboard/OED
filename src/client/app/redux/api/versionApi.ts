@@ -13,10 +13,10 @@ export const versionApi = baseApi.injectEndpoints({
 	})
 })
 
-export const selectVersion = versionApi.endpoints.getVersion.select()
+export const selectVersion = versionApi.endpoints.getVersion.select();
 export const selectOEDVersion = createSelector(
 	selectVersion,
 	({ data: version }) => {
 		return version ?? ''
 	}
-)
+);

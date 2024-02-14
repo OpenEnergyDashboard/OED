@@ -30,7 +30,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 							conversionsApi.endpoints.refresh.initiate({
 								redoCik: true,
 								refreshReadingViews: false
-							}))
+							}));
 					})
 			}
 
@@ -46,7 +46,11 @@ export const conversionsApi = baseApi.injectEndpoints({
 				// TODO Verify Behavior w/ Maintainers
 				queryFulfilled
 					.then(() => {
-						dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: true, refreshReadingViews: false }))
+						dispatch(conversionsApi.endpoints.refresh.initiate(
+							{
+								redoCik: true,
+								refreshReadingViews: false
+							}));
 					})
 
 			}

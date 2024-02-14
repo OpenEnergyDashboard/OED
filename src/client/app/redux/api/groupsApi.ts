@@ -10,9 +10,9 @@ import { GroupChildren, GroupData } from '../../types/redux/groups';
 import { baseApi } from './baseApi';
 export const groupsAdapter = createEntityAdapter<GroupData>({
 	sortComparer: (groupA, groupB) => groupA.name?.localeCompare(groupB.name, undefined, { sensitivity: 'accent' })
-})
-export const groupsInitialState = groupsAdapter.getInitialState()
-export type GroupDataState = EntityState<GroupData, number>
+});
+export const groupsInitialState = groupsAdapter.getInitialState();
+export type GroupDataState = EntityState<GroupData, number>;
 
 export const groupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({

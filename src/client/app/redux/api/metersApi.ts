@@ -16,8 +16,8 @@ export const meterAdapter = createEntityAdapter<MeterData>({
 	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
 
 })
-export const metersInitialState = meterAdapter.getInitialState()
-export type MeterDataState = EntityState<MeterData, number>
+export const metersInitialState = meterAdapter.getInitialState();
+export type MeterDataState = EntityState<MeterData, number>;
 
 export const metersApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -76,7 +76,7 @@ export const metersApi = baseApi.injectEndpoints({
 })
 
 
-export const selectMeterDataResult = metersApi.endpoints.getMeters.select()
+export const selectMeterDataResult = metersApi.endpoints.getMeters.select();
 
 export const {
 	selectAll: selectAllMeters,
@@ -84,8 +84,7 @@ export const {
 	selectTotal: selectMeterTotal,
 	selectIds: selectMeterIds,
 	selectEntities: selectMeterDataById
-} = meterAdapter.getSelectors((state: RootState) => selectMeterDataResult(state).data ?? metersInitialState)
-
+} = meterAdapter.getSelectors((state: RootState) => selectMeterDataResult(state).data ?? metersInitialState);
 
 /**
  * Selects the name of the meter associated with a given meter ID from the Redux state.
@@ -98,7 +97,7 @@ export const {
 export const selectMeterNameById = (state: RootState, meterID: number) => {
 	const meterInfo = selectMeterById(state, meterID);
 	return meterInfo ? meterInfo.name : '';
-}
+};
 
 /**
  * Selects the identifier (not the meter ID) of the meter associated with a given meter ID from the Redux state.
@@ -111,4 +110,4 @@ export const selectMeterNameById = (state: RootState, meterID: number) => {
 export const selectMeterIdentifierById = (state: RootState, meterID: number) => {
 	const meterInfo = selectMeterById(state, meterID);
 	return meterInfo ? meterInfo.identifier : '';
-}
+};

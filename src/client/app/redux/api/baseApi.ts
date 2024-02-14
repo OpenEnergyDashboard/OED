@@ -16,11 +16,11 @@ export const baseApi = createApi({
 			// For each api call attempt to set the JWT token in the request header
 			// Token placed in store either on startup after validation, or via credentialed login
 			if (state.currentUser.token) {
-				headers.set('token', state.currentUser.token)
+				headers.set('token', state.currentUser.token);
 			}
 		},
-		// Default Behavior assumes all response are json
-		// use content type cause API responses are varied
+		// Default Behavior assumes all responses are json
+		// use content type because API responses are varied
 		// TODO Validate Behavior against all endpoints
 		responseHandler: 'content-type'
 	}),
