@@ -21,14 +21,15 @@ import { processGraphLink } from './graphSlice';
 export interface AppState {
 	initComplete: boolean;
 	optionsVisibility: boolean;
+	chartLinkHideOptions: boolean;
 	selectedLanguage: LanguageTypes;
 }
 
 const defaultState: AppState = {
 	initComplete: false,
 	optionsVisibility: true,
-	selectedLanguage: LanguageTypes.en
-
+	selectedLanguage: LanguageTypes.en,
+	chartLinkHideOptions: false
 }
 
 export const appStateSlice = createThunkSlice({
@@ -49,6 +50,10 @@ export const appStateSlice = createThunkSlice({
 		updateSelectedLanguage: create.reducer<LanguageTypes>((state, action) => {
 			state.selectedLanguage = action.payload
 			moment.locale(action.payload)
+		}),
+		setChartLinkOptionsVisibility: create.reducer<boolean>((state, action) => {
+			state.chartLinkHideOptions = action.payload
+
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
@@ -115,7 +120,8 @@ export const appStateSlice = createThunkSlice({
 	selectors: {
 		selectInitComplete: state => state.initComplete,
 		selectOptionsVisibility: state => state.optionsVisibility,
-		selectSelectedLanguage: state => state.selectedLanguage
+		selectSelectedLanguage: state => state.selectedLanguage,
+		selectChartLinkHideOptions: state => state.chartLinkHideOptions
 	}
 })
 
@@ -124,11 +130,13 @@ export const {
 	setInitComplete,
 	toggleOptionsVisibility,
 	setOptionsVisibility,
-	updateSelectedLanguage
+	updateSelectedLanguage,
+	setChartLinkOptionsVisibility
 } = appStateSlice.actions
 
 export const {
 	selectInitComplete,
 	selectOptionsVisibility,
-	selectSelectedLanguage
+	selectSelectedLanguage,
+	selectChartLinkHideOptions
 } = appStateSlice.selectors

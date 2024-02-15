@@ -70,7 +70,6 @@ export interface GraphState {
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	lineGraphRate: LineGraphRate;
-	renderOnce: boolean;
 	showMinMax: boolean;
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;

@@ -5,7 +5,6 @@
 import * as React from 'react';
 import ReactTooltip from 'react-tooltip';
 import ExportComponent from '../components/ExportComponent';
-import ChartLinkContainer from '../containers/ChartLinkContainer';
 import { selectChartToRender } from '../redux/slices/graphSlice';
 import { useAppSelector } from '../redux/reduxHooks';
 import { ChartTypes } from '../types/redux/graph';
@@ -19,6 +18,7 @@ import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
+import ChartLinkComponent from './ChartLinkComponent';
 
 /**
  * @returns the UI Control panel
@@ -81,7 +81,7 @@ export default function UIOptionsComponent() {
 				chartToRender !== ChartTypes.threeD &&
 				chartToRender !== ChartTypes.radar && <ExportComponent />
 			}
-			<ChartLinkContainer />
+			<ChartLinkComponent />
 		</div>
 	);
 }
