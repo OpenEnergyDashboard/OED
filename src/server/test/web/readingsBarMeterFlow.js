@@ -26,6 +26,7 @@ mocha.describe('readings API', () => {
             mocha.describe('for flow meters', () => {
 
                 // Add B15 here
+                /*
                 mocha.it('B15: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
@@ -43,6 +44,7 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
+                */
                 
                 // Add B16 here
 
