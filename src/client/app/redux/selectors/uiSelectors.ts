@@ -59,7 +59,7 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 			}
 			else if (selectedUnitId === -99) {
 				// no unitSelected, but has a default unit
-				compatibleMeters.add(meterId)
+				compatibleMeters.add(meterId);
 			}
 			else {
 				// A unit is selected
@@ -219,18 +219,17 @@ export const selectChartTypeCompatibility = createAppSelector(
 	}
 )
 
-//Filter compatible entities from selected Meters
+// Filter compatible entities from selected Meters
 export const selectCompatibleSelectedMeters = createAppSelector(
 	[selectSelectedMeters, selectChartTypeCompatibility],
 	(selectedMeters, { compatibleMeters }) => selectedMeters.filter(id => compatibleMeters.has(id))
 )
 
-//Filter compatible entities from selected Groups
+// Filter compatible entities from selected Groups
 export const selectCompatibleSelectedGroups = createAppSelector(
 	[selectSelectedGroups, selectChartTypeCompatibility],
 	(selectedMeters, { compatibleGroups }) => selectedMeters.filter(id => compatibleGroups.has(id))
 )
-
 
 export const selectMeterGroupSelectData = createAppSelector(
 	[
@@ -249,46 +248,44 @@ export const selectMeterGroupSelectData = createAppSelector(
 		const incompatibleSelectedMeters = new Set<number>();
 		selectedMeters.forEach(meterID => {
 			// Sort and populate compatible/incompatible based on previous selector's compatible meters
-			compatibleMeters.has(meterID) ? compatibleSelectedMeters.add(meterID) : incompatibleSelectedMeters.add(meterID)
+			compatibleMeters.has(meterID) ? compatibleSelectedMeters.add(meterID) : incompatibleSelectedMeters.add(meterID);
 		});
 		const compatibleSelectedGroups = new Set<number>();
 		const incompatibleSelectedGroups = new Set<number>();
 		selectedGroups.forEach(groupID => {
 			// Sort and populate compatible/incompatible based on previous selector's compatible groups
-			compatibleGroups.has(groupID) ? compatibleSelectedGroups.add(groupID) : incompatibleSelectedGroups.add(groupID)
+			compatibleGroups.has(groupID) ? compatibleSelectedGroups.add(groupID) : incompatibleSelectedGroups.add(groupID);
 		});
 
 		// The Multiselect's current selected value(s) as compatible/ incompatible options
-		const selectedMeterOptions = getSelectOptionsByEntity(compatibleSelectedMeters, incompatibleSelectedMeters, meterDataById)
-		const selectedGroupOptions = getSelectOptionsByEntity(compatibleSelectedGroups, incompatibleSelectedGroups, groupDataById)
+		const selectedMeterOptions = getSelectOptionsByEntity(compatibleSelectedMeters, incompatibleSelectedMeters, meterDataById);
+		const selectedGroupOptions = getSelectOptionsByEntity(compatibleSelectedGroups, incompatibleSelectedGroups, groupDataById);
 
 		// All selected values even if not graph-able. Non compatible will be visually marked as disabled in custom react-select component(s)
-		const allSelectedMeterValues = selectedMeterOptions.compatible.concat(selectedMeterOptions.incompatible)
-		const allSelectedGroupValues = selectedGroupOptions.compatible.concat(selectedGroupOptions.incompatible)
+		const allSelectedMeterValues = selectedMeterOptions.compatible.concat(selectedMeterOptions.incompatible);
+		const allSelectedGroupValues = selectedGroupOptions.compatible.concat(selectedGroupOptions.incompatible);
 
 		// List of options with metadata for react-select independent of currently selected. (Used to Populate the Select List(s))
-		const meterSelectOptions = getSelectOptionsByEntity(compatibleMeters, incompatibleMeters, meterDataById)
-		const groupSelectOptions = getSelectOptionsByEntity(compatibleGroups, incompatibleGroups, groupDataById)
+		const meterSelectOptions = getSelectOptionsByEntity(compatibleMeters, incompatibleMeters, meterDataById);
+		const groupSelectOptions = getSelectOptionsByEntity(compatibleGroups, incompatibleGroups, groupDataById);
 
 		// Format The generated selectOptions into grouped options for the React-Select component
 		const meterGroupedOptions: GroupedOption[] = [
 			{ label: 'Meters', options: meterSelectOptions.compatible },
 			{ label: 'Incompatible Meters', options: meterSelectOptions.incompatible }
-		]
+		];
 		const groupsGroupedOptions: GroupedOption[] = [
 			{ label: 'Options', options: groupSelectOptions.compatible },
 			{ label: 'Incompatible Options', options: groupSelectOptions.incompatible }
-		]
+		];
 
 		return {
 			meterGroupedOptions, groupsGroupedOptions,
 			selectedMeterOptions, selectedGroupOptions,
 			allSelectedMeterValues, allSelectedGroupValues
-		}
+		};
 	}
 )
-
-
 
 export const selectUnitSelectData = createAppSelector(
 	[
@@ -360,12 +357,12 @@ export const selectUnitSelectData = createAppSelector(
 				options: unitOptions.incompatible
 			}
 		]
-		return unitsGroupedOptions
+		return unitsGroupedOptions;
 	}
 )
 
 /**
- *  Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
+ * Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
  * Visibility is determined by which set the items are contained in.
  * @param compatibleItems - compatible items to make select options for
  * @param incompatibleItems - incompatible items to make select options for
@@ -376,16 +373,15 @@ export function getSelectOptionsByEntity(
 	compatibleItems: Set<number>,
 	incompatibleItems: Set<number>, dataById: MeterDataByID | GroupDataByID | UnitDataById
 ) {
-
 	//The final list of select options to be displayed
 	const compatibleItemOptions = Object.entries(dataById)
 		.filter(([id]) => compatibleItems.has(Number(id)))
 		.map(([id, entity]) => {
 			// Groups unit and meters have identifier, groups doesn't
-			const label = selectNameFromEntity(entity)
+			const label = selectNameFromEntity(entity);
 			// MeterAnd Group, undefined for units
-			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity)
-			const meterOrGroup = selectMeterOrGroupFromEntity(entity)
+			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity);
+			const meterOrGroup = selectMeterOrGroupFromEntity(entity);
 			return {
 				value: Number(id),
 				label: label,
@@ -393,33 +389,31 @@ export function getSelectOptionsByEntity(
 				isDisabled: false,
 				meterOrGroup: meterOrGroup,
 				defaultGraphicUnit: defaultGraphicUnit
-			} as SelectOption
-		})
+			} as SelectOption;
+		});
 
 	//Loop over each itemId and create an activated select option
 	const incompatibleItemOptions = Object.entries(dataById)
 		.filter(([id]) => incompatibleItems.has(Number(id)))
 		.map(([id, entity]) => {
-			const label = selectNameFromEntity(entity)
+			const label = selectNameFromEntity(entity);
 			// MeterAnd Group, undefined for units
-			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity)
-			const meterOrGroup = selectMeterOrGroupFromEntity(entity)
+			const defaultGraphicUnit = selectDefaultGraphicUnitFromEntity(entity);
+			const meterOrGroup = selectMeterOrGroupFromEntity(entity);
 			return {
 				value: Number(id),
 				label: label,
-				// If option is compatible then not disabled
+				// If option is incompatible then disabled
 				isDisabled: true,
 				meterOrGroup: meterOrGroup,
 				defaultGraphicUnit: defaultGraphicUnit
-			} as SelectOption
-		})
+			} as SelectOption;
+		});
 
-	const compatible = _.sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc')
-	const incompatible = _.sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc')
-	return { compatible, incompatible }
+	const compatible = _.sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc');
+	const incompatible = _.sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc');
+	return { compatible, incompatible };
 }
-
-
 
 // Helper function for area compatibility
 // areaNorm should be active when called
@@ -429,12 +423,12 @@ export const isAreaNormCompatible = (
 	const meterGraphingUnit = meterOrGroupData[id].defaultGraphicUnit;
 
 	// If no unit is selected then no meter/group should be selected if meter type is raw
-	const noUnitAndRaw = selectedUnit === -99 && unitDataById[meterGraphingUnit]?.unitRepresent === UnitRepresentType.raw
+	const noUnitAndRaw = selectedUnit === -99 && unitDataById[meterGraphingUnit]?.unitRepresent === UnitRepresentType.raw;
 
 	// do not allow meter to be selected if it has zero area or no area unit
-	const noAreaOrUnitType = meterOrGroupData[id].area === 0 || meterOrGroupData[id].areaUnit === AreaUnitType.none
-	const isAreaNormCompatible = !noUnitAndRaw && !noAreaOrUnitType
-	return isAreaNormCompatible
+	const noAreaOrUnitType = meterOrGroupData[id].area === 0 || meterOrGroupData[id].areaUnit === AreaUnitType.none;
+	const isAreaNormCompatible = !noUnitAndRaw && !noAreaOrUnitType;
+	return isAreaNormCompatible;
 }
 
 export const selectChartLink = createAppSelector(
@@ -493,14 +487,14 @@ export const selectChartLink = createAppSelector(
 		linkText += `&areaUnit=${current.selectedAreaUnit}&areaNormalization=${current.areaNormalization}`;
 		linkText += `&minMax=${current.showMinMax}`;
 		if (chartLinkHideOptions) {
-			linkText += '&optionsVisibility=false'
+			linkText += '&optionsVisibility=false';
 		}
-		return linkText
+		return linkText;
 	}
 )
 
 export const selectAnythingFetching = (state: RootState) => {
-	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending)
+	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending);
 	return anythingLoading;
 }
 

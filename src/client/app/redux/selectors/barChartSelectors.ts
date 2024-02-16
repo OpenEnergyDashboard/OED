@@ -24,13 +24,14 @@ export const selectPlotlyBarDeps = createAppSelector(
 		const barGroupDeps = { ...groupDeps, barDuration }
 		return { barMeterDeps, barGroupDeps }
 	}
-)
+);
 
-// Selector that derives meter data for the line graphic
+// Selector that derives meter data for the bar graphic
 export const selectPlotlyBarDataFromResult = createSelector.withTypes<BarReadings>()(
 	[
 		// Query data
-		data => data,	// Data derivation dependencies. Use ReturnType inference to get type from dependency selector.
+		// Data derivation dependencies. Use ReturnType inference to get type from dependency selector.
+		data => data,
 		(_data, dependencies: PlotlyBarDeps) => dependencies
 	],
 	(data, { areaNormalization, compatibleEntities, meterDataById, groupDataById, meterOrGroup, barDuration, barUnitLabel, areaUnit }) => {
@@ -79,4 +80,5 @@ export const selectPlotlyBarDataFromResult = createSelector.withTypes<BarReading
 				}
 			})
 		return plotlyData
-	})
+	}
+);

@@ -67,7 +67,7 @@ export const selectCommonQueryArgs = createSelector(
 		const groupSkip = !groupArgs.ids.length;
 
 		// Most Queries share these arguments, however values can be appended, or omitted per endpoint specification
-		return { meterArgs, groupArgs, meterSkip, groupSkip }
+		return { meterArgs, groupArgs, meterSkip, groupSkip };
 	}
 )
 
@@ -79,7 +79,7 @@ export const selectLineChartQueryArgs = createSelector(
 		const groupArgs: LineReadingApiArgs = common.groupArgs;
 		const meterShouldSkip = common.meterSkip;
 		const groupShouldSkip = common.groupSkip;
-		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
+		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 )
 
@@ -96,7 +96,7 @@ export const selectBarChartQueryArgs = createSelector(
 	selectBarWidthDays,
 	(common, barWidthDays) => {
 		// QueryArguments to pass into the bar chart component
-		const barWidthAsDays = Math.round(barWidthDays.asDays())
+		const barWidthAsDays = Math.round(barWidthDays.asDays());
 		// copy common args, then add bar chart args
 		const meterArgs: BarReadingApiArgs = {
 			...common.meterArgs,
@@ -108,7 +108,7 @@ export const selectBarChartQueryArgs = createSelector(
 		};
 		const meterShouldSkip = common.meterSkip;
 		const groupShouldSkip = common.groupSkip;
-		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
+		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 )
 
@@ -121,21 +121,21 @@ export const selectCompareChartQueryArgs = createSelector(
 			shift: calculateCompareShift(comparePeriod).toISOString(),
 			curr_start: compareTimeInterval.getStartTimestamp()?.toISOString(),
 			curr_end: compareTimeInterval.getEndTimestamp()?.toISOString()
-		}
+		};
 		const meterArgs: CompareReadingApiArgs = {
 			// compare currently doesn't use the global time interval, so omit
 			..._.omit(common.meterArgs, 'timeInterval'),
 			...compareArgs
 
-		}
+		};
 		const groupArgs: CompareReadingApiArgs = {
 			// compare currently doesn't use the global time interval, so omit
 			..._.omit(common.groupArgs, 'timeInterval'),
 			...compareArgs
-		}
+		};
 		const meterShouldSkip = common.meterSkip;
 		const groupShouldSkip = common.groupSkip;
-		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
+		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 )
 
@@ -148,26 +148,25 @@ export const selectMapChartQueryArgs = createSelector(
 			queryTimeInterval.equals(TimeInterval.unbounded())
 				? moment.duration(4, 'weeks')
 				: moment.duration(queryTimeInterval.duration('days'), 'days')
-		).asDays())
+		).asDays());
 
 		const meterArgs: MapReadingApiArgs = {
 			...barChartArgs.meterArgs,
 			// Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 			barWidthDays: durationDays
-		}
+		};
 		const groupArgs: MapReadingApiArgs = {
 			...barChartArgs.groupArgs,
 			// Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 			barWidthDays: durationDays
 
-		}
-		const meterShouldSkip = barChartArgs.meterShouldSkip || maps.selectedMap === 0
-		const groupShouldSkip = barChartArgs.groupShouldSkip || maps.selectedMap === 0
-		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip }
+		};
+		const meterShouldSkip = barChartArgs.meterShouldSkip || maps.selectedMap === 0;
+		const groupShouldSkip = barChartArgs.groupShouldSkip || maps.selectedMap === 0;
+		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 
 )
-
 
 // Selector prepares the query args for ALL graph endpoints based on the current graph slice state
 // TODO Break down into individual selectors?
@@ -184,8 +183,8 @@ export const selectThreeDQueryArgs = createSelector(
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
 		}
-		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded()
-		return { args, shouldSkipQuery }
+		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
+		return { args, shouldSkipQuery };
 	}
 )
 

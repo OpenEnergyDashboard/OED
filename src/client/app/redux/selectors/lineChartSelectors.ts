@@ -18,9 +18,9 @@ type PlotlyLineDeps = ReturnType<typeof selectPlotlyMeterDeps> & { showMinMax: b
 export const selectLineChartDeps = createAppSelector(
 	[selectPlotlyMeterDeps, selectPlotlyGroupDeps, selectShowMinMax],
 	(meterDep, groupDep, showMinMax) => {
-		const meterDeps = { ...meterDep, showMinMax }
-		const groupDeps = { ...groupDep, showMinMax }
-		return { meterDeps, groupDeps }
+		const meterDeps = { ...meterDep, showMinMax };
+		const groupDeps = { ...groupDep, showMinMax };
+		return { meterDeps, groupDeps };
 	}
 )
 
@@ -34,11 +34,11 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 			// compatible entities is using the same data deriving selectors as the select option for group, & meter.
 			.filter(([groupID]) => compatibleEntities.includes((Number(groupID))))
 			.map(([id, readings]) => {
-				const meterInfo = meterDataById[Number(id)]
+				const meterInfo = meterDataById[Number(id)];
 
-				const scaling = selectScalingFromEntity(meterInfo, areaUnit, areaNormalization, rateScaling)
-				const label = selectNameFromEntity(meterInfo)
-				const colorID = meterInfo.id
+				const scaling = selectScalingFromEntity(meterInfo, areaUnit, areaNormalization, rateScaling);
+				const label = selectNameFromEntity(meterInfo);
+				const colorID = meterInfo.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data from the line readings
 				const xData: string[] = [];

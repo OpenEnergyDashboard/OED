@@ -41,17 +41,16 @@ export const selectAdminPreferences = createAppSelector(
 		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
 		defaultHelpUrl: adminState.defaultHelpUrl
 	})
-)
-
+);
 
 export const selectPossibleGraphicUnits = createAppSelector(
 	selectUnitDataById,
 	unitDataById => potentialGraphicUnits(unitDataById)
-)
+);
 
 /**
  * Calculates the set of all possible meter units for a meter.
- * This is any unit that is of type unit or suffix.
+ * This is any unit that is of type meter.
  * @returns The set of all possible graphic units for a meter
  */
 export const selectPossibleMeterUnits = createAppSelector(
@@ -69,22 +68,22 @@ export const selectPossibleMeterUnits = createAppSelector(
 		// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 		return possibleMeterUnits.add(noUnitTranslated());
 	}
-)
+);
 
 export const selectUnitName = createAppSelector(
 	// This is the unit associated with the meter.
 	// The first test of length is because the state may not yet be set when loading. This should not be seen
 	// since the state should be set and the page redrawn so just use 'no unit'.
 	// The second test of -99 is for meters without units.
-	// ThisSelector takes an argument, due to one or more of the selectors accepts an argument (selectUnitWithID selectMeterDataWithID)
+	// This Selector takes an argument, due to one or more of the selectors accepts an argument (selectUnitWithID selectMeterDataWithID)
 	selectUnitDataById,
 	selectMeterById,
 	(unitDataById, meterData) => {
 		const unitName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.unitId === -99) ?
-			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit]?.identifier
-		return unitName
+			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit]?.identifier;
+		return unitName;
 	}
-)
+);
 
 export const selectGraphicName = createAppSelector(
 	// This is the default graphic unit associated with the meter. See above for how code works.
@@ -93,11 +92,10 @@ export const selectGraphicName = createAppSelector(
 	selectMeterById,
 	(unitDataById, meterData) => {
 		const graphicName = (Object.keys(unitDataById).length === 0 || !meterData || meterData.defaultGraphicUnit === -99) ?
-			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier
-		return graphicName
+			noUnitTranslated().identifier : unitDataById[meterData.defaultGraphicUnit].identifier;
+		return graphicName;
 	}
-)
-
+);
 
 export const selectGraphicUnitCompatibility = createAppSelector(
 	[
@@ -163,9 +161,9 @@ export const selectGraphicUnitCompatibility = createAppSelector(
 			compatibleUnits = new Set(possibleMeterUnits);
 		}
 		// return compatibility for current selected unit(s)
-		return { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits, incompatibleUnits }
+		return { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits, incompatibleUnits };
 	}
-)
+);
 
 
 export const selectIsValidConversion = createAppSelector(
@@ -195,7 +193,6 @@ export const selectIsValidConversion = createAppSelector(
 
 		// Source or destination not set
 		if (sourceId == -999 || destinationId == -999) {
-			// TODO Translate Me!
 			return [false, translate('conversion.create.source.destination.not')];
 		}
 
@@ -213,21 +210,20 @@ export const selectIsValidConversion = createAppSelector(
 		}
 
 		// If there is a non bidirectional inverse, then it is a valid conversion
-
 		for (const conversion of Object.values(conversions)) {
 			// Loop over conversions and check for existence of inverse of conversion passed in
-			const inverseExists = (conversion.sourceId === destinationId) && (conversion.destinationId === sourceId)
-			const isBidirectional = conversion.bidirectional || bidirectional
+			const inverseExists = (conversion.sourceId === destinationId) && (conversion.destinationId === sourceId);
+			const isBidirectional = conversion.bidirectional || bidirectional;
 
 			// If there exists an inverse that is bidirectional, then there is no point in making a conversion since it is essentially a duplicate.
 			if (inverseExists && isBidirectional) {
-				return [false, translate('conversion.create.exists.inverse')]
+				return [false, translate('conversion.create.exists.inverse')];
 			}
 		}
-
-		return [true, 'Conversion is Valid']
+		// The return message is never shown to admin/used so not translated.
+		return [true, 'Conversion is Valid'];
 	}
-)
+);
 
 export const selectVisibleMeterAndGroupData = createAppSelector(
 	[
@@ -236,11 +232,11 @@ export const selectVisibleMeterAndGroupData = createAppSelector(
 		selectAllGroups
 	],
 	(visible, meterData, groupData) => {
-		const visibleMeters = meterData.filter(meterData => visible.meters.has(meterData.id))
-		const visibleGroups = groupData.filter(groupData => visible.groups.has(groupData.id))
-		return { visibleMeters, visibleGroups }
+		const visibleMeters = meterData.filter(meterData => visible.meters.has(meterData.id));
+		const visibleGroups = groupData.filter(groupData => visible.groups.has(groupData.id));
+		return { visibleMeters, visibleGroups };
 	}
-)
+);
 
 export const selectDefaultCreateMeterValues = createAppSelector(
 	[selectAdminPreferences],
@@ -283,11 +279,10 @@ export const selectDefaultCreateMeterValues = createAppSelector(
 			maxDate: adminPreferences.defaultMeterMaximumDate,
 			maxError: adminPreferences.defaultMeterMaximumErrors,
 			disableChecks: adminPreferences.defaultMeterDisableChecks
-		}
-
-		return defaultValues
+		};
+		return defaultValues;
 	}
-)
+);
 
 export const selectDefaultCreateConversionValues = createAppSelector(
 	[selectAllUnits],
@@ -303,7 +298,7 @@ export const selectDefaultCreateConversionValues = createAppSelector(
 			slope: 0,
 			intercept: 0,
 			note: ''
-		}
-		return defaultValues
+		};
+		return defaultValues;
 	}
-)
+);

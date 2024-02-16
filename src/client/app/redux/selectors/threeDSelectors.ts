@@ -20,13 +20,13 @@ export const selectThreeDComponentInfo = createSelector(
 	selectMeterDataById,
 	selectGroupDataById,
 	(id, meterOrGroup, meterDataById, groupDataById) => {
-		//Default Values
-		let meterOrGroupName = 'Unselected Meter or Group'
+		// Default Values
+		let meterOrGroupName = 'Unselected Meter or Group';
 		let isAreaCompatible = true;
 
 		if (id && meterDataById[id]) {
-			const entity = meterOrGroup === MeterOrGroup.meters ? meterDataById[id] : groupDataById[id]
-			meterOrGroupName = selectNameFromEntity(entity)
+			const entity = meterOrGroup === MeterOrGroup.meters ? meterDataById[id] : groupDataById[id];
+			meterOrGroupName = selectNameFromEntity(entity);
 			// Get Meter or Group's info
 			if (meterOrGroup === MeterOrGroup.meters && entity) {
 				isAreaCompatible = entity.area !== 0 && entity.areaUnit !== AreaUnitType.none;
@@ -34,14 +34,12 @@ export const selectThreeDComponentInfo = createSelector(
 				meterOrGroupName = entity.name;
 				isAreaCompatible = entity.area !== 0 && entity.areaUnit !== AreaUnitType.none;
 			}
-
 		}
 		return {
 			meterOrGroupID: id,
 			meterOrGroup: meterOrGroup,
 			meterOrGroupName: meterOrGroupName,
 			isAreaCompatible: isAreaCompatible
-		}
+		};
 	}
-
 )

@@ -28,8 +28,8 @@ const stableEmptyData: BarReadings = {}
  */
 export default function BarChartComponent() {
 	const dispatch = useAppDispatch();
-	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps)
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs)
+	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
@@ -48,16 +48,16 @@ export default function BarChartComponent() {
 
 	const barStacking = useAppSelector(selectBarStacking);
 	// The unit label depends on the unit which is in selectUnit state.
-	const raw = useAppSelector(selectIsRaw)
-	const unitLabel = useAppSelector(selectBarUnitLabel)
-	const locale = useAppSelector(selectSelectedLanguage)
+	const raw = useAppSelector(selectIsRaw);
+	const unitLabel = useAppSelector(selectBarUnitLabel);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
 
 	if (meterIsFetching || groupIsFetching) {
-		return <SpinnerComponent loading width={50} height={50} />
+		return <SpinnerComponent loading width={50} height={50} />;
 	}
 
 	const handleRelayout = (e: PlotRelayoutEvent) => {
@@ -66,8 +66,8 @@ export default function BarChartComponent() {
 		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
 			// The event signals changes in the user's interaction with the graph.
 			// this will automatically trigger a refetch due to updating a query arg.
-			const startTS = moment.utc(e['xaxis.range[0]'])
-			const endTS = moment.utc(e['xaxis.range[1]'])
+			const startTS = moment.utc(e['xaxis.range[0]']);
+			const endTS = moment.utc(e['xaxis.range[1]']);
 			const workingTimeInterval = new TimeInterval(startTS, endTS);
 			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
 		}
@@ -77,17 +77,17 @@ export default function BarChartComponent() {
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
 
 	if (raw) {
-		return <h1><b>${translate('bar.raw')}</b></h1>
+		return <h1><b>${translate('bar.raw')}</b></h1>;
 	}
 	// At least one viable dataset.
-	const enoughData = datasets.find(dataset => dataset.x!.length > 1)
+	const enoughData = datasets.find(dataset => dataset.x!.length > 1);
 
 	if (datasets.length === 0) {
 		return <h1>
 			{`${translate('select.meter.group')}`}
-		</h1>
+		</h1>;
 	} else if (!enoughData) {
-		return <h1>{`${translate('threeD.no.data')}`}</h1>
+		return <h1>{`${translate('threeD.no.data')}`}</h1>;
 	} else {
 		return (
 			<Plot
