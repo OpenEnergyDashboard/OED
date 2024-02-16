@@ -25,11 +25,60 @@ mocha.describe('readings API', () => {
         mocha.describe('for bar charts', () => {
             mocha.describe('for flow meters', () => {
 
-                // Add B15 here
-                /*
                 mocha.it('B15: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
+                    const unitData = [
+                        {
+                            // u4
+                            name: 'kW',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true,
+                            note: 'kilowatts'
+                        },
+                        {
+                            // u5
+                            name: 'Electric',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
+                    ];
+                    const conversionData = [
+                        {
+                            // c4
+                            sourceName: 'Electric',
+                            destinationName: 'kW',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'Electric → kW'
+                        }
+                    ];
+                    const meterData = [
+                        {
+                            name: 'Electric kW',
+                            unit: 'Electric',
+                            defaultGraphicUnit: 'kW',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
                     // Load the data into the database
-                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                    await prepareTest(unitData, conversionData, meterData);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kW');
                     // Load the expected response data from the corresponding csv file
@@ -44,8 +93,7 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-                */
-                
+
                 // Add B16 here
 
             });
