@@ -11,14 +11,15 @@ const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
-    createTimeString,
+    //createTimeString,
     expectReadingToEqualExpected,
     getUnitId,
     ETERNITY,
     METER_ID,
-    unitDatakWh,
-    conversionDatakWh,
-    meterDatakWh } = require('../../util/readingsUtils');
+    //unitDatakWh,
+    //conversionDatakWh,
+    //meterDatakWh 
+    } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
