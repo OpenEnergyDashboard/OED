@@ -38,7 +38,6 @@ export interface GroupChildren {
 	childGroups: number[];
 }
 
-
 export interface StatefulEditable {
 	dirty: boolean;
 	submitted?: boolean;

@@ -7,17 +7,6 @@
 * Defines the action interfaces used in the corresponding reducers.
 */
 
-// export interface RequestVersion {
-// 	type: ActionType.RequestVersion;
-// }
-
-// export interface ReceiveVersion {
-// 	type: ActionType.ReceiveVersion;
-// 	data: string;
-// }
-
-// export type VersionAction = RequestVersion | ReceiveVersion;
-
 export interface VersionState {
 	isFetching: boolean;
 	version: string;

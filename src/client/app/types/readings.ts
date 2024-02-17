@@ -24,25 +24,20 @@ export interface LineReading extends BarReading {
 	max: number;
 }
 
-// export interface LineReadings {
-// 	[id: number]: LineReading[];
-// }
-export type LineReadings = Record<number, LineReading[]>
+export type LineReadings = Record<number, LineReading[]>;
 export interface BarReading {
 	reading: number;
 	startTimestamp: number;
 	endTimestamp: number;
 }
 
-// export interface BarReadings {
-// 	[id: number]: BarReading[];
-// }
-export type BarReadings = Record<number, BarReading[]>
+export type BarReadings = Record<number, BarReading[]>;
 
 interface ReadingInterval {
 	startTimestamp: number;
 	endTimestamp: number;
 }
+
 export interface ThreeDReading {
 	xData: ReadingInterval[];
 	yData: number[];

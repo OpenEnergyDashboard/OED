@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export enum UnitType {
 	unit = 'unit',
@@ -48,10 +48,8 @@ export interface UnitEditData {
 	note: string;
 }
 
-// export interface UnitDataById {
-// 	[unitId: number]: UnitData;
-// }
 export interface UnitDataById extends Record<number, UnitData> { }
+
 export interface UnitsState {
 	hasBeenFetchedOnce: boolean,
 	isFetching: boolean;

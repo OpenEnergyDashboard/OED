@@ -47,7 +47,6 @@ export interface LineGraphRate {
 
 export type MeterOrGroupID = number;
 export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
-export enum ByMeterOrGroup { meters = 'byMeterID', groups = 'byGroupID' }
 export type MeterOrGroupPill = { meterOrGroupID: number, isDisabled: boolean, meterOrGroup: MeterOrGroup }
 
 export interface ThreeDState {

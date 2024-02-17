@@ -24,7 +24,7 @@ export interface SelectOption {
 }
 export interface GroupedOption {
 	label: string;
-	options: SelectOption[]
+	options: SelectOption[];
 }
 
 /**

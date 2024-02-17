@@ -60,7 +60,7 @@ export const adminSlice = createSlice({
 			state.defaultAreaUnit = action.payload;
 			state.submitted = false;
 		},
-		updateDefaultTimeZone: (state, action: PayloadAction<string>) => {
+		updateDefaultTimezone: (state, action: PayloadAction<string>) => {
 			state.defaultTimezone = action.payload;
 			state.submitted = false;
 		},
@@ -152,7 +152,7 @@ export const {
 	updateDisplayTitle,
 	updateDefaultChartToRender,
 	updateDefaultLanguage,
-	updateDefaultTimeZone,
+	updateDefaultTimezone,
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit,
 	updateDefaultAreaUnit,

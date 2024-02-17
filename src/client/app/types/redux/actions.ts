@@ -82,7 +82,7 @@ export enum ActionType {
 	ToggleDefaultBarStacking = 'TOGGLE_DEFAULT_BAR_STACKING',
 	ToggleDefaultAreaNormalization = 'TOGGLE_DEFAULT_AREA_NORMALIZATION',
 	UpdateDefaultAreaUnit = 'UPDATE_DEFAULT_AREA_UNIT',
-	UpdateDefaultTimeZone = 'UPDATE_DEFAULT_TIMEZONE',
+	UpdateDefaultTimezone = 'UPDATE_DEFAULT_TIMEZONE',
 	UpdateDefaultLanguage = 'UPDATE_DEFAULT_LANGUAGE',
 	RequestPreferences = 'REQUEST_PREFERENCES',
 	ReceivePreferences = 'RECEIVE_PREFERENCES',
