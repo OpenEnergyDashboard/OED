@@ -1,9 +1,9 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
-
 import * as moment from 'moment';
 import { BarReading, LineReading, RawReadings } from '../types/readings';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';

@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { defineMessages, createIntl, createIntlCache } from 'react-intl';
 import { LocaleDataKey, TranslationKey } from '../translations/data';
@@ -16,7 +16,6 @@ function translate(messageID: string): string;
  * @returns get translated string given a key
  */
 function translate(messageID: LocaleDataKey | string): string {
-
 	// TODO BANDAID FIX
 	// Application wasn't loading due to store.getState() returning undefined after adding call to translation in GraphicRateMenuComponent
 	// My guess is that the call to store.getState() was too early as the store hadn't finished loading completely
@@ -38,4 +37,4 @@ function translate(messageID: LocaleDataKey | string): string {
 	return intl.formatMessage(defineMessages({ [messageID]: { id: messageID } })[messageID]);
 }
 
-export default translate
+export default translate;

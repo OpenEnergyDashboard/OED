@@ -16,7 +16,6 @@ import { GroupData } from '../types/redux/groups';
 import { UnitData, UnitType } from '../types/redux/units';
 import { selectAllMeters, selectMeterDataById } from '../redux/api/metersApi';
 
-
 /**
  * The intersect operation of two sets.
  * @param setA The first set.
@@ -77,7 +76,7 @@ export function unitsCompatibleWithUnit(unitId: number): Set<number> {
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
 	// Do same if pik is not yet available.
-	const pik = selectPik(store.getState())
+	const pik = selectPik(store.getState());
 	if (unitId != -99 && pik) {
 		// Get the row index in Pik of this unit.
 		const row = pRowFromUnit(unitId);
@@ -201,7 +200,7 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 	// Get the units that are compatible with this set of meters.
 	const currentUnits = unitsCompatibleWithMeters(deepMetersSet);
 	// Get all meters' state.
-	const meterData = selectAllMeters(state)
+	const meterData = selectAllMeters(state);
 
 	// Options for the meter menu.
 	const options: SelectOption[] = [];
@@ -316,7 +315,7 @@ export function getCompatibilityChangeCase(currentUnits: Set<number>, idToAdd: n
 function getCompatibleUnits(id: number, type: DataType, deepMeters: number[]): Set<number> {
 	if (type == DataType.Meter) {
 		const state = store.getState();
-		const meterDataByID = selectMeterDataById(state)
+		const meterDataByID = selectMeterDataById(state);
 		// Get the unit id of meter.
 		const unitId = meterDataByID[id].unitId;
 		// Returns all compatible units with this unit id.

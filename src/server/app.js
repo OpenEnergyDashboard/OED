@@ -103,7 +103,6 @@ router.get('*', (req, res) => {
 	});
 });
 
-
 app.use(router);
 
 app.use((req, res) => {
