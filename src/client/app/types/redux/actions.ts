@@ -77,7 +77,6 @@ export enum ActionType {
 	ConfirmGroupsFetchedOnce = 'CONFIRM_GROUPS_FETCHED_ONCE',
 	ConfirmAllGroupsChildrenFetchedOnce = 'CONFIRM_ALL_GROUPS_CHILDREN_FETCHED_ONCE',
 
-	UpdateImportMeter = 'UPDATE_IMPORT_METER',
 	UpdateDisplayTitle = 'UPDATE_DISPLAY_TITLE',
 	UpdateDefaultChartToRender = 'UPDATE_DEFAULT_CHART_TO_RENDER',
 	ToggleDefaultBarStacking = 'TOGGLE_DEFAULT_BAR_STACKING',

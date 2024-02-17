@@ -13,7 +13,6 @@ import { durationFormat } from '../../utils/durationFormat';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export const defaultAdminState: AdminState = {
-	selectedMeter: null,
 	displayTitle: '',
 	defaultChartToRender: ChartTypes.line,
 	defaultBarStacking: false,
@@ -41,9 +40,6 @@ export const adminSlice = createSlice({
 	name: 'admin',
 	initialState: defaultAdminState,
 	reducers: {
-		updateImportMeter: (state, action: PayloadAction<number>) => {
-			state.selectedMeter = action.payload;
-		},
 		updateDisplayTitle: (state, action: PayloadAction<string>) => {
 			state.displayTitle = action.payload;
 			state.submitted = false;

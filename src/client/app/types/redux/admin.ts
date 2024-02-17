@@ -8,7 +8,6 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 
 export interface AdminState {
-	selectedMeter: number | null;
 	displayTitle: string;
 	defaultChartToRender: ChartTypes;
 	defaultBarStacking: boolean;
