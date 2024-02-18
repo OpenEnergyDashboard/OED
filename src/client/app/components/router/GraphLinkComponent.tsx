@@ -14,20 +14,20 @@ export const GraphLink = () => {
 	const [URLSearchParams] = useSearchParams();
 	const { initComplete } = useWaitForInit();
 	React.useEffect(() => {
-		const linkIsValid = validateHotlink(URLSearchParams)
+		const linkIsValid = validateHotlink(URLSearchParams);
 		if (linkIsValid) {
-			dispatch(processGraphLink(URLSearchParams))
+			dispatch(processGraphLink(URLSearchParams));
 		}
 	}, [])
 
 	if (!initComplete) {
-		return <InitializingComponent />
+		return <InitializingComponent />;
 	}
-	return <Navigate to='/' replace />
+	return <Navigate to='/' replace />;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const validateHotlink = (params: URLSearchParams) => {
 	// TODO VALIDATE HOTLINK
-	return true
+	return true;
 }

@@ -11,36 +11,33 @@ import { selectChartLink } from '../redux/selectors/uiSelectors';
 import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
+import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-
 
 /**
  * @returns chartLinkComponent
  */
 export default function ChartLinkComponent() {
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch();
 	const [linkTextVisible, setLinkTextVisible] = React.useState<boolean>(false);
-	const linkText = useAppSelector(selectChartLink)
-	const linkHideOptions = useAppSelector(selectChartLinkHideOptions)
-	const selectedMeters = useAppSelector(selectSelectedMeters)
-	const selectedGroups = useAppSelector(selectSelectedGroups)
-	const ref = React.useRef<HTMLDivElement>(null)
+	const linkText = useAppSelector(selectChartLink);
+	const linkHideOptions = useAppSelector(selectChartLinkHideOptions);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const ref = React.useRef<HTMLDivElement>(null);
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard.writeText(linkText)
 			.then(() => {
-				showInfoNotification('Copied To Clipboard', toast.POSITION.TOP_RIGHT, 1000)
+				showInfoNotification(translate('clipboard.copied'), toast.POSITION.TOP_RIGHT, 1000);
 			})
 			.catch(() => {
 				// if operation fails, open copyable text for manual copy.
-				showErrorNotification('Failed to Copied To Clipboard!', toast.POSITION.TOP_RIGHT, 1000)
-				setLinkTextVisible(true)
+				showErrorNotification(translate('clipboard.not.copied'), toast.POSITION.TOP_RIGHT, 1000);
+				setLinkTextVisible(true);
 			})
-
-
-	}
+	};
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
-
 		return (
 			<div>
 				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
@@ -78,10 +75,10 @@ export default function ChartLinkComponent() {
 					</div>
 				}
 			</div >
-		)
+		);
 	}
 	else {
-		return null
+		return null;
 	}
 }
 

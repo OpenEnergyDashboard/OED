@@ -5,11 +5,13 @@
 import * as React from 'react';
 import ReactTooltip from 'react-tooltip';
 import ExportComponent from '../components/ExportComponent';
-import { selectChartToRender } from '../redux/slices/graphSlice';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectChartToRender } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import BarControlsComponent from './BarControlsComponent';
+import ChartDataSelectComponent from './ChartDataSelectComponent';
+import ChartLinkComponent from './ChartLinkComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import CompareControlsComponent from './CompareControlsComponent';
 import DateRangeComponent from './DateRangeComponent';
@@ -17,8 +19,6 @@ import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
-import ChartDataSelectComponent from './ChartDataSelectComponent';
-import ChartLinkComponent from './ChartLinkComponent';
 
 /**
  * @returns the UI Control panel

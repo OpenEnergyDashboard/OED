@@ -8,15 +8,14 @@ import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as React from 'react';
 import 'react-calendar/dist/Calendar.css';
 import { useDispatch } from 'react-redux';
-import { selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import { selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
+import '../styles/DateRangeCustom.css';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-
-import '../styles/DateRangeCustom.css'
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)

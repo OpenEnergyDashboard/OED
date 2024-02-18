@@ -11,14 +11,13 @@ import Select, {
 import makeAnimated from 'react-select/animated';
 import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
-import { graphSlice } from '../redux/slices/graphSlice';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { selectAnythingFetching, selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { graphSlice } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectAnythingFetching } from '../redux/selectors/uiSelectors';
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options
@@ -38,7 +37,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMetersOrGroups = newValues.map(option => option.value);
 		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
-	}
+	};
 
 	return (
 		<>
@@ -64,7 +63,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				isLoading={somethingIsFetching}
 			/>
 		</>
-	)
+	);
 }
 
 const groupStyles: React.CSSProperties = {
@@ -80,7 +79,7 @@ const formatGroupLabel = (data: GroupedOption) => {
 			<Badge pill color="primary">{data.options.length}</Badge>
 		</div >
 	)
-}
+};
 
 interface MeterAndGroupSelectProps {
 	meterOrGroup: MeterOrGroup;
@@ -92,7 +91,7 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	const ref = React.useRef<HTMLDivElement | null>(null);
 	// TODO would be nice if relevant message was derived from uiSelectors, which currently only tracks / trims non-compatible ids
 	// TODO Add meta data along chain? i.e. disabled due to chart type, area norm... etc. and display relevant message.
-	const isDisabled = typedProps.data.isDisabled
+	const isDisabled = typedProps.data.isDisabled;
 	// TODO Verify behavior, and set proper message/ translate
 	return (
 		< div ref={ref}
@@ -123,7 +122,7 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 		</div >
 	)
 
-}
+};
 
 const animatedComponents = makeAnimated({
 	...components,

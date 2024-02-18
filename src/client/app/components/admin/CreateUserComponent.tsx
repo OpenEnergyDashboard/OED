@@ -28,7 +28,7 @@ export default function CreateUserComponent() {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (password == confirmPassword) {
-			setPasswordMatch(true)
+			setPasswordMatch(true);
 			const newUser: NewUser = { email, role, password }
 			createUser(newUser)
 				.unwrap()
@@ -41,10 +41,9 @@ export default function CreateUserComponent() {
 					showErrorNotification(translate('users.failed.to.create.user'));
 				})
 		} else {
-			setPasswordMatch(false)
+			setPasswordMatch(false);
 		}
-
-	}
+	};
 	return (
 		<div>
 			<div className='container-fluid'>
@@ -55,7 +54,7 @@ export default function CreateUserComponent() {
 							<label> <FormattedMessage id='email' /> </label><br />
 							<Input type='email' onChange={({ target }) => setEmail(target.value)} required value={email} />
 						</div>
-						{!passwordMatch && <Alert color='danger'>Error: Passwords Do Not Match</Alert>}
+						{!passwordMatch && <Alert color='danger'>{translate('user.password.mismatch')}</Alert>}
 						<div style={formInputStyle}>
 							<label> <FormattedMessage id='password' /> </label><br />
 							<Input type='password' onChange={({ target }) => setPassword(target.value)} required value={password} />
