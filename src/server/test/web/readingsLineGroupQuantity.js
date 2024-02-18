@@ -20,13 +20,14 @@ const { prepareTest,
     unitDatakWh,
     conversionDatakWh,
     meterDatakWhGroups,
-    groupDatakWh } = require('../../util/readingsUtils');
+    groupDatakWh, 
+    createTimeString} = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('for quantity groups', () => {
-                // Test using a date range of infinity, which should return as days
+                //Test using a date range of infinity, which should return as days
                 mocha.it('LG1: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
@@ -42,11 +43,38 @@ mocha.describe('readings API', () => {
                 });
 
                 // Add LG2 here
-
+                
                 // Add LG3 here
 
                 // Add LG4 here
+                mocha.it('LG4: should have hourly points for middle readings of 15 + 20 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 
+                    //Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+
+                    //Get the unitID since the DB could be any value
+                    const unitId = await getUnitId('kWh');
+
+                    //Load the expected response data from the csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+
+                    // Create a request API for the 60days period
+                    const startDate = "2022-08-25";
+                    const endDate = "2022-10-24";
+                    const time = "00:00:00";
+                    const timeInterval = createTimeString(startDate, time, endDate, time);
+
+                    //Create request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query(
+                            { 
+                                timeInterval, 
+                                graphicUnitId: unitId 
+                            });
+
+                        //Check if the Readings is equal to the expected file
+                        expectReadingToEqualExpected(res, expected, GROUP_ID);
+                })
                 // Add LG5 here
 
                 // Add LG6 here
