@@ -88,6 +88,8 @@ mocha.describe('readings API', () => {
                         preferredDisplay: false, 
                         note: 'special unit' 
                     },
+                ]
+                    const conversionDatakWh = [
                     {
                         //c1 
                         sourceName: 'Electric_Utility', 
@@ -98,6 +100,7 @@ mocha.describe('readings API', () => {
                         note: 'Electric_Utility → kWh' 
                     }
                 ]
+
 
                 // Add LG7 here
 
