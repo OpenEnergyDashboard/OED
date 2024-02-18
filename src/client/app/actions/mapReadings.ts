@@ -4,7 +4,7 @@
 
 import {Dispatch, GetState, Thunk} from '../types/redux/actions';
 import {TimeInterval} from '../../../common/TimeInterval';
-import * as moment from 'moment';
+import moment from 'moment';
 import {
 	receiveGroupBarReadings,
 	receiveMeterBarReadings,

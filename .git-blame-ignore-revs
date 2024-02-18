@@ -1,0 +1,9 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# chore: Format files
+a4e02448709b0b72d31b0a518937096b8629bafb
+
+# format: Convert to tabs in `package{,-lock}.json` and config files
+e35768e5691eb130c6c38c2fb797f3bdad806002

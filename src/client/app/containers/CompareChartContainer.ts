@@ -11,7 +11,7 @@ import { CompareEntity } from './MultiCompareChartContainer';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
-import * as moment from 'moment';
+import moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 

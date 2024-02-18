@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
+import moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { ActionType } from './actions';
 import { BarReading, BarReadings } from '../readings';

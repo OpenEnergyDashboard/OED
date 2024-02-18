@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button } from 'reactstrap';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import graphExport, { downloadRawCSV } from '../utils/exportData';
 import { FormattedMessage } from 'react-intl';
 import { metersApi } from '../utils/api'

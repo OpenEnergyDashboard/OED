@@ -5,7 +5,7 @@
  */
 
 import ApiBackend from './ApiBackend';
-import * as moment from 'moment';
+import moment from 'moment';
 import { CompareReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { GroupChildren, GroupData, GroupDetailsData, GroupEditData } from '../../types/redux/groups';

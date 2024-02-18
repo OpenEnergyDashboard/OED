@@ -18,8 +18,8 @@ npm run migratedb -- highest
 echo "Doing docker compose up --no-start --build to capture any changes needed for images/containers without starting..."
 docker compose up --no-start --build
 
-echo "Doing webpack:build to update the application..."
-npm run webpack:build
+echo "Doing client:build to update the application..."
+npm run client:build
 
 # Though generally not needed, it is possible that you need to refresh the reading views after a migration.
 # This is definitely needed for the migration to 1.0.0 because it deletes the old views and creates new ones.

@@ -1,7 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
+/* global require, __dirname, process, module */
+/* eslint-disable @typescript-eslint/no-var-requires */
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
@@ -15,7 +16,7 @@ const config = {
 	// Enable sourcemaps for debugging webpack's output.
 	devtool: 'source-map',
 	entry: {
-		application: APP_DIR + '/index.tsx',
+		application: APP_DIR + '/index.tsx'
 	},
 	cache: {
 		type: 'filesystem'
@@ -41,12 +42,14 @@ const config = {
 			// Also, for development, JavaScript is handled by 'awesome-typescript-loader' and passed to Babel.
 			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
 			// Any remaining JavaScript ('.js' or '.jsx') will be transpiled by Babel, for production uglification.
-			{ test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: 'babel-loader'}] },
+			{ test: /\/jsx?$/, exclude: /node_modules/, use: [{ loader: 'babel-loader' }] },
 			// CSS stylesheet loader.
-			{ test: /\.css$/, use: [
-				{loader: 'style-loader'},
-				{loader: 'css-loader'}
-			] },
+			{
+				test: /\.css$/, use: [
+					{ loader: 'style-loader' },
+					{ loader: 'css-loader' }
+				]
+			},
 			// Babel not able to resolve imports https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
 			{
 				test: /\.m?js/,
@@ -55,7 +58,7 @@ const config = {
 				}
 			},
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
+			{ enforce: 'pre', test: /\.js$/, use: [{ loader: 'source-map-loader' }] }
 		]
 	},
 	output: {

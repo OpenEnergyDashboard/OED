@@ -41,7 +41,7 @@ before_script:
 script:
   # Validate legal requirements on source files
   - npm run check:header
-    # Validate that all areas which are intended to be typed, are typed
+  # Validate that all areas which are intended to be typed, are typed
   - npm run check:typescript
     # Validate that the client's type system is internally consistent
   - npm run check:types

@@ -9,7 +9,7 @@ import { NamedIDItem } from '../../types/items';
 import { CompareReadings, RawReadings } from '../../types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { MeterData, MeterEditData } from '../../types/redux/meters';
-import * as moment from 'moment';
+import moment from 'moment';
 
 export default class MetersApi {
 	private readonly backend: ApiBackend;

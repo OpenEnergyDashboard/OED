@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import { updateSelectedMeter } from '../actions/admin';
 import MeterDropdownComponent from '../components/MeterDropDownComponent';

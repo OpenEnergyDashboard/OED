@@ -9,8 +9,8 @@ const validate = require('jsonschema').validate;
 const _ = require('lodash');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
-const { TimeInterval } = require('../../common/TimeInterval');
-const moment = require('moment');
+import * as moment from 'moment'
+const { TimeInterval } = require('../../common/TimeInterval.js');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {

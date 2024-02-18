@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import Plot from 'react-plotly.js';
 import { State } from '../types/redux/state';
@@ -10,7 +10,7 @@ import {
 	calculateScaleFromEndpoints, itemDisplayableOnMap, Dimensions,
 	CartesianPoint, normalizeImageDimensions, itemMapInfoOk, gpsToUserGrid
 } from '../utils/calibration';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import getGraphColor from '../utils/getGraphColor';
 import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';

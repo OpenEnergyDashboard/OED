@@ -26,9 +26,7 @@ const { meterLineReadings,
 	validateThreeDQueryParams,
 } = require('../../routes/unitReadings');
 
-const { createTimeString } = require('../../util/readingsUtils');
-
-const { TimeInterval } = require('../../../common/TimeInterval');
+const { TimeInterval } = require('../../../common/TimeInterval.js');
 
 // TODO is this actually used anywhere?
 function mockResponse() {
@@ -61,7 +59,7 @@ mocha.describe('unit readings routes', () => {
 		// TODO The mocha documentation (https://mochajs.org/#arrow-functions) discourages lambda functions. Thus, the following used function().
 		// Should consider removing lambda functions from all tests.
 
-		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
+		// This needs to run the after() for this test so separated into its own describe since after works at that level.
 		mocha.describe('correct call', function () {
 			// Used by the test and in after so needs to be at this scope.
 			let readingsStub;
@@ -115,7 +113,7 @@ mocha.describe('unit readings routes', () => {
 		});
 
 
-		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
+		// This needs to run the after() for this test so separated into its own describe since after works at that level.
 		mocha.describe('correct call', function () {
 			// Used by the test and in after so needs to be at this scope.
 			let readingsStub;
@@ -168,7 +166,7 @@ mocha.describe('unit readings routes', () => {
 			// TODO Maybe check for invalid for each value in validateLineReadingsQueryParams (also in Bar below).
 		});
 
-		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
+		// This needs to run the after() for this test so separated into its own describe since after works at that level.
 		mocha.describe('correct call', function () {
 			// Used by the test and in after so needs to be at this scope.
 			let readingsStub;
@@ -222,7 +220,7 @@ mocha.describe('unit readings routes', () => {
 			// TODO Maybe check for invalid for each value in validateLineReadingsQueryParams (also in Bar below).
 		});
 
-		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
+		// This needs to run the after() for this test so separated into its own describe since after works at that level.
 		mocha.describe('correct call', function () {
 			// Used by the test and in after so needs to be at this scope.
 			let readingsStub;

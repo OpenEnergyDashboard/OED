@@ -12,7 +12,7 @@ import MapChartContainer from '../containers/MapChartContainer';
 import ThreeDComponent from './ThreeDComponent';
 import SpinnerComponent from './SpinnerComponent';
 import { ChartTypes } from '../types/redux/graph';
-import * as moment from 'moment';
+import moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';

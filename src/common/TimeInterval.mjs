@@ -4,9 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const moment = require('moment')
+import moment from 'moment'
 
-exports.TimeInterval = class TimeInterval {
+export class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
 		// utc keeps the moments from changing timezone.
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
@@ -45,7 +45,7 @@ exports.TimeInterval = class TimeInterval {
 	 * Test if this time interval is contains another.
 	 * Intervals are considered to contain equal intervals.
 	 * @param other
-	 * @returns {boolean}
+	 * @return {boolean}
 	 */
 	contains(other) {
 		if (!(other instanceof TimeInterval)) {
@@ -67,7 +67,7 @@ exports.TimeInterval = class TimeInterval {
 	/**
 	 * Returns TimeInterval.toString() so that using a time interval as an object key will
 	 * have reasonable behaviour.
-	 * @returns {*}
+	 * @return {*}
 	 */
 	valueOf() {
 		return this.toString();
@@ -81,13 +81,9 @@ exports.TimeInterval = class TimeInterval {
 		return this.endTimestamp;
 	}
 
-	getIsBounded() {
-		return this.isBounded;
-	}
-
 	/**
 	 * Creates a new unbounded time interval
-	 * @returns {TimeInterval}
+	 * @return {TimeInterval}
 	 */
 	static unbounded() {
 		return new TimeInterval(null, null);
@@ -96,7 +92,7 @@ exports.TimeInterval = class TimeInterval {
 	/**
 	 * Creates a new TimeInterval from its string representation
 	 * @param {string} stringified the string representation
-	 * @returns {TimeInterval}
+	 * @return {TimeInterval}
 	 */
 	static fromString(stringified) {
 		if (stringified === 'all') {

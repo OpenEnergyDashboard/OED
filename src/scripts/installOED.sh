@@ -38,8 +38,8 @@ while test $# -gt 0; do
 			shift
 			;;
 		*)
-			printf "Unknown argument \"%s\"\n" $1
-			printf "%s\n" $USAGE
+			printf "Unknown argument \"%s\"\n" "$1"
+			printf "%s\n" "$USAGE"
 			exit 1
 	esac
 done
@@ -93,7 +93,7 @@ while [ $create_error == 0 ]; do
 	# Sleep to let PostgreSQL chill out
 	sleep 3
 	printf "%s\n" "Attempting to create database..."
-	# Redirect stderr to a file
+	# Redirect stdout and stderr to a file
 	npm run createdb |& tee /tmp/oed.error > /dev/null
 	createdb_code=${PIPESTATUS[0]}
 	# TODO: This should be moved to the error case below once issues with this process are under control.
@@ -159,11 +159,11 @@ if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
 	npm run developerdb
 fi
 
-# Build webpack if needed
+# Build client if needed
 if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
-	npm run webpack:build
+	npm run client:build
 elif [ "$dostart" == "no" ]; then
-	npm run webpack
+	npm run client:dev
 fi
 
 printf "%s\n" "OED install finished"

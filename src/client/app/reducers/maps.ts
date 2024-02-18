@@ -4,7 +4,7 @@
 
 import {MapMetadata, MapsAction, MapState} from '../types/redux/map';
 import {ActionType} from '../types/redux/actions';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import {CalibratedPoint} from '../utils/calibration';
 
 const defaultState: MapState = {

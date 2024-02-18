@@ -17,7 +17,7 @@ import { UnitData, UnitDataById } from 'types/redux/units';
 import { ConversionData } from 'types/redux/conversions';
 import { UnitType } from '../../types/redux/units';
 import { notifyUser } from '../../utils/input'
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { Dispatch } from 'types/redux/actions';
 
