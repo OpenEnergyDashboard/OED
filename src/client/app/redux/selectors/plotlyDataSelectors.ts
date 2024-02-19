@@ -17,10 +17,7 @@ import {
 import { RootState } from '../../store';
 import { LineReadings } from '../../types/readings';
 import { MeterOrGroup } from '../../types/redux/graph';
-import { GroupData } from '../../types/redux/groups';
-import { MeterData } from '../../types/redux/meters';
-import { UnitData, UnitRepresentType } from '../../types/redux/units';
-import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
+import { UnitRepresentType } from '../../types/redux/units';
 import { barUnitLabel, lineUnitLabel } from '../../utils/graphics';
 import { createAppSelector } from './selectors';
 import { selectCompatibleSelectedGroups, selectCompatibleSelectedMeters } from './uiSelectors';
@@ -54,20 +51,6 @@ export const selectLineUnitLabelRateScaling = createAppSelector(
 export const selectLineRateScaling = (state: RootState) => selectLineUnitLabelRateScaling(state).rateScaling;
 export const selectLineNeedsRateScaling = (state: RootState) => selectLineUnitLabelRateScaling(state).needsRateScaling;
 export const selectLineUnitLabel = (state: RootState) => selectLineUnitLabelRateScaling(state).unitLabel;
-export const selectScalingFromEntity = (entity: MeterData | GroupData, areaUnit: AreaUnitType, areaNormalization: boolean, rateScaling: number) => {
-	const entityArea = entity.area;
-	// We either don't care about area, or we do in which case there needs to be a nonzero area.
-	// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-	const areaScaling = areaNormalization ? entityArea * getAreaUnitConversion(entity.areaUnit, areaUnit) : 1;
-	// Divide areaScaling into the rate so have complete scaling factor for readings.
-	return rateScaling / areaScaling;
-};
-
-export const selectAreaScalingFromEntity = (entity: MeterData | GroupData, areaUnit: AreaUnitType, areaNormalization: boolean) => {
-	// We either don't care about area, or we do in which case there needs to be a nonzero area.
-	// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-	return areaNormalization ? entity.area * getAreaUnitConversion(entity.areaUnit, areaUnit) : 1;
-};
 
 // Determines the unit label and scaling rate based on current graph settings.
 export const selectBarUnitLabel = (state: RootState) => {
@@ -83,27 +66,6 @@ export const selectBarUnitLabel = (state: RootState) => {
 		unitLabel = barUnitLabel(unit, areaNormalization, areaUnit);
 	}
 	return unitLabel;
-};
-
-// fallback to name if no identifier
-export const selectNameFromEntity = (entity: MeterData | GroupData | UnitData) => {
-	if (entity && 'identifier' in entity && entity.identifier) {
-		return entity.identifier;
-	} else if (entity && 'name' in entity && entity.name) {
-		return entity.name;
-	} else {
-		// Users May Possibly receive data for meters with neither identifier, or name so empty.
-		return '';
-	}
-};
-
-// Determines if meter or group base on objet distinct properties of each
-export const selectMeterOrGroupFromEntity = (entity: MeterData | GroupData) => {
-	return 'meterType' in entity ? MeterOrGroup.meters : 'childMeters' in entity ? MeterOrGroup.groups : undefined;
-};
-
-export const selectDefaultGraphicUnitFromEntity = (entity: MeterData | GroupData) => {
-	return 'defaultGraphicUnit' in entity ? entity.defaultGraphicUnit : undefined;
 };
 
 // Line and Groups use these values to derive plotly data, so make selector for them to 'extend'

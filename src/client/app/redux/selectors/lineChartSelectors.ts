@@ -7,11 +7,9 @@ import { selectShowMinMax } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';
 import getGraphColor from '../../utils/getGraphColor';
 import translate from '../../utils/translate';
-import {
-	selectFromLineReadingsResult, selectNameFromEntity,
-	selectPlotlyGroupDeps, selectPlotlyMeterDeps, selectScalingFromEntity
-} from './plotlyDataSelectors';
 import { createAppSelector } from './selectors';
+import { selectScalingFromEntity, selectNameFromEntity } from './entitySelectors';
+import { selectPlotlyMeterDeps, selectPlotlyGroupDeps, selectFromLineReadingsResult } from './plotlyDataSelectors';
 
 type PlotlyLineDeps = ReturnType<typeof selectPlotlyMeterDeps> & { showMinMax: boolean }
 // Common deps + additional values needed to derive meter data in selectFromResult for plotly line chart

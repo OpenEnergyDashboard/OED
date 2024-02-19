@@ -29,8 +29,8 @@ import {
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../slices/graphSlice';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
-import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './plotlyDataSelectors';
 import { createAppSelector } from './selectors';
+import { selectNameFromEntity, selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity } from './entitySelectors';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[

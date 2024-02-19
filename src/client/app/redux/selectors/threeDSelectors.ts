@@ -10,7 +10,7 @@ import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { MeterOrGroup } from '../../types/redux/graph';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../../redux/api/metersApi';
-import { selectNameFromEntity } from './plotlyDataSelectors';
+import { selectNameFromEntity } from './entitySelectors';
 
 
 // Memoized Selectors

@@ -9,8 +9,9 @@ import { selectBarWidthDays } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';
 import { MeterOrGroup } from '../../types/redux/graph';
 import getGraphColor from '../../utils/getGraphColor';
-import { selectAreaScalingFromEntity, selectNameFromEntity, selectPlotlyGroupDeps, selectPlotlyMeterDeps } from './plotlyDataSelectors';
 import { createAppSelector } from './selectors';
+import { selectAreaScalingFromEntity, selectNameFromEntity } from './entitySelectors';
+import { selectPlotlyMeterDeps, selectPlotlyGroupDeps } from './plotlyDataSelectors';
 
 type PlotlyBarDeps = ReturnType<typeof selectPlotlyMeterDeps> & { barDuration: moment.Duration }
 export const selectPlotlyBarDeps = createAppSelector(
