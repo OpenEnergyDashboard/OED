@@ -204,8 +204,7 @@ daily_readings_unit
 		
 	tsrange(gen.interval_start, gen.interval_start + '1 day'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
-	-- This sequence of joins takes the meter id to its unit and in the final join
-	-- it then uses the unit_index for this unit.
+	-- This sequence of joins takes the meter id to its unit and a unit.
 	INNER JOIN meters m ON r.meter_id = m.id)
 	INNER JOIN units u ON m.unit_id = u.id)
 		CROSS JOIN LATERAL generate_series(
@@ -330,8 +329,7 @@ hourly_readings_unit
 
 	tsrange(gen.interval_start, gen.interval_start + '1 hour'::INTERVAL, '()') AS time_interval
 	FROM ((readings r
-	-- This sequence of joins takes the meter id to its unit and in the final join
-	-- it then uses the unit_index for this unit.
+	-- This sequence of joins takes the meter id to its unit and a unit.
 	INNER JOIN meters m ON r.meter_id = m.id)
 	INNER JOIN units u ON m.unit_id = u.id)
 		CROSS JOIN LATERAL generate_series(
@@ -379,7 +377,6 @@ DECLARE
 	requested_range TSRANGE;
 	requested_interval INTERVAL;
 	requested_interval_seconds INTEGER;
-	unit_column INTEGER;
 	frequency INTERVAL;
 	frequency_seconds INTEGER;
 	-- Which index of the meter_id array you are currently working on.
@@ -389,8 +386,6 @@ DECLARE
 	-- Holds accuracy for current meter.
 	current_point_accuracy reading_line_accuracy;
 	BEGIN
-	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
-	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 	-- For each frequency of points, verify that you will get the minimum graphing points to use for each meter.
 	-- Start with the raw, then hourly and then daily if others will not work.
 	-- Loop over all meters.
@@ -468,7 +463,7 @@ DECLARE
 				FROM (((readings r
 				INNER JOIN meters m ON m.id = current_meter_id)
 				INNER JOIN units u ON m.unit_id = u.id)
-				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY r.start_timestamp ASC;
@@ -487,10 +482,9 @@ DECLARE
 					hourly.max_rate * c.slope + c.intercept AS max_rate,
 					lower(hourly.time_interval) AS start_timestamp,
 					upper(hourly.time_interval) AS end_timestamp
-				FROM (((hourly_readings_unit hourly
+				FROM ((hourly_readings_unit hourly
 				INNER JOIN meters m ON m.id = current_meter_id)
-				INNER JOIN units u ON m.unit_id = u.id)
-				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 				WHERE requested_range @> time_interval AND hourly.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
@@ -508,15 +502,13 @@ DECLARE
 					daily.max_rate * c.slope + c.intercept AS max_rate,
 					lower(daily.time_interval) AS start_timestamp,
 					upper(daily.time_interval) AS end_timestamp
-				FROM (((daily_readings_unit daily
+				FROM ((daily_readings_unit daily
 				-- Get all the meter_ids in the passed array of meters.
-				-- This sequence of joins takes the meter id to its unit and in the final join
-				-- it then uses the unit_index for this unit.
+				-- This sequence of joins takes the meter id to its unit and a unit.
 				INNER JOIN meters m ON m.id = current_meter_id)
-				INNER JOIN units u ON m.unit_id = u.id)
-				-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+				-- This is getting the conversion for the meter and unit to graph.
 				-- The slope and intercept are used above the transform the reading to the desired unit.
-				INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 				WHERE requested_range @> time_interval AND daily.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
@@ -652,7 +644,6 @@ DECLARE
 	real_tsrange TSRANGE;
 	real_start_stamp TIMESTAMP;
 	real_end_stamp TIMESTAMP;
-	unit_column INTEGER;
 	num_bars INTEGER;
 BEGIN
 	-- This is how wide (time interval) for each bar.
@@ -686,9 +677,6 @@ BEGIN
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
 
-	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
-	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
-
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,
 		--  dr.reading_rate is the weighted average reading rate per hour over the day.
@@ -703,13 +691,13 @@ BEGIN
 		-- Get all the meter_ids in the passed array of meters.
 		INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id)
 		-- This sequence of joins takes the meter id to its unit and in the final join
-		-- it then uses the unit_index for this unit.
+		-- it then get the desired conversion.
 		INNER JOIN meters m ON m.id = meters.id)
 		-- Don't return bar data if raw since cannot sum.
 		INNER JOIN units u ON m.unit_id = u.id AND u.unit_represent != 'raw'::unit_represent_type)
-		-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+		-- This is getting the conversion for the meter (source_id) and unit to graph (destination_id).
 		-- The slope and intercept are used above the transform the reading to the desired unit.
-		INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 		GROUP BY dr.meter_id, bars.interval_start, c.slope, c.intercept;
 END;
 $$ LANGUAGE 'plpgsql';
