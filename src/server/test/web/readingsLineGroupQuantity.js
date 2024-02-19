@@ -12,7 +12,7 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
-    // createTimeString,
+    createTimeString,
     getUnitId,
     ETERNITY,
     // METER_ID,
@@ -56,51 +56,13 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kWh');
                     // Load the expected response data from the corresponding csv file
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
                     // Create a request to the API for unbounded reading times and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
-                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                        .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-
-                const unitData = [
-                    {
-                        // u1 
-                        name: 'kWh',
-                        identifier: '',
-                        unitRepresent: Unit.unitRepresentType.QUANTITY,
-                        secInRate: 3600,
-                        typeOfUnit: Unit.unitType.UNIT,
-                        suffix: '',
-                        displayable: Unit.displayableType.ALL,
-                        preferredDisplay: true,
-                        note: 'OED created standard unit'
-                    },
-                    {
-                        //u2
-                        name: 'Electric_Utility', 
-                        identifier: '', 
-                        unitRepresent: Unit.unitRepresentType.QUANTITY, 
-                        secInRate: 3600, typeOfUnit: Unit.unitType.METER,
-                        suffix: '', 
-                        displayable: Unit.displayableType.NONE, 
-                        preferredDisplay: false, 
-                        note: 'special unit' 
-                    },
-                ]
-                    const conversionDatakWh = [
-                    {
-                        //c1 
-                        sourceName: 'Electric_Utility', 
-                        destinationName: 'kWh', 
-                        bidirectional: false, 
-                        slope: 1, 
-                        intercept: 0, 
-                        note: 'Electric_Utility → kWh' 
-                    }
-                ]
-
 
                 // Add LG7 here
 
