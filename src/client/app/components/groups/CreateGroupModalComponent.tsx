@@ -153,7 +153,7 @@ export default function CreateGroupModalComponent() {
 				}
 				if (window.confirm(msg)) {
 					// the + here converts back into a number
-					setState({ ...state, ['area']: +areaSum.toPrecision(6) });
+					setState({ ...state, ['area']: + areaSum.toPrecision(6) });
 				}
 			} else {
 				showErrorNotification(translate('group.area.calculate.error.group.unit'));

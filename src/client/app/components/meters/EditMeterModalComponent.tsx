@@ -411,6 +411,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
+
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>

@@ -38,8 +38,7 @@ export default function CreateUnitModalComponent() {
 		// The client code makes the id for the selected unit and default graphic unit be -99
 		// so it can tell it is not yet assigned and do the correct logic for that case.
 		// The units API expects these values to be undefined on call so that the database can assign their values.
-		id: -99,
-		unitIndex: -99
+		id: -99
 	}
 
 	/* State */

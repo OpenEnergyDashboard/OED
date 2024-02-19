@@ -5,6 +5,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import { ConversionData } from '../../types/redux/conversions';
 import { baseApi } from './baseApi';
+import { CikData } from '../../types/redux/ciks';
 
 export const conversionsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -12,10 +13,8 @@ export const conversionsApi = baseApi.injectEndpoints({
 			query: () => 'api/conversions',
 			providesTags: ['ConversionDetails']
 		}),
-		getConversionArray: builder.query<boolean[][], void>({
-			query: () => 'api/conversion-array',
-			providesTags: ['ConversionDetails']
-
+		getCikDetails: builder.query<CikData[], void>({
+			query: () => 'api/ciks'
 		}),
 		addConversion: builder.mutation<void, ConversionData>({
 			query: conversion => ({
@@ -98,10 +97,11 @@ export const selectConversionsDetails = createSelector(
 	}
 )
 
-export const selectPikQueryState = conversionsApi.endpoints.getConversionArray.select()
-export const selectPik = createSelector(
-	selectPikQueryState,
-	({ data: pik = [[]] }) => {
-		return pik
+const selectCikQueryState = conversionsApi.endpoints.getCikDetails.select()
+
+export const selectCik = createSelector(
+	[selectCikQueryState],
+	({ data: cik = [] }) => {
+		return cik
 	}
 )

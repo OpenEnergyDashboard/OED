@@ -12,12 +12,44 @@ const sqlFile = database.sqlFile;
  */
 class Cik {
 	/**
+	 * @param {*} meterUnitId The id of the meter unit.
+	 * @param {*} nonMeterUnitId The id of the non meter unit.
+	 * @param {*} slope The slope of the conversion.
+	 * @param {*} intercept The intercept of the conversion.
+	 */
+	constructor(meterUnitId, nonMeterUnitId, slope, intercept) {
+		this.meterUnitId = meterUnitId;
+		this.nonMeterUnitId = nonMeterUnitId;
+		this.slope = slope;
+		this.intercept = intercept;
+	}
+
+	/**
 	 * Returns a promise to create the cik table.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
 	static createTable(conn) {
 		return conn.none(sqlFile('cik/create_cik_table.sql'));
+	}
+
+	/**
+	 * Create a new Cik object from row's data.
+	 * @param {*} row The row from which Cik will be created.
+	 * @returns the created Cik object
+	 */
+	static mapRow(row) {
+		return new Cik(row.meter_unit_id, row.non_meter_unit_id, row.slope, row.intercept);
+	}
+
+	/**
+	 * Get all Cik objects
+	 * @param {*} conn The database connection to use.
+	 * @returns all Cik objects
+	 */
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('cik/get_cik.sql'));
+		return rows.map(Cik.mapRow);
 	}
 
 	/**
@@ -32,41 +64,15 @@ class Cik {
 		// Remove all the current values in the table.
 		await conn.none(sqlFile('cik/delete_all_conversions.sql'));
 
-		// Loop over the rows and columns of the cik array.
-		for (let row = 0; row < cik.length; ++row) {
-			for (let column = 0; column < cik[row].length; ++column) {
-				// If there is a conversion then insert it into the cik table in database.
-				// In principle need to check [0] and [1] but they should both be the same
-				// and only one checked as in other parts of the code.
-				if (!isNaN(cik[row][column][0])) {
-					await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
-						rowIndex: row,
-						columnIndex: column,
-						slope: cik[row][column][0],
-						intercept: cik[row][column][1]
-					});
-				}
-			}
-		}
-	}
-
-	/**
-	 * Returns Pik array based on Cik values in the database.
-	 */
-	static async getPik(conn) {
-		// Get the max index for pik rows and columns. Length is one greater.
-		let temp;
-		temp = await conn.one(sqlFile('unit/get_max_meter_row_index.sql'));
-		const numRows = temp.max + 1;
-		temp = await conn.one(sqlFile('unit/get_max_non_meter_row_index.sql'));
-		const numColumns = temp.max + 1;
-		// Fill the Pik with false values.
-		let pik = new Array(numRows).fill(0).map(() => new Array(numColumns).fill(false));
-		// Get all the Cik values from the database.
-		const rows = await conn.any(sqlFile('cik/get_all_conversions.sql'));
-		// pik is true if there is a conversion for cik.
-		rows.map(row => { pik[row.row_index][row.column_index] = true; });
-		return pik;
+		// Loop over all conversions in cik array and insert each in DB.
+		cik.forEach(async (conversion) => {
+			await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
+				sourceId: conversion.source,
+				destinationId: conversion.destination,
+				slope: conversion.slope,
+				intercept: conversion.intercept
+			});
+		});
 	}
 }
 

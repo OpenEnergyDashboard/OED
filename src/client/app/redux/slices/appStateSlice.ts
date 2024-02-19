@@ -64,7 +64,7 @@ export const appStateSlice = createThunkSlice({
 				dispatch(versionApi.endpoints.getVersion.initiate());
 				dispatch(unitsApi.endpoints.getUnitsDetails.initiate());
 				dispatch(conversionsApi.endpoints.getConversionsDetails.initiate());
-				dispatch(conversionsApi.endpoints.getConversionArray.initiate());
+				dispatch(conversionsApi.endpoints.getCikDetails.initiate());
 
 				// Older style thunk fetch cycle for maps until migration
 				dispatch(fetchMapsDetails());

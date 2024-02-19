@@ -3,5 +3,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- Inserts a new conversion into the cik table.
-INSERT INTO cik (row_index, column_index, slope, intercept)
-VALUES (${rowIndex}, ${columnIndex}, ${slope}, ${intercept});
+INSERT INTO cik (source_id, destination_id, slope, intercept)
+VALUES (${sourceId}, ${destinationId}, ${slope}, ${intercept});

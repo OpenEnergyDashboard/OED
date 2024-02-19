@@ -76,7 +76,6 @@ export const NoUnit: UnitData = {
 	unitRepresent: UnitRepresentType.quantity,
 	secInRate: 99,
 	typeOfUnit: UnitType.unit,
-	unitIndex: -99,
 	suffix: '',
 	displayable: DisplayableType.none,
 	preferredDisplay: false,

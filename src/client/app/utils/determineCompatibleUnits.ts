@@ -4,17 +4,15 @@
 
 // TODO it is a bad practice to import store anywhere other than index.tsx These utils need to be converted into selectors.
 
-import { store } from '../store';
 import * as _ from 'lodash';
 import React from 'react';
-import { selectPik } from '../redux/api/conversionsApi';
+import { selectCik } from '../redux/api/conversionsApi';
 import { selectAllGroups, selectGroupDataById } from '../redux/api/groupsApi';
-import { selectUnitDataById } from '../redux/api/unitsApi';
+import { selectAllMeters, selectMeterDataById } from '../redux/api/metersApi';
+import { store } from '../store';
 import { DataType } from '../types/Datasources';
 import { SelectOption } from '../types/items';
 import { GroupData } from '../types/redux/groups';
-import { UnitData, UnitType } from '../types/redux/units';
-import { selectAllMeters, selectMeterDataById } from '../redux/api/metersApi';
 
 /**
  * The intersect operation of two sets.
@@ -67,75 +65,27 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 
 /**
  * Returns a set of units ids that are compatible with a specific unit id.
- * @param unitId The unit id.
- * @returns Set of units ids that are compatible with specified unit id.
+ * @param unitId The unit id
+ * @returns a set of compatible unit ids
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
-	// unitSet starts as an empty set.
+	// access the global state
+	const state = store.getState();
 	const unitSet = new Set<number>();
+	// get all ciks data
+	const globalCiksState = selectCik(state);
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
-	// Do same if pik is not yet available.
-	const pik = selectPik(store.getState());
-	if (unitId != -99 && pik) {
-		// Get the row index in Pik of this unit.
-		const row = pRowFromUnit(unitId);
-		// The compatible units are all columns with true for Pik where i = row.
-		// Loops over all columns of Pik in row.
-		for (let k = 0; k < pik[0].length; ++k) {
-			if (pik[row][k]) {
-				// unit at index k is compatible with meter unit so add to set.
-				// Convert index in Pik to unit id.
-				unitSet.add(unitFromPColumn(k));
+	if (unitId !== -99) {
+		// loop through each cik to find ones whose meterUnitId equals unitId param
+		// then add the corresponding nonMeterUnitId to the unitSet
+		for (const cik of globalCiksState) {
+			if (cik.meterUnitId === unitId) {
+				unitSet.add(cik.nonMeterUnitId);
 			}
 		}
 	}
 	return unitSet;
-}
-
-/**
- * Returns the row index in Pik for a meter unit.
- * @param unitId The unit id.
- * @returns The row index in Pik for given meter unit.
- */
-export function pRowFromUnit(unitId: number): number {
-	const unitDataById = selectUnitDataById(store.getState())
-
-	const unit = _.find(unitDataById, function (o: UnitData) {
-		// Since this is the row index, type of unit must be meter.
-		return o.id == unitId && o.typeOfUnit == UnitType.meter;
-	}) as UnitData;
-	return unit.unitIndex;
-}
-
-/**
- * Returns the unit id given the row in Pik.
- * @param row The row to find the associated unit.
- * @returns The unit id given the row in Pik units.
- */
-export function unitFromPRow(row: number): number {
-	const unitDataById = selectUnitDataById(store.getState())
-
-	const unit = _.find(unitDataById, function (o: UnitData) {
-		// Since the given unitIndex is a row index, the unit type must be meter.
-		return o.unitIndex == row && o.typeOfUnit == UnitType.meter;
-	}) as UnitData;
-	return unit.id;
-}
-
-/**
- * Returns the unit id given the column in Pik.
- * @param column The column to find the associated unit.
- * @returns The unit id given the column in Pik.
- */
-export function unitFromPColumn(column: number): number {
-	const unitDataById = selectUnitDataById(store.getState())
-
-	const unit = _.find(unitDataById, function (o: UnitData) {
-		// Since the given unitIndex is a column index, the unit type must be different from meter.
-		return o.unitIndex == column && o.typeOfUnit != UnitType.meter;
-	}) as UnitData;
-	return unit.id;
 }
 
 /**

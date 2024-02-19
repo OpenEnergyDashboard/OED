@@ -8,7 +8,6 @@ UPDATE units
 		unit_represent = ${unitRepresent},
 		sec_in_rate = ${secInRate},
 		type_of_unit = ${typeOfUnit},
-		unit_index = ${unitIndex},
 		suffix = ${suffix},
 		displayable = ${displayable},
 		preferred_display = ${preferredDisplay},

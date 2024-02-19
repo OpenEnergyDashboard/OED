@@ -27,7 +27,6 @@ export interface UnitData {
 	unitRepresent: UnitRepresentType;
 	secInRate: number;
 	typeOfUnit: UnitType;
-	unitIndex: number;
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
@@ -41,7 +40,6 @@ export interface UnitEditData {
 	unitRepresent: string;
 	secInRate: number;
 	typeOfUnit: UnitType;
-	unitIndex: number;
 	suffix: string;
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
