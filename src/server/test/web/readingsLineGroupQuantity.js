@@ -12,10 +12,10 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
-    // createTimeString,
+    createTimeString,
     getUnitId,
     ETERNITY,
-    // METER_ID,
+    METER_ID,
     GROUP_ID,
     unitDatakWh,
     conversionDatakWh,
@@ -53,7 +53,85 @@ mocha.describe('readings API', () => {
 
                 // Add LG7 here
 
-                // Add LG10 here
+                // Test using a data range of infinity, which should return as days
+                mocha.it('LG10: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
+                    // Add MegaJoules unit to our unitData list
+                    const unitData = unitDatakWh.concat([
+                        {
+                            name: 'MJ',
+                            identifier: 'megaJoules',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT, suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'MJ' 
+                        }
+                    ]);
+                    // Add kWh -> MJ conversion to our conversionData list
+                    const conversionData = conversionDatakWh.concat([
+                        { 
+                            sourceName: 'kWh',
+                            destinationName: 'MJ',
+                            bidirectional: true,
+                            slope: 3.6,
+                            intercept: 0,
+                            note: 'kWh → MJ' 
+                        }
+                    ]);
+                    // Converts meters from kWh to MJ
+                    const meterData = [
+                        {
+                            name: 'Electric Utility MJ',
+                            unit: 'Electric_Utility',
+                            defaultGraphicUnit: 'MJ',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            // Test 15 minutes
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        },
+                        {
+                            name: 'Electric Utility Other',
+                            unit: 'Electric_Utility',
+                            defaultGraphicUnit: 'MJ',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+                            deleteFile: false,
+                            // Test 20 minutes
+                            readingFrequency: '20 minutes',
+                            id: (METER_ID + 1)
+                        }
+                    ];
+                    // Group data as MegaJoules instead of kWh.
+                    const groupData = [
+                        {
+                            id: GROUP_ID,
+                            name: 'Electric Utility MJ + Other',
+                            displayable: true,
+                            note: 'special group',
+                            defaultGraphicUnit: 'MJ',
+                            childMeters: ['Electric Utility MJ', 'Electric Utility Other'],
+                            childGroups: [],
+                        }
+                    ]
+                    // Load the data into the database
+                    await prepareTest(unitData, conversionData, meterData, groupData);
+                    //Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('MJ');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_MJ_st_-inf_et_inf.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                })
 
                 // Add LG11 here
 
