@@ -197,20 +197,6 @@ class Meter {
 	}
 
 	/**
-	 * For the given meter id, gets the associated unitId. 
-	 * Then, returns the unitIndex (the row/column id in the Cik/Pik table) of that unitId.
-	 * @param {*} meterId The meter id.
-	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Int>}
-	 */
-	static async getUnitIndex(meterId, conn) {
-		const resp = await conn.one(sqlFile('meter/get_unit_id.sql'), { meterId: meterId });
-		const unitId = resp.unit_id;
-		const unit = await Unit.getById(unitId, conn);
-		return unit.unitIndex;
-	}
-
-	/**
 	 * Returns all meters where unitId is not null.
 	 * @param {*} conn The connection to be used.
 	 * @returns {Promise.<Array.<Meter>>}

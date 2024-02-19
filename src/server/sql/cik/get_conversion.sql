@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- Get conversion for specific row and column in the cik table (same as Cik array).
-SELECT * FROM cik WHERE row_index=${rowIndex} and column_index=${columnIndex};
+SELECT * FROM cik WHERE source_id=${sourceId} and destination_id=${destinationId};

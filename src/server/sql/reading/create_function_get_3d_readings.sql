@@ -43,8 +43,6 @@ AS $$
 DECLARE
     -- Holds the range of dates for returned data that fits the actual data.
     requested_range TSRANGE;
-    -- The value associated with the graphing unit
-    unit_column INTEGER;
     -- The slope of the conversion from meter to graphing units
     slope FLOAT;
    -- The intercept of the conversion from meter to graphing units
@@ -64,9 +62,6 @@ DECLARE
     -- The actual number of hours in a reading to use.
     reading_length_hours_use INTEGER;
 BEGIN
-    -- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
-    SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
-
     -- Get the smallest reading frequency for all meters requested.
     SELECT min(reading_frequency) INTO meter_frequency
 	FROM (meters m
@@ -96,8 +91,7 @@ BEGIN
         -- Get the conversion from the current meter's unit to the desired graphing unit.
         SELECT c.slope, c.intercept into slope, intercept
         FROM meters m
-        INNER JOIN units u ON m.unit_id = u.id
-        INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column
+		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id
         WHERE m.id = current_meter_id
         ;
 

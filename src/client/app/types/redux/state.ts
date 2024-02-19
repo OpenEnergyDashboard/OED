@@ -17,6 +17,7 @@ import { UnsavedWarningState } from './unsavedWarning';
 import { UnitsState } from './units';
 import { ConversionsState } from './conversions';
 import { OptionsState } from './options';
+import { CiksState } from './ciks';
 
 export interface State {
 	meters: MetersState;
@@ -36,4 +37,5 @@ export interface State {
 	units: UnitsState;
 	conversions: ConversionsState;
 	options: OptionsState;
+	ciks: CiksState;
 }
