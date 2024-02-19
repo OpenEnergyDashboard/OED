@@ -94,9 +94,23 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-
-                // Add B5 here
-
+                mocha.it('B5: 75 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+                    // Load the data into the database
+                   await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                   // Get the unit ID since the DB could use any value.
+                   const unitId = await getUnitId('kWh');
+                   // Load the expected response data from the corresponding csv file
+                   const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_ri_15_mu_kWh_gu_kWh_st_-inf_et_inf_bd_75.csv');
+                   // Create a request to the API for unbounded reading times and save the response
+                   const res = await chai.request(app).get(`/api/unitReadings/bar/meters/${METER_ID}`)
+                   .query({
+                        timeInterval: ETERNITY.toString(),
+                         barWidthDays: 75,
+                         graphicUnitId: unitId
+                   });
+                   // Check that the API reading is equal to what it is expected to equal
+                   expectReadingToEqualExpected(res, expected);
+                });                   
                 mocha.it('B6: 76 day bars (no values) for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
