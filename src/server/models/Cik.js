@@ -64,22 +64,15 @@ class Cik {
 		// Remove all the current values in the table.
 		await conn.none(sqlFile('cik/delete_all_conversions.sql'));
 
-		// Loop over the rows and columns of the cik array.
-		for (let row = 0; row < cik.length; ++row) {
-			for (let column = 0; column < cik[row].length; ++column) {
-				// If there is a conversion then insert it into the cik table in database.
-				// In principle need to check [0] and [1] but they should both be the same
-				// and only one checked as in other parts of the code.
-				if (!isNaN(cik[row][column][0])) {
-					await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
-						rowIndex: row,
-						columnIndex: column,
-						slope: cik[row][column][0],
-						intercept: cik[row][column][1]
-					});
-				}
-			}
-		}
+		// Loop over all conversions in cik array and insert each in DB.
+		cik.forEach(async (conversion) => {
+			await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
+				sourceId: conversion.source,
+				destinationId: conversion.destination,
+				slope: conversion.slope,
+				intercept: conversion.intercept
+			});
+		});
 	}
 }
 

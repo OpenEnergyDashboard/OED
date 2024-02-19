@@ -17,7 +17,6 @@ function expectUnitToBeEquivalent(expected, actual) {
     expect(actual).to.have.property('unitRepresent', expected.unitRepresent);
     expect(actual).to.have.property('secInRate', expected.secInRate);
     expect(actual).to.have.property('typeOfUnit', expected.typeOfUnit);
-    expect(actual).to.have.property('unitIndex', expected.unitIndex);
     expect(actual).to.have.property('suffix', expected.suffix);
     expect(actual).to.have.property('displayable', expected.displayable);
     expect(actual).to.have.property('preferredDisplay', expected.preferredDisplay);

@@ -26,7 +26,7 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 	// Note the admin can later change identifier, displayable and preferredDisplay to something else
 	// since OED does not recreate the unit if it exists so those changes will stay.
 	const newUnit = new Unit(undefined, unitName, unitIdentifier, destinationUnit.unitRepresent, sourceUnit.secInRate,
-		Unit.unitType.SUFFIX, undefined, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
+		Unit.unitType.SUFFIX, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
 	await newUnit.insert(conn);
 
 	// Create the conversion from the prefix unit to this new unit.
