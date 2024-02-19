@@ -42,7 +42,7 @@ mocha.describe('readings API', () => {
                 });
 
                 // Add LG2 here
- 
+
                 mocha.it('LG3: should have daily points for middle readings of 15 + 20 minute for a 61 day period and quantity units with kWh as kWh', async () => {
                     // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
@@ -56,8 +56,24 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-
-                // Add LG4 here
+                mocha.it('LG4: should have hourly points for middle readings of 15 + 20 minute for a 60 day period and quantity units with kWh as kWh', async () => {
+                    //Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    //Get the unitID since the DB could be any value
+                    const unitId = await getUnitId('kWh');
+                    //Load the expected response data from the csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+                    // Create a request API for the 60days period
+                    const startDate = "2022-08-25";
+                    const endDate = "2022-10-24";
+                    const time = "00:00:00";
+                    const timeInterval = createTimeString(startDate, time, endDate, time);
+                    //Create request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval, graphicUnitId: unitId });
+                    //Check if the Readings is equal to the expected file
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
                 // Add LG5 here
 
