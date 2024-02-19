@@ -16,7 +16,7 @@ import { userApi } from '../api/userApi';
 import { versionApi } from '../api/versionApi';
 import { createThunkSlice } from '../sliceCreators';
 import { currentUserSlice } from './currentUserSlice';
-import { processGraphLink } from './graphSlice';
+import { processGraphLink } from '../../redux/actions/extraActions';
 
 export interface AppState {
 	initComplete: boolean;

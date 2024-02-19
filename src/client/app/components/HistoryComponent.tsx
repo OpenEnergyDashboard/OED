@@ -4,10 +4,8 @@
 
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import {
-	selectForwardHistory, selectPrevHistory,
-	historyStepBack, historyStepForward
-} from '../redux/slices/graphSlice';
+import { selectForwardHistory, selectPrevHistory } from '../redux/slices/graphSlice';
+import { historyStepBack, historyStepForward } from '../redux/actions/extraActions'
 /**
  * @returns Renders a history component with previous and next buttons.
  */

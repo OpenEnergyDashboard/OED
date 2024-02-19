@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { useWaitForInit } from '../../redux/componentHooks';
 import { useAppDispatch } from '../../redux/reduxHooks';
-import { processGraphLink } from '../../redux/slices/graphSlice';
+import { processGraphLink } from '../../redux/actions/extraActions';
 import InitializingComponent from '../router/InitializingComponent';
 
 export const GraphLink = () => {

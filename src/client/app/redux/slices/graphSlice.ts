@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -11,6 +11,7 @@ import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } 
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
+import { updateHistory, historyStepBack, historyStepForward, processGraphLink } from '../../redux/actions/extraActions';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -370,8 +371,3 @@ export const {
 	updateSelectedMetersOrGroups
 } = graphSlice.actions;
 
-export const historyStepBack = createAction('graph/historyStepBack');
-export const historyStepForward = createAction('graph/historyStepForward');
-export const updateHistory = createAction<GraphState>('graph/updateHistory');
-
-export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');

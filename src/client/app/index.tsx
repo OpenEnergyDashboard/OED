@@ -19,7 +19,6 @@ const root = createRoot(container);
 
 root.render(
 	//  Provides the Redux store to all child components
-	// TODO I think we ultimately want the store to go away once everything uses RTK.
 	< Provider store={store} stabilityCheck='always' >
 		< RouteComponent />
 	</Provider >
