@@ -182,7 +182,6 @@ mocha.describe('readings API', () => {
 
                 // Add LG18 here
 
-                // Add LG19 here
 				mocha.it('LG19: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
 					const unitDatakWh = [
 						{
