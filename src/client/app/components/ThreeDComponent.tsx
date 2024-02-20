@@ -222,7 +222,7 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	// responsible for setting Labels
 	return {
 		// Eliminate margin
-		margin: { t: 0, b: 0, l: 0, r: 0, pad: 0 },
+		margin: { t: 0, b: 0, l: 0, r: 0 },
 		// Leaves gaps / voids in graph for missing, undefined, NaN, or null values
 		connectgaps: false,
 		scene: {

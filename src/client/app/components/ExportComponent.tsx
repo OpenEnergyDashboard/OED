@@ -6,35 +6,30 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import { showErrorNotification } from '../utils/notifications';
+import { exportGraphReadingsThunk } from '../redux/thunks/exportThunk';
 import { selectConversionsDetails } from '../redux/api/conversionsApi';
-import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
-import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/reduxHooks';
-import { selectAllChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
-import { selectGraphState, selectShowMinMax } from '../redux/slices/graphSlice';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
+import { selectGraphState, selectQueryTimeInterval } from '../redux/slices/graphSlice';
 import { UserRole } from '../types/items';
 import { ConversionData } from '../types/redux/conversions';
-import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { metersApi, usersApi } from '../utils/api';
-import graphExport, { downloadRawCSV } from '../utils/exportData';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-import { barUnitLabel, lineUnitLabel } from '../utils/graphics';
+import { downloadRawCSV } from '../utils/exportData';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { showErrorNotification } from '../utils/notifications';
 import { hasToken } from '../utils/token';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-
 /**
  * Creates export buttons and does code for handling export to CSV files.
  * @returns HTML for export buttons
  */
 export default function ExportComponent() {
+	const dispatch = useAppDispatch();
 	// Meters state
 	const meterDataById = useAppSelector(selectMeterDataById);
-	// Groups state
-	const groupDataById = useAppSelector(selectGroupDataById);
 	// Units state
 	const unitsDataById = useAppSelector(selectUnitDataById);
 	// Conversion state
@@ -43,149 +38,9 @@ export default function ExportComponent() {
 	const graphState = useAppSelector(selectGraphState);
 	// admin state
 	const adminState = useAppSelector(state => state.admin);
-	// error bar state
-	const errorBarState = useAppSelector(selectShowMinMax);
 	// Time range of graphic
-	const timeInterval = graphState.queryTimeInterval;
-
-	const queryArgs = useAppSelector(selectAllChartQueryArgs)
-
-	const { data: lineMeterReadings = {}, isFetching: lineMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.meterArgs);
-	const { data: lineGroupReadings = {}, isFetching: groupMeterIsFetching } = readingsApi.endpoints.line.useQueryState(queryArgs.line.groupArgs);
-	const { data: barMeterReadings = {}, isFetching: barMeterIsFetching } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.meterArgs);
-	const { data: barGroupReadings = {}, isFetching: barGroupIsFetching } = readingsApi.endpoints.bar.useQueryState(queryArgs.bar.groupArgs);
-
-	// Function to export the data in a graph.
-	const exportGraphReading = () => {
-		// What unit is being graphed. Unit of all lines to export.
-		const unitId = graphState.selectedUnit;
-		// This is the graphic unit identifier
-		const unitIdentifier = unitsDataById[unitId].identifier;
-		// What type of chart/graphic is being displayed.
-		const chartName = graphState.chartToRender;
-		if (chartName === ChartTypes.line && !lineMeterIsFetching) {
-			// Exporting a line chart
-			// Get the full y-axis unit label for a line
-			const returned = lineUnitLabel(unitsDataById[unitId], graphState.lineGraphRate, graphState.areaNormalization, graphState.selectedAreaUnit);
-			const unitLabel = returned.unitLabel
-			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
-			const rateScaling = returned.needsRateScaling ? graphState.lineGraphRate.rate : 1;
-			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
-			for (const meterId of graphState.selectedMeters) {
-				const meterArea = meterDataById[meterId].area;
-				// export if area normalization is off or the meter can be normalized
-				if (!graphState.areaNormalization || (meterArea > 0 && meterDataById[meterId].areaUnit !== AreaUnitType.none)) {
-					// Line readings data for this meter.
-					// Get the readings for the time range and unit graphed
-					const readingsData = lineMeterReadings[meterId];
-					// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-					const areaScaling = graphState.areaNormalization ?
-						meterArea * getAreaUnitConversion(meterDataById[meterId].areaUnit, graphState.selectedAreaUnit) : 1;
-					// Divide areaScaling into the rate so have complete scaling factor for readings.
-					const scaling = rateScaling / areaScaling;
-					// Make sure they are there and not being fetched.
-					if (readingsData) {
-						// Get the readings from the state.
-						const readings = _.values(readingsData);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current meter.
-						const meterIdentifier = meterDataById[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meters, errorBarState);
-					} else {
-						throw new Error(`Unacceptable condition: readingsData.readings is undefined for meter ${meterId}.`);
-					}
-				}
-			}
-			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
-			for (const groupId of graphState.selectedGroups) {
-				const groupArea = groupDataById[groupId].area;
-				// export if area normalization is off or the group can be normalized
-				if (!graphState.areaNormalization || (groupArea > 0 && groupDataById[groupId].areaUnit !== AreaUnitType.none)) {
-					// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-					const areaScaling = graphState.areaNormalization ?
-						groupArea * getAreaUnitConversion(groupDataById[groupId].areaUnit, graphState.selectedAreaUnit) : 1;
-					// Divide areaScaling into the rate so have complete scaling factor for readings.
-					const scaling = rateScaling / areaScaling;
-
-
-					// Line readings data for this group.
-					const readingsData = lineGroupReadings[groupId]
-					// Make sure they are there and not being fetched.
-					if (readingsData && !groupMeterIsFetching) {
-						// Get the readings from the state.
-						const readings = _.values(readingsData);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current group.
-						const groupName = groupDataById[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.groups);
-					} else {
-						throw new Error(`Unacceptable condition: readingsData.readings is undefined for group ${groupId}.`);
-					}
-				}
-			}
-		} else if (chartName === ChartTypes.bar) {
-			// Exporting a bar chart
-			// Get the full y-axis unit label for a bar
-			const unitLabel = barUnitLabel(unitsDataById[unitId], graphState.areaNormalization, graphState.selectedAreaUnit);
-			// Loop over the displayed meters and export one-by-one.  Does nothing if no meters selected.
-			for (const meterId of graphState.selectedMeters) {
-				// export if area normalization is off or the meter can be normalized
-				if (!graphState.areaNormalization || (meterDataById[meterId].area > 0 && meterDataById[meterId].areaUnit !== AreaUnitType.none)) {
-					// No scaling if areaNormalization is not enabled
-					let scaling = 1;
-					if (graphState.areaNormalization) {
-						// convert the meter area into the proper unit, if needed
-						scaling *= getAreaUnitConversion(meterDataById[meterId].areaUnit, graphState.selectedAreaUnit);
-					}
-					// Get the readings for the time range and unit graphed
-					const readingsData = barMeterReadings[meterId];
-					// Make sure they are there and not being fetched.
-					if (readingsData && !barMeterIsFetching) {
-
-						// Get the readings from the state.
-						const readings = _.values(readingsData);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current meter.
-						const meterIdentifier = meterDataById[meterId].identifier;
-						graphExport(sortedReadings, meterIdentifier, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.meters);
-					} else if (!readingsData && !barMeterIsFetching) {
-						throw new Error(`Unacceptable condition: bar readingsData.readings is undefined for meter ${meterId}.`);
-					}
-				}
-			}
-			// Loop over the displayed groups and export one-by-one.  Does nothing if no groups selected.
-			for (const groupId of graphState.selectedGroups) {
-				// export if area normalization is off or the group can be normalized
-				if (!graphState.areaNormalization || (groupDataById[groupId].area > 0 && groupDataById[groupId].areaUnit !== AreaUnitType.none)) {
-					// Bar readings data for this group.
-					// No scaling if areaNormalization is not enabled
-					let scaling = 1;
-					if (graphState.areaNormalization) {
-						// convert the meter area into the proper unit, if needed
-						scaling *= getAreaUnitConversion(groupDataById[groupId].areaUnit, graphState.selectedAreaUnit);
-					}
-					// Get the readings for the time range and unit graphed
-					const readingsData = barGroupReadings[groupId];
-					// Make sure they are there and not being fetched.
-					if (readingsData && !barGroupIsFetching) {
-
-						// Get the readings from the state.
-						const readings = _.values(readingsData);
-						// Sort by start timestamp.
-						const sortedReadings = _.sortBy(readings, item => item.startTimestamp, 'asc');
-						// Identifier for current group.
-						const groupName = groupDataById[groupId].name;
-						graphExport(sortedReadings, groupName, unitLabel, unitIdentifier, chartName, scaling, MeterOrGroup.groups);
-					} else if (!readingsData && !barGroupIsFetching) {
-						throw new Error(`Unacceptable condition: bar readingsData.readings is undefined for group ${groupId}.`);
-					}
-				}
-			}
-		}
-	}
+	const timeInterval = useAppSelector(selectQueryTimeInterval);
+	const somethingIsFetching = useAppSelector(selectAnythingFetching);
 
 	// Function to export raw readings of graphic data shown.
 	const exportRawReadings = async () => {
@@ -288,18 +143,17 @@ export default function ExportComponent() {
 	return (
 		<>
 			<div>
-				{/*
-				TODO conditionally disable button click if data for current graph is fetching.
-				TODO VERIFY Behavior with RTK migration
-				 */}
-				<Button color='secondary' outline onClick={exportGraphReading}>
+				{/* Buttons have no callback when any data fetch in progress */}
+				<Button color='secondary' outline onClick={() => {
+					dispatch(exportGraphReadingsThunk())
+				}}>
 					<FormattedMessage id='export.graph.data' />
 				</Button>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
 			</div>
 			{/* Only raw export if a line graph */}
 			{graphState.chartToRender === 'line' ? <div style={{ paddingTop: '10px' }}>
-				<Button color='secondary' outline onClick={exportRawReadings}>
+				<Button color='secondary' outline onClick={!somethingIsFetching ? exportRawReadings : undefined}>
 					<FormattedMessage id='export.raw.graph.data' />
 				</Button>
 			</div> : ''}
