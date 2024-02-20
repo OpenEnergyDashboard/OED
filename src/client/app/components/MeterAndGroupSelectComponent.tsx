@@ -12,12 +12,13 @@ import makeAnimated from 'react-select/animated';
 import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectAnythingFetching, selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { graphSlice } from '../redux/slices/graphSlice';
+import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
+import { updateSelectedMetersOrGroups } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options
@@ -36,7 +37,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMetersOrGroups = newValues.map(option => option.value);
-		dispatch(graphSlice.actions.updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
+		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	};
 
 	return (

@@ -2,7 +2,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { QueryStatus } from '@reduxjs/toolkit/query';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -10,7 +9,6 @@ import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { selectChartLinkHideOptions } from '../../redux/slices/appStateSlice';
-import { RootState } from '../../store';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes } from '../../types/redux/graph';
@@ -29,8 +27,8 @@ import {
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../slices/graphSlice';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
+import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
 import { createAppSelector } from './selectors';
-import { selectNameFromEntity, selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity } from './entitySelectors';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
@@ -493,10 +491,6 @@ export const selectChartLink = createAppSelector(
 	}
 )
 
-export const selectAnythingFetching = (state: RootState) => {
-	const anythingLoading = Object.values(state.api.queries).some(entry => entry?.status === QueryStatus.pending);
-	return anythingLoading;
-}
 
 
 /**
