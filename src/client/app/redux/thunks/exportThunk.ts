@@ -1,6 +1,5 @@
 import * as _ from 'lodash'
 import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectAdminState } from '../../redux/slices/adminSlice'
 import { selectGroupById } from '../../redux/api/groupsApi'
 import { metersApi, selectMeterById } from '../../redux/api/metersApi'
 import { readingsApi } from '../../redux/api/readingsApi'
@@ -10,14 +9,14 @@ import { selectBarChartQueryArgs, selectLineChartQueryArgs } from '../../redux/s
 import { selectNameFromEntity, selectScalingFromEntity } from '../../redux/selectors/entitySelectors'
 import { selectLineChartDeps } from '../../redux/selectors/lineChartSelectors'
 import { selectBarUnitLabel, selectLineUnitLabel, selectPlotlyMeterDeps } from '../../redux/selectors/plotlyDataSelectors'
+import { selectAdminState } from '../../redux/slices/adminSlice'
+import { selectHasRolePermissions } from '../../redux/slices/currentUserSlice'
 import { selectChartToRender, selectQueryTimeInterval, selectSelectedMeters, selectSelectedUnit } from '../../redux/slices/graphSlice'
 import { UserRole } from '../../types/items'
 import { ConversionData } from '../../types/redux/conversions'
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph'
-import { usersApi } from '../../utils/api'
 import graphExport, { downloadRawCSV } from '../../utils/exportData'
 import { showErrorNotification } from '../../utils/notifications'
-import { hasToken } from '../../utils/token'
 import translate from '../../utils/translate'
 import { createAppThunk } from './appThunk'
 
@@ -115,7 +114,6 @@ export const exportRawReadings = createAppThunk(
 		// we will still get the correct count since this is not done very often and don't want to get
 		// the wrong value. The time to do this is small compared to most raw exports (if file is large
 		// when it matters).
-		// const count = await metersApi.lineReadingsCount(graphState.selectedMeters, graphState.queryTimeInterval);
 		const count = await dispatch(metersApi.endpoints.lineReadingsCount.initiate({ meterIDs, timeInterval })).unwrap();
 		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
 		// This is just a decent estimate for larger files.
@@ -126,8 +124,9 @@ export const exportRawReadings = createAppThunk(
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;
 		} else if (fileSize > adminState.defaultFileSizeLimit) {
+
 			// Exceeds the size allowed unless admin or export role and must verify want to continue.
-			if (hasToken() || await usersApi.hasRolePermissions(UserRole.EXPORT)) {
+			if (selectHasRolePermissions(state, UserRole.EXPORT)) {
 				// A user allowed to do this but need to check okay with them.
 				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
 					translate('csv.download.size.warning.verify') + '?';

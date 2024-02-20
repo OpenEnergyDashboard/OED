@@ -2,22 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot from 'react-plotly.js';
-import { TimeInterval } from '../../../common/TimeInterval';
 import { readingsApi } from '../redux/api/readingsApi';
-import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
-import { graphSlice } from '../redux/slices/graphSlice';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import locales from '../types/locales';
 import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import locales from '../types/locales';
+import { PlotOED } from './PlotOED';
 
 // Stable reference for when there is not data.
 const stableEmptyReadings: LineReadings = {}
@@ -25,7 +21,6 @@ const stableEmptyReadings: LineReadings = {}
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
-	const dispatch = useAppDispatch();
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
 	// get data needed to derive/ format data from query response
@@ -57,23 +52,13 @@ export default function LineChartComponent() {
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 	const locale = useAppSelector(selectSelectedLanguage);
 
-	const datasets: Partial<Plotly.PlotData>[] = meterPlotlyData.concat(groupPlotlyData);
+	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData])
+	const datasets = React.useDeferredValue(data)
 	if (meterIsLoading || groupIsLoading) {
 		return <LogoSpinner />
 	}
 
-	const handleRelayout = (e: PlotRelayoutEvent) => {
-		// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
-		// These values indicate when the user has zoomed or made other changes to the graph.
-		if (e['xaxis.range[0]'] && e['xaxis.range[0]']) {
-			// The event signals changes in the user's interaction with the graph.
-			// this will automatically trigger a refetch due to updating a query arg.
-			const startTS = moment.utc(e['xaxis.range[0]'])
-			const endTS = moment.utc(e['xaxis.range[1]'])
-			const workingTimeInterval = new TimeInterval(startTS, endTS);
-			dispatch(graphSlice.actions.updateTimeInterval(workingTimeInterval));
-		}
-	};
+
 	// Check if there is at least one valid graph
 	const ableToGraph = datasets.find(data => data.x!.length > 1);
 	// Customize the layout of the plot
@@ -84,11 +69,8 @@ export default function LineChartComponent() {
 		return <h1>{`${translate('threeD.no.data')}`}</h1>
 	} else {
 		return (
-			<Plot
-				data={datasets as Plotly.Data[]}
-				onRelayout={handleRelayout}
-				style={{ width: '100%', height: '100%' }}
-				useResizeHandler={true}
+			<PlotOED
+				data={datasets}
 				layout={{
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },

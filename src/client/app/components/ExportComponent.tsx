@@ -5,11 +5,14 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import { selectLineChartDeps } from '../redux/selectors/lineChartSelectors';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
+import { selectLineChartDeps } from '../redux/selectors/lineChartSelectors';
+import { selectHasRolePermissions } from '../redux/slices/currentUserSlice';
 import { selectChartToRender } from '../redux/slices/graphSlice';
 import { exportGraphReadingsThunk, exportRawReadings } from '../redux/thunks/exportThunk';
+import { UserRole } from '../types/items';
+import { ChartTypes } from '../types/redux/graph';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 /**
  * Creates export buttons and does code for handling export to CSV files.
@@ -20,23 +23,30 @@ export default function ExportComponent() {
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps)
 	const chartToRender = useAppSelector(selectChartToRender);
-	const shouldExport = !somethingIsFetching && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0)
+	const hasRolePermissions = useAppSelector(state => selectHasRolePermissions(state, UserRole.EXPORT))
+	const canExport = !somethingIsFetching && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0)
 
 	return (
 		<>
-			<div>
-				{/* Buttons have no callback when any data fetch in progress */}
-				<Button color='secondary' outline onClick={() => shouldExport && dispatch(exportGraphReadingsThunk())}>
-					<FormattedMessage id='export.graph.data' />
-				</Button>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
-			</div>
-			{/* Only raw export if a line graph */}
-			{chartToRender === 'line' ? <div style={{ paddingTop: '10px' }}>
-				<Button color='secondary' outline onClick={() => shouldExport && dispatch(exportRawReadings())}>
-					<FormattedMessage id='export.raw.graph.data' />
-				</Button>
-			</div> : ''}
+			{
+				hasRolePermissions &&
+				<div>
+					{/* will not dispatch if data in flight */}
+					<Button color='secondary' outline onClick={() => canExport && dispatch(exportGraphReadingsThunk())}>
+						<FormattedMessage id='export.graph.data' />
+					</Button>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
+				</div>
+			}
+			{
+				/* Only raw export if a line graph */
+				chartToRender === ChartTypes.line && hasRolePermissions &&
+				<div style={{ paddingTop: '10px' }}>
+					<Button color='secondary' outline onClick={() => canExport && dispatch(exportRawReadings())}>
+						<FormattedMessage id='export.raw.graph.data' />
+					</Button>
+				</div>
+			}
 		</>
 	);
 }

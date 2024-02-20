@@ -15,7 +15,7 @@ export default function HistoryComponent() {
 	const forwardStack = useAppSelector(selectForwardHistory);
 
 	return (
-		<div style={{ width: '80%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+		<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
 			<svg width={20} height={20} viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
 				style={{ visibility: !backStack.length ? 'hidden' : 'visible', cursor: 'pointer' }}
 				onClick={() => dispatch(historyStepBack())}

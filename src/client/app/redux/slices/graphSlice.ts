@@ -3,15 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
+import { clearGraphHistory, historyStepBack, historyStepForward, processGraphLink, updateHistory } from '../../redux/actions/extraActions';
 import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
-import { updateHistory, historyStepBack, historyStepForward, processGraphLink } from '../../redux/actions/extraActions';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
@@ -84,7 +85,9 @@ export const graphSlice = createSlice({
 			}
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.rangeSliderInterval = action.payload;
+			if (action.payload.getIsBounded() || state.current.rangeSliderInterval.getIsBounded()) {
+				state.current.rangeSliderInterval = action.payload;
+			}
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderInterval = TimeInterval.unbounded();
@@ -236,6 +239,11 @@ export const graphSlice = createSlice({
 					state.current = next;
 				}
 			})
+			.addCase(clearGraphHistory, state => {
+				state.current = _.cloneDeep(defaultState)
+				state.prev = [];
+				state.next = [];
+			})
 			.addCase(processGraphLink, ({ current }, { payload }) => {
 				current.hotlinked = true;
 				payload.forEach((value, key) => {
@@ -335,7 +343,10 @@ export const graphSlice = createSlice({
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
-		selectThreeDReadingInterval: state => state.current.threeD.readingInterval
+		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
+		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
+		selectDefaultGraphState: () => defaultState,
+		selectIsDirty: state => state.prev.length > 0 || state.next.length > 0
 	}
 })
 
@@ -351,7 +362,8 @@ export const {
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectGraphAreaNormalization
+	selectGraphAreaNormalization, selectSliderRangeInterval,
+	selectDefaultGraphState, selectIsDirty
 } = graphSlice.selectors;
 
 // actionCreators exports
