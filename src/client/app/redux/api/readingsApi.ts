@@ -22,7 +22,7 @@ export const readingsApi = baseApi.injectEndpoints({
 			// Refer to the line endpoint for an example of an endpoint with custom cache behavior
 			query: ({ id, timeInterval, graphicUnitId, readingInterval, meterOrGroup }) => ({
 				// destructure args that are passed into the callback, and generate/ implicitly return the API url for the request.
-				url: `api/unitReadings/threeD/${meterOrGroup}/${id}?`,
+				url: `api/unitReadings/threeD/${meterOrGroup}/${id}`,
 				params: { timeInterval, graphicUnitId, readingInterval }
 			})
 		}),
