@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { PlotRelayoutEvent } from 'plotly.js';
+import { Datum, PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot, { Figure } from 'react-plotly.js';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -53,18 +53,18 @@ export const PlotOED = (props: OEDPlotProps) => {
 	const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1])
 
 	// Get min/ max value from dataset
-	const min = minDataset?.x?.[0]
-	const max = maxDataset?.x?.[maxDataset?.x?.length - 1]
+	const min = minDataset?.x?.[0] as Datum
+	const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum
 
 	// RangeSlider's min/max value
 	// if unbounded, then undefined
-	const rangeSliderMin = rangeSlider.getStartTimestamp()?.utc().toDate()
-	const rangeSliderMax = rangeSlider.getEndTimestamp()?.utc().toDate()
+	const rangeSliderMin = rangeSlider.getStartTimestamp()?.utc().toDate().toISOString() as Datum
+	const rangeSliderMax = rangeSlider.getEndTimestamp()?.utc().toDate().toISOString() as Datum
 
 	// Use rangeSlider if not unbounded else min/max
 	const start = rangeSliderMin ?? min
 	const end = rangeSliderMax ?? max
-	console.log(figure.current)
+
 	return <Plot style={{ width: '100%', height: '100%' }}
 		data={data}
 		config={config}
@@ -75,7 +75,13 @@ export const PlotOED = (props: OEDPlotProps) => {
 			...figure.current.layout,
 			xaxis: {
 				...figure.current.layout?.xaxis,
-				range: [start, end]
+				// xaxis.range: Current position of slider knobs subSet- of range-slider.range
+				range: [start, end],
+				// rangeslider: range of min and max reading dates (queryInterval())
+				rangeslider: {
+					...figure.current.layout?.xaxis?.rangeslider,
+					range: [min, max]
+				}
 			}
 		}}
 	// onHover={e => console.log(e)}
