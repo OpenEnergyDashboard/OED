@@ -10,7 +10,7 @@ import 'react-calendar/dist/Calendar.css';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
+import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
 import '../styles/DateRangeCustom.css';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
@@ -26,7 +26,10 @@ export default function DateRangeComponent() {
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 
-	const handleChange = (value: Value) => { dispatch(updateTimeInterval(dateRangeToTimeInterval(value))) }
+	const handleChange = (value: Value) => {
+		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)))
+		dispatch(changeSliderRange(dateRangeToTimeInterval(value)))
+	}
 
 
 	return (

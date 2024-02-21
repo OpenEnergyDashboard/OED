@@ -6,7 +6,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { authApi } from '../api/authApi';
 import { userApi } from '../api/userApi';
-import {  UserRole } from '../../types/items';
+import { UserRole } from '../../types/items';
 import { CurrentUserState } from '../../types/redux/currentUser';
 import { setToken } from '../../utils/token';
 
@@ -49,14 +49,21 @@ export const currentUserSlice = createSlice({
 		selectCurrentUser: state => state,
 		selectCurrentUserRole: state => state.profile?.role,
 		// Should resolve to a boolean, Typescript doesn't agree so type assertion 'as boolean'
-		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN)
+		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN),
+		selectHasRolePermissions: (state, role: UserRole): boolean => {
+			const isAdmin = currentUserSlice.getSelectors().selectIsAdmin(state)
+			const userRole = currentUserSlice.getSelectors().selectCurrentUserRole(state)
+			return Boolean(isAdmin || (userRole && userRole === role))
+
+		}
 	}
 })
 
 export const {
 	selectCurrentUser,
 	selectCurrentUserRole,
-	selectIsAdmin
+	selectIsAdmin,
+	selectHasRolePermissions
 } = currentUserSlice.selectors
 
 export const {

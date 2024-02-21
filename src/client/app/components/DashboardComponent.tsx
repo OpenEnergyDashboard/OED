@@ -4,17 +4,17 @@
 
 import * as React from 'react';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectOptionsVisibility } from '../redux/slices/appStateSlice';
+import { selectChartToRender } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import BarChartComponent from './BarChartComponent';
-import HistoryComponent from './HistoryComponent';
 import LineChartComponent from './LineChartComponent';
 import MapChartComponent from './MapChartComponent';
 import MultiCompareChartComponent from './MultiCompareChartComponent';
+import RadarChartComponent from './RadarChartComponent';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
-import { selectChartToRender } from '../redux/slices/graphSlice';
-import { selectOptionsVisibility } from '../redux/slices/appStateSlice';
-import RadarChartComponent from './RadarChartComponent';
+import PlotNavComponent from './PlotNavComponent';
 
 /**
  * React component that controls the dashboard
@@ -32,7 +32,7 @@ export default function DashboardComponent() {
 				</div>
 				<div className={`${optionsVisibility ? 'col-12 col-lg-10' : 'col-12'} align-self-auto text-center`} style={{ height: '100%' }}>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
-						<HistoryComponent />
+						<PlotNavComponent />
 						{chartToRender === ChartTypes.line && <LineChartComponent />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent />}
 						{chartToRender === ChartTypes.compare && <MultiCompareChartComponent />}
