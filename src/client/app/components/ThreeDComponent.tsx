@@ -58,7 +58,7 @@ export default function ThreeDComponent() {
 		layout = setHelpLayout(translate('threeD.rendering'));
 	} else if (threeDData.zData.length === 0) {
 		// There is no data in the selected date range.
-		layout = setHelpLayout(translate('threeD.no.data'));
+		layout = setHelpLayout(translate('no.data.in.range'));
 	} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
 		// Special Case where meter frequency is greater than 12 hour intervals
 		layout = setHelpLayout(translate('threeD.incompatible'));

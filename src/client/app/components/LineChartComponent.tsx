@@ -81,7 +81,7 @@ export default function LineChartComponent() {
 	if (datasets.length === 0) {
 		return <h1>{`${translate('select.meter.group')}`}	</h1>
 	} else if (!ableToGraph) {
-		return <h1>{`${translate('threeD.no.data')}`}</h1>
+		return <h1>{`${translate('no.data.in.range')}`}</h1>
 	} else {
 		return (
 			<Plot
