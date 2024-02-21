@@ -65,7 +65,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 	const start = rangeSliderMin ?? min
 	const end = rangeSliderMax ?? max
 
-	return <Plot style={{ width: '100%', height: '100%' }}
+	return <Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
 		data={data}
 		config={config}
 		onRelayout={debouncedSliderUpdate}
