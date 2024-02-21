@@ -4,8 +4,6 @@
 
 import * as moment from 'moment';
 import * as React from 'react';
-import Plot from 'react-plotly.js';
-import { selectGraphState } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
@@ -13,6 +11,7 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
+import { selectGraphState } from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
@@ -22,6 +21,7 @@ import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateR
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
+import { PlotOED } from './PlotOED';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
 
@@ -31,7 +31,7 @@ import ThreeDPillComponent from './ThreeDPillComponent';
  */
 export default function ThreeDComponent() {
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	const { data, isLoading: isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -71,12 +71,9 @@ export default function ThreeDComponent() {
 			<ThreeDPillComponent />
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
-				: <Plot
-					data={dataToRender as Plotly.Data[]}
+				: <PlotOED
+					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
-					config={config}
-					style={{ width: '100%', flexGrow: '1' }}
-					useResizeHandler={true}
 				/>
 			}
 		</>
@@ -253,7 +250,3 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	} as Partial<Plotly.Layout>
 }
 
-const config = {
-	responsive: true,
-	displayModeBar: false
-};

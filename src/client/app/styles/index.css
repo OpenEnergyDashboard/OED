@@ -24,3 +24,8 @@ body {
 			display: none;
 	}
 }
+
+/* Hide Default Plotly Notifications, Like DoubleClick, etc. */
+div.plotly-notifier {
+  visibility: hidden;
+}

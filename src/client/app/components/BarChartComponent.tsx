@@ -8,9 +8,7 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/selectors/barChartSelectors';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { selectBarStacking } from '../redux/slices/graphSlice';
-import locales from '../types/locales';
 import { BarReadings } from '../types/readings';
 import translate from '../utils/translate';
 import { PlotOED } from './PlotOED';
@@ -46,7 +44,6 @@ export default function BarChartComponent() {
 	// The unit label depends on the unit which is in selectUnit state.
 	const raw = useAppSelector(selectIsRaw);
 	const unitLabel = useAppSelector(selectBarUnitLabel);
-	const locale = useAppSelector(selectSelectedLanguage);
 
 
 	// useQueryHooks for data fetching
@@ -75,12 +72,6 @@ export default function BarChartComponent() {
 		return (
 			<PlotOED
 				data={datasets}
-				config={{
-					displayModeBar: false,
-					responsive: true,
-					locale,
-					locales
-				}}
 				layout={{
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
@@ -93,7 +84,6 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
-						// rangeselector: { visible: true },
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,

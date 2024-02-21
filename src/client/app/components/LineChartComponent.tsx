@@ -8,8 +8,6 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import locales from '../types/locales';
 import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
@@ -50,7 +48,6 @@ export default function LineChartComponent() {
 
 	// Use Query Data to derive plotly datasets memoized selector
 	const unitLabel = useAppSelector(selectLineUnitLabel);
-	const locale = useAppSelector(selectSelectedLanguage);
 
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData])
 	const datasets = React.useDeferredValue(data)
@@ -76,16 +73,7 @@ export default function LineChartComponent() {
 					legend: { x: 0, y: 1.1, orientation: 'h' },
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
-					xaxis: {
-						rangeslider: { visible: true },
-						showgrid: true, gridcolor: '#ddd'
-					}
-				}}
-				config={{
-					responsive: true,
-					displayModeBar: false,
-					locale,
-					locales
+					xaxis: { rangeslider: { visible: true }, showgrid: true, gridcolor: '#ddd' }
 				}}
 			/>
 		)

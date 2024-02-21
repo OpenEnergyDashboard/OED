@@ -2,28 +2,37 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Datum, PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
-import Plot, { Figure } from 'react-plotly.js';
-import { useDebounceCallback } from 'usehooks-ts';
+import Plot, { Figure, PlotParams } from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { changeSliderRange, selectSliderRangeInterval } from '../redux/slices/graphSlice';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import { changeSliderRange, selectPlotlySliderMax, selectPlotlySliderMin } from '../redux/slices/graphSlice';
+import locales from '../types/locales';
+
 
 
 export interface OEDPlotProps {
 	data: Partial<Plotly.PlotData>[];
-	layout: Partial<Plotly.Layout>
-	config: Partial<Plotly.Config>
+	layout: Partial<Plotly.Layout>;
+	config?: Partial<Plotly.Config>;
+	frames?: Plotly.Frame[] | undefined;
+
 }
 
 export const PlotOED = (props: OEDPlotProps) => {
-	const { data, config } = props;
+	const { data } = props
 	const dispatch = useAppDispatch();
 
-	// don't need value but trigger re-render when changes
-	const rangeSlider = useAppSelector(selectSliderRangeInterval);
+	// Current Range Slider. Controls Zoom for graphics.
+	const rangeSliderMin = useAppSelector(selectPlotlySliderMin)
+	const rangeSliderMax = useAppSelector(selectPlotlySliderMax)
+	const locale = useAppSelector(selectSelectedLanguage);
 
-	const figure = React.useRef<Partial<Figure>>(props)
-	const debouncedSliderUpdate = useDebounceCallback(
+	// Local State for plotly
+	const figure = React.useRef<Partial<PlotParams>>(props)
+
+	// Debounce to limit dispatch and keep reasonable history
+	const debouncedRelayout = _.debounce(
 		(e: PlotRelayoutEvent) => {
 			// console.log(e)
 			// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
@@ -43,47 +52,69 @@ export const PlotOED = (props: OEDPlotProps) => {
 				dispatch(changeSliderRange(new TimeInterval(startTS, endTS)));
 
 			}
-		});
-	const trackPlotly = (e: Figure) => {
-		figure.current = { ...e }
-	}
+		}, 500, { leading: false, trailing: true });
 
+	// Save plotly state as ref. Not using state which would cause excessive re-renders
+	const trackPlotly = (e: Figure) => {
+		figure.current = {
+			...figure.current,
+			...e
+		} as PlotParams
+	};
+
+	// Iterating through datasets may be expensive, so useMemo()
 	// Get dataset wth min /max date
-	const minDataset = _.minBy(data, obj => obj.x![0])
-	const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1])
+	const minRange = React.useMemo(() => {
+		const minDataset = _.minBy(data, obj => obj.x![0])
+		const min = minDataset?.x?.[0]
+		return min as Datum
+	}, [props.data])
 
 	// Get min/ max value from dataset
-	const min = minDataset?.x?.[0] as Datum
-	const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum
+	const maxRange = React.useMemo(() => {
+		const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1])
+		const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum
+		return max as Datum
+	}, [props.data])
 
-	// RangeSlider's min/max value
-	// if unbounded, then undefined
-	const rangeSliderMin = rangeSlider.getStartTimestamp()?.utc().toDate().toISOString() as Datum
-	const rangeSliderMax = rangeSlider.getEndTimestamp()?.utc().toDate().toISOString() as Datum
+	// Use rangeSlider when bounded, else use min/maxRange
+	const start = rangeSliderMin ?? minRange
+	const end = rangeSliderMax ?? maxRange
 
-	// Use rangeSlider if not unbounded else min/max
-	const start = rangeSliderMin ?? min
-	const end = rangeSliderMax ?? max
-
-	return <Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
-		data={data}
-		config={config}
-		onRelayout={debouncedSliderUpdate}
-		onUpdate={trackPlotly}
-		useResizeHandler
-		layout={{
-			...figure.current.layout,
-			xaxis: {
-				...figure.current.layout?.xaxis,
-				// xaxis.range: Current position of slider knobs subSet- of range-slider.range
-				range: [start, end],
-				// rangeslider: range of min and max reading dates (queryInterval())
-				rangeslider: {
-					...figure.current.layout?.xaxis?.rangeslider,
-					range: [min, max]
+	return (
+		<Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
+			data={props.data}
+			onRelayout={debouncedRelayout}
+			onUpdate={trackPlotly}
+			useResizeHandler
+			config={{
+				responsive: true,
+				displayModeBar: false,
+				// Current Locale
+				locale,
+				// Available Locales
+				locales,
+				// Buggy Behavior with current architecture, so doubleClick  disabled in favor of custom expand ui.
+				doubleClick: false,
+				...props.config
+			}}
+			layout={{
+				// useProps Layout first, if any
+				...props.layout,
+				// then overwrite with current, if any
+				// figure takes priority, as values are added throughout user interactions.
+				...figure.current.layout,
+				xaxis: {
+					...figure.current.layout?.xaxis,
+					// rangeslider: range of min and max reading dates (queryInterval())
+					rangeslider: {
+						...figure.current.layout?.xaxis?.rangeslider,
+						range: [minRange, maxRange]
+					},
+					// xaxis.range: Current position of slider knobs. A subSet of range-slider.range
+					range: [start, end]
 				}
-			}
-		}}
-	// onHover={e => console.log(e)}
-	/>
+			}}
+		/>
+	)
 }

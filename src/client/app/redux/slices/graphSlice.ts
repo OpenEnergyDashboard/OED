@@ -344,9 +344,11 @@ export const graphSlice = createSlice({
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
-		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
 		selectDefaultGraphState: () => defaultState,
-		selectIsDirty: state => state.prev.length > 0 || state.next.length > 0
+		selectIsDirty: state => state.prev.length > 0 || state.next.length > 0,
+		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
+		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
+		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
 	}
 })
 
@@ -363,7 +365,8 @@ export const {
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization, selectSliderRangeInterval,
-	selectDefaultGraphState, selectIsDirty
+	selectDefaultGraphState, selectIsDirty,
+	selectPlotlySliderMax, selectPlotlySliderMin
 } = graphSlice.selectors;
 
 // actionCreators exports
