@@ -15,7 +15,7 @@ const { prepareTest,
     // createTimeString,
     getUnitId,
     ETERNITY,
-    // METER_ID,
+    METER_ID,
     GROUP_ID,
     unitDatakWh,
     conversionDatakWh,
@@ -171,9 +171,9 @@ mocha.describe('readings API', () => {
 
                     const meterData = [
                         {
-                            name: 'Electric_Utility pound of CO₂',
+                            name: 'Electric Utility pound of CO₂',
                             unit: 'Electric_Utility',
-                            defaultGraphicUnit: 'pound of CO₂',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -189,7 +189,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility Other',
                             unit: 'Electric_Utility',
                             //not sure change the property of GraphicUnit
-                            defaultGraphicUnit: 'pound of CO₂',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
@@ -207,7 +207,7 @@ mocha.describe('readings API', () => {
                             name: 'Electric Utility pound of CO₂ + Other',
                             displayable: true,
                             note: 'special group',
-                            defaultGraphicUnit: 'pound of CO₂',
+                            //defaultGraphicUnit: 'pound of CO₂',
                             childMeters: ['Electric Utility pound of CO₂', 'Electric Utility Other'],
                             childGroups: [],
                         }
