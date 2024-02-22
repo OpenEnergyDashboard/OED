@@ -67,7 +67,7 @@ mocha.describe('readings API', () => {
 
                 // Add LG20 here
 
-                mocha.it('LG21: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
+                mocha.it('LG21: should have hourly points for middle readings of 15 + 20 minute for a 60 day period and quantity units & kWh as MJ', async () => {
                     // Load the data into the database
                     const unitData = unitDatakWh.concat([
                         {
