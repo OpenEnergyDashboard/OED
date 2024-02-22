@@ -11,7 +11,6 @@ import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
-
 interface MapsDetailProps {
 	maps: number[];
 	unsavedChanges: boolean;

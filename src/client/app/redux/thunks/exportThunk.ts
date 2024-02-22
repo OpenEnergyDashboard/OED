@@ -57,7 +57,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
 					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
-					graphExport(sortedReadings, entityName, lineUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.meters, showMinMax);
+					graphExport(sortedReadings, entityName, lineUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups, showMinMax);
 				})
 		}
 
@@ -89,7 +89,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
 					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
-					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.meters);
+					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups);
 				})
 		}
 		return api.fulfillWithValue('success')
