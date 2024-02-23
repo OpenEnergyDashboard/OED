@@ -25,7 +25,7 @@ mocha.describe('readings API', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('for quantity meters', () => {
                 // This date range is on the threshold of returning daily point readings, 61 days
-                mocha.it('L3: should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
+                mocha.it('LM3: should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
                     // Load the data into the database (u1, u2, c1)
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.
