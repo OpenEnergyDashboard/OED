@@ -20,7 +20,6 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
-import { ConversionArray } from '../../types/conversionArray';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser, getGPSString, nullToEmptyString, noUnitTranslated } from '../../utils/input';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -119,6 +118,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// unit state
 	const unitState = useSelector((state: State) => state.units.units);
 
+	// cik state
+	const ciksState = useSelector((state: State) => state.ciks.ciks);
+
 
 	/* Edit Meter Validation:
 		Name cannot be blank
@@ -176,6 +178,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		state.maxDate,
 		state.maxError
 	]);
+
 	/* End State */
 
 	// Reset the state to default values
@@ -370,9 +373,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			compatibleUnits: new Set(compatibleUnits),
 			incompatibleUnits: new Set(incompatibleUnits)
 		});
-		// If either unit or the status of pik changes then this needs to be done.
-		// pik is needed since the compatible units is not correct until pik is available.
-	}, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
+		// If either unit changes then this needs to be done.
+		// make sure ciksState is available.
+	}, [state.unitId, state.defaultGraphicUnit, ciksState]);
 
 	// If you edit and return to this page then want to see the DB result formatted for users
 	// for the readingFrequency. Since the update on save is to the global state, need to
@@ -642,6 +645,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
+
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>

@@ -19,7 +19,7 @@ mocha.describe("Units routes", () => {
 
     mocha.it('returns one visible unit', async () => {
         const conn = testDB.getConnection();
-        const expected = new Unit(undefined, 'kwh', 'kWh', Unit.unitRepresentType.QUANTITY, undefined, Unit.unitType.UNIT, null, '', Unit.displayableType.ALL, true, "standard unit");
+        const expected = new Unit(undefined, 'kwh', 'kWh', Unit.unitRepresentType.QUANTITY, undefined, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, "standard unit");
         await expected.insert(conn);
         const res = await chai.request(app).get('/api/units');
         expect(res).to.have.status(200);
@@ -48,7 +48,7 @@ mocha.describe("Units routes", () => {
         for (let i = 0; i < units.length; ++i) {
             const unitData = units[i];
             const aUnit = new Unit(undefined, unitData[0], unitData[1], unitData[2], undefined,
-                unitData[3], null, unitData[4], unitData[5], unitData[6], 'test unit' + i);
+                unitData[3], unitData[4], unitData[5], unitData[6], 'test unit' + i);
             expectedUnits.push(aUnit);
             await aUnit.insert(conn);
         }

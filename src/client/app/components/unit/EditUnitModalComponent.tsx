@@ -48,8 +48,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		secInRate: props.unit.secInRate,
 		suffix: props.unit.suffix,
 		note: props.unit.note,
-		id: props.unit.id,
-		unitIndex: props.unit.unitIndex
+		id: props.unit.id
 	}
 
 	/* State */

@@ -5,8 +5,6 @@
 import { store }  from '../store';
 import * as _ from 'lodash';
 import { MeterData } from '../types/redux/meters';
-import { ConversionArray } from '../types/conversionArray';
-import { UnitData, UnitType } from '../types/redux/units';
 import { GroupDefinition, GroupEditData } from '../types/redux/groups';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
@@ -62,73 +60,27 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 
 /**
  * Returns a set of units ids that are compatible with a specific unit id.
- * @param unitId The unit id.
- * @returns Set of units ids that are compatible with specified unit id.
+ * @param unitId The unit id
+ * @returns a set of compatible unit ids
  */
 export function unitsCompatibleWithUnit(unitId: number): Set<number> {
-	// unitSet starts as an empty set.
+	// access the global state
+	const state = store.getState();
 	const unitSet = new Set<number>();
+	// get all ciks data
+	const globalCiksState = state.ciks.ciks;
 	// If unit was null in the database then -99. This means there is no unit
 	// so nothing is compatible with it. Skip processing and return empty set at end.
-	// Do same if pik is not yet available.
-	if (unitId != -99 && ConversionArray.pikAvailable()) {
-		// The Pik array.
-		const pik = ConversionArray.pik;
-		// Get the row index in Pik of this unit.
-		const row = pRowFromUnit(unitId);
-		// The compatible units are all columns with true for Pik where i = row.
-		// Loops over all columns of Pik in row.
-		for (let k = 0; k < pik[0].length; ++k) {
-			if (pik[row][k]) {
-				// unit at index k is compatible with meter unit so add to set.
-				// Convert index in Pik to unit id.
-				unitSet.add(unitFromPColumn(k));
+	if (unitId !== -99) {
+		// loop through each cik to find ones whose meterUnitId equals unitId param
+		// then add the corresponding nonMeterUnitId to the unitSet
+		for (const cik of globalCiksState) {
+			if (cik.meterUnitId === unitId) {
+				unitSet.add(cik.nonMeterUnitId);
 			}
 		}
 	}
 	return unitSet;
-}
-
-/**
- * Returns the row index in Pik for a meter unit.
- * @param unitId The unit id.
- * @returns The row index in Pik for given meter unit.
- */
-export function pRowFromUnit(unitId: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
-		// Since this is the row index, type of unit must be meter.
-		return o.id == unitId && o.typeOfUnit == UnitType.meter;
-	}) as UnitData;
-	return unit.unitIndex;
-}
-
-/**
- * Returns the unit id given the row in Pik.
- * @param row The row to find the associated unit.
- * @returns The unit id given the row in Pik units.
- */
-export function unitFromPRow(row: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
-		// Since the given unitIndex is a row index, the unit type must be meter.
-		return o.unitIndex == row && o.typeOfUnit == UnitType.meter;
-	}) as UnitData;
-	return unit.id;
-}
-
-/**
- * Returns the unit id given the column in Pik.
- * @param column The column to find the associated unit.
- * @returns The unit id given the column in Pik.
- */
-export function unitFromPColumn(column: number): number {
-	const state = store.getState();
-	const unit = _.find(state.units.units, function (o: UnitData) {
-		// Since the given unitIndex is a column index, the unit type must be different from meter.
-		return o.unitIndex == column && o.typeOfUnit != UnitType.meter;
-	}) as UnitData;
-	return unit.id;
 }
 
 /**

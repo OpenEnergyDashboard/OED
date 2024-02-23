@@ -51,12 +51,9 @@ AS $$
 DECLARE
 	prev_start TIMESTAMP;
 	prev_end TIMESTAMP;
-	unit_column INTEGER;
 BEGIN
 	prev_start := curr_start - shift;
 	prev_end := curr_end - shift;
-	-- unit_column holds the column index into the cik table. This is the unit that was requested for graphing.
-	SELECT unit_index INTO unit_column FROM units WHERE id = graphic_unit_id;
 
 	RETURN QUERY
 	WITH
@@ -65,15 +62,12 @@ BEGIN
 			meters.id AS meter_id,
 			-- Convert the reading based on the conversion found below.
 			SUM(r.reading) * c.slope + c.intercept AS reading
-		FROM ((((readings r
+		FROM (((readings r
 		INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
-		-- This sequence of joins takes the meter id to its unit and in the final join
-		-- it then uses the unit_index for this unit.
 		INNER JOIN meters m ON m.id = meters.id)
-		INNER JOIN units u ON m.unit_id = u.id)
-		-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+		-- This is getting the conversion for the meter and unit to graph.
 		-- The slope and intercept are used above the transform the reading to the desired unit.
-		INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 		WHERE r.start_timestamp >= curr_start AND r.end_timestamp <= curr_end
 		GROUP BY meters.id, c.slope, c.intercept
 	),
@@ -82,15 +76,12 @@ BEGIN
 			meters.id AS meter_id,
 			-- Convert the reading based on the conversion found below.
 			SUM(r.reading) * c.slope + c.intercept AS reading
-		FROM ((((readings r
+		FROM (((readings r
 			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
-		-- This sequence of joins takes the meter id to its unit and in the final join
-		-- it then uses the unit_index for this unit.
 		INNER JOIN meters m ON m.id = meters.id)
-		INNER JOIN units u ON m.unit_id = u.id)
-		-- This is getting the conversion for the meter (row_index) and unit to graph (column_index).
+		-- This is getting the conversion for the meter and unit to graph.
 		-- The slope and intercept are used above the transform the reading to the desired unit.
-		INNER JOIN cik c on c.row_index = u.unit_index AND c.column_index = unit_column)
+		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 		WHERE r.start_timestamp >= prev_start AND r.end_timestamp <= prev_end
 		GROUP BY meters.id, c.slope, c.intercept
 	)
