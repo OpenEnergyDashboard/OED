@@ -22,7 +22,7 @@ const { prepareTest,
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
-        mocha.describe('for line charts', () => {
+        mocha.describe('for line charts with min/max', () => {
             mocha.describe('for quantity meters', () => {
                 // This date range is on the threshold of returning daily point readings, 61 days
                 mocha.it('LM3: should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
