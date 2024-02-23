@@ -89,12 +89,12 @@ function expectMaxMinToEqualExpected(res, expected, id = METER_ID) {
     for (let i = 0; i < expected.length; i++) {
         // Check that the reading's value is within the expected tolerance (DELTA).
         expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][1]), DELTA);
+        // Reading also has correct max/min
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][2]), DELTA);
         // Reading has correct start/end date and time
         expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][3]));
         expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][4]));
-        // Reading also has correct max/min
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(Date.parse(expected[i][0]));
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(Date.parse(expected[i][2]));
     }
 }
 
@@ -266,6 +266,7 @@ module.exports = {
     prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
+    expectMaxMinToEqualExpected,
     expectThreeDReadingToEqualExpected,
     createTimeString,
     getUnitId,
