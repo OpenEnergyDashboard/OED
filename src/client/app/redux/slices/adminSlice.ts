@@ -77,7 +77,7 @@ export const adminSlice = createSlice({
 				isFetching: false,
 				...action.payload,
 				defaultMeterReadingFrequency: durationFormat(action.payload.defaultMeterReadingFrequency)
-			}
+			};
 		},
 		markPreferencesNotSubmitted: state => {
 			state.submitted = false;
@@ -130,7 +130,7 @@ export const adminSlice = createSlice({
 			state.submitted = false;
 		},
 		updateDefaultHelpUrl: (state, action: PayloadAction<string>) => {
-			state.defaultHelpUrl = action.payload
+			state.defaultHelpUrl = action.payload;
 			state.submitted = false;
 		}
 	},
@@ -139,7 +139,7 @@ export const adminSlice = createSlice({
 			...state,
 			...action.payload,
 			defaultMeterReadingFrequency: durationFormat(action.payload.defaultMeterReadingFrequency)
-		}))
+		}));
 	},
 	selectors: {
 		selectAdminState: state => state,
@@ -164,10 +164,10 @@ export const {
 	updateDefaultMeterReadingGap,
 	updateDefaultMeterMaximumErrors,
 	updateDefaultMeterDisableChecks
-} = adminSlice.actions
+} = adminSlice.actions;
 
 export const {
 	selectAdminState,
 	selectDisplayTitle,
 	selectBaseHelpUrl
-} = adminSlice.selectors
+} = adminSlice.selectors;

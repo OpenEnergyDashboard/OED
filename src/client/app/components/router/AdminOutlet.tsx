@@ -13,11 +13,11 @@ import { authApi, authPollInterval } from '../../redux/api/authApi';
  */
 export default function AdminOutlet() {
 	const { isAdmin, initComplete } = useWaitForInit();
-	authApi.useTokenPollQuery(undefined, { pollingInterval: authPollInterval })
+	authApi.useTokenPollQuery(undefined, { pollingInterval: authPollInterval });
 	if (!initComplete) {
 		// Return a spinner until all init queries return and populate cache with data
-		return <InitializingComponent />
+		return <InitializingComponent />;
 	}
 	// if user is an admin return requested route, otherwise redirect to root
-	return isAdmin ? <Outlet /> : <Navigate to='/' />
+	return isAdmin ? <Outlet /> : <Navigate to='/' />;
 }

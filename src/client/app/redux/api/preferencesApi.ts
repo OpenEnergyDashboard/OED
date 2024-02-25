@@ -21,4 +21,4 @@ export const preferencesApi = baseApi.injectEndpoints({
 			invalidatesTags: ['Preferences']
 		})
 	})
-})
+});

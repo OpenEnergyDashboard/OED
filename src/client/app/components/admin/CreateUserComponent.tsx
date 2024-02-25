@@ -23,23 +23,23 @@ export default function CreateUserComponent() {
 	const [passwordMatch, setPasswordMatch] = React.useState<boolean>(true);
 	const [role, setRole] = React.useState<UserRole>(UserRole.ADMIN);
 	const [createUser] = userApi.useCreateUserMutation();
-	const nav = useNavigate()
+	const nav = useNavigate();
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (password == confirmPassword) {
 			setPasswordMatch(true);
-			const newUser: NewUser = { email, role, password }
+			const newUser: NewUser = { email, role, password };
 			createUser(newUser)
 				.unwrap()
 				.then(() => {
-					showSuccessNotification(translate('users.successfully.create.user'))
-					nav('/users')
+					showSuccessNotification(translate('users.successfully.create.user'));
+					nav('/users');
 
 				})
 				.catch(() => {
 					showErrorNotification(translate('users.failed.to.create.user'));
-				})
+				});
 		} else {
 			setPasswordMatch(false);
 		}
@@ -79,7 +79,7 @@ export default function CreateUserComponent() {
 			</div>
 		</div>
 
-	)
+	);
 }
 const formInputStyle: React.CSSProperties = {
 	paddingBottom: '5px'

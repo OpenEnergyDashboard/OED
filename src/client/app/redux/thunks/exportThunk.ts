@@ -1,24 +1,24 @@
-import * as _ from 'lodash'
-import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectGroupById } from '../../redux/api/groupsApi'
-import { metersApi, selectMeterById } from '../../redux/api/metersApi'
-import { readingsApi } from '../../redux/api/readingsApi'
-import { selectUnitById, selectUnitDataById } from '../../redux/api/unitsApi'
-import { selectPlotlyBarDeps } from '../../redux/selectors/barChartSelectors'
-import { selectBarChartQueryArgs, selectLineChartQueryArgs } from '../../redux/selectors/chartQuerySelectors'
-import { selectNameFromEntity, selectScalingFromEntity } from '../../redux/selectors/entitySelectors'
-import { selectLineChartDeps } from '../../redux/selectors/lineChartSelectors'
-import { selectBarUnitLabel, selectLineUnitLabel, selectPlotlyMeterDeps } from '../../redux/selectors/plotlyDataSelectors'
-import { selectAdminState } from '../../redux/slices/adminSlice'
-import { selectHasRolePermissions } from '../../redux/slices/currentUserSlice'
-import { selectChartToRender, selectQueryTimeInterval, selectSelectedMeters, selectSelectedUnit } from '../../redux/slices/graphSlice'
-import { UserRole } from '../../types/items'
-import { ConversionData } from '../../types/redux/conversions'
-import { ChartTypes, MeterOrGroup } from '../../types/redux/graph'
-import graphExport, { downloadRawCSV } from '../../utils/exportData'
-import { showErrorNotification } from '../../utils/notifications'
-import translate from '../../utils/translate'
-import { createAppThunk } from './appThunk'
+import * as _ from 'lodash';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { selectGroupById } from '../../redux/api/groupsApi';
+import { metersApi, selectMeterById } from '../../redux/api/metersApi';
+import { readingsApi } from '../../redux/api/readingsApi';
+import { selectUnitById, selectUnitDataById } from '../../redux/api/unitsApi';
+import { selectPlotlyBarDeps } from '../../redux/selectors/barChartSelectors';
+import { selectBarChartQueryArgs, selectLineChartQueryArgs } from '../../redux/selectors/chartQuerySelectors';
+import { selectNameFromEntity, selectScalingFromEntity } from '../../redux/selectors/entitySelectors';
+import { selectLineChartDeps } from '../../redux/selectors/lineChartSelectors';
+import { selectBarUnitLabel, selectLineUnitLabel, selectPlotlyMeterDeps } from '../../redux/selectors/plotlyDataSelectors';
+import { selectAdminState } from '../../redux/slices/adminSlice';
+import { selectHasRolePermissions } from '../../redux/slices/currentUserSlice';
+import { selectChartToRender, selectQueryTimeInterval, selectSelectedMeters, selectSelectedUnit } from '../../redux/slices/graphSlice';
+import { UserRole } from '../../types/items';
+import { ConversionData } from '../../types/redux/conversions';
+import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
+import graphExport, { downloadRawCSV } from '../../utils/exportData';
+import { showErrorNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import { createAppThunk } from './appThunk';
 
 export const exportGraphReadingsThunk = createAppThunk(
 	'graph/exportGraphData',
@@ -26,76 +26,76 @@ export const exportGraphReadingsThunk = createAppThunk(
 		const state = api.getState();
 		const chartToRender = selectChartToRender(state);
 		if (chartToRender === ChartTypes.line) {
-			const lineUnitLabel = selectLineUnitLabel(state)
-			const lineDeps = selectLineChartDeps(state)
-			const lineChartQueryArgs = selectLineChartQueryArgs(state)
-			const lineReadings = readingsApi.endpoints.line.select(lineChartQueryArgs.meterArgs)(state)
-			const groupReadings = readingsApi.endpoints.line.select(lineChartQueryArgs.groupArgs)(state)
+			const lineUnitLabel = selectLineUnitLabel(state);
+			const lineDeps = selectLineChartDeps(state);
+			const lineChartQueryArgs = selectLineChartQueryArgs(state);
+			const lineReadings = readingsApi.endpoints.line.select(lineChartQueryArgs.meterArgs)(state);
+			const groupReadings = readingsApi.endpoints.line.select(lineChartQueryArgs.groupArgs)(state);
 
-			const { areaUnit, areaNormalization, lineGraphRate, showMinMax } = lineDeps.meterDeps
+			const { areaUnit, areaNormalization, lineGraphRate, showMinMax } = lineDeps.meterDeps;
 			lineReadings.data && Object.entries(lineReadings.data)
 				.filter(([id]) => lineDeps.meterDeps.compatibleEntities.includes(Number(id)))
 				.forEach(([id, readings]) => {
-					const entity = selectMeterById(state, Number(id))
+					const entity = selectMeterById(state, Number(id));
 					// Divide areaScaling into the rate so have complete scaling factor for readings.
-					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate)
+					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
 					// Get the readings from the state.
 					// Sort by start timestamp.
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					// Identifier for current meter.
 					const entityName = selectNameFromEntity(entity);
 					// const unitLabel = selectUnitById(state, selectSelectedUnit(state))
-					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
+					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, lineUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.meters, showMinMax);
-				})
+				});
 
 			groupReadings.data && Object.entries(groupReadings.data)
 				.filter(([id]) => lineDeps.groupDeps.compatibleEntities.includes(Number(id)))
 				.forEach(([id, readings]) => {
-					const entity = selectGroupById(state, Number(id))
-					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate)
+					const entity = selectGroupById(state, Number(id));
+					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
-					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
+					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, lineUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups, showMinMax);
-				})
+				});
 		}
 
 		if (chartToRender === ChartTypes.bar) {
-			const barUnitLabel = selectBarUnitLabel(state)
-			const barChartQueryArgs = selectBarChartQueryArgs(state)
-			const barReadings = readingsApi.endpoints.bar.select(barChartQueryArgs.meterArgs)(state)
-			const groupReadings = readingsApi.endpoints.bar.select(barChartQueryArgs.groupArgs)(state)
+			const barUnitLabel = selectBarUnitLabel(state);
+			const barChartQueryArgs = selectBarChartQueryArgs(state);
+			const barReadings = readingsApi.endpoints.bar.select(barChartQueryArgs.meterArgs)(state);
+			const groupReadings = readingsApi.endpoints.bar.select(barChartQueryArgs.groupArgs)(state);
 
-			const barDeps = selectPlotlyBarDeps(state)
-			const { areaUnit, areaNormalization, lineGraphRate } = barDeps.barMeterDeps
+			const barDeps = selectPlotlyBarDeps(state);
+			const { areaUnit, areaNormalization, lineGraphRate } = barDeps.barMeterDeps;
 			barReadings.data && Object.entries(barReadings.data)
 				.filter(([id]) => barDeps.barMeterDeps.compatibleEntities.includes(Number(id)))
 				.forEach(([id, readings]) => {
-					const entity = selectMeterById(state, Number(id))
-					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate)
+					const entity = selectMeterById(state, Number(id));
+					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
-					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
+					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.meters);
-				})
+				});
 
 
 			groupReadings.data && Object.entries(groupReadings.data)
 				.filter(([id]) => barDeps.barGroupDeps.compatibleEntities.includes(Number(id)))
 				.forEach(([id, readings]) => {
-					const entity = selectGroupById(state, Number(id))
-					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate)
+					const entity = selectGroupById(state, Number(id));
+					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
 					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
-					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)))
+					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups);
-				})
+				});
 		}
-		return api.fulfillWithValue('success')
+		return api.fulfillWithValue('success');
 
 	}
-)
+);
 
 export const exportRawReadings = createAppThunk(
 	'graph/ExportRaw',
@@ -107,7 +107,7 @@ export const exportRawReadings = createAppThunk(
 		const adminState = selectAdminState(state);
 		const { meterDataById, compatibleEntities } = selectPlotlyMeterDeps(state);
 		const conversionState = selectConversionsDetails(state);
-		const unitsDataById = selectUnitDataById(state)
+		const unitsDataById = selectUnitDataById(state);
 		// Function to export raw readings of graphic data shown.
 		// Get the total number of readings for all meters so can warn user if large.
 		// Soon OED will be able to estimate the number of readings based on reading frequency. However,
@@ -205,6 +205,6 @@ export const exportRawReadings = createAppThunk(
 		}
 
 
-		return api.fulfillWithValue('success')
+		return api.fulfillWithValue('success');
 	}
-)
+);

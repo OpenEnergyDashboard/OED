@@ -30,7 +30,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 								redoCik: true,
 								refreshReadingViews: false
 							}));
-					})
+					});
 			}
 
 		}),
@@ -50,7 +50,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 								redoCik: true,
 								refreshReadingViews: false
 							}));
-					})
+					});
 
 			}
 		}),
@@ -63,7 +63,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 			onQueryStarted: async ({ shouldRedoCik }, { queryFulfilled, dispatch }) => {
 				// TODO write more robust logic for error handling, and manually invalidate tags instead?
 				// TODO Verify Behavior w/ Maintainers
-				await queryFulfilled
+				await queryFulfilled;
 
 				if (shouldRedoCik) {
 					dispatch(conversionsApi.endpoints.refresh.initiate(
@@ -71,9 +71,9 @@ export const conversionsApi = baseApi.injectEndpoints({
 							redoCik: true,
 							refreshReadingViews: false
 						}
-					))
+					));
 				} else {
-					dispatch(conversionsApi.util.invalidateTags(['ConversionDetails']))
+					dispatch(conversionsApi.util.invalidateTags(['ConversionDetails']));
 				}
 			}
 		}),
@@ -87,21 +87,21 @@ export const conversionsApi = baseApi.injectEndpoints({
 			invalidatesTags: ['ConversionDetails']
 		})
 	})
-})
+});
 
-export const selectConversionsQueryState = conversionsApi.endpoints.getConversionsDetails.select()
+export const selectConversionsQueryState = conversionsApi.endpoints.getConversionsDetails.select();
 export const selectConversionsDetails = createSelector(
 	selectConversionsQueryState,
 	({ data: conversionData = [] }) => {
-		return conversionData
+		return conversionData;
 	}
-)
+);
 
-const selectCikQueryState = conversionsApi.endpoints.getCikDetails.select()
+const selectCikQueryState = conversionsApi.endpoints.getCikDetails.select();
 
 export const selectCik = createSelector(
 	[selectCikQueryState],
 	({ data: cik = [] }) => {
-		return cik
+		return cik;
 	}
-)
+);

@@ -40,7 +40,7 @@ export default function AreaUnitSelectComponent() {
 
 	const handleToggleAreaNormalization = () => {
 		dispatch(graphSlice.actions.toggleAreaNormalization());
-	}
+	};
 
 	const labelStyle: React.CSSProperties = {
 		fontWeight: 'bold',
@@ -77,7 +77,7 @@ export default function AreaUnitSelectComponent() {
 						value={{ label: translate(`AreaUnitType.${graphState.selectedAreaUnit}`), value: graphState.selectedAreaUnit } as StringSelectOption}
 						onChange={newSelectedUnit => {
 							if (newSelectedUnit) {
-								dispatch(graphSlice.actions.updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType))
+								dispatch(graphSlice.actions.updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType));
 							}
 						}}
 					/>

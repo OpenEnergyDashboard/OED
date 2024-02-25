@@ -37,10 +37,10 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 	const graphicName = useAppSelector(state => selectGraphicName(state, props.meter.id));
 	const handleShow = () => {
 		setShowEditModal(true);
-	}
+	};
 	const handleClose = () => {
 		setShowEditModal(false);
-	}
+	};
 	// Only display limited data if not an admin.
 	return (
 		<div className="card">

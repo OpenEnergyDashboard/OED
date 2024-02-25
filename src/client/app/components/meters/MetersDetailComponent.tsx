@@ -23,7 +23,7 @@ export default function MetersDetailComponent() {
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
 	// page may contain admin info so verify admin status while admin is authenticated.
-	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval })
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
@@ -71,4 +71,4 @@ const tooltipStyle = {
 };
 
 // Switch help depending if admin or not.
-const getToolTipMessage = (isAdmin: boolean) => isAdmin ? 'help.admin.meterview' : 'help.meters.meterview'
+const getToolTipMessage = (isAdmin: boolean) => isAdmin ? 'help.admin.meterview' : 'help.meters.meterview';

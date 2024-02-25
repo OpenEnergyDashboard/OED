@@ -38,23 +38,23 @@ export const authApi = baseApi.injectEndpoints({
 			// Query to be used as a polling utility for admin outlet pages.
 			queryFn: (_args, api) => {
 				if (hasToken()) {
-					api.dispatch(authApi.endpoints.verifyToken.initiate(getToken()))
+					api.dispatch(authApi.endpoints.verifyToken.initiate(getToken()));
 				}
 				// don't care about data, middleware will handle failed verifications
-				return { data: null }
+				return { data: null };
 			}
 		}),
 		logout: builder.mutation<null, void>({
 			queryFn: (_, { dispatch }) => {
 				// Opt to use a RTK mutation instead of manually writing a thunk to take advantage mutation invalidations
-				deleteToken()
-				dispatch(currentUserSlice.actions.clearCurrentUser())
-				return { data: null }
+				deleteToken();
+				dispatch(currentUserSlice.actions.clearCurrentUser());
+				return { data: null };
 			},
 			invalidatesTags: ['MeterData', 'GroupData']
 		})
 	})
-})
+});
 
 // Poll interval in milliseconds (1 minute)
-export const authPollInterval = 60000
+export const authPollInterval = 60000;

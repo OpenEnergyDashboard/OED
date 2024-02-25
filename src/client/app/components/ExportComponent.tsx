@@ -21,10 +21,10 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 export default function ExportComponent() {
 	const dispatch = useAppDispatch();
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
-	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps)
+	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const chartToRender = useAppSelector(selectChartToRender);
-	const hasRolePermissions = useAppSelector(state => selectHasRolePermissions(state, UserRole.EXPORT))
-	const canExport = !somethingIsFetching && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0)
+	const hasRolePermissions = useAppSelector(state => selectHasRolePermissions(state, UserRole.EXPORT));
+	const canExport = !somethingIsFetching && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0);
 
 	return (
 		<>

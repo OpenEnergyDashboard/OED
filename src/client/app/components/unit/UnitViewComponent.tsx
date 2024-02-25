@@ -30,11 +30,11 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 
 	const handleShow = () => {
 		setShowEditModal(true);
-	}
+	};
 
 	const handleClose = () => {
 		setShowEditModal(false);
-	}
+	};
 
 	return (
 		<div className="card">

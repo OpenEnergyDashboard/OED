@@ -53,7 +53,7 @@ export const selectCommonQueryArgs = createSelector(
 			timeInterval: queryTimeInterval.toString(),
 			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.meters
-		}
+		};
 
 		// args that 'most' groups queries share
 		const groupArgs = {
@@ -61,7 +61,7 @@ export const selectCommonQueryArgs = createSelector(
 			timeInterval: queryTimeInterval.toString(),
 			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.groups
-		}
+		};
 		// skip fetch if no meters or groups selected respectively
 		const meterSkip = !meterArgs.ids.length;
 		const groupSkip = !groupArgs.ids.length;
@@ -69,7 +69,7 @@ export const selectCommonQueryArgs = createSelector(
 		// Most Queries share these arguments, however values can be appended, or omitted per endpoint specification
 		return { meterArgs, groupArgs, meterSkip, groupSkip };
 	}
-)
+);
 
 export const selectLineChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
@@ -81,15 +81,15 @@ export const selectLineChartQueryArgs = createSelector(
 		const groupShouldSkip = common.groupSkip;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
-)
+);
 
 export const selectRadarChartQueryArgs = createSelector(
 	selectLineChartQueryArgs,
 	lineChartArgs => {
 		// Radar uses the same args as line, so copy
-		return { ...lineChartArgs }
+		return { ...lineChartArgs };
 	}
-)
+);
 
 export const selectBarChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
@@ -110,7 +110,7 @@ export const selectBarChartQueryArgs = createSelector(
 		const groupShouldSkip = common.groupSkip;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
-)
+);
 
 export const selectCompareChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
@@ -137,7 +137,7 @@ export const selectCompareChartQueryArgs = createSelector(
 		const groupShouldSkip = common.groupSkip;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
-)
+);
 
 export const selectMapChartQueryArgs = createSelector(
 	selectBarChartQueryArgs,
@@ -166,7 +166,7 @@ export const selectMapChartQueryArgs = createSelector(
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 
-)
+);
 
 // Selector prepares the query args for ALL graph endpoints based on the current graph slice state
 // TODO Break down into individual selectors?
@@ -182,11 +182,11 @@ export const selectThreeDQueryArgs = createSelector(
 			graphicUnitId: selectedUnit,
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
-		}
+		};
 		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
 		return { args, shouldSkipQuery };
 	}
-)
+);
 
 export const selectAllChartQueryArgs = createSelector(
 	selectLineChartQueryArgs,
@@ -201,4 +201,4 @@ export const selectAllChartQueryArgs = createSelector(
 		map,
 		threeD
 	})
-)
+);

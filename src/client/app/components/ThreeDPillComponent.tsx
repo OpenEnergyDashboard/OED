@@ -27,18 +27,18 @@ export default function ThreeDPillComponent() {
 		const area = meterDataById[meterID]?.area;
 		const areaUnit = meterDataById[meterID]?.areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
-		const isDisabled = !isAreaCompatible && graphState.areaNormalization
+		const isDisabled = !isAreaCompatible && graphState.areaNormalization;
 
-		return { meterOrGroupID: meterID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.meters } as MeterOrGroupPill
-	})
+		return { meterOrGroupID: meterID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.meters } as MeterOrGroupPill;
+	});
 
 	const groupPillData = graphState.selectedGroups.map(groupID => {
 		const area = groupDataById[groupID]?.area;
 		const areaUnit = groupDataById[groupID]?.areaUnit;
 		const isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
-		const isDisabled = !isAreaCompatible && graphState.areaNormalization
-		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill
-	})
+		const isDisabled = !isAreaCompatible && graphState.areaNormalization;
+		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
+	});
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(updateThreeDMeterOrGroupInfo(
@@ -78,9 +78,9 @@ export default function ThreeDPillComponent() {
 					style={pill}
 					onClick={() => handlePillClick(pillData)}
 				>{meterOrGroupName}</Badge>
-			)
+			);
 		});
-	}
+	};
 
 	return (
 		<div style={pillContainer}>
@@ -102,7 +102,7 @@ export default function ThreeDPillComponent() {
 				</div>
 			}
 		</div >
-	)
+	);
 }
 
 // TODO Styling for the component, may need to be converted into .css files
@@ -114,14 +114,14 @@ const pillContainer: React.CSSProperties = {
 	padding: '0px',
 	minHeight: '100px',
 	maxHeight: '200px'
-}
+};
 
 const pillBoxLabel: React.CSSProperties = {
 	alignItems: 'start',
 	textAlign: 'left',
 	margin: '0px',
 	padding: '0px'
-}
+};
 
 const pillBox: React.CSSProperties = {
 	display: 'flex',
@@ -132,7 +132,7 @@ const pillBox: React.CSSProperties = {
 	maxWidth: '45%',
 	margin: '0px',
 	padding: '0px'
-}
+};
 
 const pills: React.CSSProperties = {
 	display: 'flex',
@@ -141,10 +141,10 @@ const pills: React.CSSProperties = {
 	maxHeight: '100%',
 	margin: '0px',
 	padding: '0px'
-}
+};
 
 const pill: React.CSSProperties = {
 	margin: '2px',
 	userSelect: 'none',
 	cursor: 'pointer'
-}
+};

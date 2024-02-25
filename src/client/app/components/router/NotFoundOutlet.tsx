@@ -10,5 +10,5 @@ import { Navigate } from 'react-router-dom';
  */
 export default function NotFound() {
 	// redirect to home page if non-existent route is requested.
-	return <Navigate to='/' replace />
+	return <Navigate to='/' replace />;
 }

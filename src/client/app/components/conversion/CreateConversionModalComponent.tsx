@@ -23,10 +23,10 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Conversion create element
  */
 export default function CreateConversionModalComponent() {
-	const [addConversionMutation] = conversionsApi.useAddConversionMutation()
+	const [addConversionMutation] = conversionsApi.useAddConversionMutation();
 	// Want units in sorted order by identifier regardless of case.
 
-	const defaultValues = useAppSelector(selectDefaultCreateConversionValues)
+	const defaultValues = useAppSelector(selectDefaultCreateConversionValues);
 
 	/* State */
 	// Modal show
@@ -41,15 +41,15 @@ export default function CreateConversionModalComponent() {
 	const [conversionState, setConversionState] = useState(defaultValues);
 
 	// If the currently selected conversion is valid
-	const [validConversion, reason] = useAppSelector(state => selectIsValidConversion(state, conversionState))
+	const [validConversion, reason] = useAppSelector(state => selectIsValidConversion(state, conversionState));
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setConversionState({ ...conversionState, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setConversionState({ ...conversionState, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		// once a source or destination is selected, it will be removed from the other options.
@@ -68,13 +68,13 @@ export default function CreateConversionModalComponent() {
 		} else {
 			setConversionState(state => ({ ...state, [e.target.name]: Number(e.target.value) }));
 		}
-	}
+	};
 	/* End State */
 
 	// Reset the state to default values
 	const resetState = () => {
 		setConversionState(defaultValues);
-	}
+	};
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -87,10 +87,10 @@ export default function CreateConversionModalComponent() {
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			//
-			addConversionMutation(_.omit(conversionState, 'sourceOptions'))
+			addConversionMutation(_.omit(conversionState, 'sourceOptions'));
 			resetState();
 		} else {
-			showErrorNotification(reason)
+			showErrorNotification(reason);
 		}
 	};
 
@@ -137,7 +137,7 @@ export default function CreateConversionModalComponent() {
 											{translate('conversion.select.source') + '...'}
 										</option>}
 										{Object.values(conversionState.sourceOptions).map(unitData => {
-											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>);
 										})}
 									</Input>
 									<FormFeedback>
@@ -164,7 +164,7 @@ export default function CreateConversionModalComponent() {
 											{translate('conversion.select.destination') + '...'}
 										</option>}
 										{Object.values(conversionState.destinationOptions).map(unitData => {
-											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>)
+											return (<option value={unitData.id} key={unitData.id}>{unitData.identifier}</option>);
 										})}
 									</Input>
 									<FormFeedback>
@@ -182,7 +182,7 @@ export default function CreateConversionModalComponent() {
 								type='select'
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup>

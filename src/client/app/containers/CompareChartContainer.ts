@@ -54,9 +54,9 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	// Also need to determine if raw.
 	const graphingUnit = selectSelectedUnit(state);
 	// This container is not called if there is no data of there are not units so this is safe.
-	const unitDataById = selectUnitDataById(state)
-	const meterDataById = selectMeterDataById(state)
-	const groupDataById = selectGroupDataById(state)
+	const unitDataById = selectUnitDataById(state);
+	const meterDataById = selectMeterDataById(state);
+	const groupDataById = selectGroupDataById(state);
 	const selectUnitState = unitDataById[graphingUnit];
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
@@ -130,7 +130,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
-	const areaNormalization = selectGraphAreaNormalization(state)
+	const areaNormalization = selectGraphAreaNormalization(state);
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
 		if (areaNormalization) {
@@ -185,7 +185,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 					}
 				}
 			]
-		}
+		};
 	} else {
 		layout = {
 			title: `<b>${changeSummary}</b>`,

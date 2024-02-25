@@ -18,7 +18,7 @@ export default function PlotNavComponent() {
 			<HistoryComponent />
 			<PlotNav />
 		</div >
-	)
+	);
 }
 export const PlotNav = () => {
 	return (
@@ -27,29 +27,29 @@ export const PlotNav = () => {
 			<TrashCanHistoryComponent />
 			<RefreshGraphComponent />
 		</div>
-	)
-}
+	);
+};
 export const TrashCanHistoryComponent = () => {
 	const dispatch = useAppDispatch();
 	const isDirty = useAppSelector(selectIsDirty);
 	return (
 		< img src={isDirty ? './full_trashcan.png' : './empty_trashcan.png'} style={{ height: '25px' }}
 			onClick={() => {
-				dispatch(clearGraphHistory())
+				dispatch(clearGraphHistory());
 			}}
 		/>
-	)
-}
+	);
+};
 
 
 export const ExpandComponent = () => {
 	const dispatch = useAppDispatch();
 	return (
 		<img src='./expand.png' style={{ height: '25px' }}
-			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded())) }}
+			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded())); }}
 		/>
-	)
-}
+	);
+};
 
 export const RefreshGraphComponent = () => {
 	const [time, setTime] = React.useState(0);
@@ -58,7 +58,7 @@ export const RefreshGraphComponent = () => {
 	const somethingFetching = useAppSelector(selectAnythingFetching);
 
 	React.useEffect(() => {
-		const interval = setInterval(() => { setTime(prevTime => (prevTime + 25) % 360) }, 16);
+		const interval = setInterval(() => { setTime(prevTime => (prevTime + 25) % 360); }, 16);
 		if (!somethingFetching) {
 			clearInterval(interval);
 		}
@@ -66,7 +66,7 @@ export const RefreshGraphComponent = () => {
 	}, [somethingFetching]);
 	return (
 		<img src='./refresh.png' style={{ height: '25px', transform: `rotate(${time}deg)` }}
-			onClick={() => { dispatch(updateTimeInterval(slider)) }}
+			onClick={() => { dispatch(updateTimeInterval(slider)); }}
 		/>
-	)
-}
+	);
+};

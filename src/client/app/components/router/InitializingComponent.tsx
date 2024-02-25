@@ -22,5 +22,5 @@ export default function InitializingComponent() {
 			<SpinnerComponent loading width={50} height={50} />
 		</div>
 
-	)
+	);
 }

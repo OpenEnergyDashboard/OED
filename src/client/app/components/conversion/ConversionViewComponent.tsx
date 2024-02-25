@@ -28,15 +28,15 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
-	const unitDataById = useAppSelector(selectUnitDataById)
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	const handleShow = () => {
 		setShowEditModal(true);
-	}
+	};
 
 	const handleClose = () => {
 		setShowEditModal(false);
-	}
+	};
 	// Create header from sourceId, destinationId identifiers
 	// Arrow is bidirectional if conversion is bidirectional and one way if not.
 	let arrowShown: string;

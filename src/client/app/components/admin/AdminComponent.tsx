@@ -23,7 +23,7 @@ export default function AdminComponent() {
 		fontWeight: 'bold',
 		margin: 0,
 		paddingBottom: '5px'
-	}
+	};
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
 	};

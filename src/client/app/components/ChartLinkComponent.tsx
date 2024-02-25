@@ -35,7 +35,7 @@ export default function ChartLinkComponent() {
 				// if operation fails, open copyable text for manual copy.
 				showErrorNotification(translate('clipboard.not.copied'), toast.POSITION.TOP_RIGHT, 1000);
 				setLinkTextVisible(true);
-			})
+			});
 	};
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
@@ -49,14 +49,14 @@ export default function ChartLinkComponent() {
 								<div ref={ref} data-for={'home'} data-tip={'help.home.toggle.chart.link'}								>
 									<Input type='checkbox' defaultChecked={linkHideOptions}
 										onClickCapture={e => {
-											e.stopPropagation()
-											dispatch(setChartLinkOptionsVisibility(!linkHideOptions))
+											e.stopPropagation();
+											dispatch(setChartLinkOptionsVisibility(!linkHideOptions));
 										}}
 										onMouseOver={() => {
-											ref.current && ReactTooltip.show(ref.current)
+											ref.current && ReactTooltip.show(ref.current);
 										}}
 										onMouseLeave={() => {
-											ref.current && ReactTooltip.hide(ref.current)
+											ref.current && ReactTooltip.hide(ref.current);
 										}}
 									/>
 								</div>

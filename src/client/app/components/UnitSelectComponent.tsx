@@ -37,7 +37,7 @@ export default function UnitSelectComponent() {
 		} as SelectOption;
 	}
 
-	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value))
+	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value));
 
 	return (
 		<div style={divBottomPadding}>
@@ -55,7 +55,7 @@ export default function UnitSelectComponent() {
 				isLoading={unitsIsFetching}
 			/>
 		</div>
-	)
+	);
 }
 const groupStyles: React.CSSProperties = {
 	display: 'flex',
@@ -70,8 +70,8 @@ const formatGroupLabel = (data: GroupedOption) => {
 			<Badge pill color="primary">{data.options.length}</Badge>
 		</div >
 
-	)
-}
+	);
+};
 
 const divBottomPadding: React.CSSProperties = {
 	paddingBottom: '15px'

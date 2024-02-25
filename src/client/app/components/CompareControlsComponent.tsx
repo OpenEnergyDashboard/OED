@@ -20,11 +20,11 @@ export default function CompareControlsComponent() {
 	const compareSortingOrder = useAppSelector(selectSortingOrder);
 	const [compareSortingDropdownOpen, setCompareSortingDropdownOpen] = React.useState<boolean>(false);
 	const handleCompareButton = (comparePeriod: ComparePeriod) => {
-		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }))
-	}
+		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }));
+	};
 	const handleSortingButton = (sortingOrder: SortingOrder) => {
-		dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder))
-	}
+		dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
+	};
 
 	return (
 		<div>
@@ -81,7 +81,7 @@ export default function CompareControlsComponent() {
 				</DropdownMenu>
 			</Dropdown>
 		</div>
-	)
+	);
 }
 
 const zIndexFix: React.CSSProperties = {

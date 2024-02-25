@@ -32,5 +32,5 @@ export default function ErrorComponent() {
 			</div>
 		</AppLayout>
 
-	)
+	);
 }

@@ -4,10 +4,10 @@
 
 // listenerMiddleware.ts
 // https://redux-toolkit.js.org/api/createListenerMiddleware#typescript-usage
-import { addListener, createListenerMiddleware } from '@reduxjs/toolkit'
-import type { AppDispatch, RootState } from '../store'
-import { graphHistoryListener } from './middleware/graphHistoryMiddleware'
-import { unauthorizedRequestListener } from './middleware/unauthorizedAccesMiddleware'
+import { addListener, createListenerMiddleware } from '@reduxjs/toolkit';
+import type { AppDispatch, RootState } from '../store';
+import { graphHistoryListener } from './middleware/graphHistoryMiddleware';
+import { unauthorizedRequestListener } from './middleware/unauthorizedAccesMiddleware';
 
 export const listenerMiddleware = createListenerMiddleware();
 

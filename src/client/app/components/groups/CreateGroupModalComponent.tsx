@@ -40,7 +40,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Group create element
  */
 export default function CreateGroupModalComponent() {
-	const [createGroup] = groupsApi.useCreateGroupMutation()
+	const [createGroup] = groupsApi.useCreateGroupMutation();
 
 	// Meters state
 	const metersDataById = useAppSelector(selectMeterDataById);
@@ -49,7 +49,7 @@ export default function CreateGroupModalComponent() {
 	// Units state
 	const unitsDataById = useAppSelector(selectUnitDataById);
 	// Which units are possible for graphing state
-	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
+	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
 
 	// Since creating group the initial values are effectively nothing or the desired defaults.
 	const defaultValues: GroupData = {
@@ -66,7 +66,7 @@ export default function CreateGroupModalComponent() {
 		// default is no unit or -99.
 		defaultGraphicUnit: -99,
 		areaUnit: AreaUnitType.none
-	}
+	};
 
 	// The information on the children of this group for state. Except for selected, the
 	// values are set by the useEffect functions.
@@ -75,14 +75,14 @@ export default function CreateGroupModalComponent() {
 		meterSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown and initially empty.
 		groupSelectOptions: [] as SelectOption[]
-	}
+	};
 
 	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
 		possibleGraphicUnits: possibleGraphicUnits,
 		compatibleGraphicUnits: possibleGraphicUnits,
 		incompatibleGraphicUnits: new Set<UnitData>()
-	}
+	};
 
 	/* State */
 	// State for the created group.
@@ -92,15 +92,15 @@ export default function CreateGroupModalComponent() {
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	// Unlike EditGroupsModalComponent, we don't pass show and close via props.
 	// Modal show
@@ -161,20 +161,20 @@ export default function CreateGroupModalComponent() {
 		} else {
 			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
-	}
+	};
 
 	const handleClose = () => {
 		setShowModal(false);
 		resetState();
 	};
-	const handleShow = () => { setShowModal(true); }
+	const handleShow = () => { setShowModal(true); };
 
 	// Reset the state to default value so each time starts from scratch.
 	const resetState = () => {
 		setState(defaultValues);
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
-	}
+	};
 
 	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -217,7 +217,7 @@ export default function CreateGroupModalComponent() {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
-			createGroup(submitState)
+			createGroup(submitState);
 			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
@@ -326,10 +326,10 @@ export default function CreateGroupModalComponent() {
 								onChange={e => handleNumberChange(e)}>
 								{/* First list the selectable ones and then the rest as disabled. */}
 								{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
 								{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -344,7 +344,7 @@ export default function CreateGroupModalComponent() {
 								value={state.displayable.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -395,7 +395,7 @@ export default function CreateGroupModalComponent() {
 								onChange={e => handleStringChange(e)}
 								invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>

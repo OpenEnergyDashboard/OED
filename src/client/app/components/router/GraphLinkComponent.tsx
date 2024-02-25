@@ -18,16 +18,16 @@ export const GraphLink = () => {
 		if (linkIsValid) {
 			dispatch(processGraphLink(URLSearchParams));
 		}
-	}, [])
+	}, []);
 
 	if (!initComplete) {
 		return <InitializingComponent />;
 	}
 	return <Navigate to='/' replace />;
-}
+};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const validateHotlink = (params: URLSearchParams) => {
 	// TODO VALIDATE HOTLINK
 	return true;
-}
+};

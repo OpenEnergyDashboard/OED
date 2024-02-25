@@ -11,7 +11,7 @@ import RouteComponent from './components/RouteComponent';
 import { initApp } from './redux/slices/appStateSlice';
 import './styles/index.css';
 
-store.dispatch(initApp())
+store.dispatch(initApp());
 
 // Renders the entire application, starting with RouteComponent, into the root div
 const container = document.getElementById('root') as HTMLElement;

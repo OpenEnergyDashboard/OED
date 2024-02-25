@@ -20,10 +20,10 @@ export default function ManageUsersLinkButtonComponent(props: ManageUserLinkButt
 	const inlineButtonStyle: React.CSSProperties = {
 		display: 'inline',
 		paddingLeft: '5px'
-	}
+	};
 
 	return (
 		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users' >
 			<Button color='secondary' outline><FormattedMessage id='users'/> </Button></Link>
-	)
+	);
 }

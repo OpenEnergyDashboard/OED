@@ -26,7 +26,7 @@ export default function GraphicRateMenuComponent() {
 	const graphState = useAppSelector(selectGraphState);
 
 	// Unit data by Id
-	const selectedUnitData = useAppSelector(selectSelectedUnitData)
+	const selectedUnitData = useAppSelector(selectSelectedUnitData);
 
 	// Should the rate drop down menu be rendered.
 	let shouldRender = true;
@@ -76,7 +76,7 @@ export default function GraphicRateMenuComponent() {
 								dispatch(graphSlice.actions.updateLineGraphRate({
 									label: newSelectedRate.labelIdForTranslate,
 									rate: Number(newSelectedRate.value)
-								} as LineGraphRate))
+								} as LineGraphRate));
 							}
 						}}
 					/>

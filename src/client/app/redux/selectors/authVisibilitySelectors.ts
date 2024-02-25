@@ -29,7 +29,7 @@ export const selectVisibleMetersAndGroups = createSelector(
 				groups.add(group.id);
 			}
 		});
-		return { meters, groups }
+		return { meters, groups };
 	}
 );
 
@@ -51,4 +51,4 @@ export const selectVisibleUnitOrSuffixState = createSelector(
 		);
 		return visibleUnitsOrSuffixes;
 	}
-)
+);

@@ -41,7 +41,7 @@ export default function MultiCompareChartComponent() {
 		const name = meterDataByID[Number(key)].name;
 		const identifier = meterDataByID[Number(key)].identifier;
 
-		const areaNormValid = (!areaNormalization || (meterDataByID[Number(key)].area > 0 && meterDataByID[Number(key)].areaUnit !== AreaUnitType.none))
+		const areaNormValid = (!areaNormalization || (meterDataByID[Number(key)].area > 0 && meterDataByID[Number(key)].areaUnit !== AreaUnitType.none));
 		if (areaNormValid && selectedMeters.includes(Number(key))) {
 			const change = calculateChange(value.curr_use, value.prev_use);
 			const entity: CompareEntity = {
@@ -55,7 +55,7 @@ export default function MultiCompareChartComponent() {
 			};
 			selectedCompareEntities.push(entity);
 		}
-	})
+	});
 	Object.entries(groupReadings).forEach(([key, value]) => {
 		const identifier = groupDataById[Number(key)].name;
 		const areaNormValid = (!areaNormalization || (groupDataById[Number(key)].area > 0 && groupDataById[Number(key)].areaUnit !== AreaUnitType.none));
@@ -72,9 +72,9 @@ export default function MultiCompareChartComponent() {
 			};
 			selectedCompareEntities.push(entity);
 		}
-	})
+	});
 
-	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder)
+	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder);
 
 
 	// Compute how much space should be used in the bootstrap grid system

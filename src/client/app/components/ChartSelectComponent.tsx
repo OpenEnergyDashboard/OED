@@ -17,7 +17,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Chart select element
  */
 export default function ChartSelectComponent() {
-	const currentChartToRender = useAppSelector(selectChartToRender)
+	const currentChartToRender = useAppSelector(selectChartToRender);
 	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);
 

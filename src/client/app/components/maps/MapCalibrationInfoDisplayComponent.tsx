@@ -99,7 +99,7 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 		} else {
 			this.props.log('info', `refused data point with invalid input: ${input}`);
 		}
-	}
+	};
 
 	private handleGPSInput(event: ChangeEvent<HTMLTextAreaElement>) {
 		this.setState({

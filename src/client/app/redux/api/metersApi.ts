@@ -15,7 +15,7 @@ import { conversionsApi } from './conversionsApi';
 export const meterAdapter = createEntityAdapter<MeterData>({
 	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
 
-})
+});
 export const metersInitialState = meterAdapter.getInitialState();
 export type MeterDataState = EntityState<MeterData, number>;
 
@@ -29,7 +29,7 @@ export const metersApi = baseApi.injectEndpoints({
 				return meterAdapter.setAll(metersInitialState, response.map(meter => ({
 					...meter,
 					readingFrequency: durationFormat(meter.readingFrequency)
-				})))
+				})));
 			},
 			// Tags used for invalidation by mutation requests.
 			providesTags: ['MeterData']
@@ -43,10 +43,10 @@ export const metersApi = baseApi.injectEndpoints({
 			onQueryStarted: async ({ meterData, shouldRefreshViews }, { dispatch, queryFulfilled }) => {
 				queryFulfilled.then(() => {
 					// Update reading views if needed. Never redoCik so false.
-					dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: false, refreshReadingViews: shouldRefreshViews }))
-					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, meterData) }))
+					dispatch(conversionsApi.endpoints.refresh.initiate({ redoCik: false, refreshReadingViews: shouldRefreshViews }));
+					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, meterData); }));
 
-				})
+				});
 			},
 			invalidatesTags: ['MeterData']
 		}),
@@ -59,8 +59,8 @@ export const metersApi = baseApi.injectEndpoints({
 			transformResponse: (data: MeterData) => ({ ...data, readingFrequency: durationFormat(data.readingFrequency) }),
 			onQueryStarted: (_arg, { dispatch, queryFulfilled }) => {
 				queryFulfilled.then(({ data }) => {
-					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, data) }))
-				})
+					dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => { meterAdapter.addOne(cacheDraft, data); }));
+				});
 			}
 		}),
 		lineReadingsCount: builder.query<number, { meterIDs: number[], timeInterval: TimeInterval }>({
@@ -73,7 +73,7 @@ export const metersApi = baseApi.injectEndpoints({
 			query: ({ meterID, timeInterval }) => `api/readings/line/raw/meter/${meterID}?timeInterval=${timeInterval.toString()}`
 		})
 	})
-})
+});
 
 
 export const selectMeterDataResult = metersApi.endpoints.getMeters.select();

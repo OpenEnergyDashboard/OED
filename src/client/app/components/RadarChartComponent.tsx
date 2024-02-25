@@ -4,7 +4,7 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as React from 'react'
+import * as React from 'react';
 import getGraphColor from '../utils/getGraphColor';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
@@ -29,7 +29,7 @@ import LogoSpinner from './LogoSpinner';
  * @returns radar plotly component
  */
 export default function RadarChartComponent() {
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectRadarChartQueryArgs)
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectRadarChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
 	const datasets: any[] = [];
@@ -47,7 +47,7 @@ export default function RadarChartComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 
 	if (meterIsLoading || groupIsLoading) {
-		return <LogoSpinner />
+		return <LogoSpinner />;
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
@@ -60,7 +60,7 @@ export default function RadarChartComponent() {
 		if (selectUnitState !== undefined) {
 			// Determine the r-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, areaNormalization, selectedAreaUnit);
-			unitLabel = returned.unitLabel
+			unitLabel = returned.unitLabel;
 			needsRateScaling = returned.needsRateScaling;
 		}
 	}
@@ -78,7 +78,7 @@ export default function RadarChartComponent() {
 					meterArea * getAreaUnitConversion(meterDataById[meterID].areaUnit, selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				const readingsData = meterReadings[meterID]
+				const readingsData = meterReadings[meterID];
 				if (readingsData) {
 					const label = meterDataById[meterID].identifier;
 					const colorID = meterID;
@@ -139,7 +139,7 @@ export default function RadarChartComponent() {
 					groupArea * getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit) : 1;
 				// Divide areaScaling into the rate so have complete scaling factor for readings.
 				const scaling = rateScaling / areaScaling;
-				const readingsData = groupData[groupID]
+				const readingsData = groupData[groupID];
 				if (readingsData) {
 					const label = groupDataById[groupID].name;
 					const colorID = groupID;
@@ -210,7 +210,7 @@ export default function RadarChartComponent() {
 					}
 				}
 			]
-		}
+		};
 	} else {
 		// Plotly scatterpolar plots have the unfortunate attribute that if a smaller number of plotting
 		// points is done first then that impacts the labeling of the polar coordinate where you can get
@@ -245,7 +245,7 @@ export default function RadarChartComponent() {
 						}
 					}
 				]
-			}
+			};
 		} else {
 			// Check if all the values for the dates are compatible. Plotly does not like having different dates in different
 			// scatterpolar lines. Lots of attempts to get this to work failed so not going to allow since not that common.
@@ -280,7 +280,7 @@ export default function RadarChartComponent() {
 							}
 						}
 					]
-				}
+				};
 			} else {
 				// Data available and okay so plot.
 				// Maximum number of ticks, represents 12 months. Too many is cluttered so this seems good value.
@@ -334,5 +334,5 @@ export default function RadarChartComponent() {
 				layout={layout}
 			/>
 		</div>
-	)
+	);
 }

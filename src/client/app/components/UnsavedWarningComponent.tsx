@@ -25,36 +25,36 @@ export interface UnsavedWarningProps {
  * @returns Component that prompts before navigating away from current page
  */
 export function UnsavedWarningComponent(props: UnsavedWarningProps) {
-	const { hasUnsavedChanges, submitChanges, changes } = props
-	const blocker = useBlocker(hasUnsavedChanges)
+	const { hasUnsavedChanges, submitChanges, changes } = props;
+	const blocker = useBlocker(hasUnsavedChanges);
 	const handleSubmit = async () => {
 		submitChanges(changes)
 			.unwrap()
 			.then(() => {
 				//TODO translate me
-				showSuccessNotification(translate('unsaved.success'))
+				showSuccessNotification(translate('unsaved.success'));
 				if (blocker.state === 'blocked') {
-					blocker.proceed()
+					blocker.proceed();
 				}
 			})
 			.catch(() => {
 				//TODO translate me
-				showErrorNotification(translate('unsaved.failure'))
+				showErrorNotification(translate('unsaved.failure'));
 				if (blocker.state === 'blocked') {
-					blocker.proceed()
+					blocker.proceed();
 				}
-			})
-	}
+			});
+	};
 	React.useEffect(() => {
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			if (blocker.state === 'blocked') {
 				e.preventDefault();
 			}
-		}
+		};
 
-		window.addEventListener('beforeunload', handleBeforeUnload)
-		return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-	}, [hasUnsavedChanges, blocker])
+		window.addEventListener('beforeunload', handleBeforeUnload);
+		return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+	}, [hasUnsavedChanges, blocker]);
 
 	return (
 
@@ -72,5 +72,5 @@ export function UnsavedWarningComponent(props: UnsavedWarningProps) {
 				</Button>
 			</ModalFooter>
 		</Modal>
-	)
+	);
 }

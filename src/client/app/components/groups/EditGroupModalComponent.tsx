@@ -57,8 +57,8 @@ interface EditGroupModalComponentProps {
  * @returns Group edit element
  */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
-	const [submitGroupEdits] = groupsApi.useEditGroupMutation()
-	const [deleteGroup] = groupsApi.useDeleteGroupMutation()
+	const [submitGroupEdits] = groupsApi.useEditGroupMutation();
+	const [deleteGroup] = groupsApi.useDeleteGroupMutation();
 	// Meter state
 	const meterDataById = useAppSelector(selectMeterDataById);
 	// Group state used on other pages
@@ -67,7 +67,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
 	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
-	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits)
+	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
 
 	// The current groups state of group being edited of the local copy. It should always be valid.
 	const groupState = editGroupsState[props.groupId];
@@ -81,14 +81,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		meterSelectOptions: [] as SelectOption[],
 		// The group selections in format for selection dropdown.
 		groupSelectOptions: [] as SelectOption[]
-	}
+	};
 
 	// Information on the default graphic unit values.
 	const graphicUnitsStateDefaults = {
 		possibleGraphicUnits: possibleGraphicUnits,
 		compatibleGraphicUnits: possibleGraphicUnits,
 		incompatibleGraphicUnits: new Set<UnitData>()
-	}
+	};
 
 	/* State */
 	// Handlers for each type of input change where update the local edit state.
@@ -100,8 +100,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				...editGroupsState[groupState.id],
 				[e.target.name]: e.target.value
 			}
-		})
-	}
+		});
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEditGroupsState({
@@ -110,8 +110,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				...editGroupsState[groupState.id],
 				[e.target.name]: JSON.parse(e.target.value)
 			}
-		})
-	}
+		});
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setEditGroupsState({
@@ -120,11 +120,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				...editGroupsState[groupState.id],
 				[e.target.name]: Number(e.target.value)
 			}
-		})
-	}
+		});
+	};
 
 	// Dropdowns state
-	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults)
+	const [groupChildrenState, setGroupChildrenState] = useState(groupChildrenDefaults);
 	const [graphicUnitsState, setGraphicUnitsState] = useState(graphicUnitsStateDefaults);
 
 	/* Edit Group Validation:
@@ -157,20 +157,20 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		setShowDeleteConfirmationModal(false);
 		// Show the edit modal
 		handleShow();
-	}
+	};
 	const handleDeleteConfirmationModalOpen = () => {
 		// Hide the edit modal
 		handleClose();
 		// Show the warning modal
 		setShowDeleteConfirmationModal(true);
-	}
+	};
 	const handleDeleteGroup = () => {
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 		// Delete the group using the state object where only really need id.
-		deleteGroup(groupState.id)
-	}
+		deleteGroup(groupState.id);
+	};
 	/* End Confirm Delete Modal */
 
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
@@ -214,7 +214,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		} else {
 			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
-	}
+	};
 
 	// Reset the state to default values.
 	// To be used for the discard changes button
@@ -227,12 +227,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Set back to the default values for the menus.
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
-	}
+	};
 
 	// Should show the modal for editing.
 	const handleShow = () => {
 		props.handleShow();
-	}
+	};
 
 	// Note this differs from the props.handleClose(). This is only called when the user
 	// clicks to discard or close the modal.
@@ -242,7 +242,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// State cannot change if you are not an admin.
 			resetState();
 		}
-	}
+	};
 
 	// Save changes - done when admin clicks the save button.
 	const handleSubmit = () => {
@@ -324,10 +324,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						id: thisGroupState.id, name: thisGroupState.name, childMeters: thisGroupState.childMeters,
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
 						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
-					}
+					};
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
-					submitGroupEdits(submitState)
+					submitGroupEdits(submitState);
 				});
 			} else {
 				showErrorNotification(translate('group.input.error'));
@@ -444,10 +444,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									onChange={e => handleNumberChange(e)}>
 									{/* First list the selectable ones and then the rest as disabled. */}
 									{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 									})}
 									{Array.from(graphicUnitsState.incompatibleGraphicUnits).map(unit => {
-										return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+										return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 									})}
 								</Input>
 							</FormGroup></Col>
@@ -475,7 +475,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									value={groupState.defaultGraphicUnit}
 									disabled>
 									{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
-										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 									})}
 								</Input>
 							</FormGroup>
@@ -493,7 +493,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										value={groupState.displayable.toString()}
 										onChange={e => handleBooleanChange(e)}>
 										{Object.keys(TrueFalseType).map(key => {
-											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 										})}
 									</Input>
 								</FormGroup>
@@ -551,7 +551,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										onChange={e => handleStringChange(e)}
 										invalid={groupState.area > 0 && groupState.areaUnit === AreaUnitType.none}>
 										{Object.keys(AreaUnitType).map(key => {
-											return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+											return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
 										})}
 									</Input>
 									<FormFeedback>
@@ -598,7 +598,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedMeterId = removedMeter[0];
-										const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter)
+										const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter);
 										if (!childRemoved) {
 											// The new child meter removal was rejected so put it back. Should only be one item so no need to sort.
 											newSelectedMeterOptions.push({
@@ -645,7 +645,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedGroupId = removedGroup[0];
-										const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group)
+										const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group);
 										if (!childRemoved) {
 											// The new child group removal was rejected so put it back. Should only be one item so no need to sort.
 											newSelectedGroupOptions.push({
@@ -744,7 +744,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Only do next step if update is still possible.
 		if (shouldUpdate) {
 			// Get all parent groups of this group.
-			const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }))
+			const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }));
 			// Check for group changes and have admin agree or not.
 			shouldUpdate = await validateGroupPostAddChild(groupState.id, parentGroupIDs, tempGroupsState);
 		}
@@ -889,7 +889,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 */
 	async function validateDelete() {
 		// Get all parent groups of this group.
-		const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }))
+		const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }));
 
 		// If there are parents then you cannot delete this group. Notify admin.
 		if (parentGroupIDs.length !== 0) {
@@ -897,7 +897,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			let msg = `${translate('group')} "${groupState.name}" ${translate('group.delete.issue')}:\n`;
 			parentGroupIDs.forEach(groupId => {
 				msg += `${editGroupsState[groupId].name}\n`;
-			})
+			});
 			msg += `\n${translate('group.edit.cancelled')}`;
 			showErrorNotification(msg);
 		} else {

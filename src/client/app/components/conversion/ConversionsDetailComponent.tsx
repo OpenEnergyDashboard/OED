@@ -14,8 +14,8 @@ import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { UnitDataById } from 'types/redux/units';
 
-const stableEmptyConversions: ConversionData[] = []
-const stableEmptyUnitDataById: UnitDataById = {}
+const stableEmptyConversions: ConversionData[] = [];
+const stableEmptyUnitDataById: UnitDataById = {};
 /**
  * Defines the conversions page card view
  * @returns Conversion page element
@@ -31,7 +31,7 @@ export default function ConversionsDetailComponent() {
 			...result,
 			unitDataById: data && unitsAdapter.getSelectors().selectEntities(data)
 		})
-	})
+	});
 	// const x = useAppSelector(state => conversionsApi.endpoints.refresh.select()(state))
 
 	// unnecessary? Currently this occurs as a side effect of the mutation which will invalidate meters/group

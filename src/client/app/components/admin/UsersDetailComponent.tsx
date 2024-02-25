@@ -16,7 +16,7 @@ import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 
 // Provide a stable empty reference for when data is in flight
-const stableEmptyUsers: User[] = []
+const stableEmptyUsers: User[] = [];
 /**
  * Component which shows user details
  * @returns User Detail element
@@ -28,8 +28,8 @@ export default function UserDetailComponent() {
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
-	React.useEffect(() => { setLocalUsersChanges(users) }, [users])
-	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)) }, [localUsersChanges, users])
+	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
+	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
 	const submitChanges = async () => {
 		submitUserEdits(localUsersChanges)
 			.unwrap()
@@ -37,28 +37,28 @@ export default function UserDetailComponent() {
 				showSuccessNotification(translate('users.successfully.edit.users'));
 			})
 			.catch(() => {
-				showErrorNotification(translate('users.failed.to.edit.users'))
-			})
-	}
+				showErrorNotification(translate('users.failed.to.edit.users'));
+			});
+	};
 
 	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
 		// copy user, and update role
-		const updatedUser: User = { ...targetUser, role: e.target.value as UserRole }
+		const updatedUser: User = { ...targetUser, role: e.target.value as UserRole };
 		// make new list from existing local user state
-		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user)
-		setLocalUsersChanges(updatedList)
-	}
+		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user);
+		setLocalUsersChanges(updatedList);
+	};
 
 	const deleteUser = (email: string) => {
 		submitDeleteUser(email)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.delete.user'))
+				showSuccessNotification(translate('users.successfully.delete.user'));
 			})
 			.catch(() => {
 				showErrorNotification(translate('users.failed.to.delete.user'));
-			})
-	}
+			});
+	};
 
 
 	return (
@@ -124,7 +124,7 @@ export default function UserDetailComponent() {
 				</div>
 			</div>
 		</div>
-	)
+	);
 }
 
 const titleStyle: React.CSSProperties = {
@@ -139,7 +139,7 @@ const tableStyle: React.CSSProperties = {
 const buttonsStyle: React.CSSProperties = {
 	display: 'flex',
 	justifyContent: 'space-between'
-}
+};
 
 const tooltipStyle = {
 	display: 'inline-block',

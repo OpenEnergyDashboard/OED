@@ -47,7 +47,7 @@ const initialState: History<GraphState> = {
 	prev: [],
 	current: defaultState,
 	next: []
-}
+};
 
 export const graphSlice = createSlice({
 	name: 'graph',
@@ -226,7 +226,7 @@ export const graphSlice = createSlice({
 				state.prev.push(action.payload);
 			})
 			.addCase(historyStepBack, state => {
-				const prev = state.prev.pop()
+				const prev = state.prev.pop();
 				if (prev) {
 					state.next.push(state.current);
 					state.current = prev;
@@ -240,7 +240,7 @@ export const graphSlice = createSlice({
 				}
 			})
 			.addCase(clearGraphHistory, state => {
-				state.current = _.cloneDeep(defaultState)
+				state.current = _.cloneDeep(defaultState);
 				state.prev = [];
 				state.next = [];
 			})
@@ -310,7 +310,7 @@ export const graphSlice = createSlice({
 							current.selectedUnit = parseInt(value);
 							break;
 					}
-				})
+				});
 			})
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
 				if (!current.hotlinked) {
@@ -320,7 +320,7 @@ export const graphSlice = createSlice({
 					current.barStacking = defaultBarStacking;
 					current.areaNormalization = defaultAreaNormalization;
 				}
-			})
+			});
 	},
 	selectors: {
 		selectGraphState: state => state.current,
@@ -350,7 +350,7 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
 	}
-})
+});
 
 // Selectors that can be imported and used in 'useAppSelectors' and 'createSelectors'
 export const {

@@ -23,4 +23,4 @@ export const unauthorizedRequestListener = (startListening: AppListener) => {
 			}
 		}
 	});
-}
+};

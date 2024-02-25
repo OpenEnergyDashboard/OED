@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import { PlotOED } from './PlotOED';
 import SpinnerComponent from './SpinnerComponent';
 
-const stableEmptyData: BarReadings = {}
+const stableEmptyData: BarReadings = {};
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access

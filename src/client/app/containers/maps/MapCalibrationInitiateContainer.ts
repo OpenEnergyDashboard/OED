@@ -12,7 +12,7 @@ import {State} from '../../types/redux/state';
 function mapStateToProps(state: State) {
 	return {
 		map: state.maps.editedMaps[state.maps.calibratingMap]
-	}
+	};
 }
 
 function mapDispatchToProps(dispatch: Dispatch) {

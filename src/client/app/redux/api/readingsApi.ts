@@ -93,7 +93,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
-			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
 				const dataInCache = currentArg?.ids.every(id => currentData.includes(id));
@@ -111,7 +111,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		}),
 		compare: builder.query<CompareReadings, CompareReadingApiArgs>({
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
-			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
 				const requestedAlreadyCached = currentArg?.ids.every(id => currentData.includes(id));
@@ -130,7 +130,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		radar: builder.query<LineReadings, RadarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
-			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData) },
+			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
 				const dataInCache = currentArg?.ids.every(id => currentData.includes(id));
@@ -148,4 +148,4 @@ export const readingsApi = baseApi.injectEndpoints({
 		})
 
 	})
-})
+});

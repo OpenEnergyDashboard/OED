@@ -17,8 +17,8 @@ import { useLocation } from 'react-router-dom';
  */
 export default function MenuModalComponent() {
 	const [showModal, setShowModal] = useState(false);
-	const toggleModal = () => { setShowModal(!showModal); }
-	const { pathname } = useLocation()
+	const toggleModal = () => { setShowModal(!showModal); };
+	const { pathname } = useLocation();
 
 	const inlineStyle: React.CSSProperties = {
 		display: 'inline',
@@ -40,7 +40,7 @@ export default function MenuModalComponent() {
 				</ModalBody>
 			</Modal>
 		</div >
-	)
+	);
 }
 
 const customModalHeader = () => {
@@ -56,5 +56,5 @@ const customModalHeader = () => {
 			<h6>
 				<HeaderButtonsComponent />
 			</h6>
-		</div>)
-}
+		</div>);
+};

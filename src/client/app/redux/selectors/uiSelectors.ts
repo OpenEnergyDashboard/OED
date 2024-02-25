@@ -74,7 +74,7 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 					incompatibleGroups.add(groupId);
 				}
 				else if (selectedUnitId === -99) {
-					compatibleGroups.add(groupId)
+					compatibleGroups.add(groupId);
 				}
 				else {
 					// Get the set of units compatible with the current group (through its deepMeters attribute)
@@ -82,11 +82,11 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
 					compatibleUnits.has(selectedUnitId) ? compatibleGroups.add(groupId) : incompatibleGroups.add(groupId);
 				}
-			})
+			});
 
-		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
+		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups };
 	}
-)
+);
 
 export const selectCurrentAreaCompatibility = createAppSelector(
 	[
@@ -121,11 +121,11 @@ export const selectCurrentAreaCompatibility = createAppSelector(
 			});
 		}
 		// Filter out any new incompatible meters/groups from the compatibility list.
-		incompatibleMeters.forEach(meterID => compatibleMeters.delete(meterID))
-		incompatibleGroups.forEach(groupID => compatibleGroups.delete(groupID))
-		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups }
+		incompatibleMeters.forEach(meterID => compatibleMeters.delete(meterID));
+		incompatibleGroups.forEach(groupID => compatibleGroups.delete(groupID));
+		return { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups };
 	}
-)
+);
 
 export const selectChartTypeCompatibility = createAppSelector(
 	[
@@ -211,21 +211,21 @@ export const selectChartTypeCompatibility = createAppSelector(
 			compatibleGroups,
 			incompatibleMeters,
 			incompatibleGroups
-		}
+		};
 	}
-)
+);
 
 // Filter compatible entities from selected Meters
 export const selectCompatibleSelectedMeters = createAppSelector(
 	[selectSelectedMeters, selectChartTypeCompatibility],
 	(selectedMeters, { compatibleMeters }) => selectedMeters.filter(id => compatibleMeters.has(id))
-)
+);
 
 // Filter compatible entities from selected Groups
 export const selectCompatibleSelectedGroups = createAppSelector(
 	[selectSelectedGroups, selectChartTypeCompatibility],
 	(selectedMeters, { compatibleGroups }) => selectedMeters.filter(id => compatibleGroups.has(id))
-)
+);
 
 export const selectMeterGroupSelectData = createAppSelector(
 	[
@@ -281,7 +281,7 @@ export const selectMeterGroupSelectData = createAppSelector(
 			allSelectedMeterValues, allSelectedGroupValues
 		};
 	}
-)
+);
 
 export const selectUnitSelectData = createAppSelector(
 	[
@@ -352,10 +352,10 @@ export const selectUnitSelectData = createAppSelector(
 				label: 'Incompatible Units',
 				options: unitOptions.incompatible
 			}
-		]
+		];
 		return unitsGroupedOptions;
 	}
-)
+);
 
 /**
  * Returns a set of SelectOptions based on the type of state passed in and sets the visibility.
@@ -425,7 +425,7 @@ export const isAreaNormCompatible = (
 	const noAreaOrUnitType = meterOrGroupData[id].area === 0 || meterOrGroupData[id].areaUnit === AreaUnitType.none;
 	const isAreaNormCompatible = !noUnitAndRaw && !noAreaOrUnitType;
 	return isAreaNormCompatible;
-}
+};
 
 export const selectChartLink = createAppSelector(
 	[
@@ -488,5 +488,5 @@ export const selectChartLink = createAppSelector(
 		}
 		return linkText;
 	}
-)
+);
 

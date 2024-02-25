@@ -22,7 +22,7 @@ import { showSuccessNotification, showErrorNotification } from '../../utils/noti
  */
 export default function CreateUnitModalComponent() {
 	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
-	const translate = useTranslate()
+	const translate = useTranslate();
 
 	const defaultValues = {
 		name: '',
@@ -39,7 +39,7 @@ export default function CreateUnitModalComponent() {
 		// so it can tell it is not yet assigned and do the correct logic for that case.
 		// The units API expects these values to be undefined on call so that the database can assign their values.
 		id: -99
-	}
+	};
 
 	/* State */
 	// Unlike EditUnitModalComponent, there are no props so we don't pass show and close via props.
@@ -56,15 +56,15 @@ export default function CreateUnitModalComponent() {
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	/* Create Unit Validation:
 		Name cannot be blank
@@ -81,7 +81,7 @@ export default function CreateUnitModalComponent() {
 	// Reset the state to default values
 	const resetState = () => {
 		setState(defaultValues);
-	}
+	};
 
 	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -108,7 +108,7 @@ export default function CreateUnitModalComponent() {
 			})
 			.catch(() => {
 				showErrorNotification(translate('unit.failed.to.create.unit'));
-			})
+			});
 		resetState();
 	};
 
@@ -174,7 +174,7 @@ export default function CreateUnitModalComponent() {
 								invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}>
 								{Object.keys(UnitType).map(key => {
 									return (<option value={key} key={key} disabled={state.suffix != '' && key != UnitType.suffix}>
-										{translate(`UnitType.${key}`)}</option>)
+										{translate(`UnitType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -191,7 +191,7 @@ export default function CreateUnitModalComponent() {
 								onChange={e => handleStringChange(e)}
 								value={state.unitRepresent}>
 								{Object.keys(UnitRepresentType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -209,7 +209,7 @@ export default function CreateUnitModalComponent() {
 								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
 								{Object.keys(DisplayableType).map(key => {
 									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
-										{translate(`DisplayableType.${key}`)}</option>)
+										{translate(`DisplayableType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -225,7 +225,7 @@ export default function CreateUnitModalComponent() {
 								type='select'
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>

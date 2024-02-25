@@ -77,7 +77,7 @@ export default function ThreeDComponent() {
 				/>
 			}
 		</>
-	)
+	);
 }
 
 /**
@@ -117,7 +117,7 @@ function formatThreeDData(
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, graphState.areaNormalization, graphState.selectedAreaUnit);
-			unitLabel = returned.unitLabel
+			unitLabel = returned.unitLabel;
 			needsRateScaling = returned.needsRateScaling;
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
@@ -149,7 +149,7 @@ function formatThreeDData(
 		const startTS = moment.utc(data.xData[j].startTimestamp);
 		const endTS = moment.utc(data.xData[j].endTimestamp);
 		const midpointTS = moment.utc(startTS.clone().add(endTS.clone().diff(startTS) / 2));
-		const dateTS = moment.utc(data.yData[i])
+		const dateTS = moment.utc(data.yData[i]);
 
 		// Use first day's values to populate xData Labels
 		if (i === 0) {
@@ -179,9 +179,9 @@ function formatThreeDData(
 		z: zDataToRender,
 		hoverinfo: 'text',
 		hovertext: hoverText
-	}]
+	}];
 	const layout = setThreeDLayout(unitLabel);
-	return [formattedData, layout]
+	return [formattedData, layout];
 }
 
 /**
@@ -207,7 +207,7 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 				'font': { 'size': fontSize }
 			}
 		]
-	}
+	};
 }
 
 /**
@@ -247,6 +247,6 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 				}
 			}
 		}
-	} as Partial<Plotly.Layout>
+	} as Partial<Plotly.Layout>;
 }
 

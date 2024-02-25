@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectForwardHistory, selectPrevHistory } from '../redux/slices/graphSlice';
-import { historyStepBack, historyStepForward } from '../redux/actions/extraActions'
+import { historyStepBack, historyStepForward } from '../redux/actions/extraActions';
 /**
  * @returns Renders a history component with previous and next buttons.
  */
@@ -29,5 +29,5 @@ export default function HistoryComponent() {
 				<path d="M5 1L9 5L5 9" stroke={'black'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 			</svg>
 		</div >
-	)
+	);
 }

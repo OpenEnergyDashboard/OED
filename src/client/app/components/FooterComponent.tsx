@@ -12,7 +12,7 @@ import { useAppSelector } from '../redux/reduxHooks';
  * @returns Footer loaded at the bottom of every webpage, which loads the site version from the redux store
  */
 export default function FooterComponent() {
-	const version = useAppSelector(selectOEDVersion)
+	const version = useAppSelector(selectOEDVersion);
 	return (
 		<div id='footer' style={footerStyle}>
 			<FormattedMessage id='oed.description' />
@@ -27,7 +27,7 @@ export default function FooterComponent() {
 			<FormattedMessage id='oed.version' />
 			{version}
 		</div>
-	)
+	);
 }
 
 

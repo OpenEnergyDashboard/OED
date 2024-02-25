@@ -69,5 +69,5 @@ export function showErrorNotification(message: string, position: ToastPosition =
 		pauseOnHover: false,
 		draggable: true,
 		theme: 'colored'
-	})
+	});
 }

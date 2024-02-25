@@ -20,7 +20,7 @@ export const selectLineChartDeps = createAppSelector(
 		const groupDeps = { ...groupDep, showMinMax };
 		return { meterDeps, groupDeps };
 	}
-)
+);
 
 // Selector that derives meter data for the line graphic
 export const selectPlotlyMeterData = selectFromLineReadingsResult(
@@ -92,11 +92,11 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 						width: 2,
 						color: getGraphColor(colorID, DataType.Meter)
 					}
-				} as Partial<Plotly.PlotData>
-			})
-		return plotlyLineData
+				} as Partial<Plotly.PlotData>;
+			});
+		return plotlyLineData;
 	}
-)
+);
 
 export const selectPlotlyGroupData = selectFromLineReadingsResult(
 	[data => data, (_data, dependencies: PlotlyLineDeps) => dependencies],
@@ -105,8 +105,8 @@ export const selectPlotlyGroupData = selectFromLineReadingsResult(
 			// filter entries for requested groups
 			.filter(([groupID]) => compatibleEntities.includes((Number(groupID))))
 			.map(([id, readings]) => {
-				const groupInfo = groupDataById[Number(id)]
-				const scaling = selectScalingFromEntity(groupInfo, areaUnit, areaNormalization, rateScaling)
+				const groupInfo = groupDataById[Number(id)];
+				const scaling = selectScalingFromEntity(groupInfo, areaUnit, areaNormalization, rateScaling);
 				const label = selectNameFromEntity(groupInfo);
 				const colorID = groupInfo.id;
 
@@ -140,8 +140,8 @@ export const selectPlotlyGroupData = selectFromLineReadingsResult(
 						width: 2,
 						color: getGraphColor(colorID, DataType.Group)
 					}
-				} as Partial<Plotly.PlotData>
-			})
-		return plotlyData
-	})
+				} as Partial<Plotly.PlotData>;
+			});
+		return plotlyData;
+	});
 

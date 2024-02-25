@@ -18,7 +18,7 @@ export const unitsApi = baseApi.injectEndpoints({
 		getUnitsDetails: builder.query<UnitDataState, void>({
 			query: () => 'api/units',
 			transformResponse: (response: UnitData[]) => {
-				return unitsAdapter.setAll(unitsInitialState, response)
+				return unitsAdapter.setAll(unitsInitialState, response);
 			},
 			providesTags: ['Units']
 		}),
@@ -35,8 +35,8 @@ export const unitsApi = baseApi.injectEndpoints({
 							conversionsApi.endpoints.refresh.initiate({
 								redoCik: true,
 								refreshReadingViews: false
-							}))
-					})
+							}));
+					});
 			},
 			invalidatesTags: ['Units']
 		}),
@@ -53,13 +53,13 @@ export const unitsApi = baseApi.injectEndpoints({
 							conversionsApi.endpoints.refresh.initiate({
 								redoCik: shouldRedoCik,
 								refreshReadingViews: shouldRefreshReadingViews
-							}))
-					})
+							}));
+					});
 			},
 			invalidatesTags: ['Units']
 		})
 	})
-})
+});
 
 export const selectUnitDataResult = unitsApi.endpoints.getUnitsDetails.select();
 export const {

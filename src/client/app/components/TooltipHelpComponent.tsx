@@ -26,8 +26,8 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 	 */
 
 
-	const version = useAppSelector(selectOEDVersion)
-	const baseHelpUrl = useAppSelector(selectBaseHelpUrl)
+	const version = useAppSelector(selectOEDVersion);
+	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
 	const helpUrl = baseHelpUrl + version;
 
 	const helpLinks: Record<string, Record<string, string>> = {

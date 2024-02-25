@@ -248,7 +248,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// The Plotly coordinates have the opposite at the max coordinate values that is the normalized
 	// size coordinates.
 	// Similar to above but different point.
-	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height }
+	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height };
 	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, northAngle);
 	const oppositeCoordinate: GPSPoint = {
 		latitude: calibrationSet[0].gps.latitude + degreePerUnitY * (oppositeTrueNorth.y - clickedTrueNorth.y),
@@ -332,7 +332,7 @@ export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 	const res: Dimensions = {
 		width,
 		height
-	}
+	};
 	return res;
 }
 
@@ -432,7 +432,7 @@ export function trueNorthOrigin(size: Dimensions, northAngle: number): Cartesian
 export function trueNorthOpposite(size: Dimensions, northAngle: number): CartesianPoint {
 	// The opposite coordinate is the size since it is in the top, right corner
 	// of the user map.
-	const opposite: CartesianPoint = { x: size.width, y: size.height }
+	const opposite: CartesianPoint = { x: size.width, y: size.height };
 	// Shift this value to center and then rotate to put on true north map.
 	return shiftRotate(size, opposite, -1, northAngle);
 }

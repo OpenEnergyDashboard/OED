@@ -54,7 +54,7 @@ export default function ReadingsPerDaySelect() {
 				// (24 hours a day) / intervalLength, e.g, 1 hour intervals give 24 readings per day
 				label: String((24 / intervalLength)),
 				value: intervalLength
-			} as ReadingsPerDayOption
+			} as ReadingsPerDayOption;
 		});
 
 	// Use the selectedOption enum value to update threeD State
@@ -74,7 +74,7 @@ export default function ReadingsPerDaySelect() {
 	const value = {
 		label: displayValue,
 		value: readingInterval
-	}
+	};
 
 	if (graphState.chartToRender === ChartTypes.threeD) {
 		return (
@@ -85,7 +85,7 @@ export default function ReadingsPerDaySelect() {
 				</p>
 				<Select value={value} options={options} isLoading={isFetching} isDisabled={isDisabled} onChange={onSelectChange} />
 			</div>
-		)
+		);
 	} else {
 		return null;
 	}

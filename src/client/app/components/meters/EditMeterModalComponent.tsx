@@ -51,7 +51,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		incompatibleUnits
 	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits));
 
-	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)) }, [meterState]);
+	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)); }, [meterState]);
 	/* State */
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -59,7 +59,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const [validMeter, setValidMeter] = useState(isValidMeter(localMeterEdits));
 
-	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)) }, [localMeterEdits]);
+	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
 
 
@@ -75,7 +75,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
-		const meterHasChanges = !_.isEqual(meterState, localMeterEdits)
+		const meterHasChanges = !_.isEqual(meterState, localMeterEdits);
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
@@ -126,7 +126,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
-				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
+				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews });
 			} else {
 				// Tell user that not going to update due to input issues.
 				showErrorNotification(translate('meter.input.error'));
@@ -136,19 +136,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalMeterEdits({ ...localMeterEdits, [e.target.name]: e.target.value.trim() });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalMeterEdits({ ...localMeterEdits, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalMeterEdits({ ...localMeterEdits, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	const handleTimeZoneChange = (timeZone: string) => {
 		setLocalMeterEdits({ ...localMeterEdits, ['timeZone']: timeZone });
-	}
+	};
 	// Reset the state to default values
 	// To be used for the discard changes button
 	// Different use case from CreateMeterModalComponent's resetState
@@ -156,12 +156,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// Failure to edit meters will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setLocalMeterEdits(meterState);
-	}
+	};
 
 	const handleClose = () => {
 		props.handleClose();
 		resetState();
-	}
+	};
 	return (
 		<>
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
@@ -213,10 +213,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.unitId}
 								onChange={e => handleNumberChange(e)}>
 								{Array.from(compatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
 								{Array.from(incompatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -230,10 +230,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.defaultGraphicUnit}
 								onChange={e => handleNumberChange(e)}>
 								{Array.from(compatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
 								{Array.from(incompatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -255,7 +255,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.enabled?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -270,7 +270,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleBooleanChange(e)}
 								invalid={localMeterEdits.displayable && localMeterEdits.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -290,7 +290,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}>
 								{/* The dB expects lowercase. */}
 								{Object.keys(MeterType).map(key => {
-									return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
+									return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -361,7 +361,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								invalid={localMeterEdits.area > 0 && localMeterEdits.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -391,7 +391,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.cumulative?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -405,7 +405,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.cumulativeReset?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -448,7 +448,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								value={localMeterEdits.endOnlyTime?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -515,7 +515,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								{Object.keys(MeterTimeSortType).map(key => {
 									// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
 									// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
-									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -625,7 +625,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleBooleanChange(e)}
 								invalid={localMeterEdits?.disableChecks && localMeterEdits.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -742,4 +742,4 @@ const isValidMeter = (localMeterEdits: MeterData) => {
 		moment(localMeterEdits.minDate).isSameOrBefore(moment(localMeterEdits.maxDate)) &&
 		moment(localMeterEdits.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
 		(localMeterEdits.maxError >= 0 && localMeterEdits.maxError <= MAX_ERRORS);
-}
+};

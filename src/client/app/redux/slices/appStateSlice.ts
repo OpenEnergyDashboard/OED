@@ -30,7 +30,7 @@ const defaultState: AppState = {
 	optionsVisibility: true,
 	selectedLanguage: LanguageTypes.en,
 	chartLinkHideOptions: false
-}
+};
 
 export const appStateSlice = createThunkSlice({
 	name: 'appState',
@@ -76,14 +76,14 @@ export const appStateSlice = createThunkSlice({
 					try {
 						await dispatch(authApi.endpoints.verifyToken.initiate(getToken()))
 							.unwrap()
-							.catch(e => { throw e });
+							.catch(e => { throw e; });
 						// Token is valid if not errored out by this point,
 						// Apis will now use the token in headers via baseAPI's Prepare Headers
 						dispatch(currentUserSlice.actions.setUserToken(getToken()));
 						//  Get userDetails with verified token in headers
 						await dispatch(userApi.endpoints.getUserDetails.initiate(undefined, { subscribe: false }))
 							.unwrap()
-							.catch(e => { throw e });
+							.catch(e => { throw e; });
 
 					} catch {
 						// User had a token that isn't valid or getUserDetails threw an error.
@@ -99,7 +99,7 @@ export const appStateSlice = createThunkSlice({
 			},
 			{
 				settled: state => {
-					state.initComplete = true
+					state.initComplete = true;
 				}
 			}
 
@@ -115,7 +115,7 @@ export const appStateSlice = createThunkSlice({
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
 				state.selectedLanguage = action.payload.defaultLanguage;
 				moment.locale(action.payload.defaultLanguage);
-			})
+			});
 	},
 	selectors: {
 		selectInitComplete: state => state.initComplete,
@@ -123,7 +123,7 @@ export const appStateSlice = createThunkSlice({
 		selectSelectedLanguage: state => state.selectedLanguage,
 		selectChartLinkHideOptions: state => state.chartLinkHideOptions
 	}
-})
+});
 
 export const {
 	initApp,

@@ -79,7 +79,7 @@ const formatGroupLabel = (data: GroupedOption) => {
 			<span>{data.label}</span>
 			<Badge pill color="primary">{data.options.length}</Badge>
 		</div >
-	)
+	);
 };
 
 interface MeterAndGroupSelectProps {
@@ -101,27 +101,27 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 			data-tip={isDisabled ? 'help.home.area.normalize' : `${props.data.label}`}
 			onMouseDown={e => e.stopPropagation()}
 			onClick={e => {
-				ReactTooltip.rebuild()
-				e.stopPropagation()
-				ref.current && ReactTooltip.show(ref.current)
+				ReactTooltip.rebuild();
+				e.stopPropagation();
+				ref.current && ReactTooltip.show(ref.current);
 			}}
 			style={{ overflow: 'hidden' }}
 			onMouseEnter={e => {
 				if (!isDisabled) {
-					const multiValueLabel = e.currentTarget.children[0]
+					const multiValueLabel = e.currentTarget.children[0];
 					if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
-						ReactTooltip.rebuild()
-						ref.current && ReactTooltip.show(ref.current)
+						ReactTooltip.rebuild();
+						ref.current && ReactTooltip.show(ref.current);
 					}
 				}
 			}}
 			onMouseLeave={() => {
-				ref.current && ReactTooltip.hide(ref.current)
+				ref.current && ReactTooltip.hide(ref.current);
 			}}
 		>
 			<components.MultiValueLabel {...props} />
 		</div >
-	)
+	);
 
 };
 

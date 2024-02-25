@@ -26,15 +26,15 @@ export const groupsApi = baseApi.injectEndpoints({
 						// endpoint doesn't return these so define them here or else undefined may cause issues on admin pages
 						childMeters: [],
 						childGroups: []
-					})))
+					})));
 			},
 			onQueryStarted: async (_, { dispatch, queryFulfilled, getState }) => {
 				try {
-					await queryFulfilled
-					const state = getState() as RootState
+					await queryFulfilled;
+					const state = getState() as RootState;
 					// if user is an admin, automatically fetch allGroupChildren and update the
 					if (selectIsAdmin(state)) {
-						const { data = [] } = await dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate(undefined, { subscribe: false }))
+						const { data = [] } = await dispatch(groupsApi.endpoints.getAllGroupsChildren.initiate(undefined, { subscribe: false }));
 						// Map the data to the format needed for updateMany
 						const updates: Update<GroupData, number>[] = data.map(childrenInfo => ({
 							id: childrenInfo.groupId,
@@ -43,10 +43,10 @@ export const groupsApi = baseApi.injectEndpoints({
 								childGroups: childrenInfo.childGroups
 							}
 						}));
-						dispatch(groupsApi.util.updateQueryData('getGroups', undefined, groupDataById => { groupsAdapter.updateMany(groupDataById, updates) }))
+						dispatch(groupsApi.util.updateQueryData('getGroups', undefined, groupDataById => { groupsAdapter.updateMany(groupDataById, updates); }));
 					}
 				} catch (e) {
-					console.log(e)
+					console.log(e);
 				}
 			},
 			providesTags: ['GroupData']
@@ -84,7 +84,7 @@ export const groupsApi = baseApi.injectEndpoints({
 			query: groupId => `api/groups/parents/${groupId}`
 		})
 	})
-})
+});
 
 export const selectGroupDataResult = groupsApi.endpoints.getGroups.select();
 
@@ -94,10 +94,10 @@ export const {
 	selectTotal: selectGroupTotal,
 	selectIds: selectGroupIds,
 	selectEntities: selectGroupDataById
-} = groupsAdapter.getSelectors((state: RootState) => selectGroupDataResult(state).data ?? groupsInitialState)
+} = groupsAdapter.getSelectors((state: RootState) => selectGroupDataResult(state).data ?? groupsInitialState);
 
 
 export const selectGroupNameWithID = (state: RootState, groupId: number) => {
-	const groupInfo = selectGroupById(state, groupId)
+	const groupInfo = selectGroupById(state, groupId);
 	return groupInfo ? groupInfo.name : '';
-}
+};

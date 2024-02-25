@@ -14,7 +14,7 @@ import LogoSpinner from './LogoSpinner';
 import { PlotOED } from './PlotOED';
 
 // Stable reference for when there is not data.
-const stableEmptyReadings: LineReadings = {}
+const stableEmptyReadings: LineReadings = {};
 /**
  * @returns plotlyLine graphic
  */
@@ -49,10 +49,10 @@ export default function LineChartComponent() {
 	// Use Query Data to derive plotly datasets memoized selector
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 
-	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData])
-	const datasets = React.useDeferredValue(data)
+	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
+	const datasets = React.useDeferredValue(data);
 	if (meterIsLoading || groupIsLoading) {
-		return <LogoSpinner />
+		return <LogoSpinner />;
 	}
 
 
@@ -61,9 +61,9 @@ export default function LineChartComponent() {
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (datasets.length === 0) {
-		return <h1>{`${translate('select.meter.group')}`}	</h1>
+		return <h1>{`${translate('select.meter.group')}`}	</h1>;
 	} else if (!ableToGraph) {
-		return <h1>{`${translate('no.data.in.range')}`}</h1>
+		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
 		return (
 			<PlotOED
@@ -76,7 +76,7 @@ export default function LineChartComponent() {
 					xaxis: { rangeslider: { visible: true }, showgrid: true, gridcolor: '#ddd' }
 				}}
 			/>
-		)
+		);
 
 	}
 }

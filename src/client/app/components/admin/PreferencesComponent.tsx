@@ -24,19 +24,19 @@ import { defaultAdminState } from '../../redux/slices/adminSlice';
  */
 export default function PreferencesComponent() {
 	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
-	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(_.cloneDeep(adminPreferences))
+	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(_.cloneDeep(adminPreferences));
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
 	// mutation will invalidate preferences tag and will be re-fetched.
 	// On query response, reset local changes to response
-	React.useEffect(() => { setLocalAdminPref(_.cloneDeep(adminPreferences)) }, [adminPreferences])
+	React.useEffect(() => { setLocalAdminPref(_.cloneDeep(adminPreferences)); }, [adminPreferences]);
 	// Compare the API response against the localState to determine changes
-	React.useEffect(() => { setHasChanges(!_.isEqual(adminPreferences, localAdminPref)) }, [localAdminPref, adminPreferences])
+	React.useEffect(() => { setHasChanges(!_.isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
 	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
-		setLocalAdminPref({ ...localAdminPref, [key]: value })
-	}
+		setLocalAdminPref({ ...localAdminPref, [key]: value });
+	};
 
 	return (
 		<div>
@@ -298,7 +298,7 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultMeterDisableChecks?.toString()}
 					onChange={e => makeLocalChanges('defaultMeterDisableChecks', e.target.value)}>
 					{Object.keys(TrueFalseType).map(key => {
-						return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+						return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 					})}
 				</Input>
 			</div>
@@ -318,10 +318,10 @@ export default function PreferencesComponent() {
 					submitPreferences(localAdminPref)
 						.unwrap()
 						.then(() => {
-							showSuccessNotification(translate('updated.preferences'))
+							showSuccessNotification(translate('updated.preferences'));
 						})
 						.catch(() => {
-							showErrorNotification(translate('failed.to.submit.changes'))
+							showErrorNotification(translate('failed.to.submit.changes'));
 						})
 				}
 				disabled={!hasChanges}

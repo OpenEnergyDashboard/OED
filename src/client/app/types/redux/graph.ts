@@ -22,7 +22,7 @@ export const LineGraphRates = {
 	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
-}
+};
 
 // Use to determine readings per day on 3D Graphs
 // 24 / ReadingInterval.Hourly(1) = 24 readings per day @ 1 hour intervals

@@ -11,12 +11,12 @@ export const versionApi = baseApi.injectEndpoints({
 			query: () => '/api/version'
 		})
 	})
-})
+});
 
 export const selectVersion = versionApi.endpoints.getVersion.select();
 export const selectOEDVersion = createSelector(
 	selectVersion,
 	({ data: version }) => {
-		return version ?? ''
+		return version ?? '';
 	}
 );

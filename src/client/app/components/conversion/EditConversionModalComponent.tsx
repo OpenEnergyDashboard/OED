@@ -34,12 +34,12 @@ interface EditConversionModalComponentProps {
  * @returns Conversion edit element
  */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
-	const [editConversion] = conversionsApi.useEditConversionMutation()
-	const [deleteConversion] = conversionsApi.useDeleteConversionMutation()
-	const unitDataById = useAppSelector(selectUnitDataById)
+	const [editConversion] = conversionsApi.useEditConversionMutation();
+	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Set existing conversion values
-	const values = { ...props.conversion }
+	const values = { ...props.conversion };
 
 	/* State */
 	// Handlers for each type of input change
@@ -47,15 +47,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
+	};
 	/* End State */
 
 	/* Confirm Delete Modal */
@@ -70,22 +70,22 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		setShowDeleteConfirmationModal(false);
 		// Show the edit modal
 		handleShow();
-	}
+	};
 	const handleDeleteConfirmationModalOpen = () => {
 		// Hide the edit modal
 		handleClose();
 		// Show the warning modal
 		setShowDeleteConfirmationModal(true);
-	}
+	};
 	const handleDeleteConversion = () => {
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 
 		// Delete the conversion using the state object, it should only require the source and destination ids set
-		deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId })
+		deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId });
 
-	}
+	};
 	/* End Confirm Delete Modal */
 
 	// Reset the state to default values
@@ -95,16 +95,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Failure to edit conversions will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
-	}
+	};
 
 	const handleShow = () => {
 		props.handleShow();
-	}
+	};
 
 	const handleClose = () => {
 		resetState();
 		props.handleClose();
-	}
+	};
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -124,9 +124,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes
-			editConversion({ conversionData: state, shouldRedoCik })
+			editConversion({ conversionData: state, shouldRedoCik });
 		}
-	}
+	};
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -193,7 +193,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								defaultValue={state.bidirectional.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup>

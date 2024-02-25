@@ -51,19 +51,19 @@ export default function CreateMeterModalComponent() {
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterDetails({ ...meterDetails, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterDetails({ ...meterDetails, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMeterDetails({ ...meterDetails, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	const handleTimeZoneChange = (timeZone: string) => {
 		setMeterDetails({ ...meterDetails, ['timeZone']: timeZone });
-	}
+	};
 
 	// Dropdowns
 	const [selectedGraphicId, setSelectedGraphicId] = useState<boolean>(false);
@@ -82,7 +82,7 @@ export default function CreateMeterModalComponent() {
 		setMeterDetails(defaultValues);
 		setSelectedGraphicId(false);
 		setSelectedUnitId(false);
-	}
+	};
 
 	const handleClose = () => {
 		setShowModal(false);
@@ -150,7 +150,7 @@ export default function CreateMeterModalComponent() {
 				})
 				.catch(err => {
 					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
-				})
+				});
 		} else {
 			// Tell user that not going to update due to input issues.
 			showErrorNotification(translate('meter.input.error'));
@@ -225,8 +225,8 @@ export default function CreateMeterModalComponent() {
 								type='select'
 								value={selectedUnitId ? meterDetails.unitId : -999}
 								onChange={e => {
-									handleNumberChange(e)
-									setSelectedUnitId(true)
+									handleNumberChange(e);
+									setSelectedUnitId(true);
 								}}
 								invalid={!selectedUnitId}>
 								{<option
@@ -237,10 +237,10 @@ export default function CreateMeterModalComponent() {
 									{translate('select.unit')}
 								</option>}
 								{Array.from(compatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
 								{Array.from(incompatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 								})}
 							</Input>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
@@ -255,8 +255,8 @@ export default function CreateMeterModalComponent() {
 								value={selectedGraphicId ? meterDetails.defaultGraphicUnit : -999}
 								invalid={!selectedGraphicId}
 								onChange={e => {
-									handleNumberChange(e)
-									setSelectedGraphicId(true)
+									handleNumberChange(e);
+									setSelectedGraphicId(true);
 								}}
 							>
 								{<option
@@ -267,10 +267,10 @@ export default function CreateMeterModalComponent() {
 									{translate('select.unit')}
 								</option>}
 								{Array.from(compatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
 								{Array.from(incompatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>)
+									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
 								})}
 							</Input>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
@@ -287,7 +287,7 @@ export default function CreateMeterModalComponent() {
 								value={meterDetails.enabled.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -302,7 +302,7 @@ export default function CreateMeterModalComponent() {
 								onChange={e => handleBooleanChange(e)}
 								invalid={meterDetails.displayable && meterDetails.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -331,7 +331,7 @@ export default function CreateMeterModalComponent() {
 								</option>}
 								{/* The dB expects lowercase. */}
 								{Object.keys(MeterType).map(key => {
-									return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>)
+									return (<option value={key.toLowerCase()} key={key.toLowerCase()}>{`${key}`}</option>);
 								})}
 							</Input>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
@@ -402,7 +402,7 @@ export default function CreateMeterModalComponent() {
 								onChange={e => handleStringChange(e)}
 								invalid={meterDetails.area > 0 && meterDetails.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -432,7 +432,7 @@ export default function CreateMeterModalComponent() {
 								value={meterDetails.cumulative.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -446,7 +446,7 @@ export default function CreateMeterModalComponent() {
 								value={meterDetails.cumulativeReset.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -488,7 +488,7 @@ export default function CreateMeterModalComponent() {
 								value={meterDetails.endOnlyTime.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -555,7 +555,7 @@ export default function CreateMeterModalComponent() {
 								{Object.keys(MeterTimeSortType).map(key => {
 									// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
 									// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
-									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -664,7 +664,7 @@ export default function CreateMeterModalComponent() {
 								defaultValue={meterDetails.disableChecks?.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -772,7 +772,7 @@ const isValidCreateMeter = (meterDetails: MeterData) => {
 		moment(meterDetails.minDate).isSameOrBefore(moment(meterDetails.maxDate)) &&
 		moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
 		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS);
-}
+};
 
 const MIN_VAL = Number.MIN_SAFE_INTEGER;
 const MAX_VAL = Number.MAX_SAFE_INTEGER;

@@ -21,9 +21,9 @@ export const selectPlotlyBarDeps = createAppSelector(
 		selectBarWidthDays
 	],
 	(meterDeps, groupDeps, barDuration) => {
-		const barMeterDeps = { ...meterDeps, barDuration }
-		const barGroupDeps = { ...groupDeps, barDuration }
-		return { barMeterDeps, barGroupDeps }
+		const barMeterDeps = { ...meterDeps, barDuration };
+		const barGroupDeps = { ...groupDeps, barDuration };
+		return { barMeterDeps, barGroupDeps };
 	}
 );
 
@@ -40,10 +40,10 @@ export const selectPlotlyBarDataFromResult = createSelector.withTypes<BarReading
 			// filter entries for requested groups
 			.filter(([id]) => compatibleEntities.includes((Number(id))))
 			.map(([id, readings]) => {
-				const entityId = Number(id)
-				const entity = meterOrGroup === MeterOrGroup.meters ? meterDataById[entityId] : groupDataById[entityId]
-				const entityArea = selectAreaScalingFromEntity(entity, areaUnit, areaNormalization)
-				const label = selectNameFromEntity(entity)
+				const entityId = Number(id);
+				const entity = meterOrGroup === MeterOrGroup.meters ? meterDataById[entityId] : groupDataById[entityId];
+				const entityArea = selectAreaScalingFromEntity(entity, areaUnit, areaNormalization);
+				const label = selectNameFromEntity(entity);
 				const colorID = entity.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data.
@@ -78,8 +78,8 @@ export const selectPlotlyBarDataFromResult = createSelector.withTypes<BarReading
 					hoverinfo: 'text',
 					type: 'bar',
 					marker: { color: getGraphColor(colorID, DataType.Meter) }
-				}
-			})
-		return plotlyData
+				};
+			});
+		return plotlyData;
 	}
 );

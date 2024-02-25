@@ -39,4 +39,4 @@ export const baseApi = createApi({
 	endpoints: () => ({})
 	// Defaults to 60 seconds or 1 minute
 	// keepUnusedDataFor: 60
-})
+});

@@ -25,7 +25,7 @@ export function getGPSString(gps: GPSPoint | null) {
 	}
 	else {
 		// Assume it is a string that was input.
-		return gps
+		return gps;
 	}
 }
 
@@ -80,7 +80,7 @@ export const NoUnit: UnitData = {
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
 	note: ''
-}
+};
 
 /**
  * The enum is fine if don't want translation but this is dynamic so translation works.

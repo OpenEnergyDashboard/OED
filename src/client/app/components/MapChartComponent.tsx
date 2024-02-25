@@ -40,28 +40,28 @@ import SpinnerComponent from './SpinnerComponent';
  */
 export default function MapChartComponent() {
 
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectMapChartQueryArgs)
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectMapChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, { skip: groupShouldSkip });
 
 	// converting maps to RTK has been proving troublesome, therefore using a combination of old/new stateSelectors
 	const unitID = useAppSelector(selectSelectedUnit);
-	const barDuration = useAppSelector(selectBarWidthDays)
-	const areaNormalization = useAppSelector(selectGraphAreaNormalization)
-	const selectedAreaUnit = useAppSelector(selectAreaUnit)
-	const selectedMeters = useAppSelector(selectSelectedMeters)
-	const selectedGroups = useAppSelector(selectSelectedGroups)
-	const unitDataById = useAppSelector(selectUnitDataById)
-	const groupDataById = useAppSelector(selectGroupDataById)
-	const meterDataById = useAppSelector(selectMeterDataById)
+	const barDuration = useAppSelector(selectBarWidthDays);
+	const areaNormalization = useAppSelector(selectGraphAreaNormalization);
+	const selectedAreaUnit = useAppSelector(selectAreaUnit);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const unitDataById = useAppSelector(selectUnitDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
+	const meterDataById = useAppSelector(selectMeterDataById);
 
 	// RTK Types Disagree with maps ts types so, use old until migration completer for maps.
 	// This is also an issue when trying to refactor maps reducer into slice.
 	const selectedMap = useSelector((state: State) => state.maps.selectedMap);
 	const byMapID = useSelector((state: State) => state.maps.byMapID);
-	const editedMaps = useSelector((state: State) => state.maps.editedMaps)
+	const editedMaps = useSelector((state: State) => state.maps.editedMaps);
 	if (meterIsFetching || groupIsFetching) {
-		return <SpinnerComponent loading width={50} height={50} />
+		return <SpinnerComponent loading width={50} height={50} />;
 	}
 
 

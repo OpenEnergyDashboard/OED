@@ -149,7 +149,7 @@ export default function HeaderButtonsComponent() {
 		};
 		const currentShowOptionsStyle = {
 			display: pathname === '/' ? 'block' : 'none'
-		}
+		};
 		// Admin help or regular user page
 		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
 		const currentPageChoicesHelp = helpUrl + neededPage;
@@ -173,7 +173,7 @@ export default function HeaderButtonsComponent() {
 			// TODO Re-implement AFTER RTK Migration
 			// dispatch(unsavedWarningSlice.actions.flipLogOutState());
 		} else {
-			logout()
+			logout();
 		}
 	};
 

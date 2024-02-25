@@ -22,7 +22,7 @@ export default function UnitsDetailComponent() {
 
 	//Units state
 	const { status } = useAppSelector(selectUnitDataResult);
-	const unitData = useAppSelector(selectAllUnits)
+	const unitData = useAppSelector(selectAllUnits);
 
 	return (
 		<div>

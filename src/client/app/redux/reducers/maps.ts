@@ -41,7 +41,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			return {
 				...state,
 				selectedMap: action.mapID
-			}
+			};
 		case ActionType.RequestMapsDetails:
 			return {
 				...state,

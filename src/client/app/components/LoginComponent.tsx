@@ -42,8 +42,8 @@ export default function LoginComponent() {
 				// Error on login Mutation
 				inputRef.current?.focus();
 				showErrorNotification(translate('login.failed'));
-			})
-	}
+			});
+	};
 
 	return (
 		<div>
@@ -79,11 +79,11 @@ export default function LoginComponent() {
 				</Button>
 			</Form>
 		</div >
-	)
+	);
 }
 
 const formStyle = {
 	maxWidth: '500px',
 	margin: 'auto',
 	width: '50%'
-}
+};

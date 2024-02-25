@@ -31,13 +31,13 @@ import CreateUserComponent from './admin/CreateUserComponent';
  * @returns the router component Responsible for client side routing.
  */
 export default function RouteComponent() {
-	const lang = useAppSelector(selectSelectedLanguage)
+	const lang = useAppSelector(selectSelectedLanguage);
 	const messages = (LocaleTranslationData)[lang];
 	return (
 		<IntlProvider locale={lang} messages={messages} key={lang}>
 			<RouterProvider router={router} />
 		</IntlProvider>
-	)
+	);
 }
 
 // Router Responsible for client side routing.
@@ -72,4 +72,4 @@ const router = createBrowserRouter([
 			{ path: '*', element: <NotFound /> }
 		]
 	}
-])
+]);

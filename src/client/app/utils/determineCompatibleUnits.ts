@@ -30,7 +30,7 @@ export function setIntersect(setA: Set<number>, setB: Set<number>): Set<number> 
  * @returns Set of compatible unit ids.
  */
 export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
-	const meterDataByID = selectMeterDataById(store.getState())
+	const meterDataByID = selectMeterDataById(store.getState());
 
 	// The first meter processed is different since intersection with empty set is empty.
 	let first = true;
@@ -98,7 +98,7 @@ export function metersInGroup(groupId: number): Set<number> {
 	const state = store.getState();
 	// Gets the group associated with groupId.
 	// The deep children are automatically fetched with group state so should exist.
-	const groupDataById = selectGroupDataById(state)
+	const groupDataById = selectGroupDataById(state);
 	const group = _.get(groupDataById, groupId);
 	// Create a set of the deep meters of this group and return it.
 	// null group can break on startup without optional chain
@@ -113,7 +113,7 @@ export function metersInGroup(groupId: number): Set<number> {
  */
 export function metersInChangedGroup(changedGroupState: GroupData): number[] {
 	const state = store.getState();
-	const groupDataById = selectGroupDataById(state)
+	const groupDataById = selectGroupDataById(state);
 
 	// deep meters starts with all the direct child meters of the group being changed.
 	const deepMeters = new Set(changedGroupState.childMeters);
@@ -176,7 +176,7 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 
 	// We want the options sorted by meter identifier.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc')
+	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc');
 }
 
 /**
@@ -221,7 +221,7 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 
 	// We want the options sorted by group name.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc')
+	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc');
 }
 
 /**
@@ -321,6 +321,6 @@ function getMenuOptionFont(compatibilityChangeCase: GroupCase): React.CSSPropert
 
 		default:
 			// Should never reach here.
-			return {}
+			return {};
 	}
 }

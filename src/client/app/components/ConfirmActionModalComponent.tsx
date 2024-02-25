@@ -44,7 +44,7 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 
 	const handleClose = () => {
 		props.handleClose();
-	}
+	};
 
 	return (
 		<>

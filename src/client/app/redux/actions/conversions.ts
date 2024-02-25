@@ -32,7 +32,7 @@ export function fetchConversionsDetails(): Thunk {
 				dispatch(conversionsSlice.actions.conversionsFetchedOnce());
 			}
 		}
-	}
+	};
 }
 
 
@@ -99,7 +99,7 @@ export function addConversion(conversion: t.ConversionData): Dispatch {
 		} catch (err) {
 			showErrorNotification(translate('conversion.failed.to.create.conversion') + ' "' + err.response.data as string + '"');
 		}
-	}
+	};
 }
 
 // Delete conversion from database
@@ -131,5 +131,5 @@ export function deleteConversion(conversion: t.ConversionData): (dispatch: Dispa
 			// Inform the store we are done working with the conversion
 			dispatch(conversionsSlice.actions.deleteSubmittedConversion(conversion));
 		}
-	}
+	};
 }

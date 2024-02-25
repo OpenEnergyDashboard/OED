@@ -20,16 +20,16 @@ export interface OEDPlotProps {
 }
 
 export const PlotOED = (props: OEDPlotProps) => {
-	const { data } = props
+	const { data } = props;
 	const dispatch = useAppDispatch();
 
 	// Current Range Slider. Controls Zoom for graphics.
-	const rangeSliderMin = useAppSelector(selectPlotlySliderMin)
-	const rangeSliderMax = useAppSelector(selectPlotlySliderMax)
+	const rangeSliderMin = useAppSelector(selectPlotlySliderMin);
+	const rangeSliderMax = useAppSelector(selectPlotlySliderMax);
 	const locale = useAppSelector(selectSelectedLanguage);
 
 	// Local State for plotly
-	const figure = React.useRef<Partial<PlotParams>>(props)
+	const figure = React.useRef<Partial<PlotParams>>(props);
 
 	// Debounce to limit dispatch and keep reasonable history
 	const debouncedRelayout = _.debounce(
@@ -39,16 +39,16 @@ export const PlotOED = (props: OEDPlotProps) => {
 			if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
 				// The event signals changes in the user's interaction with the graph.
 				// this will automatically trigger a refetch due to updating a query arg.
-				const startTS = moment.utc(e['xaxis.range[0]'])
-				const endTS = moment.utc(e['xaxis.range[1]'])
+				const startTS = moment.utc(e['xaxis.range[0]']);
+				const endTS = moment.utc(e['xaxis.range[1]']);
 				const workingTimeInterval = new TimeInterval(startTS, endTS);
 				dispatch(changeSliderRange(workingTimeInterval));
 			}
 			else if (e['xaxis.range']) {
 				// this case is when the slider knobs are dragged.
-				const range = figure.current.layout?.xaxis?.range
-				const startTS = range && range[0]
-				const endTS = range && range[1]
+				const range = figure.current.layout?.xaxis?.range;
+				const startTS = range && range[0];
+				const endTS = range && range[1];
 				dispatch(changeSliderRange(new TimeInterval(startTS, endTS)));
 
 			}
@@ -59,27 +59,27 @@ export const PlotOED = (props: OEDPlotProps) => {
 		figure.current = {
 			...figure.current,
 			...e
-		} as PlotParams
+		} as PlotParams;
 	};
 
 	// Iterating through datasets may be expensive, so useMemo()
 	// Get dataset wth min /max date
 	const minRange = React.useMemo(() => {
-		const minDataset = _.minBy(data, obj => obj.x![0])
-		const min = minDataset?.x?.[0]
-		return min as Datum
-	}, [props.data])
+		const minDataset = _.minBy(data, obj => obj.x![0]);
+		const min = minDataset?.x?.[0];
+		return min as Datum;
+	}, [props.data]);
 
 	// Get min/ max value from dataset
 	const maxRange = React.useMemo(() => {
-		const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1])
-		const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum
-		return max as Datum
-	}, [props.data])
+		const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1]);
+		const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum;
+		return max as Datum;
+	}, [props.data]);
 
 	// Use rangeSlider when bounded, else use min/maxRange
-	const start = rangeSliderMin ?? minRange
-	const end = rangeSliderMax ?? maxRange
+	const start = rangeSliderMin ?? minRange;
+	const end = rangeSliderMax ?? maxRange;
 
 	return (
 		<Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
@@ -116,5 +116,5 @@ export const PlotOED = (props: OEDPlotProps) => {
 				}
 			}}
 		/>
-	)
-}
+	);
+};

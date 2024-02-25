@@ -2,22 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash'
-import { selectConversionsDetails } from '../../redux/api/conversionsApi'
-import { selectAllGroups } from '../../redux/api/groupsApi'
-import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi'
-import { PreferenceRequestItem } from '../../types/items'
-import { ConversionData } from '../../types/redux/conversions'
-import { MeterData, MeterTimeSortType } from '../../types/redux/meters'
-import { UnitData, UnitType } from '../../types/redux/units'
-import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits'
-import { AreaUnitType } from '../../utils/getAreaUnitConversion'
-import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input'
-import translate from '../../utils/translate'
-import { selectAllUnits, selectUnitDataById } from '../api/unitsApi'
-import { selectAdminState } from '../slices/adminSlice'
-import { selectVisibleMetersAndGroups } from './authVisibilitySelectors'
-import { createAppSelector } from './selectors'
+import * as _ from 'lodash';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { selectAllGroups } from '../../redux/api/groupsApi';
+import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi';
+import { PreferenceRequestItem } from '../../types/items';
+import { ConversionData } from '../../types/redux/conversions';
+import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
+import { UnitData, UnitType } from '../../types/redux/units';
+import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
+import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
+import translate from '../../utils/translate';
+import { selectAllUnits, selectUnitDataById } from '../api/unitsApi';
+import { selectAdminState } from '../slices/adminSlice';
+import { selectVisibleMetersAndGroups } from './authVisibilitySelectors';
+import { createAppSelector } from './selectors';
 
 export const selectAdminPreferences = createAppSelector(
 	[selectAdminState],

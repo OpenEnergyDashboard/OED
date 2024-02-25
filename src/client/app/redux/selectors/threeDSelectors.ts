@@ -42,4 +42,4 @@ export const selectThreeDComponentInfo = createSelector(
 			isAreaCompatible: isAreaCompatible
 		};
 	}
-)
+);

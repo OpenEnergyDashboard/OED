@@ -18,8 +18,8 @@ export const graphHistoryListener = (startListening: AppListener) => {
 			const prev = getOriginalState().graph.current;
 			dispatch(updateHistory(prev));
 		}
-	})
-}
+	});
+};
 
 // listen to all graphSlice actions
 const isHistoryTrigger = isAnyOf(...Object.values(graphSlice.actions));

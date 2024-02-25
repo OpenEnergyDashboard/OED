@@ -23,19 +23,19 @@ export default function BarControlsComponent() {
 	const [sliderVal, setSliderVal] = React.useState<number>(barDuration.asDays());
 
 	const toggleSlider = () => {
-		setShowSlider(showSlider => !showSlider)
-	}
+		setShowSlider(showSlider => !showSlider);
+	};
 
 	const handleChangeBarStacking = () => {
-		dispatch(graphSlice.actions.changeBarStacking())
-	}
+		dispatch(graphSlice.actions.changeBarStacking());
+	};
 
 	const handleSliderChange = (value: number) => {
-		setSliderVal(value)
-	}
+		setSliderVal(value);
+	};
 	const updateBarDurationChange = (value: number) => {
-		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')))
-	}
+		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
+	};
 	const barDurationDays = barDuration.asDays();
 
 	return (
@@ -80,11 +80,11 @@ export default function BarControlsComponent() {
 				</div>
 			}
 		</div>
-	)
+	);
 }
 
 const Slider = createSliderWithTooltip(sliderWithoutTooltips);
-const formatSliderTip = (value: number) => `${value} ${translate(value <= 1 ? 'day' : 'days')}`
+const formatSliderTip = (value: number) => `${value} ${translate(value <= 1 ? 'day' : 'days')}`;
 
 
 const divTopPadding: React.CSSProperties = {

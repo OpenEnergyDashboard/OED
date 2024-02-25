@@ -40,12 +40,12 @@ export const selectLineUnitLabelRateScaling = createAppSelector(
 		if (selectedUnitData && selectedUnitData.id !== -99) {
 			// Determine the y-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectedUnitData, lineGraphRate, areaNormalization, areaUnit);
-			unitLabel = returned.unitLabel
+			unitLabel = returned.unitLabel;
 			needsRateScaling = returned.needsRateScaling;
 		}
 		const rateScaling = needsRateScaling ? lineGraphRate.rate : 1;
 
-		return { unitLabel, needsRateScaling, rateScaling }
+		return { unitLabel, needsRateScaling, rateScaling };
 	}
 );
 export const selectLineRateScaling = (state: RootState) => selectLineUnitLabelRateScaling(state).rateScaling;

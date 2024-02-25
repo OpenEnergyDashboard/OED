@@ -20,12 +20,12 @@ export default function RoleOutlet(props: RoleOutletProps) {
 	const { userRole, initComplete } = useWaitForInit();
 	// // If state contains token it has been validated on startup or login.
 	if (!initComplete) {
-		return <InitializingComponent />
+		return <InitializingComponent />;
 	}
 
 	if (userRole === props.role || userRole === UserRole.ADMIN) {
-		return <Outlet />
+		return <Outlet />;
 	}
 
-	return <Navigate to='/' replace />
+	return <Navigate to='/' replace />;
 }

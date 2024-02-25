@@ -35,7 +35,7 @@ class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCa
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0])
+				await this.props.submitCSV(files[0]);
 				// TODO Using an alert is not the best. At some point this should be integrated
 				// with react.
 				showSuccessNotification('<h1>SUCCESS</h1>The meter upload was a success.');
@@ -45,7 +45,7 @@ class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCa
 			showErrorNotification(error.response.data as string);
 		}
 		// Refetch meters details by invalidating its api cache.
-		this.props.resetApiCache()
+		this.props.resetApiCache();
 
 	}
 
@@ -62,13 +62,13 @@ class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCa
 
 		const checkboxStyle: React.CSSProperties = {
 			paddingBottom: '15px'
-		}
+		};
 
 		const formStyle: React.CSSProperties = {
 			display: 'flex',
 			justifyContent: 'center',
 			padding: '20px'
-		}
+		};
 
 		return (
 			<div style={formStyle}>
@@ -103,7 +103,7 @@ class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCa
 					</Button>
 				</Form>
 			</div>
-		)
+		);
 	}
 
 }

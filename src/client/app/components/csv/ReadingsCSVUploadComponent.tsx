@@ -141,13 +141,13 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 
 		const checkboxStyle: React.CSSProperties = {
 			paddingBottom: '15px'
-		}
+		};
 
 		const formStyle: React.CSSProperties = {
 			display: 'flex',
 			justifyContent: 'center',
 			padding: '20px'
-		}
+		};
 
 		return (
 			<div style={formStyle}>
@@ -335,6 +335,6 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 					</Button>
 				</Form>
 			</div>
-		)
+		);
 	}
 }

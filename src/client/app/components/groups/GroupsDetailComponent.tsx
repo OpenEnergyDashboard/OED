@@ -22,7 +22,7 @@ export default function GroupsDetailComponent() {
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 
 	// page may contain admin info so verify admin status while admin is authenticated.
-	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval })
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));

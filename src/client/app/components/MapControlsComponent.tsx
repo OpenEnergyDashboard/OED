@@ -19,8 +19,8 @@ export default function MapControlsComponent() {
 	const barDuration = useAppSelector(selectBarWidthDays);
 
 	const handleDurationChange = (value: number) => {
-		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')))
-	}
+		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
+	};
 
 	const barDurationDays = barDuration.asDays();
 
@@ -54,7 +54,7 @@ export default function MapControlsComponent() {
 			</div>
 			<MapChartSelectComponent key='chart' />
 		</div>
-	)
+	);
 }
 
 

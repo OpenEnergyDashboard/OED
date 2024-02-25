@@ -33,11 +33,11 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 
 	const handleShow = () => {
 		setShowEditModal(true);
-	}
+	};
 
 	const handleClose = () => {
 		setShowEditModal(false);
-	}
+	};
 
 	// Check for admin status
 	const loggedInAsAdmin = useAppSelector(selectIsAdmin);

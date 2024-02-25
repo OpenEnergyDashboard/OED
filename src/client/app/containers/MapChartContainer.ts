@@ -59,7 +59,7 @@ function mapStateToProps(state: State) {
 
 		// Figure out what time interval the bar is using since user bar data for now.
 		const timeInterval = state.graph.queryTimeInterval;
-		const barDuration = state.graph.barDuration
+		const barDuration = state.graph.barDuration;
 		// Make sure there is a map with values so avoid issues.
 		if (map && map.origin && map.opposite) {
 			// The size of the original map loaded into OED.
@@ -352,7 +352,7 @@ function mapStateToProps(state: State) {
 	const props = {
 		data,
 		layout
-	} as PlotParams
+	} as PlotParams;
 	return props;
 }
 

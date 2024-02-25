@@ -27,9 +27,9 @@ export default function DateRangeComponent() {
 	const locale = useAppSelector(selectSelectedLanguage);
 
 	const handleChange = (value: Value) => {
-		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)))
-		dispatch(changeSliderRange(dateRangeToTimeInterval(value)))
-	}
+		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
+		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
+	};
 
 
 	return (

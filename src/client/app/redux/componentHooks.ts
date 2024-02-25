@@ -12,8 +12,8 @@ export const useWaitForInit = () => {
 	const isAdmin = useAppSelector(selectIsAdmin);
 	const userRole = useAppSelector(selectCurrentUserRole);
 	const initComplete = useAppSelector(selectInitComplete);
-	return { isAdmin, userRole, initComplete }
-}
+	return { isAdmin, userRole, initComplete };
+};
 
 // Overloads to support TS key completions
 type TranslateFunction = {
@@ -25,14 +25,14 @@ type TranslateFunction = {
 // const translate = useTranslate()
 // translate('myKey')
 export const useTranslate = () => {
-	const lang = useAppSelector(selectSelectedLanguage)
+	const lang = useAppSelector(selectSelectedLanguage);
 	const cache = createIntlCache();
 	const messages = localeData[lang];
 	const intl = createIntl({ locale: lang, messages }, cache);
 
 	const translate: TranslateFunction = (messageID: LocaleDataKey | string) => {
 		return intl.formatMessage(defineMessages({ [messageID]: { id: messageID } })[messageID]);
-	}
+	};
 
-	return translate
+	return translate;
 };

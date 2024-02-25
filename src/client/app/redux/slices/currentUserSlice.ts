@@ -23,11 +23,11 @@ export const currentUserSlice = createSlice({
 	initialState: defaultState,
 	reducers: {
 		clearCurrentUser: state => {
-			state.profile = null
-			state.token = null
+			state.profile = null;
+			state.token = null;
 		},
 		setUserToken: (state, action: PayloadAction<string | null>) => {
-			state.token = action.payload
+			state.token = action.payload;
 		}
 	},
 	extraReducers: builder => {
@@ -35,15 +35,15 @@ export const currentUserSlice = createSlice({
 		builder
 			.addMatcher(userApi.endpoints.getUserDetails.matchFulfilled,
 				(state, { payload }) => {
-					state.profile = payload
+					state.profile = payload;
 				})
 			.addMatcher(authApi.endpoints.login.matchFulfilled,
 				(state, { payload }) => {
 					// User has logged in update state, and write to local storage
-					state.profile = { email: payload.email, role: payload.role }
-					state.token = payload.token
-					setToken(state.token)
-				})
+					state.profile = { email: payload.email, role: payload.role };
+					state.token = payload.token;
+					setToken(state.token);
+				});
 	},
 	selectors: {
 		selectCurrentUser: state => state,
@@ -51,22 +51,22 @@ export const currentUserSlice = createSlice({
 		// Should resolve to a boolean, Typescript doesn't agree so type assertion 'as boolean'
 		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN),
 		selectHasRolePermissions: (state, role: UserRole): boolean => {
-			const isAdmin = currentUserSlice.getSelectors().selectIsAdmin(state)
-			const userRole = currentUserSlice.getSelectors().selectCurrentUserRole(state)
-			return Boolean(isAdmin || (userRole && userRole === role))
+			const isAdmin = currentUserSlice.getSelectors().selectIsAdmin(state);
+			const userRole = currentUserSlice.getSelectors().selectCurrentUserRole(state);
+			return Boolean(isAdmin || (userRole && userRole === role));
 
 		}
 	}
-})
+});
 
 export const {
 	selectCurrentUser,
 	selectCurrentUserRole,
 	selectIsAdmin,
 	selectHasRolePermissions
-} = currentUserSlice.selectors
+} = currentUserSlice.selectors;
 
 export const {
 	setUserToken,
 	clearCurrentUser
-} = currentUserSlice.actions
+} = currentUserSlice.actions;
