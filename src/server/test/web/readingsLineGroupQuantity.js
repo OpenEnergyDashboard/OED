@@ -68,6 +68,10 @@ mocha.describe('readings API', () => {
                 });
                 mocha.it('LG4: should have hourly points for middle readings of 15 + 20 minute for a 60 day period and quantity units with kWh as kWh', async () => {
                     //Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    //Get the unitID since the DB could be any value
+                    const unitId = await getUnitId('kWh');
+                    //Load the data into the database
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
                     // Create a request API for the 60days period
                     const startDate = "2022-08-25";
