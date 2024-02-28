@@ -51,4 +51,5 @@ export default function DateRangeComponent() {
 	);
 }
 
+// Needed to make this component work well if width is made small.
 const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };
