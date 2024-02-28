@@ -32,13 +32,6 @@ export default function ConversionsDetailComponent() {
 			unitDataById: data && unitsAdapter.getSelectors().selectEntities(data)
 		})
 	});
-	// const x = useAppSelector(state => conversionsApi.endpoints.refresh.select()(state))
-
-	// unnecessary? Currently this occurs as a side effect of the mutation which will invalidate meters/group
-	// unused for now, until decided
-	// const isUpdatingCikAndDBViews = useAppSelector(state => state.admin.isUpdatingCikAndDBViews);
-
-	// Check if the units state is fully loaded
 
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
