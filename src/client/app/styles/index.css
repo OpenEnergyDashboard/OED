@@ -21,11 +21,17 @@ body {
 	-ms-overflow-style: none; /* Internet Explorer and Edge */
 	/* Hide scrollbar for Webkit browsers */
 	::-webkit-scrollbar {
-			display: none;
+		display: none;
 	}
 }
 
 /* Hide Default Plotly Notifications, Like DoubleClick, etc. */
 div.plotly-notifier {
-  visibility: hidden;
+	visibility: hidden;
+}
+
+/* Disable hover effect on scrollbar */
+.customScrollBar {
+	scrollbar-color: #888 #ffffff00;
+	scrollbar-width: thin;
 }

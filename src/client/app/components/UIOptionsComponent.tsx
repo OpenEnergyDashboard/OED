@@ -40,11 +40,11 @@ export default function UIOptionsComponent() {
 				// When options are greater in height than window real-estate, set max height & overflow properties
 				if (scrollHeight >= maxOptionsHeight) {
 					optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`;
-					optionsRef.current.style.overflow = 'scroll';
+					optionsRef.current.style.overflowY = 'scroll';
 				} else {
 					// Clear constraints when enough space.
 					optionsRef.current.style.maxHeight = 'none';
-					optionsRef.current.style.overflow = 'visible';
+					optionsRef.current.style.overflowY = 'visible';
 				}
 			}
 		};
@@ -55,7 +55,9 @@ export default function UIOptionsComponent() {
 
 	ReactTooltip.rebuild();
 	return (
-		<div className='no_scrollbar' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', overflow: 'scroll' }} ref={optionsRef}>
+		<div
+			className='customScrollBar'
+			style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', paddingRight: '10px' }} ref={optionsRef}>
 			<ReactTooltip event='custom-event' className='tip' id='select-tooltips' />
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
