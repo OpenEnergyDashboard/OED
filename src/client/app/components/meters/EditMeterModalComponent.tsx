@@ -56,7 +56,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
 
-
 	const [validMeter, setValidMeter] = useState(isValidMeter(localMeterEdits));
 
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
