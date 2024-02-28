@@ -13,7 +13,7 @@ import translate from '../utils/translate';
 import LogoSpinner from './LogoSpinner';
 import { PlotOED } from './PlotOED';
 
-// Stable reference for when there is not data.
+// Stable reference for when there is not data. Avoids rerenders.
 const stableEmptyReadings: LineReadings = {};
 /**
  * @returns plotlyLine graphic
