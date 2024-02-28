@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectGroupById } from '../../redux/api/groupsApi';
 import { metersApi, selectMeterById } from '../../redux/api/metersApi';
@@ -23,11 +22,23 @@ import graphExport, { downloadRawCSV } from '../../utils/exportData';
 import { showErrorNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import { createAppThunk } from './appThunk';
+import { selectAnythingFetching } from '../../redux/selectors/apiSelectors';
+import { RootState } from '../../store';
+import { find, sortBy } from 'lodash';
+
+const selectCanExport = (state: RootState) => {
+	const fetchInProgress = selectAnythingFetching(state);
+	const { meterDeps, groupDeps } = selectLineChartDeps(state);
+	return !fetchInProgress && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0);
+};
 
 export const exportGraphReadingsThunk = createAppThunk(
 	'graph/exportGraphData',
 	(_unused, api) => {
 		const state = api.getState();
+		if (!selectCanExport(state)) {
+			return api.rejectWithValue('Data Fetch In Progress, Or No data');
+		}
 		const chartToRender = selectChartToRender(state);
 		if (chartToRender === ChartTypes.line) {
 			const lineUnitLabel = selectLineUnitLabel(state);
@@ -45,7 +56,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
 					// Get the readings from the state.
 					// Sort by start timestamp.
-					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
+					const sortedReadings = sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					// Identifier for current meter.
 					const entityName = selectNameFromEntity(entity);
 					// const unitLabel = selectUnitById(state, selectSelectedUnit(state))
@@ -58,7 +69,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 				.forEach(([id, readings]) => {
 					const entity = selectGroupById(state, Number(id));
 					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
-					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
+					const sortedReadings = sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
 					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, lineUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups, showMinMax);
@@ -78,7 +89,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 				.forEach(([id, readings]) => {
 					const entity = selectMeterById(state, Number(id));
 					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
-					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
+					const sortedReadings = sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
 					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.meters);
@@ -90,7 +101,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 				.forEach(([id, readings]) => {
 					const entity = selectGroupById(state, Number(id));
 					const scaling = selectScalingFromEntity(entity, areaUnit, areaNormalization, lineGraphRate.rate);
-					const sortedReadings = _.sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
+					const sortedReadings = sortBy(Object.values(readings), item => item.startTimestamp, 'asc');
 					const entityName = selectNameFromEntity(entity);
 					const unitIdentifier = selectNameFromEntity(selectUnitById(state, selectSelectedUnit(state)));
 					graphExport(sortedReadings, entityName, barUnitLabel, unitIdentifier, chartToRender, scaling, MeterOrGroup.groups);
@@ -105,6 +116,10 @@ export const exportRawReadings = createAppThunk(
 	'graph/ExportRaw',
 	async (_arg, api) => {
 		const state = api.getState();
+		if (!selectCanExport(state)) {
+			return api.rejectWithValue('Data Fetch In Progress, Or No data');
+		}
+
 		const dispatch = api.dispatch;
 		const meterIDs = selectSelectedMeters(state);
 		const timeInterval = selectQueryTimeInterval(state);
@@ -169,17 +184,17 @@ export const exportRawReadings = createAppThunk(
 				// A complication is that a unit associated with a meter is not the one the user
 				// sees when graphing. Now try to find the graphing unit.
 				// Try to find expected conversion from meter with slope = 1 and intercept = 0
-				const conversion = _.find(conversionState, function (c: ConversionData) {
+				const conversion = find(conversionState, function (c: ConversionData) {
 					return c.sourceId === meterUnitId && c.slope === 1 && c.intercept === 0;
-				}) as ConversionData;
-				if (conversion == undefined) {
+				});
+				if (!conversion) {
 					// This is the unusual case where the conversion is not 1, 0.
 					// We find the first conversion and use it.
-					const anyConversion = _.find(conversionState, function (c: ConversionData) {
+					const anyConversion = find(conversionState, function (c: ConversionData) {
 						// Conversion has source that is the meter unit.
 						return c.sourceId === meterUnitId;
-					}) as ConversionData;
-					if (anyConversion == undefined) {
+					});
+					if (!anyConversion) {
 						// Could not find a conversion with this meter. This should never happen.
 						// Use the identifier of currentMeter unit and extra info.
 						unitIdentifier = unitsDataById[meterUnitId].identifier +
@@ -201,8 +216,10 @@ export const exportRawReadings = createAppThunk(
 				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
 
 				// Get the raw readings.
-				// currently remain subscribed for subsequent calls. Can Modify if desired.
-				const lineReadings = await dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval })).unwrap();
+				const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval }));
+				const lineReadings = await response.unwrap();
+				// unsub from query after a minute.
+				setTimeout(() => { response.unsubscribe(); }, 60000);
 				// Get the CSV to to user.
 				downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
 			}
