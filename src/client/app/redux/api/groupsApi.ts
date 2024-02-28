@@ -4,10 +4,12 @@
 
 import { EntityState, Update, createEntityAdapter } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import { selectIsAdmin } from '../slices/currentUserSlice';
 import { RootState } from '../../store';
 import { GroupChildren, GroupData } from '../../types/redux/groups';
+import { showErrorNotification } from '../../utils/notifications';
+import { selectIsAdmin } from '../slices/currentUserSlice';
 import { baseApi } from './baseApi';
+
 export const groupsAdapter = createEntityAdapter<GroupData>({
 	sortComparer: (groupA, groupB) => groupA.name?.localeCompare(groupB.name, undefined, { sensitivity: 'accent' })
 });
@@ -46,7 +48,8 @@ export const groupsApi = baseApi.injectEndpoints({
 						dispatch(groupsApi.util.updateQueryData('getGroups', undefined, groupDataById => { groupsAdapter.updateMany(groupDataById, updates); }));
 					}
 				} catch (e) {
-					console.log(e);
+					// This is unlikely to fail and is generally done at startup. Notify user since on client-side.
+					showErrorNotification(e);
 				}
 			},
 			providesTags: ['GroupData']
