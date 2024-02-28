@@ -7,8 +7,7 @@ import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as React from 'react';
 import 'react-calendar/dist/Calendar.css';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
 import '../styles/DateRangeCustom.css';
@@ -22,7 +21,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Date Range Calendar Picker
  */
 export default function DateRangeComponent() {
-	const dispatch: Dispatch = useDispatch();
+	const dispatch: Dispatch = useAppDispatch();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 

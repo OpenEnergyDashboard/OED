@@ -4,9 +4,8 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import Select from 'react-select';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedUnitData } from '../redux/selectors/plotlyDataSelectors';
 import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
@@ -20,7 +19,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Rate selection element
  */
 export default function GraphicRateMenuComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	// Graph state
 	const graphState = useAppSelector(selectGraphState);

@@ -4,9 +4,8 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch } from 'react-redux';
 import Select from 'react-select';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
@@ -20,7 +19,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Area unit select element
  */
 export default function AreaUnitSelectComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	const graphState = useAppSelector(selectGraphState);
 	const unitDataById = useAppSelector(selectUnitDataById);
