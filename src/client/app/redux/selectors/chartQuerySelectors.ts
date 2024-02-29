@@ -3,19 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
-import * as moment from 'moment';
 import { RootState } from 'store';
-import { TimeInterval } from '../../../../common/TimeInterval';
-import {
-	selectBarWidthDays, selectComparePeriod,
-	selectCompareTimeInterval, selectQueryTimeInterval,
-	selectSelectedGroups, selectSelectedMeters,
-	selectSelectedUnit, selectThreeDState
-} from '../slices/graphSlice';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
+import {
+	selectBarWidthDays, selectComparePeriod,
+	selectCompareTimeInterval, selectMapBarWidthDays, selectQueryTimeInterval,
+	selectSelectedGroups, selectSelectedMeters,
+	selectSelectedUnit, selectThreeDState
+} from '../slices/graphSlice';
+import { omit } from 'lodash';
 
 // query args that 'most' graphs share
 export interface commonQueryArgs {
@@ -124,13 +122,13 @@ export const selectCompareChartQueryArgs = createSelector(
 		};
 		const meterArgs: CompareReadingApiArgs = {
 			// compare currently doesn't use the global time interval, so omit
-			..._.omit(common.meterArgs, 'timeInterval'),
+			...omit(common.meterArgs, 'timeInterval'),
 			...compareArgs
 
 		};
 		const groupArgs: CompareReadingApiArgs = {
 			// compare currently doesn't use the global time interval, so omit
-			..._.omit(common.groupArgs, 'timeInterval'),
+			...omit(common.groupArgs, 'timeInterval'),
 			...compareArgs
 		};
 		const meterShouldSkip = common.meterSkip;
@@ -141,14 +139,10 @@ export const selectCompareChartQueryArgs = createSelector(
 
 export const selectMapChartQueryArgs = createSelector(
 	selectBarChartQueryArgs,
-	selectQueryTimeInterval,
+	selectMapBarWidthDays,
 	(state: RootState) => state.maps,
-	(barChartArgs, queryTimeInterval, maps) => {
-		const durationDays = Math.round((
-			queryTimeInterval.equals(TimeInterval.unbounded())
-				? moment.duration(4, 'weeks')
-				: moment.duration(queryTimeInterval.duration('days'), 'days')
-		).asDays());
+	(barChartArgs, barWidthDays, maps) => {
+		const durationDays = Math.round(barWidthDays.asDays());
 
 		const meterArgs: MapReadingApiArgs = {
 			...barChartArgs.meterArgs,

@@ -6,7 +6,7 @@ import * as React from 'react';
 import ReactTooltip from 'react-tooltip';
 import ExportComponent from '../components/ExportComponent';
 import { useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender } from '../redux/slices/graphSlice';
+import { selectChartToRender, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import BarControlsComponent from './BarControlsComponent';
@@ -25,33 +25,36 @@ import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
  */
 export default function UIOptionsComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const optionsRef = React.useRef<HTMLDivElement>(null);
 
-	// Effect Manipulates UI Options max height. To allow for dynamic window sizing to work.
-	React.useEffect(() => {
+	const resizeHandler = () => {
 		const headFootHeight = document.querySelector('#header')!.clientHeight + document.querySelector('#footer')!.clientHeight + 50;
-		const resizeHandler = () => {
-			// Total window - Header and footer height = dashboard height
-			const maxOptionsHeight = window.innerHeight - headFootHeight;
+		// Total window - Header and footer height = dashboard height
+		const maxOptionsHeight = window.innerHeight - headFootHeight;
 
-			// May be null for initial render(s)
-			if (optionsRef.current) {
-				const scrollHeight = optionsRef.current.scrollHeight;
-				// When options are greater in height than window real-estate, set max height & overflow properties
-				if (scrollHeight >= maxOptionsHeight) {
-					optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`;
-					optionsRef.current.style.overflowY = 'scroll';
-				} else {
-					// Clear constraints when enough space.
-					optionsRef.current.style.maxHeight = 'none';
-					optionsRef.current.style.overflowY = 'visible';
-				}
+		// May be null for initial render(s)
+		if (optionsRef.current) {
+			const scrollHeight = optionsRef.current.scrollHeight;
+			// When options are greater in height than window real-estate, set max height & overflow properties
+			if (scrollHeight >= maxOptionsHeight) {
+				optionsRef.current.style.maxHeight = `${maxOptionsHeight}px`;
+				optionsRef.current.style.overflowY = 'scroll';
+			} else {
+				// Clear constraints when enough space.
+				optionsRef.current.style.maxHeight = 'none';
+				optionsRef.current.style.overflowY = 'visible';
 			}
-		};
+		}
+	};
+	// Effect(s) Manipulates UI Options max height. To allow for dynamic window sizing to work.
+	React.useEffect(() => {
 		resizeHandler();
 		window.addEventListener('resize', resizeHandler);
 		return () => window.removeEventListener('resize', resizeHandler);
 	}, []);
+	React.useEffect(() => { resizeHandler(); }, [selectedMeters, selectedGroups]);
 
 	ReactTooltip.rebuild();
 	return (

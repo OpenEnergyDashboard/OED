@@ -58,9 +58,6 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 				// Included React-Select Animations
 				components={animatedComponents}
 				styles={customStyles}
-				classNames={{
-					valueContainer: () => 'no_scrollbar'
-				}}
 				isLoading={somethingIsFetching}
 			/>
 		</>
@@ -132,16 +129,6 @@ const animatedComponents = makeAnimated({
 
 
 const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
-	valueContainer: base => ({
-		...base,
-		maxHeight: 175,
-		overflowY: 'scroll',
-		'&::-webkit-scrollbar': {
-			display: 'none'
-		},
-		'msOverflowStyle': 'none',
-		'scrollbarWidth': 'none'
-	}),
 	multiValue: (base, props) => ({
 		...base,
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
