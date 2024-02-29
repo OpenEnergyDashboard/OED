@@ -3,12 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { TimeInterval } from '../../../common/TimeInterval';
 import { clearGraphHistory } from '../redux/actions/extraActions';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
-import { changeSliderRange, selectIsDirty, selectSliderRangeInterval, updateTimeInterval } from '../redux/slices/graphSlice';
+import {
+	changeSliderRange, selectChartToRender, selectHistoryIsDirty,
+	selectSelectedGroups, selectSelectedMeters,
+	selectSliderRangeInterval, updateTimeInterval
+} from '../redux/slices/graphSlice';
 import HistoryComponent from './HistoryComponent';
-import { TimeInterval } from '../../../common/TimeInterval';
+import { ChartTypes } from '../types/redux/graph';
+
 /**
  * @returns Renders a history component with previous and next buttons.
  */
@@ -16,31 +22,20 @@ export default function PlotNavComponent() {
 	return (
 		<div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
 			<HistoryComponent />
-			<PlotNav />
+			<RefreshGraphComponent />
+
 		</div >
 	);
 }
-export const PlotNav = () => {
-	return (
-		<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-			<ExpandComponent />
-			<TrashCanHistoryComponent />
-			<RefreshGraphComponent />
-		</div>
-	);
-};
 export const TrashCanHistoryComponent = () => {
 	const dispatch = useAppDispatch();
-	const isDirty = useAppSelector(selectIsDirty);
+	const isDirty = useAppSelector(selectHistoryIsDirty);
 	return (
-		< img src={isDirty ? './full_trashcan.png' : './empty_trashcan.png'} style={{ height: '25px' }}
-			onClick={() => {
-				dispatch(clearGraphHistory());
-			}}
+		< img src={isDirty ? './full_trashcan.png' : './empty_trashcan.png'} style={{ height: '25px', visibility: isDirty ? 'visible' : 'hidden' }}
+			onClick={() => { dispatch(clearGraphHistory()); }}
 		/>
 	);
 };
-
 
 export const ExpandComponent = () => {
 	const dispatch = useAppDispatch();
@@ -54,8 +49,15 @@ export const ExpandComponent = () => {
 export const RefreshGraphComponent = () => {
 	const [time, setTime] = React.useState(0);
 	const dispatch = useAppDispatch();
-	const slider = useAppSelector(selectSliderRangeInterval);
+	const sliderInterval = useAppSelector(selectSliderRangeInterval);
 	const somethingFetching = useAppSelector(selectAnythingFetching);
+	const selectedMeters = useAppSelector(selectSelectedMeters);
+	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const chartType = useAppSelector(selectChartToRender);
+	const iconVisible = chartType !== ChartTypes.threeD
+		&& chartType !== ChartTypes.map
+		&& chartType !== ChartTypes.compare
+		&& (selectedMeters.length || selectedGroups.length);
 
 	React.useEffect(() => {
 		const interval = setInterval(() => { setTime(prevTime => (prevTime + 25) % 360); }, 16);
@@ -65,8 +67,10 @@ export const RefreshGraphComponent = () => {
 		return () => clearInterval(interval);
 	}, [somethingFetching]);
 	return (
-		<img src='./refresh.png' style={{ height: '25px', transform: `rotate(${time}deg)` }}
-			onClick={() => { dispatch(updateTimeInterval(slider)); }}
+		<img
+			src='./refresh.png'
+			style={{ height: '25px', transform: `rotate(${time}deg)`, visibility: iconVisible ? 'visible' : 'hidden' }}
+			onClick={() => { !somethingFetching && dispatch(updateTimeInterval(sliderInterval)); }}
 		/>
 	);
 };

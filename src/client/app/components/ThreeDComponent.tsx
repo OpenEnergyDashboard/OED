@@ -21,9 +21,11 @@ import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateR
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
-import { PlotOED } from './PlotOED';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
+import Plot from 'react-plotly.js';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import Locales from '../types/locales';
 
 /**
  * Component used to render 3D graphics
@@ -36,6 +38,7 @@ export default function ThreeDComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const graphState = useAppSelector(selectGraphState);
+	const locale = useAppSelector(selectSelectedLanguage);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
 
 
@@ -71,9 +74,18 @@ export default function ThreeDComponent() {
 			<ThreeDPillComponent />
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
-				: <PlotOED
+				: <Plot
+					style={{ width: '100%', height: '100%' }}
 					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
+					config={{
+						responsive: true,
+						displayModeBar: false,
+						// Current Locale
+						locale,
+						// Available Locales
+						locales: Locales
+					}}
 				/>
 			}
 		</>

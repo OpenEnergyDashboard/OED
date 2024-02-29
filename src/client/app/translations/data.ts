@@ -5,7 +5,7 @@
 /* eslint-disable */
 
 // This file used to be a json file, but had issues with importing, so we declared the json variable in a js file instead.
-const LocaleTranslationData =  {
+const LocaleTranslationData = {
 	"en": {
 		"3D": "3D",
 		"400": "400 Bad Request",
@@ -40,6 +40,7 @@ const LocaleTranslationData =  {
 		"cancel": "Cancel",
 		"child.groups": "Child Groups",
 		"child.meters": "Child Meters",
+		"clear.graph.history": "Clear History",
 		"clipboard.copied": "Copied To Clipboard",
 		"clipboard.not.copied": "Failed to Copy To Clipboard",
 		"close": "Close",
@@ -453,7 +454,7 @@ const LocaleTranslationData =  {
 		"unit.successfully.edited.unit": "Successfully edited unit.",
 		"unit.suffix": "Suffix:",
 		"unit.type.of.unit": "Type of Unit:",
-		"unit.type.of.unit.suffix" : "Added suffix will set type of unit to suffix", 
+		"unit.type.of.unit.suffix": "Added suffix will set type of unit to suffix",
 		"units": "Units",
 		"unsaved.failure": "Changes failed to save",
 		"unsaved.success": "Changes saved",
@@ -519,6 +520,7 @@ const LocaleTranslationData =  {
 		"cancel": "Annuler",
 		"child.groups": "Groupes Enfants",
 		"child.meters": "Mètres Enfants",
+		"clear.graph.history": "Effacer l'historique",
 		"clipboard.copied": "(Need French) Copied To Clipboard",
 		"clipboard.not.copied": "(Need French) Failed to Copy To Clipboard",
 		"close": "(need French) Close",
@@ -932,7 +934,7 @@ const LocaleTranslationData =  {
 		"unit.successfully.edited.unit": "(Need French) Successfully edited unit.",
 		"unit.suffix": "(Need French) Suffix:",
 		"unit.type.of.unit": "(Need French) Type of Unit:",
-		"unit.type.of.unit.suffix" : "(Need French) Added suffix will set type of unit to suffix", 
+		"unit.type.of.unit.suffix": "(Need French) Added suffix will set type of unit to suffix",
 		"units": "(Need French) Units",
 		"unsaved.failure": "(Need French) Changes failed to save",
 		"unsaved.success": "(Need French) Changes saved",
@@ -998,6 +1000,9 @@ const LocaleTranslationData =  {
 		"cancel": "Cancelar",
 		"child.groups": "Los grupos secundarios",
 		"child.meters": "Medidores infantiles",
+		"clear.graph.history": "Borrar historia",
+		"clipboard.copied": "Copied To Clipboard",
+		"clipboard.not.copied": "Failed to Copy To Clipboard",
 		"close": "Cerrar",
 		"compare": "Comparar",
 		"compare.raw": "No se puede crear gráfico de comparación con unidades crudas como temperatura",
@@ -1396,7 +1401,7 @@ const LocaleTranslationData =  {
 		"unit.dropdown.displayable.option.all": "Todo",
 		"unit.dropdown.displayable.option.admin": "administrador",
 		"unit.failed.to.create.unit": "No se pudo crear unidad",
-		"unit.failed.to.edit.unit":"No se pudo editar unidad",
+		"unit.failed.to.edit.unit": "No se pudo editar unidad",
 		"unit.input.error": "Entrada no válida por eso unidad no se creó ni se editó.",
 		"unit.none": "Sin unidad",
 		"unit.preferred.display": "Visualización preferida:",
@@ -1407,7 +1412,7 @@ const LocaleTranslationData =  {
 		"unit.successfully.edited.unit": "Unidad editado con éxito.",
 		"unit.suffix": "Sufijo:",
 		"unit.type.of.unit": "Tipo de Unidad:",
-		"unit.type.of.unit.suffix" : "Sufijo agregado establecerá el tipo de unidad al sufijo", 
+		"unit.type.of.unit.suffix": "Sufijo agregado establecerá el tipo de unidad al sufijo",
 		"units": "Unidades",
 		"unsaved.warning": "Tienes cambios sin guardar. ¿Estás seguro que quieres salir?",
 		"update": "Actualizado",

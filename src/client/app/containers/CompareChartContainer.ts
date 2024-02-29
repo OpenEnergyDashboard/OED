@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
-import locales from '../types/locales';
+import Locales from '../types/locales';
 import * as moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -21,6 +21,7 @@ import {
 	selectCompareTimeInterval, selectGraphAreaNormalization,
 	selectSelectedUnit
 } from '../redux/slices/graphSlice';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 
 export interface CompareEntity {
 	id: number;
@@ -58,6 +59,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	const meterDataById = selectMeterDataById(state);
 	const groupDataById = selectGroupDataById(state);
 	const selectUnitState = unitDataById[graphingUnit];
+	const locale = selectSelectedLanguage(state);
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
@@ -229,7 +231,8 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		layout,
 		config: {
 			displayModeBar: false,
-			locales // makes locales available for use
+			locale,
+			locales: Locales // makes locales available for use
 		}
 	};
 	props.config.locale = state.appState.selectedLanguage;

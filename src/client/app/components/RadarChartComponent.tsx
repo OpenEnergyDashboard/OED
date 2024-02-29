@@ -9,7 +9,7 @@ import getGraphColor from '../utils/getGraphColor';
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import { Layout } from 'plotly.js';
-import locales from '../types/locales';
+import Locales from '../types/locales';
 import { DataType } from '../types/Datasources';
 import { lineUnitLabel } from '../utils/graphics';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
@@ -23,7 +23,7 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectGroupDataById } from '../redux/api/groupsApi';
-import LogoSpinner from './LogoSpinner';
+import Spinner from './Spinner';
 
 /**
  * @returns radar plotly component
@@ -47,7 +47,7 @@ export default function RadarChartComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 
 	if (meterIsLoading || groupIsLoading) {
-		return <LogoSpinner />;
+		return <Spinner />;
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
@@ -329,7 +329,7 @@ export default function RadarChartComponent() {
 				config={{
 					displayModeBar: true,
 					responsive: true,
-					locales: locales // makes locales available for use
+					locales: Locales // makes locales available for use
 				}}
 				layout={layout}
 			/>

@@ -463,7 +463,8 @@ export const selectChartLink = createAppSelector(
 				linkText += `&barStacking=${current.barStacking}`;
 				break;
 			case ChartTypes.line:
-				linkText += `&sliderRange=${rangeSliderInterval}`;
+				// TODO Omitted for the time being re-implement slider range later.
+				// linkText += `&sliderRange=${rangeSliderInterval}`;
 				break;
 			case ChartTypes.compare:
 				linkText += `&comparePeriod=${current.comparePeriod}`;

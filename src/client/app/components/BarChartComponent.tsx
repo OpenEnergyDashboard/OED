@@ -4,15 +4,22 @@
 
 import * as React from 'react';
 import { readingsApi } from '../redux/api/readingsApi';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/selectors/barChartSelectors';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectBarStacking } from '../redux/slices/graphSlice';
 import { BarReadings } from '../types/readings';
 import translate from '../utils/translate';
-import { PlotOED } from './PlotOED';
-import SpinnerComponent from './SpinnerComponent';
+import Locales from '../types/locales';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import Plot from 'react-plotly.js';
+import { debounce } from 'lodash';
+import { utc } from 'moment';
+import { PlotRelayoutEvent } from 'plotly.js';
+import { updateSliderRange } from '../redux/actions/extraActions';
+import { TimeInterval } from '../../../common/TimeInterval';
+import Spinner from './Spinner';
 
 const stableEmptyData: BarReadings = {};
 /**
@@ -22,9 +29,11 @@ const stableEmptyData: BarReadings = {};
  * @returns Plotly BarChart
  */
 export default function BarChartComponent() {
+	const dispatch = useAppDispatch();
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
-	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
+	const locale = useAppSelector(selectSelectedLanguage);
+	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
 			...rest,
@@ -32,7 +41,7 @@ export default function BarChartComponent() {
 		})
 	});
 
-	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, {
+	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useBarQuery(groupArgs, {
 		skip: groupShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
 			...rest,
@@ -50,7 +59,7 @@ export default function BarChartComponent() {
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
 
 	if (meterIsFetching || groupIsFetching) {
-		return <SpinnerComponent loading width={50} height={50} />;
+		return <Spinner />;
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
@@ -70,8 +79,9 @@ export default function BarChartComponent() {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
 		return (
-			<PlotOED
+			<Plot
 				data={datasets}
+				style={{ width: '100%', height: '100%' }}
 				layout={{
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
@@ -90,6 +100,35 @@ export default function BarChartComponent() {
 						tickfont: { size: 10 }
 					}
 				}}
+				config={{
+					responsive: true,
+					displayModeBar: false,
+					// Current Locale
+					locale,
+					// Available Locales
+					locales: Locales
+				}}
+				onRelayout={debounce(
+					(e: PlotRelayoutEvent) => {
+						// console.log(e)
+						// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
+						if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
+							// The event signals changes in the user's interaction with the graph.
+							// this will automatically trigger a refetch due to updating a query arg.
+							const startTS = utc(e['xaxis.range[0]']);
+							const endTS = utc(e['xaxis.range[1]']);
+							const workingTimeInterval = new TimeInterval(startTS, endTS);
+							dispatch(updateSliderRange(workingTimeInterval));
+						}
+						else if (e['xaxis.range']) {
+							// this case is when the slider knobs are dragged.
+							const range = e['xaxis.range']!;
+							const startTS = range && range[0];
+							const endTS = range && range[1];
+							dispatch(updateSliderRange(new TimeInterval(utc(startTS), utc(endTS))));
+
+						}
+					}, 500, { leading: false, trailing: true })}
 			/>
 		);
 	}

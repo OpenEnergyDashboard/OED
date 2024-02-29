@@ -7,7 +7,11 @@ import * as _ from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { clearGraphHistory, historyStepBack, historyStepForward, processGraphLink, updateHistory } from '../../redux/actions/extraActions';
+import {
+	clearGraphHistory, historyStepBack,
+	historyStepForward, processGraphLink,
+	updateHistory, updateSliderRange
+} from '../../redux/actions/extraActions';
 import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
@@ -221,97 +225,119 @@ export const graphSlice = createSlice({
 	},
 	extraReducers: builder => {
 		builder
-			.addCase(updateHistory, (state, action) => {
-				state.next = [];
-				state.prev.push(action.payload);
-			})
-			.addCase(historyStepBack, state => {
-				const prev = state.prev.pop();
-				if (prev) {
-					state.next.push(state.current);
-					state.current = prev;
+			.addCase(
+				updateHistory,
+				(state, action) => {
+					state.next = [];
+					state.prev.push(action.payload);
 				}
-			})
-			.addCase(historyStepForward, state => {
-				const next = state.next.pop();
-				if (next) {
-					state.prev.push(state.current);
-					state.current = next;
-				}
-			})
-			.addCase(clearGraphHistory, state => {
-				state.current = _.cloneDeep(defaultState);
-				state.prev = [];
-				state.next = [];
-			})
-			.addCase(processGraphLink, ({ current }, { payload }) => {
-				current.hotlinked = true;
-				payload.forEach((value, key) => {
-					// TODO Needs to be refactored into a single dispatch/reducer pair.
-					// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
-					// TODO validation could be implemented across all cases similar to compare period and sorting order
-					switch (key) {
-						case 'areaNormalization':
-							current.areaNormalization = value === 'true';
-							break;
-						case 'areaUnit':
-							current.selectedAreaUnit = value as AreaUnitType;
-							break;
-						case 'barDuration':
-							current.barDuration = moment.duration(parseInt(value), 'days');
-							break;
-						case 'barStacking':
-							current.barStacking = value === 'true';
-							break;
-						case 'chartType':
-							current.chartToRender = value as ChartTypes;
-							break;
-						case 'comparePeriod':
-							{
-								current.comparePeriod = validateComparePeriod(value);
-								current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment());
-							}
-							break;
-						case 'compareSortingOrder':
-							current.compareSortingOrder = validateSortingOrder(value);
-							break;
-						case 'groupIDs':
-							current.selectedGroups = value.split(',').map(s => parseInt(s));
-							break;
-						case 'meterIDs':
-							current.selectedMeters = value.split(',').map(s => parseInt(s));
-							break;
-						case 'meterOrGroup':
-							current.threeD.meterOrGroup = value as MeterOrGroup;
-							break;
-						case 'meterOrGroupID':
-							current.threeD.meterOrGroupID = parseInt(value);
-							break;
-						case 'minMax':
-							current.showMinMax = value === 'true';
-							break;
-						case 'rate':
-							{
-								const params = value.split(',');
-								const rate = { label: params[0], rate: parseFloat(params[1]) } as LineGraphRate;
-								current.lineGraphRate = rate;
-							}
-							break;
-						case 'readingInterval':
-							current.threeD.readingInterval = parseInt(value);
-							break;
-						case 'serverRange':
-							current.queryTimeInterval = TimeInterval.fromString(value);
-							break;
-						case 'sliderRange':
-							current.rangeSliderInterval = TimeInterval.fromString(value);
-							break;
-						case 'unitID':
-							current.selectedUnit = parseInt(value);
-							break;
+			)
+			.addCase(
+				historyStepBack,
+				state => {
+					const prev = state.prev.pop();
+					if (prev) {
+						state.next.push(state.current);
+						state.current = prev;
 					}
-				});
-			})
+				}
+			)
+			.addCase(
+				historyStepForward,
+				state => {
+					const next = state.next.pop();
+					if (next) {
+						state.prev.push(state.current);
+						state.current = next;
+					}
+				}
+			)
+			.addCase(
+				clearGraphHistory,
+				state => {
+					state.current = _.cloneDeep(defaultState);
+					state.prev = [];
+					state.next = [];
+				}
+			)
+			.addCase(
+				updateSliderRange,
+				(state, { payload }) => {
+					state.current.rangeSliderInterval = payload;
+				}
+			)
+			.addCase(
+				processGraphLink,
+				({ current }, { payload }) => {
+					current.hotlinked = true;
+					payload.forEach((value, key) => {
+						// TODO Needs to be refactored into a single dispatch/reducer pair.
+						// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
+						// TODO validation could be implemented across all cases similar to compare period and sorting order
+						switch (key) {
+							case 'areaNormalization':
+								current.areaNormalization = value === 'true';
+								break;
+							case 'areaUnit':
+								current.selectedAreaUnit = value as AreaUnitType;
+								break;
+							case 'barDuration':
+								current.barDuration = moment.duration(parseInt(value), 'days');
+								break;
+							case 'barStacking':
+								current.barStacking = value === 'true';
+								break;
+							case 'chartType':
+								current.chartToRender = value as ChartTypes;
+								break;
+							case 'comparePeriod':
+								{
+									current.comparePeriod = validateComparePeriod(value);
+									current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment());
+								}
+								break;
+							case 'compareSortingOrder':
+								current.compareSortingOrder = validateSortingOrder(value);
+								break;
+							case 'groupIDs':
+								current.selectedGroups = value.split(',').map(s => parseInt(s));
+								break;
+							case 'meterIDs':
+								current.selectedMeters = value.split(',').map(s => parseInt(s));
+								break;
+							case 'meterOrGroup':
+								current.threeD.meterOrGroup = value as MeterOrGroup;
+								break;
+							case 'meterOrGroupID':
+								current.threeD.meterOrGroupID = parseInt(value);
+								break;
+							case 'minMax':
+								current.showMinMax = value === 'true';
+								break;
+							case 'rate':
+								{
+									const params = value.split(',');
+									const rate = { label: params[0], rate: parseFloat(params[1]) } as LineGraphRate;
+									current.lineGraphRate = rate;
+								}
+								break;
+							case 'readingInterval':
+								current.threeD.readingInterval = parseInt(value);
+								break;
+							case 'serverRange':
+								current.queryTimeInterval = TimeInterval.fromString(value);
+								break;
+							case 'sliderRange':
+								// TODO omitted for now re-implement later.
+								// current.rangeSliderInterval = TimeInterval.fromString(value);
+								break;
+							case 'unitID':
+								current.selectedUnit = parseInt(value);
+								break;
+						}
+					});
+				}
+			)
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
 				if (!current.hotlinked) {
 					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload;
@@ -345,7 +371,7 @@ export const graphSlice = createSlice({
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
 		selectDefaultGraphState: () => defaultState,
-		selectIsDirty: state => state.prev.length > 0 || state.next.length > 0,
+		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
 		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
@@ -365,7 +391,7 @@ export const {
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization, selectSliderRangeInterval,
-	selectDefaultGraphState, selectIsDirty,
+	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin
 } = graphSlice.selectors;
 

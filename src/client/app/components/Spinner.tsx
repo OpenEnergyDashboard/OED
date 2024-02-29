@@ -7,7 +7,7 @@ import * as React from 'react';
 /**
  * @returns spinner with oed logo
  */
-export default function LogoSpinner() {
+export default function Spinner() {
 	const [time, setTime] = React.useState(0);
 
 	React.useEffect(() => {

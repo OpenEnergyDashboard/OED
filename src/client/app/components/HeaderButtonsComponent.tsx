@@ -19,6 +19,7 @@ import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectCurrentUser } from '../redux/slices/currentUserSlice';
 import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
+import { clearGraphHistory } from '../redux/actions/extraActions';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -260,6 +261,12 @@ export default function HeaderButtonsComponent() {
 								className='d-none d-lg-block'
 								onClick={() => dispatch(toggleOptionsVisibility())}>
 								<FormattedMessage id={optionsVisibility ? 'hide.options' : 'show.options'} />
+							</DropdownItem>
+							<DropdownItem
+								style={state.showOptionsStyle}
+								className='d-none d-lg-block'
+								onClick={() => dispatch(clearGraphHistory())}>
+								<FormattedMessage id={'clear.graph.history'} />
 							</DropdownItem>
 							<DropdownItem divider />
 							<DropdownItem

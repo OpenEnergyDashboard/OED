@@ -2,16 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { debounce } from 'lodash';
+import { utc } from 'moment';
+import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
+import Plot from 'react-plotly.js';
+import { updateSliderRange } from '../redux/actions/extraActions';
+import { TimeInterval } from '../../../common/TimeInterval';
 import { readingsApi } from '../redux/api/readingsApi';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import Locales from '../types/locales';
 import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
-import LogoSpinner from './LogoSpinner';
-import { PlotOED } from './PlotOED';
+import Spinner from './Spinner';
 
 // Stable reference for when there is not data. Avoids rerenders.
 const stableEmptyReadings: LineReadings = {};
@@ -19,13 +26,15 @@ const stableEmptyReadings: LineReadings = {};
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
+	const dispatch = useAppDispatch();
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
 	// get data needed to derive/ format data from query response
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 	// Fetch data, and derive plotly points
-	const { data: meterPlotlyData, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs,
+	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
 		{
 			skip: meterShouldSkip,
 			// Custom Data Derivation with query hook properties.
@@ -37,7 +46,7 @@ export default function LineChartComponent() {
 			})
 		});
 
-	const { data: groupPlotlyData = stableEmptyReadings, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs,
+	const { data: groupPlotlyData = stableEmptyReadings, isFetching: groupIsFetching } = readingsApi.useLineQuery(groupArgs,
 		{
 			skip: groupShouldSkip,
 			selectFromResult: ({ data, ...rest }) => ({
@@ -50,24 +59,26 @@ export default function LineChartComponent() {
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
-	const datasets = React.useDeferredValue(data);
-	if (meterIsLoading || groupIsLoading) {
-		return <LogoSpinner />;
+
+
+	if (meterIsFetching || groupIsFetching) {
+		return <Spinner />;
 	}
 
 
 	// Check if there is at least one valid graph
-	const ableToGraph = datasets.find(data => data.x!.length > 1);
+	const enoughData = data.find(data => data.x!.length > 1);
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-	if (datasets.length === 0) {
+	if (data.length === 0) {
 		return <h1>{`${translate('select.meter.group')}`}	</h1>;
-	} else if (!ableToGraph) {
+	} else if (!enoughData) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
 		return (
-			<PlotOED
-				data={datasets}
+			<Plot
+				data={data}
+				style={{ width: '100%', height: '100%' }}
 				layout={{
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
@@ -75,6 +86,36 @@ export default function LineChartComponent() {
 					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
 					xaxis: { rangeslider: { visible: true }, showgrid: true, gridcolor: '#ddd' }
 				}}
+				config={{
+					responsive: true,
+					displayModeBar: false,
+					// Current Locale
+					locale,
+					// Available Locales
+					locales: Locales
+				}}
+				onRelayout={debounce(
+					(e: PlotRelayoutEvent) => {
+						// console.log(e)
+						// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
+						if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
+							// The event signals changes in the user's interaction with the graph.
+							// this will automatically trigger a refetch due to updating a query arg.
+							const startTS = utc(e['xaxis.range[0]']);
+							const endTS = utc(e['xaxis.range[1]']);
+							const workingTimeInterval = new TimeInterval(startTS, endTS);
+							dispatch(updateSliderRange(workingTimeInterval));
+						}
+						else if (e['xaxis.range']) {
+							// this case is when the slider knobs are dragged.
+							const range = e['xaxis.range']!;
+							const startTS = range && range[0];
+							const endTS = range && range[1];
+							dispatch(updateSliderRange(new TimeInterval(utc(startTS), utc(endTS))));
+
+						}
+					}, 500, { leading: false, trailing: true })
+				}
 			/>
 		);
 

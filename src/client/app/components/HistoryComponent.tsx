@@ -16,14 +16,14 @@ export default function HistoryComponent() {
 
 	return (
 		<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
-			<svg width={20} height={20} viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-				style={{ visibility: !backStack.length ? 'hidden' : 'visible', cursor: 'pointer' }}
+			<svg width={20} height={20} style={{ visibility: !backStack.length ? 'hidden' : 'visible', cursor: 'pointer' }}
 				onClick={() => dispatch(historyStepBack())}
+				viewBox="0 0 10 10" fill="none"
 			>
 				<path d="M5 1L1 5L5 9" stroke={'black'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 			</svg>
-			<svg width={20} height={20} viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"
-				style={{ visibility: !forwardStack.length ? 'hidden' : 'visible', cursor: 'pointer' }}
+			<svg width={20} height={20} style={{ visibility: !forwardStack.length ? 'hidden' : 'visible', cursor: 'pointer' }}
+				viewBox="0 0 10 10" fill="none"
 				onClick={() => dispatch(historyStepForward())}
 			>
 				<path d="M5 1L9 5L5 9" stroke={'black'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

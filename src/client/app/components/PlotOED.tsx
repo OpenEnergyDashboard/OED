@@ -11,7 +11,6 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectPlotlySliderMax, selectPlotlySliderMin } from '../redux/slices/graphSlice';
-import locales from '../types/locales';
 
 
 
@@ -97,7 +96,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 				// Current Locale
 				locale,
 				// Available Locales
-				locales,
+				// Locales: locales,
 				// Buggy Behavior with current architecture, so doubleClick  disabled in favor of custom expand ui.
 				doubleClick: false,
 				...props.config
