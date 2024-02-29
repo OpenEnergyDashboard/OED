@@ -761,7 +761,7 @@ const isValidCreateMeter = (meterDetails: MeterData) => {
 		(meterDetails.readingDuplication >= 1 && meterDetails.readingDuplication <= 9) &&
 		meterDetails.readingFrequency !== '' &&
 		meterDetails.unitId !== -99 &&
-		meterDetails.defaultGraphicUnit !== -99 &&
+		meterDetails.defaultGraphicUnit !== -999 &&
 		meterDetails.meterType !== '' &&
 		meterDetails.minVal >= MIN_VAL &&
 		meterDetails.minVal <= meterDetails.maxVal &&
