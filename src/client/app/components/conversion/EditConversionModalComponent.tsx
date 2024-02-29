@@ -111,7 +111,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// If there is a difference between props and state, then a change was made
 	// Side note, we could probably just set a boolean when any input i
 	// Edit Conversion Validation: is not needed as no breaking edits can be made
-	const handleSaveChanges = async () => {
+	const handleSaveChanges = () => {
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
