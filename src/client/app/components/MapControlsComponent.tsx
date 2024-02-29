@@ -31,24 +31,9 @@ export default function MapControlsComponent() {
 					{translate('map.interval')}:
 				</p>
 				<ButtonGroup style={zIndexFix}>
-					<Button
-						outline={barDurationDays !== 1}
-						onClick={() => handleDurationChange(1)}
-					>
-						{translate('day')}
-					</Button>
-					<Button
-						outline={barDurationDays !== 7}
-						onClick={() => handleDurationChange(7)}
-					>
-						{translate('week')}
-					</Button>
-					<Button
-						outline={barDurationDays !== 28}
-						onClick={() => handleDurationChange(28)}
-					>
-						{translate('4.weeks')}
-					</Button>
+					<Button outline={barDurationDays !== 1} onClick={() => handleDurationChange(1)}> {translate('day')} </Button>
+					<Button outline={barDurationDays !== 7} onClick={() => handleDurationChange(7)}> {translate('week')} </Button>
+					<Button outline={barDurationDays !== 28} onClick={() => handleDurationChange(28)}> {translate('4.weeks')} </Button>
 				</ButtonGroup>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 			</div>

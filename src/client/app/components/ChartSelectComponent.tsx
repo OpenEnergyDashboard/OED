@@ -2,13 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { sortBy, values } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import { useSelector } from 'react-redux';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectChartToRender } from '../redux/slices/graphSlice';
+import { SelectOption } from '../types/items';
 import { ChartTypes } from '../types/redux/graph';
+import { State } from '../types/redux/state';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -20,11 +24,10 @@ export default function ChartSelectComponent() {
 	const currentChartToRender = useAppSelector(selectChartToRender);
 	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);
-
-	// TODO Re-write as selector to use elsewhere
-	// const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (
-	// 	{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
-	// )), 'label');
+	const mapsById = useSelector((state: State) => state.maps.byMapID);
+	const sortedMaps = sortBy(values(mapsById).map(map => (
+		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
+	)), 'label');
 
 	return (
 		<>
@@ -47,14 +50,21 @@ export default function ChartSelectComponent() {
 							.map(chartType =>
 								<DropdownItem
 									key={chartType}
-									onClick={() => dispatch(graphSlice.actions.changeChartToRender(chartType))}
+									onClick={() => {
+										dispatch(graphSlice.actions.changeChartToRender(chartType));
+										if (chartType === ChartTypes.map && Object.keys(sortedMaps).length === 1) {
+											// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
+											dispatch({ type: 'UPDATE_SELECTED_MAPS', mapID: sortedMaps[0].value });
+
+										}
+									}}
 								>
 									{translate(`${chartType}`)}
 								</DropdownItem>
 							)
 					}
 				</DropdownMenu>
-			</Dropdown>
+			</Dropdown >
 		</ >
 	);
 }
