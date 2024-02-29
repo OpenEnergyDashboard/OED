@@ -45,7 +45,7 @@ export default function ConversionsDetailComponent() {
 	};
 
 	return (
-		<div>
+		<div className='flexGrowOne'>
 			{(conversionsFetching || unitsFetching) ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
