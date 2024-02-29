@@ -102,8 +102,6 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-                // Add LG7 here
-                // Partial days/hours for daily gives only full days
                 mocha.it('LG7: partial days/hours for daily gives only full days', async () => {
                     //Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
