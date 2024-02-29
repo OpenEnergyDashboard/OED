@@ -11,6 +11,7 @@ import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { durationFormat } from '../../utils/durationFormat';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { createAppSelector } from '../../redux/selectors/selectors';
 
 export const defaultAdminState: AdminState = {
 	displayTitle: '',
@@ -171,3 +172,28 @@ export const {
 	selectDisplayTitle,
 	selectBaseHelpUrl
 } = adminSlice.selectors;
+
+
+export const selectAdminPreferences = createAppSelector(
+	[selectAdminState],
+	(adminState): PreferenceRequestItem => ({
+		displayTitle: adminState.displayTitle,
+		defaultChartToRender: adminState.defaultChartToRender,
+		defaultBarStacking: adminState.defaultBarStacking,
+		defaultLanguage: adminState.defaultLanguage,
+		defaultTimezone: adminState.defaultTimezone,
+		defaultWarningFileSize: adminState.defaultWarningFileSize,
+		defaultFileSizeLimit: adminState.defaultFileSizeLimit,
+		defaultAreaNormalization: adminState.defaultAreaNormalization,
+		defaultAreaUnit: adminState.defaultAreaUnit,
+		defaultMeterReadingFrequency: adminState.defaultMeterReadingFrequency,
+		defaultMeterMinimumValue: adminState.defaultMeterMinimumValue,
+		defaultMeterMaximumValue: adminState.defaultMeterMaximumValue,
+		defaultMeterMinimumDate: adminState.defaultMeterMinimumDate,
+		defaultMeterMaximumDate: adminState.defaultMeterMaximumDate,
+		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
+		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
+		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
+		defaultHelpUrl: adminState.defaultHelpUrl
+	})
+);
