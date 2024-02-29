@@ -81,7 +81,7 @@ export default function BarChartComponent() {
 		return (
 			<Plot
 				data={datasets}
-				style={{ width: '100%', height: '100%' }}
+				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings

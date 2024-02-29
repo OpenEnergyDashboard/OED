@@ -78,7 +78,7 @@ export default function LineChartComponent() {
 		return (
 			<Plot
 				data={data}
-				style={{ width: '100%', height: '100%' }}
+				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },

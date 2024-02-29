@@ -168,9 +168,6 @@ export const selectMapChartQueryArgs = createSelector(
 
 );
 
-// Selector prepares the query args for ALL graph endpoints based on the current graph slice state
-// TODO Break down into individual selectors?
-// Verify if prop drilling is a better pattern vs useSelector in same sameComponent
 export const selectThreeDQueryArgs = createSelector(
 	selectQueryTimeInterval,
 	selectSelectedUnit,

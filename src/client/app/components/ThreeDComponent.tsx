@@ -75,7 +75,7 @@ export default function ThreeDComponent() {
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
 				: <Plot
-					style={{ width: '100%', height: '100%' }}
+					style={{ width: '100%', height: '100%', minHeight: '700px' }}
 					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
 					config={{
