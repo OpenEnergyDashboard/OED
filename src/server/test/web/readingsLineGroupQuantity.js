@@ -22,7 +22,7 @@ const { prepareTest,
     meterDatakWhGroups,
     groupDatakWh } = require('../../util/readingsUtils');
 
-mocha.describe('readings API', () => {
+mocha.describe.only('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('for quantity groups', () => {
@@ -84,8 +84,26 @@ mocha.describe('readings API', () => {
                     //Check if the Readings is equal to the expected file
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
+                
+                mocha.it('LG5: should barely have hourly points for middle readings of 15 + 20 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => { 
+                    //Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    //Get the unitID since the DB could be any value
+                    const unitId = await getUnitId('kWh');
+                    //Load the expected response data from the csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
+                    // Create a request API for the 15 day + 15 min period
+                    const startDate = "2022-09-21";
+                    const endDate = "2022-10-06";
+                    const time = "00:00:00";
+                    const timeInterval = createTimeString(startDate, time, endDate, time);
+                    //Create request to the API for reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval, graphicUnitId: unitId });
+                    //Check if the Readings is equal to the expected file
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
-                // Add LG5 here
 
                 // Add LG6 here
                 mocha.it('LG6: 14 days still gives hourly points & middle readings', async () => {
