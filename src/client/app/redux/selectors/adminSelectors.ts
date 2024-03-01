@@ -156,10 +156,6 @@ export const selectCreateMeterUnitCompatibility = createAppSelector(
 		(_state, meterDetails: MeterData) => meterDetails.unitId
 	],
 	(possibleGraphicUnits, possibleMeterUnits, unitId) => {
-		console.log(
-			'possibleGraphicUnits', possibleGraphicUnits,
-			'\npossibleMeterUnits', possibleGraphicUnits
-		);
 		// Units always Editable, and default Grahpic changes based on this.
 		const compatibleUnits = new Set<UnitData>(possibleMeterUnits);
 		// Units incompatible with currently selected graphic unit
