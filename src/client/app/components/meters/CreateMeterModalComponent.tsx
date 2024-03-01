@@ -583,9 +583,13 @@ export default function CreateMeterModalComponent() {
 							<Input id='disableChecks' name='disableChecks' type='select'
 								defaultValue={meterDetails.disableChecks?.toString()}
 								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
+								{
+									Object.keys(TrueFalseType).map(key =>
+										<option value={key} key={key}>
+											{translate(`TrueFalseType.${key}`)}
+										</option>
+									)
+								}
 							</Input>
 						</FormGroup></Col>
 					</Row>

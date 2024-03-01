@@ -14,7 +14,8 @@ export const conversionsApi = baseApi.injectEndpoints({
 			providesTags: ['ConversionDetails']
 		}),
 		getCikDetails: builder.query<CikData[], void>({
-			query: () => 'api/ciks'
+			query: () => 'api/ciks',
+			providesTags: ['Cik']
 		}),
 		addConversion: builder.mutation<void, ConversionData>({
 			query: conversion => ({
@@ -83,8 +84,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			// TODO check behavior with maintainers, always invalidates, should be conditional?
-			invalidatesTags: ['ConversionDetails']
+			invalidatesTags: ['ConversionDetails', 'Cik']
 		})
 	})
 });
