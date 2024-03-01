@@ -2,24 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { debounce } from 'lodash';
+import { utc } from 'moment';
+import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
+import Plot from 'react-plotly.js';
+import { TimeInterval } from '../../../common/TimeInterval';
+import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/selectors/barChartSelectors';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { selectBarStacking } from '../redux/slices/graphSlice';
+import Locales from '../types/locales';
 import { BarReadings } from '../types/readings';
 import translate from '../utils/translate';
-import Locales from '../types/locales';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import Plot from 'react-plotly.js';
-import { debounce } from 'lodash';
-import { utc } from 'moment';
-import { PlotRelayoutEvent } from 'plotly.js';
-import { updateSliderRange } from '../redux/actions/extraActions';
-import { TimeInterval } from '../../../common/TimeInterval';
-import Spinner from './Spinner';
+import SpinnerComponent from './SpinnerComponent';
 
 const stableEmptyData: BarReadings = {};
 /**
@@ -59,7 +59,7 @@ export default function BarChartComponent() {
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
 
 	if (meterIsFetching || groupIsFetching) {
-		return <Spinner />;
+		return <SpinnerComponent loading height={50} width={50} />;
 	}
 
 	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps

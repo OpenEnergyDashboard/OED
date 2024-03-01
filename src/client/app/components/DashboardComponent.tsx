@@ -25,7 +25,7 @@ export default function DashboardComponent() {
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
 
 	return (
-		<div className='container-fluid' style={{ flexGrow: '1' }}>
+		<div className='container-fluid flexGrowOne' >
 			<div className='row' style={{ overflowY: 'hidden', height: '100%' }}>
 				<div className={`${optionsVisibility ? 'col-2 d-none d-lg-block' : 'd-none'}`} style={{ height: '100%' }}>
 					<UIOptionsComponent />

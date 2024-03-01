@@ -29,7 +29,7 @@ export default function MetersDetailComponent() {
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
 
 	return (
-		<div>
+		<div className='flexGrowOne'>
 			<TooltipHelpComponent page='meters' />
 
 			<div className='container-fluid'>

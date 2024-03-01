@@ -25,7 +25,7 @@ export default function UnitsDetailComponent() {
 	const unitData = useAppSelector(selectAllUnits);
 
 	return (
-		<div>
+		<div className='flexGrowOne'>
 			{status === QueryStatus.pending ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />

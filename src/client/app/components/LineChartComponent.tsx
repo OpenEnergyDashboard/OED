@@ -7,8 +7,8 @@ import { utc } from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
-import { updateSliderRange } from '../redux/actions/extraActions';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
@@ -18,7 +18,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
-import Spinner from './Spinner';
+import SpinnerComponent from './SpinnerComponent';
 
 // Stable reference for when there is not data. Avoids rerenders.
 const stableEmptyReadings: LineReadings = {};
@@ -62,7 +62,7 @@ export default function LineChartComponent() {
 
 
 	if (meterIsFetching || groupIsFetching) {
-		return <Spinner />;
+		return <SpinnerComponent loading height={50} width={50} />;
 	}
 
 

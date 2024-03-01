@@ -39,33 +39,31 @@ export default function GroupsDetailComponent() {
 	};
 
 	return (
-		<div>
-			<div>
-				<TooltipHelpComponent page='groups' />
+		<div className='flexGrowOne'>
+			<TooltipHelpComponent page='groups' />
 
-				<div className='container-fluid'>
-					<h2 style={titleStyle}>
-						<FormattedMessage id='groups' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
-						</div>
-					</h2>
-					{isAdmin &&
-						<div className="edit-btn">
-							{/* The actual button for create is inside this component. */}
-							< CreateGroupModalComponent />
-						</div>
-					}
-					{
-						<div className="card-container">
-							{Object.values(visibleGroups)
-								.map(groupData => (<GroupViewComponent
-									group={groupData}
-									key={groupData.id}
-								/>))}
-						</div>
-					}
-				</div>
+			<div className='container-fluid'>
+				<h2 style={titleStyle}>
+					<FormattedMessage id='groups' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
+					</div>
+				</h2>
+				{isAdmin &&
+					<div className="edit-btn">
+						{/* The actual button for create is inside this component. */}
+						< CreateGroupModalComponent />
+					</div>
+				}
+				{
+					<div className="card-container">
+						{Object.values(visibleGroups)
+							.map(groupData => (<GroupViewComponent
+								group={groupData}
+								key={groupData.id}
+							/>))}
+					</div>
+				}
 			</div>
 		</div>
 	);

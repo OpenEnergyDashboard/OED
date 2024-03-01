@@ -3,23 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
-import * as React from 'react';
-import translate from '../utils/translate';
-import { Button, ButtonGroup } from 'reactstrap';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import MapChartSelectComponent from './MapChartSelectComponent';
-import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { graphSlice, selectBarWidthDays } from '../redux/slices/graphSlice';
 import * as moment from 'moment';
+import * as React from 'react';
+import { Button, ButtonGroup } from 'reactstrap';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { selectMapBarWidthDays, updateMapsBarDuration } from '../redux/slices/graphSlice';
+import translate from '../utils/translate';
+import MapChartSelectComponent from './MapChartSelectComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 /**
  * @returns Map page controls
  */
 export default function MapControlsComponent() {
 	const dispatch = useAppDispatch();
-	const barDuration = useAppSelector(selectBarWidthDays);
+	const barDuration = useAppSelector(selectMapBarWidthDays);
 
 	const handleDurationChange = (value: number) => {
-		dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
+		dispatch(updateMapsBarDuration(moment.duration(value, 'days')));
 	};
 
 	const barDurationDays = barDuration.asDays();

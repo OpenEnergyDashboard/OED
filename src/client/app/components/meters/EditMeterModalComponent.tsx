@@ -11,7 +11,11 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { metersApi, selectMeterById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { selectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
+import {
+	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS,
+	MAX_VAL, MIN_DATE, MIN_DATE_MOMENT, MIN_VAL,
+	selectGraphicUnitCompatibility
+} from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -696,13 +700,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 }
 
 
-const MIN_VAL = Number.MIN_SAFE_INTEGER;
-const MAX_VAL = Number.MAX_SAFE_INTEGER;
-const MIN_DATE_MOMENT = moment(0).utc();
-const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
-const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
-const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
-const MAX_ERRORS = 75;
+
 const tooltipStyle = {
 	...tooltipBaseStyle,
 	// Only an admin can edit a meter.

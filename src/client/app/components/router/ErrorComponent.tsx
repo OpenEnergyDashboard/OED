@@ -25,8 +25,10 @@ export default function ErrorComponent() {
 				<p>
 					{translate('error.unknown')}
 				</p>
-				<Button color='primary'
-					onClick={() => nav('/')}>
+				<Button
+					color='primary'
+					onClick={() => nav('/')}
+				>
 					{translate('return.dashboard')}
 				</Button>
 			</div>

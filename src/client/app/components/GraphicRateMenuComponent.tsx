@@ -37,7 +37,13 @@ export default function GraphicRateMenuComponent() {
 		}
 	}
 	// Also don't show if not the line graphic, or three-d.
-	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD) {
+	const displayOnChartType: ChartTypes[] = [
+		ChartTypes.line,
+		ChartTypes.threeD,
+		ChartTypes.radar
+	];
+
+	if (!displayOnChartType.includes(graphState.chartToRender)) {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates

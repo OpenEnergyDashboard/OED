@@ -35,3 +35,7 @@ div.plotly-notifier {
 	scrollbar-color: #888 #ffffff00;
 	scrollbar-width: thin;
 }
+
+.flexGrowOne {
+	flex-grow: 1;
+}

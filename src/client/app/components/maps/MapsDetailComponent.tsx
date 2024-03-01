@@ -53,7 +53,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		};
 
 		return (
-			<div>
+			<div className='flexGrowOne'>
 				{/* <UnsavedWarningContainer /> */}
 				<TooltipHelpComponent page='maps' />
 				<div className='container-fluid'>

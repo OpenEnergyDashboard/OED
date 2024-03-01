@@ -4,26 +4,26 @@
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import * as React from 'react';
-import getGraphColor from '../utils/getGraphColor';
-import translate from '../utils/translate';
-import Plot from 'react-plotly.js';
 import { Layout } from 'plotly.js';
-import Locales from '../types/locales';
-import { DataType } from '../types/Datasources';
-import { lineUnitLabel } from '../utils/graphics';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import * as React from 'react';
+import Plot from 'react-plotly.js';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { readingsApi } from '../redux/api/readingsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import {
 	selectAreaUnit, selectGraphAreaNormalization, selectLineGraphRate,
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../redux/slices/graphSlice';
-import { selectUnitDataById } from '../redux/api/unitsApi';
-import { selectMeterDataById } from '../redux/api/metersApi';
-import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
-import { readingsApi } from '../redux/api/readingsApi';
-import { selectGroupDataById } from '../redux/api/groupsApi';
-import Spinner from './Spinner';
+import { DataType } from '../types/Datasources';
+import Locales from '../types/locales';
+import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import getGraphColor from '../utils/getGraphColor';
+import { lineUnitLabel } from '../utils/graphics';
+import translate from '../utils/translate';
+import SpinnerComponent from './SpinnerComponent';
 
 /**
  * @returns radar plotly component
@@ -47,7 +47,7 @@ export default function RadarChartComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 
 	if (meterIsLoading || groupIsLoading) {
-		return <Spinner />;
+		return <SpinnerComponent loading width={50} height={50} />;
 		// return <SpinnerComponent loading width={50} height={50} />
 	}
 

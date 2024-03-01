@@ -4,12 +4,18 @@
 
 import * as moment from 'moment';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { selectDefaultCreateMeterValues, selectGraphicUnitCompatibility } from '../../redux/selectors/adminSelectors';
+import {
+	MAX_DATE, MAX_DATE_MOMENT,
+	MAX_ERRORS, MAX_VAL, MIN_DATE,
+	MIN_DATE_MOMENT, MIN_VAL,
+	isValidCreateMeter,
+	selectDefaultCreateMeterValues, selectCreateMeterUnitCompatibility
+} from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
@@ -27,8 +33,9 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Meter create element
  */
 export default function CreateMeterModalComponent() {
-
-	const [addMeter] = metersApi.endpoints.addMeter.useMutation();
+	// Tracks wheter a unit/ default unit has been selected.
+	// RTKQ Mutation to submit add meter
+	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
 	// Memo'd memoized selector
 	const defaultValues = useAppSelector(selectDefaultCreateMeterValues);
 
@@ -36,17 +43,16 @@ export default function CreateMeterModalComponent() {
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 
-
 	// Handlers for each type of input change
 	const [meterDetails, setMeterDetails] = useState(defaultValues);
-	const {
-		compatibleGraphicUnits,
-		incompatibleGraphicUnits,
-		compatibleUnits,
-		incompatibleUnits
-		// Type assertion due to conflicting GPS Property
-	} = useAppSelector(state => selectGraphicUnitCompatibility(state, meterDetails as unknown as MeterData));
+	const unitIsSelected = meterDetails.unitId !== -999;
+	const defaultGaphicUnitIsSelected = meterDetails.defaultGraphicUnit !== -999;
 
+	const { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits } = useAppSelector(state =>
+		// Type assertion due to conflicting GPS Property
+		selectCreateMeterUnitCompatibility(state, meterDetails as unknown as MeterData)
+	);
+	const { meterIsValid, defaultGraphicUnitIsValid } = useAppSelector(state => isValidCreateMeter(state, meterDetails as unknown as MeterData));
 	const handleShow = () => setShowModal(true);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,24 +70,9 @@ export default function CreateMeterModalComponent() {
 	const handleTimeZoneChange = (timeZone: string) => {
 		setMeterDetails({ ...meterDetails, ['timeZone']: timeZone });
 	};
-
-	// Dropdowns
-	const [selectedGraphicId, setSelectedGraphicId] = useState<boolean>(false);
-	const [selectedUnitId, setSelectedUnitId] = useState<boolean>(false);
-
-	const [validMeter, setValidMeter] = useState(false);
-
-	useEffect(() => {
-		// Conflicting GPS point type so type assertions
-		setValidMeter(isValidCreateMeter(meterDetails as unknown as MeterData));
-	}, [meterDetails]);
-	/* End State */
-
 	// Reset the state to default values
 	const resetState = () => {
 		setMeterDetails(defaultValues);
-		setSelectedGraphicId(false);
-		setSelectedUnitId(false);
 	};
 
 	const handleClose = () => {
@@ -141,7 +132,7 @@ export default function CreateMeterModalComponent() {
 			};
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
-			addMeter(submitState)
+			submitAddMeter(submitState)
 				.unwrap()
 				.then(() => {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
@@ -182,7 +173,9 @@ export default function CreateMeterModalComponent() {
 					<FormattedMessage id="meter.create" />
 					<TooltipHelpComponent page='meters-create' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='meters-create' helpTextId={tooltipStyle.tooltipCreateMeterView} />
+						<TooltipMarkerComponent page='meters-create'
+							helpTextId={tooltipStyle.tooltipCreateMeterView}
+						/>
 					</div>
 				</ModalHeader>
 				{/* when any of the Meter values are changed call one of the functions. */}
@@ -190,26 +183,25 @@ export default function CreateMeterModalComponent() {
 					<Row xs='1' lg='2'>
 						{/* Identifier input */}
 						<Col><FormGroup>
-							<Label for='identifier'>{translate('identifier')}</Label>
-							<Input
-								id='identifier'
-								name='identifier'
-								type='text'
-								autoComplete='on'
+							<Label for='identifier'>
+								{translate('identifier')}
+							</Label>
+							<Input id='identifier' name='identifier' type='text' autoComplete='on'
+								value={meterDetails.identifier}
 								onChange={e => handleStringChange(e)}
-								value={meterDetails.identifier} />
+							/>
 						</FormGroup></Col>
 						{/* Name input */}
 						<Col><FormGroup>
-							<Label for='name'>{translate('name')}</Label>
-							<Input
-								id='name'
-								name='name'
-								type='text'
+							<Label for='name'>
+								{translate('name')}
+							</Label>
+							<Input id='name' name='name' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								required value={meterDetails.name}
-								invalid={meterDetails.name === ''} />
+								invalid={meterDetails.name === ''}
+							/>
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -218,60 +210,62 @@ export default function CreateMeterModalComponent() {
 					<Row xs='1' lg='2'>
 						{/* meter unit input */}
 						<Col><FormGroup>
-							<Label for='unitId'> {translate('meter.unitName')}</Label>
-							<Input
-								id='unitId'
-								name='unitId'
-								type='select'
-								value={selectedUnitId ? meterDetails.unitId : -999}
+							<Label for='unitId'>
+								{translate('meter.unitName')}
+							</Label>
+							<Input id='unitId' name='unitId' type='select'
+								value={meterDetails.unitId}
 								onChange={e => {
 									handleNumberChange(e);
-									setSelectedUnitId(true);
 								}}
-								invalid={!selectedUnitId}>
-								{<option
-									value={-999}
-									key={-999}
-									hidden={meterDetails.unitId !== -999}
-									disabled>
-									{translate('select.unit')}
-								</option>}
-								{Array.from(compatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
-								})}
-								{Array.from(incompatibleUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
-								})}
+								invalid={!unitIsSelected}>
+								{
+									<option value={-999} key={-999} hidden disabled>
+										{translate('select.unit')}
+									</option>
+								}
+								{
+									Array.from(compatibleUnits).map(unit =>
+										<option key={unit.id} value={unit.id}>
+											{unit.identifier}
+										</option>
+									)
+								}
 							</Input>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup></Col>
 						{/* default graphic unit input */}
 						<Col><FormGroup>
-							<Label for='defaultGraphicUnit'>{translate('defaultGraphicUnit')}</Label>
-							<Input
-								id='defaultGraphicUnit'
-								name='defaultGraphicUnit'
-								type='select'
-								value={selectedGraphicId ? meterDetails.defaultGraphicUnit : -999}
-								invalid={!selectedGraphicId}
+							<Label for='defaultGraphicUnit'>
+								{translate('defaultGraphicUnit')}
+							</Label>
+							<Input id='defaultGraphicUnit' name='defaultGraphicUnit' type='select'
+								value={meterDetails.defaultGraphicUnit}
+								// Invalid when unitId is selected and no graphic selected or invalid choice.
+								invalid={unitIsSelected && (!defaultGaphicUnitIsSelected || !defaultGraphicUnitIsValid)}
+								disabled={!unitIsSelected}
 								onChange={e => {
 									handleNumberChange(e);
-									setSelectedGraphicId(true);
 								}}
 							>
-								{<option
-									value={-999}
-									key={-999}
-									hidden={!selectedGraphicId}
-									disabled>
+								<option value={-999} key={-999} hidden disabled>
 									{translate('select.unit')}
-								</option>}
-								{Array.from(compatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
-								})}
-								{Array.from(incompatibleGraphicUnits).map(unit => {
-									return (<option value={unit.id} key={unit.id} disabled>{unit.identifier}</option>);
-								})}
+								</option>
+								{
+									Array.from(compatibleGraphicUnits).map(unit =>
+										<option value={unit.id} key={unit.id}>
+											{unit.identifier}
+										</option>
+									)
+								}
+								{
+									Array.from(incompatibleGraphicUnits).map(unit =>
+										<option value={unit.id} key={unit.id} disabled>
+											{unit.identifier}
+										</option>
+
+									)
+								}
 							</Input>
 							<FormFeedback><FormattedMessage id="error.required" /></FormFeedback>
 						</FormGroup></Col>
@@ -280,10 +274,7 @@ export default function CreateMeterModalComponent() {
 						{/* Enabled input */}
 						<Col><FormGroup>
 							<Label for='enabled'>{translate('meter.enabled')}</Label>
-							<Input
-								id='enabled'
-								name='enabled'
-								type='select'
+							<Input id='enabled' name='enabled' type='select'
 								value={meterDetails.enabled.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -294,10 +285,7 @@ export default function CreateMeterModalComponent() {
 						{/* Displayable input */}
 						<Col><FormGroup>
 							<Label for='displayable'>{translate('displayable')}</Label>
-							<Input
-								id='displayable'
-								name='displayable'
-								type='select'
+							<Input id='displayable' name='displayable' type='select'
 								value={meterDetails.displayable.toString()}
 								onChange={e => handleBooleanChange(e)}
 								invalid={meterDetails.displayable && meterDetails.unitId === -99}>
@@ -314,10 +302,7 @@ export default function CreateMeterModalComponent() {
 						{/* Meter type input */}
 						<Col><FormGroup>
 							<Label for='meterType'>{translate('meter.type')}</Label>
-							<Input
-								id='meterType'
-								name='meterType'
-								type='select'
+							<Input id='meterType' name='meterType' type='select'
 								value={meterDetails.meterType}
 								onChange={e => handleStringChange(e)}
 								invalid={meterDetails.meterType === ''}>
@@ -339,10 +324,7 @@ export default function CreateMeterModalComponent() {
 						{/* Meter reading frequency */}
 						<Col><FormGroup>
 							<Label for='readingFrequency'>{translate('meter.readingFrequency')}</Label>
-							<Input
-								id='readingFrequency'
-								name='readingFrequency'
-								type='text'
+							<Input id='readingFrequency' name='readingFrequency' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.readingFrequency}
@@ -356,10 +338,7 @@ export default function CreateMeterModalComponent() {
 						{/* URL input */}
 						<Col><FormGroup>
 							<Label for='url'>{translate('meter.url')}</Label>
-							<Input
-								id='url'
-								name='url'
-								type='text'
+							<Input id='url' name='url' type='text'
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.url} />
@@ -367,10 +346,7 @@ export default function CreateMeterModalComponent() {
 						{/* GPS input */}
 						<Col><FormGroup>
 							<Label for='gps'>{translate('gps')}</Label>
-							<Input
-								id='gps'
-								name='gps'
-								type='text'
+							<Input id='gps' name='gps' type='text'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.gps} />
 						</FormGroup></Col>
@@ -379,10 +355,7 @@ export default function CreateMeterModalComponent() {
 						{/* Area input */}
 						<Col><FormGroup>
 							<Label for='area'>{translate('area')}</Label>
-							<Input
-								id='area'
-								name='area'
-								type='number'
+							<Input id='area' name='area' type='number'
 								min='0'
 								defaultValue={meterDetails.area}
 								onChange={e => handleNumberChange(e)}
@@ -394,10 +367,7 @@ export default function CreateMeterModalComponent() {
 						{/* meter area unit input */}
 						<Col><FormGroup>
 							<Label for='areaUnit'>{translate('area.unit')}</Label>
-							<Input
-								id='areaUnit'
-								name='areaUnit'
-								type='select'
+							<Input id='areaUnit' name='areaUnit' type='select'
 								value={meterDetails.areaUnit}
 								onChange={e => handleStringChange(e)}
 								invalid={meterDetails.area > 0 && meterDetails.areaUnit === AreaUnitType.none}>
@@ -413,10 +383,7 @@ export default function CreateMeterModalComponent() {
 					{/* note input */}
 					<FormGroup>
 						<Label for='note'>{translate('note')}</Label>
-						<Input
-							id='note'
-							name='note'
-							type='textarea'
+						<Input id='note' name='note' type='textarea'
 							onChange={e => handleStringChange(e)}
 							value={meterDetails.note}
 							placeholder='Note' />
@@ -425,10 +392,7 @@ export default function CreateMeterModalComponent() {
 						{/* cumulative input */}
 						<Col><FormGroup>
 							<Label for='cumulative'>{translate('meter.cumulative')}</Label>
-							<Input
-								id='cumulative'
-								name='cumulative'
-								type='select'
+							<Input id='cumulative' name='cumulative' type='select'
 								value={meterDetails.cumulative.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -439,10 +403,7 @@ export default function CreateMeterModalComponent() {
 						{/* cumulativeReset input */}
 						<Col><FormGroup>
 							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
-							<Input
-								id='cumulativeReset'
-								name='cumulativeReset'
-								type='select'
+							<Input id='cumulativeReset' name='cumulativeReset' type='select'
 								value={meterDetails.cumulativeReset.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -455,11 +416,7 @@ export default function CreateMeterModalComponent() {
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
-							<Input
-								id='cumulativeResetStart'
-								name='cumulativeResetStart'
-								type='text'
-								autoComplete='off'
+							<Input id='cumulativeResetStart' name='cumulativeResetStart' type='text' autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetStart}
 								placeholder='HH:MM:SS' />
@@ -467,10 +424,7 @@ export default function CreateMeterModalComponent() {
 						{/* cumulativeResetEnd input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
-							<Input
-								id='cumulativeResetEnd'
-								name='cumulativeResetEnd'
-								type='text'
+							<Input id='cumulativeResetEnd' name='cumulativeResetEnd' type='text'
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetEnd}
@@ -481,11 +435,7 @@ export default function CreateMeterModalComponent() {
 						{/* endOnlyTime input */}
 						<Col><FormGroup>
 							<Label for='endOnlyTime'>{translate('meter.endOnlyTime')}</Label>
-							<Input
-								id='endOnlyTime'
-								name='endOnlyTime'
-								type='select'
-								value={meterDetails.endOnlyTime.toString()}
+							<Input id='endOnlyTime' name='endOnlyTime' type='select' value={meterDetails.endOnlyTime.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -495,10 +445,7 @@ export default function CreateMeterModalComponent() {
 						{/* readingGap input */}
 						<Col><FormGroup>
 							<Label for='readingGap'>{translate('meter.readingGap')}</Label>
-							<Input
-								id='readingGap'
-								name='readingGap'
-								type='number'
+							<Input id='readingGap' name='readingGap' type='number'
 								onChange={e => handleNumberChange(e)}
 								min='0'
 								defaultValue={meterDetails.readingGap}
@@ -512,10 +459,7 @@ export default function CreateMeterModalComponent() {
 						{/* readingVariation input */}
 						<Col><FormGroup>
 							<Label for='readingVariation'>{translate('meter.readingVariation')}</Label>
-							<Input
-								id='readingVariation'
-								name='readingVariation'
-								type='number'
+							<Input id='readingVariation' name='readingVariation' type='number'
 								onChange={e => handleNumberChange(e)}
 								min='0'
 								defaultValue={meterDetails.readingVariation}
@@ -527,10 +471,7 @@ export default function CreateMeterModalComponent() {
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							<Input
-								id='readingDuplication'
-								name='readingDuplication'
-								type='number'
+							<Input id='readingDuplication' name='readingDuplication' type='number'
 								onChange={e => handleNumberChange(e)}
 								step='1'
 								min='1'
@@ -546,10 +487,7 @@ export default function CreateMeterModalComponent() {
 						{/* timeSort input */}
 						<Col><FormGroup>
 							<Label for='timeSort'>{translate('meter.timeSort')}</Label>
-							<Input
-								id='timeSort'
-								name='timeSort'
-								type='select'
+							<Input id='timeSort' name='timeSort' type='select'
 								value={meterDetails.timeSort}
 								onChange={e => handleStringChange(e)}>
 								{Object.keys(MeterTimeSortType).map(key => {
@@ -569,10 +507,7 @@ export default function CreateMeterModalComponent() {
 						{/* minVal input */}
 						<Col><FormGroup>
 							<Label for='minVal'>{translate('meter.minVal')}</Label>
-							<Input
-								id='minVal'
-								name='minVal'
-								type='number'
+							<Input id='minVal' name='minVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={MIN_VAL}
 								max={meterDetails.maxVal}
@@ -585,10 +520,7 @@ export default function CreateMeterModalComponent() {
 						{/* maxVal input */}
 						<Col><FormGroup>
 							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
-							<Input
-								id='maxVal'
-								name='maxVal'
-								type='number'
+							<Input id='maxVal' name='maxVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={meterDetails.minVal}
 								max={MAX_VAL}
@@ -603,10 +535,7 @@ export default function CreateMeterModalComponent() {
 						{/* minDate input */}
 						<Col><FormGroup>
 							<Label for='minDate'>{translate('meter.minDate')}</Label>
-							<Input
-								id='minDate'
-								name='minDate'
-								type='text'
+							<Input id='minDate' name='minDate' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
@@ -621,10 +550,7 @@ export default function CreateMeterModalComponent() {
 						{/* maxDate input */}
 						<Col><FormGroup>
 							<Label for='maxDate'>{translate('meter.maxDate')}</Label>
-							<Input
-								id='maxDate'
-								name='maxDate'
-								type='text'
+							<Input id='maxDate' name='maxDate' type='text'
 								autoComplete='on'
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								onChange={e => handleStringChange(e)}
@@ -642,10 +568,7 @@ export default function CreateMeterModalComponent() {
 						{/* maxError input */}
 						<Col><FormGroup>
 							<Label for='maxError'>{translate('meter.maxError')}</Label>
-							<Input
-								id='maxError'
-								name='maxError'
-								type='number'
+							<Input id='maxError' name='maxError' type='number'
 								onChange={e => handleNumberChange(e)}
 								min='0'
 								max={MAX_ERRORS}
@@ -657,15 +580,16 @@ export default function CreateMeterModalComponent() {
 						</FormGroup></Col>
 						<Col><FormGroup>
 							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
-							<Input
-								id='disableChecks'
-								name='disableChecks'
-								type='select'
+							<Input id='disableChecks' name='disableChecks' type='select'
 								defaultValue={meterDetails.disableChecks?.toString()}
 								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
+								{
+									Object.keys(TrueFalseType).map(key =>
+										<option value={key} key={key}>
+											{translate(`TrueFalseType.${key}`)}
+										</option>
+									)
+								}
 							</Input>
 						</FormGroup></Col>
 					</Row>
@@ -673,20 +597,14 @@ export default function CreateMeterModalComponent() {
 						{/* reading input */}
 						<Col><FormGroup>
 							<Label for='reading'>{translate('meter.reading')}</Label>
-							<Input
-								id='reading'
-								name='reading'
-								type='number'
+							<Input id='reading' name='reading' type='number'
 								onChange={e => handleNumberChange(e)}
 								defaultValue={meterDetails.reading} />
 						</FormGroup></Col>
 						{/* startTimestamp input */}
 						<Col><FormGroup>
 							<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
-							<Input
-								id='startTimestamp'
-								name='startTimestamp'
-								type='text'
+							<Input id='startTimestamp' name='startTimestamp' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
@@ -697,10 +615,7 @@ export default function CreateMeterModalComponent() {
 						{/* endTimestamp input */}
 						<Col><FormGroup>
 							<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
-							<Input
-								id='endTimestamp'
-								name='endTimestamp'
-								type='text'
+							<Input id='endTimestamp' name='endTimestamp' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
@@ -709,10 +624,7 @@ export default function CreateMeterModalComponent() {
 						{/* previousEnd input */}
 						<Col><FormGroup>
 							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
-							<Input
-								id='previousEnd'
-								name='previousEnd'
-								type='text'
+							<Input id='previousEnd' name='previousEnd' type='text'
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								placeholder='YYYY-MM-DD HH:MM:SS'
@@ -726,7 +638,7 @@ export default function CreateMeterModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validMeter}>
+					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
@@ -735,49 +647,5 @@ export default function CreateMeterModalComponent() {
 	);
 }
 
-/* Create Meter Validation:
-	Name cannot be blank
-	Area must be positive or zero
-	If area is nonzero, area unit must be set
-	Reading Gap must be greater than zero
-	Reading Variation must be greater than zero
-	Reading Duplication must be between 1 and 9
-	Reading frequency cannot be blank
-	Unit and Default Graphic Unit must be set (can be to no unit)
-	Meter type must be set
-	If displayable is true and unitId is set to -99, warn admin
-	Minimum Value cannot bigger than Maximum Value
-	Minimum Value and Maximum Value must be between valid input
-	Minimum Date and Maximum cannot be blank
-	Minimum Date cannot be after Maximum Date
-	Minimum Date and Maximum Value must be between valid input
-	Maximum No of Error must be between 0 and valid input
-*/
-const isValidCreateMeter = (meterDetails: MeterData) => {
-	return meterDetails.name !== '' &&
-		(meterDetails.area === 0 || (meterDetails.area > 0 && meterDetails.areaUnit !== AreaUnitType.none)) &&
-		meterDetails.readingGap >= 0 &&
-		meterDetails.readingVariation >= 0 &&
-		(meterDetails.readingDuplication >= 1 && meterDetails.readingDuplication <= 9) &&
-		meterDetails.readingFrequency !== '' &&
-		meterDetails.unitId !== -99 &&
-		meterDetails.defaultGraphicUnit !== -99 &&
-		meterDetails.meterType !== '' &&
-		meterDetails.minVal >= MIN_VAL &&
-		meterDetails.minVal <= meterDetails.maxVal &&
-		meterDetails.maxVal <= MAX_VAL &&
-		moment(meterDetails.minDate).isValid() &&
-		moment(meterDetails.maxDate).isValid() &&
-		moment(meterDetails.minDate).isSameOrAfter(MIN_DATE_MOMENT) &&
-		moment(meterDetails.minDate).isSameOrBefore(moment(meterDetails.maxDate)) &&
-		moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT) &&
-		(meterDetails.maxError >= 0 && meterDetails.maxError <= MAX_ERRORS);
-};
 
-const MIN_VAL = Number.MIN_SAFE_INTEGER;
-const MAX_VAL = Number.MAX_SAFE_INTEGER;
-const MIN_DATE_MOMENT = moment(0).utc();
-const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
-const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
-const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
-const MAX_ERRORS = 75;
+
