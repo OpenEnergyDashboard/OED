@@ -22,7 +22,7 @@ const { prepareTest,
     meterDatakWhGroups,
     groupDatakWh } = require('../../util/readingsUtils');
 
-mocha.describe.only('readings API', () => {
+mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('for quantity groups', () => {
