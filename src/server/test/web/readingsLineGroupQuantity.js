@@ -120,7 +120,19 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-                // Add LG7 here
+                mocha.it('LG7: partial days/hours for daily gives only full days', async () => {
+                    //Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    //Get the unit ID since the DB could use any value 
+                    const unitId = await getUnitId('kWh');
+                    //Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
                 // Test using a data range of infinity, which should return as days
                 mocha.it('LG10: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ', async () => {
@@ -202,7 +214,43 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 })
 
-                // Add LG11 here
+                mocha.it('LG11: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
+                    const unitData = unitDatakWh.concat([
+                        { 
+                            // u3
+                            name: 'MJ', 
+                            identifier: 'megaJoules', 
+                            unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                            secInRate: 3600, typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: false, 
+                            note: 'MJ' 
+                        }
+                    ]);
+                    const conversionData = conversionDatakWh.concat([
+                        { 
+                            // c6
+                            sourceName: 'MJ', 
+                            destinationName: 'kWh',
+                            bidirectional: true, 
+                            slope: 1 / 3.6, 
+                            intercept: 0, 
+                            note: 'MJ → KWh' 
+                        }
+                    ]);
+                    // Load the data into the database
+                    await prepareTest(unitData, conversionData, meterDatakWhGroups, groupDatakWh);
+                    // Get the unit ID since the DB can use any value
+                    const unitId = await getUnitId('MJ');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_MJ_st_-inf_et_inf.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
                 mocha.it('LG12: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
                     const unitData = unitDatakWh.concat([
@@ -321,7 +369,7 @@ mocha.describe('readings API', () => {
                             intercept: 0,
                             note: 'CO₂ → kg'
                         },
-                       
+
                     ];
                     const meterData = [
                         {
@@ -371,132 +419,132 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-				mocha.it('LG19: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
-					const unitDatakWh = [
-						{
-							// u2
-							name: 'Electric_Utility',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.METER,
-							suffix: '',
-							displayable: Unit.displayableType.NONE,
-							preferredDisplay: false,
-							note: 'special unit'
-						},
-						{
-							// u10
-							name: 'kg',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'OED created standard unit'
-						},
-						{
-							// u11
-							name: 'metric ton',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: '',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'OED created standard unit'
-						},
-						{
-							// u12
-							name: 'kg CO₂',
-							identifier: '',
-							unitRepresent: Unit.unitRepresentType.QUANTITY,
-							secInRate: 3600,
-							typeOfUnit: Unit.unitType.UNIT,
-							suffix: 'CO₂',
-							displayable: Unit.displayableType.ALL,
-							preferredDisplay: false,
-							note: 'special unit'
-						}
-					];
-					const conversionDatakWh = [
-						{
-							// c11
-							sourceName: 'Electric_Utility',
-							destinationName: 'kg CO₂',
-							bidirectional: false,
-							slope: 0.709,
-							intercept: 0,
-							note: 'Electric_Utility → kg CO₂'
-						},
-						{
-							// c12
-							sourceName: 'kg CO₂',
-							destinationName: 'kg',
-							bidirectional: false,
-							slope: 1,
-							intercept: 0,
-							note: 'CO₂ → kg'
-						},
-						{
-							// c13
-							sourceName: 'kg',
-							destinationName: 'metric ton',
-							bidirectional: true,
-							slope: 1e-3,
-							intercept: 0,
-							note: 'kg → Metric ton'
-						}
-					];
-					const meterDatakWhGroups = [
-						{
-							name: 'Electric_Utility metric ton of CO₂',
-							unit: 'Electric_Utility',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						},
-						{
-							name: 'Electric Utility metric ton of CO₂ Other',
-							unit: 'Electric_Utility',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_20_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '20 minutes',
-							id: (METER_ID + 1)
-						}
-					];
-					const groupDatakWh = [
-						{
-							id: GROUP_ID,
-							name: 'Electric Utility kWh + Other',
-							displayable: true,
-							note: 'special group',
-							childMeters: ['Electric_Utility metric ton of CO₂', 'Electric Utility metric ton of CO₂ Other'],
-							childGroups: [],
-						}
-					];
-					// Load the data into the database
-					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
-					// Get the unit ID since the DB could use any value.
-					const unitId = await getUnitId('metric ton of CO₂');
-					// Load the expected response data from the corresponding csv file
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
-					// Create a request to the API for unbounded reading times and save the response
-					const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
-						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
-					// Check that the API reading is equal to what it is expected to equal
-					expectReadingToEqualExpected(res, expected, GROUP_ID);
-				});
+                mocha.it('LG19: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained', async () => {
+                    const unitDatakWh = [
+                        {
+                            // u2
+                            name: 'Electric_Utility',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        },
+                        {
+                            // u10
+                            name: 'kg',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'OED created standard unit'
+                        },
+                        {
+                            // u11
+                            name: 'metric ton',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'OED created standard unit'
+                        },
+                        {
+                            // u12
+                            name: 'kg CO₂',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: 'CO₂',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
+                    ];
+                    const conversionDatakWh = [
+                        {
+                            // c11
+                            sourceName: 'Electric_Utility',
+                            destinationName: 'kg CO₂',
+                            bidirectional: false,
+                            slope: 0.709,
+                            intercept: 0,
+                            note: 'Electric_Utility → kg CO₂'
+                        },
+                        {
+                            // c12
+                            sourceName: 'kg CO₂',
+                            destinationName: 'kg',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'CO₂ → kg'
+                        },
+                        {
+                            // c13
+                            sourceName: 'kg',
+                            destinationName: 'metric ton',
+                            bidirectional: true,
+                            slope: 1e-3,
+                            intercept: 0,
+                            note: 'kg → Metric ton'
+                        }
+                    ];
+                    const meterDatakWhGroups = [
+                        {
+                            name: 'Electric_Utility metric ton of CO₂',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        },
+                        {
+                            name: 'Electric Utility metric ton of CO₂ Other',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '20 minutes',
+                            id: (METER_ID + 1)
+                        }
+                    ];
+                    const groupDatakWh = [
+                        {
+                            id: GROUP_ID,
+                            name: 'Electric Utility kWh + Other',
+                            displayable: true,
+                            note: 'special group',
+                            childMeters: ['Electric_Utility metric ton of CO₂', 'Electric Utility metric ton of CO₂ Other'],
+                            childGroups: [],
+                        }
+                    ];
+                    // Load the data into the database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('metric ton of CO₂');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
                 // Add LG20 here
 
