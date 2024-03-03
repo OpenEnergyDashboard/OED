@@ -94,7 +94,6 @@ export default function LineChartComponent() {
 				}}
 				onRelayout={debounce(
 					(e: PlotRelayoutEvent) => {
-						// console.log(e)
 						// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 						if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
 							// The event signals changes in the user's interaction with the graph.

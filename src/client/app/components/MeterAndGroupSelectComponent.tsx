@@ -13,9 +13,9 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { updateSelectedMetersOrGroups } from '../redux/slices/graphSlice';
+import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
-import { MeterOrGroup } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
@@ -90,6 +90,8 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	// TODO would be nice if relevant message was derived from uiSelectors, which currently only tracks / trims non-compatible ids
 	// TODO Add meta data along chain? i.e. disabled due to chart type, area norm... etc. and display relevant message.
 	const isDisabled = typedProps.data.isDisabled;
+	const dispatch = useAppDispatch();
+	const onThreeD = useAppSelector(state => selectChartToRender(state) === ChartTypes.threeD);
 	// TODO Verify behavior, and set proper message/ translate
 	return (
 		< div ref={ref}
@@ -100,12 +102,21 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				e.stopPropagation();
 				ReactTooltip.rebuild();
 				ref.current && ReactTooltip.show(ref.current);
+				if (onThreeD && !isDisabled) {
+					dispatch(
+						updateThreeDMeterOrGroupInfo({
+							meterOrGroupID: typedProps.data.value,
+							meterOrGroup: typedProps.data.meterOrGroup!
+						})
+					);
+				}
 			}}
 			onClick={e => e.stopPropagation()}
 			style={{ overflow: 'hidden' }}
 			onMouseEnter={e => {
 				if (!isDisabled) {
 					const multiValueLabel = e.currentTarget.children[0];
+					// display a  reacto tooltip for options that have overflowing/cutoff labels.
 					if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
 						ref.current && ReactTooltip.show(ref.current);
 					}

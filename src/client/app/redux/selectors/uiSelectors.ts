@@ -362,15 +362,16 @@ export const selectUnitSelectData = createAppSelector(
  * Visibility is determined by which set the items are contained in.
  * @param compatibleItems - compatible items to make select options for
  * @param incompatibleItems - incompatible items to make select options for
- * @param dataById - current redux state, must be one of UnitsState, MetersState, or GroupsState
+ * @param entityDataById - current redux state, must be one of UnitsState, MetersState, or GroupsState
  * @returns Two Lists: Compatible, and Incompatible selectOptions for use as grouped React-Select options
  */
 export function getSelectOptionsByEntity(
 	compatibleItems: Set<number>,
-	incompatibleItems: Set<number>, dataById: MeterDataByID | GroupDataByID | UnitDataById
+	incompatibleItems: Set<number>,
+	entityDataById: MeterDataByID | GroupDataByID | UnitDataById
 ) {
 	//The final list of select options to be displayed
-	const compatibleItemOptions = Object.entries(dataById)
+	const compatibleItemOptions = Object.entries(entityDataById)
 		.filter(([id]) => compatibleItems.has(Number(id)))
 		.map(([id, entity]) => {
 			// Groups unit and meters have identifier, groups doesn't
@@ -389,7 +390,7 @@ export function getSelectOptionsByEntity(
 		});
 
 	//Loop over each itemId and create an activated select option
-	const incompatibleItemOptions = Object.entries(dataById)
+	const incompatibleItemOptions = Object.entries(entityDataById)
 		.filter(([id]) => incompatibleItems.has(Number(id)))
 		.map(([id, entity]) => {
 			const label = selectNameFromEntity(entity);
