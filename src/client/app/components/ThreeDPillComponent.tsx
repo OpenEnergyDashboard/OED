@@ -41,12 +41,12 @@ export default function ThreeDPillComponent() {
 	});
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
-	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(updateThreeDMeterOrGroupInfo(
-		{
+	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(
+		updateThreeDMeterOrGroupInfo({
 			meterOrGroupID: pillData.meterOrGroupID,
 			meterOrGroup: pillData.meterOrGroup
-		}
-	));
+		})
+	);
 
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {

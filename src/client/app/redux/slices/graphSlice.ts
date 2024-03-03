@@ -134,15 +134,24 @@ export const graphSlice = createSlice({
 		updateThreeDReadingInterval: (state, action: PayloadAction<ReadingInterval>) => {
 			state.current.threeD.readingInterval = action.payload;
 		},
-		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
-			state.current.threeD.meterOrGroupID = action.payload.meterOrGroupID;
-			state.current.threeD.meterOrGroup = action.payload.meterOrGroup;
-		},
-		updateThreeDMeterOrGroupID: (state, action: PayloadAction<number>) => {
-			state.current.threeD.meterOrGroupID = action.payload;
+		updateThreeDMeterOrGroupID: (state, action: PayloadAction<number | undefined>) => {
+			if (state.current.threeD.meterOrGroupID !== action.payload) {
+				state.current.threeD.meterOrGroupID = action.payload;
+			}
 		},
 		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
-			state.current.threeD.meterOrGroup = action.payload;
+			if (state.current.threeD.meterOrGroup !== action.payload) {
+				state.current.threeD.meterOrGroup = action.payload;
+			}
+		},
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
+			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
+			updateThreeDMeterOrGroupID(state, graphSlice.actions.updateThreeDMeterOrGroupID(action.payload.meterOrGroupID));
+			updateThreeDMeterOrGroup(state, graphSlice.actions.updateThreeDMeterOrGroup(action.payload.meterOrGroup));
+			if (!state.current.queryTimeInterval.getIsBounded()) {
+				// Set the query time interval to 6 moths back when not bounded for 3D
+				state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
+			}
 		},
 		updateSelectedMetersOrGroups: ({ current }, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
 			// This reducer handles the addition and subtraction values for both the meter and group select components.
