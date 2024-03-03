@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../types/redux/state';
 import { fetchMetersDetails, fetchMetersDetailsIfNeeded } from '../actions/meters';
 import { fetchGroupsDetailsIfNeeded } from '../actions/groups';
-import { ConversionArray } from '../types/conversionArray';
 import { fetchPreferencesIfNeeded } from '../actions/admin';
 import { fetchMapsDetails } from '../actions/map';
 import { fetchUnitsDetailsIfNeeded } from '../actions/units';
@@ -16,6 +15,7 @@ import { fetchConversionsDetailsIfNeeded } from '../actions/conversions';
 import { Dispatch } from 'types/redux/actions';
 import { Slide, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchCiksIfNeeded } from '../actions/ciks';
 
 /**
  * Initializes OED redux with needed details
@@ -33,7 +33,7 @@ export default function InitializationComponent() {
 		dispatch(fetchMapsDetails());
 		dispatch(fetchUnitsDetailsIfNeeded());
 		dispatch(fetchConversionsDetailsIfNeeded());
-		ConversionArray.fetchPik();
+		dispatch(fetchCiksIfNeeded());
 	}, []);
 
 	// Rerender the route component if the user state changes

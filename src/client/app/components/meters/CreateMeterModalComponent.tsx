@@ -19,7 +19,6 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { UnitData } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
-import { ConversionArray } from '../../types/conversionArray';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -122,6 +121,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 
 	// Dropdowns
 	const [dropdownsState, setDropdownsState] = useState(dropdownsStateDefaults);
+	const ciksState = useSelector((state: State) => state.ciks.ciks);
 
 	/* Create Meter Validation:
 		Name cannot be blank
@@ -332,9 +332,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalCompone
 			compatibleUnits: new Set(compatibleUnits),
 			incompatibleUnits: new Set(incompatibleUnits)
 		});
-		// If either unit or the status of pik changes then this needs to be done.
-		// pik is needed since the compatible units is not correct until pik is available.
-	}, [state.unitId, state.defaultGraphicUnit, ConversionArray.pikAvailable()]);
+		// cik is needed since the compatible units is not correct until cik is available.
+	}, [state.unitId, state.defaultGraphicUnit, ciksState]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

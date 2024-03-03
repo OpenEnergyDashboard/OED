@@ -24,9 +24,9 @@ mocha.describe('Conversions', () => {
 	mocha.beforeEach(async () => {
 		conn = testDB.getConnection();
 		const unitA = new Unit(undefined, 'Unit A', 'Unit A', Unit.unitRepresentType.QUANTITY, 1000,
-			Unit.unitType.UNIT, 1, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
+			Unit.unitType.UNIT, 'Suffix A', Unit.displayableType.ADMIN, true, 'Note A');
 		const unitB = new Unit(undefined, 'Unit B', 'Unit B', Unit.unitRepresentType.QUANTITY, 2000,
-			Unit.unitType.METER, 1, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
+			Unit.unitType.METER, 'Suffix B', Unit.displayableType.ALL, true, 'Note B');
 		await unitA.insert(conn);
 		await unitB.insert(conn);
 	});

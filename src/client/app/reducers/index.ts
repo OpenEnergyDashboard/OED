@@ -19,6 +19,7 @@ import unsavedWarning from './unsavedWarning';
 import units from './units';
 import conversions from './conversions';
 import options from './options';
+import ciks from './ciks';
 
 
 export default combineReducers({
@@ -39,5 +40,6 @@ export default combineReducers({
 	unsavedWarning,
 	units,
 	conversions,
-	options
+	options,
+	ciks
 });

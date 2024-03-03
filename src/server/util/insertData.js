@@ -36,7 +36,7 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 				if (dbUnit === null) {
 					// The unit does not exist so add it.
 					await new Unit(undefined, unitData.name, unitData.identifier, unitData.unitRepresent, unitData.secInRate,
-						unitData.typeOfUnit, null, unitData.suffix, unitData.displayable, unitData.preferredDisplay, unitData.note).insert(conn);
+						unitData.typeOfUnit, unitData.suffix, unitData.displayable, unitData.preferredDisplay, unitData.note).insert(conn);
 				} else if (update) {
 					// Asked to update so will. Does not bother to check if no changes.
 					dbUnit.name = unitData.name;

@@ -15,7 +15,7 @@ const router = express.Router();
 function formatUnitForResponse(item) {
 	return {
 		id: item.id, name: item.name, identifier: item.identifier, unitRepresent: item.unitRepresent,
-		secInRate: item.secInRate, typeOfUnit: item.typeOfUnit, unitIndex: item.unitIndex, suffix: item.suffix,
+		secInRate: item.secInRate, typeOfUnit: item.typeOfUnit, suffix: item.suffix,
 		displayable: item.displayable, preferredDisplay: item.preferredDisplay, note: item.note
 	};
 }
@@ -178,7 +178,6 @@ router.post('/addUnit', async (req, res) => {
 					req.body.unitRepresent,
 					req.body.secInRate,
 					req.body.typeOfUnit,
-					undefined, // initIndex
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,
