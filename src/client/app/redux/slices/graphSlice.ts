@@ -153,7 +153,8 @@ export const graphSlice = createSlice({
 				state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
 			}
 		},
-		updateSelectedMetersOrGroups: ({ current }, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
+			const { current } = state;
 			// This reducer handles the addition and subtraction values for both the meter and group select components.
 			// The 'MeterOrGroup' type is heavily utilized in the reducer and other parts of the code.
 			// Note that this option is binary, if it's not a meter, then it's a group.
@@ -162,8 +163,10 @@ export const graphSlice = createSlice({
 			const { newMetersOrGroups, meta } = action.payload;
 			const cleared = meta.action === 'clear';
 			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue !== undefined;
-			const valueAdded = meta.action === 'select-option' && meta.option;
+			const valueAdded = meta.action === 'select-option' && meta.option !== undefined;
 			let isAMeter = true;
+			console.log('UpSelMetOrGroupies.');
+			console.log(valueRemoved, meta, valueRemoved && meta.option);
 
 			if (cleared) {
 				const clearedMeterOrGroups = meta.removedValues;
@@ -209,12 +212,18 @@ export const graphSlice = createSlice({
 					current.threeD.meterOrGroup = undefined;
 
 				}
-			} else if (valueAdded && meta.option && current.chartToRender === ChartTypes.threeD) {
+			} else if (valueAdded && current.chartToRender === ChartTypes.threeD) {
 				// When a meter or group is selected/added, make it the currently active in 3D current.
 				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
-				current.threeD.meterOrGroupID = meta.option.value;
-				current.threeD.meterOrGroup = meta.option.meterOrGroup;
-			} else if (valueRemoved && meta.option) {
+				// re-use existing reducers, action creators
+				graphSlice.caseReducers.updateThreeDMeterOrGroupInfo(state,
+					graphSlice.actions.updateThreeDMeterOrGroupInfo({
+						meterOrGroupID: meta.option!.value,
+						meterOrGroup: meta.option!.meterOrGroup!
+					})
+				);
+			} else if (valueRemoved) {
+				console.log('Should be removing the current threedstate');
 				const idMatches = meta.removedValue.value === current.threeD.meterOrGroupID;
 				const typeMatches = meta.removedValue.meterOrGroup === current.threeD.meterOrGroup;
 				if (idMatches && typeMatches) {

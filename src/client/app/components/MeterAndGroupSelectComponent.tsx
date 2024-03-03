@@ -93,21 +93,20 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	// TODO Verify behavior, and set proper message/ translate
 	return (
 		< div ref={ref}
-			key={`${typedProps.data.value}:${typedProps.data.label}`}
+			key={`${typedProps.data.value}:${typedProps.data.label}:${typedProps.data.isDisabled}`}
 			data-for={isDisabled ? 'home' : 'select-tooltips'}
 			data-tip={isDisabled ? 'help.home.area.normalize' : `${props.data.label}`}
-			onMouseDown={e => e.stopPropagation()}
-			onClick={e => {
-				ReactTooltip.rebuild();
+			onMouseDown={e => {
 				e.stopPropagation();
+				ReactTooltip.rebuild();
 				ref.current && ReactTooltip.show(ref.current);
 			}}
+			onClick={e => e.stopPropagation()}
 			style={{ overflow: 'hidden' }}
 			onMouseEnter={e => {
 				if (!isDisabled) {
 					const multiValueLabel = e.currentTarget.children[0];
 					if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
-						ReactTooltip.rebuild();
 						ref.current && ReactTooltip.show(ref.current);
 					}
 				}
