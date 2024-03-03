@@ -9,7 +9,7 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
-import { readingsApi } from '../redux/api/readingsApi';
+import { readingsApi, stableEmptyBarReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/selectors/barChartSelectors';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
@@ -17,11 +17,9 @@ import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSe
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
-import { BarReadings } from '../types/readings';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 
-const stableEmptyData: BarReadings = {};
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access
@@ -37,7 +35,7 @@ export default function BarChartComponent() {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
 			...rest,
-			data: selectPlotlyBarDataFromResult(data ?? stableEmptyData, barMeterDeps)
+			data: selectPlotlyBarDataFromResult(data ?? stableEmptyBarReadings, barMeterDeps)
 		})
 	});
 
@@ -45,7 +43,7 @@ export default function BarChartComponent() {
 		skip: groupShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
 			...rest,
-			data: selectPlotlyBarDataFromResult(data ?? stableEmptyData, barGroupDeps)
+			data: selectPlotlyBarDataFromResult(data ?? stableEmptyBarReadings, barGroupDeps)
 		})
 	});
 

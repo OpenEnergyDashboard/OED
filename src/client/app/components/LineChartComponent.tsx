@@ -9,19 +9,17 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
-import { readingsApi } from '../redux/api/readingsApi';
+import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import { LineReadings } from '../types/readings';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 
-// Stable reference for when there is not data. Avoids rerenders.
-const stableEmptyReadings: LineReadings = {};
+
 /**
  * @returns plotlyLine graphic
  */
@@ -42,16 +40,16 @@ export default function LineChartComponent() {
 				...rest,
 				// use query data as selector parameter, pass in data dependencies.
 				// Data may still be in transit, so pass a stable empty reference if needed for memoization.
-				data: selectPlotlyMeterData(data ?? stableEmptyReadings, meterDeps)
+				data: selectPlotlyMeterData(data ?? stableEmptyLineReadings, meterDeps)
 			})
 		});
 
-	const { data: groupPlotlyData = stableEmptyReadings, isFetching: groupIsFetching } = readingsApi.useLineQuery(groupArgs,
+	const { data: groupPlotlyData = stableEmptyLineReadings, isFetching: groupIsFetching } = readingsApi.useLineQuery(groupArgs,
 		{
 			skip: groupShouldSkip,
 			selectFromResult: ({ data, ...rest }) => ({
 				...rest,
-				data: selectPlotlyGroupData(data ?? stableEmptyReadings, groupDeps)
+				data: selectPlotlyGroupData(data ?? stableEmptyLineReadings, groupDeps)
 			})
 		});
 

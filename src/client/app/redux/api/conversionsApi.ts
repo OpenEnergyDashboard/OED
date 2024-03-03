@@ -105,3 +105,5 @@ export const selectCik = createSelector(
 		return cik;
 	}
 );
+
+export const stableEmptyConversions: ConversionData[] = [];

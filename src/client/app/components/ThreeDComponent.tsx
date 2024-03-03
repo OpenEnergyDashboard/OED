@@ -33,7 +33,7 @@ import Locales from '../types/locales';
  */
 export default function ThreeDComponent() {
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
-	const { data, isLoading: isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);

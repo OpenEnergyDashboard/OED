@@ -4,7 +4,7 @@
 
 import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { RootState } from 'store';
-import { UnitData } from '../../types/redux/units';
+import { UnitData, UnitDataById } from '../../types/redux/units';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
 export const unitsAdapter = createEntityAdapter<UnitData>({
@@ -70,3 +70,4 @@ export const {
 	selectEntities: selectUnitDataById
 } = unitsAdapter.getSelectors((state: RootState) => selectUnitDataResult(state).data ?? unitsInitialState);
 
+export const stableEmptyUnitDataById: UnitDataById = {};

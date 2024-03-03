@@ -6,16 +6,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../SpinnerComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { conversionsApi } from '../../redux/api/conversionsApi';
-import { unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
+import { conversionsApi, stableEmptyConversions } from '../../redux/api/conversionsApi';
+import { stableEmptyUnitDataById, unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
 import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
-import { UnitDataById } from 'types/redux/units';
 
-const stableEmptyConversions: ConversionData[] = [];
-const stableEmptyUnitDataById: UnitDataById = {};
 /**
  * Defines the conversions page card view
  * @returns Conversion page element

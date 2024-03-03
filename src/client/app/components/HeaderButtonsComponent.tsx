@@ -41,7 +41,6 @@ export default function HeaderButtonsComponent() {
 	const csvPermission = useAppSelector(state => selectHasRolePermissions(state, UserRole.CSV));
 	// whether to collapse options when on graphs page
 	const optionsVisibility = useAppSelector(selectOptionsVisibility);
-	console.log('loggedInAsAdmin', loggedInAsAdmin, 'loggedIn', loggedIn, 'csvPermission', csvPermission);
 	// This is the state model for rendering this page.
 	const defaultState = {
 		// All these values should update before user interacts with them so hide everything until the useEffects
@@ -147,7 +146,6 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
-	console.log(state);
 	return (
 		<div>
 			<Navbar expand>

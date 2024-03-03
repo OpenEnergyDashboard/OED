@@ -149,3 +149,12 @@ export const readingsApi = baseApi.injectEndpoints({
 
 	})
 });
+
+// Stable reference for when there is not data. Avoids rerenders.
+export const stableEmptyLineReadings: LineReadings = {};
+export const stableEmptyBarReadings: BarReadings = {};
+export const stableEmptyThreeDReadings: ThreeDReading = {
+	xData: [],
+	yData: [],
+	zData: []
+};

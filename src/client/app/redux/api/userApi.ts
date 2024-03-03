@@ -42,3 +42,6 @@ export const userApi = baseApi.injectEndpoints({
 		})
 	})
 });
+
+// Provide a stable empty reference for when data is in flight
+export const stableEmptyUsers: User[] = [];

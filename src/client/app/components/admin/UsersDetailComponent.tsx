@@ -7,7 +7,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input, Table } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { userApi } from '../../redux/api/userApi';
+import { stableEmptyUsers, userApi } from '../../redux/api/userApi';
 import { User, UserRole } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
@@ -15,8 +15,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 
-// Provide a stable empty reference for when data is in flight
-const stableEmptyUsers: User[] = [];
+
 /**
  * Component which shows user details
  * @returns User Detail element
