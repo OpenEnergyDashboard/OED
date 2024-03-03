@@ -4,14 +4,15 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as moment from 'moment';
-import { preferencesApi } from '../api/preferencesApi';
+import { createAppSelector } from '../../redux/selectors/selectors';
 import { PreferenceRequestItem } from '../../types/items';
 import { AdminState } from '../../types/redux/admin';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { durationFormat } from '../../utils/durationFormat';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { createAppSelector } from '../../redux/selectors/selectors';
+import { preferencesApi } from '../api/preferencesApi';
+import { selectOEDVersion } from '../../redux/api/versionApi';
 
 export const defaultAdminState: AdminState = {
 	displayTitle: '',
@@ -196,4 +197,9 @@ export const selectAdminPreferences = createAppSelector(
 		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
 		defaultHelpUrl: adminState.defaultHelpUrl
 	})
+);
+
+export const selectHelpUrl = createAppSelector(
+	[selectBaseHelpUrl, selectOEDVersion],
+	(baseUrl, version) => baseUrl + version
 );

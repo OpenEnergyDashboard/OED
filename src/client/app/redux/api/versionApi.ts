@@ -16,7 +16,8 @@ export const versionApi = baseApi.injectEndpoints({
 export const selectVersion = versionApi.endpoints.getVersion.select();
 export const selectOEDVersion = createSelector(
 	selectVersion,
-	({ data: version }) => {
-		return version ?? '';
+	({ data: version = 'v1.0.0' }) => {
+		// default to v1.0.0 when data in flight, or error
+		return version;
 	}
 );

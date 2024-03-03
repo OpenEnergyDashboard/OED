@@ -164,8 +164,7 @@ export const graphSlice = createSlice({
 				// if a meter clear meters, else clear groups
 				isAMeter ? current.selectedMeters = [] : current.selectedGroups = [];
 
-			}
-			if (valueRemoved) {
+			} else if (valueRemoved) {
 				isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
 				// An entry was deleted.
 				// Update either selected meters or groups
@@ -173,9 +172,7 @@ export const graphSlice = createSlice({
 				isAMeter
 					? current.selectedMeters = newMetersOrGroups
 					: current.selectedGroups = newMetersOrGroups;
-			}
-
-			if (valueAdded) {
+			} else if (valueAdded) {
 				isAMeter = meta.option?.meterOrGroup === MeterOrGroup.meters;
 				const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
 				// An entry was added,

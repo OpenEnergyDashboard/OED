@@ -4,11 +4,11 @@
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
-import { authApi } from '../api/authApi';
-import { userApi } from '../api/userApi';
 import { UserRole } from '../../types/items';
 import { CurrentUserState } from '../../types/redux/currentUser';
 import { setToken } from '../../utils/token';
+import { authApi } from '../api/authApi';
+import { userApi } from '../api/userApi';
 
 /*
 * Defines store interactions when version related actions are dispatched to the store.
@@ -46,27 +46,32 @@ export const currentUserSlice = createSlice({
 				});
 	},
 	selectors: {
-		selectCurrentUser: state => state,
+		selectCurrentUserState: state => state,
+		selectIsLoggedIn: state => Boolean(state.profile),
+		selectCurrentUserProfile: state => state.profile,
 		selectCurrentUserRole: state => state.profile?.role,
 		// Should resolve to a boolean, Typescript doesn't agree so type assertion 'as boolean'
 		selectIsAdmin: state => Boolean(state.token && state.profile?.role === UserRole.ADMIN),
-		selectHasRolePermissions: (state, role: UserRole): boolean => {
+		selectHasRolePermissions: (state, desiredRole: UserRole): boolean => {
 			const isAdmin = currentUserSlice.getSelectors().selectIsAdmin(state);
 			const userRole = currentUserSlice.getSelectors().selectCurrentUserRole(state);
-			return Boolean(isAdmin || (userRole && userRole === role));
+			return Boolean(isAdmin || (userRole && userRole === desiredRole));
 
 		}
 	}
 });
 
 export const {
-	selectCurrentUser,
+	selectCurrentUserState,
 	selectCurrentUserRole,
 	selectIsAdmin,
-	selectHasRolePermissions
+	selectHasRolePermissions,
+	selectCurrentUserProfile,
+	selectIsLoggedIn
 } = currentUserSlice.selectors;
 
 export const {
 	setUserToken,
 	clearCurrentUser
 } = currentUserSlice.actions;
+

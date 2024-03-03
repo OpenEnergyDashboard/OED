@@ -9,13 +9,14 @@ import { useAppSelector } from '../redux/reduxHooks';
 import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
+import { selectDisplayTitle } from '../redux/slices/adminSlice';
 
 /**
  * React component that controls the header strip at the top of all pages
  * @returns header element
  */
 export default function HeaderComponent() {
-	const siteTitle = useAppSelector(state => state.admin.displayTitle);
+	const siteTitle = useAppSelector(selectDisplayTitle);
 	const showOptions = useAppSelector(selectOptionsVisibility);
 	const { pathname } = useLocation();
 

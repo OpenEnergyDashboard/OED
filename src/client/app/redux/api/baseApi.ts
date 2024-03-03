@@ -38,6 +38,4 @@ export const baseApi = createApi({
 	],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({})
-	// Defaults to 60 seconds or 1 minute
-	// keepUnusedDataFor: 60
 });

@@ -39,24 +39,6 @@ export default function ReadingsPerDaySelect() {
 
 	}
 
-	// Return normal interval
-	// return readingInterval;
-
-	// Iterate over readingInterval enum to create select option
-	const options = Object.values(ReadingInterval)
-		// Filter strings as to only get integer values from typescript's reverse mapping of enums
-		.filter(value => !isNaN(Number(value)) && value !== ReadingInterval.Incompatible)
-		.map(value => {
-			// Length of interval readings in hours
-			const intervalLength = Number(value);
-			return {
-				// readingInterval Enum inversely corresponds to the hour interval for readings.
-				// (24 hours a day) / intervalLength, e.g, 1 hour intervals give 24 readings per day
-				label: String((24 / intervalLength)),
-				value: intervalLength
-			} as ReadingsPerDayOption;
-		});
-
 	// Use the selectedOption enum value to update threeD State
 	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingInterval(selectedOption.value));
 
@@ -95,3 +77,18 @@ interface ReadingsPerDayOption {
 	label: string;
 	value: ReadingInterval;
 }
+
+// Iterate over readingInterval enum to create select option
+const options = Object.values(ReadingInterval)
+	// Filter strings as to only get integer values from typescript's reverse mapping of enums
+	.filter(value => !isNaN(Number(value)) && value !== ReadingInterval.Incompatible)
+	.map(value => {
+		// Length of interval readings in hours
+		const intervalLength = Number(value);
+		return {
+			// readingInterval Enum inversely corresponds to the hour interval for readings.
+			// (24 hours a day) / intervalLength, e.g, 1 hour intervals give 24 readings per day
+			label: String((24 / intervalLength)),
+			value: intervalLength
+		} as ReadingsPerDayOption;
+	});

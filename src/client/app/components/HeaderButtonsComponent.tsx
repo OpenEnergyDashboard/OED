@@ -8,18 +8,17 @@ import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
+import { clearGraphHistory } from '../redux/actions/extraActions';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { selectHelpUrl } from '../redux/slices/adminSlice';
+import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
+import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import { hasPermissions, isRoleAdmin } from '../utils/hasPermissions';
 import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { selectCurrentUser } from '../redux/slices/currentUserSlice';
-import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
-import { clearGraphHistory } from '../redux/actions/extraActions';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -33,32 +32,26 @@ export default function HeaderButtonsComponent() {
 
 	// OED version is needed for help redirect
 	const version = useAppSelector(selectOEDVersion);
-	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
-	// Help URL location
-	const helpUrl = baseHelpUrl + version;
+	const helpUrl = useAppSelector(selectHelpUrl);
 	// options help
 	const optionsHelp = helpUrl + '/optionsMenu.html';
 
+	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
+	const loggedIn = useAppSelector(selectIsLoggedIn);
+	const csvPermission = useAppSelector(state => selectHasRolePermissions(state, UserRole.CSV));
+	// whether to collapse options when on graphs page
+	const optionsVisibility = useAppSelector(selectOptionsVisibility);
+	console.log('loggedInAsAdmin', loggedInAsAdmin, 'loggedIn', loggedIn, 'csvPermission', csvPermission);
 	// This is the state model for rendering this page.
 	const defaultState = {
 		// All these values should update before user interacts with them so hide everything until the useEffects
 		// set to what is desired.
 		// The styles control if an item is seen at all.
-		adminViewableLinkStyle: {
-			display: 'none'
-		} as React.CSSProperties,
-		csvViewableLinkStyle: {
-			display: 'none'
-		} as React.CSSProperties,
-		loginLinkStyle: {
-			display: 'none'
-		} as React.CSSProperties,
-		logoutLinkStyle: {
-			display: 'none'
-		} as React.CSSProperties,
-		showOptionsStyle: {
-			display: 'none'
-		} as React.CSSProperties,
+		adminViewableLinkStyle: { display: 'none' } as React.CSSProperties,
+		csvViewableLinkStyle: { display: 'none' } as React.CSSProperties,
+		loginLinkStyle: { display: 'none' } as React.CSSProperties,
+		logoutLinkStyle: { display: 'none' } as React.CSSProperties,
+		showOptionsStyle: { display: 'none' } as React.CSSProperties,
 		// The should ones tell if see but not selectable.
 		shouldHomeButtonDisabled: true,
 		shouldAdminButtonDisabled: true,
@@ -76,14 +69,11 @@ export default function HeaderButtonsComponent() {
 
 	// Local state for rendering.
 	const [state, setState] = useState(defaultState);
-	// Information on the current user.
-	const { profile: currentUser } = useAppSelector(selectCurrentUser);
 	// Tracks unsaved changes.
 	// TODO Re-implement AFTER RTK Migration
-	// const unsavedChangesState = useAppSelector(state => state.unsavedWarning.hasUnsavedChanges);
+	// hard-coded for the time being. Rework w/admin pages
 	const unsavedChangesState = false;
-	// whether to collapse options when on graphs page
-	const optionsVisibility = useAppSelector(selectOptionsVisibility);
+
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {
@@ -110,43 +100,23 @@ export default function HeaderButtonsComponent() {
 
 	// This updates which items are hidden based on the login status.
 	useEffect(() => {
-		// True if you are an admin.
-		let loggedInAsAdmin: boolean;
-		// What role you have or null if not logged in.
 		// We can get the admin state from the role but separate the two.
-		let role: UserRole | null;
-		let currentMenuTitle: string;
-		if (currentUser !== null) {
-			// There is a current user so gets its information
-			loggedInAsAdmin = isRoleAdmin(currentUser.role);
-			role = currentUser.role;
-			// The menu title has logout.
-			currentMenuTitle = translate('page.choice.logout');
-		} else {
-			// You are not logged in.
-			loggedInAsAdmin = false;
-			role = null;
-			// The menu title has login.
-			currentMenuTitle = translate('page.choice.login');
-		}
-		// If you have a role then check if it is CSV.
-		const renderCSVButton = Boolean(role && hasPermissions(role, UserRole.CSV));
-		// If no role then not logged in so show link to log in.
-		const renderLoginButton = role === null;
-		// If an admin then show these items, otherwise hide them.
+		const currentMenuTitle = loggedIn ? translate('page.choice.logout') : translate('page.choice.login');
 		const currentAdminViewableLinkStyle = {
+			// If an admin then show these items, otherwise hide them.
+			// If no role then not logged in so show link to log in.
 			display: loggedInAsAdmin ? 'block' : 'none'
 		};
 		// Similar but need to have CSV permissions.
 		const currentCsvViewableLinkStyle: React.CSSProperties = {
-			display: renderCSVButton ? 'block' : 'none'
+			display: csvPermission ? 'block' : 'none'
 		};
 		// Show login if not and logout if you are.
 		const currentLoginLinkStyle = {
-			display: renderLoginButton ? 'block' : 'none'
+			display: !loggedIn ? 'block' : 'none'
 		};
 		const currentLogoutLinkStyle = {
-			display: !renderLoginButton ? 'block' : 'none'
+			display: loggedIn ? 'block' : 'none'
 		};
 		const currentShowOptionsStyle = {
 			display: pathname === '/' ? 'block' : 'none'
@@ -165,7 +135,7 @@ export default function HeaderButtonsComponent() {
 			pageChoicesHelp: currentPageChoicesHelp,
 			showOptionsStyle: currentShowOptionsStyle
 		}));
-	}, [pathname, currentUser, helpUrl]);
+	}, [pathname, helpUrl, loggedIn, csvPermission, loggedInAsAdmin]);
 
 	// Handle actions on logout.
 	const handleLogOut = () => {
@@ -177,7 +147,7 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
-
+	console.log(state);
 	return (
 		<div>
 			<Navbar expand>
