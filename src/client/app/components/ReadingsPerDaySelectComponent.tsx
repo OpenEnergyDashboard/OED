@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
 import * as React from 'react';
 import Select from 'react-select';
-import { selectGraphState, selectThreeDReadingInterval, updateThreeDReadingInterval } from '../redux/slices/graphSlice';
-import { readingsApi } from '../redux/api/readingsApi';
+import { readingsApi, stableEmptyThreeDReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
-import { ChartTypes, ReadingInterval } from '../types/redux/graph';
+import { selectReadingsPerDaySelectData } from '../redux/selectors/threeDSelectors';
+import { selectThreeDReadingInterval, updateThreeDReadingInterval } from '../redux/slices/graphSlice';
+import { ReadingInterval } from '../types/redux/graph';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -19,58 +19,32 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function ReadingsPerDaySelect() {
 	const dispatch = useAppDispatch();
-	const graphState = useAppSelector(selectGraphState);
 	const readingInterval = useAppSelector(selectThreeDReadingInterval);
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	const { currentValue, isDisabled, isFetching } = readingsApi.endpoints.threeD.useQuery(args, {
+		skip: shouldSkipQuery,
+		selectFromResult: ({ currentData, ...result }) => ({
+			...result,
+			...selectReadingsPerDaySelectData(currentData ?? stableEmptyThreeDReadings, readingInterval)
+		})
+	});
 
-	let actualReadingInterval = ReadingInterval.Hourly;
-	if (data && data.zData.length) {
-		// Special Case:  When no compatible data available, data returned is from api is -999
-		if (data.zData[0][0] && data.zData[0][0] < 0) {
-			actualReadingInterval = ReadingInterval.Incompatible;
-		} else {
-			const startTS = moment.utc(data.xData[0].startTimestamp);
-			const endTS = moment.utc(data.xData[0].endTimestamp);
-			// This should be the number of hours between readings.
-			actualReadingInterval = endTS.diff(startTS) / 3600000;
-		}
-
-	}
-
-	// Use the selectedOption enum value to update threeD State
-	const onSelectChange = (selectedOption: ReadingsPerDayOption) => dispatch(updateThreeDReadingInterval(selectedOption.value));
-
-	// Default Display Value && Disabled Status
-	let displayValue = `${24 / readingInterval}`;
-	let isDisabled = false;
-
-	// Modify Display Value if needed.
-	if (actualReadingInterval === ReadingInterval.Incompatible) {
-		isDisabled = true;
-	} else if (actualReadingInterval !== readingInterval) {
-		displayValue += ` -> ${24 / actualReadingInterval}`;
-	}
-
-	const value = {
-		label: displayValue,
-		value: readingInterval
-	};
-
-	if (graphState.chartToRender === ChartTypes.threeD) {
-		return (
-			<div>
-				<p style={{ fontWeight: 'bold', margin: 0 }}>
-					{`${translate('readings.per.day')}:`}
-					<TooltipMarkerComponent page='home' helpTextId={'help.home.readings.per.day'} />
-				</p>
-				<Select value={value} options={options} isLoading={isFetching} isDisabled={isDisabled} onChange={onSelectChange} />
-			</div>
-		);
-	} else {
-		return null;
-	}
+	return (
+		<div>
+			<p style={{ fontWeight: 'bold', margin: 0 }}>
+				{`${translate('readings.per.day')}:`}
+				<TooltipMarkerComponent page='home' helpTextId={'help.home.readings.per.day'} />
+			</p>
+			<Select
+				value={currentValue}
+				options={options}
+				isLoading={isFetching}
+				isDisabled={isDisabled}
+				onChange={e => dispatch(updateThreeDReadingInterval(e!.value))}
+			/>
+		</div>
+	);
 }
 
 interface ReadingsPerDayOption {
@@ -92,3 +66,4 @@ const options = Object.values(ReadingInterval)
 			value: intervalLength
 		} as ReadingsPerDayOption;
 	});
+

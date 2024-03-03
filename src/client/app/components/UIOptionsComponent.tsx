@@ -18,7 +18,7 @@ import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
-import ThreeDSelectComponent from './ReadingsPerDaySelectComponent';
+import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 
 /**
  * @returns the UI Control panel
@@ -65,7 +65,7 @@ export default function UIOptionsComponent() {
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
 			<GraphicRateMenuComponent />
-			<ThreeDSelectComponent />
+			{chartToRender === ChartTypes.threeD && <ReadingsPerDaySelectComponent />}
 			<DateRangeComponent />
 			<AreaUnitSelectComponent />
 			{ /* Controls error bar, specifically for the line chart. */
