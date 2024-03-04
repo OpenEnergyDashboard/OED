@@ -116,7 +116,7 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 			onMouseEnter={e => {
 				if (!isDisabled) {
 					const multiValueLabel = e.currentTarget.children[0];
-					// display a  reacto tooltip for options that have overflowing/cutoff labels.
+					// display a react tooltip for options that have overflowing/cutoff labels.
 					if (multiValueLabel.scrollWidth > e.currentTarget.clientWidth) {
 						ref.current && ReactTooltip.show(ref.current);
 					}

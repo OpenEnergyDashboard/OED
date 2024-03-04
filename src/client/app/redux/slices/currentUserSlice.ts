@@ -74,4 +74,3 @@ export const {
 	setUserToken,
 	clearCurrentUser
 } = currentUserSlice.actions;
-

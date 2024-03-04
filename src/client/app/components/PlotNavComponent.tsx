@@ -23,7 +23,6 @@ export default function PlotNavComponent() {
 		<div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
 			<HistoryComponent />
 			<RefreshGraphComponent />
-
 		</div >
 	);
 }
