@@ -18,6 +18,7 @@ import LogsApi from './LogsApi';
 import UnitsApi from './unitsApi';
 import ConversionsApi from './ConversionsApi';
 import ConversionArrayApi from './ConversionArrayApi';
+import CiksApi from './CiksApi';
 
 const apiBackend = new ApiBackend();
 
@@ -35,6 +36,7 @@ const versionApi = new VersionApi(apiBackend);
 const conversionArrayApi = new ConversionArrayApi(apiBackend);
 const unitsApi = new UnitsApi(apiBackend);
 const conversionsApi = new ConversionsApi(apiBackend);
+const ciksApi = new CiksApi(apiBackend);
 
 
 export {
@@ -50,5 +52,6 @@ export {
 	uploadCSVApi,
 	conversionArrayApi,
 	unitsApi,
-	conversionsApi
+	conversionsApi,
+	ciksApi
 };

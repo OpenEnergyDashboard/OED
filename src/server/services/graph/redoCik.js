@@ -25,14 +25,6 @@ async function redoCik(conn) {
 }
 
 /**
- * Uses the cik table to create a Pik array and return it.
- */
-async function createPik(conn) {
-	pik = await Cik.getPik(conn);
-	return pik;
-}
-
-/**
  * Needed to call from npm run. Give new name so hopefully won't use in regular code.
 */
 async function updateCikAndViews() {
@@ -44,6 +36,5 @@ async function updateCikAndViews() {
 
 module.exports = {
 	redoCik,
-	createPik,
 	updateCikAndViews
 };

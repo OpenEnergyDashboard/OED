@@ -4,9 +4,9 @@
 
 -- create cik table
 CREATE TABLE IF NOT EXISTS cik (
-	row_index INTEGER,
-	column_index INTEGER,
+	source_id INTEGER REFERENCES units(id),
+	destination_id INTEGER REFERENCES units(id),
 	slope FLOAT,
 	intercept FLOAT,
-	PRIMARY KEY (row_index, column_index)
+	PRIMARY KEY (source_id, destination_id)
 );

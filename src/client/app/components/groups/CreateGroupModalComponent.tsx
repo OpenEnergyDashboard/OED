@@ -25,7 +25,6 @@ import { UnitData } from '../../types/redux/units';
 import {
 	unitsCompatibleWithMeters, getMeterMenuOptionsForGroup, getGroupMenuOptionsForGroup, metersInChangedGroup
 } from '../../utils/determineCompatibleUnits';
-import { ConversionArray } from '../../types/conversionArray';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { notifyUser, getGPSString } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -50,6 +49,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 	const groupsState = useSelector((state: State) => state.groups.byGroupID);
 	// Unit state
 	const unitsState = useSelector((state: State) => state.units.units);
+	// Cik state
+	const ciksState = useSelector((state: State) => state.ciks.ciks);
 
 	// Check for admin status
 	const currentUser = useSelector((state: State) => state.currentUser.profile);
@@ -247,10 +248,10 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 				groupSelectOptions: possibleGroups
 			});
 		}
-		// pik is needed since the compatible units is not correct until pik is available.
 		// metersState normally does not change but can so include.
 		// groupState can change if another group is created/edited and this can change ones displayed in menus.
-	}, [ConversionArray.pikAvailable(), metersState, groupsState, state.defaultGraphicUnit, state.deepMeters]);
+		// make sure ciksState is available.
+	}, [metersState, groupsState, state.defaultGraphicUnit, state.deepMeters, ciksState]);
 
 	// Update compatible default graphic units set.
 	useEffect(() => {
@@ -283,8 +284,8 @@ export default function CreateGroupModalComponent(props: CreateGroupModalCompone
 		}
 		// If any of these change then it needs to be updated.
 		// metersState normally does not change but can so include.
-		// pik is needed since the compatible units is not correct until pik is available.
-	}, [ConversionArray.pikAvailable(), metersState, state.deepMeters]);
+		// make sure ciksState is available.
+	}, [metersState, state.deepMeters, ciksState]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

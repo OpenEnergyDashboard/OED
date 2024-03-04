@@ -62,11 +62,11 @@ mocha.describe('Meters', () => {
 	let unitA, unitB;
 	mocha.beforeEach(async () => {
 		unitA = new Unit(undefined, 'Unit A', 'Unit A Id', Unit.unitRepresentType.QUANTITY, 1000,
-			Unit.unitType.UNIT, 1, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
+			Unit.unitType.UNIT, 'Unit A Suffix', Unit.displayableType.ALL, true, 'Unit A Note');
 		unitB = new Unit(undefined, 'Unit B', 'Unit B Id', Unit.unitRepresentType.QUANTITY, 2000,
-			Unit.unitType.UNIT, 2, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
+			Unit.unitType.UNIT, 'Unit B Suffix', Unit.displayableType.ALL, true, 'Unit B Note');
 		const unitC = new Unit(undefined, 'Unit C', 'Unit C Id', Unit.unitRepresentType.QUANTITY, 3000,
-			Unit.unitType.UNIT, 3, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
+			Unit.unitType.UNIT, 'Unit C Suffix', Unit.displayableType.ALL, true, 'Unit C Note');
 		await Promise.all([unitA, unitB, unitC].map(unit => unit.insert(conn)));
 	});
 
@@ -155,19 +155,6 @@ mocha.describe('Meters', () => {
 		const visibleMeters = await Meter.getDisplayable(conn);
 		expect(visibleMeters).to.have.lengthOf(1);
 		expectMetersToBeEquivalent(visibleMeter, visibleMeters[0]);
-	});
-
-	mocha.it('can get unit index', async () => {
-		const conn = testDB.getConnection();
-		const visibleMeter = new Meter(undefined, 'VisibleMeter', null, true, true, Meter.type.MAMAC, null, gps,
-			'Identified 1', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, undefined);
-		await visibleMeter.insert(conn);
-
-		const actualUnitIndex = await Meter.getUnitIndex(1, conn);
-		const expectedUnitIndex = unitA.unitIndex;
-		expect(actualUnitIndex).to.be.equal(expectedUnitIndex);
 	});
 
 	mocha.it('can get all meter where unitId is not null', async () => {
