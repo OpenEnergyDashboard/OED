@@ -165,8 +165,6 @@ export const graphSlice = createSlice({
 			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue !== undefined;
 			const valueAdded = meta.action === 'select-option' && meta.option !== undefined;
 			let isAMeter = true;
-			console.log('UpSelMetOrGroupies.');
-			console.log(valueRemoved, meta, valueRemoved && meta.option);
 
 			if (cleared) {
 				const clearedMeterOrGroups = meta.removedValues;
@@ -223,7 +221,6 @@ export const graphSlice = createSlice({
 					})
 				);
 			} else if (valueRemoved) {
-				console.log('Should be removing the current threedstate');
 				const idMatches = meta.removedValue.value === current.threeD.meterOrGroupID;
 				const typeMatches = meta.removedValue.meterOrGroup === current.threeD.meterOrGroup;
 				if (idMatches && typeMatches) {
