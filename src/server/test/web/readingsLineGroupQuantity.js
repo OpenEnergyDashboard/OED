@@ -12,7 +12,7 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
-    // createTimeString,
+    createTimeString,
     getUnitId,
     ETERNITY,
     // METER_ID,
@@ -45,7 +45,7 @@ mocha.describe('readings API', () => {
 
                 // Add LG3 here
 
-                // Add LG4 here
+                // Add LG4 here 
 
                 // Add LG5 here
 
