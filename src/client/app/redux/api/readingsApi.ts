@@ -24,7 +24,8 @@ export const readingsApi = baseApi.injectEndpoints({
 				// destructure args that are passed into the callback, and generate/ implicitly return the API url for the request.
 				url: `api/unitReadings/threeD/${meterOrGroup}/${id}`,
 				params: { timeInterval, graphicUnitId, readingInterval }
-			})
+			}),
+			providesTags: ['Readings']
 		}),
 		line: builder.query<LineReadings, LineReadingApiArgs>({
 			// Customize Cache Behavior by utilizing (serializeQueryArgs, merge, forceRefetch)
@@ -88,7 +89,8 @@ export const readingsApi = baseApi.injectEndpoints({
 				// https://redux-toolkit.js.org/rtk-query/usage/customizing-queries#implementing-a-queryfn
 				// queryFn requires either a data, or error object to be returned
 				return error ? { error } : { data: data as LineReadings };
-			}
+			},
+			providesTags: ['Readings']
 		}),
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
@@ -107,7 +109,8 @@ export const readingsApi = baseApi.injectEndpoints({
 				const idsToFetch = _.difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `api/unitReadings/bar/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as BarReadings };
-			}
+			},
+			providesTags: ['Readings']
 		}),
 		compare: builder.query<CompareReadings, CompareReadingApiArgs>({
 			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
@@ -125,7 +128,8 @@ export const readingsApi = baseApi.injectEndpoints({
 				const idsToFetch = _.difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `/api/compareReadings/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as CompareReadings };
-			}
+			},
+			providesTags: ['Readings']
 		}),
 		radar: builder.query<LineReadings, RadarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
@@ -144,7 +148,8 @@ export const readingsApi = baseApi.injectEndpoints({
 				const idsToFetch = _.difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `api/unitReadings/radar/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as LineReadings };
-			}
+			},
+			providesTags: ['Readings']
 		})
 
 	})

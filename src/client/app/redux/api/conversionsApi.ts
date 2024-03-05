@@ -84,7 +84,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			invalidatesTags: ['ConversionDetails', 'Cik']
+			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings']
 		})
 	})
 });
