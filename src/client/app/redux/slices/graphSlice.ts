@@ -148,10 +148,11 @@ export const graphSlice = createSlice({
 			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
 			updateThreeDMeterOrGroupID(state, graphSlice.actions.updateThreeDMeterOrGroupID(action.payload.meterOrGroupID));
 			updateThreeDMeterOrGroup(state, graphSlice.actions.updateThreeDMeterOrGroup(action.payload.meterOrGroup));
-			if (!state.current.queryTimeInterval.getIsBounded()) {
-				// Set the query time interval to 6 moths back when not bounded for 3D
-				state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
-			}
+			// TODO Under development so in future
+			// if (!state.current.queryTimeInterval.getIsBounded()) {
+			// 	// Set the query time interval to 6 moths back when not bounded for 3D
+			// 	state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
+			// }
 		},
 		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
 			const { current } = state;
