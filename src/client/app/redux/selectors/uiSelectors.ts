@@ -205,6 +205,9 @@ export const selectChartTypeCompatibility = createAppSelector(
 				}
 			});
 		}
+		// Filter out any new incompatible meters/groups from the compatibility list.
+		incompatibleMeters.forEach(meterID => compatibleMeters.delete(meterID));
+		incompatibleGroups.forEach(groupID => compatibleGroups.delete(groupID));
 
 		return {
 			compatibleMeters,
