@@ -69,6 +69,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
 
+	// Update group state in case changed from create/edit
+	useEffect(() => {
+		setEditGroupsState(_.cloneDeep(groupDataById));
+	}, [groupDataById]);
+
 	// The current groups state of group being edited of the local copy. It should always be valid.
 	const groupState = editGroupsState[props.groupId];
 
