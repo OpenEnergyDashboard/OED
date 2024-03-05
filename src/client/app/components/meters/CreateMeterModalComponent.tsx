@@ -53,6 +53,15 @@ export default function CreateMeterModalComponent() {
 		selectCreateMeterUnitCompatibility(state, meterDetails as unknown as MeterData)
 	);
 	const { meterIsValid, defaultGraphicUnitIsValid } = useAppSelector(state => isValidCreateMeter(state, meterDetails as unknown as MeterData));
+
+	// Reset default graphingUnit when selected is invalid with updated unitId.
+	React.useEffect(() => {
+		if (!defaultGraphicUnitIsValid) {
+			setMeterDetails(details => ({ ...details, defaultGraphicUnit: -999 }));
+		}
+	}, [meterDetails.unitId]);
+
+
 	const handleShow = () => setShowModal(true);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
