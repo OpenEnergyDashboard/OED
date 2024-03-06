@@ -3,18 +3,26 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Button, Input, Form, FormGroup, Label } from 'reactstrap';
-import { MetersCSVUploadProps } from '../../types/csvUploadForm';
-import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { FormattedMessage } from 'react-intl';
+import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { MODE } from '../../containers/csv/UploadCSVContainer';
-import { fetchMetersDetails } from '../../actions/meters';
-import { store }  from '../../store';
-
-export default class MetersCSVUploadComponent extends React.Component<MetersCSVUploadProps> {
+import { MetersCSVUploadProps } from '../../types/csvUploadForm';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import FormFileUploaderComponent from '../FormFileUploaderComponent';
+import { AppDispatch } from '../../store';
+import { baseApi } from '../../redux/api/baseApi';
+import { connect } from 'react-redux';
+const mapDispatchToProps = (dispatch: AppDispatch) => {
+	return {
+		resetApiCache: () => dispatch(baseApi.util.invalidateTags(['MeterData']))
+	};
+};
+type ResetProp = { resetApiCache: () => void }
+type MetersCsvUploadPropWithCacheDispatch = MetersCSVUploadProps & ResetProp
+class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCacheDispatch> {
 	private fileInput: React.RefObject<HTMLInputElement>;
 
-	constructor(props: MetersCSVUploadProps) {
+	constructor(props: MetersCsvUploadPropWithCacheDispatch) {
 		super(props);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.handleSetMeterName = this.handleSetMeterName.bind(this);
@@ -27,18 +35,18 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 			const current = this.fileInput.current as HTMLInputElement;
 			const { files } = current;
 			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0])
+				await this.props.submitCSV(files[0]);
 				// TODO Using an alert is not the best. At some point this should be integrated
 				// with react.
-				window.alert('<h1>SUCCESS</h1>The meter upload was a success.');
+				showSuccessNotification('<h1>SUCCESS</h1>The meter upload was a success.');
 			}
 		} catch (error) {
 			// A failed axios request should result in an error.
-			window.alert(error.response.data as string);
+			showErrorNotification(error.response.data as string);
 		}
-		// Refetch meters details.
-		store.getState().meters.hasBeenFetchedOnce = false;
-		fetchMetersDetails();
+		// Refetch meters details by invalidating its api cache.
+		this.props.resetApiCache();
+
 	}
 
 	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
@@ -54,13 +62,13 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 
 		const checkboxStyle: React.CSSProperties = {
 			paddingBottom: '15px'
-		}
+		};
 
 		const formStyle: React.CSSProperties = {
 			display: 'flex',
 			justifyContent: 'center',
 			padding: '20px'
-		}
+		};
 
 		return (
 			<div style={formStyle}>
@@ -95,7 +103,8 @@ export default class MetersCSVUploadComponent extends React.Component<MetersCSVU
 					</Button>
 				</Form>
 			</div>
-		)
+		);
 	}
 
 }
+export default connect(null, mapDispatchToProps)(MetersCSVUploadComponent);

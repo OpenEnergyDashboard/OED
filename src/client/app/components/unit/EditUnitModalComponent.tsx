@@ -1,26 +1,24 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
-import { store }  from '../../store';
 //Realize that * is already imported from react
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
+import { unitsApi } from '../../redux/api/unitsApi';
+import { useTranslate } from '../../redux/componentHooks';
+import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import { submitEditedUnit } from '../../actions/units';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType } from '../../types/redux/units';
-import { TrueFalseType } from '../../types/items';
-import { notifyUser } from '../../utils/input'
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { Dispatch } from 'types/redux/actions';
-import { useSelector } from 'react-redux';
-import { State } from 'types/redux/state';
+import { TrueFalseType } from '../../types/items';
+import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -35,7 +33,8 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
-	const dispatch: Dispatch = useDispatch();
+	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
+	const translate = useTranslate();
 
 	// Set existing unit values
 	const values = {
@@ -49,24 +48,25 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		suffix: props.unit.suffix,
 		note: props.unit.note,
 		id: props.unit.id
-	}
+	};
 
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
-	const globalConversionsState = useSelector((state: State) => state.conversions.conversions);
+	const conversionData = useAppSelector(selectConversionsDetails);
+	const meterDataByID = useAppSelector(selectMeterDataById);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	/* Edit Unit Validation:
 		Name cannot be blank
@@ -88,12 +88,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
-	}
+	};
 
 	const handleClose = () => {
 		props.handleClose();
 		resetState();
-	}
+	};
 
 	// Validate the changes and return true if we should update this unit.
 	// Two reasons for not updating the unit:
@@ -106,11 +106,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Check for case 1
 		if (props.unit.typeOfUnit === UnitType.meter && state.typeOfUnit !== UnitType.meter) {
 			// Get an array of all meters
-			const meters = Object.values(store.getState().meters.byMeterID);
+			const meters = Object.values(meterDataByID);
 			const meter = meters.find(m => m.unitId === props.unit.id);
 			if (meter) {
 				// There exists a meter that is still linked with this unit
-				notifyUser(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
+				showErrorNotification(`${translate('the.unit.of.meter')} ${meter.name} ${translate('meter.unit.change.requires')}`);
 				inputOk = false;
 			}
 		}
@@ -128,10 +128,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| props.unit.note != state.note;
 		} else {
 			// Tell user that not going to update due to input issues.
-			notifyUser(`${translate('unit.input.error')}`);
+			showErrorNotification(`${translate('unit.input.error')}`);
 			return false;
 		}
-	}
+	};
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -159,28 +159,34 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			if (state.typeOfUnit != UnitType.suffix && state.suffix != '') {
 				state.typeOfUnit = UnitType.suffix;
 			}
-			// Save our changes by dispatching the submitEditedUnit action
-			dispatch(submitEditedUnit(state, shouldRedoCik, shouldRefreshReadingViews));
+			// Save our changes by dispatching the submitEditedUnit mutation
+			submitEditedUnit({ editedUnit: state, shouldRedoCik, shouldRefreshReadingViews })
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(translate('unit.successfully.edited.unit'));
+				})
+				.catch(() => {
+					showErrorNotification(translate('unit.failed.to.edit.unit'));
+				});
 			// The updated unit is not fetched to save time. However, the identifier might have been
 			// automatically set if it was empty. Mimic that here.
 			if (state.identifier === '') {
 				state.identifier = state.name;
 			}
-			dispatch(removeUnsavedChanges());
 		}
-	}
+	};
 
 	// Check if the unit is used in any conversion.
 	// 1. If the unit is used, the Unit Represent cannot be changed.
 	// 2. Otherwise, the Unit Represent can be changed.
 	const inConversions = () => {
-		for (const conversion of globalConversionsState) {
+		for (const conversion of conversionData) {
 			if (conversion.sourceId === state.id || conversion.destinationId === state.id) {
 				return true;
 			}
 		}
 		return false;
-	}
+	};
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -192,7 +198,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.unit" />
-					<TooltipHelpContainer page='units-edit' />
+					<TooltipHelpComponent page='units-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
 					</div>
@@ -241,7 +247,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}>
 								{Object.keys(UnitType).map(key => {
 									return (<option value={key} key={key} disabled={state.suffix != '' && key != UnitType.suffix}>
-										{translate(`UnitType.${key}`)}</option>)
+										{translate(`UnitType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -259,7 +265,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								disabled={inConversions()}
 								onChange={e => handleStringChange(e)}>
 								{Object.keys(UnitRepresentType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -277,7 +283,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
 								{Object.keys(DisplayableType).map(key => {
 									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
-										{translate(`DisplayableType.${key}`)}</option>)
+										{translate(`DisplayableType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -294,7 +300,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								value={state.preferredDisplay.toString()}
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>

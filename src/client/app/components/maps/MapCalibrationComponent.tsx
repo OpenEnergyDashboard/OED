@@ -3,13 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { CalibrationModeTypes } from '../../types/redux/map';
-import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
 import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibrationChartDisplayContainer';
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import HeaderComponent from '../../components/HeaderComponent';
+import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
 import MapsDetailContainer from '../../containers/maps/MapsDetailContainer';
+import { CalibrationModeTypes } from '../../types/redux/map';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -26,16 +24,14 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 		if (this.props.mode === CalibrationModeTypes.initiate) {
 			return (
 				<div className='container-fluid'>
-					<UnsavedWarningContainer />
-					<HeaderComponent />
+					{/* <UnsavedWarningContainer /> */}
 					<MapCalibrationInitiateContainer />
 				</div>
 			);
 		} else if (this.props.mode === CalibrationModeTypes.calibrate) {
 			return (
 				<div className='container-fluid'>
-					<UnsavedWarningContainer />
-					<HeaderComponent />
+					{/* <UnsavedWarningContainer /> */}
 					<div id={'MapCalibrationContainer'}>
 						{/* TODO These types of plotly containers expect a lot of passed
 						values and it gives a TS error. Given we plan to  replace this

@@ -71,7 +71,7 @@ mocha.describe('readings API', () => {
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     //Get the unitID since the DB could be any value
                     const unitId = await getUnitId('kWh');
-                    //Load the expected response data from the csv file
+                    //Load the data into the database
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
                     // Create a request API for the 60days period
                     const startDate = "2022-08-25";
@@ -107,7 +107,6 @@ mocha.describe('readings API', () => {
 
                 // Add LG6 here
                 mocha.it('LG6: 14 days still gives hourly points & middle readings', async () => {
-                    // Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kWh');

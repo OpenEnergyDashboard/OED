@@ -6,9 +6,9 @@ import {connect} from 'react-redux';
 import { State } from '../../types/redux/state';
 import { Dispatch } from '../../types/redux/actions';
 import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibrationInfoDisplayComponent';
-import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../actions/map';
+import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../redux/actions/map';
 import {GPSPoint} from '../../utils/calibration';
-import {logToServer} from '../../actions/logs';
+import {logToServer} from '../../redux/actions/logs';
 import translate from '../../utils/translate';
 
 function mapStateToProps(state: State) {

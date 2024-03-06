@@ -4,7 +4,6 @@
 
 import { BarReadingsState } from './barReadings';
 import { LineReadingsState } from './lineReadings';
-import { ThreeDReadingsState } from './threeDReadings';
 import { GraphState } from './graph';
 import { GroupsState } from './groups';
 import { MetersState } from './meters';
@@ -16,16 +15,15 @@ import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
 import { UnitsState } from './units';
 import { ConversionsState } from './conversions';
-import { OptionsState } from './options';
-import { CiksState } from './ciks';
+import { AppState } from 'redux/slices/appStateSlice';
 
 export interface State {
+	appState: AppState;
 	meters: MetersState;
 	readings: {
 		line: LineReadingsState;
 		bar: BarReadingsState;
 		compare: CompareReadingsState;
-		threeD: ThreeDReadingsState;
 	};
 	graph: GraphState;
 	maps: MapState;
@@ -36,6 +34,4 @@ export interface State {
 	unsavedWarning: UnsavedWarningState;
 	units: UnitsState;
 	conversions: ConversionsState;
-	options: OptionsState;
-	ciks: CiksState;
 }

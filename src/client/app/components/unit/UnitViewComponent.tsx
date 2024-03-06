@@ -11,6 +11,7 @@ import EditUnitModalComponent from './EditUnitModalComponent';
 import '../../styles/card-page.css';
 import { UnitData } from 'types/redux/units';
 import translate from '../../utils/translate';
+import { LocaleDataKey } from 'translations/data';
 
 interface UnitViewComponentProps {
 	unit: UnitData;
@@ -29,11 +30,11 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 
 	const handleShow = () => {
 		setShowEditModal(true);
-	}
+	};
 
 	const handleClose = () => {
 		setShowEditModal(false);
-	}
+	};
 
 	return (
 		<div className="card">
@@ -53,7 +54,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<b><FormattedMessage id="displayable" /></b> {props.unit.displayable}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}`)}
+				<b><FormattedMessage id="unit.preferred.display" /></b> {translate(`TrueFalseType.${props.unit.preferredDisplay.toString()}` as LocaleDataKey)}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="unit.sec.in.rate" /></b> {props.unit.secInRate}
