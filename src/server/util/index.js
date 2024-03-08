@@ -5,6 +5,7 @@
  */
 
 const { mapToObject } = require('./mapToObject');
+const { threeDHoleAlgorithm } = require('./threeDHoleAlgorithm');
 const { compareSemanticVersion, findMaxSemanticVersion } = require('./semver');
 const obvius = require('./obvius');
 
@@ -12,6 +13,7 @@ module.exports = {
 	obvius,
 	mapToObject,
 	compareSemanticVersion,
-	findMaxSemanticVersion
+	findMaxSemanticVersion,
+	threeDHoleAlgorithm
 };
 

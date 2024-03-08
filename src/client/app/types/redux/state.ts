@@ -15,9 +15,10 @@ import { CurrentUserState } from './currentUser';
 import { UnsavedWarningState } from './unsavedWarning';
 import { UnitsState } from './units';
 import { ConversionsState } from './conversions';
-import { OptionsState } from './options';
+import { AppState } from 'redux/slices/appStateSlice';
 
 export interface State {
+	appState: AppState;
 	meters: MetersState;
 	readings: {
 		line: LineReadingsState;
@@ -33,5 +34,4 @@ export interface State {
 	unsavedWarning: UnsavedWarningState;
 	units: UnitsState;
 	conversions: ConversionsState;
-	options: OptionsState;
 }

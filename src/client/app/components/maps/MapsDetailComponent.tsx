@@ -3,18 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Table, Button } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import { hasToken } from '../../utils/token';
-import FooterContainer from '../../containers/FooterContainer';
-import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { Link } from 'react-router-dom';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import { Button, Table } from 'reactstrap';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import MapViewContainer from '../../containers/maps/MapViewContainer';
+import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { removeUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import HeaderComponent from '../../components/HeaderComponent';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -58,10 +53,9 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 		};
 
 		return (
-			<div>
-				<UnsavedWarningContainer />
-				<HeaderComponent />
-				<TooltipHelpContainer page='maps' />
+			<div className='flexGrowOne'>
+				{/* <UnsavedWarningContainer /> */}
+				<TooltipHelpComponent page='maps' />
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
@@ -108,13 +102,12 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 						<FormattedMessage id='save.map.edits' />
 					</Button>}
 				</div>
-				<FooterContainer />
 			</div>
 		);
 	}
 
 	private removeUnsavedChanges() {
-		store.dispatch(removeUnsavedChanges());
+		// store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
 	}
 
 	private handleSubmitClicked() {

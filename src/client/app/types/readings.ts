@@ -7,9 +7,7 @@ export interface CompareReading {
 	prev_use: number;
 }
 
-export interface CompareReadings {
-	[id: number]: CompareReading;
-}
+export interface CompareReadings extends Record<number, CompareReading> { }
 
 export interface RawReadings {
 	// Note that the identifiers are not the usual ones so the route
@@ -21,21 +19,27 @@ export interface RawReadings {
 	e: string
 }
 
-export interface LineReading extends BarReading{
+export interface LineReading extends BarReading {
 	min: number;
 	max: number;
 }
 
-export interface LineReadings {
-	[id: number]: LineReading[];
-}
-
+export type LineReadings = Record<number, LineReading[]>;
 export interface BarReading {
 	reading: number;
 	startTimestamp: number;
 	endTimestamp: number;
 }
 
-export interface BarReadings {
-	[id: number]: BarReading[];
+export type BarReadings = Record<number, BarReading[]>;
+
+interface ReadingInterval {
+	startTimestamp: number;
+	endTimestamp: number;
+}
+
+export interface ThreeDReading {
+	xData: ReadingInterval[];
+	yData: number[];
+	zData: (number | null)[][];
 }

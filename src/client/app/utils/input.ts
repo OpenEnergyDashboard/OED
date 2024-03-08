@@ -5,21 +5,7 @@
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
 import translate from './translate';
-import { showErrorNotification } from './notifications';
 import * as _ from 'lodash';
-
-// Notifies user of msg.
-// TODO isValidGPSInput uses alert so continue that. Maybe all should be changed but this impacts other parts of the code.
-// Note this causes the modal to close but the state is not reset.
-// Use a function so can easily change how it works.
-/**
- * Causes a window popup with msg
- * @param msg message to display
- */
-export function notifyUser(msg: string) {
-	// window.alert(msg);
-	showErrorNotification(msg);
-}
 
 /**
  * get string value from GPSPoint or null.
@@ -39,7 +25,7 @@ export function getGPSString(gps: GPSPoint | null) {
 	}
 	else {
 		// Assume it is a string that was input.
-		return gps
+		return gps;
 	}
 }
 
@@ -90,12 +76,11 @@ export const NoUnit: UnitData = {
 	unitRepresent: UnitRepresentType.quantity,
 	secInRate: 99,
 	typeOfUnit: UnitType.unit,
-	unitIndex: -99,
 	suffix: '',
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
 	note: ''
-}
+};
 
 /**
  * The enum is fine if don't want translation but this is dynamic so translation works.

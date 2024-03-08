@@ -2,78 +2,77 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as _ from 'lodash';
 import * as React from 'react';
-import { User, UserRole } from '../../types/items';
-import { Button, Input, Table } from 'reactstrap';
-import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { FormattedMessage } from 'react-intl';
-import UnsavedWarningContainer from '../../containers/UnsavedWarningContainer';
-import { updateUnsavedChanges, removeUnsavedChanges } from '../../actions/unsavedWarning';
-import store from '../../index'
+import { Button, Input, Table } from 'reactstrap';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import { stableEmptyUsers, userApi } from '../../redux/api/userApi';
+import { User, UserRole } from '../../types/items';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
+import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
 
-interface UserDisplayComponentProps {
-	users: User[];
-	deleteUser: (email: string) => Promise<void>;
-	edited: boolean;
-	editUser: (email: string, newRole: UserRole) => void;
-	submitUserEdits: () => Promise<void>;
-}
 
 /**
  * Component which shows user details
- * @param props defined above
  * @returns User Detail element
  */
-export default function UserDetailComponent(props: UserDisplayComponentProps) {
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
+export default function UserDetailComponent() {
+	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery(undefined);
+	const [submitUserEdits] = userApi.useEditUsersMutation();
+	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
+	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
+	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
+
+	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
+	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
+	const submitChanges = async () => {
+		submitUserEdits(localUsersChanges)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.edit.users'));
+			})
+			.catch(() => {
+				showErrorNotification(translate('users.failed.to.edit.users'));
+			});
 	};
 
-	const tableStyle: React.CSSProperties = {
-		marginLeft: '10%',
-		marginRight: '10%'
+	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
+		// copy user, and update role
+		const updatedUser: User = { ...targetUser, role: e.target.value as UserRole };
+		// make new list from existing local user state
+		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user);
+		setLocalUsersChanges(updatedList);
 	};
 
-	const buttonsStyle: React.CSSProperties = {
-		display: 'flex',
-		justifyContent: 'space-between'
-	}
-
-	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%'
+	const deleteUser = (email: string) => {
+		submitDeleteUser(email)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.delete.user'));
+			})
+			.catch(() => {
+				showErrorNotification(translate('users.failed.to.delete.user'));
+			});
 	};
 
-	const removeUnsavedChangesFunction = (callback: () => void) => {
-		// This function is called to reset all the inputs to the initial state
-		// Do not need to do anything since unsaved changes will be removed after leaving this page
-		callback();
-	}
-
-	const submitUnsavedChangesFunction = (successCallback: () => void, failureCallback: () => void) => {
-		// This function is called to submit the unsaved changes
-		props.submitUserEdits().then(successCallback, failureCallback);
-	}
-
-	const addUnsavedChanges = () => {
-		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(removeUnsavedChangesFunction, submitUnsavedChangesFunction));
-	}
-
-	const clearUnsavedChanges = () => {
-		// Notify that there are no unsaved changes
-		store.dispatch(removeUnsavedChanges());
-	}
 
 	return (
 		<div>
-			<UnsavedWarningContainer />
-			<TooltipHelpContainer page='users' />
+			<UnsavedWarningComponent
+				hasUnsavedChanges={hasChanges}
+				changes={localUsersChanges}
+				submitChanges={submitUserEdits}
+				successMessage='users.successfully.edit.users'
+				failureMessage='failed.to.submit.changes'
+			/>
+			<TooltipHelpComponent page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					<FormattedMessage id='users'/>
+					<FormattedMessage id='users' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
 					</div>
@@ -82,23 +81,20 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 					<Table striped bordered hover>
 						<thead>
 							<tr>
-								<th> <FormattedMessage id='email'/> </th>
-								<th> <FormattedMessage id='role'/> </th>
-								<th> <FormattedMessage id='action'/> </th>
+								<th> <FormattedMessage id='email' /> </th>
+								<th> <FormattedMessage id='role' /> </th>
+								<th> <FormattedMessage id='action' /> </th>
 							</tr>
 						</thead>
 						<tbody>
-							{props.users.map(user => (
+							{localUsersChanges.map(user => (
 								<tr key={user.email}>
 									<td>{user.email}</td>
 									<td>
 										<Input
 											type='select'
 											value={user.role}
-											onChange={({ target }) => {
-												props.editUser(user.email, target.value as UserRole);
-												addUnsavedChanges();
-											}}
+											onChange={e => editUser(e, user)}
 										>
 											{Object.entries(UserRole).map(([role, val]) => (
 												<option value={val} key={role}> {role} </option>
@@ -106,8 +102,8 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 										</Input>
 									</td>
 									<td>
-										<Button color='danger' onClick={() => { props.deleteUser(user.email); }}>
-											<FormattedMessage id='delete.user'/>
+										<Button color='danger' onClick={() => { deleteUser(user.email); }}>
+											<FormattedMessage id='delete.user' />
 										</Button>
 									</td>
 								</tr>
@@ -118,17 +114,33 @@ export default function UserDetailComponent(props: UserDisplayComponentProps) {
 						<CreateUserLinkButtonComponent />
 						<Button
 							color='success'
-							disabled={!props.edited}
-							onClick={() => {
-								props.submitUserEdits();
-								clearUnsavedChanges();
-							}}
+							disabled={_.isEqual(users, localUsersChanges)}
+							onClick={submitChanges}
 						>
-							<FormattedMessage id='save.role.changes'/>
+							<FormattedMessage id='save.role.changes' />
 						</Button>
 					</div>
 				</div>
 			</div>
 		</div>
-	)
+	);
 }
+
+const titleStyle: React.CSSProperties = {
+	textAlign: 'center'
+};
+
+const tableStyle: React.CSSProperties = {
+	marginLeft: '10%',
+	marginRight: '10%'
+};
+
+const buttonsStyle: React.CSSProperties = {
+	display: 'flex',
+	justifyContent: 'space-between'
+};
+
+const tooltipStyle = {
+	display: 'inline-block',
+	fontSize: '50%'
+};

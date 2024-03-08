@@ -46,8 +46,8 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/data\/unit\/.*")
 NFILES=$(echo $FILES | wc -w)
 
 if [ "$NFILES" -eq "0" ]; then
-   echo "[MPL2] No files to check for header, please check the checkHeader.sh script.";
-   exit 1;
+	echo "[MPL2] No files to check for header, please check the checkHeader.sh script.";
+	exit 1;
 fi
 
 echo "[MPL2] Checking $NFILES files for a Mozilla Public License 2.0 header."

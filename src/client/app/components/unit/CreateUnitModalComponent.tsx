@@ -1,27 +1,28 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import translate from '../../utils/translate';
 import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import TooltipHelpContainer from '../../containers/TooltipHelpContainer';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { UnitRepresentType, DisplayableType, UnitType } from '../../types/redux/units';
-import { addUnit } from '../../actions/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { Dispatch } from 'types/redux/actions';
+import { unitsApi } from '../../redux/api/unitsApi';
+import { useTranslate } from '../../redux/componentHooks';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 
 /**
  * Defines the create unit modal form
  * @returns Unit create element
  */
 export default function CreateUnitModalComponent() {
-	const dispatch: Dispatch = useDispatch();
+	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
+	const translate = useTranslate();
 
 	const defaultValues = {
 		name: '',
@@ -37,9 +38,8 @@ export default function CreateUnitModalComponent() {
 		// The client code makes the id for the selected unit and default graphic unit be -99
 		// so it can tell it is not yet assigned and do the correct logic for that case.
 		// The units API expects these values to be undefined on call so that the database can assign their values.
-		id: -99,
-		unitIndex: -99
-	}
+		id: -99
+	};
 
 	/* State */
 	// Unlike EditUnitModalComponent, there are no props so we don't pass show and close via props.
@@ -56,30 +56,32 @@ export default function CreateUnitModalComponent() {
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
-	}
+	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
-	}
+	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
-	}
+	};
 
 	/* Create Unit Validation:
 		Name cannot be blank
 		Sec in Rate must be greater than zero
+		If type of unit is suffix their must be a suffix
 	*/
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.name !== '' && state.secInRate > 0);
-	}, [state.name, state.secInRate]);
+		setValidUnit(state.name !== '' && state.secInRate > 0 &&
+			(state.typeOfUnit !== UnitType.suffix || state.suffix !== ''));
+	}, [state.name, state.secInRate, state.typeOfUnit, state.suffix]);
 	/* End State */
 
 	// Reset the state to default values
 	const resetState = () => {
 		setState(defaultValues);
-	}
+	};
 
 	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.
@@ -91,11 +93,22 @@ export default function CreateUnitModalComponent() {
 		// Set default identifier as name if left blank
 		state.identifier = (!state.identifier || state.identifier.length === 0) ? state.name : state.identifier;
 		// set displayable to none if unit is meter
-		if(state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
+		if (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) {
 			state.displayable = DisplayableType.none;
 		}
+		// set unit to suffix if suffix is not empty
+		if (state.typeOfUnit != UnitType.suffix && state.suffix != '') {
+			state.typeOfUnit = UnitType.suffix;
+		}
 		// Add the new unit and update the store
-		dispatch(addUnit(state));
+		submitCreateUnit(state)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('unit.successfully.create.unit'));
+			})
+			.catch(() => {
+				showErrorNotification(translate('unit.failed.to.create.unit'));
+			});
 		resetState();
 	};
 
@@ -113,7 +126,7 @@ export default function CreateUnitModalComponent() {
 			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.unit" />
-					<TooltipHelpContainer page='units-create' />
+					<TooltipHelpComponent page='units-create' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='units-create' helpTextId={tooltipStyle.tooltipCreateUnitView} />
 					</div>
@@ -142,7 +155,7 @@ export default function CreateUnitModalComponent() {
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.name}
-								invalid={state.name === ''}/>
+								invalid={state.name === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
@@ -157,11 +170,16 @@ export default function CreateUnitModalComponent() {
 								name='typeOfUnit'
 								type='select'
 								onChange={e => handleStringChange(e)}
-								value={state.typeOfUnit}>
+								value={state.typeOfUnit}
+								invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}>
 								{Object.keys(UnitType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitType.${key}`)}</option>)
+									return (<option value={key} key={key} disabled={state.suffix != '' && key != UnitType.suffix}>
+										{translate(`UnitType.${key}`)}</option>);
 								})}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id="unit.type.of.unit.suffix" />
+							</FormFeedback>
 						</FormGroup></Col>
 						{/* Unit represent input */}
 						<Col><FormGroup>
@@ -173,7 +191,7 @@ export default function CreateUnitModalComponent() {
 								onChange={e => handleStringChange(e)}
 								value={state.unitRepresent}>
 								{Object.keys(UnitRepresentType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -191,7 +209,7 @@ export default function CreateUnitModalComponent() {
 								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
 								{Object.keys(DisplayableType).map(key => {
 									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
-										{translate(`DisplayableType.${key}`)}</option>)
+										{translate(`DisplayableType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
@@ -207,7 +225,7 @@ export default function CreateUnitModalComponent() {
 								type='select'
 								onChange={e => handleBooleanChange(e)}>
 								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>)
+									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>
@@ -226,7 +244,7 @@ export default function CreateUnitModalComponent() {
 								min='1'
 								invalid={state.secInRate <= 0} />
 							<FormFeedback>
-								<FormattedMessage id="error.greater" values={{ min: '0'}}  />
+								<FormattedMessage id="error.greater" values={{ min: '0' }} />
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Suffix input */}
@@ -238,7 +256,11 @@ export default function CreateUnitModalComponent() {
 								type='text'
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
-								value={state.suffix} />
+								value={state.suffix}
+								invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
 					{/* Note input */}

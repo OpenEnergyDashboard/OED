@@ -3,17 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
 import MetersCSVUploadComponent from '../../components/csv/MetersCSVUploadComponent';
 import ReadingsCSVUploadComponent from '../../components/csv/ReadingsCSVUploadComponent';
-import FooterContainer from '../FooterContainer';
+import { BooleanMeterTypes, MetersCSVUploadPreferencesItem, ReadingsCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { uploadCSVApi } from '../../utils/api';
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanMeterTypes } from '../../types/csvUploadForm';
-import { ReadingsCSVUploadDefaults, MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
-import { TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
-import TooltipHelpContainer from '../TooltipHelpContainer';
-import TooltipMarkerComponent from '../../components/TooltipMarkerComponent';
-import HeaderComponent from '../../components/HeaderComponent';
+import { MetersCSVUploadDefaults, ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 
 export const enum MODE {
 	meters = 'meters',
@@ -65,7 +63,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		uploadReadingsPreferences: {
 			...ReadingsCSVUploadDefaults
 		}
-	}
+	};
 
 	private setMeterName(mode: MODE, value: string) {
 		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
@@ -75,7 +73,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState[preference],
 				meterName: value
 			}
-		}))
+		}));
 	}
 	private selectTimeSort(value: TimeSortTypes) {
 		this.setState(previousState => ({
@@ -84,7 +82,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				timeSort: value
 			}
-		}))
+		}));
 	}
 	private selectDuplications(value: string) {
 		this.setState(previousState => ({
@@ -93,7 +91,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				duplications: value
 			}
-		}))
+		}));
 	}
 	private selectCumulative(value: BooleanMeterTypes) {
 		this.setState(previousState => ({
@@ -102,7 +100,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				cumulative: value
 			}
-		}))
+		}));
 	}
 	private selectCumulativeReset(value: BooleanMeterTypes) {
 		this.setState(previousState => ({
@@ -111,7 +109,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				cumulativeReset: value
 			}
-		}))
+		}));
 	}
 	private setCumulativeResetStart(value: string) {
 		this.setState(previousState => ({
@@ -120,7 +118,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				cumulativeResetStart: value
 			}
-		}))
+		}));
 	}
 	private setCumulativeResetEnd(value: string) {
 		this.setState(previousState => ({
@@ -129,7 +127,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				cumulativeResetEnd: value
 			}
-		}))
+		}));
 	}
 	private setLengthGap(value: string) {
 		this.setState(previousState => ({
@@ -138,7 +136,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				lengthGap: value
 			}
-		}))
+		}));
 	}
 	private setLengthVariation(value: string) {
 		this.setState(previousState => ({
@@ -147,7 +145,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				lengthVariation: value
 			}
-		}))
+		}));
 	}
 	private selectEndOnly(value: BooleanMeterTypes) {
 		this.setState(previousState => ({
@@ -156,7 +154,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				endOnly: value
 			}
-		}))
+		}));
 	}
 	private toggleCreateMeter() {
 		this.setState(previousState => ({
@@ -165,7 +163,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				createMeter: !previousState.uploadReadingsPreferences.createMeter
 			}
-		}))
+		}));
 	}
 	private toggleGzip(mode: MODE) {
 		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
@@ -176,8 +174,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 					...previousState[preference],
 					gzip: !previousState[preference].gzip
 				}
-			}))
-		}
+			}));
+		};
 	}
 	private toggleHeaderRow(mode: MODE) {
 		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
@@ -188,8 +186,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 					...previousState[preference],
 					headerRow: !previousState[preference].headerRow
 				}
-			}))
-		}
+			}));
+		};
 	}
 
 	private toggleRefreshHourlyReadings() {
@@ -199,7 +197,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				refreshHourlyReadings: !previousState.uploadReadingsPreferences.refreshHourlyReadings
 			}
-		}))
+		}));
 	}
 
 	private toggleRefreshReadings() {
@@ -209,7 +207,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				refreshReadings: !previousState.uploadReadingsPreferences.refreshReadings
 			}
-		}))
+		}));
 	}
 
 	private toggleHonorDst() {
@@ -219,7 +217,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				honorDst: !previousState.uploadReadingsPreferences.honorDst
 			}
-		}))
+		}));
 	}
 
 	private toggleRelaxedParsing() {
@@ -229,7 +227,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 				...previousState.uploadReadingsPreferences,
 				relaxedParsing: !previousState.uploadReadingsPreferences.relaxedParsing
 			}
-		}))
+		}));
 	}
 
 	private toggleUpdate(mode: MODE) {
@@ -241,8 +239,8 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 					...previousState[preference],
 					update: !previousState[preference].update
 				}
-			}))
-		}
+			}));
+		};
 	}
 
 	private async submitReadings(file: File) {
@@ -266,11 +264,10 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 	public render() {
 		const navStyle: React.CSSProperties = {
 			cursor: 'pointer'
-		}
+		};
 		return (
 			<div>
-				<HeaderComponent />
-				<TooltipHelpContainer page='csv' />
+				<TooltipHelpComponent page='csv' />
 				<Nav tabs style={{ display: 'flex', justifyContent: 'center' }}>
 					<NavItem style={navStyle}>
 						<NavLink onClick={() => this.toggleTab(MODE.readings)}>
@@ -322,8 +319,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 						/>
 					</TabPane>
 				</TabContent>
-				<FooterContainer />
 			</div>
-		)
+		);
 	}
 }

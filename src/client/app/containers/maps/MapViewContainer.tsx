@@ -7,7 +7,7 @@ import MapViewComponent from '../../components/maps/MapViewComponent';
 import { Dispatch } from '../../types/redux/actions';
 import { State } from '../../types/redux/state';
 import {CalibrationModeTypes, MapMetadata} from '../../types/redux/map';
-import {editMapDetails, removeMap, setCalibration} from '../../actions/map';
+import {editMapDetails, removeMap, setCalibration} from '../../redux/actions/map';
 
 function mapStateToProps(state: State, ownProps: {id: number}) {
 	let map = state.maps.byMapID[ownProps.id];

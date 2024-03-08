@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-const TerserPlugin = require("terser-webpack-plugin");
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const TerserPlugin = require('terser-webpack-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 const webpack = require('webpack');
 const path = require('path');
 
@@ -15,20 +15,20 @@ const config = {
 	// Enable sourcemaps for debugging webpack's output.
 	devtool: 'source-map',
 	entry: {
-		application: APP_DIR + "/index.tsx",
+		application: APP_DIR + '/index.tsx',
 	},
 	cache: {
-		type: "filesystem"
+		type: 'filesystem'
 	},
 	resolve: {
 		fallback: {
-			"buffer": require.resolve('buffer/'),
-			"assert": require.resolve('assert/'),
-			"stream": require.resolve('stream-browserify'),
-			"fs": false
+			'buffer': require.resolve('buffer/'),
+			'assert': require.resolve('assert/'),
+			'stream': require.resolve('stream-browserify'),
+			'fs': false
 		},
 		// Add '.ts' and '.tsx' as resolvable extensions.
-		extensions: [".css", ".ts", ".tsx", ".js", ".jsx", ".json"]
+		extensions: ['.css', '.ts', '.tsx', '.js', '.jsx', '.json']
 	},
 
 	// Ignore warnings about bundle size
@@ -41,25 +41,25 @@ const config = {
 			// Also, for development, JavaScript is handled by 'awesome-typescript-loader' and passed to Babel.
 			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
 			// Any remaining JavaScript ('.js' or '.jsx') will be transpiled by Babel, for production uglification.
-			{ test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: "babel-loader"}] },
+			{ test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: 'babel-loader'}] },
 			// CSS stylesheet loader.
 			{ test: /\.css$/, use: [
-				{loader: "style-loader"},
-				{loader: "css-loader"}
-			], },
+				{loader: 'style-loader'},
+				{loader: 'css-loader'}
+			] },
 			// Babel not able to resolve imports https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
 			{
 				test: /\.m?js/,
 				resolve: {
-				  fullySpecified: false
+					fullySpecified: false
 				}
 			},
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-			{ enforce: "pre", test: /\.js$/, use:[{loader: "source-map-loader"}] }
+			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
 		]
 	},
 	output: {
-		filename: "bundle.js",
+		filename: 'bundle.js',
 		path: BUILD_DIR
 	},
 	plugins: [
@@ -76,10 +76,10 @@ if (process.env.NODE_ENV === 'production') {
 			}
 		}),
 		new TerserPlugin({
-			 terserOptions: {
-				 sourceMap: true
-			 },
-	})
+			terserOptions: {
+				sourceMap: true
+			}
+		})
 	);
 }
 

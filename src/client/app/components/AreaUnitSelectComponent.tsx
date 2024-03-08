@@ -4,14 +4,14 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
-import { toggleAreaNormalization, updateSelectedAreaUnit } from '../actions/graph';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
+import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
-import { State } from '../types/redux/state';
+import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import translate from '../utils/translate';
-import { UnitRepresentType } from '../types/redux/units';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -19,10 +19,10 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Area unit select element
  */
 export default function AreaUnitSelectComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
-	const graphState = useSelector((state: State) => state.graph);
-	const unitState = useSelector((state: State) => state.units.units);
+	const graphState = useAppSelector(selectGraphState);
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
@@ -38,15 +38,15 @@ export default function AreaUnitSelectComponent() {
 	});
 
 	const handleToggleAreaNormalization = () => {
-		dispatch(toggleAreaNormalization());
-	}
+		dispatch(graphSlice.actions.toggleAreaNormalization());
+	};
 
 	const labelStyle: React.CSSProperties = {
 		fontWeight: 'bold',
 		margin: 0
 	};
 
-	if (graphState.selectedUnit != -99 && unitState[graphState.selectedUnit].unitRepresent === UnitRepresentType.raw) {
+	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit]?.unitRepresent === UnitRepresentType.raw) {
 		return null;
 	}
 
@@ -76,7 +76,7 @@ export default function AreaUnitSelectComponent() {
 						value={{ label: translate(`AreaUnitType.${graphState.selectedAreaUnit}`), value: graphState.selectedAreaUnit } as StringSelectOption}
 						onChange={newSelectedUnit => {
 							if (newSelectedUnit) {
-								dispatch(updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType))
+								dispatch(graphSlice.actions.updateSelectedAreaUnit(newSelectedUnit.value as AreaUnitType));
 							}
 						}}
 					/>

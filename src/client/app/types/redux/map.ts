@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {ActionType} from './actions';
-import {CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint} from '../../utils/calibration';
+import { ActionType } from './actions';
+import { CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint } from '../../utils/calibration';
 
 /**
  * 'initiate', 'calibrate' or 'unavailable'
@@ -126,7 +126,7 @@ export type MapsAction =
  * @param opposite
  * @param mapSource
  */
-export interface MapData{
+export interface MapData {
 	id: number;
 	name: string;
 	displayable: boolean;
@@ -173,9 +173,8 @@ export interface CalibrationSettings {
 /**
  * @param mapID <= -1 means it's a new map;
  */
-interface MapMetadataByID {
-	[mapID: number]: MapMetadata;
-}
+interface MapMetadataByID extends Record<number, MapMetadata> { }
+
 
 export interface MapState {
 	isLoading: boolean;

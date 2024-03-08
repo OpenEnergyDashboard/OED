@@ -3,36 +3,25 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { selectOptionsVisibility } from '../redux/slices/appStateSlice';
+import { useAppSelector } from '../redux/reduxHooks';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
-import HeaderButtonsComponent from './HeaderButtonsComponent';
-import { useSelector } from 'react-redux';
-import { State } from '../types/redux/state';
-import getPage from '../utils/getPage';
+import { selectDisplayTitle } from '../redux/slices/adminSlice';
 
 /**
  * React component that controls the header strip at the top of all pages
  * @returns header element
  */
 export default function HeaderComponent() {
-	const siteTitle = useSelector((state: State) => state.admin.displayTitle);
-	const showOptions = useSelector((state: State) => state.graph.optionsVisibility);
-
-	const divStyle = {
-		marginTop: '5px',
-		paddingBottom: '5px'
-	};
-	const largeTitleStyle = {
-		display: 'inline-block'
-	};
-	const smallTitleStyle = {
-		display: 'inline-block',
-		marginTop: '10px'
-	};
+	const siteTitle = useAppSelector(selectDisplayTitle);
+	const showOptions = useAppSelector(selectOptionsVisibility);
+	const { pathname } = useLocation();
 
 	return (
-		<div className='container-fluid' style={divStyle}>
+		<div className='container-fluid' id='header'>
 			<div className='row'>
 				<div className='d-none d-lg-block col-4'>
 					<Link to='/'><LogoComponent height={80} url='./logo.png' /></Link>
@@ -55,12 +44,20 @@ export default function HeaderComponent() {
 				</div>
 				<div className='col-4 justify-content-end d-lg-flex d-none'>
 					{/* collapse menu if optionsVisibility is false */}
-					{getPage() === '' && !showOptions ?
-						<MenuModalComponent /> :
-						<HeaderButtonsComponent />
+					{
+						pathname === '/' && !showOptions
+							? <MenuModalComponent />
+							: <HeaderButtonsComponent />
 					}
 				</div>
 			</div>
 		</div>
 	);
 }
+const largeTitleStyle = {
+	display: 'inline-block'
+};
+const smallTitleStyle = {
+	display: 'inline-block',
+	marginTop: '10px'
+};

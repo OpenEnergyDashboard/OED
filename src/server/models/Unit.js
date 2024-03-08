@@ -14,20 +14,18 @@ class Unit {
 	 * @param {*} unitRepresent Tells how the data is fetched for readings (only need for meter type unit).
 	 * @param {*} secInRate The number of seconds in the unit associated with flow (rate) units.
 	 * @param {*} typeOfUnit This unit's type. Can be meter, unit, or suffix.
-	 * @param {*} unitIndex The unique number for row/column index in conversion table for this unit.
 	 * @param {*} suffix This unit's suffix.
 	 * @param {*} displayable Can be none, all, or admin. Restrict the type of user that can see this unit.
 	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
 	 */
-	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, unitIndex, suffix = '', displayable, preferredDisplay, note) {
+	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay, note) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
 		this.unitRepresent = unitRepresent;
 		this.secInRate = secInRate;
 		this.typeOfUnit = typeOfUnit;
-		this.unitIndex = unitIndex;
 		this.suffix = suffix;
 		this.displayable = displayable;
 		this.preferredDisplay = preferredDisplay;
@@ -41,7 +39,7 @@ class Unit {
 	 */
 	static mapRow(row) {
 		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate,
-			row.type_of_unit, row.unit_index, row.suffix, row.displayable, row.preferred_display, row.note);
+			row.type_of_unit, row.suffix, row.displayable, row.preferred_display, row.note);
 	}
 
 	/**
@@ -182,29 +180,6 @@ class Unit {
 	static async getByName(name, conn) {
 		const row = await conn.oneOrNone(sqlFile('unit/get_by_name.sql'), { name: name });
 		return row === null ? null : Unit.mapRow(row);
-	}
-
-	/**
-	 * Returns the associated id of type meter for the given unitIndex.
-	 * @param {*} unitIndex The unit's index.
-	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Int>}
-	 */
-	static async getByUnitIndexMeter(unitIndex, conn) {
-		const resp = await conn.one(sqlFile('unit/get_by_unit_index_meter.sql'), { unitIndex: unitIndex });
-		return resp.id;
-	}
-
-	// TODO: Returns a special value if it doesn't exist
-	/**
-	 * Returns the associated id of type unit for the given unitIndex.
-	 * @param {*} unitIndex The unit's index.
-	 * @param {*} conn The connection to use.
-	 * @returns {Promise.<Int>}
-	 */
-	static async getByUnitIndexUnit(unitIndex, conn) {
-		const resp = await conn.oneOrNone(sqlFile('unit/get_by_unit_index_unit.sql'), { unitIndex: unitIndex });
-		return resp === null ? null : resp.id;
 	}
 
 	/**

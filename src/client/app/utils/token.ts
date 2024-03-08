@@ -33,3 +33,10 @@ export function hasToken(): boolean {
 export function deleteToken(): void {
 	localStorage.removeItem('token');
 }
+
+/**
+ * @param token the token string to save to local storage for returning users.
+ */
+export function setToken(token: string): void {
+	localStorage.setItem('token', token);
+}

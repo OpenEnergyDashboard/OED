@@ -3,25 +3,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { LanguageTypes } from '../types/redux/i18n';
 import { FormattedMessage } from 'react-intl';
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown } from 'reactstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../types/redux/state';
-import { updateSelectedLanguage } from '../actions/options';
-import { BASE_URL } from './TooltipHelpComponent';
+import { selectSelectedLanguage, updateSelectedLanguage } from '../redux/slices/appStateSlice';
+import { selectOEDVersion } from '../redux/api/versionApi';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { LanguageTypes } from '../types/redux/i18n';
+import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
 
 /**
  * A component that allows users to select which language the page should be displayed in.
  * @returns Language selector element for navbar
  */
 export default function LanguageSelectorComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
-	const selectedLanguage = useSelector((state: State) => state.options.selectedLanguage);
-	const version = useSelector((state: State) => state.version.version);
+	const selectedLanguage = useAppSelector(selectSelectedLanguage);
+	const version = useAppSelector(selectOEDVersion);
+	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
 
-	const HELP_URL = BASE_URL + version;
+	const helpUrl = baseHelpUrl + version;
 
 	return (
 		<>
@@ -47,7 +48,7 @@ export default function LanguageSelectorComponent() {
 					</DropdownItem>
 					<DropdownItem divider />
 					<DropdownItem
-						href={HELP_URL + '/language.html'}>
+						href={helpUrl + '/language.html'}>
 						<FormattedMessage id="help" />
 					</DropdownItem>
 				</DropdownMenu>

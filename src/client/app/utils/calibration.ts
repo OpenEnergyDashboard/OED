@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { MapMetadata } from '../types/redux/map';
-import { logToServer } from '../actions/logs';
+import { showErrorNotification } from './notifications';
+import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
+import { MapMetadata } from '../types/redux/map';
 import translate from './translate';
-import { notifyUser } from './input';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -122,7 +122,7 @@ export function isValidGPSInput(input: string): boolean {
 	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
 		// TODO It would be nice to return the error and then notify as desired.
-		notifyUser(translate('input.gps.range') + input);
+		showErrorNotification(translate('input.gps.range') + input);
 	}
 	return result;
 }
@@ -248,7 +248,7 @@ export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Di
 	// The Plotly coordinates have the opposite at the max coordinate values that is the normalized
 	// size coordinates.
 	// Similar to above but different point.
-	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height }
+	const opposite: CartesianPoint = { x: normalizedDimensions.width, y: normalizedDimensions.height };
 	const oppositeTrueNorth: CartesianPoint = shiftRotate(normalizedDimensions, opposite, -1, northAngle);
 	const oppositeCoordinate: GPSPoint = {
 		latitude: calibrationSet[0].gps.latitude + degreePerUnitY * (oppositeTrueNorth.y - clickedTrueNorth.y),
@@ -332,7 +332,7 @@ export function normalizeImageDimensions(dimensions: Dimensions): Dimensions {
 	const res: Dimensions = {
 		width,
 		height
-	}
+	};
 	return res;
 }
 
@@ -432,7 +432,7 @@ export function trueNorthOrigin(size: Dimensions, northAngle: number): Cartesian
 export function trueNorthOpposite(size: Dimensions, northAngle: number): CartesianPoint {
 	// The opposite coordinate is the size since it is in the top, right corner
 	// of the user map.
-	const opposite: CartesianPoint = { x: size.width, y: size.height }
+	const opposite: CartesianPoint = { x: size.width, y: size.height };
 	// Shift this value to center and then rotate to put on true north map.
 	return shiftRotate(size, opposite, -1, northAngle);
 }

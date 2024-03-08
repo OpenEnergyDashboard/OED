@@ -3,13 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
-import UIOptionsContainer from '../containers/UIOptionsContainer';
-import HeaderButtonsComponent from './HeaderButtonsComponent';
+import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
-import { useState } from 'react';
-import getPage from '../utils/getPage';
+import { Button, Modal, ModalBody, ModalHeader } from 'reactstrap';
+import HeaderButtonsComponent from './HeaderButtonsComponent';
+import UIOptionsComponent from './UIOptionsComponent';
+import { useLocation } from 'react-router-dom';
 
 /**
  * React component to define the collapsed menu modal
@@ -17,7 +17,8 @@ import getPage from '../utils/getPage';
  */
 export default function MenuModalComponent() {
 	const [showModal, setShowModal] = useState(false);
-	const toggleModal = () => { setShowModal(!showModal); }
+	const toggleModal = () => { setShowModal(!showModal); };
+	const { pathname } = useLocation();
 
 	const inlineStyle: React.CSSProperties = {
 		display: 'inline',
@@ -33,13 +34,13 @@ export default function MenuModalComponent() {
 				<ModalHeader tag={customModalHeader} style={{ padding: '0.25rem 1rem' }} />
 				<ModalBody>
 					{/* Only render graph options if on the graph page */}
-					{getPage() === '' &&
-						<UIOptionsContainer />
+					{pathname === '/' &&
+						<UIOptionsComponent />
 					}
 				</ModalBody>
 			</Modal>
 		</div >
-	)
+	);
 }
 
 const customModalHeader = () => {
@@ -55,5 +56,5 @@ const customModalHeader = () => {
 			<h6>
 				<HeaderButtonsComponent />
 			</h6>
-		</div>)
-}
+		</div>);
+};

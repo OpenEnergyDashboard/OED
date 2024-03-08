@@ -2,16 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
-import { Button } from 'reactstrap';
-import { Link } from 'react-router-dom';
-import { hasToken } from '../../utils/token';
-import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
-import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import * as moment from 'moment';
-import store from '../../index';
-import { updateUnsavedChanges } from '../../actions/unsavedWarning';
-import { fetchMapsDetails, submitEditedMaps, confirmEditedMaps } from '../../actions/map';
+import * as React from 'react';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
+import { Link } from 'react-router-dom';
+import { Button } from 'reactstrap';
+import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { showErrorNotification } from '../../utils/notifications';
+import { hasToken } from '../../utils/token';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -93,21 +91,28 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		}
 	}
 
-	private removeUnsavedChangesFunction(callback: () => void) {
-		// This function is called to reset all the inputs to the initial state
-		store.dispatch<any>(confirmEditedMaps()).then(() => {
-			store.dispatch<any>(fetchMapsDetails()).then(callback);
-		});
-	}
+	// Re-implement After RTK migration
+	// private removeUnsavedChangesFunction(callback: () => void) {
+	// 	// This function is called to reset all the inputs to the initial state
+	// 	store.dispatch<any>(confirmEditedMaps()).then(() => {
+	// 		store.dispatch<any>(fetchMapsDetails()).then(callback);
+	// 	});
+	// }
 
-	private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
-		// This function is called to submit the unsaved changes
-		store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
-	}
+	// Re-implement After RTK migration
+	// private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+	// 	// This function is called to submit the unsaved changes
+	// 	store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
+	// }
 
 	private updateUnsavedChanges() {
+		// Re-implement After RTK migration
 		// Notify that there are unsaved changes
-		store.dispatch(updateUnsavedChanges(this.removeUnsavedChangesFunction, this.submitUnsavedChangesFunction));
+		// store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+		// 	removeFunction: this.removeUnsavedChangesFunction,
+		// 	submitFunction: this.submitUnsavedChangesFunction
+		// }));
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	}
 
 	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -137,7 +142,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			this.setState({ circleFocus: !this.state.circleFocus });
 		}
 		else {
-			window.alert(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
+			showErrorNotification(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
 		}
 	}
 
@@ -269,7 +274,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 
 	// this function throws alert on the browser notifying that map needs calibrating before display
 	private notifyCalibrationNeeded() {
-		window.alert(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
+		showErrorNotification(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
 	}
 
 	private toggleNameInput() {

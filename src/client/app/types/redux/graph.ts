@@ -4,7 +4,6 @@
 
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { ActionType } from './actions';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
@@ -12,12 +11,9 @@ export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
 	compare = 'compare',
-	map = 'map'
-}
-
-export enum MeterOrGroup {
-	meter = 'meter',
-	group = 'group'
+	map = 'map',
+	radar = 'radar',
+	threeD = '3D'
 }
 
 // Rates that can be graphed, only relevant to line graphs.
@@ -26,116 +22,37 @@ export const LineGraphRates = {
 	'minute': (1 / 60),
 	'hour': 1,
 	'day': 24
+};
+
+// Use to determine readings per day on 3D Graphs
+// 24 / ReadingInterval.Hourly(1) = 24 readings per day @ 1 hour intervals
+// 24 / ReadingInterval.TwoHour(2) = 12 readings per day @ 2 hour intervals
+// and so on.
+export enum ReadingInterval {
+	Hourly = 1,
+	TwoHour = 2,
+	ThreeHour = 3,
+	FourHour = 4,
+	SixHour = 6,
+	EightHour = 8,
+	TwelveHour = 12,
+	Incompatible = -999
 }
 
-export interface UpdateSelectedMetersAction {
-	type: ActionType.UpdateSelectedMeters;
-	meterIDs: number[];
-}
-
-export interface UpdateSelectedGroupsAction {
-	type: ActionType.UpdateSelectedGroups;
-	groupIDs: number[];
-}
-
-export interface UpdateSelectedUnitAction {
-	type: ActionType.UpdateSelectedUnit;
-	unitID: number;
-}
-
-export interface UpdateSelectedAreaUnitAction {
-	type: ActionType.UpdateSelectedAreaUnit;
-	areaUnit: AreaUnitType;
-}
-
-export interface UpdateBarDurationAction {
-	type: ActionType.UpdateBarDuration;
-	barDuration: moment.Duration;
-}
-
-export interface ChangeChartToRenderAction {
-	type: ActionType.ChangeChartToRender;
-	chartType: ChartTypes;
-}
-
-export interface ToggleAreaNormalizationAction {
-	type: ActionType.ToggleAreaNormalization;
-}
-
-export interface ToggleShowMinMaxAction {
-	type: ActionType.ToggleShowMinMax;
-}
-
-export interface ChangeBarStackingAction {
-	type: ActionType.ChangeBarStacking;
-}
-
-export interface ChangeGraphZoomAction {
-	type: ActionType.ChangeGraphZoom;
-	timeInterval: TimeInterval;
-}
-
-export interface ChangeSliderRangeAction {
-	type: ActionType.ChangeSliderRange;
-	sliderInterval: TimeInterval;
-}
-
-export interface ResetRangeSliderStackAction {
-	type: ActionType.ResetRangeSliderStack;
-}
-
-export interface UpdateComparePeriodAction {
-	type: ActionType.UpdateComparePeriod;
-	comparePeriod: ComparePeriod;
-	currentTime: moment.Moment;
-}
-
-export interface ChangeCompareSortingOrderAction {
-	type: ActionType.ChangeCompareSortingOrder;
-	compareSortingOrder: SortingOrder;
-}
-
-export interface SetHotlinked {
-	type: ActionType.SetHotlinked;
-	hotlinked: boolean;
-}
-
-export interface ToggleOptionsVisibility {
-	type: ActionType.ToggleOptionsVisibility;
-}
-
-export interface UpdateLineGraphRate {
-	type: ActionType.UpdateLineGraphRate;
-	lineGraphRate: LineGraphRate;
-}
-
-export interface ConfirmGraphRenderOnce {
-	type: ActionType.ConfirmGraphRenderOnce;
-}
-
-export type GraphAction =
-	| ChangeGraphZoomAction
-	| ChangeSliderRangeAction
-	| ResetRangeSliderStackAction
-	| ChangeBarStackingAction
-	| ToggleAreaNormalizationAction
-	| ToggleShowMinMaxAction
-	| ChangeChartToRenderAction
-	| UpdateBarDurationAction
-	| UpdateSelectedGroupsAction
-	| UpdateSelectedMetersAction
-	| UpdateSelectedUnitAction
-	| UpdateSelectedAreaUnitAction
-	| UpdateComparePeriodAction
-	| SetHotlinked
-	| ChangeCompareSortingOrderAction
-	| ToggleOptionsVisibility
-	| UpdateLineGraphRate
-	| ConfirmGraphRenderOnce;
 
 export interface LineGraphRate {
 	label: string,
 	rate: number
+}
+
+export type MeterOrGroupID = number;
+export enum MeterOrGroup { meters = 'meters', groups = 'groups' }
+export type MeterOrGroupPill = { meterOrGroupID: number, isDisabled: boolean, meterOrGroup: MeterOrGroup }
+
+export interface ThreeDState {
+	meterOrGroupID: MeterOrGroupID | undefined;
+	meterOrGroup: MeterOrGroup | undefined;
+	readingInterval: ReadingInterval;
 }
 
 export interface GraphState {
@@ -144,17 +61,17 @@ export interface GraphState {
 	selectedGroups: number[];
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
-	timeInterval: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;
+	mapsBarDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;
 	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
-	hotlinked: boolean;
-	optionsVisibility: boolean;
 	lineGraphRate: LineGraphRate;
-	renderOnce: boolean;
 	showMinMax: boolean;
+	threeD: ThreeDState;
+	queryTimeInterval: TimeInterval;
+	hotlinked: boolean;
 }
