@@ -57,6 +57,16 @@ export const unitsApi = baseApi.injectEndpoints({
 					});
 			},
 			invalidatesTags: ['Units']
+		}),
+		deleteUnit: builder.mutation<void, number>({
+			query: unitId => ({
+				url: 'api/units/delete',
+				method: 'POST',
+				body: { id: unitId }
+			}),
+			// You should not be able to delete a unit that is used in a meter or conversion
+			// so no invalidation for those.
+			invalidatesTags: ['Units']
 		})
 	})
 });

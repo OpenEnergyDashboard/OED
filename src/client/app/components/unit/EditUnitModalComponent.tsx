@@ -35,6 +35,7 @@ interface EditUnitModalComponentProps {
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
+	const [deleteUnit] = unitsApi.useDeleteUnitMutation();
 	const translate = useTranslate();
 
 	// Set existing unit values
@@ -107,7 +108,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			showErrorNotification(error_message);
 		} else {
 			// It is okay to delete this unit.
-			// TODO delete unit
+			// TODO ***** need to get the returned error if happened
+			deleteUnit(state.id);
 		}
 	};
 

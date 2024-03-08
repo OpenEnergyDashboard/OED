@@ -193,4 +193,38 @@ router.post('/addUnit', async (req, res) => {
 	}
 });
 
+/**
+ * Route for POST, delete unit.
+ */
+router.post('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['id'],
+		properties: {
+			id: { type: 'integer' }
+		}
+	};
+
+	// Ensure delete request is valid
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
+		log.warn(errorMsg);
+		failure(res, 400, errorMsg);
+	} else {
+		const conn = getConnection();
+		try {
+			// Don't worry about checking if the unit already exists
+			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
+			await Unit.delete(req.body.id, conn);
+		} catch (err) {
+			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			log.error(errorMsg);
+			failure(res, 500, errorMsg);
+		}
+		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
+	}
+});
+
 module.exports = router;
