@@ -4,31 +4,28 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { State } from '../types/redux/state';
-import { useDispatch, useSelector } from 'react-redux';
-import { SelectOption } from '../types/items';
 import Select from 'react-select';
-import translate from '../utils/translate';
-import { updateLineGraphRate } from '../actions/graph'
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedUnitData } from '../redux/selectors/plotlyDataSelectors';
+import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
+import { SelectOption } from '../types/items';
 import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
+import { UnitRepresentType } from '../types/redux/units';
+import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { UnitRepresentType } from '../types/redux/units'
 
 /**
  * React component that controls the line graph rate menu
  * @returns Rate selection element
  */
 export default function GraphicRateMenuComponent() {
-	const dispatch = useDispatch();
+	const dispatch = useAppDispatch();
 
 	// Graph state
-	const graphState = useSelector((state: State) => state.graph);
-
-	// Unit state
-	const unitDataById = useSelector((state: State) => state.units.units);
+	const graphState = useAppSelector(selectGraphState);
 
 	// Unit data by Id
-	const selectedUnitData = unitDataById[graphState.selectedUnit];
+	const selectedUnitData = useAppSelector(selectSelectedUnitData);
 
 	// Should the rate drop down menu be rendered.
 	let shouldRender = true;
@@ -40,7 +37,13 @@ export default function GraphicRateMenuComponent() {
 		}
 	}
 	// Also don't show if not the line graphic, or three-d.
-	if (graphState.chartToRender !== ChartTypes.line && graphState.chartToRender !== ChartTypes.threeD ) {
+	const displayOnChartType: ChartTypes[] = [
+		ChartTypes.line,
+		ChartTypes.threeD,
+		ChartTypes.radar
+	];
+
+	if (!displayOnChartType.includes(graphState.chartToRender)) {
 		shouldRender = false;
 	}
 	// Array of select options created from the rates
@@ -75,10 +78,10 @@ export default function GraphicRateMenuComponent() {
 						value={{ label: translate(graphState.lineGraphRate.label), value: graphState.lineGraphRate.rate } as SelectOption}
 						onChange={newSelectedRate => {
 							if (newSelectedRate) {
-								dispatch(updateLineGraphRate({
+								dispatch(graphSlice.actions.updateLineGraphRate({
 									label: newSelectedRate.labelIdForTranslate,
 									rate: Number(newSelectedRate.value)
-								} as LineGraphRate))
+								} as LineGraphRate));
 							}
 						}}
 					/>

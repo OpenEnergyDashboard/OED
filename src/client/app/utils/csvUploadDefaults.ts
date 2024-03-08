@@ -25,11 +25,11 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	update: false,
 	honorDst: false,
 	relaxedParsing: false
-}
+};
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
 	meterName: '',
 	gzip: false,
 	headerRow: false,
 	update: false
-}
+};

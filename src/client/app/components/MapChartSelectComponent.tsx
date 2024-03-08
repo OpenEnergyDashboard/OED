@@ -27,6 +27,7 @@ export default function MapChartSelectComponent() {
 		selectMap: {id: 'select.map'}
 	});
 
+	// TODO When this is converted to RTK then should use useAppDispatch().
 	//Utilizes useDispatch and useSelector hooks
 	const dispatch = useDispatch();
 	const sortedMaps = _.sortBy(_.values(useSelector((state: State) => state.maps.byMapID)).map(map => (

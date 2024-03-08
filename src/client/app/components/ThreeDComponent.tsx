@@ -2,88 +2,58 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as React from 'react';
 import * as moment from 'moment';
-import Plot from 'react-plotly.js';
-import ThreeDPillComponent from './ThreeDPillComponent';
-import SpinnerComponent from './SpinnerComponent';
-import { State } from '../types/redux/state';
-import { useDispatch, useSelector } from 'react-redux';
-import { ThreeDReading } from '../types/readings'
-import { roundTimeIntervalForFetch, isValidThreeDInterval } from '../utils/dateRangeCompatibility';
-import { lineUnitLabel } from '../utils/graphics';
+import * as React from 'react';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { readingsApi } from '../redux/api/readingsApi';
+import { selectUnitDataById } from '../redux/api/unitsApi';
+import { useAppSelector } from '../redux/reduxHooks';
+import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
+import { selectGraphState } from '../redux/slices/graphSlice';
+import { ThreeDReading } from '../types/readings';
+import { GraphState, MeterOrGroup } from '../types/redux/graph';
+import { GroupDataByID } from '../types/redux/groups';
+import { MeterDataByID } from '../types/redux/meters';
+import { UnitDataById } from '../types/redux/units';
+import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { lineUnitLabel } from '../utils/graphics';
 import translate from '../utils/translate';
-import { ByMeterOrGroup, GraphState, MeterOrGroup } from '../types/redux/graph';
-import { Dispatch } from '../types/redux/actions';
-import { useEffect } from 'react';
-import { fetchNeededThreeDReadings } from '../actions/threeDReadings';
-import { UnitsState } from 'types/redux/units';
-import { MetersState } from 'types/redux/meters';
-import { GroupsState } from 'types/redux/groups';
+import SpinnerComponent from './SpinnerComponent';
+import ThreeDPillComponent from './ThreeDPillComponent';
+import Plot from 'react-plotly.js';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import Locales from '../types/locales';
 
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
-	const dispatch: Dispatch = useDispatch();
-	const metersState = useSelector((state: State) => state.meters);
-	const groupsState = useSelector((state: State) => state.groups);
-	const graphState = useSelector((state: State) => state.graph);
-	const unitState = useSelector((state: State) => state.units);
-	const threeDReadings = useSelector((state: State) => state.readings.threeD);
-	const isFetching = useSelector((state: State) => state.readings.threeD.isFetching);
+	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	const meterDataById = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
+	const unitDataById = useAppSelector(selectUnitDataById);
+	const graphState = useAppSelector(selectGraphState);
+	const locale = useAppSelector(selectSelectedLanguage);
+	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
 
-	const threeDState = graphState.threeD;
-	const meterOrGroupID = threeDState.meterOrGroupID;
-
-	// meterOrGroup determines whether to get readings from state .byMeterID or .byGroupID
-	const byMeterOrGroup = threeDState.meterOrGroup === MeterOrGroup.meters ? ByMeterOrGroup.meters : ByMeterOrGroup.groups;
-
-	// 3D requires intervals to be rounded to a full day.
-	const timeInterval = roundTimeIntervalForFetch(graphState.timeInterval).toString();
-	const unitID = graphState.selectedUnit;
-
-	// Level of detail along the xAxis / Readings per day
-	const readingInterval = threeDState.readingInterval;
 
 	// Initialize Default values
-	let threeDData = null;
-	let isAreaCompatible = true;
-	let meterOrGroupName = 'Unknown Meter or Group';
+	const threeDData = data;
 	let layout = {};
 	let dataToRender = null;
 
-	// Meter Or Group is selected
-	if (meterOrGroupID) {
-		// Get Reading data, if any
-		threeDData = threeDReadings[byMeterOrGroup][meterOrGroupID]?.[timeInterval]?.[unitID]?.[readingInterval]?.readings;
-
-		// Get Meter or Group's info
-		const meterOrGroupInfo = threeDState.meterOrGroup === MeterOrGroup.meters ?
-			metersState.byMeterID[meterOrGroupID]
-			:
-			groupsState.byGroupID[meterOrGroupID];
-
-		// Use Meter or Group's info to determine whether it can be rendered with area normalization
-		const area = meterOrGroupInfo.area;
-		const areaUnit = meterOrGroupInfo.areaUnit;
-		isAreaCompatible = area !== 0 && areaUnit !== AreaUnitType.none;
-
-		// Get Meter Or Groups name/label
-		meterOrGroupName = threeDState.meterOrGroup === MeterOrGroup.meters ?
-			metersState.byMeterID[meterOrGroupID].identifier
-			:
-			groupsState.byGroupID[meterOrGroupID].name;
-	}
 
 	if (!meterOrGroupID) {
 		// No selected Meters
 		layout = setHelpLayout(translate('select.meter.group'));
 	} else if (graphState.areaNormalization && !isAreaCompatible) {
 		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.timeInterval))) {
+	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.queryTimeInterval))) {
 		// Not a valid time interval. ThreeD can only support up to 1 year of readings
 		layout = setHelpLayout(translate('threeD.date.range.too.long'));
 	} else if (!threeDData) {
@@ -91,55 +61,54 @@ export default function ThreeDComponent() {
 		layout = setHelpLayout(translate('threeD.rendering'));
 	} else if (threeDData.zData.length === 0) {
 		// There is no data in the selected date range.
-		layout = setHelpLayout(translate('threeD.no.data'));
+		layout = setHelpLayout(translate('no.data.in.range'));
 	} else if (threeDData.zData[0][0] && threeDData.zData[0][0] < 0) {
 		// Special Case where meter frequency is greater than 12 hour intervals
 		layout = setHelpLayout(translate('threeD.incompatible'));
 	} else {
-		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, metersState, groupsState, graphState, unitState);
+		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
 	}
 
-	// Necessary for the case when a meter/group is selected and time intervals get altered externally. (Line graphic slider, for example.)
-	useEffect(() => {
-		// Fetch on initial render only, all other fetch will be called from PillBadges, or meter/group multiselect
-		dispatch(fetchNeededThreeDReadings());
-	}, [])
-
 	return (
-		<div style={{ width: '100%', height: '75vh' }}>
+		<>
 			<ThreeDPillComponent />
-			{isFetching ?
-				<SpinnerComponent loading width={50} height={50} />
-				:
-				<Plot
-					data={dataToRender as Plotly.Data[]}
+			{isFetching
+				? <SpinnerComponent loading width={50} height={50} />
+				: <Plot
+					style={{ width: '100%', height: '100%', minHeight: '700px' }}
+					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
-					config={config}
-					style={{ width: '100%', height: '80%' }}
-					useResizeHandler={true}
+					config={{
+						responsive: true,
+						displayModeBar: false,
+						// Current Locale
+						locale,
+						// Available Locales
+						locales: Locales
+					}}
 				/>
 			}
-		</div>
-	)
+		</>
+	);
 }
 
 /**
  * Formats Readings for plotly 3d surface
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
- * @param meters redux meters state
- * @param groups redux groups state
+ * @param meterDataById redux meters state
+ * @param groupDataById redux groups state
  * @param graphState redux graph state
- * @param unitsState redux units state
+ * @param unitDataById redux units state
  * @returns Data, and Layout objects for a 3D Plotly Graph
  */
 function formatThreeDData(
 	data: ThreeDReading,
 	selectedMeterOrGroupID: number,
-	meters: MetersState,
-	groups: GroupsState,
+	meterDataById: MeterDataByID,
+	groupDataById: GroupDataByID,
 	graphState: GraphState,
-	unitsState: UnitsState
+	unitDataById: UnitDataById
 ) {
 	// Initialize Plotly Data
 	const xDataToRender: string[] = [];
@@ -156,24 +125,24 @@ function formatThreeDData(
 	let unitLabel = '';
 	let needsRateScaling = false;
 	if (graphingUnit !== -99) {
-		const selectUnitState = unitsState.units[graphState.selectedUnit];
+		const selectUnitState = unitDataById[graphState.selectedUnit];
 		if (selectUnitState !== undefined) {
 			// Determine the y-axis label and if the rate needs to be scaled.
 			const returned = lineUnitLabel(selectUnitState, currentSelectedRate, graphState.areaNormalization, graphState.selectedAreaUnit);
-			unitLabel = returned.unitLabel
+			unitLabel = returned.unitLabel;
 			needsRateScaling = returned.needsRateScaling;
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
 			const meterArea = meterOrGroup === MeterOrGroup.meters ?
-				meters.byMeterID[selectedMeterOrGroupID].area
+				meterDataById[selectedMeterOrGroupID].area
 				:
-				groups.byGroupID[selectedMeterOrGroupID].area;
+				groupDataById[selectedMeterOrGroupID].area;
 
 			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
-				meters.byMeterID[selectedMeterOrGroupID].areaUnit
+				meterDataById[selectedMeterOrGroupID].areaUnit
 				:
-				groups.byGroupID[selectedMeterOrGroupID].areaUnit;
+				groupDataById[selectedMeterOrGroupID].areaUnit;
 
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
 			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
@@ -192,7 +161,7 @@ function formatThreeDData(
 		const startTS = moment.utc(data.xData[j].startTimestamp);
 		const endTS = moment.utc(data.xData[j].endTimestamp);
 		const midpointTS = moment.utc(startTS.clone().add(endTS.clone().diff(startTS) / 2));
-		const dateTS = moment.utc(data.yData[i])
+		const dateTS = moment.utc(data.yData[i]);
 
 		// Use first day's values to populate xData Labels
 		if (i === 0) {
@@ -222,9 +191,9 @@ function formatThreeDData(
 		z: zDataToRender,
 		hoverinfo: 'text',
 		hovertext: hoverText
-	}]
+	}];
 	const layout = setThreeDLayout(unitLabel);
-	return [formattedData, layout]
+	return [formattedData, layout];
 }
 
 /**
@@ -250,7 +219,7 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 				'font': { 'size': fontSize }
 			}
 		]
-	}
+	};
 }
 
 /**
@@ -261,8 +230,9 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 	// responsible for setting Labels
 	return {
-		autosize: true,
-		//Leaves holes in graph for missing, undefined, NaN, or null values
+		// Eliminate margin
+		margin: { t: 0, b: 0, l: 0, r: 0 },
+		// Leaves gaps / voids in graph for missing, undefined, NaN, or null values
 		connectgaps: false,
 		scene: {
 			xaxis: {
@@ -289,9 +259,6 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 				}
 			}
 		}
-	}
+	} as Partial<Plotly.Layout>;
 }
 
-const config = {
-	responsive: true
-};

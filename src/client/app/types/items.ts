@@ -2,9 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ChartTypes } from '../types/redux/graph';
+import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { LanguageTypes } from './redux/i18n';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { MeterData } from './redux/meters';
+import { GroupData } from './redux/groups';
+import { UnitData } from './redux/units';
 
 /**
  * The type of options displayed in Select components.
@@ -15,6 +18,13 @@ export interface SelectOption {
 	isDisabled?: boolean;
 	labelIdForTranslate?: string;
 	style?: React.CSSProperties;
+	meterOrGroup?: MeterOrGroup;
+	defaultGraphicUnit?: number;
+	entity?: MeterData | GroupData | UnitData;
+}
+export interface GroupedOption {
+	label: string;
+	options: SelectOption[];
 }
 
 /**
@@ -74,6 +84,9 @@ export interface TooltipItems {
 export interface User {
 	email: string;
 	role: UserRole;
+}
+export interface NewUser extends User {
+	password: string;
 }
 
 /**

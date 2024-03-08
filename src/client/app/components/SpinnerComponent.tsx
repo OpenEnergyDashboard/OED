@@ -24,17 +24,14 @@ function SpinnerComponent(props: SpinnerProps) {
 		backgroundColor: props.color ? props.color : 'black'
 	};
 
-	return (
-		<div>
-			{props.loading &&
-				<div>
-					<div style={spinnerStyle} className='spinner spinner-item-1' />
-					<div style={spinnerStyle} className='spinner spinner-item-2' />
-					<div style={spinnerStyle} className='spinner spinner-item-1' />
-				</div>
-			}
+	return props.loading ?
+		<div style={{ width: `${props.width ? props.width * 3 : 150}px` }}>
+			<div style={spinnerStyle} className='spinner spinner-item-1' />
+			<div style={spinnerStyle} className='spinner spinner-item-2' />
+			<div style={spinnerStyle} className='spinner spinner-item-1' />
 		</div>
-	);
+		:
+		null;
 }
 
 export default SpinnerComponent;

@@ -31,5 +31,5 @@ export default function FileUploaderComponent(props: FileUploader) {
 				<FormattedMessage id={props.formText}/>
 			</FormText>
 		</FormGroup>
-	)
+	);
 }

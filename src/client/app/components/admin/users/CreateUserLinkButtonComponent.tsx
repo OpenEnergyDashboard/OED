@@ -20,10 +20,10 @@ export default function CreateUserLinkButtonComponent(props: CreateUserLinkButto
 	const inlineButtonStyle: React.CSSProperties = {
 		display: 'inline',
 		paddingLeft: '5px'
-	}
+	};
 
 	return (
 		<Link style={{ ...inlineButtonStyle, ...props.style }} to='/users/new'>
 			<Button color='primary' outline> <FormattedMessage id='create.user'/> </Button></Link>
-	)
+	);
 }

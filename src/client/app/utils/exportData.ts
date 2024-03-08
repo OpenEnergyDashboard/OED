@@ -2,8 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { LineReading, BarReading, RawReadings } from '../types/readings';
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import * as moment from 'moment';
+import { BarReading, LineReading, RawReadings } from '../types/readings';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 
 /**
@@ -30,12 +32,12 @@ function convertToCSV(readings: LineReading[] | BarReading[], name: string, unit
 	}
 	// TODO should be internationalized
 	let meterOrGroupString = '';
-	if (meterGroup === MeterOrGroup.meter) {
-		meterOrGroupString = 'Meter'
+	if (meterGroup === MeterOrGroup.meters) {
+		meterOrGroupString = 'Meter';
 	} else {
-		meterOrGroupString = 'Group'
+		meterOrGroupString = 'Group';
 	}
-	csvOutput += `, ${meterOrGroupString} name, ${name}, Unit, ${unitLabel}\n`
+	csvOutput += `, ${meterOrGroupString} name, ${name}, Unit, ${unitLabel}\n`;
 	readings.forEach(reading => {
 		const value = reading.reading * scaling;
 		// As usual, maintain UTC.
@@ -55,7 +57,7 @@ function convertToCSV(readings: LineReading[] | BarReading[], name: string, unit
 			if (reading.min && reading.max) {
 				const min = reading.min * scaling;
 				const max = reading.max * scaling;
-				csvOutput += `,${min},${max}`
+				csvOutput += `,${min},${max}`;
 			}
 		}
 		csvOutput += '\n';
@@ -130,7 +132,7 @@ export function downloadRawCSV(readings: RawReadings[], meter: string, unit: str
 			const startTimestamp = moment.utc(ele.s).format('YYYY-MM-DD HH:mm:ss');
 			const endTimestamp = moment.utc(ele.e).format('YYYY-MM-DD HH:mm:ss');
 			csvOutput += `${ele.r},${startTimestamp},${endTimestamp}\n`;
-		})
+		});
 		// Use regex to remove commas and replace spaces/colons/hyphens with underscores.
 		// These are time times for the file name which go from the first reading start time to the last reading end time.
 		// Easy to get since the data is sorted.

@@ -2,11 +2,40 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-html {
-	position: relative;
-	min-height: 100%;
+body {
+	margin: 0;
+	padding: 0;
+	height: 100dvh;
+	width: 100dvw;
 }
 
-.js-plotly-plot {
+#root {
+	height: 100%;
 	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.no_scrollbar {
+	scrollbar-width: none; /* Firefox 64+ */
+	-ms-overflow-style: none; /* Internet Explorer and Edge */
+	/* Hide scrollbar for Webkit browsers */
+	::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/* Hide Default Plotly Notifications, Like DoubleClick, etc. */
+div.plotly-notifier {
+	visibility: hidden;
+}
+
+/* Disable hover effect on scrollbar */
+.customScrollBar {
+	scrollbar-color: #888 #ffffff00;
+	scrollbar-width: thin;
+}
+
+.flexGrowOne {
+	flex-grow: 1;
 }

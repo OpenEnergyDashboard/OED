@@ -7,10 +7,10 @@ import Plot from 'react-plotly.js';
 import { State } from '../../types/redux/state';
 import * as plotly from 'plotly.js';
 import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
-import { updateCurrentCartesian } from '../../actions/map';
+import { updateCurrentCartesian } from '../../redux/actions/map';
 import { store }  from '../../store';
 import { CalibrationSettings } from '../../types/redux/map';
-import Locales from '../../types/locales'
+import Locales from '../../types/locales';
 
 function mapStateToProps(state: State) {
 	const x: number[] = [];
@@ -95,7 +95,7 @@ function mapStateToProps(state: State) {
 			locales: Locales // makes locales available for use
 		}
 	};
-	props.config.locale = state.options.selectedLanguage;
+	props.config.locale = state.appState.selectedLanguage;
 	return props;
 }
 
