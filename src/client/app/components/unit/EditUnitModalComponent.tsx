@@ -76,9 +76,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			// This unit is used by a meter so cannot be deleted.
 			if (value.unitId == state.id) {
 				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
-				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} "${state.name}";`;
+				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
+					`"${state.name}" ${translate('as.meter.unit')};`;
 			}
-			// TODO check default graphic unit**************
+			if (value.defaultGraphicUnit == state.id) {
+				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
+					`"${state.name}" ${translate('as.meter.defaultgraphicunit')};`;
+			}
 		}
 		for (let i = 0; i < conversionData.length; i++) {
 			if (conversionData[i].sourceId == state.id) {
@@ -91,7 +95,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 			if (conversionData[i].destinationId == state.id) {
 				// This unit is the destination of a conversion so cannot be deleted.
-				// TODO use source -> destination to identify*****************
 				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
 					`${conversionArrow(conversionData[i].bidirectional)}` +
 					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
