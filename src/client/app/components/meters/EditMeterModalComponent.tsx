@@ -155,7 +155,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// error_message = translate('meter.is.not.editable') + '\n' + error_message;
 				error_message = translate('meter.is.not.editable') + ': ' + error_message;
 				// TODO Attempts to add a line break with \n, <br />, etc. failed when using showErrorNotification.
-				// This is going to be a general problem.
+				// This is going to be a general problem. See https://github.com/fkhadra/react-toastify/issues/687
+				// and https://github.com/fkhadra/react-toastify/issues/201.
 				showErrorNotification(error_message);
 			} else {
 				// Tell user that not going to update due to input issues.

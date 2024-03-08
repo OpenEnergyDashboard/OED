@@ -10,14 +10,14 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
-import { selectAllUnits } from '../../redux/api/unitsApi';
-import { unitsApi } from '../../redux/api/unitsApi';
+import { selectUnitDataById, unitsApi } from '../../redux/api/unitsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { conversionArrow } from '../../utils/conversionArrow';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -56,7 +56,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const [state, setState] = useState(values);
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const meterDataByID = useAppSelector(selectMeterDataById);
-	const unitData = useAppSelector(selectAllUnits);
+	const unitDataByID = useAppSelector(selectUnitDataById);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -83,14 +83,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		for (let i = 0; i < conversionData.length; i++) {
 			if (conversionData[i].sourceId == state.id) {
 				// This unit is the source of a conversion so cannot be deleted.
-				error_message += ` ${translate('conversion')} ${unitData[conversionData[i].sourceId].name} ${translate('uses')} ${translate('unit')}` +
+				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
+					`${conversionArrow(conversionData[i].bidirectional)}` +
+					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
 					` "${state.name}" ${translate('unit.source.error')};`;
 			}
 
 			if (conversionData[i].destinationId == state.id) {
 				// This unit is the destination of a conversion so cannot be deleted.
 				// TODO use source -> destination to identify*****************
-				error_message += ` ${translate('conversion')} ${unitData[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
+				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
+					`${conversionArrow(conversionData[i].bidirectional)}` +
+					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
 					` "${state.name}" ${translate('unit.destination.error')};`;
 			}
 		}

@@ -8,11 +8,12 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { ConversionData } from 'types/redux/conversions';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
+import { conversionArrow } from '../../utils/conversionArrow';
 import translate from '../../utils/translate';
 import EditConversionModalComponent from './EditConversionModalComponent';
-import { useAppSelector } from '../../redux/reduxHooks';
-import { selectUnitDataById } from '../../redux/api/unitsApi';
 
 interface ConversionViewComponentProps {
 	conversion: ConversionData;
@@ -37,15 +38,10 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 	const handleClose = () => {
 		setShowEditModal(false);
 	};
+
 	// Create header from sourceId, destinationId identifiers
-	// Arrow is bidirectional if conversion is bidirectional and one way if not.
-	let arrowShown: string;
-	if (props.conversion.bidirectional) {
-		arrowShown = ' ↔ ';
-	} else {
-		arrowShown = ' → ';
-	}
-	const header = String(unitDataById[props.conversion.sourceId]?.identifier + arrowShown + unitDataById[props.conversion.destinationId]?.identifier);
+	const header = String(unitDataById[props.conversion.sourceId]?.identifier + conversionArrow(props.conversion.bidirectional) +
+		unitDataById[props.conversion.destinationId]?.identifier);
 
 	// Unlike the details component, we don't check if units are loaded since must come through that page.
 
