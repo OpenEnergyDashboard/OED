@@ -7,6 +7,7 @@ const Meter = require('../../models/Meter');
 const ConfigFile = require('../../models/obvius/Configfile');
 const moment = require('moment');
 const Unit = require('../../models/Unit');
+const { getConnection } = require('../../db');
 
 /**
  * Creates array of meters from a config file
@@ -28,6 +29,7 @@ async function processConfigFile(configFile) {
 		metersHash[internalMeterName] = { ...meter, [characteristic]: config[key] };
 	}
 	// TODO: the unit name needs to come from the config file
+	const conn = getConnection();
 	const kWhUnit = await Unit.getByName('kWh', conn);
 	let unitId;
 	if (kWhUnit === null) {
