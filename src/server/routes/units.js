@@ -223,7 +223,7 @@ router.post('/delete', async (req, res) => {
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
-		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
+		success(res, `Successfully deleted conversion ${req.body.id}`);
 	}
 });
 

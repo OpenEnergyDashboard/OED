@@ -103,13 +103,14 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			}
 		}
 		if (error_message) {
-			// TODO see EditMeterModalComponent for issue with line breaks.
 			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
 			showErrorNotification(error_message);
 		} else {
 			// It is okay to delete this unit.
-			// TODO ***** need to get the returned error if happened
-			deleteUnit(state.id);
+			deleteUnit(state.id)
+				.unwrap()
+				.then(() => { showSuccessNotification(translate('unit.delete.success')); })
+				.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
 		}
 	};
 
