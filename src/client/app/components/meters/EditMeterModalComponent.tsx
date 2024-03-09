@@ -121,7 +121,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			let error_message = '';
 			// See if the meter unit changed since only allowed if not already in a group.
 			if (meterState.unitId !== localMeterEdits.unitId) {
-				// Check if the deep meters of any group in the redux state depend on the meter being edited.
+				// Check if the deep meters of groups in the redux state depend on the meter being edited.
 				// If so, the meter should not be edited.
 				for (const value of Object.values(groupDataByID)) {
 					for (let i = 0; i < value.deepMeters.length; i++) {
@@ -154,7 +154,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			} else if (error_message) {
 				// Display an error message if there are dependent deep meters and checked.
 				// Undo the unit change.
-				setLocalMeterEdits({ ...localMeterEdits, ['unitId']:  props.meter.unitId });
+				setLocalMeterEdits({ ...localMeterEdits, ['unitId']: props.meter.unitId });
 				error_message = translate('meter.unit.is.not.editable') + error_message;
 				// TODO Attempts to add a line break with \n, <br />, etc. failed when using showErrorNotification.
 				// This is going to be a general problem. See https://github.com/fkhadra/react-toastify/issues/687
