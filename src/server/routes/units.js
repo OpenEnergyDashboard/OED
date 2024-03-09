@@ -105,9 +105,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-            failure(res, 500, 'Unable to edit units ' + err.toString());
+            failure(res, 500, 'Unable to edit unit ' + err.toString());
 		}
-		success(res, `Successfully edited units ${req.body.identifier}`);
+		success(res, `Successfully edited unit`);
 	}
 });
 
@@ -223,7 +223,7 @@ router.post('/delete', async (req, res) => {
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
-		success(res, 'Successfully deleted conversion' + req.body.id);
+		success(res, 'Successfully deleted conversion');
 	}
 });
 
