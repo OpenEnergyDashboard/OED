@@ -74,7 +74,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const handleDeleteUnit = () => {
 		let error_message = '';
 		for (const value of Object.values(meterDataByID)) {
-			// This unit is used by a meter so cannot be deleted.
+			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
 			if (value.unitId == state.id) {
 				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
 				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
