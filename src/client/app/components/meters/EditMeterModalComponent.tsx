@@ -8,7 +8,8 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { metersApi, selectMeterById } from '../../redux/api/metersApi';
+import { selectGroupDataById } from '../../redux/api/groupsApi';
+import { metersApi, selectMeterById, selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import {
@@ -54,6 +55,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		compatibleUnits,
 		incompatibleUnits
 	} = useAppSelector(state => selectGraphicUnitCompatibility(state, localMeterEdits));
+	const groupDataByID = useAppSelector(selectGroupDataById);
+	// TODO should this state be used for the meterState above or would that cause issues?
+	const meterDataByID = useAppSelector(selectMeterDataById);
 
 	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)); }, [meterState]);
 	/* State */
@@ -113,6 +117,23 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				}
 			}
 
+			// The message if issue with meter and groups. If blank then no issue.
+			let error_message = '';
+			// See if the meter unit changed since only allowed if not already in a group.
+			if (meterState.unitId !== localMeterEdits.unitId) {
+				// Check if the deep meters of groups in the redux state depend on the meter being edited.
+				// If so, the meter should not be edited.
+				for (const value of Object.values(groupDataByID)) {
+					for (let i = 0; i < value.deepMeters.length; i++) {
+						if (value.deepMeters[i] == props.meter.id) {
+							inputOk = false;
+							// TODO Would like line break between messages. See below on issue.
+							error_message += `${translate('group')} "${value.name}" ${translate('uses')} ${translate('meter')} "${meterDataByID[value.deepMeters[i]].name}"; `;
+						}
+					}
+				}
+			}
+
 			if (inputOk) {
 				// The input passed validation.
 				// GPS may have been updated so create updated state to submit.
@@ -130,6 +151,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews });
+			} else if (error_message) {
+				// Display an error message if there are dependent deep meters and checked.
+				// Undo the unit change.
+				setLocalMeterEdits({ ...localMeterEdits, ['unitId']: props.meter.unitId });
+				error_message = translate('meter.unit.is.not.editable') + error_message;
+				// TODO Attempts to add a line break with \n, <br />, etc. failed when using showErrorNotification.
+				// This is going to be a general problem. See https://github.com/fkhadra/react-toastify/issues/687
+				// and https://github.com/fkhadra/react-toastify/issues/201.
+				showErrorNotification(error_message);
 			} else {
 				// Tell user that not going to update due to input issues.
 				showErrorNotification(translate('meter.input.error'));

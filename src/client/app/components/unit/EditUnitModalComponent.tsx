@@ -10,13 +10,14 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
-import { unitsApi } from '../../redux/api/unitsApi';
+import { selectUnitDataById, unitsApi } from '../../redux/api/unitsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { conversionArrow } from '../../utils/conversionArrow';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -34,6 +35,7 @@ interface EditUnitModalComponentProps {
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
 	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
+	const [deleteUnit] = unitsApi.useDeleteUnitMutation();
 	const translate = useTranslate();
 
 	// Set existing unit values
@@ -55,6 +57,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const [state, setState] = useState(values);
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const meterDataByID = useAppSelector(selectMeterDataById);
+	const unitDataByID = useAppSelector(selectUnitDataById);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -66,6 +69,49 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
+	};
+
+	const handleDeleteUnit = () => {
+		let error_message = '';
+		for (const value of Object.values(meterDataByID)) {
+			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
+			if (value.unitId == state.id) {
+				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
+				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
+					`"${state.name}" ${translate('as.meter.unit')};`;
+			}
+			if (value.defaultGraphicUnit == state.id) {
+				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
+					`"${state.name}" ${translate('as.meter.defaultgraphicunit')};`;
+			}
+		}
+		for (let i = 0; i < conversionData.length; i++) {
+			if (conversionData[i].sourceId == state.id) {
+				// This unit is the source of a conversion so cannot be deleted.
+				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
+					`${conversionArrow(conversionData[i].bidirectional)}` +
+					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
+					` "${state.name}" ${translate('unit.source.error')};`;
+			}
+
+			if (conversionData[i].destinationId == state.id) {
+				// This unit is the destination of a conversion so cannot be deleted.
+				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
+					`${conversionArrow(conversionData[i].bidirectional)}` +
+					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
+					` "${state.name}" ${translate('unit.destination.error')};`;
+			}
+		}
+		if (error_message) {
+			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
+			showErrorNotification(error_message);
+		} else {
+			// It is okay to delete this unit.
+			deleteUnit(state.id)
+				.unwrap()
+				.then(() => { showSuccessNotification(translate('unit.delete.success')); })
+				.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
+		}
 	};
 
 	/* Edit Unit Validation:
@@ -352,6 +398,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</FormGroup>
 				</Container></ModalBody>
 				<ModalFooter>
+					<Button variant="warning" color='danger' onClick={handleDeleteUnit}>
+						<FormattedMessage id="unit.delete.unit" />
+					</Button>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
