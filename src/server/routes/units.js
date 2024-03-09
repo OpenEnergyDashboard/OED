@@ -165,8 +165,8 @@ router.post('/addUnit', async (req, res) => {
 	};
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
-        log.error(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-        failure(res, 400, `Got request to add units with invalid unit data, errors:${validatorResult.errors}`);
+        log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
+        failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
