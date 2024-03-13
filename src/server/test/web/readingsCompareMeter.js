@@ -13,7 +13,10 @@ const { prepareTest,
     expectCompareToEqualExpected,
     getUnitId,
     ETERNITY,
-    METER_ID } = require('../../util/readingsUtils');
+    METER_ID,
+    unitDatakWh,
+    conversionDatakWh,
+    meterDatakWh } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -21,18 +24,19 @@ mocha.describe('readings API', () => {
             mocha.describe('for meters', () => {
                 // Test 15 minutes over all time for flow unit.
                 mocha.it('Expected and actual data should line up', async () => {
-                    await prepareTest(unitData, conversionData, meterData);
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kWh');
                     const expected = '';
-                    //for compare, need the unitID, currentStart, currentEnd, shift
+                    // for compare, need the unitID, currentStart, currentEnd, shift
                     const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
-                        .query({ 
-                            currStart: "2022-10-30T00:00:00.000Z",
-                            currEnd: "2022-10-31T17:00:00.000Z",
+                        .query({
+                            curr_start: '2022-10-30 00:00:00',
+                            curr_end: '2022-10-31 17:00:00',
                             shift: 'P1D',
                             graphicUnitID: unitId
                         });
+                    console.log('res: ' , res.body);
                     expectCompareToEqualExpected(res, expected);
                 });
             });

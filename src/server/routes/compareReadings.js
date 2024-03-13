@@ -110,6 +110,7 @@ function createRouter() {
 		const currStart = moment.parseZone(req.query.curr_start, undefined, true);
 		const currEnd = moment.parseZone(req.query.curr_end, undefined, true);
 		const shift = moment.duration(req.query.shift);
+		console.log(meterIDs, graphicUnitID, currStart, currEnd, shift);
 		res.json(await meterCompareReadings(meterIDs, graphicUnitID, currStart, currEnd, shift));
 	});
 
