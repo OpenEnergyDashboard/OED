@@ -34,9 +34,9 @@ mocha.describe('readings API', () => {
                             curr_start: '2022-10-30 00:00:00',
                             curr_end: '2022-10-31 17:00:00',
                             shift: 'P1D',
-                            graphicUnitID: unitId
+                            graphicUnitId: unitId
                         });
-                    console.log('res: ' , res.body);
+                    console.log('res.body: ' , res.body);
                     expectCompareToEqualExpected(res, expected);
                 });
             });
