@@ -105,9 +105,9 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-            failure(res, 500, 'Unable to edit units ' + err.toString());
+            failure(res, 500, 'Unable to edit unit ' + err.toString());
 		}
-		success(res, `Successfully edited units ${req.body.identifier}`);
+		success(res, `Successfully edited unit`);
 	}
 });
 
@@ -165,8 +165,8 @@ router.post('/addUnit', async (req, res) => {
 	};
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
-        log.error(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-        failure(res, 400, `Got request to add units with invalid unit data, errors:${validatorResult.errors}`);
+        log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
+        failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -190,6 +190,40 @@ router.post('/addUnit', async (req, res) => {
 			log.error(`Error while inserting new unit ${err}`, err);
             failure(res, 500, `Error while inserting new unit ${err}`);
 		}
+	}
+});
+
+/**
+ * Route for POST, delete unit.
+ */
+router.post('/delete', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['id'],
+		properties: {
+			id: { type: 'integer' }
+		}
+	};
+
+	// Ensure delete request is valid
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
+		log.warn(errorMsg);
+		failure(res, 400, errorMsg);
+	} else {
+		const conn = getConnection();
+		try {
+			// Don't worry about checking if the unit already exists
+			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
+			await Unit.delete(req.body.id, conn);
+		} catch (err) {
+			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			log.error(errorMsg);
+			failure(res, 500, errorMsg);
+		}
+		success(res, 'Successfully deleted conversion');
 	}
 });
 

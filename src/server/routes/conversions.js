@@ -182,7 +182,7 @@ router.post('/delete', async (req, res) => {
 			log.error(`Error while deleting conversion with error(s): ${err}`);
 			failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
 		}
-		success(res, `Successfully deleted conversion ${req.body.sourceId} -> ${req.body.destinationId}`);
+		success(res, 'Successfully deleted conversion');
 	}
 });
 

@@ -217,6 +217,16 @@ class Unit {
 			log.warn(`Automatically set identifier of the unit "${unit.name}" to "${unit.name}"`);
 		}
 	}
+
+	/**
+	 * Returns a promise to delete a unit
+	 * @param mapID The ID of the unit to be deleted
+	 * @param conn the connection to be used.
+	 * @returns {Promise.<void>}
+	 */
+	static async delete(unitID, conn) {
+		await conn.none(sqlFile('unit/delete_unit.sql'), { id: unitID });
+	}
 }
 
 Unit.unitType = Object.freeze({

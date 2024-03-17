@@ -703,8 +703,46 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-                // Add LG21 here
-
+                mocha.it('LG21: should have hourly points for middle readings of 15 + 20 minute for a 60 day period and quantity units & kWh as MJ', async () => {
+                    // Load the data into the database
+                    const unitData = unitDatakWh.concat([
+                        {
+                            // u3
+                            name: 'MJ',
+                            identifier: 'megaJoules',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'MJ'
+                        }
+                    ]);
+                    const conversionData = conversionDatakWh.concat([
+                        {
+                            // c2
+                            sourceName: 'kWh',
+                            destinationName: 'MJ',
+                            bidirectional: true,
+                            slope: 3.6,
+                            intercept: 0,
+                            note: 'kWh → MJ'
+                        }
+                    ]);
+                    await prepareTest(unitData, conversionData, meterDatakWhGroups, groupDatakWh);
+                    // needs u1 u2 u3 c1 c2
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('MJ');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_MJ_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                    // ask for data (get) check it and make sure it is right
+                        .query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
             });
         });
     });

@@ -4,7 +4,7 @@
 
 const express = require('express') /* needed to resolve types in JSDoc comments */
 const { CSVPipelineError } = require('./CustomErrors');
-const escapeHtml = require('core-js/fn/string/escape-html');
+const escapeHtml = require('escape-html');
 const { log } = require('../../log');
 
 /**
