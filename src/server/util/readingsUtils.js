@@ -107,18 +107,12 @@ function expectCompareToEqualExpected(res, expected, id = METER_ID) {
     expect(res).to.be.json;
     expect(res).to.have.status(HTTP_CODE.OK);
     // Did the response have the correct number of readings.
-    expect(res.body).to.have.property(`${id}`).to.have.lengthOf(2);
+    //expect(res.body).to.have.property(`${id}`).to.have.lengthOf(2);
     console.log(res.body);
     console.log(expected.length);
-    // Loop over each reading
-    //for (let i = 0; i < expected.length; i++) {
-        // Check that the reading's value is within the expected tolerance (DELTA).
-    expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), DELTA);
-        // Reading has correct start/end date and time.
-    expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('CurrStart').to.equal(Date.parse(expected[i][1]));
-    expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('CurrEnd').to.equal(Date.parse(expected[i][2]));
-    expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('Shift').to.equal(Date.parse(expected[i][3]));
-    //}
+    // Check that the reading's values (previous value and current value) is within the expected tolerance (DELTA).
+    expect(res.body).to.have.property(`${id}`).to.have.property(`${0}`).to.have.property('curr_use').to.be.closeTo(Number(expected[0][0]), DELTA);
+    expect(res.body).to.have.property(`${id}`).to.have.property(`${1}`).to.have.property('prev_use').to.be.closeTo(Number(expected[0][1]), DELTA);
 }
 
 /**

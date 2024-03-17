@@ -12,7 +12,6 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     expectCompareToEqualExpected,
     getUnitId,
-    ETERNITY,
     METER_ID,
     unitDatakWh,
     conversionDatakWh,
@@ -27,7 +26,7 @@ mocha.describe('readings API', () => {
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kWh');
-                    const expected = '';
+                    const expected = { '100': { curr_use: '7962.23097109771', prev_use: '8764.06090894387'} };
                     // for compare, need the unitID, currentStart, currentEnd, shift
                     const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
                         .query({
