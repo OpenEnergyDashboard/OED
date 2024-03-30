@@ -16,9 +16,12 @@ const { prepareTest,
     getUnitId,
     ETERNITY,
     METER_ID,
+    GROUP_ID,
     unitDatakWh,
     conversionDatakWh,
-    meterDatakWh } = require('../../util/readingsUtils');
+    meterDatakWh,
+    meterDatakWhGroups,
+    groupDatakWh } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -30,7 +33,23 @@ mocha.describe('readings API', () => {
                 // Add BG2 here
 
                 // Add BG3 here
-
+                mocha.it('BG3: 28 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
+                    //load data into database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    //get unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kWh');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_28.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
+                        .query({ 
+                            timeInterval: ETERNITY.toString(), 
+                            barWidthDays: '28',
+                            graphicUnitId: unitId });
+                    console.log(res);
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+            });
                 // Add BG4 here
 
                 // Add BG5 here
