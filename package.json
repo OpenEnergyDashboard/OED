@@ -80,7 +80,7 @@
 		"dotenv": "~16.4.5",
 		"escape-html": "~1.0.3",
 		"express": "~4.19.2",
-		"express-rate-limit": "~5.5.1",
+		"express-rate-limit": "~7.2.0",
 		"history": "~4.7.2",
 		"ini": "~2.0.0",
 		"jsonschema": "~1.4.1",
