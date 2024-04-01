@@ -46,7 +46,6 @@ mocha.describe('readings API', () => {
                             timeInterval: ETERNITY.toString(), 
                             barWidthDays: '28',
                             graphicUnitId: unitId });
-                    console.log(res);
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
             });
