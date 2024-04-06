@@ -99,7 +99,7 @@ function expectMaxMinToEqualExpected(res, expected, id = METER_ID) {
 }
 
 /**
- * Compares readings from api call against the expected readings csv
+ * Compares readings from compare api call against the expected readings
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
  */
@@ -109,8 +109,8 @@ function expectCompareToEqualExpected(res, expected, id = METER_ID) {
     // Did the response have the correct meter
     expect(res.body).to.have.property(`${id}`);
     // Check that the reading's values (previous value and current value) is within the expected tolerance (DELTA).
-    expect(res.body).to.have.property(`${id}`).to.have.property('curr_use').to.be.closeTo(Number(expected[0][0]), DELTA);
-    expect(res.body).to.have.property(`${id}`).to.have.property('prev_use').to.be.closeTo(Number(expected[0][1]), DELTA);
+    expect(res.body).to.have.property(`${id}`).to.have.property('curr_use').to.be.closeTo(Number(expected[0]), DELTA);
+    expect(res.body).to.have.property(`${id}`).to.have.property('prev_use').to.be.closeTo(Number(expected[1]), DELTA);
 }
 
 /**

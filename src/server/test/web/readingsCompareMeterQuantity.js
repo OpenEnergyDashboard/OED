@@ -6,9 +6,7 @@
     This file tests the readings retrieval API compare chart meters.
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
-
 const { chai, mocha, app } = require('../common');
-const Unit = require('../../models/Unit');
 const { prepareTest,
     expectCompareToEqualExpected,
     getUnitId,
@@ -26,7 +24,7 @@ mocha.describe('readings API', () => {
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kWh');
-                    const expected = [ [ '7962.23097109771', '8764.06090894387', '2022-10-31 17:00:00', 'P1D' ] ];
+                    const expected = [ '7962.23097109771', '8764.06090894387', '2022-10-31 17:00:00', 'P1D' ];
                     // for compare, need the unitID, currentStart, currentEnd, shift
                     const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
                         .query({
