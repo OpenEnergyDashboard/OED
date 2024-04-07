@@ -1,0 +1,42 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+	This file tests the readings retrieval API compare chart meters.
+	See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
+*/
+const { chai, mocha, app } = require('../common');
+const { prepareTest,
+	expectCompareToEqualExpected,
+	getUnitId,
+	GROUP_ID,
+	unitDatakWh,
+	conversionDatakWh,
+	meterDatakWhGroups,
+    groupDatakWh } = require('../../util/readingsUtils');
+
+mocha.describe('readings API', () => {
+	mocha.describe('readings test, test if data returned by API is as expected', () => {
+		mocha.describe('for compare charts', () => {
+			mocha.describe('for groups', () => {
+				// Test 15 minutes over all time for flow unit.
+				mocha.it('Expected and actual data should line up', async () => {
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					const expected = [5666.35293886656, 5872.41914277899];
+					// for compare, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				});
+			});
+		});
+	});
+});
