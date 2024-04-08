@@ -10,55 +10,56 @@ const { chai, mocha, app } = require('../common');
 const { prepareTest,
 	expectCompareToEqualExpected,
 	getUnitId,
-	METER_ID,
+	GROUP_ID,
 	unitDatakWh,
 	conversionDatakWh,
-	meterDatakWh } = require('../../util/readingsUtils');
+	meterDatakWhGroups,
+    groupDatakWh } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {
 		mocha.describe('for compare charts', () => {
-			mocha.describe('for meters', () => {
+			mocha.describe('for groups', () => {
 				// Test 15 minutes over all time for flow unit.
-				mocha.it('C1: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh', async () => {
-					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+				mocha.it(' 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh ', async () => {
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
-					const expected = [3120.01835362067, 3367.50141893133];
+					const expected = [5666.35293886656, 5872.41914277899];
 					// for compare, need the unitID, currentStart, currentEnd, shift
-					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
 						.query({
 							curr_start: '2022-10-31 00:00:00',
 							curr_end: '2022-10-31 17:00:00',
 							shift: 'P1D',
 							graphicUnitId: unitId
 						});
-					expectCompareToEqualExpected(res, expected);
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 
-				// Add C2 here
+				// Add CG2 here
 
-				// Add C3 here
+				// Add CG3 here
 
-				// Add C4 here
+				// Add CG4 here
 
-				// Add C5 here
+				// Add CG5 here
 
-				// Add C6 here
+				// Add CG6 here
 
-				// Add C8 here
+				// Add CG8 here
 
-				// Add C9 here
+				// Add CG9 here
 
-				// Add C10 here
+				// Add CG10 here
 
-				// Add C11 here
+				// Add CG11 here
 
-				// Add C12 here
+				// Add CG12 here
 
-				// Add C13 here
+				// Add CG13 here
 
-				// Add C14 here
+				// Add CG14 here
 			});
 		});
 	});
