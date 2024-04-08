@@ -140,7 +140,7 @@
 		"chai-http": "~4.3.0",
 		"css-loader": "~6.8.1",
 		"eslint": "~8.48.0",
-		"eslint-plugin-jsdoc": "~46.5.0",
+		"eslint-plugin-jsdoc": "~48.2.3",
 		"lodash-webpack-plugin": "~0.11.6",
 		"mocha": "~10.3.0",
 		"node-polyfill-webpack-plugin": "~1.1.4",
