@@ -20,7 +20,7 @@ mocha.describe('readings API', () => {
 		mocha.describe('for compare charts', () => {
 			mocha.describe('for meters', () => {
 				// Test 15 minutes over all time for flow unit.
-				mocha.it('Expected and actual data should line up', async () => {
+				mocha.it('C1: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh', async () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('kWh');
@@ -35,6 +35,30 @@ mocha.describe('readings API', () => {
 						});
 					expectCompareToEqualExpected(res, expected);
 				});
+
+				// Add C2 here
+
+				// Add C3 here
+
+				// Add C4 here
+
+				// Add C5 here
+
+				// Add C6 here
+
+				// Add C8 here
+
+				// Add C9 here
+
+				// Add C10 here
+
+				// Add C11 here
+
+				// Add C12 here
+
+				// Add C13 here
+
+				// Add C14 here
 			});
 		});
 	});
