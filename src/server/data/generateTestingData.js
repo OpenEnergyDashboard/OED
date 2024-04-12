@@ -139,7 +139,7 @@ function momenting(arrayOfMoments, periodLength) {
  * @param {boolean} options.noShift - If false then shift so all values positive, true then no shift.
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if true) or not (if false).
- * @returns {[string, string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
+ * @returns {[number, string, string][]} Matrix of rows representing each csv row of the form value, startTimeStamp, endTimeStamp.
  */
 function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	// function generateSineData(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataOptions={}): Array<[string, string]> {
@@ -166,10 +166,29 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 			const scaledResult = chosenOptions.noShift ? result * chosenOptions.maxAmplitude :
 				halfMaxAmplitude * result + halfMaxAmplitude;
 			// Squares each sine value if desired output is a series of sine-squared values
-			return `${chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult}`;
+			//return `${chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult}`;
+			return chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult;
 		});
-	return (_.zip(sineValues, startDates, endDates));
-}
+	
+	const generatedData = [];
+
+	//Loop over individual arrays 
+	for (let i = 0; i < sineValues.length; i++) {
+		//Put each piece of data in curly brace array 
+		const rowData = {
+			value: sineValues[i],
+			startTimeStamp: startDates[i],
+			endTimeStamp: endDates[i]
+		};
+
+		//Push curly brace array into the array
+		generatedData.push(rowData);
+	}
+
+	return generatedData;
+
+	//return (_.zip(sineValues, startDates, endDates));
+} 
 
 /**
  * Write csv data and header into a csv file
@@ -229,7 +248,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
 		noShift: options.noShift || false,
-		filename: options.filename || 'test.csv',
+		//filename: options.filename || 'test.csv',
 		skipNormalize: options.skipNormalize || false,
 		// OED line graphs normalize to the hour so you normally don't need to set this value. You might to change
 		// the bar graph value to something desired.
@@ -255,7 +274,11 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		//await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		//Generate the data
+		const sineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
+		//return data in the function 
+		return sineData; 
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
 	}
@@ -284,7 +307,7 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
-		noShift: options.noShift || false,
+		noShift: options.noShift || false, 
 		filename: options.filename || 'test.csv',
 		skipNormalize: options.skipNormalize || false,
 		// OED line graphs normalize to the hour so you normally don't need to set this value. You might to change

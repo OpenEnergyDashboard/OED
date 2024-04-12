@@ -13,6 +13,7 @@ const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const fs = require('fs').promises;
+const conn = getConnection();
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -41,11 +42,14 @@ async function generateSineTestingData(frequency = 15, amplitude = 1) {
 		timeStep: { minute: frequency },
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: amplitude,
-		filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString()
-			+ 'Freq' + amplitude.toString() + 'AmpSineTestData.csv'),
+		//filename: path.join(__dirname, '../test/db/data/automatedTests/' + frequency.toString()
+			//+ 'Freq' + amplitude.toString() + 'AmpSineTestData.csv'),
 		normalize: true
 	};
-	await generateSine(startDate, endDate, options);
+	//store data in a variable
+	const generatedData = await generateSine(startDate, endDate, options);
+	//return the generatedData in the function
+	return generatedData;
 }
 
 /**
@@ -90,7 +94,7 @@ async function generateSineSquaredTestingData(amplitude = 1) {
 		// It is also necessary for the sin^2 and cos^2 to have the same amplitude for the sum to
 		// yield a constant value.
 		noShift: true,
-		filename: path.join(__dirname, '../test/db/data/automatedTests/' + amplitude.toString() + 'AmpSineSquaredTestData.csv'),
+		//filename: path.join(__dirname, '../test/db/data/automatedTests/' + amplitude.toString() + 'AmpSineSquaredTestData.csv'),
 		squared: true // Option set to true because want sine *squared* data.
 	};
 	await generateSine(startDate, endDate, options);
@@ -179,14 +183,39 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
 async function generateFourDayTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
 	const endDate = DEFAULT_OPTIONS.endDateOneYr;
+	const meterData = [
+		{
+			name: 'Sin 4 Day kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			//file: 'test/db/data/automatedTests/fourDayFreqTestData.csv',
+			//instead of filepath store generatedData in variable
+			data: [],
+			readingFrequency: '4 days',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		}
+	];
 	const options = {
 		timeStep: { day: 4 },
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
 		// Data saved in 'fourDayFreqTestData.csv' file.
-		filename: path.join(__dirname, '../test/db/data/automatedTests/fourDayFreqTestData.csv')
+		//filename: path.join(__dirname, '../test/db/data/automatedTests/fourDayFreqTestData.csv')
 	};
-	await generateSine(startDate, endDate, options);
+	//Instead of writing to a file store the data in a variable 
+	const generatedData = await generateSine(startDate, endDate, options);
+	console.log(generatedData);
+	//Store generatedData in meterData object
+	meterData[0].data = generatedData;
+	//return generatedData;
+	//Instead of returning the data call insertMeters
+	//Have the third parameter of insertMeters have a variable that has the meters data 
+	insertMeters(meterData, conn, 'variable');
 }
 
 /**
@@ -271,27 +300,27 @@ async function generateTestingData() {
 	await generateFourDayTestingData();
 
 	// Generates 1 year of sinusoidal data with data points at 4-hour intervals
-	await generateFourHourTestingData();
+	// await generateFourHourTestingData();
 
-	// Generates 1 year of sinusoidal data with data points at 23-minute intervals
-	await generateTwentyThreeMinuteTestingData();
+	// // Generates 1 year of sinusoidal data with data points at 23-minute intervals
+	// await generateTwentyThreeMinuteTestingData();
 
-	// Generates 1 year of sinusoidal data with data points at 15-minute intervals
-	await generateFifteenMinuteTestingData();
+	// // Generates 1 year of sinusoidal data with data points at 15-minute intervals
+	// await generateFifteenMinuteTestingData();
 
-	// Generates 1 year of sinusoidal data with data points at 1-minute intervals.
-	// Normally not desired so commented out.
-	// generateOneMinuteTestingData();
+	// // Generates 1 year of sinusoidal data with data points at 1-minute intervals.
+	// // Normally not desired so commented out.
+	// // generateOneMinuteTestingData();
 
-	// Generates 1 year of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
-	// Should be related to 23-minute sinusoidal above.
-	await generateCosineTestingData(23, 3);
+	// // Generates 1 year of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
+	// // Should be related to 23-minute sinusoidal above.
+	// await generateCosineTestingData(23, 3);
 
-	// Generates 2 years of *squared* sinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	await generateSineSquaredTestingData(2.5);
+	// // Generates 2 years of *squared* sinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
+	// await generateSineSquaredTestingData(2.5);
 
-	// Generates 2 years of *squared* cosinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	await generateCosineSquaredTestingData(2.5);
+	// // Generates 2 years of *squared* cosinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
+	// await generateCosineSquaredTestingData(2.5);
 }
 
 /**
@@ -1019,19 +1048,20 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 			areaUnit: 'feet',
 			deleteFile: false
 		},
-		{
-			name: 'Sin 4 Day kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/fourDayFreqTestData.csv',
-			readingFrequency: '4 days',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
+		//removed so doesn't write to a file 
+		// {
+		// 	name: 'Sin 4 Day kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/fourDayFreqTestData.csv',
+		// 	readingFrequency: '4 days',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
 		{
 			name: 'Sin 4 Hour kWh',
 			unit: 'Electric_Utility',
