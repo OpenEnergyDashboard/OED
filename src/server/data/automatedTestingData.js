@@ -209,13 +209,11 @@ async function generateFourDayTestingData() {
 	};
 	//Instead of writing to a file store the data in a variable 
 	const generatedData = await generateSine(startDate, endDate, options);
-	console.log(generatedData);
 	//Store generatedData in meterData object
 	meterData[0].data = generatedData;
 	//return generatedData;
 	//Instead of returning the data call insertMeters
-	//Have the third parameter of insertMeters have a variable that has the meters data 
-	insertMeters(meterData, conn, 'variable');
+	insertMeters(meterData, conn);
 }
 
 /**
@@ -341,7 +339,7 @@ async function testData() {
 	console.log("Start generating first set of test data (square, varying freq of readings: 7 files):");
 	await generateTestingData();
 	console.log("Start generating second set of test data (varying amplitudes: 3 files):")
-	await generateVariableAmplitudeTestingData();
+	// await generateVariableAmplitudeTestingData();
 }
 
 // This array contains special units data that is used for both dev and web.
@@ -1062,118 +1060,118 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 		// 	areaUnit: 'feet',
 		// 	deleteFile: true
 		// },
-		{
-			name: 'Sin 4 Hour kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/fourHourFreqTestData.csv',
-			// Some points less than 1 day but this is what is typical.
-			readingFrequency: '4 hours',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Sin 23 Min kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv',
-			readingFrequency: '23 minutes',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Sin 15 Min kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv',
-			readingFrequency: '15 minutes',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Cos 23 Min kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/23FreqCosineTestData.csv',
-			readingFrequency: '23 minutes',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Sin Sq kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv',
-			readingFrequency: '15 minutes',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Cos Sq kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: undefined,
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv',
-			readingFrequency: '15 minutes',
-			area: 10,
-			areaUnit: 'feet',
-			deleteFile: true
-		},
-		{
-			name: 'Sin Amp 1 kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: '8.5, 41.6',
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'Sin Amp 2 kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: '23.4, 42.6',
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
-		{
-			name: 'Sin Amp 3 kWh',
-			unit: 'Electric_Utility',
-			defaultGraphicUnit: 'kWh',
-			displayable: true,
-			gps: '25.2, 26.8',
-			note: 'special meter',
-			file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
-			readingFrequency: '15 minutes',
-			deleteFile: true
-		},
+		// {
+		// 	name: 'Sin 4 Hour kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/fourHourFreqTestData.csv',
+		// 	// Some points less than 1 day but this is what is typical.
+		// 	readingFrequency: '4 hours',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin 23 Min kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/twentyThreeMinuteFreqTestData.csv',
+		// 	readingFrequency: '23 minutes',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin 15 Min kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/fifteenMinuteFreqTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Cos 23 Min kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/23FreqCosineTestData.csv',
+		// 	readingFrequency: '23 minutes',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin Sq kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/2.5AmpSineSquaredTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Cos Sq kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: undefined,
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/2.5AmpCosineSquaredTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	area: 10,
+		// 	areaUnit: 'feet',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin Amp 1 kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: '8.5, 41.6',
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/15Freq1AmpSineTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin Amp 2 kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: '23.4, 42.6',
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/15Freq2AmpSineTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	deleteFile: true
+		// },
+		// {
+		// 	name: 'Sin Amp 3 kWh',
+		// 	unit: 'Electric_Utility',
+		// 	defaultGraphicUnit: 'kWh',
+		// 	displayable: true,
+		// 	gps: '25.2, 26.8',
+		// 	note: 'special meter',
+		// 	file: 'test/db/data/automatedTests/15Freq3AmpSineTestData.csv',
+		// 	readingFrequency: '15 minutes',
+		// 	deleteFile: true
+		// }
 	];
 
 	// This assumes the insertSpecialMeters has been run.

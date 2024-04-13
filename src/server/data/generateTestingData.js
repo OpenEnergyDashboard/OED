@@ -277,7 +277,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 		//await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 		//Generate the data
 		const sineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
-		//return data in the function 
+		//return data in the function
 		return sineData; 
 	} catch (error) {
 		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);

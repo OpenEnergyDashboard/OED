@@ -7,6 +7,7 @@ const Conversion = require('../models/Conversion');
 const Meter = require('../models/Meter');
 const Group = require('../models/Group');
 const { loadCsvInput } = require('../services/pipeline-in-progress/loadCsvInput');
+const { loadGeneratedInput } = require('../services/pipeline-in-progress/loadGeneratedInput');
 const moment = require('moment');
 const fs = require('fs').promises;
 const _ = require('lodash');
@@ -299,7 +300,7 @@ async function insertStandardConversions(conn) {
  * @param {*} conn database connection to use
  * @param {string} dataSource - indicates the source of the data, whether its from a file or variable 
  */
-async function insertMeters(metersToInsert, conn, dataSource = undefined) {
+async function insertMeters(metersToInsert, conn) {
 	// Function used to map values when reading the CSV file.
 	function mapRowsToModel(row) {
 		const reading = row[0];
@@ -338,18 +339,18 @@ async function insertMeters(metersToInsert, conn, dataSource = undefined) {
 			}
 		})
 		if (ok) {
-			//If there is both a file and data throw and error since there can't be both
 			if (meterData.file && meterData.data) {
+				// If there is both a file and data throw and error since there can't be both
 				console.log('Error: Both file and data cannot be provided.');
 				ok = false;
-				//If there isn't a file or data throw an error since at least one is needed
 			} else if (!meterData.file && !meterData.data) {
+				// If there isn't a file or data throw an error since at least one is needed
 				console.log('Error: Either a file or data must be provided.');
 				ok = false;
 			}
 		}
 		if (ok) {
-			console.log(`            loading meter ${meterData.name} from file ${meterData.file}`);
+			console.log(`            loading meter ${meterData.name}`);
 			// Get the unit by name if provided or -99 if not
 			meterData.unit = meterData.unit ? (await Unit.getByName(meterData.unit, conn)).id : -99;
 			meterData.defaultGraphicUnit = meterData.defaultGraphicUnit ? (await Unit.getByName(meterData.defaultGraphicUnit, conn)).id : -99;
@@ -431,8 +432,9 @@ async function insertMeters(metersToInsert, conn, dataSource = undefined) {
 					maxError: meter.maxError,
 					disableChecks: meter.disableChecks
 				}
-				//Check if a file object exists in meterData and load data from file
 				if (meterData.file) {
+					// load data from file
+					console.log(`              getting meter data from file ${meterData.file}`);
 					let filename = `src/server/${meterData.file}`;
 					await loadCsvInput(
 						filename, // filePath
@@ -464,13 +466,13 @@ async function insertMeters(metersToInsert, conn, dataSource = undefined) {
 						// });
 						await fs.unlink(filename);
 					}
-				} else if (meterData.data) {
+				} else {
 					// TODO make into if/else: new mapping function and add else for error
 					// Create loadGeneratedInput and call it here   
 					// Pass a new variable like meter.data instead of file name, data that needs to map, function uses that data 
 					// Otherwise if there is no file, load data from variable
 					await loadGeneratedInput(
-						meter.data, // generated data 
+						meterData.data, // generated data
 						meter.id, // meterID
 						mapGeneratedData, // mapRowToModel
 						meter.timeSort, //timeSort
@@ -487,109 +489,107 @@ async function insertMeters(metersToInsert, conn, dataSource = undefined) {
 						conditionSet, // conditionSet
 						conn
 					);
-				} else {
-					console.log('Error: Either a file or data must be provided for meter insertion.');
 				}
 			}
 		}
 	}
-
-	/**
-	 * Inserts groups specified into the database.
-	 * @param [[]] groupsToInsert array of arrays that specify the group info for inserting groups where each row has:
-	 * group name, default graphic unit name, displayable, gps, note, array of meter names to add to group, array of group names to add to group, group id.
-	 * A final [5] optional item in row can be the value to set the meter id to.
-	 * @param {*} conn database connection
-	 */
-	async function insertGroups(groupsToInsert, conn) {
-		// Check that needed keys are there.
-		const requiredKeys = ['name', 'displayable', 'childMeters', 'childGroups'];
-		// We don't use Promise.all since one group may include another group.
-		// Loop over the array of groups provided.
-		for (let i = 0; i < groupsToInsert.length; ++i) {
-			// Group currently working on
-			const groupData = groupsToInsert[i];
-			// Check that all required keys are present for this group.
-			let ok = true;
-			requiredKeys.forEach(key => {
-				if (!groupData.hasOwnProperty(key)) {
-					console.log(`********key "${key}" is required but missing so group number ${i} not processed with values:`, groupData);
-					// Don't insert
-					ok = false;
-				}
-			})
-			if (ok) {
-				// Group values from above.
-				const groupName = groupData.name;
-				console.log(`            creating group ${groupName}`);
-				// We get the needed unit id from the name given of the default graphic unit.
-				let groupDefaultGraphicUnit;
-				if (groupData.hasOwnProperty('defaultGraphicUnit')) {
-					// This group provided a default graphic unit name so use to get the existing unit id.
-					// This simply fails if the name does not exist since this is special code and not for users.
-					groupDefaultGraphicUnit = (await Unit.getByName(groupData.defaultGraphicUnit, conn)).id;
-				} else {
-					// No unit so make it -99, i.e., no unit.
-					groupDefaultGraphicUnit = -99;
-				}
-				const group = new Group(
-					undefined, // id
-					groupName,
-					groupData.displayable,
-					groupData.gps,
-					groupData.note,
-					groupData.area,
-					groupDefaultGraphicUnit,
-					groupData.areaUnit
-				);
-				if (await group.existsByName(conn)) {
-					console.log(`              Warning: group '${group.name}' existed so not changed.`);
-				} else {
-					// Only insert the group and its children if the group did not already exist.
-					await group.insert(conn);
-					// If id is not undefined then use value to set meter id.
-					// This is normally only done for the website data.
-					// It is best/easiest to do this before there are any members of the group.
-					let parent;
-					if (groupData.hasOwnProperty('id')) {
-						// Get it again so have id.
-						const newId = groupData.id;
-						console.log('              group id set to ', newId);
-						group.id = newId;
-						const query = `update groups set id = ${group.id} where name = '${groupName}'`;
-						await conn.none(query);
-						parent = group;
-					} else {
-						// Set to id provided.
-						parent = await Group.getByName(group.name, conn);
-					}
-					// Now add the meter children.
-					for (let k = 0; k < groupData.childMeters.length; ++k) {
-						const childMeter = groupData.childMeters[k];
-						console.log(`              adding child meter ${childMeter}`);
-						// Use meter id to add to group.
-						const childId = (await Meter.getByName(childMeter, conn)).id;
-						await parent.adoptMeter(childId, conn);
-					}
-					// Now add the group children.
-					for (let k = 0; k < groupData.childGroups.length; ++k) {
-						const childGroup = groupData.childGroups[k];
-						console.log(`              adding child group ${childGroup}`);
-						// Use group id to add to group.
-						const childId = (await Group.getByName(childGroup, conn)).id;
-						await parent.adoptGroup(childId, conn);
-					}
-				}
-			}
-		}
-	}
-
-	module.exports = {
-		insertUnits,
-		insertStandardUnits,
-		insertConversions,
-		insertStandardConversions,
-		insertMeters,
-		insertGroups
-	};
 }
+
+/**
+ * Inserts groups specified into the database.
+ * @param [[]] groupsToInsert array of arrays that specify the group info for inserting groups where each row has:
+ * group name, default graphic unit name, displayable, gps, note, array of meter names to add to group, array of group names to add to group, group id.
+ * A final [5] optional item in row can be the value to set the meter id to.
+ * @param {*} conn database connection
+ */
+async function insertGroups(groupsToInsert, conn) {
+	// Check that needed keys are there.
+	const requiredKeys = ['name', 'displayable', 'childMeters', 'childGroups'];
+	// We don't use Promise.all since one group may include another group.
+	// Loop over the array of groups provided.
+	for (let i = 0; i < groupsToInsert.length; ++i) {
+		// Group currently working on
+		const groupData = groupsToInsert[i];
+		// Check that all required keys are present for this group.
+		let ok = true;
+		requiredKeys.forEach(key => {
+			if (!groupData.hasOwnProperty(key)) {
+				console.log(`********key "${key}" is required but missing so group number ${i} not processed with values:`, groupData);
+				// Don't insert
+				ok = false;
+			}
+		})
+		if (ok) {
+			// Group values from above.
+			const groupName = groupData.name;
+			console.log(`            creating group ${groupName}`);
+			// We get the needed unit id from the name given of the default graphic unit.
+			let groupDefaultGraphicUnit;
+			if (groupData.hasOwnProperty('defaultGraphicUnit')) {
+				// This group provided a default graphic unit name so use to get the existing unit id.
+				// This simply fails if the name does not exist since this is special code and not for users.
+				groupDefaultGraphicUnit = (await Unit.getByName(groupData.defaultGraphicUnit, conn)).id;
+			} else {
+				// No unit so make it -99, i.e., no unit.
+				groupDefaultGraphicUnit = -99;
+			}
+			const group = new Group(
+				undefined, // id
+				groupName,
+				groupData.displayable,
+				groupData.gps,
+				groupData.note,
+				groupData.area,
+				groupDefaultGraphicUnit,
+				groupData.areaUnit
+			);
+			if (await group.existsByName(conn)) {
+				console.log(`              Warning: group '${group.name}' existed so not changed.`);
+			} else {
+				// Only insert the group and its children if the group did not already exist.
+				await group.insert(conn);
+				// If id is not undefined then use value to set meter id.
+				// This is normally only done for the website data.
+				// It is best/easiest to do this before there are any members of the group.
+				let parent;
+				if (groupData.hasOwnProperty('id')) {
+					// Get it again so have id.
+					const newId = groupData.id;
+					console.log('              group id set to ', newId);
+					group.id = newId;
+					const query = `update groups set id = ${group.id} where name = '${groupName}'`;
+					await conn.none(query);
+					parent = group;
+				} else {
+					// Set to id provided.
+					parent = await Group.getByName(group.name, conn);
+				}
+				// Now add the meter children.
+				for (let k = 0; k < groupData.childMeters.length; ++k) {
+					const childMeter = groupData.childMeters[k];
+					console.log(`              adding child meter ${childMeter}`);
+					// Use meter id to add to group.
+					const childId = (await Meter.getByName(childMeter, conn)).id;
+					await parent.adoptMeter(childId, conn);
+				}
+				// Now add the group children.
+				for (let k = 0; k < groupData.childGroups.length; ++k) {
+					const childGroup = groupData.childGroups[k];
+					console.log(`              adding child group ${childGroup}`);
+					// Use group id to add to group.
+					const childId = (await Group.getByName(childGroup, conn)).id;
+					await parent.adoptGroup(childId, conn);
+				}
+			}
+		}
+	}
+}
+
+module.exports = {
+	insertUnits,
+	insertStandardUnits,
+	insertConversions,
+	insertStandardConversions,
+	insertMeters,
+	insertGroups
+};
