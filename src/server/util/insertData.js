@@ -426,7 +426,10 @@ async function insertMeters(metersToInsert, conn) {
 					true, // headerRow
 					false, // shouldUpdate
 					conditionSet, // conditionSet
-					conn
+					conn,
+					meter.honorDst,
+					meter.relaxedParsing,
+					meter.useMeterZone
 				);
 			}
 			// Delete mathematical test data file just uploaded. They have true for delete.

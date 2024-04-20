@@ -24,7 +24,8 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	refreshReadings: false,
 	update: false,
 	honorDst: false,
-	relaxedParsing: false
+	relaxedParsing: false,
+	useMeterZone: false
 };
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
