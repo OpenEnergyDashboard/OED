@@ -280,7 +280,8 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 		//return data in the function
 		return sineData; 
 	} catch (error) {
-		log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
+		//log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
+		log.error(`Failed to generate sine data: ${error.message}`);
 	}
 }
 
@@ -334,9 +335,14 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		//await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
+		//Generate the data 
+		const cosineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
+		//return data in the function
+		return cosineData; 
 	} catch (error) {
-		log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
+		//log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
+		log.error(`Failed to generate cosine data: ${error.message}`);
 	}
 }
 

@@ -474,7 +474,7 @@ async function insertMeters(metersToInsert, conn) {
 					await loadGeneratedInput(
 						meterData.data, // generated data
 						meter.id, // meterID
-						mapGeneratedData, // mapRowToModel
+						mapGeneratedData, // mapGeneratedData
 						meter.timeSort, //timeSort
 						meter.readingDuplication, //readingRepetition
 						meter.cumulative, // isCumulative
