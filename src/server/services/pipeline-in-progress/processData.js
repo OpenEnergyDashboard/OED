@@ -48,11 +48,13 @@ const E0 = moment(0).utc()
  * @param {array} conn the connection to the database
  * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
  * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
+ * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
+ *   Should only be true if honorDST is true and reading does not have proper time zone information.
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
 async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn, honorDst = false, relaxedParsing = false) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -188,8 +190,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// See else clause for why formatted this way.
 			startTimestamp = prevReading.endTimestamp;
 			startTimestampTz = prevEndTimestampTz;
-			endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
-			if (!endTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				endTimestampTz = moment.tz(rows[index][1], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			}
+			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
@@ -198,8 +207,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
 			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
-		}
-		else {
+		} else {
 			// If the start date/time from the reading's timezone. Next, we put it
 			// into a moment reading has a timezone offset associated with it then we want to honor it by using parseZone.
 			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
@@ -208,8 +216,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// Thus, we want in a timezone aware way so the UTC sticks and there is no shift of time.
 			// This setup should work no matter want the timezone is on the server.
 			// Get the reading into moment in a timezone aware way. Note will assume UTC if no timezone in the string.
-			startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
-			if (!startTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				startTimestampTz = moment.tz(rows[index][1], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			}
+			if (!startTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
 				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
@@ -217,8 +232,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// If this fails it is caught below.
 				startTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
-			endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
-			if (!endTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				endTimestampTz = moment.tz(rows[index][2], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
+			}
+			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
@@ -564,22 +586,22 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// Remove that in DST split since done processing this reading and don't want for next one.
 				splitDst = false;
 			} else if (inDstStop) {
-					// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
-					// We could not reset before now since it would potentially create a gap and different length.
-					currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
-					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
-					result.push(currentReading.clone());
-					// Reset inDstStop
-					inDstStop = false;
-					// We reset the start timestamp for the same issue with next reading.
-					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-					// Reset back to default so if store into DB know not in DST shift zone.
-					// clone() may not be needed but being safe.
-					prevEndTimestamp = E0.clone();
+				// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
+				// We could not reset before now since it would potentially create a gap and different length.
+				currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
+				// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+				result.push(currentReading.clone());
+				// Reset inDstStop
+				inDstStop = false;
+				// We reset the start timestamp for the same issue with next reading.
+				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+				// Reset back to default so if store into DB know not in DST shift zone.
+				// clone() may not be needed but being safe.
+				prevEndTimestamp = E0.clone();
 			} else {
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
-					result.push(currentReading.clone());
+				// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+				result.push(currentReading.clone());
 			}
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
