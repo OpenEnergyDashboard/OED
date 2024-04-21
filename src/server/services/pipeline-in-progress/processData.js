@@ -49,7 +49,8 @@ const E0 = moment(0).utc()
  * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
  * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
  * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
- *   Should only be true if honorDST is true and reading does not have proper time zone information.
+ *   Should only be true if honorDST is true and reading does not have proper time zone information. This feature is not great and should
+ *   be avoided except in special circumstances.
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
 async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
@@ -351,19 +352,29 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// for inclusion. Thus, we mark that a split is needed.
 				splitDst = true;
 			} else if (shift > 0) {
-				// These are the examples on the right in the example diagram in the developer docs.
-				// This reading crossed and left DST so went back in time.
-				// The next two lines are similar use to above.
-				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
-				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
-				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
-				// This may take multiple readings so store the time now.
-				prevEndTimestamp = prevReading.endTimestamp;
-				// We note we are in this situation and may need to remove and split readings.
-				inDst = true;
+				// This is a hack where when doing meter time zone you don't do the DST processing when crossing out
+				// of DST. This can give duplicate values and miss if the readings don't align with the DST shift range.
+				// TODO fix this up so better.
+				if (!useMeterZone) {
+					// These are the examples on the right in the example diagram in the developer docs.
+					// This reading crossed and left DST so went back in time.
+					// The next two lines are similar use to above.
+					const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+					zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+					// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
+					// This may take multiple readings so store the time now.
+					prevEndTimestamp = prevReading.endTimestamp;
+					// We note we are in this situation and may need to remove and split readings.
+					inDst = true;
+				}
+			} else {
+				// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
+				// handled next.
+				if (useMeterZone) {
+					// TODO This is a big hack because we we don't do inDst for this case so reset. Similar to issue above.
+					splitDst = false;
+				}
 			}
-			// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
-			// handled next.
 			if (inDst) {
 				if (endTimestamp.isAfter(prevEndTimestamp)) {
 					// This reading has some part of its time past the previous one used so need to use it and stop this process.
