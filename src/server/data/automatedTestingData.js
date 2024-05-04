@@ -40,7 +40,6 @@ const DEFAULT_OPTIONS = {
  */
 async function insertData(startDate, endDate, options, meterData, conn) {
 	// Instead of writing to a file store the data in a variable
-	//const generatedData = await generateSine(startDate, endDate, options);
 	// Store generatedData in meterData object
     meterData[0].data = await generateSine(startDate, endDate, options)
 	// Call insertMeters to insert meter data into the database
