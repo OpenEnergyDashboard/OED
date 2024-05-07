@@ -48,8 +48,9 @@
 	// "postCreateCommand": "bash /workspace/src/scripts/installOED.sh"
 	// then you see all the output in the terminal that opens up but it shows
 	// "Configuring Dev Container" with a spinning wheel.
-	// When you use the command below then the output goes into nohup.out.
-	"postCreateCommand": "nohup bash -c '/workspace/src/scripts/installOED.sh &'"
+	// When you use the command below then the output goes into nohup.out. The docker compose down is run to prevent vscode from crashing at startup.
+	// The VSCode container cra\ashes if an instance of the container is already running when VSCode starts up, the docker compose down prevents this behaviour.
+	"postCreateCommand": "docker compose down; nohup bash -c '/workspace/src/scripts/installOED.sh &'"
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	// "remoteUser": "vscode"
 }
