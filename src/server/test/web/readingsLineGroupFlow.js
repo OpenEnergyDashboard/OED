@@ -17,20 +17,19 @@ const { prepareTest,
     ETERNITY,
     METER_ID,
     GROUP_ID,
-    unitDatakWh,
-    conversionDatakWh,
-    meterDatakWhGroups,
-    groupDatakWh } = require('../../util/readingsUtils');
+    unitDatakW,
+    conversionDatakW,
+    meterDatakWGroups,
+    groupDatakW } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for line charts', () => {
             mocha.describe('for flow groups', () => {
-                // Add LG8 here
                 mocha.it(
                     "LG8: should have daily points for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW",
                     async () => {
-                        const unitDatakWh = [
+                        const unitDatakW = [
                             { 
                                 // u4
                                 name: 'kW', 
@@ -57,7 +56,7 @@ mocha.describe('readings API', () => {
                             },
                         ];
 
-                        const conversionDatakWh = [
+                        const conversionDatakW = [
                             { 
                                 // c4
                                 sourceName: 'Electric', 
@@ -69,10 +68,9 @@ mocha.describe('readings API', () => {
                             }
                         ];
 
-                        const meterDatakWhGroups = [
+                        const meterDatakWGroups = [
                             {
-                                // Should be 'meterDatakWhGroups with meterDatakWh' but required max 50 chars
-                                name: 'meterDatakWhGroups',
+                                name: 'meterDatakWGroups',
                                 unit: 'Electric',
                                 defaultGraphicUnit: 'kW',
                                 displayable: true,
@@ -84,7 +82,7 @@ mocha.describe('readings API', () => {
                                 id: METER_ID
                             },
                             {
-                                name: 'meterDatakWhOther',
+                                name: 'meterDatakWOther',
                                 unit: 'Electric',
                                 defaultGraphicUnit: 'kW',
                                 displayable: true, 
@@ -97,19 +95,19 @@ mocha.describe('readings API', () => {
                             }
                         ];
 
-                        const groupDatakWh = [
+                        const groupDatakW = [
                             {
                                 id: GROUP_ID,
-                                name: 'meterDatakWhGroups + meterDatakWhOther',
+                                name: 'meterDatakWGroups + meterDatakWOther',
                                 displayable: true,
                                 note: 'special group',
                                 defaultGraphicUnit: 'kW',
-                                childMeters: ['meterDatakWhGroups', 'meterDatakWhOther'],
+                                childMeters: ['meterDatakWGroups', 'meterDatakWOther'],
                                 childGroups: [], 
                             }
                         ]
                         // Load the data into the database
-                        await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                        await prepareTest(unitDatakW, conversionDatakW, meterDatakWGroups, groupDatakW);
                         // Get the unit ID since the DB could use any value.
                         const unitId = await getUnitId('kW');
                         // Load the expected response data from the corresponding csv file
