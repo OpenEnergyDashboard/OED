@@ -17,10 +17,10 @@ const { prepareTest,
     ETERNITY,
     METER_ID,
     GROUP_ID,
-    unitDatakW,
-    conversionDatakW,
-    meterDatakWGroups,
-    groupDatakW } = require('../../util/readingsUtils');
+    unitDatakWh,
+    conversionDatakWh,
+    meterDatakWhGroups,
+    groupDatakWh } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
