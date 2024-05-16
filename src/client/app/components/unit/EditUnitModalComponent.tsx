@@ -25,7 +25,6 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
-	header: string;
 	// passed in to handle opening the modal
 	handleShow: () => void;
 	// passed in to handle closing the modal
@@ -43,18 +42,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const translate = useTranslate();
 
 	// Set existing unit values
-	const values = {
-		name: props.unit.name,
-		identifier: props.unit.identifier,
-		typeOfUnit: props.unit.typeOfUnit,
-		unitRepresent: props.unit.unitRepresent,
-		displayable: props.unit.displayable,
-		preferredDisplay: props.unit.preferredDisplay,
-		secInRate: props.unit.secInRate,
-		suffix: props.unit.suffix,
-		note: props.unit.note,
-		id: props.unit.id
-	};
+	const values = { ...props.unit };
 
 	/* State */
 	// Handlers for each type of input change
@@ -78,7 +66,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + props.header + '] ?';
+	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + values.identifier + '] ?';
 	const deleteConfirmText = translate('unit.delete.unit');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
@@ -98,7 +86,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* End Confirm Delete Modal */
 
 	const handleDeleteUnit = () => {
-
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
@@ -438,8 +425,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							placeholder='Note'
 							onChange={e => handleStringChange(e)} />
 					</FormGroup>
-				</Container>
-				</ModalBody>
+				</Container></ModalBody>
 				<ModalFooter>
 					<Button variant="warning" color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="unit.delete.unit" />

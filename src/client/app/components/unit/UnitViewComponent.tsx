@@ -36,9 +36,6 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 		setShowEditModal(false);
 	};
 
-	// Create header from Unit Identifier
-	const header = String(props.unit.identifier);
-
 	return (
 		<div className="card">
 			<div className="identifier-container">
@@ -76,8 +73,6 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				{/* Creates a child UnitModalEditComponent */}
 				<EditUnitModalComponent
 					show={showEditModal}
-					unit={props.unit}
-					header={header}
 					handleShow={handleShow}
 					handleClose={handleClose} />
 			</div>

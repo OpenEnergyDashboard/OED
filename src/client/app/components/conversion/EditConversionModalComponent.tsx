@@ -21,7 +21,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
-	header: string;
+	conversionIdentifier: string;
 	// passed in to handle opening the modal
 	handleShow: () => void;
 	// passed in to handle closing the modal
@@ -61,7 +61,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('conversion.delete.conversion') + ' [' + props.header + '] ?';
+	const deleteConfirmationMessage = translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
 	const deleteConfirmText = translate('conversion.delete.conversion');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
