@@ -58,6 +58,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.compare.sort.tip': { link: `${helpUrl}/compareGraphic.html#usage` },
 		'help.home.error.bar': { link: `${helpUrl}/errorBar.html#usage` },
 		'help.home.export.graph.data': { link: `${helpUrl}/export.html` },
+		'help.home.history': { link: `${helpUrl}/history.html` },
 		'help.home.map.interval.tip': { link: `${helpUrl}/mapGraphic.html#usage` },
 		'help.home.navigation': { link: '' },
 		'help.home.select.dateRange': { link: `${helpUrl}/dateRange.html` },
