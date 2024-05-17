@@ -19,11 +19,14 @@ import { TrueFalseType } from '../../types/items';
 import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { conversionArrow } from '../../utils/conversionArrow';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
 	unit: UnitData;
+	// passed in to handle opening the modal
+	handleShow: () => void;
 	// passed in to handle closing the modal
 	handleClose: () => void;
 }
@@ -39,18 +42,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const translate = useTranslate();
 
 	// Set existing unit values
-	const values = {
-		name: props.unit.name,
-		identifier: props.unit.identifier,
-		typeOfUnit: props.unit.typeOfUnit,
-		unitRepresent: props.unit.unitRepresent,
-		displayable: props.unit.displayable,
-		preferredDisplay: props.unit.preferredDisplay,
-		secInRate: props.unit.secInRate,
-		suffix: props.unit.suffix,
-		note: props.unit.note,
-		id: props.unit.id
-	};
+	const values = { ...props.unit };
 
 	/* State */
 	// Handlers for each type of input change
@@ -71,7 +63,33 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	};
 
+	/* Confirm Delete Modal */
+	// Separate from state comment to keep everything related to the warning confirmation modal together
+	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + values.identifier + '] ?';
+	const deleteConfirmText = translate('unit.delete.unit');
+	const deleteRejectText = translate('cancel');
+	// The first two handle functions below are required because only one Modal can be open at a time (properly)
+	const handleDeleteConfirmationModalClose = () => {
+		// Hide the warning modal
+		setShowDeleteConfirmationModal(false);
+		// Show the edit modal
+		handleShow();
+	};
+	const handleDeleteConfirmationModalOpen = () => {
+		// Hide the edit modal
+		handleClose();
+		// Show the warning modal
+		setShowDeleteConfirmationModal(true);
+	};
+
+	/* End Confirm Delete Modal */
+
 	const handleDeleteUnit = () => {
+		// Closes the warning modal
+		// Do not call the handler function because we do not want to open the parent modal
+		setShowDeleteConfirmationModal(false);
+
 		let error_message = '';
 		for (const value of Object.values(meterDataByID)) {
 			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
@@ -134,6 +152,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	// Failure to edit units will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
+	};
+
+	const handleShow = () => {
+		props.handleShow();
 	};
 
 	const handleClose = () => {
@@ -241,6 +263,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	return (
 		<>
+			<ConfirmActionModalComponent
+				show={showDeleteConfirmationModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleDeleteConfirmationModalClose}
+				actionFunction={handleDeleteUnit}
+				actionConfirmText={deleteConfirmText}
+				actionRejectText={deleteRejectText} />
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.unit" />
@@ -398,7 +427,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</FormGroup>
 				</Container></ModalBody>
 				<ModalFooter>
-					<Button variant="warning" color='danger' onClick={handleDeleteUnit}>
+					<Button variant="warning" color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="unit.delete.unit" />
 					</Button>
 					{/* Hides the modal */}
