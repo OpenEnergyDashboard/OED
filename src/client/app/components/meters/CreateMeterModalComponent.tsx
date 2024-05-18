@@ -33,7 +33,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Meter create element
  */
 export default function CreateMeterModalComponent() {
-	// Tracks wheter a unit/ default unit has been selected.
+	// Tracks whether a unit/ default unit has been selected.
 	// RTKQ Mutation to submit add meter
 	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
 	// Memo'd memoized selector
@@ -60,7 +60,6 @@ export default function CreateMeterModalComponent() {
 			setMeterDetails(details => ({ ...details, defaultGraphicUnit: -999 }));
 		}
 	}, [meterDetails.unitId]);
-
 
 	const handleShow = () => setShowModal(true);
 
@@ -412,13 +411,19 @@ export default function CreateMeterModalComponent() {
 						{/* cumulativeReset input */}
 						<Col><FormGroup>
 							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
-							<Input id='cumulativeReset' name='cumulativeReset' type='select'
-								value={meterDetails.cumulativeReset.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
-							</Input>
+							{meterDetails.cumulative === true ? (
+								<Input id='cumulativeReset' name='cumulativeReset' type='select'
+									value={meterDetails.cumulativeReset.toString()}
+									onChange={e => handleBooleanChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+									})}
+								</Input>
+							) : (
+								<Input id='cumulativeReset' name='cumulativeReset' type='select' disabled>
+									<option value='no'>Unavailable</option>
+								</Input>
+							)}
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -428,7 +433,9 @@ export default function CreateMeterModalComponent() {
 							<Input id='cumulativeResetStart' name='cumulativeResetStart' type='text' autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetStart}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false ? true : false}
+							/>
 						</FormGroup></Col>
 						{/* cumulativeResetEnd input */}
 						<Col><FormGroup>
@@ -437,7 +444,9 @@ export default function CreateMeterModalComponent() {
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetEnd}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false  ? true : false}
+							/>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -655,6 +664,3 @@ export default function CreateMeterModalComponent() {
 		</>
 	);
 }
-
-
-
