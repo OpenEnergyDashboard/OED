@@ -61,6 +61,12 @@ export default function CreateMeterModalComponent() {
 		}
 	}, [meterDetails.unitId]);
 
+	React.useEffect(() => {
+		if (meterDetails.cumulative === false) {
+			setMeterDetails(details => ({ ...details, cumulativeReset: false }));
+		}
+	}, [meterDetails.cumulative]);
+
 	const handleShow = () => setShowModal(true);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -434,7 +440,7 @@ export default function CreateMeterModalComponent() {
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetStart}
 								placeholder='HH:MM:SS'
-								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false ? true : false}
+								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false}
 							/>
 						</FormGroup></Col>
 						{/* cumulativeResetEnd input */}
@@ -445,7 +451,7 @@ export default function CreateMeterModalComponent() {
 								onChange={e => handleStringChange(e)}
 								value={meterDetails.cumulativeResetEnd}
 								placeholder='HH:MM:SS'
-								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false  ? true : false}
+								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false}
 							/>
 						</FormGroup></Col>
 					</Row>

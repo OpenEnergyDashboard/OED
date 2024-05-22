@@ -69,6 +69,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
 
+	React.useEffect(() => {
+		if (localMeterEdits.cumulative === false) {
+			setLocalMeterEdits(details => ({ ...details, cumulativeReset: false }));
+		}
+	}, [localMeterEdits.cumulative]);
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -195,6 +200,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		props.handleClose();
 		resetState();
 	};
+
 	return (
 		<>
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
@@ -461,7 +467,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits.cumulativeResetStart}
 								placeholder='HH:MM:SS'
-								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false ? true : false}
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
 							/>
 						</FormGroup></Col>
 						{/* cumulativeResetEnd input */}
@@ -475,7 +481,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits?.cumulativeResetEnd}
 								placeholder='HH:MM:SS'
-								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false ? true : false}
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
 							/>
 						</FormGroup></Col>
 					</Row>
