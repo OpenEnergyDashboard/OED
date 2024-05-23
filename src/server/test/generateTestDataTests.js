@@ -119,7 +119,7 @@ mocha.describe('Generate Sine wave', () => {
 				let scaledValue = row.value * 1 / 3;
 				return { value: scaledValue, startTimeStamp: row.startTimeStamp, endTimeStamp: row.endTimeStamp };
 			});
-		(await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude })).forEach((row, idx) => {
+		generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude }).forEach((row, idx) => {
 			expect(row.value).to.be.closeTo(expectation[idx].value, 0.0001);
 			expect(row.startTimeStamp).to.equal(expectation[idx].startTimeStamp);
 			expect(row.endTimeStamp).to.equal(expectation[idx].endTimeStamp);
@@ -135,7 +135,7 @@ mocha.describe('Generate Sine wave', () => {
 				let scaledValue = (row.value * 1 / 3) ** 2;
 				return { value: scaledValue, startTimeStamp: row.startTimeStamp, endTimeStamp: row.endTimeStamp };
 			});
-		(await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: true })).forEach((row, idx) => {
+		generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: true }).forEach((row, idx) => {
 			expect(row.value).to.be.closeTo(expectation[idx].value, 0.0001);
 			expect(row.startTimeStamp).to.equal(expectation[idx].startTimeStamp);
 			expect(row.endTimeStamp).to.equal(expectation[idx].endTimeStamp);

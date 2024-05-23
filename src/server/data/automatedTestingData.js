@@ -41,9 +41,9 @@ const DEFAULT_OPTIONS = {
 async function insertData(startDate, endDate, options, meterData, conn) {
 	// Instead of writing to a file store the data in a variable
 	// Store generatedData in meterData object
-    meterData[0].data = await generateSine(startDate, endDate, options)
+    meterData[0].data = generateSine(startDate, endDate, options)
 	// Call insertMeters to insert meter data into the database
-    insertMeters(meterData, conn);
+    await insertMeters(meterData, conn);
 }
 
 /**
@@ -63,7 +63,7 @@ async function generateSineTestingData(frequency = 15, amplitude = 1) {
 		normalize: true
 	};
 	// Store data in a variable
-	const generatedData = await generateSine(startDate, endDate, options);
+	const generatedData = generateSine(startDate, endDate, options);
 	// Return the generatedData in the function
 	return generatedData;
 }
@@ -128,7 +128,7 @@ async function generateSineSquaredTestingData(amplitude = 1) {
 		noShift: true,
 		squared: true // Option set to true because want sine *squared* data.
 	};
-	insertData(startDate, endDate, options, meterData, conn)
+	await insertData(startDate, endDate, options, meterData, conn)
 }
 
 /**
@@ -162,7 +162,7 @@ async function generateCosineTestingData(frequency = 15, amplitude = 1) {
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: amplitude,
 	};
-	insertData(startDate, endDate, options, meterData, conn)
+	await insertData(startDate, endDate, options, meterData, conn)
 }
 
 /**
@@ -225,7 +225,7 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
 		noShift: true,
 		squared: true // Option set to true because want cosine *squared* data.
 	};
-	insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /*
@@ -266,7 +266,7 @@ async function generateFourDayTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourDayFreqTestData.csv' file.
 	};
-	insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -301,7 +301,7 @@ async function generateFourHourTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourHourFreqTestData.csv' file
 	};
-	insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -335,7 +335,7 @@ async function generateTwentyThreeMinuteTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'twentyThreeMinuteFreqTestData.csv' file.
 	};
-	insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -368,7 +368,7 @@ async function generateFifteenMinuteTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fifteenMinuteFreqTestData.csv' file.
 	};
-	insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -376,6 +376,7 @@ async function generateFifteenMinuteTestingData() {
  * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
  * 'oneMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
  */
+// TODO This does not put file into DB and file is not actually used.
 async function generateOneMinuteTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
 	const endDate = DEFAULT_OPTIONS.endDateOneYr;
@@ -386,7 +387,7 @@ async function generateOneMinuteTestingData() {
 		// Data saved in 'oneMinuteFreqTestData.csv' file.
 		filename: path.join(__dirname, '../test/db/data/automatedTests/oneMinuteFreqTestData.csv')
 	};
-	await generateSine(startDate, endDate, options);
+	generateSine(startDate, endDate, options);
 }
 
 /**
@@ -1381,6 +1382,11 @@ delete from conversions where source_id = (select id from units where name = 'ga
 delete from units where name in ('Electric_Utility', 'Natural_Gas_BTU', '100 w bulb', 'Natural_Gas_M3', 'Natural_Gas_Dollar', 'Water_Gallon', 'US dollar', 'US $', 'euro', 'gallon', 'liter', 'kg CO₂', 'Trash', 'Temperature_Fahrenheit', 'kW', 'Electric_kW', 'gallon per minute', 'gallon per minute', 'liter per hour', 'Water_Gallon_Per_Minute', 'kg of CO₂', 'metric ton of CO₂');
 -- Quit postgres.
 \q
+
+If you are sure you don't have any meters, groups or readings that you want then you can do:
+delete from readings; delete from groups_immediate_meters; delete from groups_immediate_children; delete from groups; delete from meters;
+and if you want to also remove all the conversions and readings:
+delete from conversions; delete from cik; delete from units;
 */
 
 module.exports = {

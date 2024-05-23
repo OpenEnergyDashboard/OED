@@ -12,7 +12,7 @@
  * generateSine,
  * writeToCsv,
  * generateCosine,
- * generateSine
+ * generateSineData
  */
 
 // Imports
@@ -169,7 +169,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 			//return `${chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult}`;
 			return chosenOptions.squared ? (scaledResult * scaledResult) : scaledResult;
 		});
-	
+
 	const generatedData = [];
 
 	//Loop over individual arrays 
@@ -188,7 +188,7 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	return generatedData;
 
 	//return (_.zip(sineValues, startDates, endDates));
-} 
+}
 
 /**
  * Write csv data and header into a csv file
@@ -240,7 +240,7 @@ async function writeToCsv(data, filename = 'test.csv') {
  * @param {number} options.phaseShift - The amount to phase shift the generated sine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if True) or not (if False).
  */
-async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
+function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 	// async function generateSine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
@@ -278,7 +278,7 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 		//Generate the data
 		const sineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
 		//return data in the function
-		return sineData; 
+		return sineData;
 	} catch (error) {
 		//log.error(`Failed to generate sine data for file: ${chosenOptions.filename}.`, error);
 		log.error(`Failed to generate sine data: ${error.message}`);
@@ -301,14 +301,14 @@ async function generateSine(startTimeStamp, endTimeStamp, options = {}) {
  * @param {number} options.phaseShift - The amount to phase shift the generated cosine wave.
  * @param {boolean} options.squared - Indicates whether output sine data should be squared (if True) or not (if False).
  */
-async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
+function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 	// async function generateCosine(startTimeStamp: string, endTimeStamp: string, options: GenerateSinusoidalDataFileOptions={}) {
 	const chosenOptions = {
 		// const chosenOptions: GenerateSinusoidalDataFileOptions = {
 		timeStep: options.timeStep || { minute: 20 },
 		periodLength: options.periodLength || { day: 1 },
 		maxAmplitude: options.maxAmplitude || 2,
-		noShift: options.noShift || false, 
+		noShift: options.noShift || false,
 		filename: options.filename || 'test.csv',
 		skipNormalize: options.skipNormalize || false,
 		// OED line graphs normalize to the hour so you normally don't need to set this value. You might to change
@@ -339,7 +339,7 @@ async function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 		//Generate the data 
 		const cosineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
 		//return data in the function
-		return cosineData; 
+		return cosineData;
 	} catch (error) {
 		//log.error(`Failed to generate cosine data for file: ${chosenOptions.filename}.`, error);
 		log.error(`Failed to generate cosine data: ${error.message}`);
