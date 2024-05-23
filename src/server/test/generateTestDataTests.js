@@ -87,9 +87,9 @@ mocha.describe('Generate Sine wave helper', () => {
 		const lastEndTimeStamp = '2019-09-12 00:00:00';
 		const expectation = [[1, startTimeStamp, endTimeStamp], [1, endTimeStamp, lastEndTimeStamp]];
 		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 }, squared: false }).forEach((row, idx) => {
-			expect(parseFloat(row[0])).to.be.closeTo(expectation[idx][0], 0.0001);
-			expect(row[1]).to.equal(expectation[idx][1]);
-			expect(row[2]).to.equal(expectation[idx][2]);
+			expect(row.value).to.be.closeTo(expectation[idx][0], 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx][1]);
+			expect(row.endTimeStamp).to.equal(expectation[idx][2]);
 		});
 	});
 	mocha.it('should be able to generate data for half a day', () => {
@@ -99,9 +99,9 @@ mocha.describe('Generate Sine wave helper', () => {
 		const lastEndTimeStamp = '2019-09-11 12:00:00';
 		const expectation = [[1, startTimeStamp, midPointTimeStamp], [1, midPointTimeStamp, endTimeStamp], [1, endTimeStamp, lastEndTimeStamp]];
 		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 }, squared: false }).forEach((row, idx) => {
-			expect(parseFloat(row[0])).to.be.closeTo(expectation[idx][0], 0.0001);
-			expect(row[1]).to.equal(expectation[idx][1]);
-			expect(row[2]).to.equal(expectation[idx][2]);
+			expect(row.value).to.be.closeTo(expectation[idx][0], 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx][1]);
+			expect(row.endTimeStamp).to.equal(expectation[idx][2]);
 		});
 	});
 });
