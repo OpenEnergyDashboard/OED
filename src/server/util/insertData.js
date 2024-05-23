@@ -299,7 +299,8 @@ async function insertStandardConversions(conn) {
  * @param {[{}]} metersToInsert key:value pairs of meter values in array with entry for each meter
  * @param {*} conn database connection to use
  * @param {string} dataSource - indicates the source of the data, whether its from a file or variable 
- */
+ * @returns Promise holding array of promises with promise from each meter/data inserted into DB.
+*/
 async function insertMeters(metersToInsert, conn) {
 	// Function used to map values when reading the CSV file.
 	function mapRowsToModel(row) {
@@ -320,6 +321,8 @@ async function insertMeters(metersToInsert, conn) {
 		return [value, startTimeStamp, endTimeStamp];
 	}
 
+	// Array that holds the promise from inserting data into DB or not doing for each meter.
+	let resultPromise = [];
 	// Loop over all meters.
 	for (let i = 0; i < metersToInsert.length; ++i) {
 		// Meter key/value pairs for the current meter.
@@ -408,9 +411,11 @@ async function insertMeters(metersToInsert, conn) {
 			// Second, the messages about changing the meter id do not align with the first meter message.
 			// This could be fixed in several ways but not doing because not using now.
 
-
 			if (await meter.existsByName(conn)) {
 				console.log(`              Warning: meter '${meter.name}' existed so not changed.`);
+				resultPromise.push(new Promise((resolve) => {
+					resolve('meter ' + i + ' existed');
+				}));
 			} else {
 				// Only insert the meter and its readings if the meter did not already exist.
 				await meter.insert(conn);
@@ -436,7 +441,7 @@ async function insertMeters(metersToInsert, conn) {
 					// load data from file
 					console.log(`              getting meter data from file ${meterData.file}`);
 					let filename = `src/server/${meterData.file}`;
-					await loadCsvInput(
+					resultPromise.push(loadCsvInput(
 						filename, // filePath
 						meter.id, // meterID
 						mapRowsToModel, // mapRowToModel
@@ -453,7 +458,7 @@ async function insertMeters(metersToInsert, conn) {
 						false, // shouldUpdate
 						conditionSet, // conditionSet
 						conn
-					);
+					));
 					// Delete mathematical test data file just uploaded. They have true for delete.
 					// Try to delete even if not uploaded since created anyway.
 					if (meterData.deleteFile) {
@@ -471,7 +476,7 @@ async function insertMeters(metersToInsert, conn) {
 					// Create loadGeneratedInput and call it here   
 					// Pass a new variable like meter.data instead of file name, data that needs to map, function uses that data 
 					// Otherwise if there is no file, load data from variable
-					await loadGeneratedInput(
+					resultPromise.push(loadGeneratedInput(
 						meterData.data, // generated data
 						meter.id, // meterID
 						mapGeneratedData, // mapGeneratedData
@@ -488,11 +493,12 @@ async function insertMeters(metersToInsert, conn) {
 						false, // shouldUpdate
 						conditionSet, // conditionSet
 						conn
-					);
+					));
 				}
 			}
 		}
 	}
+	return resultPromise;
 }
 
 /**

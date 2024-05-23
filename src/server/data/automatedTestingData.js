@@ -41,9 +41,9 @@ const DEFAULT_OPTIONS = {
 async function insertData(startDate, endDate, options, meterData, conn) {
 	// Instead of writing to a file store the data in a variable
 	// Store generatedData in meterData object
-    meterData[0].data = generateSine(startDate, endDate, options)
+	meterData[0].data = generateSine(startDate, endDate, options);
 	// Call insertMeters to insert meter data into the database
-    await insertMeters(meterData, conn);
+	await insertMeters(meterData, conn);
 }
 
 /**
@@ -53,7 +53,7 @@ async function insertData(startDate, endDate, options, meterData, conn) {
  * @param {number} [frequency=15] desired frequency of the sinusoidal test data (in minutes).
  * @param {number} [amplitude=1] desired amplitude of the sinusoidal test data.
  */
-async function generateSineTestingData(frequency = 15, amplitude = 1) {
+function generateSineTestingData(frequency = 15, amplitude = 1) {
 	const startDate = DEFAULT_OPTIONS.startDate;
 	const endDate = DEFAULT_OPTIONS.endDateTwoYr;
 	const options = {
@@ -266,7 +266,7 @@ async function generateFourDayTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourDayFreqTestData.csv' file.
 	};
-	await insertData(startDate, endDate, options, meterData, conn);
+	return await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -301,7 +301,7 @@ async function generateFourHourTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourHourFreqTestData.csv' file
 	};
-	await insertData(startDate, endDate, options, meterData, conn);
+	return await insertData(startDate, endDate, options, meterData, conn);
 }
 
 /**
@@ -392,40 +392,44 @@ async function generateOneMinuteTestingData() {
 
 /**
  * Calls the above functions with appropriate parameters to generate all the necessary testing data.
- * Each of the function calls will generate a csv file under '../test/db/data/automatedTests' that is needed for automated testing.
+ * @returns Promise holding array of promises with promise from each set of data inserted into DB.
  */
 async function generateTestingData() {
+	// Array to hold all promises from all generation data calls.
+	const generatePromises = [];
+
 	// Generates 1 year of sinusoidal data with data points at 4-day intervals
-	await generateFourDayTestingData();
+	generatePromises.push(generateFourDayTestingData());
 
 	// Generates 1 year of sinusoidal data with data points at 4-hour intervals
-	await generateFourHourTestingData();
+	generatePromises.push(generateFourHourTestingData());
 
-	// // Generates 1 year of sinusoidal data with data points at 23-minute intervals
-	await generateTwentyThreeMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 23-minute intervals
+	generatePromises.push(generateTwentyThreeMinuteTestingData());
 
-	// // Generates 1 year of sinusoidal data with data points at 15-minute intervals
-	await generateFifteenMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 15-minute intervals
+	generatePromises.push(generateFifteenMinuteTestingData())
 
-	// // Generates 1 year of sinusoidal data with data points at 1-minute intervals.
-	// // Normally not desired so commented out.
-	// // generateOneMinuteTestingData();
+	// Generates 1 year of sinusoidal data with data points at 1-minute intervals.
+	// Normally not desired so commented out.
+	// generateOneMinuteTestingData();
 
-	// // Generates 1 year of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
-	// // Should be related to 23-minute sinusoidal above.
-	await generateCosineTestingData(23, 3);
+	// Generates 1 year of cosinusoidal data with an amplitude of 3 and with data points at 23-minute intervals.
+	// Should be related to 23-minute sinusoidal above.
+	generatePromises.push(generateCosineTestingData(23, 3))
 
-	// // Generates 2 years of *squared* sinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	await generateSineSquaredTestingData(2.5);
+	// Generates 2 years of *squared* sinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
+	generatePromises.push(generateSineSquaredTestingData(2.5))
 
-	// // Generates 2 years of *squared* cosinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
-	await generateCosineSquaredTestingData(2.5);
+	// Generates 2 years of *squared* cosinusoidal data with an amplitude of 2.5 and with data points at 1-day intervals.
+	generatePromises.push(generateCosineSquaredTestingData(2.5))
+
+	return generatePromises;
 }
 
 /**
- * Generates 7 files, all containing 2 years of sinusoidal data, and each with a unique amplitude between 1 and 7. More specifically,
- * the first file contains sine waves with an amplitude of 1, the second contains waves with an amplitude of 2, and so on until
- * the seventh which contains waves an amplitude of 7.
+ * Inserts into DB three sets of sine data with amplitudes of 1, 2 & 3 with 2 years of sinusoidal data.
+ * @returns Promise holding array of promises with promise from each set of data inserted into DB.
  */
 async function generateVariableAmplitudeTestingData() {
 	const meterData = [];
@@ -464,19 +468,27 @@ async function generateVariableAmplitudeTestingData() {
 		deleteFile: true
 	});
 	for (var i = 1; i <= 3; i++) {
-		meterData[i - 1].data = await generateSineTestingData(15, i);
+		meterData[i - 1].data = generateSineTestingData(15, i);
 	}
-	await insertMeters(meterData, conn);
+	// Add meter with data
+	return insertMeters(meterData, conn);
 }
 
 /**
  * Generate mathematical test data.
+ * @returns Promise for when all the inserted data is done.
  */
 async function testData() {
-	console.log("Start generating first set of test data (square, varying freq of readings: 7 files):");
-	await generateTestingData();
-	console.log("Start generating second set of test data (varying amplitudes: 3 files):")
-	await generateVariableAmplitudeTestingData();
+	console.log("Start generating first set of test data (square, varying freq of readings: 7 sets):");
+	// The result is an array of promises for each dataset inserted into DB.
+	// Before the await it is the overall Promise for the function call.
+	const generatedResult = await generateTestingData();
+	console.log("Start generating second set of test data (varying amplitudes: 3 files):");
+	const ampResult = await generateVariableAmplitudeTestingData();
+	// Combine the two results
+	allResult = [...generatedResult, ...ampResult];
+	// Wrap it up in a single promise.
+	return Promise.all(allResult);
 }
 
 // This array contains special units data that is used for both dev and web.
@@ -1320,10 +1332,11 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	// Do now since needed to insert meters with suffix units.
 	await redoCik(conn);
 	// Generate the mathematical test data needed.
-	// TODO The code could be changed to generate the data and use without writing to a file.
+	console.log(`Start loading each set of test data into OED meters, may take minutes):\n`);
+	// This is very fast so wait since simpler and easier to see if this part fails.
+	Promise.all(await insertMeters(specialMeters, conn));
+	// Now do the large dataset generation.
 	await testData();
-	console.log(`Start loading each set of test data into OED meters (${specialMeters.length} files of varying length, may take minutes):`);
-	await insertMeters(specialMeters, conn);
 	// Recreate the Cik entries since changed meters.
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
@@ -1339,21 +1352,22 @@ already exist as those will not be touched (but will not update that meter or re
 NOTE this removes the meters and readings. You may need to remove dependent groups
 before doing this in the web groups page in OED.
 Get into postgres terminal inside the database Docker container and then do:
+TODO These likely need to be updated.
 psql -U oed
 -- Remove all the readings.
--- Normally gives "DELETE 575320"
+-- Normally gives "DELETE 294616"
 delete from readings where meter_id in (select id from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO₂', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh'));
 -- remove all groups.
--- Normally gives "DELETE 25"
+-- Normally gives "DELETE 17"
 delete from groups_immediate_meters where group_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
--- Normally gives "DELETE 6"
+-- Normally gives "DELETE 3"
 delete from groups_immediate_children where parent_id in (select id from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh'));
--- Normally gives "DELETE 14"
+-- Normally gives "DELETE 12"
 delete from groups where name in ('Electric Utility 1-5 + 2-6 kWh', 'Electric Utility 1-5 + Natural Gas Dollar Euro', 'Electric Utility 1-5 + 2-6 Dollar', 'Natural Gas Dollar Euro', 'Electric kW + 2-6 kW', 'Electric Utility 1-5 kWh not displayable', 'SqSin + SqCos kWh', 'SqSin + SqCos no unit', 'Amp 1 + 5 kWh', 'Amp 2 + 6 kWh', 'Amp 3 + 4 kWh', 'Amp 2 + (1 + 5) kWh', 'Amp 3 + 6 + (2 + (1 + 5)) + (3 + 4) kWh', 'Amp 6 + 7 + (1 + 5) + (2 + 6) + (3 + 4) kWh');
 -- Remove all the meters. Normally gives "DELETE 31"
 delete from meters where name in ('Electric Utility kWh', 'Electric Utility kWh 2-6', 'Electric Utility kWh in BTU', 'Electric Utility kWh in MTon CO₂', 'Electric Utility no unit', 'Electric Utility kWh not displayable', 'Natural Gas BTU', 'Natural Gas BTU in Dollar', 'Natural Gas Dollar', 'Natural Gas Cubic Meters', 'Water Gallon', 'Trash Kg', 'Temp Fahrenheit 0-212', 'Temp Fahrenheit in Celsius', 'Electric kW', 'Electric kW 2-6', 'Water Gallon flow 1-5 per minute', 'test4DaySin kWh', 'test4HourSin kWh', 'test23MinSin kWh', 'test15MinSin kWh', 'test23MinCos kWh', 'testSqSin kWh', 'testSqCos kWh', 'testAmp1Sin kWh', 'testAmp2Sin kWh', 'testAmp3Sin kWh', 'testAmp4Sin kWh', 'testAmp5Sin kWh', 'testAmp6Sin kWh', 'testAmp7Sin kWh');
 -- remove conversions
--- Normally 22 total
+-- Normally 27 total
 delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'kWh');
 delete from conversions where source_id = (select id from units where name = 'kWh') and destination_id = (select id from units where name = '100 w bulb');
 delete from conversions where source_id = (select id from units where name = 'Electric_Utility') and destination_id = (select id from units where name = 'US dollar');
