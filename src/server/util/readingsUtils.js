@@ -37,7 +37,7 @@ async function prepareTest(unitData, conversionData, meterData, groupData = []) 
     const conn = testDB.getConnection();
     await insertUnits(unitData, false, conn);
     await insertConversions(conversionData, conn);
-    const result = await Promise.all(await insertMeters(meterData, conn));
+    const result = await insertMeters(meterData, conn);
     await insertGroups(groupData, conn);
     await redoCik(conn);
     await refreshAllReadingViews();

@@ -299,7 +299,7 @@ async function insertStandardConversions(conn) {
  * @param {[{}]} metersToInsert key:value pairs of meter values in array with entry for each meter
  * @param {*} conn database connection to use
  * @param {string} dataSource - indicates the source of the data, whether its from a file or variable 
- * @returns Promise holding array of promises with promise from each meter/data inserted into DB.
+ * @returns Promise for all meters/data inserted into DB.
 */
 async function insertMeters(metersToInsert, conn) {
 	// Function used to map values when reading the CSV file.
@@ -498,7 +498,7 @@ async function insertMeters(metersToInsert, conn) {
 			}
 		}
 	}
-	return resultPromise;
+	return Promise.all(resultPromise);
 }
 
 /**

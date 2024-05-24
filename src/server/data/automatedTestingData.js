@@ -1334,7 +1334,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	// Generate the mathematical test data needed.
 	console.log(`Start loading each set of test data into OED meters, may take minutes):\n`);
 	// This is very fast so wait since simpler and easier to see if this part fails.
-	Promise.all(await insertMeters(specialMeters, conn));
+	await insertMeters(specialMeters, conn);
 	// Now do the large dataset generation.
 	await testData();
 	// Recreate the Cik entries since changed meters.
