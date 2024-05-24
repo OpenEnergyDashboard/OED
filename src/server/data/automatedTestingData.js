@@ -97,7 +97,6 @@ async function generateSineSquaredTestingData(amplitude = 1) {
 			readingFrequency: '15 minutes',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 	]
 	const options = {
@@ -161,7 +160,6 @@ async function generateCosineTestingData(frequency = 15, amplitude = 1) {
 			readingFrequency: '23 minutes',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 	]
 	const options = {
@@ -194,7 +192,6 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
 			readingFrequency: '15 minutes',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 	]
 	const options = {
@@ -264,7 +261,6 @@ async function generateFourDayTestingData() {
 			readingFrequency: '4 days',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		}
 	];
 	const options = {
@@ -298,7 +294,6 @@ async function generateFourHourTestingData() {
 			readingFrequency: '4 hours',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		}
 	];
 	const options = {
@@ -332,7 +327,6 @@ async function generateTwentyThreeMinuteTestingData() {
 			readingFrequency: '23 minutes',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 
 	]
@@ -366,7 +360,6 @@ async function generateFifteenMinuteTestingData() {
 			readingFrequency: '15 minutes',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 	]
 	const options = {
@@ -399,7 +392,6 @@ async function generateOneMinuteTestingData() {
 			readingFrequency: '1 minute',
 			area: 10,
 			areaUnit: 'feet',
-			deleteFile: true
 		},
 	]
 	const options = {
@@ -463,7 +455,6 @@ async function generateVariableAmplitudeTestingData() {
 		note: 'special meter',
 		data: [],
 		readingFrequency: '15 minutes',
-		deleteFile: true
 	});
 	meterData.push({
 		name: 'Sin Amp 2 kWh',
@@ -474,7 +465,6 @@ async function generateVariableAmplitudeTestingData() {
 		note: 'special meter',
 		data: [],
 		readingFrequency: '15 minutes',
-		deleteFile: true
 	});
 	meterData.push({
 		name: 'Sin Amp 3 kWh',
@@ -485,9 +475,9 @@ async function generateVariableAmplitudeTestingData() {
 		note: 'special meter',
 		data: [],
 		readingFrequency: '15 minutes',
-		deleteFile: true
 	});
 	for (var i = 1; i <= 3; i++) {
+		console.log(`          generating data for meter ${meterData[i - 1].name}`);
 		meterData[i - 1].data = generateSineTestingData(15, i);
 	}
 	// Add meter with data
