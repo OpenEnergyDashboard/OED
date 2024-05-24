@@ -69,6 +69,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
 
+	React.useEffect(() => {
+		if (localMeterEdits.cumulative === false) {
+			setLocalMeterEdits(details => ({ ...details, cumulativeReset: false }));
+		}
+	}, [localMeterEdits.cumulative]);
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -195,6 +200,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		props.handleClose();
 		resetState();
 	};
+
 	return (
 		<>
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
@@ -431,20 +437,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						{/* cumulativeReset input */}
 						<Col><FormGroup>
 							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
-							<Input
-								id='cumulativeReset'
-								name='cumulativeReset'
-								type='select'
-								value={localMeterEdits.cumulativeReset?.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
-							</Input>
+							{localMeterEdits.cumulative === true ? (
+								<Input
+									id='cumulativeReset'
+									name='cumulativeReset'
+									type='select'
+									value={localMeterEdits.cumulativeReset?.toString()}
+									onChange={e => handleBooleanChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+									})}
+								</Input>
+							) : (
+								<Input id='cumulativeReset' name='cumulativeReset' type='select' disabled>
+									<option value='no'>Unavailable</option>
+								</Input>
+							)}
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
-
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
@@ -455,7 +466,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits.cumulativeResetStart}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
+							/>
 						</FormGroup></Col>
 						{/* cumulativeResetEnd input */}
 						<Col><FormGroup>
@@ -467,7 +480,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits?.cumulativeResetEnd}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
+							/>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>

@@ -74,6 +74,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 				<EditUnitModalComponent
 					show={showEditModal}
 					unit={props.unit}
+					handleShow={handleShow}
 					handleClose={handleClose} />
 			</div>
 		</div>
