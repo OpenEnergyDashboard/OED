@@ -10,7 +10,6 @@
  * generateTestData.js exports four functions:
  * generateDates,
  * generateSine,
- * writeToCsv,
  * generateCosine,
  * generateSineData
  */
@@ -190,31 +189,6 @@ function generateSineData(startTimeStamp, endTimeStamp, options = {}) {
 	//return (_.zip(sineValues, startDates, endDates));
 }
 
-/**
- * Write csv data and header into a csv file
- * @param {[string, string, string]} data - A matrix with three columns of strings
- * @param {string?} filename - The name of the file.
- * @sources:
- * https://csv.js.org/stringify/api/
- * https://stackoverflow.com/questions/2496710/writing-files-in-node-js
- */
-async function writeToCsv(data, filename = 'test.csv') {
-	try {
-		// Assuming \n works on all systems but fine in our Unix containers.
-		const header = 'reading,start_timestamp,end_timestamp\n';
-		await fs.writeFile(filename, header) // insert header into file
-			.catch(reason => log.error(`Failed to write the header to file: ${filename}`, reason));
-		// generate csv data
-		const output = await stringifyCSV(data);
-		// append csv data into file
-		await fs.appendFile(filename, output)
-			.then(() => log.info(`The file ${filename} was saved for generating test data.`)) // log success
-			.catch(reason => log.error(`Failed to write the file: ${filename}`, reason));
-	} catch (error) {
-		log.error(`Failed to csv-stringify the contents of data: ${JSON.stringify(data)}`, error); // log failure
-	}
-}
-
 // interface GenerateDataFileOptions extends GenerateDataOptions {
 // 	filename?: string;
 // 	skipNormalize?: boolean;
@@ -274,7 +248,6 @@ function generateSine(startTimeStamp, endTimeStamp, options = {}) {
 			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		//await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 		//Generate the data
 		const sineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
 		//return data in the function
@@ -335,7 +308,6 @@ function generateCosine(startTimeStamp, endTimeStamp, options = {}) {
 			// Now scale the points.
 			chosenOptions.maxAmplitude = chosenOptions.maxAmplitude * scale;
 		}
-		//await writeToCsv(generateSineData(startTimeStamp, endTimeStamp, chosenOptions), chosenOptions.filename);
 		//Generate the data 
 		const cosineData = generateSineData(startTimeStamp, endTimeStamp, chosenOptions);
 		//return data in the function
@@ -352,6 +324,5 @@ module.exports = {
 	generateSine,
 	generateSineData,
 	generateCosine,
-	writeToCsv,
 	momenting
 };
