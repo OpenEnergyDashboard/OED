@@ -35,13 +35,19 @@ const DEFAULT_OPTIONS = {
  * @param {string} endDate - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
  * and may not be included. Check the generateDates function for more details.
  * @param {object?} options - The parameters for generating a data file for OED
+ * @param {boolean} doCosine True if the data should be cosine function, sine otherwise
  * @param {[{}]} meterData key:value pairs of meter values in array with entry for each meter
  * @param {*} conn database connection to use
  */
-async function insertData(startDate, endDate, options, meterData, conn) {
+async function insertData(startDate, endDate, options, doCosine, meterData, conn) {
 	// Instead of writing to a file store the data in a variable
 	// Store generatedData in meterData object
-	meterData[0].data = generateSine(startDate, endDate, options);
+	if (doCosine) {
+		// Want cosine data
+		meterData[0].data = generateCosine(startDate, endDate, options);
+	} else {
+		meterData[0].data = generateSine(startDate, endDate, options);
+	}
 	// Call insertMeters to insert meter data into the database
 	await insertMeters(meterData, conn);
 }
@@ -128,7 +134,7 @@ async function generateSineSquaredTestingData(amplitude = 1) {
 		noShift: true,
 		squared: true // Option set to true because want sine *squared* data.
 	};
-	await insertData(startDate, endDate, options, meterData, conn)
+	await insertData(startDate, endDate, options, false, meterData, conn)
 }
 
 /**
@@ -162,7 +168,7 @@ async function generateCosineTestingData(frequency = 15, amplitude = 1) {
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: amplitude,
 	};
-	await insertData(startDate, endDate, options, meterData, conn)
+	await insertData(startDate, endDate, options, true, meterData, conn)
 }
 
 /**
@@ -225,7 +231,7 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
 		noShift: true,
 		squared: true // Option set to true because want cosine *squared* data.
 	};
-	await insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, true, meterData, conn);
 }
 
 /*
@@ -266,7 +272,7 @@ async function generateFourDayTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourDayFreqTestData.csv' file.
 	};
-	return await insertData(startDate, endDate, options, meterData, conn);
+	return await insertData(startDate, endDate, options, false, meterData, conn);
 }
 
 /**
@@ -301,7 +307,7 @@ async function generateFourHourTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fourHourFreqTestData.csv' file
 	};
-	return await insertData(startDate, endDate, options, meterData, conn);
+	return await insertData(startDate, endDate, options, false, meterData, conn);
 }
 
 /**
@@ -335,7 +341,7 @@ async function generateTwentyThreeMinuteTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'twentyThreeMinuteFreqTestData.csv' file.
 	};
-	await insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, false, meterData, conn);
 }
 
 /**
@@ -368,7 +374,7 @@ async function generateFifteenMinuteTestingData() {
 		maxAmplitude: 3,
 		// Data saved in 'fifteenMinuteFreqTestData.csv' file.
 	};
-	await insertData(startDate, endDate, options, meterData, conn);
+	await insertData(startDate, endDate, options, false, meterData, conn);
 }
 
 /**
