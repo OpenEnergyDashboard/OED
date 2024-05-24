@@ -30,18 +30,19 @@ const DEFAULT_OPTIONS = {
 }
 /**
  * Stores the generated data in a meterData object and calls insertMeters to
- * insert the data into the database
+ * insert the data into the database. Only works for single meter.
  * @param {string} startDate - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endDate - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
  * and may not be included. Check the generateDates function for more details.
  * @param {object?} options - The parameters for generating a data file for OED
  * @param {boolean} doCosine True if the data should be cosine function, sine otherwise
- * @param {[{}]} meterData key:value pairs of meter values in array with entry for each meter
+ * @param {[{}]} meterData key:value pairs of meter values in array with entry for one meter
  * @param {*} conn database connection to use
  */
 async function insertData(startDate, endDate, options, doCosine, meterData, conn) {
 	// Instead of writing to a file store the data in a variable
 	// Store generatedData in meterData object
+	console.log(`          generating data for meter ${meterData[0].name}`);
 	if (doCosine) {
 		// Want cosine data
 		meterData[0].data = generateCosine(startDate, endDate, options);
@@ -379,21 +380,34 @@ async function generateFifteenMinuteTestingData() {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 1 minute intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
- * 'oneMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values.
  */
 // TODO This does not put file into DB and file is not actually used.
 async function generateOneMinuteTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
 	const endDate = DEFAULT_OPTIONS.endDateOneYr;
+	const meterData = [
+		{
+			name: 'Sin 1 Min kWh',
+			unit: 'Electric_Utility',
+			defaultGraphicUnit: 'kWh',
+			displayable: true,
+			gps: undefined,
+			note: 'special meter',
+			// Store data in variable instead of filepath
+			data: [],
+			readingFrequency: '1 minute',
+			area: 10,
+			areaUnit: 'feet',
+			deleteFile: true
+		},
+	]
 	const options = {
 		timeStep: { minute: 1 }, // Data point intervals set to 1 minute.
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
-		// Data saved in 'oneMinuteFreqTestData.csv' file.
-		filename: path.join(__dirname, '../test/db/data/automatedTests/oneMinuteFreqTestData.csv')
 	};
-	generateSine(startDate, endDate, options);
+	await insertData(startDate, endDate, options, false, meterData, conn);
 }
 
 /**
