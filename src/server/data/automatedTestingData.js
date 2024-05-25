@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * This file contains a series of functions used to generate (at some point automated - hopefully) test data.
+ * This file contains a series of functions used to generate test data.
  */
 
 const { generateSine, generateCosine } = require('./generateTestingData');
@@ -34,7 +34,7 @@ const DEFAULT_OPTIONS = {
  * @param {string} startDate - This is the start time of the data generation; its format needs to be 'YYYY-MM-DD HH:MM:SS'
  * @param {string} endDate - This is the end time of the data generation; it needs to have the format 'YYYY-MM-DD HH:MM:SS'
  * and may not be included. Check the generateDates function for more details.
- * @param {object?} options - The parameters for generating a data file for OED
+ * @param {object?} options - The parameters for generating a data for OED
  * @param {boolean} doCosine True if the data should be cosine function, sine otherwise
  * @param {[{}]} meterData key:value pairs of meter values in array with entry for one meter
  * @param {*} conn database connection to use
@@ -55,8 +55,7 @@ async function insertData(startDate, endDate, options, doCosine, meterData, conn
 
 /**
  * Generates sinusoidal testing data over a two year period (2020 to 2021, inclusive)
- * with a 45 day sine period with normalized by hour values and
- * saves the data in an appropriately-named file under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period with normalized by hour values.
  * @param {number} [frequency=15] desired frequency of the sinusoidal test data (in minutes).
  * @param {number} [amplitude=1] desired amplitude of the sinusoidal test data.
  * @return {[number, string, string][]} Matrix of rows representing each data row of the form startDate, endDate, options.
@@ -72,15 +71,14 @@ function generateSineTestingData(frequency = 15, amplitude = 1) {
 	};
 	// Store data in a variable
 	const generatedData = generateSine(startDate, endDate, options);
-	// Return the generatedData in the function and puts the values into the database rather than saving to a file
+	// Return the generatedData in the function
 	return generatedData;
 }
 
 /**
  * Generates squared sinusoidal testing data over a one year period (2020)
- * with a 45 day sine period, normalized by hour values with a point each day and
- * saves the data in an appropriately named file under '../test/db/data/automatedTests/'.
- * @param {number} [amplitude=1] desired amplitude of the sinusoidal squared test data.
+ * with a 45 day sine period, normalized by hour values with a point each day
+ * and places in DB.
  */
 async function generateSineSquaredTestingData(amplitude = 1) {
 	const startDate = DEFAULT_OPTIONS.startDate;
@@ -141,8 +139,7 @@ async function generateSineSquaredTestingData(amplitude = 1) {
 
 /**
  * Generates cosinusoidal testing data over a one year period (2020)
- * with a 45 day sine period with normalized by hour values and
- * then saves the data in an appropriately-named file under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period with normalized by hour values and places in DB.
  * @param {number} [frequency=15] - desired frequency of the cosinusoidal test data (in minutes).
  * @param {number} [amplitude=1] - desired amplitude of the cosinusoidal test data.
  */
@@ -175,8 +172,7 @@ async function generateCosineTestingData(frequency = 15, amplitude = 1) {
 
 /**
  * Generates squared cosinusoidal testing data over a one year period (2020)
- * with a 45 day cosine period with normalized by hour values and
- * saves the data in an appropriately named file under '../test/db/data/automatedTests/'.
+ * with a 45 day cosine period with normalized by hour values and places in DB.
  * @param {number} [amplitude=1] - desired amplitude of the squared cosinusoidal test data.
  */
 async function generateCosineSquaredTestingData(amplitude = 1) {
@@ -246,8 +242,7 @@ async function generateCosineSquaredTestingData(amplitude = 1) {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 4 day intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
- * 'fourDayFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values and places in DB.
  */
 async function generateFourDayTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
@@ -271,7 +266,6 @@ async function generateFourDayTestingData() {
 		timeStep: { day: 4 },
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
-		// Data saved in 'fourDayFreqTestData.csv' file.
 	};
 	// Puts the values into the database rather than saving to a file
 	return await insertData(startDate, endDate, options, false, meterData, getConnection());
@@ -279,8 +273,7 @@ async function generateFourDayTestingData() {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 4 hour intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
- * 'fourHourFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values and places in DB.
  */
 async function generateFourHourTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
@@ -306,7 +299,6 @@ async function generateFourHourTestingData() {
 		timeStep: { hour: 4 },
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
-		// Data saved in 'fourHourFreqTestData.csv' file
 	};
 	// Puts the values into the database rather than saving to a file
 	return await insertData(startDate, endDate, options, false, meterData, getConnection());
@@ -314,8 +306,7 @@ async function generateFourHourTestingData() {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 23 minute intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
- * 'twentyThreeMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values and places in DB.
  */
 async function generateTwentyThreeMinuteTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
@@ -340,7 +331,6 @@ async function generateTwentyThreeMinuteTestingData() {
 		timeStep: { minute: 23 }, // Data point intervals set to 23 minutes.
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
-		// Data saved in 'twentyThreeMinuteFreqTestData.csv' file.
 	};
 	// Puts the values into the database rather than saving to a file
 	await insertData(startDate, endDate, options, false, meterData, getConnection());
@@ -348,8 +338,7 @@ async function generateTwentyThreeMinuteTestingData() {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 15 minute intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values and saved in file
- * 'fifteenMinuteFreqTestData.csv' under '../test/db/data/automatedTests/'.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values and places in DB.
  */
 async function generateFifteenMinuteTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
@@ -373,7 +362,6 @@ async function generateFifteenMinuteTestingData() {
 		timeStep: { minute: 15 }, // Data point intervals set to 15 minutes.
 		periodLength: DEFAULT_OPTIONS.periodLength,
 		maxAmplitude: 3,
-		// Data saved in 'fifteenMinuteFreqTestData.csv' file.
 	};
 	// Puts the values into the database rather than saving to a file
 	await insertData(startDate, endDate, options, false, meterData, getConnection());
@@ -381,9 +369,8 @@ async function generateFifteenMinuteTestingData() {
 
 /**
  * Generates one year of sinusoidal testing data (for the whole year of 2020) at 1 minute intervals
- * with a 45 day sine period and amplitude 3 with normalized by hour values.
+ * with a 45 day sine period and amplitude 3 with normalized by hour values and places in DB.
  */
-// TODO This does not put file into DB and file is not actually used.
 async function generateOneMinuteTestingData() {
 	const startDate = DEFAULT_OPTIONS.startDate;
 	const endDate = DEFAULT_OPTIONS.endDateOneYr;
@@ -502,7 +489,7 @@ async function testData() {
 	// The result is an array of promises for each dataset inserted into DB.
 	// Before the await it is the overall Promise for the function call.
 	const generatedResult = await generateTestingData();
-	console.log("Start generating second set of test data (varying amplitudes: 3 files):");
+	console.log("Start generating second set of test data (varying amplitudes: 3 sets):");
 	const ampResult = await generateVariableAmplitudeTestingData();
 	// Combine the two results
 	allResult = [...generatedResult, ...ampResult];
