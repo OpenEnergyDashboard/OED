@@ -183,7 +183,8 @@ mocha.describe('Line & bar Readings', () => {
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
-			const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 } }).map(row => new Reading(meter.id, row[0], row[1], row[2]));
+			const data = generateSineData(startDate, endDate, { timeStep: { minute: 15 } })
+				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
 			await Reading.refreshDailyReadings(conn);
@@ -252,7 +253,8 @@ mocha.describe('Line & bar Readings', () => {
 			meter = await Meter.getByName('Meter', conn);
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
-			const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 } }).map(row => new Reading(meter.id, row[0], row[1], row[2]));
+			const data = generateSineData(startDate, endDate, { timeStep: { minute: 23 } })
+				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
 			await Reading.refreshDailyReadings(conn);

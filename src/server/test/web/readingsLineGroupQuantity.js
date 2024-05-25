@@ -84,7 +84,7 @@ mocha.describe('readings API', () => {
                     //Check if the Readings is equal to the expected file
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-                
+
                 mocha.it('LG5: should barely have hourly points for middle readings of 15 + 20 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => { 
                     //Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
@@ -103,9 +103,6 @@ mocha.describe('readings API', () => {
                     //Check if the Readings is equal to the expected file
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-
-
-                // Add LG6 here
                 mocha.it('LG6: 14 days still gives hourly points & middle readings', async () => {
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     // Get the unit ID since the DB could use any value.
