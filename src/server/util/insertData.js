@@ -298,7 +298,6 @@ async function insertStandardConversions(conn) {
  * Note the values provided for the keys are not checked for validity.
  * @param {[{}]} metersToInsert key:value pairs of meter values in array with entry for each meter
  * @param {*} conn database connection to use
- * @param {string} dataSource - indicates the source of the data, whether its from a file or variable 
  * @returns Promise for all meters/data inserted into DB.
 */
 async function insertMeters(metersToInsert, conn) {
@@ -330,7 +329,6 @@ async function insertMeters(metersToInsert, conn) {
 		const meterData = _.cloneDeep(metersToInsert[i]);
 
 		// Check that needed keys are there.
-		//const requiredKeys = ['name', 'file'];
 		//Make file an optional key
 		const requiredKeys = ['name'];
 		let ok = true;
@@ -489,7 +487,6 @@ async function insertMeters(metersToInsert, conn) {
 						meter.readingGap, // readingGap
 						meter.readingVariation, // readingLengthVariation
 						meter.endOnlyTime, // isEndOnly
-						true, // headerRow
 						false, // shouldUpdate
 						conditionSet, // conditionSet
 						conn

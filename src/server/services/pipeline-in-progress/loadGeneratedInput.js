@@ -9,7 +9,7 @@ const loadArrayInput = require('./loadArrayInput');
 const { log } = require('../../log');
 
 /**
- * Read a CSV file and select needed column to return an array of reading value and reading time
+ * Processes meter data to be inserted into the data base 
  * @param {array} dataRows array of rows containing the meter data
  * @param {number} meterID meter id being input
  * @param {function} mapGeneratedData a function that formats the generated data
@@ -22,7 +22,6 @@ const { log } = require('../../log');
  * @param {number} readingGap defines how far apart (end time of previous to start time of next) that a pair of reading can be
  * @param {number} readingLengthVariation defines how much the length of a pair of readings can vary in seconds
  * @param {boolean} isEndOnly true if the given data only has final reading date/time and not start date/time
- * @param {boolean} headerRow true if the given file has a header row
  * @param {boolean} shouldUpdate true if new values should replace old ones, otherwise false
  * @param {array} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {array} conn connection to database
@@ -42,7 +41,6 @@ async function loadGeneratedInput(
 	readingGap,
 	readingLengthVariation,
 	isEndOnly,
-	headerRow,
 	shouldUpdate,
 	conditionSet,
 	conn,
