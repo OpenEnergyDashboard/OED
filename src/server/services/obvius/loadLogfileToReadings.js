@@ -11,7 +11,7 @@ const Preferences = require('../../models/Preferences');
 
 async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 	// Get demultiplexed, parsed data from the CSV.
-	const unprocessedData = demuxCsvWithSingleColumnTimestamps(logfile);
+	const unprocessedData = await demuxCsvWithSingleColumnTimestamps(logfile);
 	// Removes the first three values because we expect it to be all zeroes
 	const data = unprocessedData.slice(3);
 	for (let i = 0; i < data.length; i++) {
