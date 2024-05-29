@@ -133,7 +133,7 @@
 		"@typescript-eslint/eslint-plugin": "~6.4.1",
 		"@typescript-eslint/parser": "~6.11.0",
 		"babel-loader": "~8.2.3",
-		"babel-plugin-formatjs": "~10.3.12",
+		"babel-plugin-formatjs": "~10.5.16",
 		"chai": "~4.4.1",
 		"chai-as-promised": "~7.1.1",
 		"chai-http": "~4.3.0",
