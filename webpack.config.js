@@ -38,22 +38,12 @@ const config = {
 	module: {
 		rules: [
 			// All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
-			// Also, for development, JavaScript is handled by 'awesome-typescript-loader' and passed to Babel.
 			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
-			// Any remaining JavaScript ('.js' or '.jsx') will be transpiled by Babel, for production uglification.
-			{ test: /\/jsx?$/, exclude: /node_modules/, use:[{loader: 'babel-loader'}] },
 			// CSS stylesheet loader.
 			{ test: /\.css$/, use: [
 				{loader: 'style-loader'},
 				{loader: 'css-loader'}
 			] },
-			// Babel not able to resolve imports https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
-			{
-				test: /\.m?js/,
-				resolve: {
-					fullySpecified: false
-				}
-			},
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
 			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
 		]
