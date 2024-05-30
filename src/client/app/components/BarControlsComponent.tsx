@@ -44,7 +44,7 @@ export default function BarControlsComponent() {
 		if (key == 'Enter') {
 			updateBarDurationChange(barDays);
 		}
-	}
+	};
 
 	const updateBarDurationChange = (value: number) => {
 		// Update if okay value. May not be okay if this came from user entry in form.
