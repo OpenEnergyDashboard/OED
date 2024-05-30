@@ -3,8 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import sliderWithoutTooltips, { createSliderWithTooltip } from 'rc-slider';
-import 'rc-slider/assets/index.css';
+import createSliderWithTooltip from 'rc-slider';
+// TODO needed
+// import 'rc-slider/assets/index.css';
 import * as React from 'react';
 import { Button, ButtonGroup } from 'reactstrap';
 import { graphSlice, selectBarStacking, selectBarWidthDays } from '../redux/slices/graphSlice';
@@ -66,7 +67,11 @@ export default function BarControlsComponent() {
 						value={sliderVal}
 						onChange={handleSliderChange}
 						onAfterChange={updateBarDurationChange}
-						tipFormatter={formatSliderTip}
+						onChangeComplete={updateBarDurationChange}
+						// TODO This is not working. It may have to do with the way imports are
+						// used but it also seems mostly gone from this release even though it
+						// is still in the docs. Without it you cannot see the value.
+						// tipFormatter={formatSliderTip}
 						trackStyle={{ backgroundColor: 'gray', height: 10 }}
 						handleStyle={[{
 							height: 28,
@@ -83,9 +88,9 @@ export default function BarControlsComponent() {
 	);
 }
 
-const Slider = createSliderWithTooltip(sliderWithoutTooltips);
-const formatSliderTip = (value: number) => `${value} ${translate(value <= 1 ? 'day' : 'days')}`;
-
+const Slider = createSliderWithTooltip;
+// TODO not working
+// const formatSliderTip = (value: number) => `${value} ${translate(value <= 1 ? 'day' : 'days')}`;
 
 const divTopPadding: React.CSSProperties = {
 	paddingTop: '15px'
