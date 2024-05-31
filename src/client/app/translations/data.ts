@@ -727,7 +727,7 @@ const LocaleTranslationData = {
 		"help.groups.area.calculate": "This will sum together the area of all meters in this group with a nonzero area with an area unit. It will ignore any meters which have no area or area unit. If this group has no area unit, it will do nothing.\u{26A1}",
 		"help.home.area.normalize": "Toggles normalization by area. Meters/Groups without area will be hidden. Please visit {link} for further details and information.\u{26A1}",
 		"help.home.bar.days.tip": "Allows user to select the desired number of days for each bar.  Please see {link} for further details and information.\u{26A1}",
-		"help.home.bar.interval.tip": "for each bar.  Please see {link} for further details and information.\u{26A1}",
+		"help.home.bar.interval.tip": "Selects the time interval (Day, Week or 4 Weeks) for each bar.  Please see {link} for further details and information.\u{26A1}",
 		"help.home.bar.stacking.tip": "Bars stack on top of each other. Please see {link} for further details and information.\u{26A1}",
 		"help.home.map.interval.tip": "for map corresponding to bar's time interval. Please see {link} for further details and information.\u{26A1}",
 		"help.home.chart.plotly.controls": "These controls are provided by Plotly, the graphics package used by OED. You generally do not need them but they are provided in case you want that level of control. Note that some of these options may not interact nicely with OED features. See Plotly documentation at {link}.\u{26A1}",
