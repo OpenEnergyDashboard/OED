@@ -118,7 +118,7 @@
 		"@typescript-eslint/parser": "~6.11.0",
 		"chai": "~4.4.1",
 		"chai-as-promised": "~7.1.1",
-		"chai-http": "~4.3.0",
+		"chai-http": "~4.4.0",
 		"css-loader": "~6.8.1",
 		"eslint": "~8.48.0",
 		"eslint-plugin-jsdoc": "~48.2.3",
