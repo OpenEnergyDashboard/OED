@@ -755,7 +755,7 @@ async function insertWebsiteData() {
 	await redoCik(conn);
 	console.log(`Start loading each set of test data into OED meters (${meters.length} files of varying length, may take minutes):`);
 	// await Meter.insertMany(meters, conn);
-	await insertMeters(meters, conn);
+    await insertMeters(meters, conn);
 	// Recreate the Cik entries since changed meters.
 	await redoCik(conn);
 	// Refresh the readings since added new ones.
