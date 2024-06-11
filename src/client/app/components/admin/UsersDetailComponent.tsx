@@ -77,6 +77,9 @@ export default function UserDetailComponent() {
 						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
 					</div>
 				</h2>
+				<div className="edit-btn">
+					<CreateUserModalComponent />
+				</div>
 				<div style={tableStyle}>
 					<Table striped bordered hover>
 						<thead>
@@ -110,9 +113,6 @@ export default function UserDetailComponent() {
 							))}
 						</tbody>
 					</Table>
-					<div className="edit-btn">
-						<CreateUserModalComponent />
-					</div>
 					<div style={buttonsStyle}>
 						<Button
 							color='success'
