@@ -6,7 +6,7 @@
 
 const moment = require('moment');
 
-class TimeInterval {
+exports.TimeInterval = class TimeInterval {
 	constructor(startTimestamp, endTimestamp) {
 		// utc keeps the moments from changing timezone.
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
@@ -107,5 +107,3 @@ class TimeInterval {
 		return new TimeInterval(startTimestamp, endTimestamp);
 	}
 }
-
-module.exports = { TimeInterval };

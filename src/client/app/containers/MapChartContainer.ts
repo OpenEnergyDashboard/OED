@@ -5,7 +5,7 @@
 
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import moment from 'moment';
 import Plot, { PlotParams } from 'react-plotly.js';
 import { connect } from 'react-redux';
 import { DataType } from '../types/Datasources';

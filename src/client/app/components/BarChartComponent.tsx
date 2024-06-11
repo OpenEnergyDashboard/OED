@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { debounce } from 'lodash';
-import { utc } from 'moment';
+import moment from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
@@ -19,6 +19,9 @@ import { selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
+
+const { utc } = moment;
+
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React

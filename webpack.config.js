@@ -5,6 +5,7 @@
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 
@@ -37,15 +38,34 @@ const config = {
 	},
 	module: {
 		rules: [
-			// All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
-			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
+			// All TypeScript ('.ts' or '.tsx') and JavaScript ('.js' or '.jsx') will be handled by 'ts-loader'.
+			{
+				test: /\.[jt]sx?$/,
+				exclude: /node_modules/,
+				use: [
+					'ts-loader',
+					/*
+					 * When some imports were re-written to satisfy Vite, the re-written
+					 * imports broke Webpack. This fixes those imports.
+					 */
+					{
+						loader: 'string-replace-loader',
+						options: {
+							search: "import moment from 'moment'",
+							replace: "import * as moment from 'moment'"
+						}
+					}
+				]
+			},
 			// CSS stylesheet loader.
-			{ test: /\.css$/, use: [
-				{loader: 'style-loader'},
-				{loader: 'css-loader'}
-			] },
+			{
+				test: /\.css$/, use: [
+					{ loader: 'style-loader' },
+					{ loader: 'css-loader' }
+				]
+			},
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
+			{ enforce: 'pre', test: /\.js$/, use: [{ loader: 'source-map-loader' }] }
 		]
 	},
 	output: {
@@ -54,7 +74,12 @@ const config = {
 	},
 	plugins: [
 		new LodashModuleReplacementPlugin(),
-		new NodePolyfillPlugin()
+		new NodePolyfillPlugin(),
+		new HtmlWebpackPlugin({
+			title: 'Custom template',
+			template: './src/index-webpack.html',
+			filename: '../index.html'
+		}),
 	]
 };
 

@@ -4,7 +4,7 @@
 
 import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import { TimeInterval } from '../../../common/TimeInterval';
-import * as moment from 'moment';
+import moment from 'moment';
 
 /**
  * Converts from OED's TimeInterval into a DateRange for compatibility with @wojtekmaj's DateRangePicker

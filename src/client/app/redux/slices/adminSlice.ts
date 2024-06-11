@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import * as moment from 'moment';
+import moment from 'moment';
 import { createAppSelector } from '../../redux/selectors/selectors';
 import { PreferenceRequestItem } from '../../types/items';
 import { AdminState } from '../../types/redux/admin';
