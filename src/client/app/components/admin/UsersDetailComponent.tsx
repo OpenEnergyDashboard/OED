@@ -13,7 +13,7 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
 import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
-import CreateUserLinkButtonComponent from './users/CreateUserLinkButtonComponent';
+import CreateUserModalComponent from './CreateUserModalComponent';
 
 
 /**
@@ -110,8 +110,10 @@ export default function UserDetailComponent() {
 							))}
 						</tbody>
 					</Table>
+					<div className="edit-btn">
+						<CreateUserModalComponent />
+					</div>
 					<div style={buttonsStyle}>
-						<CreateUserLinkButtonComponent />
 						<Button
 							color='success'
 							disabled={_.isEqual(users, localUsersChanges)}
