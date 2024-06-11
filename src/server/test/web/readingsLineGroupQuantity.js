@@ -357,7 +357,7 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('BTU');
                     // Load the expected response data from the corresponding csv file
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
                     // Create a request to the API for unbounded reading times and save the response
                     const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
                         .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
