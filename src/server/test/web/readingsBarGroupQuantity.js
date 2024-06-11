@@ -32,7 +32,7 @@ mocha.describe('readings API', () => {
 
                 // Add BG2 here
 
-                // Add BG3 here
+
                 mocha.it('BG3: 28 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
                     //load data into database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
@@ -49,8 +49,8 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-                // Add BG4 here
-                mocha.it('13 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
+
+                mocha.it('BG4: 13 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
                   //load data into database
                   await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                   //get unit ID since the DB could use any value.
