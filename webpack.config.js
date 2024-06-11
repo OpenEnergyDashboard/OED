@@ -76,7 +76,6 @@ const config = {
 		new LodashModuleReplacementPlugin(),
 		new NodePolyfillPlugin(),
 		new HtmlWebpackPlugin({
-			title: 'Custom template',
 			template: './src/index-webpack.html',
 			filename: '../index.html'
 		}),
