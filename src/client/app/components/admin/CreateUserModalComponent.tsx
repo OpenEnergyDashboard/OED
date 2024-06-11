@@ -119,7 +119,7 @@ export default function CreateUserModal() {
 										required
 									/>
 									<FormFeedback>
-										<FormattedMessage id="error.passwordMismatch" />
+										<FormattedMessage id="user.password.mismatch" />
 									</FormFeedback>
 								</FormGroup>
 							</Col>
