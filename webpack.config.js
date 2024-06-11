@@ -51,7 +51,7 @@ const config = {
 					{
 						loader: 'string-replace-loader',
 						options: {
-							search: "import moment from 'moment'",
+							search: /import[ \t]+moment[ \t]+from[ \t]+['"]moment['"]/,
 							replace: "import * as moment from 'moment'"
 						}
 					}
