@@ -69,7 +69,6 @@ mocha.describe('readings API', () => {
 
                 // Add BG5 here
 
-                // Add BG6 here
                 mocha.it('BG6: 76 day bars (no values) for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
                     //load data into database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
