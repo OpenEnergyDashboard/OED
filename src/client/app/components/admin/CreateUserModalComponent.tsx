@@ -40,7 +40,7 @@ export default function CreateUserModal() {
 	const handleSubmit = async () => {
 		if (password === confirmPassword) {
 			setPasswordMatch(true);
-			const userRole = UserRole[role as keyof typeof UserRole];
+			const userRole: UserRole = UserRole[role as keyof typeof UserRole];
 			const newUser: NewUser = { email, role: userRole, password };
 			createUser(newUser)
 				.unwrap()
@@ -139,7 +139,7 @@ export default function CreateUserModal() {
 									>
 										<option value="">Select Role</option>
 										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={val} key={val}>
+											<option value={role} key={val}>
 												{role}
 											</option>
 										))}
