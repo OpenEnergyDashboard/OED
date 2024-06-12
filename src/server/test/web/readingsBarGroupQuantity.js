@@ -28,8 +28,7 @@ mocha.describe('readings API', () => {
         mocha.describe('for bar charts', () => {
             mocha.describe('for quantity groups', () => {
 
-                // Add BG1 here
-                mocha.it('1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
+                mocha.it('BG1: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
                     //loads data into database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh)
                     //gets unit ID
