@@ -40,7 +40,7 @@ export default function DateRangeComponent() {
 			<DateRangePicker
 				value={timeIntervalToDateRange(queryTimeInterval)}
 				onChange={handleChange}
-				defaultView={'year'}
+				calendarProps={{ defaultView: 'year' }}
 				minDate={new Date(1970, 0, 1)}
 				maxDate={new Date()}
 				locale={locale} // Formats Dates, and Calendar months base on locale

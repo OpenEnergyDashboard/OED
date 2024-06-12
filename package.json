@@ -57,7 +57,7 @@
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "~2.2.5",
-		"@wojtekmaj/react-daterange-picker": "~5.2.0",
+		"@wojtekmaj/react-daterange-picker": "~6.0.0",
 		"axios": "~1.6.2",
 		"bcryptjs": "~2.4.3",
 		"body-parser": "~1.20.2",
