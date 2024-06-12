@@ -82,7 +82,7 @@
 		"ngraph.path": "~1.5.0",
 		"nodemailer": "~6.9.9",
 		"pg": "~8.12.0",
-		"pg-promise": "~11.7.8",
+		"pg-promise": "~11.8.0",
 		"plotly.js": "~2.29.1",
 		"prop-types": "~15.8.1",
 		"query-string": "~9.0.0",
