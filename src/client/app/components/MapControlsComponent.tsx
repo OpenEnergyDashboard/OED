@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
-import * as moment from 'moment';
+import moment from 'moment';
 import * as React from 'react';
 import { Button, ButtonGroup } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';

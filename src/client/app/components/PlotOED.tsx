@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import moment from 'moment';
 import { Datum, PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot, { Figure, PlotParams } from 'react-plotly.js';

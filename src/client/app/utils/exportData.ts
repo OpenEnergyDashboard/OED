@@ -4,7 +4,7 @@
 
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
-import * as moment from 'moment';
+import moment from 'moment';
 import { BarReading, LineReading, RawReadings } from '../types/readings';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 

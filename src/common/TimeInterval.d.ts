@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 export class TimeInterval {
 	public static unbounded(): TimeInterval;

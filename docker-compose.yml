@@ -46,9 +46,7 @@ services:
             # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
             # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
             - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
-            # If in a subdirectory, set it here
-            # - OED_SUBDIR=/subdir/
-            # Set the correct build environment.
+        # Set the correct build environment.
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
@@ -62,6 +60,7 @@ services:
         # Map the default port.
         ports:
             - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
+            - "8085:8085"
             - "9229:9229" # Debug port, should be commented out for production
             # For production you might want something like:
             # - "80:3000"

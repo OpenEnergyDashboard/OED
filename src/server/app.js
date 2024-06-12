@@ -105,10 +105,8 @@ const router = express.Router();
 
 // Accept all other endpoint requests which will be handled by the client router
 router.get('*', (req, res) => {
-	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
-		const subdir = config.subdir || '/';
-		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
-		res.send(htmlPlusData);
+	fs.readFile(path.resolve(__dirname, '../client/public/index.html'), (err, html) => {
+		res.send(html);
 	});
 });
 

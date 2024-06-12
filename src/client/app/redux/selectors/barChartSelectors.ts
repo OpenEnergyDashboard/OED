@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import * as moment from 'moment';
+import moment from 'moment';
 import { BarReadings } from 'types/readings';
 import { selectBarWidthDays } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';

@@ -17,7 +17,10 @@ v8-compile-cache*
 private
 
 # Build files
-/src/client/public/app/*
+/src/client/public/**
+!/src/client/public/favicon.ico
+!/src/client/public/logo.png
+!/src/client/public/refresh.png
 
 # Environment Variables
 .env

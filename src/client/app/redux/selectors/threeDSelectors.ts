@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import { utc } from 'moment';
+import moment from 'moment';
 import { ThreeDReading } from 'types/readings';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
@@ -13,6 +13,8 @@ import {
 	selectThreeDMeterOrGroup, selectThreeDMeterOrGroupID
 } from '../slices/graphSlice';
 import { selectNameFromEntity } from './entitySelectors';
+
+const { utc } = moment;
 
 
 // Memoized Selectors

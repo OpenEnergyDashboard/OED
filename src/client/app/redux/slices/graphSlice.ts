@@ -4,7 +4,7 @@
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import * as _ from 'lodash';
-import * as moment from 'moment';
+import moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import {
