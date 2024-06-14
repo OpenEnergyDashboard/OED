@@ -5,7 +5,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Input, Table } from 'reactstrap';
+import { Button } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { stableEmptyUsers, userApi } from '../../redux/api/userApi';
 import { User, UserRole } from '../../types/items';
@@ -14,6 +14,7 @@ import translate from '../../utils/translate';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
+import UserViewComponent from './UserViewComponent';
 
 
 /**
@@ -80,48 +81,24 @@ export default function UserDetailComponent() {
 				<div className="edit-btn">
 					<CreateUserModalComponent />
 				</div>
-				<div style={tableStyle}>
-					<Table striped bordered hover>
-						<thead>
-							<tr>
-								<th> <FormattedMessage id='email' /> </th>
-								<th> <FormattedMessage id='role' /> </th>
-								<th> <FormattedMessage id='action' /> </th>
-							</tr>
-						</thead>
-						<tbody>
-							{localUsersChanges.map(user => (
-								<tr key={user.email}>
-									<td>{user.email}</td>
-									<td>
-										<Input
-											type='select'
-											value={user.role}
-											onChange={e => editUser(e, user)}
-										>
-											{Object.entries(UserRole).map(([role, val]) => (
-												<option value={val} key={role}> {role} </option>
-											))}
-										</Input>
-									</td>
-									<td>
-										<Button color='danger' onClick={() => { deleteUser(user.email); }}>
-											<FormattedMessage id='delete.user' />
-										</Button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-					<div style={buttonsStyle}>
-						<Button
-							color='success'
-							disabled={_.isEqual(users, localUsersChanges)}
-							onClick={submitChanges}
-						>
-							<FormattedMessage id='save.role.changes' />
-						</Button>
-					</div>
+				<div style={cardStyle} className='card-container'>
+					{localUsersChanges.map(user => (
+						<UserViewComponent
+							key={user.email}
+							user={user}
+							editUser={editUser}
+							deleteUser={deleteUser}
+						/>
+					))}
+				</div>
+				<div style={buttonsStyle}>
+					<Button
+						color='success'
+						disabled={_.isEqual(users, localUsersChanges)}
+						onClick={submitChanges}
+					>
+						<FormattedMessage id='save.role.changes' />
+					</Button>
 				</div>
 			</div>
 		</div>
@@ -132,9 +109,10 @@ const titleStyle: React.CSSProperties = {
 	textAlign: 'center'
 };
 
-const tableStyle: React.CSSProperties = {
-	marginLeft: '10%',
-	marginRight: '10%'
+
+const cardStyle: React.CSSProperties = {
+	margin: '.625rem',
+	padding: '.625rem'
 };
 
 const buttonsStyle: React.CSSProperties = {
