@@ -57,7 +57,7 @@
 	},
 	"dependencies": {
 		"@reduxjs/toolkit": "~2.2.5",
-		"@wojtekmaj/react-daterange-picker": "~5.2.0",
+		"@wojtekmaj/react-daterange-picker": "~6.0.0",
 		"axios": "~1.6.2",
 		"bcryptjs": "~2.4.3",
 		"body-parser": "~1.20.2",
@@ -82,7 +82,7 @@
 		"ngraph.path": "~1.5.0",
 		"nodemailer": "~6.9.9",
 		"pg": "~8.12.0",
-		"pg-promise": "~11.7.8",
+		"pg-promise": "~11.8.0",
 		"plotly.js": "~2.29.1",
 		"prop-types": "~15.8.1",
 		"query-string": "~9.0.0",
@@ -131,7 +131,7 @@
 		"stream-browserify": "~3.0.0",
 		"style-loader": "~3.3.1",
 		"terser-webpack-plugin": "~5.3.10",
-		"ts-loader": "~9.2.0",
+		"ts-loader": "~9.5.1",
 		"typescript": "~5.4.5",
 		"webpack": "~5.76.0",
 		"webpack-cli": "~5.1.4"
