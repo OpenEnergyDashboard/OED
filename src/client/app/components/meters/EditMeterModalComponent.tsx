@@ -535,16 +535,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							{/* <Input
-								id='readingDuplication'
-								name='readingDuplication'
-								type='number'
-								onChange={e => handleNumberChange(e)}
-								step='1'
-								min='1'
-								max='9'
-								defaultValue={localMeterEdits?.readingDuplication}
-								invalid={localMeterEdits?.readingDuplication < 1 || localMeterEdits?.readingDuplication > 9} /> */}
 							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}
 								defaultValue={localMeterEdits?.readingDuplication} >
@@ -558,9 +548,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								<option> 8 </option>
 								<option> 9 </option>
 							</Input>
-							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
-							</FormFeedback>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
