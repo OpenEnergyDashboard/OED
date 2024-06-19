@@ -28,7 +28,7 @@ export default function BarControlsComponent() {
 	const barStacking = useAppSelector(selectBarStacking);
 	// should render as custom on initial render if not found in controlled values.
 	// This can happen with a chart link of custom bar duration.
-	const shouldRenderCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()))
+	const shouldRenderCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()));
 	// Holds the value of standard bar duration choices used so decoupled from custom and
 	// also to allow special value for custom choice.
 	const [barDays, setBarDays] = React.useState<string>(shouldRenderCustom ? CUSTOM_INPUT : barDuration.asDays().toString());
