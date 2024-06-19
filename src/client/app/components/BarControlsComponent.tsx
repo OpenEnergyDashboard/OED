@@ -26,14 +26,17 @@ export default function BarControlsComponent() {
 	// This is the current bar interval for graphic.
 	const barDuration = useAppSelector(selectBarWidthDays);
 	const barStacking = useAppSelector(selectBarStacking);
+	// should render as custom on initial render if not found in controlled values.
+	// This can happen with a chart link of custom bar duration.
+	const shouldRenderCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()))
 	// Holds the value of standard bar duration choices used so decoupled from custom and
 	// also to allow special value for custom choice.
-	const [barDays, setBarDays] = React.useState<string>(barDuration.asDays().toString());
+	const [barDays, setBarDays] = React.useState<string>(shouldRenderCustom ? CUSTOM_INPUT : barDuration.asDays().toString());
 	// Holds the value during custom bar duration input so only update graphic when done entering and
 	// separate from standard choices.
 	const [barDaysCustom, setBarDaysCustom] = React.useState<number>(barDuration.asDays());
 	// True if custom bar duration input is active.
-	const [showCustomBarDuration, setShowCustomBarDuration] = React.useState<boolean>(false);
+	const [showCustomBarDuration, setShowCustomBarDuration] = React.useState<boolean>(shouldRenderCustom);
 
 	const handleChangeBarStacking = () => {
 		dispatch(graphSlice.actions.changeBarStacking());
@@ -62,13 +65,12 @@ export default function BarControlsComponent() {
 			setBarDays(CUSTOM_INPUT);
 			setShowCustomBarDuration(true);
 		} else {
-			// Set bar duration for graphing, the standard menu value
-			// and hide the custom bar duration input.
+			// Set the standard menu value, hide the custom bar duration input
+			//  and bar duration for graphing.
 			// Since controlled values know it is a valid integer.
-			console.log('setting barDuration to ', Number(value));
-			updateBarDurationChange(Number(value));
 			setBarDays(value);
 			setShowCustomBarDuration(false);
+			updateBarDurationChange(Number(value));
 		}
 	};
 
