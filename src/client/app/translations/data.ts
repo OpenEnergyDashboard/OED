@@ -316,6 +316,7 @@ const LocaleTranslationData = {
 		"map.new.upload": "Upload map image to begin.",
 		"map.notify.calibration.needed": "Calibration needed before display",
 		"map.upload.new.file": "Redo",
+		"map.unavailable": "There's not an available map",
 		"max": "max",
 		"menu": "Menu",
 		"meter": "Meter",
