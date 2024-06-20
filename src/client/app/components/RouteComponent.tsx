@@ -4,7 +4,8 @@
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
+import ReadingsCSVUploadComponent from '../components/csv/ReadingsCSVUploadComponent';
+import MetersCSVUploadComponent from '../components/csv/MetersCSVUploadComponent';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import { useAppSelector } from '../redux/reduxHooks';
@@ -66,7 +67,8 @@ const router = createBrowserRouter([
 			{
 				element: <RoleOutlet role={UserRole.CSV} />,
 				children: [
-					{ path: 'csv', element: <UploadCSVContainer /> }
+					{ path: 'csvReadings', element: <ReadingsCSVUploadComponent /> },
+					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> }
 				]
 			},
 			{ path: '*', element: <NotFound /> }

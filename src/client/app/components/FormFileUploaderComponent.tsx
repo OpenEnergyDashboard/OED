@@ -11,6 +11,7 @@ interface FileUploader {
 	required: boolean;
 	formText: string;
 	labelStyle?: React.CSSProperties;
+	onFileChange: (file: File | null) => void;
 }
 
 /**
@@ -19,13 +20,25 @@ interface FileUploader {
  * @returns File uploader element
  */
 export default function FileUploaderComponent(props: FileUploader) {
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0] || null;
+		props.onFileChange(file);
+	};
+
 	return (
 		<FormGroup>
 			<Label style={props.labelStyle}>
 				<FormattedMessage id='csv.file' />
 			</Label>
 			<Col>
-				<Input innerRef={props.reference} type='file' name='csvfile' required={props.required} />
+				<Input
+					innerRef={props.reference}
+					type='file'
+					name='csvfile'
+					required={props.required}
+					onChange={handleFileChange}
+				/>
 			</Col>
 			<FormText color='muted'>
 				<FormattedMessage id={props.formText}/>

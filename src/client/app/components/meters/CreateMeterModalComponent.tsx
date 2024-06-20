@@ -28,11 +28,16 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
+interface CreateMeterModalProps {
+	onCreateMeter?: (meterIdentifier: string) => void; // Define the type of the callback function
+}
+
 /**
  * Defines the create meter modal form
+ * @param props for create meter to return the identifier
  * @returns Meter create element
  */
-export default function CreateMeterModalComponent() {
+export default function CreateMeterModalComponent(props: CreateMeterModalProps): React.JSX.Element {
 	// Tracks whether a unit/ default unit has been selected.
 	// RTKQ Mutation to submit add meter
 	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
@@ -152,6 +157,9 @@ export default function CreateMeterModalComponent() {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(translate('meter.successfully.create.meter'));
 					resetState();
+					if (props.onCreateMeter) {
+						props.onCreateMeter(meterDetails.identifier);
+					}
 				})
 				.catch(err => {
 					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
@@ -161,7 +169,6 @@ export default function CreateMeterModalComponent() {
 			showErrorNotification(translate('meter.input.error'));
 		}
 	};
-
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

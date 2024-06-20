@@ -174,8 +174,15 @@ export default function HeaderButtonsComponent() {
 								style={state.csvViewableLinkStyle}
 								disabled={state.shouldCSVButtonDisabled}
 								tag={Link}
-								to="/csv">
-								<FormattedMessage id='csv' />
+								to="/csvMeters">
+								<FormattedMessage id='csvMeters' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.csvViewableLinkStyle}
+								disabled={state.shouldCSVButtonDisabled}
+								tag={Link}
+								to="/csvReadings">
+								<FormattedMessage id='csvReadings' />
 							</DropdownItem>
 							<DropdownItem
 								disabled={state.shouldGroupsButtonDisabled}

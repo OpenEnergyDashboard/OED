@@ -85,6 +85,8 @@ const LocaleTranslationData = {
 		"create.user": "Create a User",
 		"create.unit": "Create a Unit",
 		"csv": "CSV",
+		"csvMeters": "CSV Meters",
+		"csvReadings": "CSV Readings",
 		"csv.file": "CSV File",
 		"csv.common.param.gzip": "Gzip",
 		"csv.common.param.header.row": "Header Row",
