@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Col, Input, FormGroup, FormText, Label } from 'reactstrap';
+import translate from '../utils/translate';
 
 interface FileUploader {
 	reference: React.RefObject<HTMLInputElement>;
@@ -29,20 +30,22 @@ export default function FileUploaderComponent(props: FileUploader) {
 	return (
 		<FormGroup>
 			<Label style={props.labelStyle}>
-				<FormattedMessage id='csv.file' />
+				<div className='pb-1'>
+					{translate('csv.file')}
+				</div>
+				<Col>
+					<Input
+						innerRef={props.reference}
+						type='file'
+						name='csvfile'
+						required={props.required}
+						onChange={handleFileChange}
+					/>
+				</Col>
+				<FormText color='muted'>
+					<FormattedMessage id={props.formText}/>
+				</FormText>
 			</Label>
-			<Col>
-				<Input
-					innerRef={props.reference}
-					type='file'
-					name='csvfile'
-					required={props.required}
-					onChange={handleFileChange}
-				/>
-			</Col>
-			<FormText color='muted'>
-				<FormattedMessage id={props.formText}/>
-			</FormText>
 		</FormGroup>
 	);
 }

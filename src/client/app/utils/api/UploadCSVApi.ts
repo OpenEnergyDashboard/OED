@@ -24,7 +24,6 @@ export default class UploadCSVApi {
 			gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
 			headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
 			update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false,
-			createMeter: uploadPreferences.createMeter ? BooleanTypes.true : BooleanTypes.false,
 			refreshHourlyReadings: uploadPreferences.refreshHourlyReadings ? BooleanTypes.true : BooleanTypes.false,
 			refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
 			honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,

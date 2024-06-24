@@ -3,8 +3,9 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button, Col, Form, FormGroup, Input, Label } from 'reactstrap';
+import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { BooleanMeterTypes, TimeSortTypes, ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
@@ -72,9 +73,13 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const selectedMeterId = parseInt(e.target.value, 10);
-		const foundMeter = visibleMeters.find(meter => meter.id === selectedMeterId) || null;
+		const selectedMeterName = e.target.value;
+		const foundMeter = visibleMeters.find(meter => meter.name === selectedMeterName) || null;
 		setSelectedMeter(foundMeter);
+		setReadingsData(prevState => ({
+			...prevState,
+			meterName: selectedMeterName
+		}));
 	};
 
 	const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -126,224 +131,379 @@ export default function ReadingsCSVUploadComponent() {
 		}
 	};
 
+	const handleClear = () => {
+		setSelectedMeter(null);
+	};
+
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '50%',
+		tooltipReadings: 'help.csv.readings'
+	};
+
+	const checkBox = {
+		display: 'flex'
+	};
+
 	return (
-		<div style={formStyle}>
+		<Container>
+			<TooltipHelpComponent page='help.csv.header' />
 			<Form onSubmit={handleSubmit}>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.param.meter.name' />
-					</Label>
-					<Col sm={8}>
-						<Input
-							id='meterId'
-							name='meterId'
-							type='select'
-							value={selectedMeter?.id || ''}
-							onChange={handleSelectedMeterChange}>
-							<option value='default' key='-1'>Select a Meter</option>
-							{Array.from(visibleMeters).map(meter => {
-								return (<option value={meter.id} key={meter.id}>{meter.identifier}</option>);
-							})}
-						</Input>
+				<Row className="justify-content-md-center">
+					<Col md='auto'>
+						<h2>
+							{translate('csv.upload.readings')}
+							<div style={tooltipStyle}>
+								<TooltipMarkerComponent page='help.csv.header' helpTextId={tooltipStyle.tooltipReadings} />
+							</div>
+						</h2>
 					</Col>
-					<br></br>
-					<Col sm={8}>
+				</Row>
+				<Row className='justify-content-md-center'>
+					<Col md='auto'>
+						<Label for='meterName'>
+							<div className='pb-1'>
+								{translate('name')}
+							</div>
+							<Input
+								id='meterName'
+								name='meterName'
+								type='select'
+								value={selectedMeter?.name || ''}
+								onChange={handleSelectedMeterChange}>
+								<option value='default' key='-1'>Select a Meter</option>
+								{Array.from(visibleMeters).map(meter => {
+									return (<option value={meter.name} key={meter.id}>{meter.name}</option>);
+								})}
+							</Input>
+						</Label>
+						<br />
 						<CreateMeterModalComponent onCreateMeter={handleCreateMeter}/>
-					</Col>
-				</FormGroup>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.param.time.sort' />
-					</Label>
-					<Col sm={8}>
-						<Input type='select' name='timeSort' value={selectedMeter?.timeSort || ''} onChange={handleChange}>
-							<option value={TimeSortTypes.meter}> {translate('TimeSortTypes.meter')} </option>
-							<option value={TimeSortTypes.increasing}> {translate('TimeSortTypes.increasing')} </option>
-							<option value={TimeSortTypes.decreasing}> {translate('TimeSortTypes.decreasing')} </option>
-						</Input>
-					</Col>
-				</FormGroup>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.param.duplications' />
-					</Label>
-					<Col sm={8}>
-						<Input type='select' name='duplications' value={selectedMeter?.readingDuplication || ''} onChange={handleChange}>
-							{range(1, 10).map(i => (
-								<option key={i} value={`${i}`}> {i} </option>
-							))}
-						</Input>
-					</Col>
-				</FormGroup>
-				<FormFileUploaderComponent
-					formText='csv.upload.readings'
-					onFileChange={handleFileChange}
-					reference={fileInputReference}
-					required labelStyle={titleStyle}
-				/>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.section.cumulative.data' />
-						<Col sm={8}>
-							<FormGroup>
-								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative' />
-									<Col sm={12}>
-										<Input
-											type='select'
-											name='cumulative'
-											value={getBooleanMeterType(selectedMeter?.cumulative)}
-											onChange={handleChange}
-										>
-											<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
-											<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-											<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
-										</Input>
+						<br /><br />
+						<FormGroup>
+							<Label for='timeSort'>
+								<div className='pb-1'>
+									{translate('meter.timeSort')}
+								</div>
+								<Input
+									type='select'
+									id='timeSort'
+									name='timeSort'
+									value={selectedMeter?.timeSort || ''}
+									onChange={handleChange}
+								>
+									<option value={TimeSortTypes.meter}> {translate('TimeSortTypes.meter')} </option>
+									<option value={TimeSortTypes.increasing}> {translate('TimeSortTypes.increasing')} </option>
+									<option value={TimeSortTypes.decreasing}> {translate('TimeSortTypes.decreasing')} </option>
+								</Input>
+							</Label>
+						</FormGroup>
+						<FormGroup>
+							<Label for='duplications'>
+								<div className='pb-1'>
+									{translate('meter.readingDuplication')}
+								</div>
+								<Input type='select' id='duplications' name='duplications' value={selectedMeter?.readingDuplication || ''} onChange={handleChange}>
+									{range(1, 10).map(i => (
+										<option key={i} value={`${i}`}> {i} </option>
+									))}
+								</Input>
+							</Label>
+						</FormGroup>
+						<FormFileUploaderComponent
+							formText='csv.upload.readings'
+							onFileChange={handleFileChange}
+							reference={fileInputReference}
+							required
+						/>
+						<FormGroup>
+							<div className='text-center pb-3'>
+								<strong>
+									Cumulative Data
+								</strong>
+							</div>
+							<Row>
+								<Col>
+									<FormGroup>
+										<Label for='cumulative'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.cumulative')}
+											</div>
+											<Input
+												type='select'
+												id='cumulative'
+												name='cumulative'
+												value={getBooleanMeterType(selectedMeter?.cumulative)}
+												onChange={handleChange}
+											>
+												<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+												<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+												<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+											</Input>
+										</Label>
+									</FormGroup>
+								</Col>
+								<Col>
+									<FormGroup>
+										<Label for='cumulativeReset'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.cumulative.reset')}
+											</div>
+											<Input
+												type='select'
+												id='cumulativeReset'
+												name='cumulativeReset'
+												value={getBooleanMeterType(selectedMeter?.cumulative)}
+												onChange={handleChange}
+											>
+												<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+												<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+												<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+											</Input>
+										</Label>
+									</FormGroup>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<FormGroup>
+										<Label for='cumulativeResetStart'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.cumulative.reset.start')}
+											</div>
+											<Input
+												id='cumulativeResetStart'
+												name='cumulativeResetStart'
+												onChange={handleChange}
+												value={selectedMeter?.cumulativeResetStart || ''}
+												placeholder={ReadingsCSVUploadDefaults.cumulativeResetStart}
+											/>
+										</Label>
+									</FormGroup>
+								</Col>
+								<Col>
+									<FormGroup>
+										<Label for='cumulativeResetEnd'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.cumulative.reset.end')}
+											</div>
+											<Input
+												id='cumulativeResetEnd'
+												name='cumulativeResetEnd'
+												onChange={handleChange}
+												value={selectedMeter?.cumulativeResetEnd || ''}
+												placeholder={ReadingsCSVUploadDefaults.cumulativeResetEnd}
+											/>
+										</Label>
+									</FormGroup>
+								</Col>
+							</Row>
+						</FormGroup>
+						<FormGroup>
+							<div className='text-center pb-3'>
+								<strong>
+									Time Gaps
+								</strong>
+							</div>
+							<Row>
+								<Col>
+									<FormGroup>
+										<Label for='lengthGap'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.length.gap')}
+											</div>
+											<Input
+												id='lengthGap'
+												name='lengthGap'
+												value={selectedMeter?.readingGap || ''}
+												onChange={handleChange}
+											/>
+										</Label>
+									</FormGroup>
+								</Col>
+								<Col>
+									<FormGroup>
+										<Label for='lengthVariation'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.length.variation')}
+											</div>
+											<Input
+												id='lengthVariation'
+												name='lengthVariation'
+												value={selectedMeter?.readingVariation || ''}
+												onChange={handleChange}
+											/>
+										</Label>
+									</FormGroup>
+								</Col>
+							</Row>
+						</FormGroup>
+						<FormGroup>
+							<Label>
+								<div className='pb-1'>
+									{translate('csv.readings.param.endOnly')}
+								</div>
+								<Input
+									type='select'
+									id='endOnly'
+									name='endOnly'
+									value={getBooleanMeterType(selectedMeter?.cumulative)}
+									onChange={handleChange}
+								>
+									<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
+									<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
+									<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+								</Input>
+							</Label>
+						</FormGroup>
+						<FormGroup>
+							<Container>
+								<Row>
+									<Col>
+										<Label for='gzip'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='gzip'
+														name='gzip'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.gzip')}
+												</div>
+											</div>
+										</Label>
 									</Col>
-								</Label>
-							</FormGroup>
-							<FormGroup>
-								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative.reset' />
-								</Label>
-								<Col sm={12}>
-									<Input
-										type='select'
-										name='cumulativeReset'
-										value={getBooleanMeterType(selectedMeter?.cumulative)}
-										onChange={handleChange}
-									>
-										<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
-										<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-										<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
-									</Input>
-								</Col>
-							</FormGroup>
-							<FormGroup>
-								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative.reset.start' />
-								</Label>
-								<Col sm={12}>
-									<Input
-										name='cumulativeResetStart'
-										onChange={handleChange}
-										value={selectedMeter?.cumulativeResetStart || ''}
-										placeholder={ReadingsCSVUploadDefaults.cumulativeResetStart}
-									/>
-								</Col>
-							</FormGroup>
-							<FormGroup>
-								<Label style={titleStyle}>
-									<FormattedMessage id='csv.readings.param.cumulative.reset.end' />
-								</Label>
-								<Col sm={12}>
-									<Input
-										name='cumulativeResetEnd'
-										onChange={handleChange}
-										value={selectedMeter?.cumulativeResetEnd || ''}
-										placeholder={ReadingsCSVUploadDefaults.cumulativeResetEnd}
-									/>
-								</Col>
-							</FormGroup>
-						</Col>
-					</Label>
-				</FormGroup>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.section.time.gaps' />
-					</Label>
-					<Col sm={8}>
-						<FormGroup>
-							<Label style={titleStyle}>
-								<FormattedMessage id='csv.readings.param.lengthGap' />
-							</Label>
-							<Col sm={12}>
-								<Input name='lengthGap' value={selectedMeter?.readingGap || ''} onChange={handleChange} />
-							</Col>
+									<Col>
+										<Label for='headerRow'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='headerRow'
+														name='headerRow'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.header.row')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<Label for='update'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='update'
+														name='update'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.update')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+									<Col>
+										<Label for='relaxedParsing'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='relaxedParsing'
+														name='relaxedParsing'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.readings.param.relaxed.parsing')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<Label for='refreshHourlyReadings'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='refreshHourlyReadings'
+														name='refreshHourlyReadings'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.readings.param.refresh.hourly.readings')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+									<Col>
+										<Label for='refreshReadings'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='refreshReadings'
+														name='refreshReadings'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.readings.param.refresh.readings')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<Label for='honorDst'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='honorDst'
+														name='honorDst'
+														onChange={handleCheckboxChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.readings.param.honor.dst')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+							</Container>
 						</FormGroup>
-						<FormGroup>
-							<Label style={titleStyle}>
-								<FormattedMessage id='csv.readings.param.length.variation' />
-							</Label>
-							<Col sm={12}>
-								<Input name='lengthVariation' value={selectedMeter?.readingVariation || ''} onChange={handleChange} />
-							</Col>
-						</FormGroup>
+						<div className='d-flex flex-row-reverse'>
+							<div className='p-3'>
+								<Button color='primary' type='submit'>
+									{translate('csv.submit.button')}
+								</Button>
+							</div>
+							<div className='p-3'>
+								<Button color='secondary' type='reset' onClick={handleClear}>
+									{translate('csv.clear.button')}
+								</Button>
+							</div>
+						</div>
+						<div className='pb-5'>
+						</div>
 					</Col>
-				</FormGroup>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.param.endOnly' />
-					</Label>
-					<Col sm={8}>
-						<Input type='select' name='endOnly' value={getBooleanMeterType(selectedMeter?.cumulative)} onChange={handleChange}>
-							<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
-							<option value={BooleanMeterTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-							<option value={BooleanMeterTypes.false}> {translate('BooleanMeterTypes.false')} </option>
-						</Input>
-					</Col>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='gzip' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.common.param.gzip' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='headerRow' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.common.param.header.row' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='update' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.common.param.update' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='refreshReadings' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.readings.param.refresh.readings' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='refreshHourlyReadings' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.readings.param.refresh.hourlyReadings' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='honorDst' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.readings.param.honor.dst' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input type='checkbox' name='relaxedParsing' onChange={handleCheckboxChange} />
-						<FormattedMessage id='csv.readings.param.relaxed.parsing' />
-					</Label>
-				</FormGroup>
-				<Button color='secondary' type='submit'>
-					<FormattedMessage id='csv.submit.button' />
-				</Button>
+				</Row>
 			</Form>
-		</div>
+		</Container>
 	);
 }
-
-const titleStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	paddingBottom: '5px'
-};
-
-const checkboxStyle: React.CSSProperties = {
-	paddingBottom: '15px'
-};
-
-const formStyle: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'center',
-	padding: '20px'
-};

@@ -4,12 +4,15 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import { baseApi } from '../../redux/api/baseApi';
 import { useDispatch } from 'react-redux';
 import { uploadCSVApi } from '../../utils/api';
+import translate from '../../utils/translate';
 
 interface MetersCSVUploadComponentProps {}
 
@@ -57,54 +60,134 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 		return await uploadCSVApi.submitMeters(meterData, file);
 	};
 
-	const titleStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		paddingBottom: '5px'
+	const handleClear = () => {
+		setMeterData({
+			meterName: '',
+			gzip: false,
+			headerRow: false,
+			update: false});
 	};
 
-	const checkboxStyle: React.CSSProperties = {
-		paddingBottom: '15px'
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '50%',
+		tooltipReadings: 'help.csv.meters'
 	};
 
-	const formStyle: React.CSSProperties = {
-		display: 'flex',
-		justifyContent: 'center',
-		padding: '20px'
+	const checkBox = {
+		display: 'flex'
 	};
 
 	return (
-		<div style={formStyle}>
+		<Container>
+			<TooltipHelpComponent page='help.csv.header' />
 			<Form onSubmit={handleSubmit}>
-				<FormFileUploaderComponent formText='csv.upload.meters' reference={fileInput} required labelStyle={titleStyle} onFileChange={handleFileChange} />
-				<FormGroup check style={checkboxStyle}>
-					<Label>
-						<Input checked={meterData.gzip} type='checkbox' name='gzip' onChange={handleChange} />
-						<FormattedMessage id='csv.common.param.gzip' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input checked={meterData.headerRow} type='checkbox' name='headerRow' onChange={handleChange} />
-						<FormattedMessage id='csv.common.param.header.row' />
-					</Label>
-				</FormGroup>
-				<FormGroup check style={checkboxStyle}>
-					<Label check>
-						<Input checked={meterData.update} type='checkbox' name='update' onChange={handleChange} />
-						<FormattedMessage id='csv.common.param.update' />
-					</Label>
-				</FormGroup>
-				<FormGroup>
-					<Label style={titleStyle}>
-						<FormattedMessage id='csv.readings.param.meter.name' />
-					</Label>
-					<Input value={meterData.meterName} name='meterName' onChange={handleChange} />
-				</FormGroup>
-				<Button color='secondary' type='submit'>
-					<FormattedMessage id='csv.submit.button' />
-				</Button>
+				<Row className="justify-content-md-center">
+					<Col md='auto'>
+						<h2>
+							{translate('csv.upload.meters')}
+							<div style={tooltipStyle}>
+								<TooltipMarkerComponent page='help.csv.header' helpTextId={tooltipStyle.tooltipReadings} />
+							</div>
+						</h2>
+					</Col>
+				</Row>
+				<Row className='justify-content-md-center'>
+					<Col md='auto'>
+						<FormFileUploaderComponent
+							formText='csv.upload.meters'
+							onFileChange={handleFileChange}
+							reference={fileInput}
+							required
+						/>
+						<FormGroup>
+							<Container>
+								<Row>
+									<Col>
+										<Label for='gzip'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='gzip'
+														name='gzip'
+														onChange={handleChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.gzip')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<Label for='headerRow'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='headerRow'
+														name='headerRow'
+														onChange={handleChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.header.row')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+								<Row>
+									<Col>
+										<Label for='update'>
+											<div style={checkBox}>
+												<div>
+													<Input
+														type='checkbox'
+														id='update'
+														name='update'
+														onChange={handleChange}
+													/>
+												</div>
+												<div className='ps-2'>
+													{translate('csv.common.param.update')}
+												</div>
+											</div>
+										</Label>
+									</Col>
+								</Row>
+							</Container>
+						</FormGroup>
+						<FormGroup>
+							<Label for='meterName'>
+								<FormattedMessage id='csv.readings.param.meter.name' />
+								<Input
+									value={meterData.meterName}
+									id='meterName'
+									name='meterName'
+									onChange={handleChange}
+								/>
+							</Label>
+						</FormGroup>
+						<div className='d-flex flex-row-reverse'>
+							<div className='p-3'>
+								<Button color='primary' type='submit'>
+									{translate('csv.submit.button')}
+								</Button>
+							</div>
+							<div className='p-3'>
+								<Button color='secondary' type='reset' onClick={handleClear}>
+									{translate('csv.clear.button')}
+								</Button>
+							</div>
+						</div>
+					</Col>
+				</Row>
 			</Form>
-		</div>
+		</Container>
 	);
 };
 

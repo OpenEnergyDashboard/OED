@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { MODE } from '../containers/csv/UploadCSVContainer';
-
 interface CSVUploadPreferences {
 	meterName: string;
 	gzip: boolean;
@@ -17,14 +15,6 @@ export interface CSVUploadPreferencesForm {
 	gzip: BooleanTypes;
 	headerRow: BooleanTypes;
 	update: BooleanTypes;
-}
-
-interface CSVUploadProps extends CSVUploadPreferences {
-	submitCSV: (file: File) => Promise<void>;
-	setMeterName: (mode: MODE, value: string) => void;
-	toggleGzip: () => void;
-	toggleHeaderRow: () => void;
-	toggleUpdate: () => void;
 }
 
 // This relates to MeterTimeSortTypes in src/client/app/types/redux/meters.ts but also has 'meter value or default'.
@@ -53,7 +43,6 @@ export const enum BooleanMeterTypes {
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
-	createMeter: boolean;
 	cumulative: BooleanMeterTypes;
 	cumulativeReset: BooleanMeterTypes;
 	cumulativeResetStart: string;
@@ -71,7 +60,6 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 }
 
 export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
-	createMeter: BooleanTypes;
 	cumulative: BooleanMeterTypes;
 	cumulativeReset: BooleanMeterTypes;
 	cumulativeResetStart: string;
@@ -88,29 +76,9 @@ export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesFo
 	relaxedParsing: BooleanTypes;
 }
 
-export interface ReadingsCSVUploadProps extends ReadingsCSVUploadPreferencesItem, CSVUploadProps{
-	// Note: each of these will have to change in consideration of redux;
-	selectTimeSort: (value: TimeSortTypes) => void;
-	selectDuplications: (value: string) => void;
-	selectCumulative: (value: BooleanMeterTypes) => void;
-	selectCumulativeReset: (value: BooleanMeterTypes) => void;
-	setCumulativeResetStart: (value: string) => void;
-	setCumulativeResetEnd: (value: string) => void;
-	setLengthGap: (value: string) => void;
-	setLengthVariation: (value: string) => void;
-	selectEndOnly: (value: string) => void;
-	toggleCreateMeter: () => void;
-	toggleRefreshHourlyReadings: () => void;
-	toggleRefreshReadings: () => void;
-	toggleHonorDst: () => void;
-	toggleRelaxedParsing: () => void;
-}
-
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.
 // Hence, we define a new type rather than a new interface that extends CSVUploadPreferences and CSVUploadProps to pass our linter.
 
 export type MetersCSVUpload = CSVUploadPreferences;
 
 export type MetersCSVUploadPreferencesItem = MetersCSVUpload;
-
-export type MetersCSVUploadProps = CSVUploadProps;
