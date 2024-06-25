@@ -17,7 +17,6 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	lengthGap: '',
 	lengthVariation: '',
 	endOnly: BooleanMeterTypes.meter,
-	createMeter: false,
 	gzip: false,
 	headerRow: false,
 	refreshHourlyReadings: false,
