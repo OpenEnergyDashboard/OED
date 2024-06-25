@@ -326,8 +326,8 @@ const LocaleTranslationData = {
 		"meter.cumulativeReset": "Cumulative Reset:",
 		"meter.cumulativeResetEnd": "Cumulative Reset End:",
 		"meter.cumulativeResetStart": "Cumulative Reset Start:",
-		"meter.enabled": "Updates:",//Ask
-		"meter.endOnlyTime": "End Only Time:",
+		"meter.enabled": "Meter enabled",
+		"meter.endOnlyTime": "Only End Times:",
 		"meter.endTimeStamp": "End Time Stamp:",
 		"meter.minVal": "Minimum Reading Value Check",
 		"meter.maxVal": "Maximum Reading Value Check",
@@ -426,6 +426,7 @@ const LocaleTranslationData = {
 		"threeD.date": "Date",
 		"threeD.date.range.too.long": 'Date Range Must be a year or less',
 		"threeD.incompatible": "Not Compatible with 3D",
+		"threeD.no.data":"There is no data in that range",
 		"threeD.rendering": "Rendering",
 		"threeD.time": "Time",
 		"threeD.x.axis.label": "Hours of Day",
@@ -1082,17 +1083,17 @@ const LocaleTranslationData = {
 		"csv.readings.param.cumulative.reset.end": "Fin del reinicio acumulativo",
 		"csv.readings.param.cumulative.reset.start": "Comienzo del reinicio acumulativo",
 		"csv.readings.param.duplications": "Duplicaciones",
-		"csv.readings.param.endOnly": "Fin solamente de tiempo",//Ask
+		"csv.readings.param.endOnly": "Únicamente tiempos finales",
 		"csv.readings.param.honor.dst": "Seguir el horario de verano",
-		"csv.readings.param.lengthGap": "Espacio de distancias",//Ask
-		"csv.readings.param.length.variation": "Variación de distancias",//Ask
+		"csv.readings.param.lengthGap": "Duración entre mediciones",
+		"csv.readings.param.length.variation": "Variación de longitud de medición",
 		"csv.readings.param.meter.name": "Nombre de medidor",
 		"csv.readings.param.refresh.hourlyReadings": "Actualizar lecturas por hora",
 		"csv.readings.param.refresh.readings": "Actualizar lecturas diarias",
 		"csv.readings.param.relaxed.parsing": "Análisis sintactico no estricto",
 		"csv.readings.param.time.sort": "Ordenar el tiempo",
 		"csv.readings.section.cumulative.data": "Datos acumulativos",
-		"csv.readings.section.time.gaps": "Longitud de tiempo",//Ask
+		"csv.readings.section.time.gaps": "Longitud de tiempos",
 		"csv.submit.button": "Entregar datos CSV",
 		"csv.tab.meters": "Medidores",
 		"csv.tab.readings": "Lecturas",
@@ -1292,7 +1293,7 @@ const LocaleTranslationData = {
 		"map.is.displayable": "Visualización activada",
 		"map.is.not.calibrated": "Necesita calibración",
 		"map.is.not.displayable": "Visualización desactivada",
-		"map.load.complete": "Subida de mapas completa de", //Ask
+		"map.load.complete": "Carga de mapas completada de", 
 		"map.modified.date": "Última modificación",
 		"map.name": "Nombre del mapa",
 		"map.new.angle": " Liste el ángulo con respecto al norte verdadero (0 a 360)",
@@ -1311,7 +1312,7 @@ const LocaleTranslationData = {
 		"meter.cumulativeResetEnd": "Final del reinicio cumulativo:",
 		"meter.cumulativeResetStart": "Comienzo del reinicio cumulativo:",
 		"meter.enabled": "Medidor activado",
-		"meter.endOnlyTime": "Solo tiempo del final.",//Ask
+		"meter.endOnlyTime": "Solo tiempos finales.",
 		"meter.endTimeStamp": "Marca de tiempo al final:",
 		"meter.minVal": "Revisión del valor mínimo de lectura",
 		"meter.maxVal": "Revisión del valor máximo de lectura",
@@ -1336,7 +1337,7 @@ const LocaleTranslationData = {
 		"meter.reading": "Lectura:",
 		"meter.readingDuplication": "Duplicación de lectura:",
 		"meter.readingFrequency": "Frecuencia de lectura",
-		"meter.readingGap": "Longitud entre las lecturas:",//Ask
+		"meter.readingGap": "Longitud entre las lecturas:",
 		"meter.readingVariation": "Variación de lecturas:",
 		"meter.startTimeStamp": "Marca de tiempo al inicio:",
 		"meter.successfully.create.meter": "Éxito al crear el medidor.",
@@ -1410,7 +1411,7 @@ const LocaleTranslationData = {
 		"threeD.date": "Fecha",
 		"threeD.date.range.too.long": 'El rango de datos debe ser un año o menos',
 		"threeD.incompatible": "No es compatible con 3D",
-		"threeD.no.data": "No hay datos en el rango de datos",//Ask
+		"threeD.no.data": "No hay datos en el rango",
 		"threeD.rendering": "Renderización",
 		"threeD.time": 'Hora',
 		"threeD.x.axis.label": "Horas del día",
