@@ -26,31 +26,28 @@ export default function BarControlsComponent() {
 	// This is the current bar interval for graphic.
 	const barDuration = useAppSelector(selectBarWidthDays);
 	const barStacking = useAppSelector(selectBarStacking);
-	// should render as custom on initial render if not found in controlled values.
-	// This can happen with a chart link of custom bar duration.
-	const shouldRenderCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()));
-	// Holds the value of standard bar duration choices used so decoupled from custom and
-	// also to allow special value for custom choice.
-	const [barDays, setBarDays] = React.useState<string>(shouldRenderCustom ? CUSTOM_INPUT : barDuration.asDays().toString());
+	// Holds the value of standard bar duration choices used so decoupled from custom.
+	const [barDays, setBarDays] = React.useState<string>(barDuration.asDays().toString());
 	// Holds the value during custom bar duration input so only update graphic when done entering and
 	// separate from standard choices.
 	const [barDaysCustom, setBarDaysCustom] = React.useState<number>(barDuration.asDays());
 	// True if custom bar duration input is active.
-	const [showCustomBarDuration, setShowCustomBarDuration] = React.useState<boolean>(shouldRenderCustom);
+	const [showCustomBarDuration, setShowCustomBarDuration] = React.useState<boolean>(false);
 
 	const handleChangeBarStacking = () => {
 		dispatch(graphSlice.actions.changeBarStacking());
 	};
 
-	// Update when the custom input bar duration is shown/hidden.
+	// Keeps react-level state, and redux state in sync.
+	// Two different layers in state may differ especially when externally updated (chart link, history buttons.)
 	React.useEffect(() => {
-		if (showCustomBarDuration) {
-			// It changed to true so set the input value as the current barDuration
-			// so shows in custom field at start of input.
-			setBarDaysCustom(barDuration.asDays());
-		}
-		// If false then hiding custom so value does not matter.
-	}, [showCustomBarDuration]);
+		// Assume value is valid  since it is coming from state.
+		// Do not allow bad values in state.
+		const isCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()));
+		setShowCustomBarDuration(isCustom);
+		setBarDaysCustom(barDuration.asDays());
+		setBarDays(isCustom ? CUSTOM_INPUT : barDuration.asDays().toString());
+	}, [barDuration]);
 
 	// Returns true if this is a valid bar duration.
 	const barDaysValid = (barDays: number) => {
@@ -68,7 +65,6 @@ export default function BarControlsComponent() {
 			// Set the standard menu value, hide the custom bar duration input
 			//  and bar duration for graphing.
 			// Since controlled values know it is a valid integer.
-			setBarDays(value);
 			setShowCustomBarDuration(false);
 			updateBarDurationChange(Number(value));
 		}
