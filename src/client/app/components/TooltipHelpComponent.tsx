@@ -50,7 +50,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.csv.meters': { link: `${helpUrl}/adminMetersImport.html` },
 		'help.csv.readings': { link: `${helpUrl}/adminReadingsImport.html` },
 		'help.home.area.normalize': { link: `${helpUrl}/areaNormalization.html` },
-		'help.home.bar.custom.slider.tip': { link: `${helpUrl}/barGraphic.html#usage` },
+		'help.home.bar.days.tip': { link: `${helpUrl}/barGraphic.html#usage` },
 		'help.home.bar.interval.tip': { link: `${helpUrl}/barGraphic.html#usage` },
 		'help.home.bar.stacking.tip': { link: `${helpUrl}/barGraphic.html#barStacking` },
 		'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
