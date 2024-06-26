@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import PreferencesComponent from './PreferencesComponent';
-import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
+import AdminSideBar from './AdminSideBar';
 
 /**
  * React component that defines the admin page
@@ -15,41 +15,34 @@ import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonCompone
  */
 export default function AdminComponent() {
 
-	const bottomPaddingStyle: React.CSSProperties = {
-		paddingBottom: '15px'
-	};
+	const [selectedPreference, setSelectedPreference] = React.useState<string>('graph');
 
-	const sectionTitleStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0,
-		paddingBottom: '5px'
-	};
+
 	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
+		textAlign: 'start',
+		paddingLeft: '10px',
+		margin: 0
 	};
 	const tooltipStyle = {
 		display: 'inline',
 		fontSize: '50%'
 	};
 	return (
-		<div>
+		<div className='d-flex vh-100 vw-100 pt-2'>
 			<TooltipHelpComponent page='admin' />
-			<div className='container-fluid'>
-				<h2 style={titleStyle}>
-					<FormattedMessage id='admin.panel' />
+			<div className='container-fluid p-0'>
+				<h2 style={titleStyle} className='border-top p-2'>
+					<FormattedMessage id='admin.preferences' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
 					</div>
 				</h2>
-				<div className='row'>
-					<div className='col-12 col-lg-6'>
-						<div style={bottomPaddingStyle}>
-							<p style={sectionTitleStyle}><FormattedMessage id='manage' />:</p>
-							<div>
-								<ManageUsersLinkButtonComponent />
-							</div>
+				<div className='row border mh-100'>
+					<AdminSideBar onSelectPreference={setSelectedPreference} selectedPreference={selectedPreference}/>
+					<div className='col-9'>
+						<div className='col-12 col-lg-6 p-3'>
+							<PreferencesComponent selectedPreference={selectedPreference}/>
 						</div>
-						<PreferencesComponent />
 					</div>
 				</div>
 			</div>
