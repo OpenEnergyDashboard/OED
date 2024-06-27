@@ -4,15 +4,15 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { useDispatch } from 'react-redux';
+import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import { baseApi } from '../../redux/api/baseApi';
+import { uploadCSVApi } from '../../utils/api';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
+import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import { baseApi } from '../../redux/api/baseApi';
-import { useDispatch } from 'react-redux';
-import { uploadCSVApi } from '../../utils/api';
-import translate from '../../utils/translate';
 
 interface MetersCSVUploadComponentProps {}
 
@@ -75,20 +75,19 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 	};
 
 	const checkBox = {
-		display: 'flex',
-		alignItems: 'center'
+		display: 'flex'
 	};
 
 	return (
-		<Container   style={{ minHeight: '100vh' }}>
-			<TooltipHelpComponent page='help.csv.header' />
+		<Container>
+			<TooltipHelpComponent page='help.csv.meters' />
 			<Form onSubmit={handleSubmit}>
-				<Row className="justify-content-center">
+				<Row className="justify-content-md-center">
 					<Col md='auto'>
 						<h2>
 							{translate('csv.upload.meters')}
 							<div style={tooltipStyle}>
-								<TooltipMarkerComponent page='help.csv.header' helpTextId={tooltipStyle.tooltipReadings} />
+								<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
 							</div>
 						</h2>
 					</Col>

@@ -4,20 +4,20 @@
 
 import * as React from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
-import TooltipHelpComponent from '../TooltipHelpComponent';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { BooleanMeterTypes, TimeSortTypes, ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
+import { BooleanMeterTypes, ReadingsCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
+import { MeterData } from '../../types/redux/meters';
+import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import { uploadCSVApi } from '../../utils/api';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
-import { useAppSelector } from '../../redux/reduxHooks';
-import { authApi, authPollInterval } from '../../redux/api/authApi';
-import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
-import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
-import { MeterData } from '../../types/redux/meters';
 
 /**
  * Returns a range of values between the specified lower and upper bounds.
@@ -34,7 +34,7 @@ function range(lower: number, upper: number): number[] {
 }
 
 /**
- * Defines the CSV Readings page card view
+ * Defines the CSV Readings page
  * @returns CSV Readings page element
  */
 export default function ReadingsCSVUploadComponent() {
@@ -66,7 +66,7 @@ export default function ReadingsCSVUploadComponent() {
 				setSelectedMeter(createdMeter);
 			}
 		}
-	}, [createdMeterIdentifier,visibleMeters]);
+	}, [createdMeterIdentifier, visibleMeters]);
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
@@ -82,7 +82,7 @@ export default function ReadingsCSVUploadComponent() {
 		}));
 	};
 
-	const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = e.target;
 		setReadingsData(prevState => ({
 			...prevState,
@@ -147,14 +147,14 @@ export default function ReadingsCSVUploadComponent() {
 
 	return (
 		<Container>
-			<TooltipHelpComponent page='help.csv.header' />
+			<TooltipHelpComponent page='help.csv.readings' />
 			<Form onSubmit={handleSubmit}>
 				<Row className="justify-content-md-center">
 					<Col md='auto'>
 						<h2>
 							{translate('csv.upload.readings')}
 							<div style={tooltipStyle}>
-								<TooltipMarkerComponent page='help.csv.header' helpTextId={tooltipStyle.tooltipReadings} />
+								<TooltipMarkerComponent page='help.csv.readings' helpTextId={tooltipStyle.tooltipReadings} />
 							</div>
 						</h2>
 					</Col>
@@ -178,7 +178,7 @@ export default function ReadingsCSVUploadComponent() {
 							</Input>
 						</Label>
 						<br />
-						<CreateMeterModalComponent onCreateMeter={handleCreateMeter}/>
+						<CreateMeterModalComponent onCreateMeter={handleCreateMeter} />
 						<br /><br />
 						<FormGroup>
 							<Label for='timeSort'>
