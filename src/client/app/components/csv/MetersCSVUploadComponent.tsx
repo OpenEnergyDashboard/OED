@@ -75,14 +75,15 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 	};
 
 	const checkBox = {
-		display: 'flex'
+		display: 'flex',
+		alignItems: 'center'
 	};
 
 	return (
-		<Container>
+		<Container   style={{ minHeight: '100vh' }}>
 			<TooltipHelpComponent page='help.csv.header' />
 			<Form onSubmit={handleSubmit}>
-				<Row className="justify-content-md-center">
+				<Row className="justify-content-center">
 					<Col md='auto'>
 						<h2>
 							{translate('csv.upload.meters')}
