@@ -837,7 +837,7 @@ const LocaleTranslationData = {
 		"meter.input.error": "Input invalid so meter not created or edited.\u{26A1}",
 		"meter.unit.change.requires": "needs to be changed before changing this unit's type\u{26A1}",
 		"meter.unitName": "Unit:\u{26A1}",
-		"meter.url": "URL du Mèters",
+		"meter.url": "URL",
 		"meter.is.displayable": "Affichage Activées",
 		"meter.is.enabled": "Mises à Jour Activées",
 		"meter.is.not.displayable": "Affichage Désactivé",
