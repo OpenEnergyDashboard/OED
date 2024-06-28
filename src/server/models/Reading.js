@@ -5,7 +5,6 @@
 const database = require('./database');
 const { mapToObject, threeDHoleAlgorithm } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
-const _ = require('lodash');
 const log = require('../log');
 
 const sqlFile = database.sqlFile;
