@@ -15,7 +15,7 @@ const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
 const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
-const _ = require('lodash');
+const merge = require('lodash/merge');
 const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 
@@ -299,7 +299,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				req.body.disableChecks
 			);
 			// Put any changed values from updatedMeter into meter.
-			_.merge(meter, updatedMeter);
+			merge(meter, updatedMeter);
 			// The frequency may be different since DB stores as interval so it is returned
 			// and the meter updated by this value.
 			meter.readingFrequency = await meter.update(conn);
