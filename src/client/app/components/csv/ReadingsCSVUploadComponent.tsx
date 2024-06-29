@@ -13,25 +13,12 @@ import { MeterData } from '../../types/redux/meters';
 import { uploadCSVApi } from '../../utils/api';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
+import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
-
-/**
- * Returns a range of values between the specified lower and upper bounds.
- * @param lower The lower bound, which will be included in the range.
- * @param upper The upper bound, which will be excluded from the range.
- * @returns An array of values between starting from the lower bound and up to and excluding the upper bound.
- */
-function range(lower: number, upper: number): number[] {
-	const arr = [];
-	for (let i = lower; i < upper; i++) {
-		arr.push(i);
-	}
-	return arr;
-}
 
 /**
  * Defines the CSV Readings page
@@ -58,12 +45,17 @@ export default function ReadingsCSVUploadComponent() {
 		setCreatedMeterIdentifier(meterIdentifier);
 	};
 
+	console.log(JSON.stringify(visibleMeters));
 	// If a new meter was created then select it as the meter to be used
 	React.useEffect(() => {
 		if (createdMeterIdentifier) {
 			const createdMeter = visibleMeters.find(meter => meter.identifier === createdMeterIdentifier) || null;
 			if (createdMeter) {
 				setSelectedMeter(createdMeter);
+				setReadingsData(prevState => ({
+					...prevState,
+					meterName: createdMeter.name
+				}));
 			}
 		}
 	}, [createdMeterIdentifier, visibleMeters]);
@@ -123,7 +115,6 @@ export default function ReadingsCSVUploadComponent() {
 			try {
 				const msg = await submitReadings(selectedFile);
 				showInfoNotification(msg as unknown as string);
-				window.location.reload();
 			} catch (error) {
 				// A failed axios request should result in an error.
 				showErrorNotification(error.response.data as string);
@@ -178,8 +169,7 @@ export default function ReadingsCSVUploadComponent() {
 							</Input>
 						</Label>
 						<br />
-						<CreateMeterModalComponent onCreateMeter={handleCreateMeter} />
-						<br /><br />
+						{isAdmin && <><CreateMeterModalComponent onCreateMeter={handleCreateMeter} /><br /><br /></>}
 						<FormGroup>
 							<Label for='timeSort'>
 								<div className='pb-1'>

@@ -14,7 +14,8 @@ import {
 	MAX_ERRORS, MAX_VAL, MIN_DATE,
 	MIN_DATE_MOMENT, MIN_VAL,
 	isValidCreateMeter,
-	selectDefaultCreateMeterValues, selectCreateMeterUnitCompatibility
+	selectCreateMeterUnitCompatibility,
+	selectDefaultCreateMeterValues
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -23,6 +24,7 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -157,8 +159,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(translate('meter.successfully.create.meter'));
 					resetState();
+					// if props exist, then return the identifier
+					//  or return the name if identifier is not set
 					if (props.onCreateMeter) {
-						props.onCreateMeter(meterDetails.identifier);
+						if (meterDetails.identifier === '') {
+							props.onCreateMeter(meterDetails.name);
+						} else {
+							props.onCreateMeter(meterDetails.identifier);
+						}
 					}
 				})
 				.catch(err => {
@@ -504,15 +512,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}>
-								<option> 1 </option>
-								<option> 2 </option>
-								<option> 3 </option>
-								<option> 4 </option>
-								<option> 5 </option>
-								<option> 6 </option>
-								<option> 7 </option>
-								<option> 8 </option>
-								<option> 9 </option>
+								{range(1, 10).map(i => (
+									<option key={i} value={`${i}`}> {i} </option>
+								))}
 							</Input>
 						</FormGroup></Col>
 					</Row>

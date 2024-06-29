@@ -1,7 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
@@ -26,6 +25,7 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
+import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -538,15 +538,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}
 								defaultValue={localMeterEdits?.readingDuplication} >
-								<option> 1 </option>
-								<option> 2 </option>
-								<option> 3 </option>
-								<option> 4 </option>
-								<option> 5 </option>
-								<option> 6 </option>
-								<option> 7 </option>
-								<option> 8 </option>
-								<option> 9 </option>
+								{range(1, 10).map(i => (
+									<option key={i} value={`${i}`}> {i} </option>
+								))}
 							</Input>
 						</FormGroup></Col>
 					</Row>
