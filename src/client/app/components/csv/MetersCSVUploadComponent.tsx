@@ -19,7 +19,7 @@ interface MetersCSVUploadComponentProps {}
 const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => {
 	const dispatch = useDispatch();
 	const[ meterData, setMeterData] = React.useState({
-		meterName: '',
+		meterIdentifier: '',
 		gzip: false,
 		headerRow: false,
 		update: false
@@ -62,7 +62,7 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 
 	const handleClear = () => {
 		setMeterData({
-			meterName: '',
+			meterIdentifier: '',
 			gzip: false,
 			headerRow: false,
 			update: false});
@@ -162,12 +162,12 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 							</Container>
 						</FormGroup>
 						<FormGroup>
-							<Label for='meterName'>
-								<FormattedMessage id='csv.readings.param.meter.name' />
+							<Label for='meterIdentifier'>
+								<FormattedMessage id='csv.readings.param.meter.identifier' />
 								<Input
-									value={meterData.meterName}
-									id='meterName'
-									name='meterName'
+									value={meterData.meterIdentifier}
+									id='meterIdentifier'
+									name='meterIdentifier'
 									onChange={handleChange}
 								/>
 							</Label>

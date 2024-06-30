@@ -3,8 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Col, Input, FormGroup, FormText, Label } from 'reactstrap';
+import { Col, Input, FormGroup, Label } from 'reactstrap';
 import translate from '../utils/translate';
 
 interface FileUploader {
@@ -42,9 +41,6 @@ export default function FileUploaderComponent(props: FileUploader) {
 						onChange={handleFileChange}
 					/>
 				</Col>
-				<FormText color='muted'>
-					<FormattedMessage id={props.formText}/>
-				</FormText>
 			</Label>
 		</FormGroup>
 	);

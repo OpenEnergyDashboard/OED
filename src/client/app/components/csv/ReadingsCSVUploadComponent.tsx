@@ -45,7 +45,6 @@ export default function ReadingsCSVUploadComponent() {
 		setCreatedMeterIdentifier(meterIdentifier);
 	};
 
-	console.log(JSON.stringify(visibleMeters));
 	// If a new meter was created then select it as the meter to be used
 	React.useEffect(() => {
 		if (createdMeterIdentifier) {
@@ -54,7 +53,7 @@ export default function ReadingsCSVUploadComponent() {
 				setSelectedMeter(createdMeter);
 				setReadingsData(prevState => ({
 					...prevState,
-					meterName: createdMeter.name
+					meterIdentifier: createdMeter.identifier
 				}));
 			}
 		}
@@ -65,13 +64,15 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const selectedMeterName = e.target.value;
-		const foundMeter = visibleMeters.find(meter => meter.name === selectedMeterName) || null;
-		setSelectedMeter(foundMeter);
-		setReadingsData(prevState => ({
-			...prevState,
-			meterName: selectedMeterName
-		}));
+		const selectedMeterIdentifier = e.target.value;
+		const foundMeter = visibleMeters.find(meter => meter.identifier === selectedMeterIdentifier) || null;
+		if (foundMeter) {
+			setSelectedMeter(foundMeter);
+			setReadingsData(prevState => ({
+				...prevState,
+				meterIdentifier: foundMeter.identifier
+			}));
+		}
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -152,19 +153,19 @@ export default function ReadingsCSVUploadComponent() {
 				</Row>
 				<Row className='justify-content-md-center'>
 					<Col md='auto'>
-						<Label for='meterName'>
+						<Label for='meterIdentifier'>
 							<div className='pb-1'>
-								{translate('name')}
+								{translate('identifier')}
 							</div>
 							<Input
-								id='meterName'
-								name='meterName'
+								id='meterIdentifier'
+								name='meterIdentifier'
 								type='select'
-								value={selectedMeter?.name || ''}
+								value={selectedMeter?.identifier || ''}
 								onChange={handleSelectedMeterChange}>
 								<option value='default' key='-1'>Select a Meter</option>
 								{Array.from(visibleMeters).map(meter => {
-									return (<option value={meter.name} key={meter.id}>{meter.name}</option>);
+									return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
 								})}
 							</Input>
 						</Label>

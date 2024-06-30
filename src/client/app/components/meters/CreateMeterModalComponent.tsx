@@ -160,7 +160,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					showSuccessNotification(translate('meter.successfully.create.meter'));
 					resetState();
 					// if props exist, then return the identifier
-					//  or return the name if identifier is not set
+					//  or return the name if identifier is not set because the identifier will be set from the name
 					if (props.onCreateMeter) {
 						if (meterDetails.identifier === '') {
 							props.onCreateMeter(meterDetails.name);

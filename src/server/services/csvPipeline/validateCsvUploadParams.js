@@ -82,7 +82,6 @@ const DEFAULTS = {
 		lengthGap: undefined,
 		lengthVariation: undefined,
 		endOnly: undefined,
-		createMeter: BooleanTypesJS.false,
 		refreshReadings: BooleanTypesJS.false,
 		refreshHourlyReadings: BooleanTypesJS.false,
 		honorDst: BooleanTypesJS.false,
@@ -96,7 +95,7 @@ const DEFAULTS = {
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
-	meterName: new StringParam('meterName', undefined, undefined),
+	meterIdentifier: new StringParam('meterIdentifier', undefined, undefined),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new BooleanParam('gzip'),
@@ -116,7 +115,7 @@ const VALIDATION = {
 	},
 	readings: {
 		type: 'object',
-		required: ['meterName'],
+		required: ['meterIdentifier'],
 		properties: {
 			...COMMON_PROPERTIES,
 			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
@@ -128,7 +127,6 @@ const VALIDATION = {
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
-			createMeter: new BooleanParam('createMeter'),
 			refreshReadings: new BooleanParam('refreshReadings'),
 			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
 			honorDst: new BooleanParam('honorDst'),
@@ -182,12 +180,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		return;
 	}
 
-	const { createMeter, cumulative, duplications,
+	const { cumulative, duplications,
 		gzip, headerRow, timeSort, update, honorDst, relaxedParsing } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
-	if (!createMeter) {
-		req.body.createMeter = DEFAULTS.readings.createMeter;
-	}
 	if (!cumulative) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
 	}

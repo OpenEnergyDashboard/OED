@@ -7,7 +7,7 @@ import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeS
 // This file contains the default parameters for uploading readings and meters CSV files. These defaults should be consistent with the defaults
 // specified in /src/server/services/csvPipeline/validateCsvUploadParams and with /src/server/sql/create_meters_table.sql.
 export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
-	meterName: '',
+	meterIdentifier: '',
 	timeSort: TimeSortTypes.meter,
 	duplications: '',
 	cumulative: BooleanMeterTypes.meter,
@@ -27,7 +27,7 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 };
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
-	meterName: '',
+	meterIdentifier: '',
 	gzip: false,
 	headerRow: false,
 	update: false

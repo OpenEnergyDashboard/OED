@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 interface CSVUploadPreferences {
-	meterName: string;
+	meterIdentifier: string;
 	gzip: boolean;
 	headerRow: boolean;
 	update: boolean;
@@ -11,7 +11,7 @@ interface CSVUploadPreferences {
 
 // Very similar to CSVUploadPreferences but uses a different Boolean type that is expected when the form is submitted.
 export interface CSVUploadPreferencesForm {
-	meterName: string;
+	meterIdentifier: string;
 	gzip: BooleanTypes;
 	headerRow: BooleanTypes;
 	update: BooleanTypes;
@@ -48,7 +48,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
-	meterName: string;
+	meterIdentifier: string;
 	lengthGap: string;
 	lengthVariation: string;
 	endOnly: BooleanMeterTypes;
@@ -65,7 +65,7 @@ export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesFo
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
-	meterName: string;
+	meterIdentifier: string;
 	lengthGap: string;
 	lengthVariation: string;
 	endOnly: BooleanMeterTypes;
