@@ -1140,6 +1140,7 @@ const LocaleTranslationData = {
 		"error.bounds": "Debe ser entre {min} y {max}.",
 		"error.displayable": "El elemento mostrable se establecerá a falso porque no unidad está seleccionada.",
 		"error.displayable.meter": "Unidades del medidor establecerá el elemento mostrable a nada.",
+		"error.displayable.suffix.input": "Suffix input will set displayable to none.\u{26A1}",
 		"error.greater": "Debe ser más que {min}.",
 		"error.gps": "Latitud deber ser entre -90 y 90, y Longitud debe ser entre -180 y 180.",
 		"error.negative": "No puede ser negativo.",
