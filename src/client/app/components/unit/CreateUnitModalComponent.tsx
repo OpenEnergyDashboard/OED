@@ -214,9 +214,9 @@ export default function CreateUnitModalComponent() {
 							</Input>
 							<FormFeedback>
 								{state.displayable !== DisplayableType.none && state.typeOfUnit == UnitType.meter ? (
-									  <FormattedMessage id="error.displayable.meter" />
+									<FormattedMessage id="error.displayable.meter" />
 								) : (
-									  <FormattedMessage id="error.displayable.suffix.input" />
+									<FormattedMessage id="error.displayable.suffix.input" />
 								)}
 							</FormFeedback>
 						</FormGroup></Col>
