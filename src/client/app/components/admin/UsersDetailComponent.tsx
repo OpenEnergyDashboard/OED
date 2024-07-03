@@ -15,7 +15,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
 import UserViewComponent from './UserViewComponent';
-
+import EditUserModalComponent from './EditUserModalComponent';
 
 /**
  * Component which shows user details
@@ -28,8 +28,12 @@ export default function UserDetailComponent() {
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
+	const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
+	const [showEditModal, setShowEditModal] = React.useState<boolean>(false);
+
 	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
 	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
+
 	const submitChanges = async () => {
 		submitUserEdits(localUsersChanges)
 			.unwrap()
@@ -41,12 +45,14 @@ export default function UserDetailComponent() {
 			});
 	};
 
-	const editUser = (e: React.ChangeEvent<HTMLInputElement>, targetUser: User) => {
-		// copy user, and update role
-		const updatedUser: User = { ...targetUser, role: e.target.value as UserRole };
-		// make new list from existing local user state
-		const updatedList = localUsersChanges.map(user => (user.email === targetUser.email) ? updatedUser : user);
-		setLocalUsersChanges(updatedList);
+	const editUser = (user: User) => {
+		setSelectedUser(user);
+		setShowEditModal(true);
+	};
+
+	const handleEditModalClose = () => {
+		setShowEditModal(false);
+		setSelectedUser(null);
 	};
 
 	const deleteUser = (email: string) => {
@@ -101,6 +107,14 @@ export default function UserDetailComponent() {
 					</Button>
 				</div>
 			</div>
+			{selectedUser && (
+				<EditUserModalComponent
+					show={showEditModal}
+					user={selectedUser}
+					handleShow={() => setShowEditModal(true)}
+					handleClose={handleEditModalClose}
+				/>
+			)}
 		</div>
 	);
 }
@@ -108,7 +122,6 @@ export default function UserDetailComponent() {
 const titleStyle: React.CSSProperties = {
 	textAlign: 'center'
 };
-
 
 const cardStyle: React.CSSProperties = {
 	margin: '.625rem',
