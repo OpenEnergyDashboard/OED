@@ -2,11 +2,11 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import { UserRole } from '../../types/items';
-import { userApi } from '../../redux/api/userApi';
-import { NewUser } from '../../types/items';
-import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { UserRole } from '../../../types/items';
+import { userApi } from '../../../redux/api/userApi';
+import { NewUser } from '../../../types/items';
+import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
+import translate from '../../../utils/translate';
 import { useNavigate } from 'react-router-dom';
 
 /**

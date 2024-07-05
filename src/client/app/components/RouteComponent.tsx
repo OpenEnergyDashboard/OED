@@ -14,7 +14,7 @@ import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import UsersDetailComponent from './admin/UsersDetailComponent';
+import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
