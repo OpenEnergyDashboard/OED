@@ -21,7 +21,7 @@ export default function UserDetailComponent() {
 	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
 
 	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
-	// React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
+	//React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
 
 	return (
 		<div>
@@ -44,6 +44,7 @@ export default function UserDetailComponent() {
 								<UserViewComponent
 									key={user.email}
 									user={user}
+									localUsers={localUsersChanges}
 								/>
 							))}
 				</div>

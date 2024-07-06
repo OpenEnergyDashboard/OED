@@ -13,10 +13,10 @@ import EditUserModalComponent from './EditUserModalComponent';
 
 interface UserViewComponentProps {
 	user: User;
+	localUsers: User[]; // Prop for localUsers
 }
 
-const UserViewComponent: React.FC<UserViewComponentProps> = ({ user }) => {
-
+const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
 
 	const handleShow = () => {
@@ -44,7 +44,9 @@ const UserViewComponent: React.FC<UserViewComponentProps> = ({ user }) => {
 					show={showEditModal}
 					user={user}
 					handleShow={handleShow}
-					handleClose={handleClose} />
+					handleClose={handleClose}
+					localUsers={localUsers} // Pass localUsers to modal
+				/>
 			</div>
 		</div>
 	);

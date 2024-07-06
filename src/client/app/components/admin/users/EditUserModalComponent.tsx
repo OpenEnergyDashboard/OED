@@ -17,6 +17,7 @@ interface EditUserModalComponentProps {
 	user: User;
 	handleShow: () => void;
 	handleClose: () => void;
+	localUsers: User[]; // New prop for localUsers
 }
 
 /**
@@ -33,6 +34,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	const [passwordMatch, setPasswordMatch] = useState<boolean>(true);
 	const currentUserProfile = useAppSelector(selectCurrentUserProfile) as User | null;
 	const [disableDelete, setDisableDelete] = useState<boolean>(false);
+	const { localUsers } = props;
 
 	useEffect(() => {
 		setUserState({ ...props.user });
@@ -65,11 +67,21 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	const handleSaveChanges = async () => {
-		props.handleClose();
+		// props.handleClose();
 		// must submit a user change as an array of users because API was coded that way
 		//  we should rewrite the api at some point as user changes are no longer done as a group
-		const userArray: User[] = [{ ...userState }];
-		submitUserEdits(userArray)
+		// const userArray: User[] = [{ ...userState }];
+		// submitUserEdits(userArray)
+		// 	.unwrap()
+		// 	.then(() => {
+		// 		showSuccessNotification(translate('users.successfully.edit.users'));
+		// 	})
+		// 	.catch(() => {
+		// 		showErrorNotification(translate('users.failed.to.edit.users'));
+		// 	});
+		props.handleClose();
+		const updatedUsers: User[] = localUsers.map(user => user.email === userState.email ? userState : user);
+		submitUserEdits(updatedUsers)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.edit.users'));
