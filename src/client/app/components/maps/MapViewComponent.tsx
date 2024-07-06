@@ -15,6 +15,7 @@ import '../../styles/card-page.css';
 //import { useAppDispatch } from '../../redux/reduxHooks';
 //import { confirmEditedMaps, fetchMapsDetails, submitEditedMaps } from '../../redux/slices/mapSlice';
 //import { updateUnsavedChanges } from '../../redux/slices/unsavedWarningSlice';
+import EditMapModalComponent from './EditMapModalComponent';
 
 // TODO: create mapSlice and unsavedWarningSlice and properly set up in the Redux store
 // with all necessary actions (confirmEditedMaps, fetchMapsDetails, submitEditedMaps, updateUnsavedChanges)
@@ -30,19 +31,8 @@ interface MapViewProps {
 	removeMap(id: number): any;
 }
 
-/**
- * Defines the maps info card
- * @param props component props
- * @returns Maps info card element
- */
 function MapViewComponent(props: MapViewProps) {
-	const [nameInput, setNameInput] = useState(props.map.name);
-	const [noteInput, setNoteInput] = useState(props.map.note || '');
-	const [circleInput, setCircleInput] = useState(props.map.circleSize.toString());
-	const [isEditingName, setIsEditingName] = useState(false);
-	const [isEditingNote, setIsEditingNote] = useState(false);
-	const [isEditingCircle, setIsEditingCircle] = useState(false);
-
+	const [showEditModal, setShowEditModal] = useState(false);
 	//const dispatch = useAppDispatch();
 	const intl = useIntl();
 
@@ -85,134 +75,54 @@ function MapViewComponent(props: MapViewProps) {
 	};
 	*/
 
-	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setNameInput(event.target.value);
-	};
-
-	const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setNoteInput(event.target.value);
-	};
-
-	const handleCircleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setCircleInput(event.target.value);
-	};
-
-	const toggleNameEdit = () => {
-		if (isEditingName) {
-			props.editMapDetails({ ...props.map, name: nameInput });
-		}
-		setIsEditingName(!isEditingName);
-	};
-
-	const toggleNoteEdit = () => {
-		if (isEditingNote) {
-			props.editMapDetails({ ...props.map, note: noteInput });
-		}
-		setIsEditingNote(!isEditingNote);
-	};
-
-	const toggleCircleEdit = () => {
-		if (isEditingCircle) {
-			const regtest = /^\d+(\.\d+)?$/;
-			if (regtest.test(circleInput) && parseFloat(circleInput) <= 2.0) {
-				props.editMapDetails({ ...props.map, circleSize: parseFloat(circleInput) });
-			} else {
-				showErrorNotification(intl.formatMessage({ id: 'invalid.number' }));
-				return;
-			}
-		}
-		setIsEditingCircle(!isEditingCircle);
-	};
-
-	const toggleMapDisplayable = () => {
-		props.editMapDetails({ ...props.map, displayable: !props.map.displayable });
-	};
-
-	const handleDelete = () => {
-		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: props.map.name }));
-		if (consent) {
-			props.removeMap(props.id);
-		}
-	};
-
-	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
-		props.setCalibration(mode, props.id);
-	};
+	const handleShowModal = () => setShowEditModal(true);
+	const handleCloseModal = () => setShowEditModal(false);
 
 	return (
 		<div className="map-card">
 			<div className="identifier-container">
-				{props.map.id} {props.isSubmitting ? '(Submitting)' : props.isEdited ? '(Edited)' : ''}
+				{props.map.name} {props.isSubmitting ? '(Submitting)' : props.isEdited ? '(Edited)' : ''}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="map.name" /></b>
-				{isEditingName ?
-					<input value={nameInput} onChange={handleNameChange} /> :
-					nameInput}
-				<Button color='primary' onClick={toggleNameEdit}>
-					<FormattedMessage id={isEditingName ? 'update' : 'edit'} />
-				</Button>
+				<b><FormattedMessage id="map.displayable" /></b>
+				<span style={{ color: props.map.displayable ? 'green' : 'red' }}>
+					<FormattedMessage id={props.map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
+				</span>
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="map.circle.size" /></b> {props.map.circleSize}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="map.modified.date" /></b>
+				{moment.parseZone(props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="map.filename" /></b> {props.map.filename}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="note" /></b> {props.map.note}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="map.calibration" /></b>
+				<span style={{ color: props.map.origin && props.map.opposite ? 'black' : 'gray' }}>
+					<FormattedMessage id={props.map.origin && props.map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
+				</span>
 			</div>
 			{hasToken() && (
-				<>
-					<div className="item-container">
-						<b><FormattedMessage id="map.displayable" /></b>
-						<span style={{ color: props.map.displayable ? 'green' : 'red' }}>
-							<FormattedMessage id={props.map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
-						</span>
-						<Button color='primary' onClick={toggleMapDisplayable}>
-							<FormattedMessage id={props.map.displayable ? 'hide' : 'show'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.circle.size" /></b>
-						{isEditingCircle ?
-							<input value={circleInput} onChange={handleCircleChange} /> :
-							circleInput}
-						<Button color='primary' onClick={toggleCircleEdit}>
-							<FormattedMessage id={isEditingCircle ? 'update' : 'edit'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.modified.date" /></b>
-						{moment.parseZone(props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.filename" /></b>
-						{props.map.filename}
-						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-							<Button color='primary'>
-								<FormattedMessage id='map.upload.new.file' />
-							</Button>
-						</Link>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="note" /></b>
-						{isEditingNote ?
-							<textarea value={noteInput} onChange={handleNoteChange} /> :
-							noteInput}
-						<Button color='primary' onClick={toggleNoteEdit}>
-							<FormattedMessage id={isEditingNote ? 'update' : 'edit'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.calibration" /></b>
-						<span style={{ color: props.map.origin && props.map.opposite ? 'black' : 'gray' }}>
-							<FormattedMessage id={props.map.origin && props.map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
-						</span>
-						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
-							<Button color='primary'>
-								<FormattedMessage id='map.calibrate' />
-							</Button>
-						</Link>
-					</div>
-					<div className="edit-btn">
-						<Button color='danger' onClick={handleDelete}>
-							<FormattedMessage id='delete.map' />
-						</Button>
-					</div>
-				</>
+				<div className="edit-btn">
+					<Button color='secondary' onClick={handleShowModal}>
+						<FormattedMessage id="edit.map" />
+					</Button>
+				</div>
 			)}
+			<EditMapModalComponent
+				show={showEditModal}
+				handleClose={handleCloseModal}
+				map={props.map}
+				editMapDetails={props.editMapDetails}
+				setCalibration={props.setCalibration}
+				removeMap={props.removeMap}
+			/>
 		</div>
 	);
 }
