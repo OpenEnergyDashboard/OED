@@ -16,7 +16,12 @@ interface UserViewComponentProps {
 	localUsers: User[]; // Prop for localUsers
 }
 
-const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers }) => {
+/**
+ * Component which shows the user card
+ * @param props props for the component
+ * @returns User card element
+ */
+export default function UserViewComponent(props: UserViewComponentProps) {
 	const [showEditModal, setShowEditModal] = useState(false);
 
 	const handleShow = () => {
@@ -30,11 +35,11 @@ const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers 
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{user.email}
+				{props.user.email}
 			</div>
 			<div className="item-container p-2">
 				<b><FormattedMessage id="role" />: </b>
-				{user.role}
+				{props.user.role}
 			</div>
 			<div className="edit-btn">
 				<Button color='secondary' onClick={handleShow}>
@@ -42,14 +47,12 @@ const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers 
 				</Button>
 				<EditUserModalComponent
 					show={showEditModal}
-					user={user}
+					user={props.user}
 					handleShow={handleShow}
 					handleClose={handleClose}
-					localUsers={localUsers} // Pass localUsers to modal
+					localUsers={props.localUsers} // Pass localUsers to modal
 				/>
 			</div>
 		</div>
 	);
-};
-
-export default UserViewComponent;
+}

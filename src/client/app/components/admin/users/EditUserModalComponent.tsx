@@ -1,23 +1,23 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { User, UserRole } from '../../../types/items';
 import { userApi } from '../../../redux/api/userApi';
-import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
-import translate from '../../../utils/translate';
-import TooltipHelpComponent from '../../TooltipHelpComponent';
-import TooltipMarkerComponent from '../../TooltipMarkerComponent';
-import ConfirmActionModalComponent from '../../ConfirmActionModalComponent';
 import { useAppSelector } from '../../../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../../../redux/slices/currentUserSlice';
+import { User, UserRole } from '../../../types/items';
+import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
+import translate from '../../../utils/translate';
+import ConfirmActionModalComponent from '../../ConfirmActionModalComponent';
+import TooltipHelpComponent from '../../TooltipHelpComponent';
+import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 
 interface EditUserModalComponentProps {
 	show: boolean;
 	user: User;
+	localUsers: User[]; // New prop for localUsers
 	handleShow: () => void;
 	handleClose: () => void;
-	localUsers: User[]; // New prop for localUsers
 }
 
 /**
@@ -32,22 +32,22 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	const [password, setPassword] = useState<string>('');
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 	const [passwordMatch, setPasswordMatch] = useState<boolean>(true);
-	const currentUserProfile = useAppSelector(selectCurrentUserProfile) as User | null;
 	const [disableDelete, setDisableDelete] = useState<boolean>(false);
-	const { localUsers } = props;
+	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
 
 	useEffect(() => {
 		setUserState({ ...props.user });
 	}, [props.user]);
 
+	// if editing current logged in user, do not allow user to delete their own account
 	useEffect(() => {
 		setDisableDelete(false);
-		if (currentUserProfile) {
-			if (props.user.email === currentUserProfile.email) {
+		if (currentLoggedInUser) {
+			if (props.user.email === currentLoggedInUser.email) {
 				setDisableDelete(true);
 			}
 		}
-	}, [currentUserProfile]);
+	}, [currentLoggedInUser, props.user]);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUserState({ ...userState, [e.target.name]: e.target.value });
@@ -67,20 +67,12 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	const handleSaveChanges = async () => {
-		// props.handleClose();
-		// must submit a user change as an array of users because API was coded that way
-		//  we should rewrite the api at some point as user changes are no longer done as a group
-		// const userArray: User[] = [{ ...userState }];
-		// submitUserEdits(userArray)
-		// 	.unwrap()
-		// 	.then(() => {
-		// 		showSuccessNotification(translate('users.successfully.edit.users'));
-		// 	})
-		// 	.catch(() => {
-		// 		showErrorNotification(translate('users.failed.to.edit.users'));
-		// 	});
 		props.handleClose();
-		const updatedUsers: User[] = localUsers.map(user => user.email === userState.email ? userState : user);
+		// edit user api requires all users to be sent together to make sure that more than one admin is
+		//  left as a safety measure to make sure there isn't a total admin user lockout.
+		// This component now has implemented a method to not allow the current user to delete their own account, which
+		//  would allow us to rewrite the edit user api to not require all users. Or we can leave double safety check as is.
+		const updatedUsers: User[] = props.localUsers.map(user => user.email === userState.email ? userState : user);
 		submitUserEdits(updatedUsers)
 			.unwrap()
 			.then(() => {

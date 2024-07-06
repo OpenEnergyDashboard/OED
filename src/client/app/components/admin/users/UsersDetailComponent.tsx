@@ -2,7 +2,6 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
@@ -18,10 +17,9 @@ import UserViewComponent from './UserViewComponent';
  */
 export default function UserDetailComponent() {
 	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery(undefined);
-	const [localUsersChanges, setLocalUsersChanges] = React.useState<User[]>([]);
+	const [localUsers, setLocalUsers] = React.useState<User[]>([]);
 
-	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
-	//React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
+	React.useEffect(() => { setLocalUsers(users); }, [users]);
 
 	return (
 		<div>
@@ -38,13 +36,13 @@ export default function UserDetailComponent() {
 				</div>
 				<div className='card-container'>
 					{// display users and sort by email alphabetically
-						[...localUsersChanges]
+						[...localUsers]
 							.sort((a, b) => a.email.localeCompare(b.email))
 							.map(user => (
 								<UserViewComponent
 									key={user.email}
 									user={user}
-									localUsers={localUsersChanges}
+									localUsers={localUsers}
 								/>
 							))}
 				</div>
