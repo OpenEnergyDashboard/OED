@@ -151,8 +151,10 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 						role: {
 							type: 'string',
 							enum: Object.values(User.role)
+						},
+						password: {
+							type: 'string'
 						}
-
 					}
 				}
 			}
@@ -167,9 +169,16 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 			const minimumUser = users.find(user => user.role === User.role.ADMIN);
 			// This protects the database so that there will always be at least one admin during role updates.
 			if (minimumUser === undefined) {
+				log.error('There must be at least one admin remaining to avoid lockout!');
 				res.sendStatus(400);
-			} else {
-				const roleUpdates = users.map(async user => await User.updateUserRole(user.email, user.role, conn));
+			} else {				
+				const roleUpdates = users.map(async user => {
+					await User.updateUserRole(user.email, user.role, conn);
+					if (user.password && user.password != '') {
+						const hashedPassword = await bcrypt.hash(user.password, 10);
+						await User.updateUserPassword(user.email, hashedPassword, conn);
+					}
+				});
 				await Promise.all(roleUpdates);
 				res.sendStatus(200);
 			}

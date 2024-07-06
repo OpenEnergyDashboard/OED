@@ -84,6 +84,7 @@ export interface TooltipItems {
 export interface User {
 	email: string;
 	role: UserRole;
+	password?: string;
 }
 export interface NewUser extends User {
 	password: string;

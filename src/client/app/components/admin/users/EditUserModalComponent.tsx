@@ -49,6 +49,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		}
 	}, [currentLoggedInUser, props.user]);
 
+	useEffect(() => {
+		setPasswordMatch(password === confirmPassword);
+		if (password === confirmPassword && password != '') {
+			setUserState({ ...userState, password: password });
+		}
+	}, [password, confirmPassword]);
+
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUserState({ ...userState, [e.target.name]: e.target.value });
 	};
@@ -59,7 +66,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setConfirmPassword(e.target.value);
-		setPasswordMatch(e.target.value === password);
 	};
 
 	const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +87,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			.catch(() => {
 				showErrorNotification(translate('users.failed.to.edit.users'));
 			});
+		resetPasswordFields();
 	};
 
 	const deleteUser = (email: string) => {
@@ -132,6 +139,11 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	const handleClose = () => {
 		props.handleClose();
+	};
+
+	const resetPasswordFields = () => {
+		setPassword('');
+		setConfirmPassword('');
 	};
 
 	const tooltipStyle = {
