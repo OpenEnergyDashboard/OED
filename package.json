@@ -104,7 +104,6 @@
 	},
 	"devDependencies": {
 		"@redux-devtools/extension": "~3.2.5",
-		"@types/history": "~5.0.0",
 		"@types/lodash": "~4.17.4",
 		"@types/node": "~20.14.10",
 		"@types/plotly.js": "~2.29.2",
