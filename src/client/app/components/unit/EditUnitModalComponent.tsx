@@ -355,14 +355,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								type='select'
 								value={state.displayable}
 								onChange={e => handleStringChange(e)}
-								invalid={state.displayable != DisplayableType.none && state.typeOfUnit == UnitType.meter}>
+								invalid={state.displayable != DisplayableType.none && (state.typeOfUnit == UnitType.meter || state.suffix != '')}>
 								{Object.keys(DisplayableType).map(key => {
-									return (<option value={key} key={key} disabled={state.typeOfUnit == UnitType.meter && key != DisplayableType.none}>
+									return (<option value={key} key={key} disabled={(state.typeOfUnit == UnitType.meter || state.suffix != '') && key != DisplayableType.none}>
 										{translate(`DisplayableType.${key}`)}</option>);
 								})}
 							</Input>
 							<FormFeedback>
-								<FormattedMessage id="error.displayable.meter" />
+								{state.displayable !== DisplayableType.none && state.typeOfUnit == UnitType.meter ? (
+									<FormattedMessage id="error.displayable.meter" />
+								) : (
+									<FormattedMessage id="error.displayable.suffix.input" />
+								)}
 							</FormFeedback>
 						</FormGroup></Col>
 						{/* Preferred display input */}
