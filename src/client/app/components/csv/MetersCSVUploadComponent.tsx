@@ -79,7 +79,7 @@ const MetersCSVUploadComponent: React.FC<MetersCSVUploadComponentProps> = () => 
 	};
 
 	return (
-		<Container>
+		<Container className = "min-vh-100">
 			<TooltipHelpComponent page='help.csv.meters' />
 			<Form onSubmit={handleSubmit}>
 				<Row className="justify-content-md-center">
