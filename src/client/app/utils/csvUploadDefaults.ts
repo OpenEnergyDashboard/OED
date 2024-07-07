@@ -19,7 +19,6 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	endOnly: BooleanMeterTypes.meter,
 	gzip: false,
 	headerRow: false,
-	refreshHourlyReadings: false,
 	refreshReadings: false,
 	update: false,
 	honorDst: false,

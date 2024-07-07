@@ -48,15 +48,14 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
-	meterIdentifier: string;
+	endOnly: BooleanMeterTypes;
+	honorDst: boolean;
 	lengthGap: string;
 	lengthVariation: string;
-	endOnly: BooleanMeterTypes;
-	refreshHourlyReadings: boolean;
+	meterIdentifier: string;
 	refreshReadings: boolean;
-	timeSort: TimeSortTypes;
-	honorDst: boolean;
 	relaxedParsing: boolean;
+	timeSort: TimeSortTypes;
 }
 
 export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
@@ -65,15 +64,14 @@ export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesFo
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: string; // Not sure how to type this an integer string;
-	meterIdentifier: string;
+	endOnly: BooleanMeterTypes;
+	honorDst: BooleanTypes;
 	lengthGap: string;
 	lengthVariation: string;
-	endOnly: BooleanMeterTypes;
-	refreshHourlyReadings: BooleanTypes;
+	meterIdentifier: string;
 	refreshReadings: BooleanTypes;
-	timeSort: TimeSortTypes;
-	honorDst: BooleanTypes;
 	relaxedParsing: BooleanTypes;
+	timeSort: TimeSortTypes;
 }
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.

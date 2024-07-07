@@ -73,19 +73,18 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
-		timeSort: undefined,
-		duplications: undefined,
 		cumulative: BooleanMeterTypesJS.meter,
 		cumulativeReset: BooleanMeterTypesJS.meter,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
+		duplications: undefined,
+		endOnly: undefined,
+		honorDst: BooleanTypesJS.false,
 		lengthGap: undefined,
 		lengthVariation: undefined,
-		endOnly: undefined,
 		refreshReadings: BooleanTypesJS.false,
-		refreshHourlyReadings: BooleanTypesJS.false,
-		honorDst: BooleanTypesJS.false,
-		relaxedParsing: BooleanTypesJS.false
+		relaxedParsing: BooleanTypesJS.false,
+		timeSort: undefined,
 	}
 }
 
@@ -118,19 +117,18 @@ const VALIDATION = {
 		required: ['meterIdentifier'],
 		properties: {
 			...COMMON_PROPERTIES,
-			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
-			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
 			cumulative: new EnumParam('cumulative', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
 			cumulativeReset: new EnumParam('cumulativeReset', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
+			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
+			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
+			honorDst: new BooleanParam('honorDst'),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
 			refreshReadings: new BooleanParam('refreshReadings'),
-			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
-			honorDst: new BooleanParam('honorDst'),
-			relaxedParsing: new BooleanParam('relaxedParsing')
+			relaxedParsing: new BooleanParam('relaxedParsing'),
+			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter])
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}

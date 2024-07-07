@@ -423,18 +423,18 @@ export default function ReadingsCSVUploadComponent() {
 								</Row>
 								<Row>
 									<Col>
-										<Label for='refreshHourlyReadings'>
+										<Label for='honorDst'>
 											<div style={checkBox}>
 												<div>
 													<Input
 														type='checkbox'
-														id='refreshHourlyReadings'
-														name='refreshHourlyReadings'
+														id='honorDst'
+														name='honorDst'
 														onChange={handleCheckboxChange}
 													/>
 												</div>
 												<div className='ps-2'>
-													{translate('csv.readings.param.refresh.hourly.readings')}
+													{translate('csv.readings.param.honor.dst')}
 												</div>
 											</div>
 										</Label>
@@ -452,25 +452,6 @@ export default function ReadingsCSVUploadComponent() {
 												</div>
 												<div className='ps-2'>
 													{translate('csv.readings.param.refresh.readings')}
-												</div>
-											</div>
-										</Label>
-									</Col>
-								</Row>
-								<Row>
-									<Col>
-										<Label for='honorDst'>
-											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='honorDst'
-														name='honorDst'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
-												<div className='ps-2'>
-													{translate('csv.readings.param.honor.dst')}
 												</div>
 											</div>
 										</Label>
