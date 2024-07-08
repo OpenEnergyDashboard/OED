@@ -113,7 +113,7 @@
 		"@types/react-dom": "~18.2.24",
 		"@types/react-plotly.js": "~2.6.0",
 		"@types/react-redux": "~7.1.25",
-		"@typescript-eslint/eslint-plugin": "~6.4.1",
+		"@typescript-eslint/eslint-plugin": "~6.21.0",
 		"@typescript-eslint/parser": "~6.21.0",
 		"chai": "~4.4.1",
 		"chai-as-promised": "~7.1.1",
