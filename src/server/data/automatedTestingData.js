@@ -12,7 +12,6 @@ const { insertUnits, insertStandardUnits, insertConversions, insertStandardConve
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
-const { get } = require('lodash');
 const fs = require('fs').promises;
 
 // Define the start and end date for data generation.

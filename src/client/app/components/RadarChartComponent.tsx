@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { values } from 'lodash';
 import * as moment from 'moment';
 import { Layout } from 'plotly.js';
 import * as React from 'react';
@@ -92,7 +92,7 @@ export default function RadarChartComponent() {
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
+					const readings = values(readingsData);
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
@@ -151,7 +151,7 @@ export default function RadarChartComponent() {
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
+					const readings = values(readingsData);
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
