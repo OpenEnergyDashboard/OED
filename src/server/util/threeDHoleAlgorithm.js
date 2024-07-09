@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const _ = require('lodash');
+const chunk = require('lodash/chunk');
 const moment = require('moment');
 
 function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
@@ -92,11 +92,11 @@ function threeDHoleAlgorithm(meterOrGroupReadings, fromTimestamp, toTimestamp) {
 			readingsToReturn = merged;
 		}
 
-		// In rare cases, there's a chance that readings per day returns a fraction (eg. 0.25 when meter reads @ 4 day intervals) which breaks _.chunk()
+		// In rare cases, there's a chance that readings per day returns a fraction (eg. 0.25 when meter reads @ 4 day intervals) which breaks chunk()
 		const chunkSize = readingsPerDay >= 1 ? readingsPerDay : 1;
 
 		// Create 2D array by chunking, each 'chunk' corresponds to a day's worth of readings.
-		const chunkedReadings = _.chunk(readingsToReturn, chunkSize);
+		const chunkedReadings = chunk(readingsToReturn, chunkSize);
 
 		// Format xData and yData  for plotly
 		chunkedReadings.forEach((day, i) => {

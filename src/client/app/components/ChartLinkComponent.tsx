@@ -42,10 +42,9 @@ export default function ChartLinkComponent() {
 			<div>
 				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
 					<ButtonGroup >
-						{/* TODO translation needed  */}
 						<Button outline onClick={handleButtonClick} >
 							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', gap: '1em', alignItems: 'center' }}>
-								Chart Link
+								{translate('chart.link')}
 								<div ref={ref} data-for={'home'} data-tip={'help.home.toggle.chart.link'}								>
 									<Input type='checkbox' defaultChecked={linkHideOptions}
 										onClickCapture={e => {

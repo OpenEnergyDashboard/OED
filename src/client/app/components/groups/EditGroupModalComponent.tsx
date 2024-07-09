@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { cloneDeep, isEqual, difference, sortBy, filter } from 'lodash';
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useEffect, useState } from 'react';
@@ -66,12 +66,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Make a local copy of the group data so we can update during the edit process.
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
-	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
+	const [editGroupsState, setEditGroupsState] = useState(cloneDeep(groupDataById));
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
 
 	// Update group state in case changed from create/edit
 	useEffect(() => {
-		setEditGroupsState(_.cloneDeep(groupDataById));
+		setEditGroupsState(cloneDeep(groupDataById));
 	}, [groupDataById]);
 
 	// The current groups state of group being edited of the local copy. It should always be valid.
@@ -228,7 +228,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		// Set back to the global group values for this group. As before, need a deep copy.
-		setEditGroupsState(_.cloneDeep(groupDataById));
+		setEditGroupsState(cloneDeep(groupDataById));
 		// Set back to the default values for the menus.
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
@@ -261,8 +261,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This is the unedited state of the group being edited to compare to for changes.
 		const originalGroupState = groupDataById[groupState.id];
 		// Check children separately since lists.
-		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
-		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
+		const childMeterChanges = !isEqual(originalGroupState.childMeters, groupState.childMeters);
+		const childGroupChanges = !isEqual(originalGroupState.childGroups, groupState.childGroups);
 		const groupHasChanges =
 			(
 				originalGroupState.name != groupState.name ||
@@ -600,7 +600,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										}
 									} else {
 										// Could have removed any item so figure out which one it is. Need to convert options to ids.
-										const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
+										const removedMeter = difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedMeterId = removedMeter[0];
 										const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter);
@@ -647,7 +647,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										}
 									} else {
 										// Could have removed any item so figure out which one it is. Need to convert options to ids.
-										const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
+										const removedGroup = difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedGroupId = removedGroup[0];
 										const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group);
@@ -716,7 +716,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This copy is directly changed without using the Redux hooks since it is not used by React.
 		// This means that changes to the group do not happen unless the change is accepted and this copy is
 		// put back into the edit state.
-		const tempGroupsState = _.cloneDeep(editGroupsState);
+		const tempGroupsState = cloneDeep(editGroupsState);
 
 		// Add the child to the group being edited in temp so can decide if want change.
 		// This assumes there are no duplicates which is not allowed by menus
@@ -843,16 +843,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// until the next render. Second, and more importantly, the updated state was not showing during the render.
 		// Why that is the case was unclear because the set value were correct. Given all of this and to make the
 		// code more similar to add, it is done with a copy.
-		const tempGroupsState = _.cloneDeep(editGroupsState);
+		const tempGroupsState = cloneDeep(editGroupsState);
 
 		// Add the child to the group being edited.
 		if (childType === DataType.Meter) {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[groupState.id].childMeters, value => value != childId);
+			const newChildren = filter(tempGroupsState[groupState.id].childMeters, value => value != childId);
 			tempGroupsState[groupState.id].childMeters = newChildren;
 		} else {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[groupState.id].childGroups, value => value != childId);
+			const newChildren = filter(tempGroupsState[groupState.id].childGroups, value => value != childId);
 			tempGroupsState[groupState.id].childGroups = newChildren;
 		}
 
@@ -927,7 +927,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
 	}
 
 	/**
@@ -948,7 +948,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
 	}
 
 	/**
