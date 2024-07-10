@@ -48,7 +48,7 @@ export default function MetersCSVUploadComponent() {
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
 		if (!file) return;
-		if (file.name.slice(-4) === '.csv') {
+		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
 			setIsValidCSV(true);
 		} else {
 			setIsValidCSV(false);
