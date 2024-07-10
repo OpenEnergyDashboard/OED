@@ -211,7 +211,7 @@ export default function HeaderButtonsComponent() {
 								disabled={state.shouldAdminButtonDisabled}
 								tag={Link}
 								to="/admin">
-								<FormattedMessage id='admin.preferences' />
+								<FormattedMessage id='admin.settings' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}

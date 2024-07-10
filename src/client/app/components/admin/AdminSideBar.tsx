@@ -1,4 +1,5 @@
 import * as React from 'react';
+import translate from '../../utils/translate';
 
 interface SidebarProps {
 	onSelectPreference: (preference: string) => void,
@@ -19,35 +20,21 @@ export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 					className={`${props.selectedPreference === 'graph' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('graph')}
 				>
-                    Graph Settings
+                    {translate('graph')}
 				</button>
 				<button
 					type="button"
 					className={`${props.selectedPreference === 'meter' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('meter')}
 				>
-                    Meter Settings
-				</button>
-				<button
-					type="button"
-					className={`${props.selectedPreference === 'dateLanguage' ? 'btn btn-primary' : 'btn btn-light'}`}
-					onClick={() => props.onSelectPreference('dateLanguage')}
-				>
-                    Date/Language Settings
-				</button>
-				<button
-					type="button"
-					className={`${props.selectedPreference === 'file' ? 'btn btn-primary' : 'btn btn-light'}`}
-					onClick={() => props.onSelectPreference('file')}
-				>
-                    File Settings
+                    {translate('meter')}
 				</button>
 				<button
 					type="button"
 					className={`${props.selectedPreference === 'misc' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('misc')}
 				>
-                    Misc Settings
+                    {translate('misc')}
 				</button>
 			</div>
 
