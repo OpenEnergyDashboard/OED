@@ -7,7 +7,7 @@ import { Col, Input, FormGroup, Label } from 'reactstrap';
 import translate from '../utils/translate';
 
 interface FileUploader {
-	reference: React.RefObject<HTMLInputElement>;
+	reference?: React.RefObject<HTMLInputElement>;
 	required: boolean;
 	formText: string;
 	labelStyle?: React.CSSProperties;

@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
+import { selectDefaultCreateMeterValues, selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { BooleanMeterTypes, ReadingsCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { MeterData } from '../../types/redux/meters';
@@ -28,16 +28,20 @@ export default function ReadingsCSVUploadComponent() {
 
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
+	// Memo'd memoized selector
+	const defaultValues = { ...useAppSelector(selectDefaultCreateMeterValues), gps: null };
 	// page may contain admin info so verify admin status while admin is authenticated.
 	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
 	// We only want displayable meters if non-admins because they still have
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
+	// This is the state for the form data for readings
 	const [readingsData, setReadingsData] = React.useState<ReadingsCSVUploadPreferencesItem>(ReadingsCSVUploadDefaults);
-	const fileInputReference = React.useRef<HTMLInputElement>(null);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-	const [selectedMeter, setSelectedMeter] = React.useState<MeterData | null>(null);
+	const [selectedMeter, setSelectedMeter] = React.useState<MeterData>(defaultValues);
 	const [createdMeterIdentifier, setCreatedMeterIdentifier] = React.useState<string | null>(null);
+	const meterIsSelected = selectedMeter.identifier !== '';
+	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
 
 	// gets the meter identifier and updates the created meter identifier to signal a new meter was created
 	const handleCreateMeter = async (meterIdentifier: string) => {
@@ -61,6 +65,13 @@ export default function ReadingsCSVUploadComponent() {
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
+		if (!file) return;
+		if (file.name.slice(-4) === '.csv') {
+			setIsValidCSV(true);
+		} else {
+			setIsValidCSV(false);
+			showErrorNotification(translate('csv.file.error') + file.name);
+		}
 	};
 
 	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,7 +135,8 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const handleClear = () => {
-		setSelectedMeter(null);
+		setSelectedMeter(defaultValues);
+		setIsValidCSV(false);
 	};
 
 	const tooltipStyle = {
@@ -155,18 +167,26 @@ export default function ReadingsCSVUploadComponent() {
 					<Col md='auto'>
 						<Label for='meterIdentifier'>
 							<div className='pb-1'>
-								{translate('identifier')}
+								{translate('csv.readings.param.meter.identifier')}
 							</div>
 							<Input
 								id='meterIdentifier'
 								name='meterIdentifier'
 								type='select'
+								required
 								value={selectedMeter?.identifier || ''}
-								onChange={handleSelectedMeterChange}>
-								<option value='default' key='-1'>Select a Meter</option>
-								{Array.from(visibleMeters).map(meter => {
-									return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
-								})}
+								onChange={handleSelectedMeterChange}
+								invalid={!meterIsSelected}>
+								{
+									<option value={''} key={-999} hidden disabled>
+										{translate('select.meter')}
+									</option>
+								}
+								{
+									Array.from(visibleMeters).map(meter => {
+										return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
+									})
+								}
 							</Input>
 						</Label>
 						<br />
@@ -204,7 +224,6 @@ export default function ReadingsCSVUploadComponent() {
 						<FormFileUploaderComponent
 							formText='csv.upload.readings'
 							onFileChange={handleFileChange}
-							reference={fileInputReference}
 							required
 						/>
 						<FormGroup>
@@ -266,6 +285,7 @@ export default function ReadingsCSVUploadComponent() {
 												id='cumulativeResetStart'
 												name='cumulativeResetStart'
 												onChange={handleChange}
+												required
 												value={selectedMeter?.cumulativeResetStart || ''}
 												placeholder={ReadingsCSVUploadDefaults.cumulativeResetStart}
 											/>
@@ -353,14 +373,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='gzip'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='gzip'
-														name='gzip'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='gzip'
+													name='gzip'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.gzip')}
 												</div>
@@ -370,14 +388,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='headerRow'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='headerRow'
-														name='headerRow'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='headerRow'
+													name='headerRow'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.header.row')}
 												</div>
@@ -389,14 +405,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='update'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='update'
-														name='update'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='update'
+													name='update'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.update')}
 												</div>
@@ -406,14 +420,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='relaxedParsing'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='relaxedParsing'
-														name='relaxedParsing'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='relaxedParsing'
+													name='relaxedParsing'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.readings.param.relaxed.parsing')}
 												</div>
@@ -425,14 +437,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='honorDst'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='honorDst'
-														name='honorDst'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='honorDst'
+													name='honorDst'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.readings.param.honor.dst')}
 												</div>
@@ -442,14 +452,12 @@ export default function ReadingsCSVUploadComponent() {
 									<Col>
 										<Label for='refreshReadings'>
 											<div style={checkBox}>
-												<div>
-													<Input
-														type='checkbox'
-														id='refreshReadings'
-														name='refreshReadings'
-														onChange={handleCheckboxChange}
-													/>
-												</div>
+												<Input
+													type='checkbox'
+													id='refreshReadings'
+													name='refreshReadings'
+													onChange={handleCheckboxChange}
+												/>
 												<div className='ps-2'>
 													{translate('csv.readings.param.refresh.readings')}
 												</div>
@@ -461,7 +469,7 @@ export default function ReadingsCSVUploadComponent() {
 						</FormGroup>
 						<div className='d-flex flex-row-reverse'>
 							<div className='p-3'>
-								<Button color='primary' type='submit'>
+								<Button color='primary' type='submit' disabled={!isValidCSV}>
 									{translate('csv.submit.button')}
 								</Button>
 							</div>
