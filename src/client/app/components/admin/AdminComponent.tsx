@@ -27,16 +27,17 @@ export default function AdminComponent() {
 		fontSize: '50%'
 	};
 	return (
-		<div className='d-flex vh-100 vw-100 pt-2'>
-			<TooltipHelpComponent page='admin' />
-			<div className='container-fluid p-0'>
-				<h2 style={titleStyle} className='border-top p-2'>
-					<FormattedMessage id='admin.preferences' />
+		<div className='flexGrowOne d-flex flex-column'>
+			<div className='container-fluid flexGrowOne d-flex flex-column'>
+
+				<TooltipHelpComponent page='admin' />
+				<h2 style={titleStyle} className='p-2'>
+					<FormattedMessage id='admin.settings' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
 					</div>
 				</h2>
-				<div className='row border mh-100'>
+				<div className='row border flexGrowOne'>
 					<AdminSideBar onSelectPreference={setSelectedPreference} selectedPreference={selectedPreference}/>
 					<div className='col-9'>
 						<div className='col-12 col-lg-6 p-3'>
