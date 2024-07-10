@@ -4,7 +4,7 @@
 
 import { MapMetadata, MapsAction, MapState } from '../../types/redux/map';
 import { ActionType } from '../../types/redux/actions';
-import * as _ from 'lodash';
+import { keyBy } from 'lodash';
 import { CalibratedPoint } from '../../utils/calibration';
 import { RootState } from '../../store';
 
@@ -58,7 +58,7 @@ export default function maps(state = defaultState, action: MapsAction) {
 			return {
 				...state,
 				isLoading: false,
-				byMapID: _.keyBy(data, map => map.id)
+				byMapID: keyBy(data, map => map.id)
 			};
 		}
 		case ActionType.IncrementCounter: {

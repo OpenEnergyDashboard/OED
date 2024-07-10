@@ -84,7 +84,7 @@ mocha.describe('readings API', () => {
                     //Check if the Readings is equal to the expected file
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-                
+
                 mocha.it('LG5: should barely have hourly points for middle readings of 15 + 20 minute for a 15 day + 15 min period and quantity units with kWh as kWh', async () => { 
                     //Load the data into the database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
@@ -103,9 +103,6 @@ mocha.describe('readings API', () => {
                     //Check if the Readings is equal to the expected file
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
-
-
-                // Add LG6 here
                 mocha.it('LG6: 14 days still gives hourly points & middle readings', async () => {
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     // Get the unit ID since the DB could use any value.
@@ -308,7 +305,65 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-                // Add LG13 here
+                mocha.it('LG13: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained with reverse conversion', async () => {
+                    const unitData = unitDatakWh.concat([
+                        { 
+                            // u3
+                            name: 'MJ',
+                            identifier: 'megaJoules',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'MJ'
+                        },
+                        {
+                            // u16
+                            name: 'BTU',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.QUANTITY,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true, 
+                            note: 'OED created standard unit'
+                        }
+                    ])
+                    const conversionData = conversionDatakWh.concat([
+                        {
+                            // c6
+                            sourceName: 'MJ',
+                            destinationName: 'kWh',
+                            bidirectional: true,
+                            slope: 1 / 3.6,
+                            intercept: 0,
+                            note: 'MJ → KWh'
+                        },
+                        {
+                            // c3
+                            sourceName: 'MJ',
+                            destinationName: 'BTU',
+                            bidirectional: true,
+                            slope: 947.8,
+                            intercept: 0,
+                            note: 'MJ → BTU'
+                        }
+                    ])
+                    // Load the data into the database
+                    await prepareTest(unitData, conversionData, meterDatakWhGroups, groupDatakWh);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('BTU');
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_group_ri_15-20_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/line/groups/${GROUP_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
                 mocha.it('LG18: should have daily points for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () => {
                     const unitData = [

@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { sortBy } from 'lodash';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
@@ -410,8 +410,8 @@ export function getSelectOptionsByEntity(
 			} as SelectOption;
 		});
 
-	const compatible = _.sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc');
-	const incompatible = _.sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc');
+	const compatible = sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc');
+	const incompatible = sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc');
 	return { compatible, incompatible };
 }
 

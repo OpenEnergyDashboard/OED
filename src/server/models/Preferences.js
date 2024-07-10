@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const _ = require('lodash');
+const merge = require('lodash/merge');
 const database = require('./database');
 
 const sqlFile = database.sqlFile;
@@ -108,7 +108,7 @@ class Preferences {
 	 */
 	static async update(newPreferences, conn) {
 		const preferences = await Preferences.get(conn);
-		_.merge(preferences, newPreferences);
+		merge(preferences, newPreferences);
 
 		await conn.none(sqlFile('preferences/update_preferences.sql'),
 			{

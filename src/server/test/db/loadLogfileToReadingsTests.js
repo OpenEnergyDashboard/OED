@@ -32,7 +32,7 @@ const csvDataReal = `'2018-04-26 16:04:59',x,x,x,0,0,0,35304.57,0.42,0.49,0.65,0
 
 mocha.describe('demuxCsvWithSingleColumnTimestamps', async () => {
 	mocha.it('should demultiplex CSVs with index time columns correctly', async () => {
-		const r = demuxCsvWithSingleColumnTimestamps(csvData);
+		const r = await demuxCsvWithSingleColumnTimestamps(csvData);
 		expect(r).to.deep.equal([
 			[
 				['2001-01-01 00:00:00', 0],
@@ -52,7 +52,7 @@ mocha.describe('demuxCsvWithSingleColumnTimestamps', async () => {
 		]);
 	});
 	mocha.it('should demultiplex CSVs with differing time columns correctly', async () => {
-		const r = demuxCsvWithSingleColumnTimestamps(csvData2, timesColumn = 3);
+		const r = await demuxCsvWithSingleColumnTimestamps(csvData2, timesColumn = 3);
 		expect(r).to.deep.equal([
 			[
 				['2001-01-01 00:00:00', 0],
@@ -72,7 +72,7 @@ mocha.describe('demuxCsvWithSingleColumnTimestamps', async () => {
 		]);
 	});
 	mocha.it('should demultiplex CSVs with missing or empty columns', async () => {
-		const r = demuxCsvWithSingleColumnTimestamps(csvDataIncons);
+		const r = await demuxCsvWithSingleColumnTimestamps(csvDataIncons);
 		expect(r).to.deep.equal([
 			[
 				['2001-01-01 00:00:00', null],

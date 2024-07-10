@@ -8,7 +8,6 @@
  */
 
 const util = require('util');
-const _ = require('lodash');
 const chai = require('chai');
 const mocha = require('mocha');
 const expect = chai.expect;
@@ -87,9 +86,9 @@ mocha.describe('Generate Sine wave helper', () => {
 		const lastEndTimeStamp = '2019-09-12 00:00:00';
 		const expectation = [[1, startTimeStamp, endTimeStamp], [1, endTimeStamp, lastEndTimeStamp]];
 		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { day: 1 }, squared: false }).forEach((row, idx) => {
-			expect(parseFloat(row[0])).to.be.closeTo(expectation[idx][0], 0.0001);
-			expect(row[1]).to.equal(expectation[idx][1]);
-			expect(row[2]).to.equal(expectation[idx][2]);
+			expect(row.value).to.be.closeTo(expectation[idx][0], 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx][1]);
+			expect(row.endTimeStamp).to.equal(expectation[idx][2]);
 		});
 	});
 	mocha.it('should be able to generate data for half a day', () => {
@@ -99,9 +98,9 @@ mocha.describe('Generate Sine wave helper', () => {
 		const lastEndTimeStamp = '2019-09-11 12:00:00';
 		const expectation = [[1, startTimeStamp, midPointTimeStamp], [1, midPointTimeStamp, endTimeStamp], [1, endTimeStamp, lastEndTimeStamp]];
 		generateSineData(startTimeStamp, endTimeStamp, { timeStep: { hour: 12 }, squared: false }).forEach((row, idx) => {
-			expect(parseFloat(row[0])).to.be.closeTo(expectation[idx][0], 0.0001);
-			expect(row[1]).to.equal(expectation[idx][1]);
-			expect(row[2]).to.equal(expectation[idx][2]);
+			expect(row.value).to.be.closeTo(expectation[idx][0], 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx][1]);
+			expect(row.endTimeStamp).to.equal(expectation[idx][2]);
 		});
 	});
 });
@@ -109,136 +108,59 @@ mocha.describe('Generate Sine wave helper', () => {
 mocha.describe('Generate Sine wave', () => {
 	const generateSineData = generateData.generateSineData;
 	const generateSine = generateData.generateSine;
-	mocha.it('should properly write to file', async () => {
-		const startTimeStamp = '2019-09-10 00:00:00';
-		const endTimeStamp = '2019-09-11 00:00:00';
-		const filename = 'test1.csv';
-		const filepath = path.join(__dirname, '../tmp');
-		const fileComplete =  path.join(filepath, filename);
-		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
-		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude * timeOptions.timeStep.minute / 60 });
-		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude });
-		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(fileComplete);
-		const records = await parseCsv(dataFromFile);
-
-		// The first row is a header
-		const header = records.shift();
-		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
-		expect(records).to.deep.equal(data);
-		await fs.unlink(fileComplete); // delete test file created
-	});
 	mocha.it('should be able to normalize values for OED', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
-		const filename = 'test2.csv';
-		const filepath = path.join(__dirname, '../tmp');
-		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: false })
+		const expectation = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: false })
 			.map(row => {
-				let scaledValue = row[0] * 1 / 3;
-				scaledValue = scaledValue.toFixed(8); // we reduce numbers down to 8 decimals places because the rest are insignificant
-				return [scaledValue, row[1], row[2]];
+				let scaledValue = row.value * 1 / 3;
+				return { value: scaledValue, startTimeStamp: row.startTimeStamp, endTimeStamp: row.endTimeStamp };
 			});
-		await generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude });
-		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(fileComplete);
-		const preprocessedRecords = await parseCsv(dataFromFile);
-		// The first row is a header
-		const header = preprocessedRecords.shift();
-		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
-		// we reduce numbers down to 8 decimals places because there will be differences at very
-		// low significant places.
-		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
-		expect(records).to.deep.equal(data);
-		await fs.unlink(fileComplete); // delete test file created
+		generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude }).forEach((row, idx) => {
+			expect(row.value).to.be.closeTo(expectation[idx].value, 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx].startTimeStamp);
+			expect(row.endTimeStamp).to.equal(expectation[idx].endTimeStamp);
+		});
 	});
 	mocha.it('should be able to normalize and square values for OED', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
-		const filename = 'test2.csv';
-		const filepath = path.join(__dirname, '../tmp');
-		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude })
+		const expectation = generateSineData(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude })
 			.map(row => {
-				let scaledValue = (row[0] * 1 / 3) ** 2;
-				scaledValue = scaledValue.toFixed(8); // we reduce numbers down to 8 decimals places because the rest are insignificant
-				return [scaledValue, row[1], row[2]];
+				let scaledValue = (row.value * 1 / 3) ** 2;
+				return { value: scaledValue, startTimeStamp: row.startTimeStamp, endTimeStamp: row.endTimeStamp };
 			});
-		await generateSine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: true });
-		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(fileComplete);
-		const preprocessedRecords = await parseCsv(dataFromFile);
-		// The first row is a header
-		const header = preprocessedRecords.shift();
-		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
-		// we reduce numbers down to 8 decimals places because there will be differences at very
-		// low significant places.
-		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
-		expect(records).to.deep.equal(data);
-		await fs.unlink(fileComplete); // delete test file created
+		generateSine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: true }).forEach((row, idx) => {
+			expect(row.value).to.be.closeTo(expectation[idx].value, 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx].startTimeStamp);
+			expect(row.endTimeStamp).to.equal(expectation[idx].endTimeStamp);
+		});
 	});
 });
 
 mocha.describe('Generate Cosine wave', () => {
 	const generateSineData = generateData.generateSineData;
 	const generateCosine = generateData.generateCosine;
-	mocha.it('should properly write to file', async () => {
-		const startTimeStamp = '2019-09-10 00:00:00';
-		const endTimeStamp = '2019-09-11 00:00:00';
-		const filename = 'test1.csv';
-		const filepath = path.join(__dirname, '../tmp');
-		const fileComplete =  path.join(filepath, filename);
-		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 } };
-		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, maxAmplitude: maxAmplitude * timeOptions.timeStep.minute / 60, phaseShift: (Math.PI / 2), squared: false });
-		await generateCosine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: false });
-		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(fileComplete);
-		const records = await parseCsv(dataFromFile);
-
-		// The first row is a header
-		const header = records.shift();
-		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
-		expect(records).to.deep.equal(data);
-		await fs.unlink(fileComplete); // delete test file created
-	});
-
 	mocha.it('should be able to normalize and square values for OED', async () => {
 		const startTimeStamp = '2019-09-10 00:00:00';
 		const endTimeStamp = '2019-09-11 00:00:00';
-		const filename = 'test2.csv';
-		const filepath = path.join(__dirname, '../tmp');
-		const fileComplete =  path.join(filepath, filename);
 		const timeOptions = { timeStep: { minute: 20 }, periodLength: { day: 1 }, normalize: true };
 		const maxAmplitude = 2;
-		const data = generateSineData(startTimeStamp, endTimeStamp,
+		const expectation = generateSineData(startTimeStamp, endTimeStamp,
+			// Use shifted sine so actually cosine.
 			{ ...timeOptions, maxAmplitude: maxAmplitude, phaseShift: (Math.PI / 2), squared: false })
 			.map(row => {
-				let scaledValue = (row[0] * 1 / 3) ** 2;
-				scaledValue = scaledValue.toFixed(8); // we reduce numbers down to 8 decimals places because the rest are insignificant
-				return [scaledValue, row[1], row[2]];
+				let scaledValue = (row.value * 1 / 3) ** 2;
+				return { value: scaledValue, startTimeStamp: row.startTimeStamp, endTimeStamp: row.endTimeStamp };
 			});
-		await generateCosine(startTimeStamp, endTimeStamp,
-			{ ...timeOptions, filename: fileComplete, maxAmplitude: maxAmplitude, squared: true });
-		// https://stackabuse.com/reading-and-writing-csv-files-in-nodejs-with-node-csv/
-		const dataFromFile = await fs.readFile(fileComplete);
-		const preprocessedRecords = await parseCsv(dataFromFile);
-		// The first row is a header
-		const header = preprocessedRecords.shift();
-		expect(header).to.deep.equal(['reading', 'start_timestamp', 'end_timestamp']);
-		// we reduce numbers down to 8 decimals places because there will be differences at very
-		// low significant places.
-		const records = preprocessedRecords.map(row => [parseFloat(row[0]).toFixed(8), row[1], row[2]]);
-		expect(records).to.deep.equal(data);
-		await fs.unlink(fileComplete); // delete test file created
+		(await generateCosine(startTimeStamp, endTimeStamp, { ...timeOptions, maxAmplitude: maxAmplitude, squared: true })).forEach((row, idx) => {
+			expect(row.value).to.be.closeTo(expectation[idx].value, 0.0001);
+			expect(row.startTimeStamp).to.equal(expectation[idx].startTimeStamp);
+			expect(row.endTimeStamp).to.equal(expectation[idx].endTimeStamp);
+		});
 	});
 });

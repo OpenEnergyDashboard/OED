@@ -2,7 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const parseCsv = require('csv-parse/lib/sync');
+const util = require('util');
+const csv = require('csv');
+const fs = require('fs').promises;
+
+const parseCsv = util.promisify(csv.parse);
 
 /**
  * Demultiplexes a CSV file with a single column of timestamps and multiple columns
@@ -12,8 +16,8 @@ const parseCsv = require('csv-parse/lib/sync');
  * @param {string} input
  * @param {number} timesColumn
  */
-function demuxCsvWithSingleColumnTimestamps(input, timesColumn = 0) {
-	data = parseCsv(input, {relax_column_count: true});
+async function demuxCsvWithSingleColumnTimestamps(input, timesColumn = 0) {
+	const data = await parseCsv(input, { relax_column_count: true });
 
 	const maxCol = data.reduce((t, c) => {
 		if (c.length > t) {

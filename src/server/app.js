@@ -21,7 +21,6 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
-const timezones = require('./routes/timezones');
 const createRouterForReadings = require('./routes/unitReadings').createRouter;
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
@@ -36,27 +35,34 @@ const ciks = require('./routes/ciks');
 
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
+// TODO Verify that user see the message returned, see https://express-rate-limit.mintlify.app/reference/configuration#message
 // Create a limit of 200 requests/5 seconds
-const generalLimiter = new rateLimit({
+const generalLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
-	max: 200 // 200 requests
+	limit: 200, // 200 requests
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
 // Apply the limit to overall requests
 const app = express().use(generalLimiter);
 
 // This is limiting 3D-Graphic
-const threeDLimiter = new rateLimit({
+const threeDLimiter = rateLimit({
 	// TODO This was causing tests to fail for 3D rejection. This limit seems to be okay
 	// but we should find a better solution than upping values just for tests.
 	windowMs: 10 * 1000, // 10 seconds
-	max: 15
+	limit: 15,
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
 app.use('/api/unitReadings/threeD/meters', threeDLimiter);
 
 // Limit the number of raw exports to 5 per 5 seconds
-const exportRawLimiter = new rateLimit({
+const exportRawLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
-	max: 5 // 5 requests
+	limit: 5, // 5 requests
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
 // Apply the raw export limit
 app.use('/api/readings/line/raw/meters', exportRawLimiter);
@@ -85,7 +91,6 @@ app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
 app.use('/api/maps', maps);
 app.use('/api/logs', logs);
-app.use('/api/timezones', timezones);
 app.use('/api/obvius', obvius);
 app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);

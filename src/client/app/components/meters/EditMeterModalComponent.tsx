@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -48,7 +48,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
-	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
+	const [localMeterEdits, setLocalMeterEdits] = useState(cloneDeep(meterState));
 	const {
 		compatibleGraphicUnits,
 		incompatibleGraphicUnits,
@@ -59,7 +59,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// TODO should this state be used for the meterState above or would that cause issues?
 	const meterDataByID = useAppSelector(selectMeterDataById);
 
-	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)); }, [meterState]);
+	useEffect(() => { setLocalMeterEdits(cloneDeep(meterState)); }, [meterState]);
 	/* State */
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -69,6 +69,11 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
 
+	React.useEffect(() => {
+		if (localMeterEdits.cumulative === false) {
+			setLocalMeterEdits(details => ({ ...details, cumulativeReset: false }));
+		}
+	}, [localMeterEdits.cumulative]);
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -82,7 +87,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
-		const meterHasChanges = !_.isEqual(meterState, localMeterEdits);
+		const meterHasChanges = !isEqual(meterState, localMeterEdits);
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
@@ -195,6 +200,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		props.handleClose();
 		resetState();
 	};
+
 	return (
 		<>
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
@@ -431,20 +437,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						{/* cumulativeReset input */}
 						<Col><FormGroup>
 							<Label for='cumulativeReset'>{translate('meter.cumulativeReset')}</Label>
-							<Input
-								id='cumulativeReset'
-								name='cumulativeReset'
-								type='select'
-								value={localMeterEdits.cumulativeReset?.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
-							</Input>
+							{localMeterEdits.cumulative === true ? (
+								<Input
+									id='cumulativeReset'
+									name='cumulativeReset'
+									type='select'
+									value={localMeterEdits.cumulativeReset?.toString()}
+									onChange={e => handleBooleanChange(e)}>
+									{Object.keys(TrueFalseType).map(key => {
+										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+									})}
+								</Input>
+							) : (
+								<Input id='cumulativeReset' name='cumulativeReset' type='select' disabled>
+									<option value='no'>Unavailable</option>
+								</Input>
+							)}
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
-
 						{/* cumulativeResetStart input */}
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
@@ -455,7 +466,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits.cumulativeResetStart}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
+							/>
 						</FormGroup></Col>
 						{/* cumulativeResetEnd input */}
 						<Col><FormGroup>
@@ -467,7 +480,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								autoComplete='off'
 								onChange={e => handleStringChange(e)}
 								value={localMeterEdits?.cumulativeResetEnd}
-								placeholder='HH:MM:SS' />
+								placeholder='HH:MM:SS'
+								disabled={localMeterEdits.cumulativeReset === false || localMeterEdits.cumulative === false}
+							/>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -520,19 +535,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							<Input
-								id='readingDuplication'
-								name='readingDuplication'
-								type='number'
+							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}
-								step='1'
-								min='1'
-								max='9'
-								defaultValue={localMeterEdits?.readingDuplication}
-								invalid={localMeterEdits?.readingDuplication < 1 || localMeterEdits?.readingDuplication > 9} />
-							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
-							</FormFeedback>
+								defaultValue={localMeterEdits?.readingDuplication} >
+								<option> 1 </option>
+								<option> 2 </option>
+								<option> 3 </option>
+								<option> 4 </option>
+								<option> 5 </option>
+								<option> 6 </option>
+								<option> 7 </option>
+								<option> 8 </option>
+								<option> 9 </option>
+							</Input>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
