@@ -178,6 +178,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="email"
 										name="email"
 										type="email"
+										disabled
 										value={userState.email}
 										onChange={handleStringChange}
 									/>
