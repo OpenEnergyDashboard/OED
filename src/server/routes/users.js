@@ -148,6 +148,9 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 						email: {
 							type: 'string'
 						},
+						newEmail: {
+							type: 'sting'
+						},
 						role: {
 							type: 'string',
 							enum: Object.values(User.role)
@@ -178,6 +181,15 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 						const hashedPassword = await bcrypt.hash(user.password, 10);
 						await User.updateUserPassword(user.email, hashedPassword, conn);
 					}
+					
+					if (user.newEmail && user.newEmail !== '') {
+                        const emailExists = await User.getByEmail(user.newEmail, conn);
+                        if (!emailExists) {
+                            await User.updateUserEmail(existingUser.id, user.newEmail, conn);
+                        } else {
+                            throw new Error(`Email ${user.newEmail} already exists`);
+                        }
+                    }
 				});
 				await Promise.all(roleUpdates);
 				res.sendStatus(200);

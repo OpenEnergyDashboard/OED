@@ -73,6 +73,15 @@ class User {
 		return conn.none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
 	}
 
+	/**
+	 * Returns a promise to update a user's email
+	 * @param email the email of the user whose email is to be updated
+	 * @param conn is the connection to use.
+	 * @returns {Promise<void>}
+	 */
+	static async updateUserEmail(email, id, conn) {
+		return conn.none(sqlFile('user/update_user_email.sql'), { email: email, id: id });
+	}
 
 	/**
 	 * Returns a promise to update a user's role
