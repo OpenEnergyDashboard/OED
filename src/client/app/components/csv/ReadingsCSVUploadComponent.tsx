@@ -38,8 +38,11 @@ export default function ReadingsCSVUploadComponent() {
 	// This is the state for the form data for readings
 	const [readingsData, setReadingsData] = React.useState<ReadingsCSVUploadPreferencesItem>(ReadingsCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+	// This is the state for the chosen meter to upload readings for
 	const [selectedMeter, setSelectedMeter] = React.useState<MeterData>(defaultValues);
+	// This is the state to track whether a new meter was created
 	const [createdMeterIdentifier, setCreatedMeterIdentifier] = React.useState<string | null>(null);
+	// tracks whether or not a meter has been selected
 	const meterIsSelected = selectedMeter.identifier !== '';
 	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
 
