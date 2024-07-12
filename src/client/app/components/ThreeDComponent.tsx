@@ -170,9 +170,7 @@ function formatThreeDData(
 
 		// Use the first index of each row/day to extract the dates for the yLabels
 		if (j === 0) {
-			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
-			// TODO find better approach as full year YYYY may be desired behavior for users.
-			yDataToRender.push(dateTS.format(moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY')));
+			yDataToRender.push(dateTS.format('YYYY-MM-DD HH:mm:ss'));
 		}
 
 		const time = midpointTS.format('LT');
@@ -239,7 +237,8 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 				title: { text: translate('threeD.x.axis.label') }
 			},
 			yaxis: {
-				title: { text: translate('threeD.y.axis.label') }
+				title: { text: translate('threeD.y.axis.label') },
+				tickangle: 0 // This lets y-axis dates appear horizontally rather overlapping ticks
 			},
 			zaxis: {
 				title: { text: zLabelText }
