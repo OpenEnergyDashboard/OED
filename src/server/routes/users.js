@@ -173,7 +173,7 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 			const numberOfAdmins = (await User.getNumberOfAdmins(conn)).count;
 			
 			// This protects the database so that there will always be at least one admin
-			if (numberOfAdmins < 2 && userBeforeChanges.role === 'admin') {
+			if (numberOfAdmins < 2 && userBeforeChanges.role === 'admin' && user.role !== 'admin') {
 				const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
 				log.error(errorMessage);
 				return res.status(400).json({
