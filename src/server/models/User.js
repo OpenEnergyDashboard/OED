@@ -73,7 +73,7 @@ class User {
 
 	/**
 	 * Returns a promise to update a user's password
-	 * @param email the email of the user whose password is to be updated
+	 * @param id the id of the user whose password is to be updated
 	 * @param passwordHash the new password's hash
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<User>>}
@@ -84,7 +84,7 @@ class User {
 
 	/**
 	 * Returns a promise to update a user's email
-	 * @param email the email of the user whose email is to be updated
+	 * @param id the id of the user whose email is to be updated
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
@@ -94,13 +94,24 @@ class User {
 
 	/**
 	 * Returns a promise to update a user's role
-	 * @param email the email of the user whose role is to be updated
+	 * @param id the id of the user whose role is to be updated
 	 * @param role the new role
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
 	static updateUserRole(id, role, conn) {
 		return conn.none(sqlFile('user/update_user_role.sql'), { id: id, role: role });
+	}
+
+		/**
+	 * Returns a promise to update a user's email
+	 * @param id the id of the user whose note is to be updated
+	 * @param note the new note
+	 * @param conn is the connection to use.
+	 * @returns {Promise<void>}
+	 */
+	static async updateUserNote(id, note, conn) {
+		return conn.none(sqlFile('user/update_user_note.sql'), { id: id, note: note });
 	}
 
 	/**

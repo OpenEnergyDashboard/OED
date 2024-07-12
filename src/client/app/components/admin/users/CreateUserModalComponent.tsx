@@ -4,7 +4,7 @@ import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, M
 import { FormattedMessage } from 'react-intl';
 import { UserRole } from '../../../types/items';
 import { userApi } from '../../../redux/api/userApi';
-import { NewUser } from '../../../types/items';
+import { User } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
 import { useNavigate } from 'react-router-dom';
@@ -18,8 +18,9 @@ export default function CreateUserModal() {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
-	const [passwordMatch, setPasswordMatch] = useState(true);
 	const [role, setRole] = useState('');
+	const [note, setNote] = useState('');
+	const [passwordMatch, setPasswordMatch] = useState(true);
 	const [createUser] = userApi.useCreateUserMutation();
 	const nav = useNavigate();
 
@@ -35,13 +36,14 @@ export default function CreateUserModal() {
 		setConfirmPassword('');
 		setRole('');
 		setPasswordMatch(true);
+		setNote('');
 	};
 
 	const handleSubmit = async () => {
 		if (password === confirmPassword) {
 			setPasswordMatch(true);
 			const userRole: UserRole = UserRole[role as keyof typeof UserRole];
-			const newUser: NewUser = { email, role: userRole, password };
+			const newUser: User = { email, role: userRole, password, note };
 			createUser(newUser)
 				.unwrap()
 				.then(() => {
@@ -80,6 +82,7 @@ export default function CreateUserModal() {
 										type="email"
 										value={email}
 										onChange={e => setEmail(e.target.value)}
+										invalid={!email}
 										required
 									/>
 								</FormGroup>
@@ -102,6 +105,7 @@ export default function CreateUserModal() {
 										type="password"
 										value={password}
 										onChange={e => setPassword(e.target.value)}
+										invalid={!password}
 										required
 									/>
 								</FormGroup>
@@ -144,6 +148,20 @@ export default function CreateUserModal() {
 											</option>
 										))}
 									</Input>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label for="note">Note</Label>
+									<Input
+										id="note"
+										name="note"
+										type="textarea"
+										value={note}
+										onChange={e => setNote(e.target.value)}
+									/>
 									<FormFeedback>
 										<FormattedMessage id="error.required" />
 									</FormFeedback>

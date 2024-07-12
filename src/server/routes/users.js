@@ -105,6 +105,9 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			role: {
 				type: 'string',
 				enum: Object.values(User.role)
+			},
+			note: {
+				type: 'string'
 			}
 		}
 	};
@@ -112,7 +115,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
-			const { email, password, role } = req.body;
+			const { email, password, role, note } = req.body;
 			const conn = getConnection();
 			// Check if user already exists
 			const currentUser = await User.getByEmail(email, conn);
@@ -120,7 +123,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 				res.status(400).send({ message: `user ${email} already exists so cannot create` });
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
-				const user = new User(undefined, email, hashedPassword, role);
+				const user = new User(undefined, email, hashedPassword, role, note);
 				await user.insert(conn);
 				res.sendStatus(200);
 			}
@@ -155,6 +158,9 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 						enum: Object.values(User.role)
 					},
 					password: {
+						type: 'string'
+					},
+					note: {
 						type: 'string'
 					}
 				}
@@ -204,6 +210,13 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 			if (user.email !== userBeforeChanges.email) {
 				userUpdates.push(
 					User.updateUserEmail(user.id, user.email, conn)
+				);
+			}
+
+			// update note if needed
+			if (user.note !== userBeforeChanges.note) {
+				userUpdates.push(
+					User.updateUserNote(user.id, user.note, conn)
 				);
 			}
 

@@ -82,12 +82,11 @@ export interface TooltipItems {
  * A user object to be displayed for Administrators.
  */
 export interface User {
+	id?: number;
 	email: string;
 	role: UserRole;
 	password?: string;
-}
-export interface NewUser extends User {
-	password: string;
+	note?: string;
 }
 
 /**

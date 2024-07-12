@@ -226,6 +226,23 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 								</FormGroup>
 							</Col>
 						</Row>
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label for="note">Note</Label>
+									<Input
+										id="note"
+										name="note"
+										type="textarea"
+										value={userState.note}
+										onChange={handleStringChange}
+									/>
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
 					</Container>
 				</ModalBody>
 				<ModalFooter>
