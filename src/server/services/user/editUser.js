@@ -60,8 +60,8 @@
  
 	 try {
 		 const passwordHash = bcrypt.hashSync(password, 10);
-		 await User.updateUserPassword(email, passwordHash, conn);
-		 await User.updateUserRole(email, role, conn);
+		 await User.updateUserPassword(id, passwordHash, conn);
+		 await User.updateUserRole(id, role, conn);
 		 terminateReadline('User\'s password and role updated');
 	 } catch (err) {
 		 terminateReadline('Failed to update user\'s password and role with error: ', err);

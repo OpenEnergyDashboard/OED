@@ -12,12 +12,14 @@ class User {
 	 * @param email This user's email
 	 * @param passwordHash The user's passwordHash
 	 * @param role The user's role
+	 * @param note The user note
 	 */
-	constructor(id, email, passwordHash, role) {
+	constructor(id, email, passwordHash, role, note) {
 		this.id = id;
 		this.email = email;
 		this.passwordHash = passwordHash;
 		this.role = role;
+		this.note = note;
 	}
 
 	/**
