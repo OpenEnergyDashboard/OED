@@ -78,19 +78,24 @@ async function uploadMeters(req, res, filepath, conn) {
 			if (req.body.update === BooleanTypesJS.true) {
 				// Updating the new meters.
 				// First get its id.
-				let nameOfMeter = req.body.meterName;
-				if (!nameOfMeter) {
-					// Seems no name provided so use one in CSV file.
-					nameOfMeter = meter[0];
+				let identifierOfMeter = req.body.meterIdentifier;
+				if (!identifierOfMeter) {
+					// Seems no identifier provided so use one in CSV file.
+					if (!meter[7]) {
+						// There is no identifier given for meter in CSV so use name as identifier since would be automatically set.
+						identifierOfMeter = meter[0];
+					} else {
+						identifierOfMeter = meter[7];
+					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter name provided (\"${nameOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
 				}
 				let currentMeter;
-				currentMeter = await Meter.getByName(nameOfMeter, conn)
+				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
 					.catch(error => {
 						// Did not find the meter.
-						let msg = `Meter name of \"${nameOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
+						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
 						throw new CSVPipelineError(msg, undefined, 500);
 					});
 				currentMeter.merge(...meter);
