@@ -1,7 +1,7 @@
-// /* eslint-disable no-mixed-spaces-and-tabs */
-// /* This Source Code Form is subject to the terms of the Mozilla Public
-//  * License, v. 2.0. If a copy of the MPL was not distributed with this
-//  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* eslint-disable no-mixed-spaces-and-tabs */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
 import { useState } from 'react';
@@ -13,11 +13,15 @@ import EditUserModalComponent from './EditUserModalComponent';
 
 interface UserViewComponentProps {
 	user: User;
-	localUsers: User[];
-	onUserUpdate: (updatedUser: User) => void;
+	localUsers: User[]; // Prop for localUsers
 }
 
-const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers, onUserUpdate }) => {
+/**
+ * Component which shows the user card
+ * @param props props for the component
+ * @returns User card element
+ */
+export default function UserViewComponent(props: UserViewComponentProps) {
 	const [showEditModal, setShowEditModal] = useState(false);
 
 	const handleShow = () => {
@@ -31,11 +35,11 @@ const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers,
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{user.email}
+				{props.user.email}
 			</div>
 			<div className="item-container p-2">
 				<b><FormattedMessage id="role" />: </b>
-				{user.role}
+				{props.user.role}
 			</div>
 			<div className="edit-btn">
 				<Button color='secondary' onClick={handleShow}>
@@ -43,15 +47,12 @@ const UserViewComponent: React.FC<UserViewComponentProps> = ({ user, localUsers,
 				</Button>
 				<EditUserModalComponent
 					show={showEditModal}
-					user={user}
-					localUsers={localUsers}
+					user={props.user}
 					handleShow={handleShow}
 					handleClose={handleClose}
-					onUserUpdate={onUserUpdate} // Pass update
+					localUsers={props.localUsers} // Pass localUsers to modal
 				/>
 			</div>
 		</div>
 	);
-};
-
-export default UserViewComponent;
+}

@@ -135,68 +135,88 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
  * Route for updating user role
  */
 router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res) => {
+	
 	const validParams = {
 		type: 'object',
-		required: ['users'],
+		required: ['user'],
 		properties: {
-			users: {
-				type: 'array',
-				items: {
-					type: 'object',
-					required: ['email', 'role'],
-					properties: {
-						email: {
-							type: 'string'
-						},
-						newEmail: {
-							type: 'sting'
-						},
-						role: {
-							type: 'string',
-							enum: Object.values(User.role)
-						},
-						password: {
-							type: 'string'
-						}
+			user: {
+				type: 'object',
+				required: ['id', 'email', 'role'],
+				properties: {
+					id: {
+						type: 'integer'
+					},
+					email: {
+						type: 'string'
+					},
+					role: {
+						type: 'string',
+						enum: Object.values(User.role)
+					},
+					password: {
+						type: 'string'
 					}
 				}
 			}
 		}
 	};
+
 	if (!validate(req.body, validParams).valid) {
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
+
 		try {
 			const conn = getConnection();
-			const { users } = req.body;
-			const minimumUser = users.find(user => user.role === User.role.ADMIN);
-			// This protects the database so that there will always be at least one admin during role updates.
-			if (minimumUser === undefined) {
-				log.error('There must be at least one admin remaining to avoid lockout!');
-				res.sendStatus(400);
-			} else {				
-				const roleUpdates = users.map(async user => {
-					await User.updateUserRole(user.email, user.role, conn);
-					if (user.password && user.password != '') {
-						const hashedPassword = await bcrypt.hash(user.password, 10);
-						await User.updateUserPassword(user.email, hashedPassword, conn);
-					}
-					
-					if (user.newEmail && user.newEmail !== '') {
-                        const emailExists = await User.getByEmail(user.newEmail, conn);
-                        if (!emailExists) {
-                            await User.updateUserEmail(existingUser.id, user.newEmail, conn);
-                        } else {
-                            throw new Error(`Email ${user.newEmail} already exists`);
-                        }
-                    }
+			const { user } = req.body;
+			const userBeforeChanges = await User.getByID(user.id,conn);
+			const numberOfAdmins = (await User.getNumberOfAdmins(conn)).count;
+			
+			// This protects the database so that there will always be at least one admin
+			if (numberOfAdmins < 2 && userBeforeChanges.role === 'admin') {
+				const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
+				log.error(errorMessage);
+				return res.status(400).json({
+					message: errorMessage,
 				});
-				await Promise.all(roleUpdates);
-				res.sendStatus(200);
 			}
+			
+			// set up Asynchronous database queries
+			const userUpdates = [];
+
+			// not the only admin, so proceed
+			// update the user's role if needed
+			if (user.role !== userBeforeChanges.role) {
+				userUpdates.push(
+					User.updateUserRole(user.id, user.role, conn)
+				);
+			}
+			
+			// update the user's password if needed
+			if (user.password) {
+				const hashedPassword = await bcrypt.hash(user.password, 10);
+				userUpdates.push(
+					User.updateUserPassword(user.id, hashedPassword, conn)
+				);
+			}
+
+			// update email if needed
+			if (user.email !== userBeforeChanges.email) {
+				userUpdates.push(
+					User.updateUserEmail(user.id, user.email, conn)
+				);
+			}
+
+			await Promise.all(userUpdates);
+			return res.sendStatus(200);
+
 		} catch (error) {
+			
 			log.error('Error while performing edit user request.', error);
-			res.sendStatus(500);
+			res.status(500).json({
+				message: 'Error while performing edit user request.',
+				error: error.message
+			});
 		}
 	}
 });

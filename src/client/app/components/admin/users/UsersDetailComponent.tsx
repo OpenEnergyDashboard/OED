@@ -16,17 +16,10 @@ import UserViewComponent from './UserViewComponent';
  * @returns User Detail element
  */
 export default function UserDetailComponent() {
-	const { data: users = stableEmptyUsers, refetch } = userApi.useGetUsersQuery(undefined);
+	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery(undefined);
 	const [localUsers, setLocalUsers] = React.useState<User[]>([]);
 
 	React.useEffect(() => { setLocalUsers(users); }, [users]);
-
-	const handleUserUpdate = (updatedUser: User) => {
-		setLocalUsers(prevUsers =>
-			prevUsers.map(user => (user.email === updatedUser.email ? updatedUser : user))
-		);
-		refetch(); // Re-fetch users to get the updated data from the server
-	};
 
 	return (
 		<div>
@@ -50,7 +43,6 @@ export default function UserDetailComponent() {
 									key={user.email}
 									user={user}
 									localUsers={localUsers}
-									onUserUpdate={handleUserUpdate}
 								/>
 							))}
 				</div>

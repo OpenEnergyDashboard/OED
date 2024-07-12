@@ -18,7 +18,6 @@ interface EditUserModalComponentProps {
 	localUsers: User[]; // New prop for localUsers
 	handleShow: () => void;
 	handleClose: () => void;
-	onUserUpdate: (updatedUser: User) => void;
 }
 
 /**
@@ -27,11 +26,10 @@ interface EditUserModalComponentProps {
  * @returns User edit element
  */
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
-	const [submitUserEdits] = userApi.useEditUsersMutation();
+	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 	const [userState, setUserState] = useState<User>({ ...props.user });
 	const [password, setPassword] = useState<string>('');
-	const [newEmail, setNewEmail] = useState<string>(userState.email);
 	const [confirmPassword, setConfirmPassword] = useState<string>('');
 	const [passwordMatch, setPasswordMatch] = useState<boolean>(true);
 	const [disableDelete, setDisableDelete] = useState<boolean>(false);
@@ -59,12 +57,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	}, [password, confirmPassword]);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		if (name === 'newEmail') {
-			setNewEmail(value);
-		} else {
-			setUserState({ ...userState, [name]: value });
-		}
+		setUserState({ ...userState, [e.target.name]: e.target.value });
 	};
 
 	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,29 +74,16 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	const handleSaveChanges = async () => {
 		props.handleClose();
-		// edit user api requires all users to be sent together to make sure that more than one admin is
-		//  left as a safety measure to make sure there isn't a total admin user lockout.
 		// This component now has implemented a method to not allow the current user to delete their own account, which
 		//  would allow us to rewrite the edit user api to not require all users. Or we can leave double safety check as is.
-
-		const updatedUserState = { ...userState, email: newEmail };
-
-		// Ensure that the updated userState is included in the localUsers array
-		const updatedUsers: User[] = props.localUsers.map(user =>
-			user.email === props.user.email ? updatedUserState : user
-		);
-
-		console.log('Sending updated users:', updatedUsers); // Debug
-
-		submitUserEdits(updatedUsers)
+		submitUserEdits(userState)
 			.unwrap()
-			.then(response => {
-				console.log('API Response:', response); // Debug: log the response from the API
-				showSuccessNotification(translate('users.successfully.edit.users'));
-				props.onUserUpdate(updatedUserState); // Notify of update
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.edit.user') + props.user.email);
 			})
-			.catch(() => {
-				showErrorNotification(translate('users.failed.to.edit.users'));
+			.catch(error => {
+				showErrorNotification(translate('users.failed.to.edit.user') + props.user.email);
+				console.log(error);
 			});
 		resetPasswordFields();
 	};
@@ -183,7 +163,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<FormattedMessage id="edit.user" />
 					<TooltipHelpComponent page='users-edit' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='users-edit' helpTextId='help.admin.useredit' />
+						<TooltipMarkerComponent page='help.admin.user' helpTextId='help.admin.user' />
 					</div>
 				</ModalHeader>
 				<ModalBody>
@@ -191,17 +171,16 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="newEmail"><FormattedMessage id="email" /></Label>
+									<Label for="email"><FormattedMessage id="email" /></Label>
 									<Input
-										id="newEmail"
-										name="newEmail"
+										id="email"
+										name="email"
 										type="email"
-										value={newEmail}
+										value={userState.email}
 										onChange={handleStringChange}
 									/>
 								</FormGroup>
 							</Col>
-
 							<Col>
 								<FormGroup>
 									<Label for="role"><FormattedMessage id="role" /></Label>

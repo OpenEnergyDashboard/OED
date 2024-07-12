@@ -4,4 +4,4 @@
 
 UPDATE users
 SET role = ${role}
-WHERE email = ${email};
+WHERE id = ${id};

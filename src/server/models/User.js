@@ -53,7 +53,16 @@ class User {
 	}
 
 	/**
-	 * Returns a promise to get all of the user from the database
+	 * Returns a promise to retrieve the number of admins in the user table
+	 * @param conn the connection to use.
+	 * @returns {Promise.<Integer>} the amount of admins
+	 */
+		static async getNumberOfAdmins(conn) {
+			return await conn.one(sqlFile('user/get_number_of_admins.sql'));
+		}
+
+	/**
+	 * Returns a promise to get all of the users from the database
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<User>>}
 	 */
@@ -69,8 +78,8 @@ class User {
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<User>>}
 	 */
-	static async updateUserPassword(email, passwordHash, conn) {
-		return conn.none(sqlFile('user/update_user_password.sql'), { email: email, password_hash: passwordHash });
+	static async updateUserPassword(id, passwordHash, conn) {
+		return conn.none(sqlFile('user/update_user_password.sql'), { id: id, password_hash: passwordHash });
 	}
 
 	/**
@@ -79,8 +88,8 @@ class User {
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
-	static async updateUserEmail(email, id, conn) {
-		return conn.none(sqlFile('user/update_user_email.sql'), { email: email, id: id });
+	static async updateUserEmail(id, email, conn) {
+		return conn.none(sqlFile('user/update_user_email.sql'), { id: id, email: email });
 	}
 
 	/**
@@ -90,8 +99,8 @@ class User {
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
-	static updateUserRole(email, role, conn) {
-		return conn.none(sqlFile('user/update_user_role.sql'), { email: email, role: role });
+	static updateUserRole(id, role, conn) {
+		return conn.none(sqlFile('user/update_user_role.sql'), { id: id, role: role });
 	}
 
 	/**
