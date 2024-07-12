@@ -42,6 +42,7 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 		this.handleSetEndOnly = this.handleSetEndOnly.bind(this);
 		this.handleSetHonorDst = this.handleSetHonorDst.bind(this);
 		this.handleSetRelaxedParsing = this.handleSetRelaxedParsing.bind(this);
+		this.handleSetUseMeterZone = this.handleSetUseMeterZone.bind(this);
 		this.handleSubmit = this.handleSubmit.bind(this);
 		this.fileInput = React.createRef();
 	}
@@ -131,6 +132,10 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 
 	private handleSetRelaxedParsing() {
 		this.props.toggleRelaxedParsing();
+	}
+
+	private handleSetUseMeterZone() {
+		this.props.toggleUseMeterZone();
 	}
 
 	public render() {
@@ -330,6 +335,13 @@ export default class ReadingsCSVUploadComponent extends React.Component<Readings
 							<FormattedMessage id='csv.readings.param.relaxed.parsing' />
 						</Label>
 					</FormGroup>
+					{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl. Rest of changes left so easy to add back in. */}
+					{/* <FormGroup check style={checkboxStyle}>
+						<Label check>
+							<Input checked={this.props.useMeterZone} type='checkbox' name='useMeterZone' onChange={this.props.toggleUseMeterZone} />
+							<FormattedMessage id='csv.readings.param.use.meter.zone' />
+						</Label>
+					</FormGroup> */}
 					<Button color='secondary' type='submit'>
 						<FormattedMessage id='csv.submit.button' />
 					</Button>
