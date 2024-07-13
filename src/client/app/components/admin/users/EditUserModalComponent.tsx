@@ -81,8 +81,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				showSuccessNotification(translate('users.successfully.edit.user') + props.user.email);
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.edit.user') + props.user.email);
-				console.log(error);
+				showErrorNotification(translate('users.failed.to.edit.user') + props.user.email + ' ' + error.data.message);
 			});
 		resetPasswordFields();
 	};
