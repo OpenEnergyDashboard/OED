@@ -18,11 +18,13 @@ interface MapsDetailProps {
 	submitEditedMaps(): Promise<any>;
 	createNewMap(): any;
 }
+
 export default class MapsDetailComponent extends React.Component<MapsDetailProps> {
 	constructor(props: MapsDetailProps) {
 		super(props);
 		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
 	}
+
 	public componentDidMount() {
 		this.props.fetchMapsDetails();
 	}
