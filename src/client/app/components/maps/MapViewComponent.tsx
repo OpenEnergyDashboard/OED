@@ -2,219 +2,436 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, injectIntl, WrappedComponentProps } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
-import * as moment from 'moment';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import { hasToken } from '../../utils/token';
 import { showErrorNotification } from '../../utils/notifications';
-import '../../styles/card-page.css';
-//import { useAppDispatch } from '../../redux/reduxHooks';
-//import { confirmEditedMaps, fetchMapsDetails, submitEditedMaps } from '../../redux/slices/mapSlice';
-//import { updateUnsavedChanges } from '../../redux/slices/unsavedWarningSlice';
-
-// TODO: create mapSlice and unsavedWarningSlice and properly set up in the Redux store
-// with all necessary actions (confirmEditedMaps, fetchMapsDetails, submitEditedMaps, updateUnsavedChanges)
-// correctly implemented in their respective slices.
+import { hasToken } from '../../utils/token';
 
 interface MapViewProps {
+	// The ID of the map to be displayed
 	id: number;
+	// The map metadata being displayed by this row
 	map: MapMetadata;
 	isEdited: boolean;
 	isSubmitting: boolean;
+	// The function used to dispatch the action to edit map details
 	editMapDetails(map: MapMetadata): any;
 	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
 	removeMap(id: number): any;
 }
 
-/**
- * Defines the maps info card
- * @param props component props
- * @returns Maps info card element
- */
-function MapViewComponent(props: MapViewProps) {
-	const [nameInput, setNameInput] = useState(props.map.name);
-	const [noteInput, setNoteInput] = useState(props.map.note || '');
-	const [circleInput, setCircleInput] = useState(props.map.circleSize.toString());
-	const [isEditingName, setIsEditingName] = useState(false);
-	const [isEditingNote, setIsEditingNote] = useState(false);
-	const [isEditingCircle, setIsEditingCircle] = useState(false);
-
-	//const dispatch = useAppDispatch();
-	const intl = useIntl();
-
-	useEffect(() => {
-		if (props.isEdited) {
-			//updateUnsavedChanges();
-		}
-	}, [props.isEdited]);
-
-	/*
-	// Function to remove unsaved changes
-	const removeUnsavedChangesFunction = async (callback: () => void) => {
-		// Dispatch action to confirm edited maps
-		await dispatch(confirmEditedMaps());
-		// Fetch updated map details
-		await dispatch(fetchMapsDetails());
-		callback();
-	};
-
-	// Function to submit unsaved changes
-	const submitUnsavedChangesFunction = async (successCallback: () => void, failureCallback: () => void) => {
-		try {
-			// Dispatch action to submit edited maps
-			await dispatch(submitEditedMaps());
-			// Call success callback if submission is successful
-			successCallback();
-		} catch (error) {
-			// Call failure callback if submission fails
-			failureCallback();
-		}
-	};
-
-	// Function to update unsaved changes
-	const updateUnsavedChanges = () => {
-	// Dispatch action to update unsaved changes with remove and submit functions
-		dispatch(updateUnsavedChanges({
-			removeFunction: removeUnsavedChangesFunction,
-			submitFunction: submitUnsavedChangesFunction
-		}));
-	};
-	*/
-
-	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setNameInput(event.target.value);
-	};
-
-	const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setNoteInput(event.target.value);
-	};
-
-	const handleCircleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setCircleInput(event.target.value);
-	};
-
-	const toggleNameEdit = () => {
-		if (isEditingName) {
-			props.editMapDetails({ ...props.map, name: nameInput });
-		}
-		setIsEditingName(!isEditingName);
-	};
-
-	const toggleNoteEdit = () => {
-		if (isEditingNote) {
-			props.editMapDetails({ ...props.map, note: noteInput });
-		}
-		setIsEditingNote(!isEditingNote);
-	};
-
-	const toggleCircleEdit = () => {
-		if (isEditingCircle) {
-			const regtest = /^\d+(\.\d+)?$/;
-			if (regtest.test(circleInput) && parseFloat(circleInput) <= 2.0) {
-				props.editMapDetails({ ...props.map, circleSize: parseFloat(circleInput) });
-			} else {
-				showErrorNotification(intl.formatMessage({ id: 'invalid.number' }));
-				return;
-			}
-		}
-		setIsEditingCircle(!isEditingCircle);
-	};
-
-	const toggleMapDisplayable = () => {
-		props.editMapDetails({ ...props.map, displayable: !props.map.displayable });
-	};
-
-	const handleDelete = () => {
-		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: props.map.name }));
-		if (consent) {
-			props.removeMap(props.id);
-		}
-	};
-
-	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
-		props.setCalibration(mode, props.id);
-	};
-
-	return (
-		<div className="map-card">
-			<div className="identifier-container">
-				{props.map.id} {props.isSubmitting ? '(Submitting)' : props.isEdited ? '(Edited)' : ''}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="map.name" /></b>
-				{isEditingName ?
-					<input value={nameInput} onChange={handleNameChange} /> :
-					nameInput}
-				<Button color='primary' onClick={toggleNameEdit}>
-					<FormattedMessage id={isEditingName ? 'update' : 'edit'} />
-				</Button>
-			</div>
-			{hasToken() && (
-				<>
-					<div className="item-container">
-						<b><FormattedMessage id="map.displayable" /></b>
-						<span style={{ color: props.map.displayable ? 'green' : 'red' }}>
-							<FormattedMessage id={props.map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
-						</span>
-						<Button color='primary' onClick={toggleMapDisplayable}>
-							<FormattedMessage id={props.map.displayable ? 'hide' : 'show'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.circle.size" /></b>
-						{isEditingCircle ?
-							<input value={circleInput} onChange={handleCircleChange} /> :
-							circleInput}
-						<Button color='primary' onClick={toggleCircleEdit}>
-							<FormattedMessage id={isEditingCircle ? 'update' : 'edit'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.modified.date" /></b>
-						{moment.parseZone(props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.filename" /></b>
-						{props.map.filename}
-						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-							<Button color='primary'>
-								<FormattedMessage id='map.upload.new.file' />
-							</Button>
-						</Link>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="note" /></b>
-						{isEditingNote ?
-							<textarea value={noteInput} onChange={handleNoteChange} /> :
-							noteInput}
-						<Button color='primary' onClick={toggleNoteEdit}>
-							<FormattedMessage id={isEditingNote ? 'update' : 'edit'} />
-						</Button>
-					</div>
-					<div className="item-container">
-						<b><FormattedMessage id="map.calibration" /></b>
-						<span style={{ color: props.map.origin && props.map.opposite ? 'black' : 'gray' }}>
-							<FormattedMessage id={props.map.origin && props.map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
-						</span>
-						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
-							<Button color='primary'>
-								<FormattedMessage id='map.calibrate' />
-							</Button>
-						</Link>
-					</div>
-					<div className="edit-btn">
-						<Button color='danger' onClick={handleDelete}>
-							<FormattedMessage id='delete.map' />
-						</Button>
-					</div>
-				</>
-			)}
-		</div>
-	);
+interface MapViewState {
+	nameFocus: boolean;
+	nameInput: string;
+	circleFocus: boolean;
+	circleInput: string;
+	noteFocus: boolean;
+	noteInput: string;
 }
 
-export default MapViewComponent;
+type MapViewPropsWithIntl = MapViewProps & WrappedComponentProps;
+
+class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewState> {
+	constructor(props: MapViewPropsWithIntl) {
+		super(props);
+		this.state = {
+			nameFocus: false,
+			nameInput: this.props.map.name,
+			noteFocus: false,
+			noteInput: (this.props.map.note) ? this.props.map.note : '',
+			circleFocus: false,
+			// circleSize should always be a valid string due to how stored and mapRow.
+			circleInput: this.props.map.circleSize.toString()
+		};
+		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
+		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
+		this.toggleNameInput = this.toggleNameInput.bind(this);
+		this.handleNameChange = this.handleNameChange.bind(this);
+		this.toggleNoteInput = this.toggleNoteInput.bind(this);
+		this.handleNoteChange = this.handleNoteChange.bind(this);
+		this.toggleDelete = this.toggleDelete.bind(this);
+		this.notifyCalibrationNeeded = this.notifyCalibrationNeeded.bind(this);
+		this.handleSizeChange = this.handleSizeChange.bind(this);
+		this.toggleCircleInput = this.toggleCircleInput.bind(this);
+	}
+
+	public render() {
+		return (
+			<tr>
+				<td> {this.props.map.id} {this.formatStatus()}</td>
+				<td> {this.formatName()} </td>
+				{hasToken() && <td> {this.formatDisplayable()} </td>}
+				{hasToken() && <td> {this.formatCircleSize()} </td>}
+				{/* This was stored as UTC but with the local time at that point.
+					Thus, moment will not modify the date/time given when done this way. */}
+				{hasToken() && <td> {moment.parseZone(this.props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')} </td>}
+				{hasToken() && <td> {this.formatFilename()} </td>}
+				{hasToken() && <td> {this.formatNote()} </td>}
+				{hasToken() && <td> {this.formatCalibrationStatus()} </td>}
+				{hasToken() && <td> {this.formatDeleteButton()} </td>}
+			</tr>
+		);
+	}
+
+	componentDidMount() {
+		if (this.props.isEdited) {
+			// When the props.isEdited is true after loading the page, there are unsaved changes
+			this.updateUnsavedChanges();
+		}
+	}
+
+	componentDidUpdate(prevProps: MapViewProps) {
+		if (this.props.isEdited && !prevProps.isEdited) {
+			// When the props.isEdited changes from false to true, there are unsaved changes
+			this.updateUnsavedChanges();
+		}
+	}
+
+	// Re-implement After RTK migration
+	// private removeUnsavedChangesFunction(callback: () => void) {
+	// 	// This function is called to reset all the inputs to the initial state
+	// 	store.dispatch<any>(confirmEditedMaps()).then(() => {
+	// 		store.dispatch<any>(fetchMapsDetails()).then(callback);
+	// 	});
+	// }
+
+	// Re-implement After RTK migration
+	// private submitUnsavedChangesFunction(successCallback: () => void, failureCallback: () => void) {
+	// 	// This function is called to submit the unsaved changes
+	// 	store.dispatch<any>(submitEditedMaps()).then(successCallback, failureCallback);
+	// }
+
+	private updateUnsavedChanges() {
+		// Re-implement After RTK migration
+		// Notify that there are unsaved changes
+		// store.dispatch(unsavedWarningSlice.actions.updateUnsavedChanges({
+		// 	removeFunction: this.removeUnsavedChangesFunction,
+		// 	submitFunction: this.submitUnsavedChangesFunction
+		// }));
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	}
+
+	private handleSizeChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ circleInput: event.target.value });
+	}
+
+	private toggleCircleInput() {
+		let checkval: boolean = true;
+		// if trying to submit an updated value
+		if (this.state.circleFocus) {
+			const regtest = /^\d+(\.\d+)?$/;
+			checkval = regtest.test(this.state.circleInput);
+			if (checkval) {
+				if (parseFloat(this.state.circleInput) > 2.0) {
+					checkval = false;
+				}
+				else {
+					const editedMap = {
+						...this.props.map,
+						circleSize: parseFloat(this.state.circleInput)
+					};
+					this.props.editMapDetails(editedMap);
+				}
+			}
+		}
+		if (checkval) {
+			this.setState({ circleFocus: !this.state.circleFocus });
+		}
+		else {
+			showErrorNotification(`${this.props.intl.formatMessage({ id: 'invalid.number' })}`);
+		}
+	}
+
+	private formatCircleSize() {
+		let formattedCircleSize;
+		let buttonMessageId;
+		if (this.state.circleFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedCircleSize = <textarea id={'csize'} autoFocus value={this.state.circleInput} onChange={event => this.handleSizeChange(event)} />;
+			buttonMessageId = 'update';
+		} else {
+			formattedCircleSize = <div>{this.state.circleInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleCircleInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return (
+				<div>
+					{formattedCircleSize}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.circleSize}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private formatStatus(): string {
+		if (this.props.isSubmitting) {
+			return '(' + this.props.intl.formatMessage({ id: 'submitting' }) + ')';
+		}
+		if (this.props.isEdited) {
+			return this.props.intl.formatMessage({ id: 'edited' });
+		}
+		return '';
+	}
+
+	private toggleDelete() {
+		const consent = window.confirm(`${this.props.intl.formatMessage({ id: 'map.confirm.remove' })} "${this.props.map.name}"?`);
+		if (consent) { this.props.removeMap(this.props.id); }
+	}
+
+	private formatDeleteButton() {
+		const editButtonStyle: React.CSSProperties = {
+			display: 'inline', // or 'none'
+			paddingLeft: '5px'
+		};
+		return <Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
+			<FormattedMessage id={'delete.map'} />
+		</Button>;
+	}
+
+	private styleEnabled(): React.CSSProperties {
+		return { color: 'green' };
+	}
+
+	private styleDisabled(): React.CSSProperties {
+		return { color: 'red' };
+	}
+
+	private styleToggleBtn(): React.CSSProperties {
+		return { float: 'right' };
+	}
+
+	private toggleMapDisplayable() {
+		const editedMap = {
+			...this.props.map,
+			displayable: !this.props.map.displayable
+		};
+		this.props.editMapDetails(editedMap);
+	}
+
+	private formatDisplayable() {
+		let styleFn;
+		let messageId;
+		let buttonMessageId;
+
+		if (this.props.map.displayable) {
+			styleFn = this.styleEnabled;
+			messageId = 'map.is.displayable';
+			buttonMessageId = 'hide';
+		} else {
+			styleFn = this.styleDisabled;
+			messageId = 'map.is.not.displayable';
+			buttonMessageId = 'show';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			// throw out alert if the admin wants to display uncalibrated map
+			if (!(this.props.map.origin && this.props.map.opposite)) {
+				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.notifyCalibrationNeeded}>
+					<FormattedMessage id={buttonMessageId} />
+				</Button>;
+			}
+			// if map is already calibrated, the button will allow it to be displayed
+			else {
+				toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleMapDisplayable}>
+					<FormattedMessage id={buttonMessageId} />
+				</Button>;
+			}
+		} else {
+			toggleButton = <div />;
+		}
+
+		return (
+			<span>
+				<span style={styleFn()}>
+					<FormattedMessage id={messageId} />
+				</span>
+				{toggleButton}
+			</span>
+		);
+	}
+
+	// this function throws alert on the browser notifying that map needs calibrating before display
+	private notifyCalibrationNeeded() {
+		showErrorNotification(`${this.props.intl.formatMessage({ id: 'map.notify.calibration.needed' })} "${this.props.map.name}"`);
+	}
+
+	private toggleNameInput() {
+		if (this.state.nameFocus) {
+			const editedMap = {
+				...this.props.map,
+				name: this.state.nameInput
+			};
+			this.props.editMapDetails(editedMap);
+		}
+		this.setState({ nameFocus: !this.state.nameFocus });
+	}
+
+	private handleNameChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ nameInput: event.target.value });
+	}
+
+	private formatName() {
+		let formattedName;
+		let buttonMessageId;
+		if (this.state.nameFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedName = <textarea id={'name'} autoFocus value={this.state.nameInput} onChange={event => this.handleNameChange(event)} />;
+			buttonMessageId = 'update';
+		} else {
+			formattedName = <div>{this.state.nameInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleNameInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return (
+				<div>
+					{formattedName}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.name}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private toggleNoteInput() {
+		if (this.state.noteFocus) {
+			const editedMap = {
+				...this.props.map,
+				note: this.state.noteInput
+			};
+			this.props.editMapDetails(editedMap);
+		}
+		this.setState({ noteFocus: !this.state.noteFocus });
+	}
+
+	private handleNoteChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
+		this.setState({ noteInput: event.target.value });
+	}
+
+	private formatNote() {
+		let formattedNote;
+		let buttonMessageId;
+		if (this.state.noteFocus) {
+			// default value for autoFocus is true and for all attributes that would be set autoFocus={true}
+			formattedNote = <textarea id={'note'} autoFocus value={this.state.noteInput} onChange={event => this.handleNoteChange(event)} />;
+			buttonMessageId = 'update';
+		} else {
+			formattedNote = <div>{this.state.noteInput}</div>;
+			buttonMessageId = 'edit';
+		}
+
+		let toggleButton;
+		if (hasToken()) {
+			toggleButton = <Button style={this.styleToggleBtn()} color='primary' onClick={this.toggleNoteInput}>
+				<FormattedMessage id={buttonMessageId} />
+			</Button>;
+		} else {
+			toggleButton = <div />;
+		}
+
+		if (hasToken()) {
+			return (
+				<div>
+					{formattedNote}
+					{toggleButton}
+				</div>
+			);
+		} else {
+			return (
+				<div>
+					{this.props.map.note}
+					{toggleButton}
+				</div>
+			);
+		}
+	}
+
+	private styleCalibrated(): React.CSSProperties {
+		return { color: 'black' };
+	}
+
+	private styleNotCalibrated(): React.CSSProperties {
+		return { color: 'gray' };
+	}
+
+	private formatCalibrationStatus() {
+		let styleFn;
+		let messageID;
+		if (this.props.map.origin && this.props.map.opposite) {
+			styleFn = this.styleCalibrated;
+			messageID = 'map.is.calibrated';
+		} else {
+			styleFn = this.styleNotCalibrated;
+			messageID = 'map.is.not.calibrated';
+		}
+		return (
+			<span>
+				<span style={styleFn()}>
+					<FormattedMessage id={messageID} />
+				</span>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
+					<Button style={this.styleToggleBtn()} color='primary'>
+						<FormattedMessage id='map.calibrate' />
+					</Button>
+				</Link>
+			</span>
+		);
+	}
+
+	private formatFilename() {
+		return (
+			<span>
+				<span>{this.props.map.filename}</span>
+				<Link to='/calibration' onClick={() => this.handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+					<Button style={this.styleToggleBtn()} color='primary'>
+						<FormattedMessage id='map.upload.new.file' />
+					</Button>
+				</Link>
+			</span>
+		);
+	}
+
+	private handleCalibrationSetting(mode: CalibrationModeTypes) {
+		this.props.setCalibration(mode, this.props.id);
+		this.updateUnsavedChanges();
+	}
+}
+
+export default injectIntl(MapViewComponent);
