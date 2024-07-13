@@ -9,22 +9,13 @@
  
  (async () => {
 	 let email;
-	 let newEmail;
 	 let password;
 	 let role;
- 
 	 try {
 		 email = await ask('Email of user to modify: ');
 	 } catch (err) {
 		 terminateReadline('Invalid email, no user modified');
 	 }
- 
-	 try {
-		 newEmail = await ask('New email (leave blank to keep current): ');
-	 } catch (err) {
-		 terminateReadline('Invalid email');
-	 }
- 
 	 password = await ask('Password: ');
  
 	 if (password.length < 8) {
@@ -43,28 +34,15 @@
 		 if (user === null) {
 			 terminateReadline('No user with that email exists');
 		 }
- 
-		 // Check if new email is provided and is different from current email
-		 if (newEmail && newEmail !== email) {
-			 const emailExists = await User.getByEmail(newEmail, conn);
-			 if (emailExists) {
-				 terminateReadline('A user with the new email already exists');
-			 } else {
-				 await User.updateUserEmail(user.id, newEmail, conn);
-				 console.log('User\'s email updated');
-			 }
-		 }
 	 } catch (err) {
 		 terminateReadline('User email lookup failed with err: ', err);
 	 }
  
 	 try {
 		 const passwordHash = bcrypt.hashSync(password, 10);
-		 await User.updateUserPassword(id, passwordHash, conn);
-		 await User.updateUserRole(id, role, conn);
-		 terminateReadline('User\'s password and role updated');
+		 await User.updateUserPassword(email, passwordHash, conn);
+		 terminateReadline('User\'s password updated');
 	 } catch (err) {
-		 terminateReadline('Failed to update user\'s password and role with error: ', err);
+		 terminateReadline('Failed to update user\'s password with error: ', err);
 	 }
  })();
- 
