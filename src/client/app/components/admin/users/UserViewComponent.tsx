@@ -13,7 +13,6 @@ import EditUserModalComponent from './EditUserModalComponent';
 
 interface UserViewComponentProps {
 	user: User;
-	localUsers: User[]; // Prop for localUsers
 }
 
 /**
@@ -50,7 +49,6 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 					user={props.user}
 					handleShow={handleShow}
 					handleClose={handleClose}
-					localUsers={props.localUsers} // Pass localUsers to modal
 				/>
 			</div>
 		</div>

@@ -39,7 +39,7 @@ class User {
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
-		return new User(row.id, row.email, row.password_hash, row.role);
+		return new User(row.id, row.email, row.password_hash, row.role, row.note);
 	}
 
 	/**
@@ -51,7 +51,7 @@ class User {
 	 */
 	static async getByEmail(email, conn) {
 		const row = await conn.oneOrNone(sqlFile('user/get_user_by_email.sql'), { email: email });
-		return row === null ? null : new User(row.id, row.email, row.password_hash, row.role);
+		return row === null ? null : new User(row.id, row.email, row.password_hash, row.role, row.note);
 	}
 
 	/**
@@ -70,7 +70,7 @@ class User {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('user/get_all_users.sql'));
-		return rows.map(row => new User(row.id, row.email, undefined, row.role));
+		return rows.map(row => new User(row.id, row.email, undefined, row.role, row.note));
 	}
 
 	/**

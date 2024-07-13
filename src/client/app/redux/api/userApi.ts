@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { NewUser, User } from '../../types/items';
+import { User } from '../../types/items';
 import { baseApi } from './baseApi';
 
 export const userApi = baseApi.injectEndpoints({
@@ -16,7 +16,7 @@ export const userApi = baseApi.injectEndpoints({
 			query: () => 'api/users',
 			providesTags: ['Users']
 		}),
-		createUser: builder.mutation<void, NewUser>({
+		createUser: builder.mutation<void, User>({
 			query: user => ({
 				url: 'api/users/create',
 				method: 'POST',

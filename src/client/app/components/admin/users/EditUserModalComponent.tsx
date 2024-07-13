@@ -15,7 +15,6 @@ import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 interface EditUserModalComponentProps {
 	show: boolean;
 	user: User;
-	localUsers: User[]; // New prop for localUsers
 	handleShow: () => void;
 	handleClose: () => void;
 }

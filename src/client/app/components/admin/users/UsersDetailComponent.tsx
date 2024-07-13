@@ -42,7 +42,6 @@ export default function UserDetailComponent() {
 								<UserViewComponent
 									key={user.email}
 									user={user}
-									localUsers={localUsers}
 								/>
 							))}
 				</div>
