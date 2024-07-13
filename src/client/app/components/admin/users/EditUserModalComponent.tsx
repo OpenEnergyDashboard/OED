@@ -90,10 +90,10 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		submitDeleteUser(email)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.delete.user'));
+				showSuccessNotification(translate('users.successfully.delete.user') + props.user.email);
 			})
-			.catch(() => {
-				showErrorNotification(translate('users.failed.to.delete.user'));
+			.catch(error => {
+				showErrorNotification(translate('users.failed.to.delete.user') + props.user.email + ' ' + error.data.message);
 			});
 	};
 
@@ -244,6 +244,11 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					</Container>
 				</ModalBody>
 				<ModalFooter>
+					{disableDelete ? (
+						<div className='text-danger px-3' >
+							<FormattedMessage id="delete.self" />
+						</div>
+					) : null}
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={disableDelete}>
 						<FormattedMessage id="delete.user" />
 					</Button>
