@@ -37,6 +37,10 @@ async function uploadMeters(req, res, filepath, conn) {
 	// as this makes the most logical sense (no update here) and it is consistent. To make this happen a for loop is used as it
 	// is sequential. A small negative is the database requests do not run in parallel in the usual case without an error.
 	// However, uploading meters is not common so slowing it down slightly seems a reasonable price to get this behavior.
+
+	// Create an array for updated or created meters to send back to the frontend so Redux can add them without invalidating all meters
+	const newOrUpdatedMeters = [];
+
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
@@ -100,16 +104,25 @@ async function uploadMeters(req, res, filepath, conn) {
 					});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
+				// add updated meter to send back to redux
+				newOrUpdatedMeters.push(currentMeter);
 			} else {
 				// Inserting the new meters.
-				await new Meter(undefined, ...meter).insert(conn)
-					.catch(error => {
-						// Probably duplicate meter.
-						throw new CSVPipelineError(
-							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
-					});
+				let currentMeter = new Meter(undefined, ...meter);
+				try {
+					await currentMeter.insert(conn);
+					// add new meters to send back to redux
+					newOrUpdatedMeters.push(currentMeter);
+				} catch (error) {
+					// Probably duplicate meter.
+					throw new CSVPipelineError(
+						`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
+				}
 			}
 		}
+		// send newly created meters and updated meters back to csv.js
+		return newOrUpdatedMeters;
+
 	} catch (error) {
 		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
 	}

@@ -4,50 +4,84 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import ApiBackend from './ApiBackend';
+import { baseApi } from '../../redux/api/baseApi';
+import { meterAdapter, metersApi } from '../../redux/api/metersApi';
 import {
-	ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, BooleanTypes, CSVUploadPreferencesForm, ReadingsCSVUploadPreferencesForm
+	BooleanTypes,
+	CSVUploadPreferencesForm,
+	MetersCSVUploadPreferencesItem,
+	ReadingsCSVUploadPreferencesForm,
+	ReadingsCSVUploadPreferencesItem
 } from '../../types/csvUploadForm';
+import { MeterData } from '../../types/redux/meters';
+import ApiBackend from './ApiBackend';
 
-export default class UploadCSVApi {
-	private readonly backend: ApiBackend;
-
-	constructor(backend: ApiBackend) {
-		this.backend = backend;
-	}
-
-	public async submitReadings(uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File): Promise<void> {
-		const formData = new FormData();
-		// The Boolean values in state must be converted to the submitted values of yes and no.
-		const uploadPreferencesForm: ReadingsCSVUploadPreferencesForm = {
-			...uploadPreferences,
-			gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
-			headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
-			update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false,
-			refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
-			honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,
-			relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false
-		};
-		for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
-			formData.append(preference, value.toString());
-		}
-		formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
-		return await this.backend.doPostRequest<void>('/api/csv/readings', formData);
-	}
-
-	public async submitMeters(uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File): Promise<void> {
-		const formData = new FormData();
-		// The Boolean values in state must be converted to the submitted values of yes and no.
-		const uploadPreferencesForm: CSVUploadPreferencesForm = {
-			...uploadPreferences,
-			gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
-			headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
-			update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false
-		};
-		for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
-			formData.append(preference, value.toString());
-		}
-		formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
-		await this.backend.doPostRequest<void>('/api/csv/meters', formData);
-	}
+interface MetersUploadResponse {
+	message: string;
+	meters: MeterData[];
 }
+
+export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File): Promise<void> => {
+
+	const backend = new ApiBackend();
+	const formData = new FormData();
+	// The Boolean values in state must be converted to the submitted values of yes and no.
+	const uploadPreferencesForm: ReadingsCSVUploadPreferencesForm = {
+		...uploadPreferences,
+		gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
+		headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
+		update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false,
+		refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
+		honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,
+		relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false
+	};
+	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
+		formData.append(preference, value.toString());
+	}
+	formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
+	return await backend.doPostRequest<void>('/api/csv/readings', formData);
+};
+
+export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File, dispatch: any): Promise<void> => {
+
+	const backend = new ApiBackend();
+	const formData = new FormData();
+	console.log('inside submitMeters!!');
+	// The Boolean values in state must be converted to the submitted values of yes and no.
+	const uploadPreferencesForm: CSVUploadPreferencesForm = {
+		...uploadPreferences,
+		gzip: uploadPreferences.gzip ? BooleanTypes.true : BooleanTypes.false,
+		headerRow: uploadPreferences.headerRow ? BooleanTypes.true : BooleanTypes.false,
+		update: uploadPreferences.update ? BooleanTypes.true : BooleanTypes.false
+	};
+	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
+		formData.append(preference, value.toString());
+	}
+	formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
+
+	try {
+		const response = await backend.doPostRequest<MetersUploadResponse>('/api/csv/meters', formData);
+		const { message, meters } = response;
+		console.log('Message:', message);
+		console.log('Meters:', meters);
+
+		// If new meters were added to DB, have redux add them to getMeters state
+		/// If meters were updated to the DB, invalidate meters
+		/// This is how the Redux metersAPI currently functions, so mirroring this functionality
+		if (uploadPreferences.update === true) {
+			dispatch(baseApi.util.invalidateTags(['MeterData']));
+			// meters were invalidated so all meter changes will now reflect in Redux state, now return
+			return;
+		} else {
+			// add each new meter into Redux state without invalidating all meters
+			meters.forEach(meter => {
+				dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => {
+					meterAdapter.addOne(cacheDraft, meter);
+				}));
+			});
+		}
+
+	} catch (error) {
+		console.error('Error submitting meters:', error);
+	}
+};

@@ -5,10 +5,9 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
-import { baseApi } from '../../redux/api/baseApi';
 import { useAppDispatch } from '../../redux/reduxHooks';
 import { MetersCSVUploadPreferencesItem } from '../../types/csvUploadForm';
-import { uploadCSVApi } from '../../utils/api';
+import { submitMeters } from '../../utils/api/UploadCSVApi';
 import { MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
@@ -21,29 +20,10 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns CSV Meters page element
  */
 export default function MetersCSVUploadComponent() {
-	const dispatch = useAppDispatch();
 	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferencesItem>(MetersCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
-
-	// This is needed until a React CSV API is created or integrated with the Redux meter API
-	const resetApiCache = () => {
-		dispatch(baseApi.util.invalidateTags(['MeterData']));
-	};
-
-	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (selectedFile) {
-			try {
-				await submitMeters(selectedFile);
-				showSuccessNotification('<h1> SUCCESS </h1>The meter was uploaded successfully.');
-			} catch (error) {
-				// A failed axios request should result in an error.
-				showErrorNotification(error.response.data as string);
-			}
-		}
-		resetApiCache();
-	};
+	const dispatch = useAppDispatch();
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
@@ -64,8 +44,12 @@ export default function MetersCSVUploadComponent() {
 		}));
 	};
 
-	const submitMeters = async (file: File) => {
-		return await uploadCSVApi.submitMeters(meterData, file);
+	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, checked } = e.target;
+		setMeterData(prevState => ({
+			...prevState,
+			[name]: checked
+		}));
 	};
 
 	const handleClear = () => {
@@ -76,6 +60,23 @@ export default function MetersCSVUploadComponent() {
 			update: false
 		});
 		setIsValidCSV(false);
+	};
+
+	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		console.log('inside submit!');
+		if (selectedFile) {
+			try {
+				console.log('SelectedFile is truthy! MeterData is: ' + JSON.stringify(meterData));
+				await submitMeters(meterData, selectedFile, dispatch);
+				console.log('after SubmitMeters await!');
+				showSuccessNotification('<h1> SUCCESS </h1>The meter was uploaded successfully.');
+			} catch (error) {
+				// A failed axios request should result in an error.
+				console.log('Error: ' + error);
+				showErrorNotification(error as string);
+			}
+		}
 	};
 
 	const tooltipStyle = {
@@ -119,7 +120,7 @@ export default function MetersCSVUploadComponent() {
 													type='checkbox'
 													id='gzip'
 													name='gzip'
-													onChange={handleChange}
+													onChange={handleCheckboxChange}
 												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.gzip')}
@@ -136,7 +137,7 @@ export default function MetersCSVUploadComponent() {
 													type='checkbox'
 													id='headerRow'
 													name='headerRow'
-													onChange={handleChange}
+													onChange={handleCheckboxChange}
 												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.header.row')}
@@ -153,7 +154,7 @@ export default function MetersCSVUploadComponent() {
 													type='checkbox'
 													id='update'
 													name='update'
-													onChange={handleChange}
+													onChange={handleCheckboxChange}
 												/>
 												<div className='ps-2'>
 													{translate('csv.common.param.update')}

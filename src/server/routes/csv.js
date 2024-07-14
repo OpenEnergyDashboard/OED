@@ -123,10 +123,13 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 		}
 
 		const conn = getConnection();
-		await uploadMeters(req, res, csvFilepath, conn);
-		success(req, res, 'Successfully inserted the meters.');
+		const newlyCreatedMeters = await uploadMeters(req, res, csvFilepath, conn);
+		// Send the newly created meters back to the frontend
+		res.status(201).send({ message: 'Successfully inserted the meters.', meters: newlyCreatedMeters});
+
 	} catch (error) {
 		failure(req, res, error);
+
 	} finally {
 		// Clean up files
 		fs.unlink(uploadedFilepath) // Delete the uploaded file.
