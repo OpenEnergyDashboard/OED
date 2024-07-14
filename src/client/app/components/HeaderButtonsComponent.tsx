@@ -173,7 +173,7 @@ export default function HeaderButtonsComponent() {
 								<FormattedMessage id='conversions' />
 							</DropdownItem>
 							<DropdownItem
-								style={state.csvViewableLinkStyle}
+								style={state.adminViewableLinkStyle}
 								disabled={state.shouldCSVMetersButtonDisabled}
 								tag={Link}
 								to="/csvMeters">

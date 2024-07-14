@@ -57,18 +57,18 @@ const router = createBrowserRouter([
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
-					{ path: 'maps', element: <MapsDetailContainer /> },
-					{ path: 'users/new', element: <CreateUserComponent /> },
-					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
-					{ path: 'users', element: <UsersDetailComponent /> }
+					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> },
+					{ path: 'maps', element: <MapsDetailContainer /> },
+					{ path: 'units', element: <UnitsDetailComponent /> },
+					{ path: 'users', element: <UsersDetailComponent /> },
+					{ path: 'users/new', element: <CreateUserComponent /> }
 				]
 			},
 			{
 				element: <RoleOutlet role={UserRole.CSV} />,
 				children: [
-					{ path: 'csvReadings', element: <ReadingsCSVUploadComponent /> },
-					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> }
+					{ path: 'csvReadings', element: <ReadingsCSVUploadComponent /> }
 				]
 			},
 			{ path: '*', element: <NotFound /> }
