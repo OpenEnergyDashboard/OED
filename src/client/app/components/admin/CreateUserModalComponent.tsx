@@ -7,7 +7,6 @@ import { userApi } from '../../redux/api/userApi';
 import { NewUser } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import { useNavigate } from 'react-router-dom';
 
 /**
  * Defines the create user modal form
@@ -21,7 +20,6 @@ export default function CreateUserModal() {
 	const [passwordMatch, setPasswordMatch] = useState(true);
 	const [role, setRole] = useState('');
 	const [createUser] = userApi.useCreateUserMutation();
-	const nav = useNavigate();
 
 	const handleShowModal = () => setShowModal(true);
 	const handleCloseModal = () => {
@@ -47,7 +45,6 @@ export default function CreateUserModal() {
 				.then(() => {
 					showSuccessNotification(translate('users.successfully.create.user'));
 					handleCloseModal();
-					nav('/users');
 				})
 				.catch(() => {
 					showErrorNotification(translate('users.failed.to.create.user'));

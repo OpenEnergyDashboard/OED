@@ -31,6 +31,13 @@ export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 				</button>
 				<button
 					type="button"
+					className={`${props.selectedPreference === 'users' ? 'btn btn-primary' : 'btn btn-light'}`}
+					onClick={() => props.onSelectPreference('users')}
+				>
+					{translate('users')}
+				</button>
+				<button
+					type="button"
 					className={`${props.selectedPreference === 'misc' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('misc')}
 				>

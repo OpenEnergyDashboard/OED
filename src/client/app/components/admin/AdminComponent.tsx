@@ -40,7 +40,7 @@ export default function AdminComponent() {
 				<div className='row border flexGrowOne'>
 					<AdminSideBar onSelectPreference={setSelectedPreference} selectedPreference={selectedPreference}/>
 					<div className='col-9'>
-						<div className='col-12 col-lg-6 p-3'>
+						<div className='col-12 col-lg-6 p-3 w-100'>
 							<PreferencesComponent selectedPreference={selectedPreference}/>
 						</div>
 					</div>

@@ -16,6 +16,7 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
+import UserDetailComponent from './UsersDetailComponent';
 
 interface PreferencesProps {
 	selectedPreference: string;
@@ -330,6 +331,13 @@ export default function PreferencesComponent(props: PreferencesProps) {
 					</div>
 				</>
 			}
+
+			{
+				props.selectedPreference === 'users' &&
+				<>
+					<UserDetailComponent />
+				</>
+			}
 			<Button
 				type='submit'
 				onClick={() => submitPreferences(localAdminPref)
@@ -341,6 +349,7 @@ export default function PreferencesComponent(props: PreferencesProps) {
 						showErrorNotification(translate('failed.to.submit.changes'));
 					})}
 				disabled={!hasChanges}
+				className={`${props.selectedPreference === 'users' ? "d-none" : "d-block"}`}
 			>
 				{translate('submit')}
 			</Button>
