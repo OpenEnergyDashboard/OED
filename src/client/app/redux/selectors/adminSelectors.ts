@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { sortBy } from 'lodash';
 import * as moment from 'moment';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectAllGroups } from '../../redux/api/groupsApi';
@@ -48,7 +48,7 @@ export const selectPossibleMeterUnits = createAppSelector(
 			}
 		});
 		// Put in alphabetical order.
-		possibleMeterUnits = new Set(_.sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+		possibleMeterUnits = new Set(sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
 		// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 		return possibleMeterUnits.add(noUnitTranslated());
 	}

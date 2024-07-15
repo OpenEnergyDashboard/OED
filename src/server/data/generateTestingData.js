@@ -18,7 +18,6 @@
 const util = require('util');
 const fs = require('fs').promises;
 const stringify = require('csv-stringify');
-const _ = require('lodash');
 const moment = require('moment');
 const { log } = require('../log');
 

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { omit, difference } from 'lodash';
 import {
 	BarReadingApiArgs,
 	CompareReadingApiArgs,
@@ -36,7 +36,7 @@ export const readingsApi = baseApi.injectEndpoints({
 				// an entry for each means requesting the same data again for ALL meters. which results in too much duplicate data requests
 
 				// We keep all args other than the ids.
-				return _.omit(queryArgs, 'ids');
+				return omit(queryArgs, 'ids');
 			},
 			merge: (currentCacheData, responseData) => {
 				// By default subsequent queries that resolve to the same cache entry will overwrite the existing data.
@@ -76,7 +76,7 @@ export const readingsApi = baseApi.injectEndpoints({
 				// get the args provided in the original request
 				const { ids, timeInterval, graphicUnitId, meterOrGroup } = args;
 				// subtract any already cached keys from the requested ids, and stringify the array for the url endpoint
-				const idsToFetch = _.difference(ids, cachedIDs).join(',');
+				const idsToFetch = difference(ids, cachedIDs).join(',');
 
 
 				// use the baseQuery from the queryFn with our url endpoint
@@ -94,7 +94,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		}),
 		bar: builder.query<BarReadings, BarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
-			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
+			serializeQueryArgs: ({ queryArgs }) => omit(queryArgs, 'ids'),
 			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
@@ -106,14 +106,14 @@ export const readingsApi = baseApi.injectEndpoints({
 				const state = queryApi.getState() as RootState;
 				const cachedData = readingsApi.endpoints.bar.select(args)(state).data;
 				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : [];
-				const idsToFetch = _.difference(ids, cachedIDs).join(',');
+				const idsToFetch = difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `api/unitReadings/bar/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as BarReadings };
 			},
 			providesTags: ['Readings']
 		}),
 		compare: builder.query<CompareReadings, CompareReadingApiArgs>({
-			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
+			serializeQueryArgs: ({ queryArgs }) => omit(queryArgs, 'ids'),
 			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
@@ -125,7 +125,7 @@ export const readingsApi = baseApi.injectEndpoints({
 				const state = queryApi.getState() as RootState;
 				const cachedData = readingsApi.endpoints.compare.select(args)(state).data;
 				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : [];
-				const idsToFetch = _.difference(ids, cachedIDs).join(',');
+				const idsToFetch = difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `/api/compareReadings/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as CompareReadings };
 			},
@@ -133,7 +133,7 @@ export const readingsApi = baseApi.injectEndpoints({
 		}),
 		radar: builder.query<LineReadings, RadarReadingApiArgs>({
 			// Refer to line endpoint for detailed explanation as the logic is identical
-			serializeQueryArgs: ({ queryArgs }) => _.omit(queryArgs, 'ids'),
+			serializeQueryArgs: ({ queryArgs }) => omit(queryArgs, 'ids'),
 			merge: (currentCacheData, responseData) => { Object.assign(currentCacheData, responseData); },
 			forceRefetch: ({ currentArg, endpointState }) => {
 				const currentData = endpointState?.data ? Object.keys(endpointState.data).map(Number) : [];
@@ -145,7 +145,7 @@ export const readingsApi = baseApi.injectEndpoints({
 				const state = queryApi.getState() as RootState;
 				const cachedData = readingsApi.endpoints.radar.select(args)(state).data;
 				const cachedIDs = cachedData ? Object.keys(cachedData).map(Number) : [];
-				const idsToFetch = _.difference(ids, cachedIDs).join(',');
+				const idsToFetch = difference(ids, cachedIDs).join(',');
 				const { data, error } = await baseQuery({ url: `api/unitReadings/radar/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as LineReadings };
 			},
