@@ -7,7 +7,6 @@ import { userApi } from '../../../redux/api/userApi';
 import { User } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
-import { useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../../redux/reduxHooks';
 import { selectDefaultCreateMeterValues } from '../../../redux/selectors/adminSelectors';
 
@@ -25,14 +24,7 @@ export default function CreateUserModal() {
 
 	// Handlers for each type of input change
 	const [userDetails, setUserDetails] = useState(defaultValues);
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
-	const [role, setRole] = useState('');
-	const [note, setNote] = useState('');
-	const [passwordMatch, setPasswordMatch] = useState(true);
 	const [createUser] = userApi.useCreateUserMutation();
-	const nav = useNavigate();
 
 	const handleShowModal = () => setShowModal(true);
 	const handleCloseModal = () => {

@@ -335,52 +335,6 @@ export const selectDefaultCreateConversionValues = createAppSelector(
 	}
 );
 
-export const selectDefaultCreateUserValues = createAppSelector(
-	[selectAdminPreferences],
-	adminPreferences => {
-		const defaultValues = {
-			id: -99,
-			identifier: '',
-			name: '',
-			area: 0,
-			enabled: false,
-			displayable: false,
-			meterType: '',
-			url: '',
-			timeZone: '',
-			// String type conflicts with MeterDataType GPSPoint
-			gps: '',
-			// Defaults of -999 (not to be confused with -99 which is no unit)
-			// Purely for allowing the default select to be "select a ..."
-			unitId: -999,
-			defaultGraphicUnit: -999,
-			note: '',
-			cumulative: false,
-			cumulativeReset: false,
-			cumulativeResetStart: '',
-			cumulativeResetEnd: '',
-			endOnlyTime: false,
-			readingGap: adminPreferences.defaultMeterReadingGap,
-			readingVariation: 0,
-			readingDuplication: 1,
-			timeSort: MeterTimeSortType.increasing,
-			reading: 0.0,
-			startTimestamp: '',
-			endTimestamp: '',
-			previousEnd: '',
-			areaUnit: AreaUnitType.none,
-			readingFrequency: adminPreferences.defaultMeterReadingFrequency,
-			minVal: adminPreferences.defaultMeterMinimumValue,
-			maxVal: adminPreferences.defaultMeterMaximumValue,
-			minDate: adminPreferences.defaultMeterMinimumDate,
-			maxDate: adminPreferences.defaultMeterMaximumDate,
-			maxError: adminPreferences.defaultMeterMaximumErrors,
-			disableChecks: adminPreferences.defaultMeterDisableChecks
-		};
-		return defaultValues;
-	}
-);
-
 /* Create Meter Validation:
 	Name cannot be blank
 	Area must be positive or zero
