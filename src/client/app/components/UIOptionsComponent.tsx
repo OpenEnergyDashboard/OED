@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
-import AreaUnitSelectComponent from './AreaUnitSelectComponent';
+//import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import BarControlsComponent from './BarControlsComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 //import ChartLinkComponent from './ChartLinkComponent';
@@ -19,6 +19,7 @@ import DateRangeComponent from './DateRangeComponent';
 //import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
+import MoreOptionsComponent from './MoreOptionsComponent';
 
 /**
  * @returns the UI Control panel
@@ -64,7 +65,6 @@ export default function UIOptionsComponent() {
 			<ReactTooltip event='custom-event' className='tip' id='select-tooltips' />
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
-			<AreaUnitSelectComponent />
 
 			{/* UI options for line graphic */}
 			{chartToRender == ChartTypes.line}
@@ -84,6 +84,8 @@ export default function UIOptionsComponent() {
 
 			{/* UI options for radar graphic */}
 			{chartToRender == ChartTypes.radar}
+
+			<MoreOptionsComponent />
 
 		</div>
 	);
