@@ -5,15 +5,21 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
-import '../styles/modal.css';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender } from '../redux/slices/graphSlice';
-//import ExportComponent from '../components/ExportComponent';
-//import AreaUnitSelectComponent from './AreaUnitSelectComponent';
-//import ChartLinkComponent from './ChartLinkComponent';
-//import ErrorBarComponent from './ErrorBarComponent';
-//import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import { ChartTypes } from '../types/redux/graph';
+import '../styles/modal.css';
+import AreaUnitSelectComponent from './AreaUnitSelectComponent';
+import ChartLinkComponent from './ChartLinkComponent';
+import DateRangeComponent from './DateRangeComponent';
+import ErrorBarComponent from './ErrorBarComponent';
+import ExportComponent from '../components/ExportComponent';
+import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 
+/**
+ * Modal popup control for various graph types
+ * @returns Custom Modal depending on selected graph type
+ */
 export default function MoreOptionsComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const [showModal, setShowModal] = useState(false);
@@ -29,10 +35,42 @@ export default function MoreOptionsComponent() {
 					<Button color='secondary' outline onClick={handleShow}>
 						More Options
 					</Button>
-					<Modal isOpen={showModal} toggle={handleClose} size='lg'>
-						<ModalHeader>More options for '{chartToRender}' graph type:</ModalHeader>
+					<Modal isOpen={showModal} toggle={handleClose} size='md'>
+						<ModalHeader>More Options for '{chartToRender}' Graph Type:</ModalHeader>
 						<ModalBody>
-							Test test
+							{/* More UI options for line graphic */}
+							{chartToRender == ChartTypes.line && <GraphicRateMenuComponent />}
+							{chartToRender == ChartTypes.line && <DateRangeComponent />}
+							{chartToRender == ChartTypes.line && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.line && <ErrorBarComponent />}
+							{chartToRender == ChartTypes.line && <ExportComponent />}
+							{chartToRender == ChartTypes.line && <ChartLinkComponent />}
+
+							{/* More UI options for bar graphic */}
+							{chartToRender == ChartTypes.bar && <DateRangeComponent />}
+							{chartToRender == ChartTypes.bar && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.bar && <ExportComponent />}
+							{chartToRender == ChartTypes.bar && <ChartLinkComponent />}
+
+							{/* More UI options for compare graphic */}
+							{chartToRender == ChartTypes.compare && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.compare && <ChartLinkComponent />}
+
+							{/* More UI options for map graphic */}
+							{chartToRender == ChartTypes.map && <DateRangeComponent />}
+							{chartToRender == ChartTypes.map && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.map && <ChartLinkComponent />}
+
+							{/* More UI options for 3D graphic */}
+							{chartToRender == ChartTypes.threeD && <GraphicRateMenuComponent />}
+							{chartToRender == ChartTypes.threeD && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.threeD && <ChartLinkComponent />}
+
+							{/* More UI options for radar graphic */}
+							{chartToRender == ChartTypes.radar && <GraphicRateMenuComponent />}
+							{chartToRender == ChartTypes.radar && <DateRangeComponent />}
+							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
 						</ModalBody>
 						<ModalFooter></ModalFooter>
 					</Modal>
