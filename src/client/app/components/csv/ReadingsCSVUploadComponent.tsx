@@ -10,7 +10,7 @@ import { selectDefaultCreateMeterValues, selectVisibleMeterAndGroupData } from '
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { BooleanMeterTypes, ReadingsCSVUploadPreferencesItem, TimeSortTypes } from '../../types/csvUploadForm';
 import { MeterData } from '../../types/redux/meters';
-import { uploadCSVApi } from '../../utils/api';
+import { submitReadings } from '../../utils/api/UploadCSVApi';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
 import { range } from '../../utils/range';
@@ -44,6 +44,7 @@ export default function ReadingsCSVUploadComponent() {
 	const [createdMeterIdentifier, setCreatedMeterIdentifier] = React.useState<string | null>(null);
 	// tracks whether or not a meter has been selected
 	const meterIsSelected = selectedMeter.identifier !== '';
+	// tracks if file has .gzip or .csv extension
 	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
 
 	// gets the meter identifier and updates the created meter identifier to signal a new meter was created
@@ -68,12 +69,15 @@ export default function ReadingsCSVUploadComponent() {
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
-		if (!file) return;
-		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
-			setIsValidCSV(true);
+		if (!file) {
+			//do nothing
 		} else {
-			setIsValidCSV(false);
-			showErrorNotification(translate('csv.file.error') + file.name);
+			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
+				setIsValidCSV(true);
+			} else {
+				setIsValidCSV(false);
+				showErrorNotification(translate('csv.file.error') + file.name);
+			}
 		}
 	};
 
@@ -116,19 +120,11 @@ export default function ReadingsCSVUploadComponent() {
 		}
 	};
 
-	const submitReadings = async (file: File) => {
-		return await uploadCSVApi.submitReadings(readingsData, file);
-	};
-
-	// dispatch(fetchMetersDetails());
-	// TODO Using an alert is not the best. At some point this should be integrated
-	// with react.
-	// There should be a message (not void) but that is not the type so overriding.
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
 			try {
-				const msg = await submitReadings(selectedFile);
+				const msg = await submitReadings(readingsData, selectedFile);
 				showInfoNotification(msg as unknown as string);
 			} catch (error) {
 				// A failed axios request should result in an error.
@@ -219,7 +215,7 @@ export default function ReadingsCSVUploadComponent() {
 								</div>
 								<Input type='select' id='duplications' name='duplications' value={selectedMeter?.readingDuplication || ''} onChange={handleChange}>
 									{range(1, 10).map(i => (
-										<option key={i} value={`${i}`}> {i} </option>
+										<option key={i} value={i}> {i} </option>
 									))}
 								</Input>
 							</Label>
@@ -266,7 +262,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='select'
 												id='cumulativeReset'
 												name='cumulativeReset'
-												value={getBooleanMeterType(selectedMeter?.cumulative)}
+												value={getBooleanMeterType(selectedMeter?.cumulativeReset)}
 												onChange={handleChange}
 											>
 												<option value={BooleanMeterTypes.meter}> {translate('BooleanMeterTypes.meter')} </option>
@@ -288,7 +284,6 @@ export default function ReadingsCSVUploadComponent() {
 												id='cumulativeResetStart'
 												name='cumulativeResetStart'
 												onChange={handleChange}
-												required
 												value={selectedMeter?.cumulativeResetStart || ''}
 												placeholder={ReadingsCSVUploadDefaults.cumulativeResetStart}
 											/>
@@ -472,7 +467,7 @@ export default function ReadingsCSVUploadComponent() {
 						</FormGroup>
 						<div className='d-flex flex-row-reverse'>
 							<div className='p-3'>
-								<Button color='primary' type='submit' disabled={!isValidCSV}>
+								<Button color='primary' type='submit' disabled={!isValidCSV || !meterIsSelected}>
 									{translate('csv.submit.button')}
 								</Button>
 							</div>

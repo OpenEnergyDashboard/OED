@@ -27,12 +27,15 @@ export default function MetersCSVUploadComponent() {
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
-		if (!file) return;
-		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
-			setIsValidCSV(true);
+		if (!file) {
+			//do nothing
 		} else {
-			setIsValidCSV(false);
-			showErrorNotification(translate('csv.file.error') + file.name);
+			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
+				setIsValidCSV(true);
+			} else {
+				setIsValidCSV(false);
+				showErrorNotification(translate('csv.file.error') + file.name);
+			}
 		}
 	};
 

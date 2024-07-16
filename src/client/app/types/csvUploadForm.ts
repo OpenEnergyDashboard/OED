@@ -47,7 +47,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	cumulativeReset: BooleanMeterTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
-	duplications: string; // Not sure how to type this an integer string;
+	duplications: number;
 	endOnly: BooleanMeterTypes;
 	honorDst: boolean;
 	lengthGap: string;
@@ -63,7 +63,7 @@ export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesFo
 	cumulativeReset: BooleanMeterTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
-	duplications: string; // Not sure how to type this an integer string;
+	duplications: number;
 	endOnly: BooleanMeterTypes;
 	honorDst: BooleanTypes;
 	lengthGap: string;

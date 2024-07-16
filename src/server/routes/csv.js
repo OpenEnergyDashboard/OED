@@ -125,7 +125,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 		const conn = getConnection();
 		const newlyCreatedMeters = await uploadMeters(req, res, csvFilepath, conn);
 		// Send the newly created meters back to the frontend
-		res.status(201).send({ message: 'Successfully inserted the meters.', meters: newlyCreatedMeters});
+		res.status(201).send({ message: 'Successfully inserted the meters.', meters: newlyCreatedMeters });
 
 	} catch (error) {
 		failure(req, res, error);
@@ -151,8 +151,8 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip ===  BooleanTypesJS.true;
-	const isRefreshReadings = req.body.refreshReadings === BooleanTypesJS.true;
+	const isGzip = (req.body.gzip === BooleanTypesJS.true);
+	const isRefreshReadings = (req.body.refreshReadings === BooleanTypesJS.true);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	let isAllReadingsOk;

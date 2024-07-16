@@ -19,19 +19,18 @@ const Meter = require('../../models/Meter');
 async function uploadReadings(req, res, filepath, conn) {
 	const { meterIdentifier, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
 	// The next few have no value in the DB for a meter so always use the value passed.
-	const hasHeaderRow = (headerRow ===  BooleanTypesJS.true);
-	const shouldUpdate = (update ===  BooleanTypesJS.true);
-	let shouldHonorDst = (honorDst ===  BooleanTypesJS.true);
-	let shouldRelaxedParsing = (relaxedParsing ===  BooleanTypesJS.true);
+	const hasHeaderRow = (headerRow === BooleanTypesJS.true);
+	const shouldUpdate = (update === BooleanTypesJS.true);
+	let shouldHonorDst = (honorDst === BooleanTypesJS.true);
+	let shouldRelaxedParsing = (relaxedParsing === BooleanTypesJS.true);
 	let meter = await Meter.getByIdentifier(meterIdentifier, conn)
 		.catch(async err => {
-				// If Meter does not exist, we do not know what to do with the readings so we error out.
-				throw new CSVPipelineError(
-					`User Error: Meter with identifier '${meterIdentifier}' not found.`,
-					err.message
-				);
+			// If Meter does not exist, we do not know what to do with the readings so we error out.
+			throw new CSVPipelineError(
+				`User Error: Meter with identifier '${meterIdentifier}' not found.`,
+				err.message
+			);
 		});
-	console.log('The meter details from getByIdentifier: ' + meter);
 	// Handle other parameter defaults
 	let { timeSort, duplications, cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 		lengthGap, lengthVariation, endOnly } = req.body;
@@ -183,7 +182,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		maxError: meter.maxError,
 		disableChecks: meter.disableChecks
 	}
-	
+
 	return await loadCsvInput(
 		filepath,
 		meter.id,
