@@ -8,13 +8,23 @@ import { User } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
 import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../../../redux/reduxHooks';
+import { selectDefaultCreateMeterValues } from '../../../redux/selectors/adminSelectors';
 
 /**
  * Defines the create user modal form
  * @returns CreateUserModal component
  */
 export default function CreateUserModal() {
+	// Memo'd memoized selector
+	const defaultValues = useAppSelector(selectDefaultCreateMeterValues);
+
+	/* State */
+	// Modal show
 	const [showModal, setShowModal] = useState(false);
+
+	// Handlers for each type of input change
+	const [userDetails, setUserDetails] = useState(defaultValues);
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,7 +59,6 @@ export default function CreateUserModal() {
 				.then(() => {
 					showSuccessNotification(translate('users.successfully.create.user'));
 					handleCloseModal();
-					nav('/users');
 				})
 				.catch(() => {
 					showErrorNotification(translate('users.failed.to.create.user'));
