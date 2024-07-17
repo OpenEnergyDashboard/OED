@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as _ from 'lodash';
+import { range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -26,7 +27,6 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
-import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';

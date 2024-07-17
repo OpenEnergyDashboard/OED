@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { range } from 'lodash';
 import * as React from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
@@ -13,7 +14,6 @@ import { MeterData } from '../../types/redux/meters';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
-import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';

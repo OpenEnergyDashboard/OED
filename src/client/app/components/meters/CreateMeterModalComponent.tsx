@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useState } from 'react';
@@ -24,7 +25,6 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import { range } from '../../utils/range';
 import translate from '../../utils/translate';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
