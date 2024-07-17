@@ -30,7 +30,7 @@ mocha.describe('PIPELINE: Load data from csv file', () => {
 		await arrayMeter.insert(conn);
 		// Return value is ignored for now.
 		await loadCsvInput(testFilePath, arrayMeter.id, mapRowsToModel, 'increasing', 1, false, false, '0:00:00', '0:00:00',
-			0, 0, false, false, false, undefined, conn, false, false);
+			0, 0, false, false, false, undefined, conn, false, false, false);
 		const result = await Reading.getAllByMeterID(arrayMeter.id, conn);
 		expect(result.length).to.equal(arrayInput.length);
 		let i = 0;

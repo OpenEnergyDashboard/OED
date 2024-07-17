@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as _ from 'lodash';
+import { sortBy } from 'lodash';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -522,7 +522,7 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
 	}
 
 	/**
@@ -541,7 +541,7 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
 	}
 
 	/**

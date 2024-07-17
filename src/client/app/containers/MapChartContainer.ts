@@ -4,7 +4,7 @@
 
 
 
-import * as _ from 'lodash';
+import { orderBy } from 'lodash';
 import * as moment from 'moment';
 import Plot, { PlotParams } from 'react-plotly.js';
 import { connect } from 'react-redux';
@@ -147,7 +147,7 @@ function mapStateToProps(state: State) {
 									// This has the limitations of the bar value where the last one can include ranges without
 									// data (GitHub issue on this).
 									// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-									const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+									const readings = orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
 									const mapReading = readings[0];
 									let timeReading: string;
 									let averagedReading = 0;
@@ -224,7 +224,7 @@ function mapStateToProps(state: State) {
 									// This has the limitations of the bar value where the last one can include ranges without
 									// data (GitHub issue on this).
 									// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-									const readings = _.orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
+									const readings = orderBy(readingsData.readings, ['startTimestamp'], ['desc']);
 									const mapReading = readings[0];
 									let timeReading: string;
 									let averagedReading = 0;

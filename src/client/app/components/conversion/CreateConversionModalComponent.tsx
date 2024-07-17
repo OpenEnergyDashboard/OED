@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { omit } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -87,7 +87,7 @@ export default function CreateConversionModalComponent() {
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			//
-			addConversionMutation(_.omit(conversionState, 'sourceOptions'));
+			addConversionMutation(omit(conversionState, 'sourceOptions'));
 			resetState();
 		} else {
 			showErrorNotification(reason);

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Input } from 'reactstrap';
@@ -24,15 +24,15 @@ import { defaultAdminState } from '../../redux/slices/adminSlice';
  */
 export default function PreferencesComponent() {
 	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
-	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(_.cloneDeep(adminPreferences));
+	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(cloneDeep(adminPreferences));
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
 	// mutation will invalidate preferences tag and will be re-fetched.
 	// On query response, reset local changes to response
-	React.useEffect(() => { setLocalAdminPref(_.cloneDeep(adminPreferences)); }, [adminPreferences]);
+	React.useEffect(() => { setLocalAdminPref(cloneDeep(adminPreferences)); }, [adminPreferences]);
 	// Compare the API response against the localState to determine changes
-	React.useEffect(() => { setHasChanges(!_.isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
+	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
 	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
 		setLocalAdminPref({ ...localAdminPref, [key]: value });

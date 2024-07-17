@@ -28,7 +28,8 @@ export default class UploadCSVApi {
 			refreshHourlyReadings: uploadPreferences.refreshHourlyReadings ? BooleanTypes.true : BooleanTypes.false,
 			refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
 			honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,
-			relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false
+			relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false,
+			useMeterZone: uploadPreferences.useMeterZone ? BooleanTypes.true : BooleanTypes.false
 		};
 		for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 			formData.append(preference, value.toString());
