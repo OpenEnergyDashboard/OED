@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { orderBy } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
@@ -183,7 +183,7 @@ export default function MapChartComponent() {
 								// This has the limitations of the bar value where the last one can include ranges without
 								// data (GitHub issue on this).
 								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-								const readings = _.orderBy(readingsData, ['startTimestamp'], ['desc']);
+								const readings = orderBy(readingsData, ['startTimestamp'], ['desc']);
 								const mapReading = readings[0];
 								let timeReading: string;
 								let averagedReading = 0;
@@ -257,7 +257,7 @@ export default function MapChartComponent() {
 								// This has the limitations of the bar value where the last one can include ranges without
 								// data (GitHub issue on this).
 								// TODO: It might be better to do this similarly to compare. (See GitHub issue)
-								const readings = _.orderBy(readingsData, ['startTimestamp'], ['desc']);
+								const readings = orderBy(readingsData, ['startTimestamp'], ['desc']);
 								const mapReading = readings[0];
 								let timeReading: string;
 								let averagedReading = 0;

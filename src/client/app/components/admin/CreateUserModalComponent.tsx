@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
 import * as React from 'react';
 import { useState } from 'react';
 import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
@@ -7,7 +11,6 @@ import { userApi } from '../../redux/api/userApi';
 import { NewUser } from '../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import { useNavigate } from 'react-router-dom';
 
 /**
  * Defines the create user modal form
@@ -21,7 +24,6 @@ export default function CreateUserModal() {
 	const [passwordMatch, setPasswordMatch] = useState(true);
 	const [role, setRole] = useState('');
 	const [createUser] = userApi.useCreateUserMutation();
-	const nav = useNavigate();
 
 	const handleShowModal = () => setShowModal(true);
 	const handleCloseModal = () => {
@@ -47,7 +49,6 @@ export default function CreateUserModal() {
 				.then(() => {
 					showSuccessNotification(translate('users.successfully.create.user'));
 					handleCloseModal();
-					nav('/users');
 				})
 				.catch(() => {
 					showErrorNotification(translate('users.failed.to.create.user'));

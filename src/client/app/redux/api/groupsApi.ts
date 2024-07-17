@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { EntityState, Update, createEntityAdapter } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
+import { omit } from 'lodash';
 import { RootState } from '../../store';
 import { GroupChildren, GroupData } from '../../types/redux/groups';
 import { showErrorNotification } from '../../utils/notifications';
@@ -63,7 +63,7 @@ export const groupsApi = baseApi.injectEndpoints({
 				url: 'api/groups/create',
 				method: 'POST',
 				// omit the 'id' property of the groupData or api errors/fails
-				body: _.omit(groupData, 'id')
+				body: omit(groupData, 'id')
 			}),
 			invalidatesTags: ['GroupData', 'GroupChildrenData']
 		}),

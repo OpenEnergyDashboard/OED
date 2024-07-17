@@ -53,6 +53,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		this.toggleTab = this.toggleTab.bind(this);
 		this.toggleHonorDst = this.toggleHonorDst.bind(this);
 		this.toggleRelaxedParsing = this.toggleRelaxedParsing.bind(this);
+		this.toggleUseMeterZone = this.toggleUseMeterZone.bind(this);
 	}
 
 	state = {
@@ -230,6 +231,16 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 		}));
 	}
 
+	private toggleUseMeterZone() {
+		this.setState(previousState => ({
+			...previousState,
+			uploadReadingsPreferences: {
+				...previousState.uploadReadingsPreferences,
+				useMeterZone: !previousState.uploadReadingsPreferences.useMeterZone
+			}
+		}));
+	}
+
 	private toggleUpdate(mode: MODE) {
 		const preference = (mode === MODE.readings) ? 'uploadReadingsPreferences' : 'uploadMetersPreferences';
 		return () => {
@@ -305,6 +316,7 @@ export default class UploadCSVContainer extends React.Component<{}, UploadCSVCon
 							toggleRefreshReadings={this.toggleRefreshReadings}
 							toggleHonorDst={this.toggleHonorDst}
 							toggleRelaxedParsing={this.toggleRelaxedParsing}
+							toggleUseMeterZone={this.toggleUseMeterZone}
 							toggleUpdate={this.toggleUpdate(MODE.readings)}
 						/>
 					</TabPane>
