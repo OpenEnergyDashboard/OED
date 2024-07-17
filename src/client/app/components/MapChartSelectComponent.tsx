@@ -46,6 +46,7 @@ export default function MapChartSelectComponent() {
 		<div>
 			<p style={labelStyle}>
 				<FormattedMessage id='maps' />:
+				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 			</p>
 			<div style={divBottomPadding}>
 				<SingleSelectComponent
@@ -56,7 +57,6 @@ export default function MapChartSelectComponent() {
 					//When we specify stuff in actions files, we also specify other variables, in this case mapID.
 					//This is where we specify values instead of triggering the action by itself.
 				/>
-				<TooltipMarkerComponent page='home' helpTextId='help.home.select.maps'/>
 			</div>
 		</div>
 	);
