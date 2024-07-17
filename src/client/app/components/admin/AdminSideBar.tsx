@@ -24,14 +24,14 @@ export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 					className={`${props.selectedPreference === 'graph' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('graph')}
 				>
-                    {translate('graph')}
+					{translate('graph')}
 				</button>
 				<button
 					type="button"
 					className={`${props.selectedPreference === 'meter' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('meter')}
 				>
-                    {translate('meter')}
+					{translate('meter')}
 				</button>
 				<button
 					type="button"
@@ -45,7 +45,7 @@ export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 					className={`${props.selectedPreference === 'misc' ? 'btn btn-primary' : 'btn btn-light'}`}
 					onClick={() => props.onSelectPreference('misc')}
 				>
-                    {translate('misc')}
+					{translate('misc')}
 				</button>
 			</div>
 

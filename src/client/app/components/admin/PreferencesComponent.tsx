@@ -24,6 +24,7 @@ interface PreferencesProps {
 
 // TODO: Add warning for invalid data
 /**
+ * @param props variables passed in to define
  * @returns Preferences Component for Administrative use
  */
 export default function PreferencesComponent(props: PreferencesProps) {
@@ -349,7 +350,7 @@ export default function PreferencesComponent(props: PreferencesProps) {
 						showErrorNotification(translate('failed.to.submit.changes'));
 					})}
 				disabled={!hasChanges}
-				className={`${props.selectedPreference === 'users' ? "d-none" : "d-block"}`}
+				className={`${props.selectedPreference === 'users' ? 'd-none' : 'd-block'}`}
 			>
 				{translate('submit')}
 			</Button>

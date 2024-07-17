@@ -15,7 +15,7 @@ import translate from '../utils/translate';
 export interface UnsavedWarningProps {
 	changes: any;
 	hasUnsavedChanges: boolean;
-	successMessage: LocaleDataKey; 
+	successMessage: LocaleDataKey;
 	failureMessage: LocaleDataKey;
 	submitChanges: MutationTrigger<any>;
 }
