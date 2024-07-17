@@ -113,7 +113,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('user.confirm.delete') + props.user.email + '?';
+	const deleteConfirmationMessage = translate('user.delete.confirm') + props.user.email + '?';
 	const deleteConfirmText = translate('delete.user');
 	const deleteRejectText = translate('cancel');
 
