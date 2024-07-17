@@ -1,30 +1,38 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
-import { UserRole } from '../../../types/items';
+import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
+	ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { userApi } from '../../../redux/api/userApi';
-import { User } from '../../../types/items';
+import { User, UserRole } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
-import { useAppSelector } from '../../../redux/reduxHooks';
-import { selectDefaultCreateMeterValues } from '../../../redux/selectors/adminSelectors';
 
 /**
  * Defines the create user modal form
  * @returns CreateUserModal component
  */
 export default function CreateUserModal() {
-	// Memo'd memoized selector
-	const defaultValues = useAppSelector(selectDefaultCreateMeterValues);
+
+	// user default values
+	const userDefaults = {
+		email: '',
+		password: '',
+		confirmPassword: '',
+		role: '',
+		note: '',
+		passwordMatch: true
+	};
+
+	// user api
+	const [createUser] = userApi.useCreateUserMutation();
 
 	/* State */
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
 
-	// Handlers for each type of input change
-	const [userDetails, setUserDetails] = useState(defaultValues);
-	const [createUser] = userApi.useCreateUserMutation();
+	// create user form state
+	const [userDetails, setUserDetails] = useState(userDefaults);
 
 	const handleShowModal = () => setShowModal(true);
 	const handleCloseModal = () => {
@@ -32,35 +40,39 @@ export default function CreateUserModal() {
 		resetForm();
 	};
 
+	// Handlers for each type of input change
+	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setUserDetails(prevDetails => ({
+			...prevDetails, ...userDetails, [e.target.name]: e.target.value
+		}));
+	};
+
+	const handleRoleChange = (newRole: UserRole) => {
+		setUserDetails(prevDetails => ({
+			...prevDetails,
+			role: newRole
+		}));
+	};
+
 	const resetForm = () => {
-		setEmail('');
-		setPassword('');
-		setConfirmPassword('');
-		setRole('');
-		setPasswordMatch(true);
-		setNote('');
+		setUserDetails(userDefaults);
 	};
 
 	const handleSubmit = async () => {
-		if (password === confirmPassword) {
-			setPasswordMatch(true);
-			const userRole: UserRole = UserRole[role as keyof typeof UserRole];
-			const newUser: User = { email, role: userRole, password, note };
-			createUser(newUser)
-				.unwrap()
-				.then(() => {
-					showSuccessNotification(translate('users.successfully.create.user'));
-					handleCloseModal();
-				})
-				.catch(() => {
-					showErrorNotification(translate('users.failed.to.create.user'));
-				});
-		} else {
-			setPasswordMatch(false);
-		}
+		const userRole: UserRole = UserRole[userDetails.role as keyof typeof UserRole];
+		const newUser: User = { email: userDetails.email, role: userRole, password: userDetails.password, note: userDetails.note };
+		createUser(newUser)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.create.user'));
+				handleCloseModal();
+			})
+			.catch(() => {
+				showErrorNotification(translate('users.failed.to.create.user'));
+			});
 	};
 
-	const isFormValid = email && password && confirmPassword === password && role;
+	const isFormValid = userDetails.email && userDetails.password && (userDetails.confirmPassword === userDetails.password) && userDetails.role;
 
 	return (
 		<>
@@ -81,15 +93,15 @@ export default function CreateUserModal() {
 										id="email"
 										name="email"
 										type="email"
-										value={email}
-										onChange={e => setEmail(e.target.value)}
-										invalid={!email}
+										value={userDetails.email}
+										onChange={e => handleStringChange(e)}
+										invalid={!userDetails.email}
 										required
 									/>
 								</FormGroup>
 							</Col>
 						</Row>
-						{!passwordMatch && (
+						{!userDetails.passwordMatch && (
 							<Row>
 								<Col>
 									<Alert color="danger">{translate('user.password.mismatch')}</Alert>
@@ -104,9 +116,9 @@ export default function CreateUserModal() {
 										id="password"
 										name="password"
 										type="password"
-										value={password}
-										onChange={e => setPassword(e.target.value)}
-										invalid={!password}
+										value={userDetails.password}
+										onChange={e => handleStringChange(e)}
+										invalid={!userDetails.password}
 										required
 									/>
 								</FormGroup>
@@ -118,9 +130,9 @@ export default function CreateUserModal() {
 										id="confirmPassword"
 										name="confirmPassword"
 										type="password"
-										value={confirmPassword}
-										onChange={e => setConfirmPassword(e.target.value)}
-										invalid={confirmPassword !== password && confirmPassword !== ''}
+										value={userDetails.confirmPassword}
+										onChange={e => handleStringChange(e)}
+										invalid={userDetails.confirmPassword !== userDetails.password && userDetails.confirmPassword !== ''}
 										required
 									/>
 									<FormFeedback>
@@ -137,9 +149,9 @@ export default function CreateUserModal() {
 										id="role"
 										name="role"
 										type="select"
-										value={role}
-										onChange={e => setRole(e.target.value)}
-										invalid={!role}
+										value={userDetails.role}
+										onChange={e => handleRoleChange(e.target.value as UserRole)}
+										invalid={!userDetails.role}
 										required
 									>
 										<option value="">Select Role</option>
@@ -160,8 +172,8 @@ export default function CreateUserModal() {
 										id="note"
 										name="note"
 										type="textarea"
-										value={note}
-										onChange={e => setNote(e.target.value)}
+										value={userDetails.note}
+										onChange={e => handleStringChange(e)}
 									/>
 									<FormFeedback>
 										<FormattedMessage id="error.required" />

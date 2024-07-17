@@ -25,57 +25,70 @@ interface EditUserModalComponentProps {
  * @returns User edit element
  */
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
+
+	const userDefaults = {
+		password: '',
+		confirmPassword: '',
+		passwordMatch: true,
+		disableDelete: false
+	};
+
+	// user apis
 	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
-	const [userState, setUserState] = useState<User>({ ...props.user });
-	const [password, setPassword] = useState<string>('');
-	const [confirmPassword, setConfirmPassword] = useState<string>('');
-	const [passwordMatch, setPasswordMatch] = useState<boolean>(true);
-	const [disableDelete, setDisableDelete] = useState<boolean>(false);
+
+	// user edit form state
+	const [userDetails, setUserDetails] = useState({
+		...props.user,
+		...userDefaults
+	});
+
+	// get current logged in user
 	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
 
+	// set user details to passed in user
 	useEffect(() => {
-		setUserState({ ...props.user });
+		setUserDetails({ ...props.user, ...userDefaults });
 	}, [props.user]);
 
 	// if editing current logged in user, do not allow user to delete their own account
 	useEffect(() => {
-		setDisableDelete(false);
+		setUserDetails({ ...userDetails, disableDelete: false });
 		if (currentLoggedInUser) {
 			if (props.user.email === currentLoggedInUser.email) {
-				setDisableDelete(true);
+				setUserDetails(prevDetails => ({
+					...prevDetails, disableDelete: true }));
 			}
 		}
 	}, [currentLoggedInUser, props.user]);
 
 	useEffect(() => {
-		setPasswordMatch(password === confirmPassword);
-		if (password === confirmPassword && password != '') {
-			setUserState({ ...userState, password: password });
-		}
-	}, [password, confirmPassword]);
+		setUserDetails(prevDetails => ({
+			...prevDetails, passwordMatch: (userDetails.password === userDetails.confirmPassword) }));
+	}, [userDetails.password, userDetails.confirmPassword]);
 
+	// Handlers for each type of input change
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUserState({ ...userState, [e.target.name]: e.target.value });
-	};
-
-	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPassword(e.target.value);
-	};
-
-	const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setConfirmPassword(e.target.value);
+		setUserDetails(prevDetails => ({
+			...prevDetails, [e.target.name]: e.target.value
+		}));
 	};
 
 	const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setUserState({ ...userState, role: e.target.value as UserRole });
+		const newRole = e.target.value as UserRole;
+		setUserDetails(prevDetails => ({
+			...prevDetails,
+			role: newRole
+		}));
 	};
 
 	const handleSaveChanges = async () => {
+		// close modal
 		props.handleClose();
-		// This component now has implemented a method to not allow the current user to delete their own account, which
-		//  would allow us to rewrite the edit user api to not require all users. Or we can leave double safety check as is.
-		submitUserEdits(userState)
+		// set needed user details into a user and send to backend
+		const editedUser: User = { id: userDetails.id, email: userDetails.email, role: userDetails.role,
+			password: userDetails.password, note: userDetails.note };
+		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.edit.user') + props.user.email);
@@ -125,7 +138,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setShowDeleteConfirmationModal(false);
 
 		// Delete the conversion using the state object, it should only require the source and destination ids set
-		deleteUser(userState.email);
+		deleteUser(userDetails.email);
 	};
 	/* End Confirm Delete Modal */
 
@@ -138,8 +151,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	const resetPasswordFields = () => {
-		setPassword('');
-		setConfirmPassword('');
+		setUserDetails({ ...userDetails, password: '', confirmPassword: '' });
 	};
 
 	const tooltipStyle = {
@@ -174,7 +186,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="email"
 										name="email"
 										type="email"
-										value={userState.email}
+										value={userDetails.email}
 										onChange={handleStringChange}
 									/>
 								</FormGroup>
@@ -186,11 +198,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="role"
 										name="role"
 										type="select"
-										value={userState.role}
+										value={userDetails.role}
 										onChange={handleRoleChange}
 									>
 										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={val} key={val}>{role}</option>
+											<option value={val} key={val}>
+												{role}
+											</option>
 										))}
 									</Input>
 								</FormGroup>
@@ -204,8 +218,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="password"
 										name="password"
 										type="password"
-										value={password}
-										onChange={handlePasswordChange}
+										value={userDetails.password}
+										onChange={e => handleStringChange(e)}
 									/>
 								</FormGroup>
 							</Col>
@@ -216,9 +230,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="confirmPassword"
 										name="confirmPassword"
 										type="password"
-										value={confirmPassword}
-										onChange={handleConfirmPasswordChange}
-										invalid={!passwordMatch}
+										value={userDetails.confirmPassword}
+										onChange={e => handleStringChange(e)}
+										invalid={!userDetails.passwordMatch}
 									/>
 									<FormFeedback><FormattedMessage id="user.password.mismatch" /></FormFeedback>
 								</FormGroup>
@@ -232,7 +246,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="note"
 										name="note"
 										type="textarea"
-										value={userState.note}
+										value={userDetails.note}
 										onChange={handleStringChange}
 									/>
 									<FormFeedback>
@@ -244,18 +258,18 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					</Container>
 				</ModalBody>
 				<ModalFooter>
-					{disableDelete ? (
+					{userDetails.disableDelete ? (
 						<div className='text-danger px-3' >
 							<FormattedMessage id="delete.self" />
 						</div>
 					) : null}
-					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={disableDelete}>
+					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={userDetails.disableDelete}>
 						<FormattedMessage id="delete.user" />
 					</Button>
 					<Button color="secondary" onClick={props.handleClose}>
 						<FormattedMessage id="cancel" />
 					</Button>
-					<Button color="primary" onClick={handleSaveChanges} disabled={!passwordMatch}>
+					<Button color="primary" onClick={handleSaveChanges} disabled={!userDetails.passwordMatch}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
