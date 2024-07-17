@@ -45,6 +45,9 @@ export default function AreaUnitSelectComponent() {
 		fontWeight: 'bold',
 		margin: 0
 	};
+	const bottomSpace: React.CSSProperties = {
+		paddingBottom: '10px'
+	};
 
 	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit]?.unitRepresent === UnitRepresentType.raw) {
 		return null;
@@ -65,9 +68,11 @@ export default function AreaUnitSelectComponent() {
 				</label>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize' />
 			</div>
-			{/* Will only show up if areaNormalization is enabled */}
+			{/* Will only show up if areaNormalization is enabled.
+				The bottom padding makes sure the drop down area unit menu does not
+				go below the next item so it can be visible/clicked through menu. */}
 			{graphState.areaNormalization &&
-				<div>
+				<div style={bottomSpace}>
 					<p style={labelStyle}>
 						<FormattedMessage id='area.unit' />:
 					</p>
