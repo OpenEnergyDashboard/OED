@@ -7,8 +7,7 @@ const readCsv = require('./readCsv');
 const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
 const util = require('util');
-const _ = require('lodash');
-const stopDB = require('../models/database').stopDB;
+const zipObject = require('lodash/zipObject');
 const { log } = require('../log');
 const moment = require('moment');
 const Unit = require('../models/Unit');
@@ -21,7 +20,7 @@ async function parseCSV(filename) {
 	// the headers should be in the first line
 	const headers = meterInfo[0];
 	const meterDataRows = meterInfo.slice(1);
-	return meterDataRows.map(row => _.zipObject(headers, row));
+	return meterDataRows.map(row => zipObject(headers, row));
 }
 
 /**

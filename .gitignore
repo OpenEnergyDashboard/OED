@@ -42,6 +42,9 @@ postgres-data
 # Test data (normally for developers)
 src/server/test/db/data/automatedTests/*.csv
 
+# Server tmp directory
+src/server/tmp
+
 # nohup.out is created when working inside the remote container with Visual Studio Code.
 nohup.out
 
@@ -50,3 +53,6 @@ nohup.out
 
 # Visual Studio Code settings file
 .vscode/settings.json
+
+# tmp file
+src/server/tmp/*

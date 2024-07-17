@@ -86,7 +86,8 @@ const DEFAULTS = {
 		refreshReadings: BooleanTypesJS.false,
 		refreshHourlyReadings: BooleanTypesJS.false,
 		honorDst: BooleanTypesJS.false,
-		relaxedParsing: BooleanTypesJS.false
+		relaxedParsing: BooleanTypesJS.false,
+		useMeterZone: BooleanTypesJS.false
 	}
 }
 
@@ -132,7 +133,8 @@ const VALIDATION = {
 			refreshReadings: new BooleanParam('refreshReadings'),
 			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
 			honorDst: new BooleanParam('honorDst'),
-			relaxedParsing: new BooleanParam('relaxedParsing')
+			relaxedParsing: new BooleanParam('relaxedParsing'),
+			useMeterZone: new BooleanParam('useMeterZone')
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -183,7 +185,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 
 	const { createMeter, cumulative, duplications,
-		gzip, headerRow, timeSort, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+		gzip, headerRow, timeSort, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
 	if (!createMeter) {
 		req.body.createMeter = DEFAULTS.readings.createMeter;
@@ -211,6 +213,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (!relaxedParsing) {
 		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
+	}
+	if (!useMeterZone) {
+		req.body.useMeterZone = DEFAULTS.readings.useMeterZone;
 	}
 	next();
 }

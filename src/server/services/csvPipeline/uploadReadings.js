@@ -20,12 +20,13 @@ const Preferences = require('../../models/Preferences');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterName, createMeter, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+	const { meterName, createMeter, headerRow, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow ===  BooleanTypesJS.true);
 	const shouldUpdate = (update ===  BooleanTypesJS.true);
 	let shouldHonorDst = (honorDst ===  BooleanTypesJS.true);
 	let shouldRelaxedParsing = (relaxedParsing ===  BooleanTypesJS.true);
+	let shouldUseMeterZone = (useMeterZone ===  BooleanTypesJS.true);
 	let meterCreated = false;
 	let meter = await Meter.getByName(meterName, conn)
 		.catch(async err => {
@@ -256,7 +257,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		conditionSet,
 		conn,
 		shouldHonorDst,
-		shouldRelaxedParsing
+		shouldRelaxedParsing,
+		shouldUseMeterZone
 	); // load csv data
 }
 
