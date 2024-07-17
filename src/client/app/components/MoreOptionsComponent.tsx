@@ -31,7 +31,7 @@ export default function MoreOptionsComponent() {
 	return (
 		<>
 			{
-				<div>
+				<div style={{marginTop: '10px'}}>
 					<Button color='secondary' outline onClick={handleShow}>
 						More Options
 					</Button>
