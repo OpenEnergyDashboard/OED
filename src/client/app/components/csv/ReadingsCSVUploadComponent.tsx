@@ -465,6 +465,23 @@ export default function ReadingsCSVUploadComponent() {
 								</Row>
 							</Container>
 						</FormGroup>
+						{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl.
+							Rest of changes left so easy to add back in. */}
+						{/*
+						<FormGroup check style={checkboxStyle}>
+							<Label check>
+								<Input
+									checked={useMeterZone}
+									type='checkbox'
+									name='useMeterZone'
+									onChange={handleCheckboxChange}
+								/>
+								<div className='ps-2'>
+									{translate('csv.readings.param.use.meter.zone' />
+								</div>
+							</Label>
+						</FormGroup>
+						*/}
 						<div className='d-flex flex-row-reverse'>
 							<div className='p-3'>
 								<Button color='primary' type='submit' disabled={!isValidCSV || !meterIsSelected}>

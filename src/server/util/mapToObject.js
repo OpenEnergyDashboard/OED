@@ -4,7 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const _ = require('lodash');
+const zipObject = require('lodash/zipObject');
+
 /**
  * Map an array into an object
  * @param array the array
@@ -14,7 +15,7 @@ const _ = require('lodash');
  * in the array
  */
 function mapToObject(array, valueMapper) {
-	return _.zipObject(array, array.map(valueMapper));
+	return zipObject(array, array.map(valueMapper));
 }
 
 module.exports = { mapToObject };

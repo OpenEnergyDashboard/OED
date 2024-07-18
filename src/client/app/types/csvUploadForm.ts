@@ -56,6 +56,7 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 	refreshReadings: boolean;
 	relaxedParsing: boolean;
 	timeSort: TimeSortTypes;
+	useMeterZone: boolean;
 }
 
 export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
@@ -72,6 +73,7 @@ export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesFo
 	refreshReadings: BooleanTypes;
 	relaxedParsing: BooleanTypes;
 	timeSort: TimeSortTypes;
+	useMeterZone: BooleanTypes;
 }
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.

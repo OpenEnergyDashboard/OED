@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -272,7 +272,7 @@ export const graphSlice = createSlice({
 			.addCase(
 				clearGraphHistory,
 				state => {
-					state.current = _.cloneDeep(defaultState);
+					state.current = cloneDeep(defaultState);
 					state.prev = [];
 					state.next = [];
 				}

@@ -85,6 +85,7 @@ const DEFAULTS = {
 		refreshReadings: BooleanTypesJS.false,
 		relaxedParsing: BooleanTypesJS.false,
 		timeSort: undefined,
+		useMeterZone: BooleanTypesJS.false
 	}
 }
 
@@ -128,7 +129,8 @@ const VALIDATION = {
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
 			relaxedParsing: new BooleanParam('relaxedParsing'),
-			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter])
+			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
+			useMeterZone: new BooleanParam('useMeterZone'),
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -179,7 +181,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 
 	const { cumulative, duplications,
-		gzip, headerRow, timeSort, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+		gzip, headerRow, timeSort, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
 	if (!cumulative) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
@@ -204,6 +206,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (!relaxedParsing) {
 		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
+	}
+	if (!useMeterZone) {
+		req.body.useMeterZone = DEFAULTS.readings.useMeterZone;
 	}
 	next();
 }

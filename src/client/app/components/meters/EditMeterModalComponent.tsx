@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
-import { range } from 'lodash';
+import { cloneDeep, isEqual, range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -49,7 +48,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
-	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
+	const [localMeterEdits, setLocalMeterEdits] = useState(cloneDeep(meterState));
 	const {
 		compatibleGraphicUnits,
 		incompatibleGraphicUnits,
@@ -60,7 +59,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// TODO should this state be used for the meterState above or would that cause issues?
 	const meterDataByID = useAppSelector(selectMeterDataById);
 
-	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)); }, [meterState]);
+	useEffect(() => { setLocalMeterEdits(cloneDeep(meterState)); }, [meterState]);
 	/* State */
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -88,7 +87,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
-		const meterHasChanges = !_.isEqual(meterState, localMeterEdits);
+		const meterHasChanges = !isEqual(meterState, localMeterEdits);
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {

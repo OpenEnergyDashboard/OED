@@ -17,12 +17,13 @@ const Meter = require('../../models/Meter');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterIdentifier, headerRow, update, honorDst, relaxedParsing } = req.body; // extract query parameters
+	const { meterIdentifier, headerRow, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = (headerRow === BooleanTypesJS.true);
 	const shouldUpdate = (update === BooleanTypesJS.true);
 	let shouldHonorDst = (honorDst === BooleanTypesJS.true);
 	let shouldRelaxedParsing = (relaxedParsing === BooleanTypesJS.true);
+	let shouldUseMeterZone = (useMeterZone === BooleanTypesJS.true);
 	let meter = await Meter.getByIdentifier(meterIdentifier, conn)
 		.catch(async err => {
 			// If Meter does not exist, we do not know what to do with the readings so we error out.
@@ -201,7 +202,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		conditionSet,
 		conn,
 		shouldHonorDst,
-		shouldRelaxedParsing
+		shouldRelaxedParsing,
+		shouldUseMeterZone
 	); // load csv data
 }
 
