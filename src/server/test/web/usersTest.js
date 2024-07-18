@@ -59,22 +59,28 @@ mocha.describe('Users API', () => {
 			const conn = testDB.getConnection();
 			const password = await bcrypt.hash('password', 10);
 			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
-			const csvUser = await csv.insert(conn);
+			await csv.insert(conn);
+			const csvUser = await User.getByEmail(csv.email, conn);
 			const obvius = new User(undefined, 'obvius@example.com', password, User.role.OBVIUS);
-			const obviusUser = await obvius.insert(conn);
-			testUser = await testUser.getByEmail(conn);
+			await obvius.insert(conn);
+			const obviusUser = await User.getByEmail(obvius.email, conn);
+			const retrievedTestUser = await User.getByEmail(testUser.email, conn);
+
 			const res1 = await chai.request(app).post('/api/users/edit').set('token', token).send({
-				user: { id: testUser.user.id, email: testUser.email, role: testUser.role }
-			});
-			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
-				user: { id: csvUser.user.id, csvemail: csv.email, role: User.role.OBVIUS }
-			});
-			const res3 = await chai.request(app).post('/api/users/edit').set('token', token).send({
-				user: { id: obviusUser.user.id,email: obvius.email, role: User.role.CSV }
+				user: { id: retrievedTestUser.id, email: retrievedTestUser.email, role: retrievedTestUser.role }
 			});
 			expect(res1).to.have.status(200);
+			
+			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
+				user: { id: csvUser.id, email: csv.email, role: User.role.OBVIUS }
+			});
 			expect(res2).to.have.status(200);
+
+			const res3 = await chai.request(app).post('/api/users/edit').set('token', token).send({
+				user: { id: obviusUser.id, email: obvius.email, role: User.role.CSV }
+			});
 			expect(res3).to.have.status(200);
+
 			const modifiedCsv = await User.getByEmail(csv.email, conn);
 			expect(modifiedCsv.role).to.equal(User.role.OBVIUS);
 			const modifiedObvius = await User.getByEmail(obvius.email, conn);
