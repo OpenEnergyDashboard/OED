@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
 import { Link } from 'react-router-dom';
-import { CalibrationModeTypes } from '../../types/redux/map';
 
 interface CreateMapModalProps {
 	show: boolean;
@@ -16,7 +15,8 @@ interface CreateMapModalProps {
 }
 
 /**
- *
+ * Defines the create map modal form
+ * @returns Map create element
  */
 function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapModalProps) {
 	const [nameInput, setNameInput] = useState('');
@@ -40,7 +40,7 @@ function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapM
 						<Input
 							id="mapName"
 							value={nameInput}
-							onChange={(e) => setNameInput(e.target.value)}
+							onChange={e => setNameInput(e.target.value)}
 						/>
 					</FormGroup>
 					<FormGroup>
@@ -49,7 +49,7 @@ function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapM
 							id="mapNote"
 							type="textarea"
 							value={noteInput}
-							onChange={(e) => setNoteInput(e.target.value)}
+							onChange={e => setNoteInput(e.target.value)}
 						/>
 					</FormGroup>
 				</Form>
