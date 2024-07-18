@@ -41,7 +41,7 @@ function MapViewComponent(props: MapViewProps) {
 	const handleCloseModal = () => setShowEditModal(false);
 
 	return (
-		<div className="map-card">
+		<div className="card">
 			<div className="identifier-container">
 				{props.map.name} {props.isSubmitting ? '(Submitting)' : props.isEdited ? '(Edited)' : ''}
 			</div>
