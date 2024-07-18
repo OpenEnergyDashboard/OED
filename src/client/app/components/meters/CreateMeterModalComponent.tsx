@@ -495,16 +495,18 @@ export default function CreateMeterModalComponent() {
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							<Input id='readingDuplication' name='readingDuplication' type='number'
-								onChange={e => handleNumberChange(e)}
-								step='1'
-								min='1'
-								max='9'
-								defaultValue={meterDetails.readingDuplication}
-								invalid={meterDetails?.readingDuplication < 1 || meterDetails?.readingDuplication > 9} />
-							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
-							</FormFeedback>
+							<Input id='readingDuplication' name='readingDuplication' type="select"
+								onChange={e => handleNumberChange(e)}>
+								<option> 1 </option>
+								<option> 2 </option>
+								<option> 3 </option>
+								<option> 4 </option>
+								<option> 5 </option>
+								<option> 6 </option>
+								<option> 7 </option>
+								<option> 8 </option>
+								<option> 9 </option>
+							</Input>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>

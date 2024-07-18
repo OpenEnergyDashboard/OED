@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { isEqual } from 'lodash';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
@@ -29,7 +29,7 @@ export default function UserDetailComponent() {
 	const [hasChanges, setHasChanges] = React.useState<boolean>(false);
 
 	React.useEffect(() => { setLocalUsersChanges(users); }, [users]);
-	React.useEffect(() => { setHasChanges(!_.isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
+	React.useEffect(() => { setHasChanges(!isEqual(users, localUsersChanges)); }, [localUsersChanges, users]);
 	const submitChanges = async () => {
 		submitUserEdits(localUsersChanges)
 			.unwrap()

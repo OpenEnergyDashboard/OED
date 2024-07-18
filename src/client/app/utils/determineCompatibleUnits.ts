@@ -4,7 +4,7 @@
 
 // TODO it is a bad practice to import store anywhere other than index.tsx These utils need to be converted into selectors.
 
-import * as _ from 'lodash';
+import { get, sortBy } from 'lodash';
 import React from 'react';
 import { selectCik } from '../redux/api/conversionsApi';
 import { selectAllGroups, selectGroupDataById } from '../redux/api/groupsApi';
@@ -39,7 +39,7 @@ export function unitsCompatibleWithMeters(meters: Set<number>): Set<number> {
 	// Loops over all meters.
 	meters.forEach(function (meterId: number) {
 		// Gets the meter associated with the meterId.
-		const meter = _.get(meterDataByID, meterId);
+		const meter = get(meterDataByID, meterId);
 		let meterUnits = new Set<number>();
 		// If meter had no unit then nothing compatible with it.
 		// This probably won't happen but be safe. Note once you have one of these then
@@ -99,7 +99,7 @@ export function metersInGroup(groupId: number): Set<number> {
 	// Gets the group associated with groupId.
 	// The deep children are automatically fetched with group state so should exist.
 	const groupDataById = selectGroupDataById(state);
-	const group = _.get(groupDataById, groupId);
+	const group = get(groupDataById, groupId);
 	// Create a set of the deep meters of this group and return it.
 	// null group can break on startup without optional chain
 	return new Set(group?.deepMeters);
@@ -120,7 +120,7 @@ export function metersInChangedGroup(changedGroupState: GroupData): number[] {
 	// These groups cannot contain the group being changed so the redux state is okay.
 	changedGroupState.childGroups.forEach((group: number) => {
 		// The group state for the current child group.
-		const groupState = _.get(groupDataById, group);
+		const groupState = get(groupDataById, group);
 		// The group state might not be defined, e.g., a group delete happened and the state is refreshing.
 		// In this case the deepMeters returned will be off but they should quickly refresh.
 		if (groupState) {
@@ -176,7 +176,7 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 
 	// We want the options sorted by meter identifier.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc');
+	return sortBy(options, item => item.label?.toLowerCase(), 'asc');
 }
 
 /**
@@ -221,7 +221,7 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 
 	// We want the options sorted by group name.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return _.sortBy(options, item => item.label?.toLowerCase(), 'asc');
+	return sortBy(options, item => item.label?.toLowerCase(), 'asc');
 }
 
 /**

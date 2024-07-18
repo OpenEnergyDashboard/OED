@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const _ = require('lodash');
 const moment = require('moment');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
