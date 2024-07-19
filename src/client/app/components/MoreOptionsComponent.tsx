@@ -15,6 +15,7 @@ import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import ExportComponent from '../components/ExportComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import translate from '../utils/translate';
 
 /**
  * Modal popup control for various graph types
@@ -33,10 +34,12 @@ export default function MoreOptionsComponent() {
 			{
 				<div style={{marginTop: '10px'}}>
 					<Button color='secondary' outline onClick={handleShow}>
-						More Options
+						{translate('more.options')}
 					</Button>
 					<Modal isOpen={showModal} toggle={handleClose} size='md'>
-						<ModalHeader>More Options for '{chartToRender}' Graph Type:</ModalHeader>
+						<ModalHeader>
+							{translate('more.options')}
+						</ModalHeader>
 						<ModalBody>
 							{/* More UI options for line graphic */}
 							{chartToRender == ChartTypes.line && <GraphicRateMenuComponent />}
