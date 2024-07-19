@@ -21,7 +21,7 @@ interface MetersUploadResponse {
 	meters: MeterData[];
 }
 
-export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File): Promise<void> => {
+export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File, dispatch: any): Promise<string> => {
 
 	const backend = new ApiBackend();
 	const formData = new FormData();
@@ -34,16 +34,23 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 		refreshReadings: uploadPreferences.refreshReadings ? BooleanTypes.true : BooleanTypes.false,
 		honorDst: uploadPreferences.honorDst ? BooleanTypes.true : BooleanTypes.false,
 		relaxedParsing: uploadPreferences.relaxedParsing ? BooleanTypes.true : BooleanTypes.false,
-			useMeterZone: uploadPreferences.useMeterZone ? BooleanTypes.true : BooleanTypes.false
+		useMeterZone: uploadPreferences.useMeterZone ? BooleanTypes.true : BooleanTypes.false
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());
 	}
 	formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
-	return await backend.doPostRequest<void>('/api/csv/readings', formData);
+
+	try {
+		await backend.doPostRequest<void>('/api/csv/readings', formData);
+		dispatch(baseApi.util.invalidateTags(['Readings']));
+	} catch (error) {
+		return 'Error submitting readings: ' + error;
+	}
+	return 'Reading have been added successfully!';
 };
 
-export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File, dispatch: any): Promise<void> => {
+export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File, dispatch: any): Promise<string> => {
 
 	const backend = new ApiBackend();
 	const formData = new FormData();
@@ -63,8 +70,7 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 	try {
 		const response = await backend.doPostRequest<MetersUploadResponse>('/api/csv/meters', formData);
 		const { message, meters } = response;
-		console.log('Message:', message);
-		console.log('Meters:', meters);
+		const meterNames: string[] = [];
 
 		// If new meters were added to DB, have redux add them to getMeters state
 		/// If meters were updated to the DB, invalidate meters
@@ -72,17 +78,19 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 		if (uploadPreferences.update === true) {
 			dispatch(baseApi.util.invalidateTags(['MeterData']));
 			// meters were invalidated so all meter changes will now reflect in Redux state, now return
-			return;
+			return message;
 		} else {
 			// add each new meter into Redux state without invalidating all meters
 			meters.forEach(meter => {
 				dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => {
 					meterAdapter.addOne(cacheDraft, meter);
 				}));
+				meterNames.push(meter.name + ', ');
 			});
+			return 'The following meters were added: ' + meterNames.forEach;
 		}
 
 	} catch (error) {
-		console.error('Error submitting meters:', error);
+		return 'Error submitting meters: ' + error;
 	}
 };

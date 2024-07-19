@@ -15,7 +15,7 @@ export enum MeterType {
 	OTHER = 'other'
 }
 
-// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts but does not have 'meter value or default'.
+// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts
 // They should be kept in sync.
 export enum MeterTimeSortType {
 	increasing = 'increasing',

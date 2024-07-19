@@ -23,17 +23,21 @@ export default function MetersCSVUploadComponent() {
 	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferencesItem>(MetersCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
+	// tracks if a file has been selected to be uploaded
+	const [FileIsSelected, setFileIsSelected] = React.useState<boolean>(false);
 	const dispatch = useAppDispatch();
 
 	const handleFileChange = (file: File | null) => {
 		setSelectedFile(file);
 		if (!file) {
-			//do nothing
+			setFileIsSelected(false);
 		} else {
 			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
 				setIsValidCSV(true);
+				setFileIsSelected(true);
 			} else {
 				setIsValidCSV(false);
+				setFileIsSelected(false);
 				showErrorNotification(translate('csv.file.error') + file.name);
 			}
 		}
@@ -73,7 +77,7 @@ export default function MetersCSVUploadComponent() {
 				console.log('SelectedFile is truthy! MeterData is: ' + JSON.stringify(meterData));
 				await submitMeters(meterData, selectedFile, dispatch);
 				console.log('after SubmitMeters await!');
-				showSuccessNotification('<h1> SUCCESS </h1>The meter was uploaded successfully.');
+				showSuccessNotification('SUCCESS!! The meter was uploaded successfully.');
 			} catch (error) {
 				// A failed axios request should result in an error.
 				console.log('Error: ' + error);
@@ -98,75 +102,71 @@ export default function MetersCSVUploadComponent() {
 			<Form onSubmit={handleSubmit}>
 				<Row className="justify-content-md-center">
 					<Col md='auto'>
-						<h2>
-							{translate('csv.upload.meters')}
-							<div style={tooltipStyle}>
-								<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
-							</div>
-						</h2>
-					</Col>
-				</Row>
-				<Row className='justify-content-md-center'>
-					<Col md='auto'>
+						<div className="text-center">
+							<h2>
+								{translate('csv.upload.meters')}
+								<div style={tooltipStyle}>
+									<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
+								</div>
+							</h2>
+						</div>
 						<FormFileUploaderComponent
-							formText='csv.upload.meters'
 							onFileChange={handleFileChange}
 							required
+							isInvalid={FileIsSelected}
 						/>
 						<FormGroup>
-							<Container>
-								<Row>
-									<Col>
-										<Label for='gzip'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='gzip'
-													name='gzip'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.gzip')}
-												</div>
+							<Row>
+								<Col>
+									<Label for='gzip'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='gzip'
+												name='gzip'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.gzip')}
 											</div>
-										</Label>
-									</Col>
-								</Row>
-								<Row>
-									<Col>
-										<Label for='headerRow'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='headerRow'
-													name='headerRow'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.header.row')}
-												</div>
+										</div>
+									</Label>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<Label for='headerRow'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='headerRow'
+												name='headerRow'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.header.row')}
 											</div>
-										</Label>
-									</Col>
-								</Row>
-								<Row>
-									<Col>
-										<Label for='update'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='update'
-													name='update'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.update')}
-												</div>
+										</div>
+									</Label>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<Label for='update'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='update'
+												name='update'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.update')}
 											</div>
-										</Label>
-									</Col>
-								</Row>
-							</Container>
+										</div>
+									</Label>
+								</Col>
+							</Row>
 						</FormGroup>
 						<FormGroup>
 							<Label for='meterIdentifier'>

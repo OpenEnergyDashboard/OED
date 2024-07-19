@@ -9,8 +9,8 @@ import translate from '../utils/translate';
 interface FileUploader {
 	reference?: React.RefObject<HTMLInputElement>;
 	required: boolean;
-	formText: string;
 	labelStyle?: React.CSSProperties;
+	isInvalid: boolean;
 	onFileChange: (file: File | null) => void;
 }
 
@@ -39,6 +39,7 @@ export default function FileUploaderComponent(props: FileUploader) {
 						name='csvfile'
 						required={props.required}
 						onChange={handleFileChange}
+						invalid={!props.isInvalid}
 					/>
 				</Col>
 			</Label>

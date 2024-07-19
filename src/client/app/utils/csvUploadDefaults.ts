@@ -2,21 +2,22 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, TimeSortTypes, BooleanMeterTypes } from '../types/csvUploadForm';
+import { ReadingsCSVUploadPreferencesItem, MetersCSVUploadPreferencesItem, BooleanTypes} from '../types/csvUploadForm';
+import { MeterTimeSortType } from '../types/redux/meters';
 
 // This file contains the default parameters for uploading readings and meters CSV files. These defaults should be consistent with the defaults
 // specified in /src/server/services/csvPipeline/validateCsvUploadParams and with /src/server/sql/create_meters_table.sql.
 export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferencesItem = {
 	meterIdentifier: '',
-	timeSort: TimeSortTypes.meter,
-	duplications: '',
-	cumulative: BooleanMeterTypes.meter,
-	cumulativeReset: BooleanMeterTypes.meter,
+	timeSort: MeterTimeSortType.increasing,
+	duplications: 1,
+	cumulative: BooleanTypes.false,
+	cumulativeReset: BooleanTypes.false,
 	cumulativeResetStart: '',
 	cumulativeResetEnd: '',
-	lengthGap: '',
-	lengthVariation: '',
-	endOnly: BooleanMeterTypes.meter,
+	lengthGap: 0,
+	lengthVariation: 0,
+	endOnly: BooleanTypes.false,
 	gzip: false,
 	headerRow: false,
 	refreshReadings: false,
@@ -31,4 +32,20 @@ export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
 	gzip: false,
 	headerRow: false,
 	update: false
+};
+
+export const convertTimeSort = (someTimeSort: string): MeterTimeSortType => {
+	let newTimeSort = MeterTimeSortType.decreasing;
+	if (someTimeSort === 'increasing') {
+		newTimeSort = MeterTimeSortType.increasing;
+	}
+	return newTimeSort;
+};
+
+export const convertBoolean = (someBoolean: boolean): BooleanTypes => {
+	let newBoolean = BooleanTypes.false;
+	if (someBoolean === true) {
+		newBoolean = BooleanTypes.true;
+	}
+	return newBoolean;
 };

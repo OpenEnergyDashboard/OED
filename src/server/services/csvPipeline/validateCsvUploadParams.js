@@ -8,18 +8,6 @@ const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSch
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
-/**
- * Enum of CSV input type sorting.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-TimeSortTypesJS = Object.freeze({
-	increasing: 'increasing',
-	decreasing: 'decreasing',
-	// meter means to use value stored on meter or the default if not.
-	meter: 'meter value or default'
-});
-
 // This is only used for meter page inputs but put here so next one above that related to.
 /**
  * Enum of CSV input type sorting.
@@ -39,18 +27,6 @@ MeterTimeSortTypesJS = Object.freeze({
 BooleanTypesJS = Object.freeze({
 	true: 'yes',
 	false: 'no',
-});
-
-/**
- * Enum of Boolean types.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-BooleanMeterTypesJS = Object.freeze({
-	true: 'yes',
-	false: 'no',
-	// meter means to use value stored on meter or the default if not.
-	meter: 'meter value or default'
 });
 
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
@@ -73,8 +49,8 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
-		cumulative: BooleanMeterTypesJS.meter,
-		cumulativeReset: BooleanMeterTypesJS.meter,
+		cumulative: BooleanTypesJS.meter,
+		cumulativeReset: BooleanTypesJS.meter,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: undefined,
@@ -118,18 +94,18 @@ const VALIDATION = {
 		required: ['meterIdentifier'],
 		properties: {
 			...COMMON_PROPERTIES,
-			cumulative: new EnumParam('cumulative', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
-			cumulativeReset: new EnumParam('cumulativeReset', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
+			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false]),
+			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false]),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
-			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
+			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false]),
 			honorDst: new BooleanParam('honorDst'),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
 			refreshReadings: new BooleanParam('refreshReadings'),
 			relaxedParsing: new BooleanParam('relaxedParsing'),
-			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
+			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
 			useMeterZone: new BooleanParam('useMeterZone'),
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
@@ -245,8 +221,6 @@ function validateMetersCsvUploadParams(req, res, next) {
 module.exports = {
 	validateMetersCsvUploadParams,
 	validateReadingsCsvUploadParams,
-	TimeSortTypesJS,
 	MeterTimeSortTypesJS,
-	BooleanMeterTypesJS,
 	BooleanTypesJS
 };

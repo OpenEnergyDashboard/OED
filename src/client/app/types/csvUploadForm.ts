@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { MeterTimeSortType } from '../types/redux/meters';
 interface CSVUploadPreferences {
 	meterIdentifier: string;
 	gzip: boolean;
@@ -17,62 +18,43 @@ export interface CSVUploadPreferencesForm {
 	update: BooleanTypes;
 }
 
-// This relates to MeterTimeSortTypes in src/client/app/types/redux/meters.ts but also has 'meter value or default'.
-// They should be kept in sync.
-export const enum TimeSortTypes {
-	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
-	increasing = 'increasing',
-	decreasing = 'decreasing',
-	// meter means to use value stored on meter or the default if not.
-	meter = 'meter value or default'
-}
-
 export const enum BooleanTypes {
 	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
 	true = 'yes',
 	false = 'no'
 }
 
-// Unusual boolean that also allows for meter so 3-way.
-export const enum BooleanMeterTypes {
-	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
-	true = 'yes',
-	false = 'no',
-	// meter means to use value stored on meter or the default if not.
-	meter = 'meter value or default'
-}
-
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
-	cumulative: BooleanMeterTypes;
-	cumulativeReset: BooleanMeterTypes;
+	cumulative: BooleanTypes;
+	cumulativeReset: BooleanTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: number;
-	endOnly: BooleanMeterTypes;
+	endOnly: BooleanTypes;
 	honorDst: boolean;
-	lengthGap: string;
-	lengthVariation: string;
+	lengthGap: number;
+	lengthVariation: number;
 	meterIdentifier: string;
 	refreshReadings: boolean;
 	relaxedParsing: boolean;
-	timeSort: TimeSortTypes;
+	timeSort: MeterTimeSortType;
 	useMeterZone: boolean;
 }
 
 export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
-	cumulative: BooleanMeterTypes;
-	cumulativeReset: BooleanMeterTypes;
+	cumulative: BooleanTypes;
+	cumulativeReset: BooleanTypes;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: number;
-	endOnly: BooleanMeterTypes;
+	endOnly: BooleanTypes;
 	honorDst: BooleanTypes;
-	lengthGap: string;
-	lengthVariation: string;
+	lengthGap: number;
+	lengthVariation: number;
 	meterIdentifier: string;
 	refreshReadings: BooleanTypes;
 	relaxedParsing: BooleanTypes;
-	timeSort: TimeSortTypes;
+	timeSort: MeterTimeSortType;
 	useMeterZone: BooleanTypes;
 }
 

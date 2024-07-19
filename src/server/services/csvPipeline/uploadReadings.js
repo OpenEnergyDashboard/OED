@@ -5,7 +5,7 @@
 const express = require('express');
 const { CSVPipelineError } = require('./CustomErrors');
 const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
-const { TimeSortTypesJS, BooleanMeterTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
+const { MeterTimeSortTypesJS, BooleanTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
 
 /**
@@ -71,43 +71,43 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingRepetition = parseInt(duplications, 10);
 	}
 
-	if (timeSort === undefined || timeSort === TimeSortTypesJS.meter) {
+	if (timeSort === undefined) {
 		if (meter.timeSort === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingTimeSort = TimeSortTypesJS.increasing;
+			readingTimeSort = MeterTimeSortTypesJS.increasing;
 		} else {
-			readingTimeSort = TimeSortTypesJS[meter.timeSort];
+			readingTimeSort = MeterTimeSortTypesJS[meter.timeSort];
 		}
 	} else {
 		readingTimeSort = timeSort;
 	}
 
-	if (cumulative === undefined || cumulative === BooleanMeterTypesJS.meter) {
+	if (cumulative === undefined || cumulative === BooleanTypesJS.meter) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingsCumulative = BooleanMeterTypesJS.false;
+			readingsCumulative = BooleanTypesJS.false;
 		} else {
-			readingsCumulative = BooleanMeterTypesJS[meter.cumulative];
+			readingsCumulative = BooleanTypesJS[meter.cumulative];
 		}
 	} else {
 		readingsCumulative = cumulative;
 	}
-	const areReadingsCumulative = (readingsCumulative === BooleanMeterTypesJS.true);
+	const areReadingsCumulative = (readingsCumulative === BooleanTypesJS.true);
 
-	if (cumulativeReset === undefined || cumulativeReset === BooleanMeterTypesJS.meter) {
+	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
 		if (meter.cumulativeReset === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingsReset = BooleanMeterTypesJS.false;
+			readingsReset = BooleanTypesJS.false;
 		} else {
-			readingsReset = BooleanMeterTypesJS[meter.cumulativeReset];
+			readingsReset = BooleanTypesJS[meter.cumulativeReset];
 		}
 	} else {
 		readingsReset = cumulativeReset;
 	}
-	const doReadingsReset = (readingsReset === BooleanMeterTypesJS.true);
+	const doReadingsReset = (readingsReset === BooleanTypesJS.true);
 
 	if (cumulativeResetStart === undefined || cumulativeResetStart === '') {
 		if (meter.cumulativeResetStart === null) {
@@ -159,18 +159,18 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
 
-	if (endOnly === undefined || endOnly === BooleanMeterTypesJS.meter) {
+	if (endOnly === undefined || endOnly === BooleanTypesJS.meter) {
 		if (meter.endOnlyTime === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
-			readingEndOnly = BooleanMeterTypesJS.false;
+			readingEndOnly = BooleanTypesJS.false;
 		} else {
-			readingEndOnly = BooleanMeterTypesJS[meter.endOnlyTime];
+			readingEndOnly = BooleanTypesJS[meter.endOnlyTime];
 		}
 	} else {
 		readingEndOnly = endOnly;
 	}
-	const areReadingsEndOnly = (readingEndOnly === BooleanMeterTypesJS.true);
+	const areReadingsEndOnly = (readingEndOnly === BooleanTypesJS.true);
 
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 
