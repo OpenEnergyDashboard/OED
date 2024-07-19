@@ -3,54 +3,54 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
-// import * as moment from 'moment';
-// import * as React from 'react';
-// import { Button, ButtonGroup } from 'reactstrap';
-// import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-// import { selectMapBarWidthDays, updateMapsBarDuration } from '../redux/slices/graphSlice';
-// import translate from '../utils/translate';
-// import MapChartSelectComponent from './MapChartSelectComponent';
-// import TooltipMarkerComponent from './TooltipMarkerComponent';
-// /**
-//  * @returns Map page controls
-//  */
-// export default function MapControlsComponent() {
-// 	const dispatch = useAppDispatch();
-// 	const mapDuration = useAppSelector(selectMapBarWidthDays);
-
-// 	const handleDurationChange = (value: number) => {
-// 		dispatch(updateMapsBarDuration(moment.duration(value, 'days')));
-// 	};
-
-// 	const barDurationDays = mapDuration.asDays();
-
-// 	return (
-// 		<div>
-// 			<div key='side-options'>
-// 				<p style={labelStyle}>
-// 					{translate('map.interval')}:
-// 				</p>
-// 				<ButtonGroup style={zIndexFix}>
-// 					<Button outline={barDurationDays !== 1} onClick={() => handleDurationChange(1)}> {translate('day')} </Button>
-// 					<Button outline={barDurationDays !== 7} onClick={() => handleDurationChange(7)}> {translate('week')} </Button>
-// 					<Button outline={barDurationDays !== 28} onClick={() => handleDurationChange(28)}> {translate('4.weeks')} </Button>
-// 				</ButtonGroup>
-// 				<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
-// 			</div>
-// 			<MapChartSelectComponent key='chart' />
-// 		</div>
-// 	);
-// }
-
-
-// const labelStyle: React.CSSProperties = {
-// 	fontWeight: 'bold',
-// 	margin: 0
-// };
-
-// const zIndexFix: React.CSSProperties = {
-// 	zIndex: 0
-// };
+//  import * as moment from 'moment';
+//  import * as React from 'react';
+//  import { Button, ButtonGroup } from 'reactstrap';
+//  import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+//  import { selectMapBarWidthDays, updateMapsBarDuration } from '../redux/slices/graphSlice';
+//  import translate from '../utils/translate';
+//  import MapChartSelectComponent from './MapChartSelectComponent';
+//  import TooltipMarkerComponent from './TooltipMarkerComponent';
+//  /**
+//   * @returns Map page controls
+//   */
+//  export default function MapControlsComponent() {
+// 	 const dispatch = useAppDispatch();
+// 	 const barDuration = useAppSelector(selectMapBarWidthDays);
+ 
+// 	 const handleDurationChange = (value: number) => {
+// 		 dispatch(updateMapsBarDuration(moment.duration(value, 'days')));
+// 	 };
+ 
+// 	 const barDurationDays = barDuration.asDays();
+ 
+// 	 return (
+// 		 <div>
+// 			 <div key='side-options'>
+// 				 <p style={labelStyle}>
+// 					 {translate('map.interval')}:
+// 				 </p>
+// 				 <ButtonGroup style={zIndexFix}>
+// 					 <Button outline={barDurationDays !== 1} onClick={() => handleDurationChange(1)}> {translate('day')} </Button>
+// 					 <Button outline={barDurationDays !== 7} onClick={() => handleDurationChange(7)}> {translate('week')} </Button>
+// 					 <Button outline={barDurationDays !== 28} onClick={() => handleDurationChange(28)}> {translate('4.weeks')} </Button>
+// 				 </ButtonGroup>
+// 				 <TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
+// 			 </div>
+// 			 <MapChartSelectComponent key='chart' />
+// 		 </div>
+// 	 );
+//  }
+ 
+ 
+//  const labelStyle: React.CSSProperties = {
+// 	 fontWeight: 'bold',
+// 	 margin: 0
+//  };
+ 
+//  const zIndexFix: React.CSSProperties = {
+// 	 zIndex: 0
+//  };
 
 import * as moment from 'moment';
 import * as React from 'react';
@@ -69,86 +69,86 @@ export default function MapControlsComponent() {
 	const dispatch = useAppDispatch();
 
 	// The min/max days allowed for user selection
-	const MIN_MAP_DAYS = 1;
-	const MAX_MAP_DAYS = 366;
+	const MIN_BAR_DAYS = 1;
+	const MAX_BAR_DAYS = 366;
 	// Special value if custom input for standard menu.
 	const CUSTOM_INPUT = '-99';
 
-	// This is the current map interval for graphic.
-	const mapDuration = useAppSelector(selectBarWidthDays);
-	// Holds the value of standard map duration choices used so decoupled from custom.
-	const [mapDays, setMapDays] = React.useState<string>(mapDuration.asDays().toString());
-	// Holds the value during custom map duration input so only update graphic when done entering and
+	// This is the current bar interval for graphic.
+	const barDuration = useAppSelector(selectBarWidthDays);
+	// Holds the value of standard bar duration choices used so decoupled from custom.
+	const [barDays, setBarDays] = React.useState<string>(barDuration.asDays().toString());
+	// Holds the value during custom bar duration input so only update graphic when done entering and
 	// separate from standard choices.
-	const [mapDaysCustom, setMapDaysCustom] = React.useState<number>(mapDuration.asDays());
-	// True if custom map duration input is active.
-	const [showCustomMapDuration, setShowCustomMapDuration] = React.useState<boolean>(false);
+	const [barDaysCustom, setBarDaysCustom] = React.useState<number>(barDuration.asDays());
+	// True if custom bar duration input is active.
+	const [showCustomBarDuration, setShowCustomBarDuration] = React.useState<boolean>(false);
 
 	// Keeps react-level state, and redux state in sync.
 	// Two different layers in state may differ especially when externally updated (chart link, history buttons.)
 	React.useEffect(() => {
-		// Assume value is valid since it is coming from state.
+		// Assume value is valid  since it is coming from state.
 		// Do not allow bad values in state.
-		const isCustom = !(['1', '7', '28'].find(days => days == mapDuration.asDays().toString()));
-		setShowCustomMapDuration(isCustom);
-		setMapDaysCustom(mapDuration.asDays());
-		setMapDays(isCustom ? CUSTOM_INPUT : mapDuration.asDays().toString());
-	}, [mapDuration]);
+		const isCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()));
+		setShowCustomBarDuration(isCustom);
+		setBarDaysCustom(barDuration.asDays());
+		setBarDays(isCustom ? CUSTOM_INPUT : barDuration.asDays().toString());
+	}, [barDuration]);
 
-	// Returns true if this is a valid map duration.
-	const mapDaysValid = (mapDays: number) => {
-		return Number.isInteger(mapDays) && mapDays >= MIN_MAP_DAYS && mapDays <= MAX_MAP_DAYS;
+	// Returns true if this is a valid bar duration.
+	const barDaysValid = (barDays: number) => {
+		return Number.isInteger(barDays) && barDays >= MIN_BAR_DAYS && barDays <= MAX_BAR_DAYS;
 	};
 
-	// Updates values when the standard map duration menu is used.
-	const handleMapDaysChange = (value: string) => {
+	// Updates values when the standard bar duration menu is used.
+	const handleBarDaysChange = (value: string) => {
 		if (value === CUSTOM_INPUT) {
-			// Set menu value for standard map to special value to show custom
+			// Set menu value for standard bar to special value to show custom
 			// and show the custom input area.
-			setMapDays(CUSTOM_INPUT);
-			setShowCustomMapDuration(true);
+			setBarDays(CUSTOM_INPUT);
+			setShowCustomBarDuration(true);
 		} else {
-			// Set the standard menu value, hide the custom map duration input
-			//  and map duration for graphing.
+			// Set the standard menu value, hide the custom bar duration input
+			//  and bar duration for graphing.
 			// Since controlled values know it is a valid integer.
-			setShowCustomMapDuration(false);
-			updateMapDurationChange(Number(value));
+			setShowCustomBarDuration(false);
+			updateBarDurationChange(Number(value));
 		}
 	};
 
-	// Updates value when the custom map duration input is used.
-	const handleCustomMapDaysChange = (value: number) => {
-		setMapDaysCustom(value);
+	// Updates value when the custom bar duration input is used.
+	const handleCustomBarDaysChange = (value: number) => {
+		setBarDaysCustom(value);
 	};
 
 	const handleEnter = (key: string) => {
 		// This detects the enter key and then uses the previously entered custom
-		// map duration to set the map duration for the graphic.
+		// bar duration to set the bar duration for the graphic.
 		if (key == 'Enter') {
-			updateMapDurationChange(mapDaysCustom);
+			updateBarDurationChange(barDaysCustom);
 		}
 	};
 
-	const updateMapDurationChange = (value: number) => {
+	const updateBarDurationChange = (value: number) => {
 		// Update if okay value. May not be okay if this came from user entry in custom form.
-		if (mapDaysValid(value)) {
+		if (barDaysValid(value)) {
 			dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
 		}
 	};
 
 	return (
 		<div>
-			<div key='side-options'>
+			<div style={divTopBottomPadding}>
 				<p style={labelStyle}>
 					{translate('map.interval')}:
-					<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
+					<TooltipMarkerComponent page='home' helpTextId='help.home.map.days.tip' />
 				</p>
 				<Input
-					id='mapDurationDays'
-					name='mapDurationDays'
+					id='barDurationDays'
+					name='barDurationDays'
 					type='select'
-					value={mapDays}
-					onChange={e => handleMapDaysChange(e.target.value)}
+					value={barDays}
+					onChange={e => handleBarDaysChange(e.target.value)}
 				>
 					<option value='1'>{translate('day')}</option>
 					<option value='7'>{translate('week')}</option>
@@ -156,20 +156,20 @@ export default function MapControlsComponent() {
 					<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
 				</Input>
 				{/* This has a little more spacing at bottom than optimal. */}
-				{showCustomMapDuration &&
+				{showCustomBarDuration &&
 					<FormGroup>
-						<Label for='mapDays'>{translate('map.days.enter')}:</Label>
-						<Input id='mapDays' name='mapDays' type='number'
-							onChange={e => handleCustomMapDaysChange(Number(e.target.value))}
+						<Label for='barDays'>{translate('bar.days.enter')}:</Label>
+						<Input id='barDays' name='barDays' type='number'
+							onChange={e => handleCustomBarDaysChange(Number(e.target.value))}
 							// This grabs each key hit and then finishes input when hit enter.
 							onKeyDown={e => { handleEnter(e.key); }}
 							step='1'
-							min={MIN_MAP_DAYS}
-							max={MAX_MAP_DAYS}
-							value={mapDaysCustom}
-							invalid={!mapDaysValid(mapDaysCustom)} />
+							min={MIN_BAR_DAYS}
+							max={MAX_BAR_DAYS}
+							value={barDaysCustom}
+							invalid={!barDaysValid(barDaysCustom)} />
 						<FormFeedback>
-							<FormattedMessage id="error.bounds" values={{ min: MIN_MAP_DAYS, max: MAX_MAP_DAYS }} />
+							<FormattedMessage id="error.bounds" values={{ min: MIN_BAR_DAYS, max: MAX_BAR_DAYS }} />
 						</FormFeedback>
 					</FormGroup>
 				}
@@ -178,7 +178,12 @@ export default function MapControlsComponent() {
 		</div >
 	);
 }
-	
+
+const divTopBottomPadding: React.CSSProperties = {
+	paddingTop: '15px',
+	paddingBottom: '15px'
+};
+
 const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',
 	margin: 0
