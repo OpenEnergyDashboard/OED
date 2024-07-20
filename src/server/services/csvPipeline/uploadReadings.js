@@ -82,8 +82,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingTimeSort = timeSort;
 	}
-
-	if (cumulative === undefined || cumulative === BooleanTypesJS.meter) {
+	
+	if (cumulative === undefined) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
@@ -96,7 +96,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	}
 	const areReadingsCumulative = (readingsCumulative === BooleanTypesJS.true);
 
-	if (cumulativeReset === undefined || cumulativeReset === BooleanTypesJS.meter) {
+	if (cumulativeReset === undefined) {
 		if (meter.cumulativeReset === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.
@@ -159,7 +159,7 @@ async function uploadReadings(req, res, filepath, conn) {
 		readingLengthVariation = parseFloat(lengthVariation);
 	}
 
-	if (endOnly === undefined || endOnly === BooleanTypesJS.meter) {
+	if (endOnly === undefined) {
 		if (meter.endOnlyTime === null) {
 			// This probably should not happen with a new DB but keep just in case.
 			// No variation allowed.

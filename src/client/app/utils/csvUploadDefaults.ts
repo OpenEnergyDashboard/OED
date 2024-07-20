@@ -34,18 +34,6 @@ export const MetersCSVUploadDefaults: MetersCSVUploadPreferencesItem = {
 	update: false
 };
 
-export const convertTimeSort = (someTimeSort: string): MeterTimeSortType => {
-	let newTimeSort = MeterTimeSortType.decreasing;
-	if (someTimeSort === 'increasing') {
-		newTimeSort = MeterTimeSortType.increasing;
-	}
-	return newTimeSort;
-};
-
 export const convertBoolean = (someBoolean: boolean): BooleanTypes => {
-	let newBoolean = BooleanTypes.false;
-	if (someBoolean === true) {
-		newBoolean = BooleanTypes.true;
-	}
-	return newBoolean;
+	return someBoolean ? BooleanTypes.true : BooleanTypes.false;
 };

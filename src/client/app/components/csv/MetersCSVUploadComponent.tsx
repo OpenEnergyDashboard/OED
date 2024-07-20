@@ -71,17 +71,12 @@ export default function MetersCSVUploadComponent() {
 
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log('inside submit!');
 		if (selectedFile) {
-			try {
-				console.log('SelectedFile is truthy! MeterData is: ' + JSON.stringify(meterData));
-				await submitMeters(meterData, selectedFile, dispatch);
-				console.log('after SubmitMeters await!');
-				showSuccessNotification('SUCCESS!! The meter was uploaded successfully.');
-			} catch (error) {
-				// A failed axios request should result in an error.
-				console.log('Error: ' + error);
-				showErrorNotification(error as string);
+			const response = await submitMeters(meterData, selectedFile, dispatch);
+			if (response.success) {
+				showSuccessNotification(response.message);
+			} else {
+				showErrorNotification(response.message);
 			}
 		}
 	};

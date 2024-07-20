@@ -10,16 +10,15 @@ import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectDefaultCreateMeterValues, selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { BooleanTypes, ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
-import { MeterData } from '../../types/redux/meters';
+import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
-import { ReadingsCSVUploadDefaults, convertTimeSort, convertBoolean } from '../../utils/csvUploadDefaults';
-import { showErrorNotification, showInfoNotification } from '../../utils/notifications';
+import { ReadingsCSVUploadDefaults, convertBoolean } from '../../utils/csvUploadDefaults';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
-
 /**
  * Defines the CSV Readings page
  * @returns CSV Readings page element
@@ -103,7 +102,7 @@ export default function ReadingsCSVUploadComponent() {
 				lengthGap: foundMeter.readingGap,
 				lengthVariation: foundMeter.readingVariation,
 				endOnly: convertBoolean(foundMeter.endOnlyTime),
-				timeSort: convertTimeSort(foundMeter.timeSort),
+				timeSort: MeterTimeSortType[foundMeter.timeSort as keyof typeof MeterTimeSortType],
 				useMeterZone: false
 			}));
 		} else {
@@ -139,7 +138,7 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const handleTimeSortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newTimeSort = convertTimeSort(e.target.value);
+		const newTimeSort = MeterTimeSortType[e.target.value as keyof typeof MeterTimeSortType];
 		setReadingsData(prevDetails => ({
 			...prevDetails,
 			timeSort: newTimeSort
@@ -149,12 +148,11 @@ export default function ReadingsCSVUploadComponent() {
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
-			try {
-				const msg = await submitReadings(readingsData, selectedFile, dispatch);
-				showInfoNotification(msg as unknown as string);
-			} catch (error) {
-				// A failed axios request should result in an error.
-				showErrorNotification(error.response.data as string);
+			const response = await submitReadings(readingsData, selectedFile, dispatch);
+			if (response.success) {
+				showSuccessNotification(response.message);
+			} else {
+				showErrorNotification(response.message);
 			}
 		}
 	};

@@ -21,7 +21,13 @@ interface MetersUploadResponse {
 	meters: MeterData[];
 }
 
-export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File, dispatch: any): Promise<string> => {
+interface ApiResponse {
+	success: boolean;
+	message: string;
+}
+
+export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem,
+	readingsFile: File, dispatch: any):Promise<ApiResponse> => {
 
 	const backend = new ApiBackend();
 	const formData = new FormData();
@@ -41,20 +47,21 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	}
 	formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
 
+	let message = '';
 	try {
-		await backend.doPostRequest<void>('/api/csv/readings', formData);
-		dispatch(baseApi.util.invalidateTags(['Readings']));
+		message = await backend.doPostRequest<string>('/api/csv/readings', formData);
 	} catch (error) {
-		return 'Error submitting readings: ' + error;
+		return { success: false, message: error.response.data };
 	}
-	return 'Reading have been added successfully!';
+	dispatch(baseApi.util.invalidateTags(['Readings']));
+	return { success: true, message: message };
 };
 
-export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File, dispatch: any): Promise<string> => {
+export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem,
+	metersFile: File, dispatch: any): Promise<ApiResponse> => {
 
 	const backend = new ApiBackend();
 	const formData = new FormData();
-	console.log('inside submitMeters!!');
 	// The Boolean values in state must be converted to the submitted values of yes and no.
 	const uploadPreferencesForm: CSVUploadPreferencesForm = {
 		...uploadPreferences,
@@ -70,27 +77,24 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 	try {
 		const response = await backend.doPostRequest<MetersUploadResponse>('/api/csv/meters', formData);
 		const { message, meters } = response;
-		const meterNames: string[] = [];
-
+		const meterNames = meters.map(meter => meter.name).join(', ');
 		// If new meters were added to DB, have redux add them to getMeters state
 		/// If meters were updated to the DB, invalidate meters
 		/// This is how the Redux metersAPI currently functions, so mirroring this functionality
 		if (uploadPreferences.update === true) {
 			dispatch(baseApi.util.invalidateTags(['MeterData']));
 			// meters were invalidated so all meter changes will now reflect in Redux state, now return
-			return message;
 		} else {
 			// add each new meter into Redux state without invalidating all meters
 			meters.forEach(meter => {
 				dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => {
 					meterAdapter.addOne(cacheDraft, meter);
 				}));
-				meterNames.push(meter.name + ', ');
 			});
-			return 'The following meters were added: ' + meterNames.forEach;
 		}
+		return { success: true, message: message + ' ' + meterNames };
 
 	} catch (error) {
-		return 'Error submitting meters: ' + error;
+		return { success: false, message: error.response.data };
 	}
 };
