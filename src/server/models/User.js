@@ -33,6 +33,8 @@ class User {
 
 	/**
 	 * Returns a promise to retrieve the user with the given id from the database.
+	 * This exposes the encrypted password so should only be used on
+	 * server code and never returned to the client.
 	 * @param conn is the connection to use.
 	 * @param id
 	 * @returns {Promise.<User>}
@@ -44,7 +46,8 @@ class User {
 
 	/**
 	 * Returns a promise to retrieve the user with the given email from the database.
-	 * This exposes the user's password_hash and should only be used for authentication purposes.
+	 * This exposes the encrypted password so should only be used on
+	 * server code and never returned to the client.
 	 * @param email the email to look up
 	 * @param conn the connection to use.
 	 * @returns {Promise.<User>} either the user object with info or null if does not exist.

@@ -5,8 +5,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
-	ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import {
+	Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
+	ModalBody, ModalFooter, ModalHeader, Row
+} from 'reactstrap';
 import { userApi } from '../../../redux/api/userApi';
 import { User, UserRole } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';

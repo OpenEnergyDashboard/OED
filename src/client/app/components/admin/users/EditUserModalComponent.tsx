@@ -61,14 +61,16 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		if (currentLoggedInUser) {
 			if (props.user.email === currentLoggedInUser.email) {
 				setUserDetails(prevDetails => ({
-					...prevDetails, disableDelete: true }));
+					...prevDetails, disableDelete: true
+				}));
 			}
 		}
 	}, [currentLoggedInUser, props.user]);
 
 	useEffect(() => {
 		setUserDetails(prevDetails => ({
-			...prevDetails, passwordMatch: (userDetails.password === userDetails.confirmPassword) }));
+			...prevDetails, passwordMatch: (userDetails.password === userDetails.confirmPassword)
+		}));
 	}, [userDetails.password, userDetails.confirmPassword]);
 
 	// Handlers for each type of input change
@@ -90,8 +92,10 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// close modal
 		props.handleClose();
 		// set needed user details into a user and send to backend
-		const editedUser: User = { id: userDetails.id, email: userDetails.email, role: userDetails.role,
-			password: userDetails.password, note: userDetails.note };
+		const editedUser: User = {
+			id: userDetails.id, email: userDetails.email, role: userDetails.role,
+			password: userDetails.password, note: userDetails.note
+		};
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
