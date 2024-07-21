@@ -72,7 +72,7 @@ services:
               # database:
               # We need the database and it has to be ready for work (see healthcheck above).
               # condition: service_healthy
-        # Lets docker-compose up work right
+        # Lets docker compose up work right
         # If environment variable install_args is not set then it becomes blank without warning user.
         command:
             [
