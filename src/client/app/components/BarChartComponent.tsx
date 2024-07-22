@@ -39,6 +39,8 @@ export default function BarChartComponent() {
 		})
 	});
 
+	console.log(meterArgs);
+
 	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useBarQuery(groupArgs, {
 		skip: groupShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
