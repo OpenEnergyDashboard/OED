@@ -31,6 +31,7 @@ function validateReadings(arrayToValidate, conditionSet, meterIdentifier = undef
  * @param {Moment} minDate inclusive earliest acceptable date (won't be rejected)
  * @param {Moment} maxDate inclusive latest acceptable date (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
 function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier) {
 	let validDates = true;
@@ -72,6 +73,7 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier)
  * @param {number} minVal inclusive minimum acceptable reading value (won't be rejected)
  * @param {number} maxVal inclusive maximum acceptable reading value (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
 function checkValue(arrayToValidate, minVal, maxVal, maxError, meterIdentifier) {
 	let validValues = true;
@@ -107,6 +109,7 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError, meterIdentifier) 
  * Check and report unequal intervals. Can be ignore by passing null interval
  * @param {Readings[]} arrayToValidate
  * @param {number} threshold the maximum allowed difference between consecutive data points' intervals
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
 function checkIntervals(arrayToValidate, threshold, meterIdentifier) {
 	let validIntervals = true;
