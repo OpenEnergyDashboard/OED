@@ -63,7 +63,7 @@ export default function BarControlsComponent() {
 			setShowCustomBarDuration(true);
 		} else {
 			// Set the standard menu value, hide the custom bar duration input
-			//  and bar duration for graphing.
+			// and bar duration for graphing.
 			// Since controlled values know it is a valid integer.
 			setShowCustomBarDuration(false);
 			updateBarDurationChange(Number(value));

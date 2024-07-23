@@ -9,7 +9,7 @@ import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import {
 	selectBarWidthDays, selectComparePeriod,
-	selectCompareTimeInterval, selectMapBarWidthDays, selectQueryTimeInterval,
+	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState
 } from '../slices/graphSlice';
@@ -139,7 +139,7 @@ export const selectCompareChartQueryArgs = createSelector(
 
 export const selectMapChartQueryArgs = createSelector(
 	selectBarChartQueryArgs,
-	selectMapBarWidthDays,
+	selectBarWidthDays,
 	(state: RootState) => state.maps,
 	(barChartArgs, barWidthDays, maps) => {
 		const durationDays = Math.round(barWidthDays.asDays());

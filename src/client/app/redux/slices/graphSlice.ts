@@ -26,7 +26,6 @@ const defaultState: GraphState = {
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
-	mapsBarDuration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
 	compareSortingOrder: SortingOrder.Descending,
@@ -81,9 +80,6 @@ export const graphSlice = createSlice({
 		},
 		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
 			state.current.barDuration = action.payload;
-		},
-		updateMapsBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.mapsBarDuration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
@@ -373,7 +369,6 @@ export const graphSlice = createSlice({
 		selectShowMinMax: state => state.current.showMinMax,
 		selectBarStacking: state => state.current.barStacking,
 		selectBarWidthDays: state => state.current.barDuration,
-		selectMapBarWidthDays: state => state.current.mapsBarDuration,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
 		selectChartToRender: state => state.current.chartToRender,
@@ -410,8 +405,7 @@ export const {
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
-	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectMapBarWidthDays
+	selectPlotlySliderMax, selectPlotlySliderMin
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -428,6 +422,6 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateMapsBarDuration
+	updateSelectedMetersOrGroups
 } = graphSlice.actions;
 
