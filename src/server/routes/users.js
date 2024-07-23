@@ -94,7 +94,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		required: ['email', 'password', 'role'],
+		required: ['email', 'password', 'role', 'note'],
 		properties: {
 			email: {
 				type: 'string'
@@ -145,7 +145,7 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 		properties: {
 			user: {
 				type: 'object',
-				required: ['id', 'email', 'role'],
+				required: ['id', 'email', 'role', 'note'],
 				properties: {
 					id: {
 						type: 'integer'
@@ -171,52 +171,37 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 	if (!validate(req.body, validParams).valid) {
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
-
 		try {
 			const conn = getConnection();
 			const { user } = req.body;
 			const userBeforeChanges = await User.getByID(user.id,conn);
-			const numberOfAdmins = (await User.getNumberOfAdmins(conn)).count;
 			
 			// This protects the database so that there will always be at least one admin
-			if (numberOfAdmins < 2 && userBeforeChanges.role === 'admin' && user.role !== 'admin') {
-				const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
-				log.error(errorMessage);
-				return res.status(400).json({
-					message: errorMessage,
-				});
+			if (userBeforeChanges.role === 'admin' && user.role !== 'admin') {
+				const numberOfAdmins = await User.getNumberOfAdmins(conn);
+				if (numberOfAdmins < 2) {
+					const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
+					log.error(errorMessage);
+					return res.status(400).json({
+						message: errorMessage,
+					});
+				}
 			}
-			
+
 			// set up Asynchronous database queries
 			const userUpdates = [];
 
-			// not the only admin, so proceed
-			// update the user's role if needed
-			if (user.role !== userBeforeChanges.role) {
-				userUpdates.push(
-					User.updateUserRole(user.id, user.role, conn)
-				);
-			}
+			// update user
+			userUpdates.push(
+				User.updateUser(user.id, user.email, user.role, user.note, conn)
+			);
+			
 			
 			// update the user's password if needed
 			if (user.password) {
 				const hashedPassword = await bcrypt.hash(user.password, 10);
 				userUpdates.push(
 					User.updateUserPassword(user.id, hashedPassword, conn)
-				);
-			}
-
-			// update email if needed
-			if (user.email !== userBeforeChanges.email) {
-				userUpdates.push(
-					User.updateUserEmail(user.id, user.email, conn)
-				);
-			}
-
-			// update note if needed
-			if (user.note !== userBeforeChanges.note) {
-				userUpdates.push(
-					User.updateUserNote(user.id, user.note, conn)
 				);
 			}
 

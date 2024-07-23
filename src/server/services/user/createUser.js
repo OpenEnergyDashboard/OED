@@ -37,7 +37,8 @@ const { getConnection } = require('../../db');
 	}
 
 	const passwordHash = bcrypt.hashSync(password, 10);
-	const admin = new User(undefined, email, passwordHash, User.role.ADMIN, undefined);
+	const admin = new User(undefined, email, passwordHash, User.role.ADMIN,
+		`User ${email} created via createUser on ${moment().toISOString()}`);
 	const conn = getConnection();
 	try {
 		// Check if user already exists and only create if does not.

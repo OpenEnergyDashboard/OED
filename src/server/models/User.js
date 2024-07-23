@@ -14,7 +14,7 @@ class User {
 	 * @param role The user's role
 	 * @param note The user note
 	 */
-	constructor(id, email, passwordHash, role, note) {
+	constructor(id, email, passwordHash, role, note = '') {
 		this.id = id;
 		this.email = email;
 		this.passwordHash = passwordHash;
@@ -62,9 +62,9 @@ class User {
 	 * @param conn the connection to use.
 	 * @returns {Promise.<Integer>} the amount of admins
 	 */
-		static async getNumberOfAdmins(conn) {
-			return await conn.one(sqlFile('user/get_number_of_admins.sql'));
-		}
+	static async getNumberOfAdmins(conn) {
+		return await conn.one(sqlFile('user/get_number_of_admins.sql'));
+	}
 
 	/**
 	 * Returns a promise to get all of the users from the database
@@ -108,7 +108,7 @@ class User {
 		return conn.none(sqlFile('user/update_user_role.sql'), { id: id, role: role });
 	}
 
-		/**
+	/**
 	 * Returns a promise to update a user's email
 	 * @param id the id of the user whose note is to be updated
 	 * @param note the new note
@@ -117,6 +117,19 @@ class User {
 	 */
 	static async updateUserNote(id, note, conn) {
 		return conn.none(sqlFile('user/update_user_note.sql'), { id: id, note: note });
+	}
+
+	/**
+	 * Returns a promise to update a user
+	 * @param id the id of the user to be updated
+	 * @param email the new email
+	 * @param role the new role
+	 * @param note the new note
+	 * @param conn is the connection to use.
+	 * @returns {Promise<void>}
+	 */
+	static async updateUser(id, email, role, note, conn) {
+		return conn.none(sqlFile('user/update_user.sql'), { id: id, email: email, role: role, note: note });
 	}
 
 	/**
