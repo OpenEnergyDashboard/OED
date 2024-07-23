@@ -52,7 +52,7 @@ export default function PreferencesComponent(props: PreferencesProps) {
 				failureMessage='failed.to.submit.changes'
 			/>
 			{/* Graph Settings */}
-			{props.selectedPreference === 'graph' &&
+			{(props.selectedPreference === 'graph' || props.selectedPreference === 'all') &&
 				<>
 					<div>
 						<p style={labelStyle}>
@@ -137,7 +137,7 @@ export default function PreferencesComponent(props: PreferencesProps) {
 				</>
 			}
 			{/* Misc Settings */}
-			{props.selectedPreference === 'misc' &&
+			{(props.selectedPreference === 'misc'  || props.selectedPreference === 'all') &&
 				<>
 					<div style={bottomPaddingStyle}>
 						<p style={titleStyle}>
@@ -238,7 +238,7 @@ export default function PreferencesComponent(props: PreferencesProps) {
 			{/* Meter Settings */}
 
 			{
-				props.selectedPreference === 'meter' &&
+				(props.selectedPreference === 'meter'  || props.selectedPreference === 'all') &&
 				<>
 					<div style={bottomPaddingStyle}>
 						<p style={titleStyle}>

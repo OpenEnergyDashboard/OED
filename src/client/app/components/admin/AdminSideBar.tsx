@@ -18,7 +18,7 @@ interface SidebarProps {
 export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 	return (
 		<div className='col-3 border-end m-0 p-0'>
-			<div className="list-group">
+			<div className="list-group position-sticky top-0">
 				<button
 					type="button"
 					className={`${props.selectedPreference === 'graph' ? 'btn btn-primary' : 'btn btn-light'}`}
@@ -39,6 +39,13 @@ export default function AdminSideBar(props: SidebarProps): React.JSX.Element {
 					onClick={() => props.onSelectPreference('misc')}
 				>
 					{translate('misc')}
+				</button>
+				<button
+					type="button"
+					className={`${props.selectedPreference === 'all' ? 'btn btn-primary' : 'btn btn-light'}`}
+					onClick={() => props.onSelectPreference('all')}
+				>
+					{translate('all.settings')}
 				</button>
 			</div>
 
