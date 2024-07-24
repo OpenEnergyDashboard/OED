@@ -2,24 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import {ActionType, Dispatch, GetState, Thunk} from '../../types/redux/actions';
+import { ActionType, Dispatch, GetState, Thunk } from '../../types/redux/actions';
 import * as t from '../../types/redux/map';
-import {CalibrationModeTypes, MapData, MapMetadata} from '../../types/redux/map';
-import {
-	calibrate,
-	CalibratedPoint,
-	CalibrationResult,
-	CartesianPoint,
-	Dimensions,
-	GPSPoint
-} from '../../utils/calibration';
-import {State} from '../../types/redux/state';
-import {mapsApi} from '../../utils/api';
-import {showErrorNotification, showSuccessNotification} from '../../utils/notifications';
+import { CalibrationModeTypes, MapData, MapMetadata } from '../../types/redux/map';
+import { calibrate, CalibratedPoint, CalibrationResult, CartesianPoint, Dimensions, GPSPoint } from '../../utils/calibration';
+import { State } from '../../types/redux/state';
+import MapsApi from '../../utils/api/MapsApi';
+import ApiBackend from '../../utils/api/ApiBackend';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import * as moment from 'moment';
-import {browserHistory} from '../../utils/history';
-import {logToServer} from './logs';
+import { browserHistory } from '../../utils/history';
+import { logToServer } from './logs';
+
+const mapsApi = new MapsApi(new ApiBackend());
 
 function requestMapsDetails(): t.RequestMapsDetailsAction {
 	return { type: ActionType.RequestMapsDetails };
@@ -34,23 +30,27 @@ function submitMapEdits(mapID: number): t.SubmitEditedMapAction {
 }
 
 function confirmMapEdits(mapID: number): t.ConfirmEditedMapAction {
-	return { type: ActionType.ConfirmEditedMap, mapID};
+	return { type: ActionType.ConfirmEditedMap, mapID };
 }
 
 export function fetchMapsDetails(): Thunk {
 	return async (dispatch: Dispatch) => {
 		dispatch(requestMapsDetails());
-		const mapsDetails = await mapsApi.details();
-		dispatch(receiveMapsDetails(mapsDetails));
+		try {
+			const mapsDetails = await mapsApi.details();
+			dispatch(receiveMapsDetails(mapsDetails));
+		} catch (error) {
+			showErrorNotification(translate('failed.to.fetch.maps'));
+		}
 	};
 }
 
 export function editMapDetails(map: MapMetadata): t.EditMapDetailsAction {
-	return {type: ActionType.EditMapDetails, map};
+	return { type: ActionType.EditMapDetails, map };
 }
 
 function incrementCounter(): t.IncrementCounterAction {
-	return { type: ActionType.IncrementCounter};
+	return { type: ActionType.IncrementCounter };
 }
 
 export function setNewMap(): Thunk {
@@ -103,7 +103,7 @@ export function dropCalibration(): Thunk {
 }
 
 function resetCalibration(mapToReset: number): t.ResetCalibrationAction {
-	return { type: ActionType.ResetCalibration, mapID: mapToReset};
+	return { type: ActionType.ResetCalibration, mapID: mapToReset };
 }
 
 export function updateMapSource(data: MapMetadata): t.UpdateMapSourceAction {
@@ -163,7 +163,7 @@ function hasCartesian(point: CalibratedPoint) {
 }
 
 function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibrationSetAction {
-	return { type: ActionType.AppendCalibrationSet, calibratedPoint};
+	return { type: ActionType.AppendCalibrationSet, calibratedPoint };
 }
 
 /**
@@ -199,11 +199,11 @@ function prepareDataToCalculation(state: State): CalibrationResult {
 }
 
 function updateResult(result: CalibrationResult): t.UpdateCalibrationResultAction {
-	return { type: ActionType.UpdateCalibrationResults, result};
+	return { type: ActionType.UpdateCalibrationResults, result };
 }
 
 export function resetCurrentPoint(): t.ResetCurrentPointAction {
-	return { type: ActionType.ResetCurrentPoint } ;
+	return { type: ActionType.ResetCurrentPoint };
 }
 
 export function submitEditedMaps(): Thunk {

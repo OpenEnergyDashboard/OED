@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { FormattedMessage} from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import * as moment from 'moment';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
@@ -23,19 +23,18 @@ interface MapViewProps {
 	removeMap(id: number): any;
 }
 
-/**
- * Defines the map info card
- * @param props variables passed in to define
- * @returns Map info card element
- */
-function MapViewComponent(props: MapViewProps) {
+// editMapDetails: (map: MapMetadata) => void;
+// setCalibration: (mode: CalibrationModeTypes, mapID: number) => void;
+// removeMap: (id: number) => void;
+
+const MapViewComponent: React.FC<MapViewProps> = ({ map, isEdited, isSubmitting, editMapDetails, setCalibration, removeMap }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
 
 	useEffect(() => {
-		if (props.isEdited) {
+		if (isEdited) {
 			//updateUnsavedChanges();
 		}
-	}, [props.isEdited]);
+	}, [isEdited]);
 
 	const handleShowModal = () => setShowEditModal(true);
 	const handleCloseModal = () => setShowEditModal(false);
@@ -43,31 +42,31 @@ function MapViewComponent(props: MapViewProps) {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{props.map.name} {props.isSubmitting ? '(Submitting)' : props.isEdited ? '(Edited)' : ''}
+				{map.name} {isSubmitting ? '(Submitting)' : isEdited ? '(Edited)' : ''}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.displayable" /></b>
-				<span style={{ color: props.map.displayable ? 'green' : 'red' }}>
-					<FormattedMessage id={props.map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
+				<span style={{ color: map.displayable ? 'green' : 'red' }}>
+					<FormattedMessage id={map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
 				</span>
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="map.circle.size" /></b> {props.map.circleSize}
+				<b><FormattedMessage id="map.circle.size" /></b> {map.circleSize}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.modified.date" /></b>
-				{moment.parseZone(props.map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
+				{moment.parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="map.filename" /></b> {props.map.filename}
+				<b><FormattedMessage id="map.filename" /></b> {map.filename}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {props.map.note}
+				<b><FormattedMessage id="note" /></b> {map.note}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
-				<span style={{ color: props.map.origin && props.map.opposite ? 'black' : 'gray' }}>
-					<FormattedMessage id={props.map.origin && props.map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
+				<span style={{ color: map.origin && map.opposite ? 'black' : 'gray' }}>
+					<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
 				</span>
 			</div>
 			{hasToken() && (
@@ -80,13 +79,13 @@ function MapViewComponent(props: MapViewProps) {
 			<EditMapModalComponent
 				show={showEditModal}
 				handleClose={handleCloseModal}
-				map={props.map}
-				editMapDetails={props.editMapDetails}
-				setCalibration={props.setCalibration}
-				removeMap={props.removeMap}
+				map={map}
+				setCalibration={setCalibration}
+				editMapDetails={editMapDetails}
+				removeMap={removeMap}
 			/>
 		</div>
 	);
-}
+};
 
 export default MapViewComponent;

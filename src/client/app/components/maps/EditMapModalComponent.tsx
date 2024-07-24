@@ -4,11 +4,15 @@
 
 import * as React from 'react';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { ThunkDispatch } from 'redux-thunk';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
-import { Link } from 'react-router-dom';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { editMapDetails, submitEditedMap, removeMap } from '../../redux/actions/map';
 import { showErrorNotification } from '../../utils/notifications';
+import { State } from '../../types/redux/state';
+import { AnyAction } from 'redux';
 
 interface EditMapModalProps {
 	show: boolean;
@@ -19,42 +23,41 @@ interface EditMapModalProps {
 	removeMap(id: number): any;
 }
 
-/**
- *Defines the edit maps modal form
- * @param props state variables needed to define the component
- * @returns Map edit element
- */
-function EditMapModalComponent(props: EditMapModalProps) {
-	const [nameInput, setNameInput] = useState(props.map.name);
-	const [noteInput, setNoteInput] = useState(props.map.note || '');
-	const [circleInput, setCircleInput] = useState(props.map.circleSize.toString());
-	const [displayable, setDisplayable] = useState(props.map.displayable);
+const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose, map, setCalibration }) => {
+	const dispatch: ThunkDispatch<State, void, AnyAction> = useDispatch();
+	const [nameInput, setNameInput] = useState(map.name);
+	const [noteInput, setNoteInput] = useState(map.note || '');
+	const [circleInput, setCircleInput] = useState(map.circleSize.toString());
+	const [displayable, setDisplayable] = useState(map.displayable);
 
 	const intl = useIntl();
 
 	const handleSave = () => {
 		const updatedMap = {
-			...props.map,
+			...map,
 			name: nameInput,
 			note: noteInput,
 			circleSize: parseFloat(circleInput),
-			displayable: displayable
+			displayable
 		};
-		props.editMapDetails(updatedMap);
-		props.handleClose();
+		dispatch(editMapDetails(updatedMap));
+		dispatch(submitEditedMap(updatedMap.id) as any).then(() => {
+			handleClose();
+		});
 	};
 
 	const handleDelete = () => {
-		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: props.map.name }));
+		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: map.name }));
 		if (consent) {
-			props.removeMap(props.map.id);
-			props.handleClose();
+			dispatch(removeMap(map.id) as any).then(() => {
+				handleClose();
+			});
 		}
 	};
 
 	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
-		props.setCalibration(mode, props.map.id);
-		props.handleClose();
+		setCalibration(mode, map.id);
+		handleClose();
 	};
 
 	const toggleCircleEdit = () => {
@@ -67,8 +70,8 @@ function EditMapModalComponent(props: EditMapModalProps) {
 	};
 
 	return (
-		<Modal isOpen={props.show} toggle={props.handleClose}>
-			<ModalHeader toggle={props.handleClose}>
+		<Modal isOpen={show} toggle={handleClose}>
+			<ModalHeader toggle={handleClose}>
 				<FormattedMessage id="edit.map" />
 			</ModalHeader>
 			<ModalBody>
@@ -114,38 +117,34 @@ function EditMapModalComponent(props: EditMapModalProps) {
 				</Form>
 				<div>
 					<Label><FormattedMessage id="map.filename" /></Label>
-					<p>{props.map.filename}</p>
-					<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-						<Button color='primary'>
-							<FormattedMessage id='map.upload.new.file' />
-						</Button>
-					</Link>
+					<p>{map.filename}</p>
+					<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+						<FormattedMessage id='map.upload.new.file' />
+					</Button>
 				</div>
 				<div>
 					<Label><FormattedMessage id="map.calibration" /></Label>
 					<p>
-						<FormattedMessage id={props.map.origin && props.map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
+						<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
 					</p>
-					<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
-						<Button color='primary'>
-							<FormattedMessage id='map.calibrate' />
-						</Button>
-					</Link>
+					<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
+						<FormattedMessage id='map.calibrate' />
+					</Button>
 				</div>
 			</ModalBody>
 			<ModalFooter>
 				<Button color="danger" onClick={handleDelete}>
 					<FormattedMessage id="delete.map" />
 				</Button>
-				<Button color="secondary" onClick={props.handleClose}>
+				<Button color="secondary" onClick={handleClose}>
 					<FormattedMessage id="cancel" />
 				</Button>
 				<Button color="primary" onClick={handleSave}>
-					<FormattedMessage id="done.editing" />
+					<FormattedMessage id="save.all" />
 				</Button>
 			</ModalFooter>
 		</Modal>
 	);
-}
+};
 
 export default EditMapModalComponent;

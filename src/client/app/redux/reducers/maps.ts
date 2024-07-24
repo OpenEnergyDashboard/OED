@@ -157,10 +157,10 @@ export default function maps(state = defaultState, action: MapsAction) {
 			};
 		case ActionType.ConfirmEditedMap:
 			submitting = state.submitting;
+			submitting.splice(submitting.indexOf(action.mapID), 1);
 			byMapID = state.byMapID;
 			editedMaps = state.editedMaps;
 			if (action.mapID > 0) {
-				submitting.splice(submitting.indexOf(action.mapID));
 				byMapID[action.mapID] = { ...editedMaps[action.mapID] };
 			}
 			delete editedMaps[action.mapID];
@@ -232,7 +232,6 @@ export default function maps(state = defaultState, action: MapsAction) {
 			return {
 				...state,
 				editedMaps: {
-					...state.editedMaps,
 					[calibrated]: {
 						...state.editedMaps[calibrated],
 						calibrationResult: action.result
