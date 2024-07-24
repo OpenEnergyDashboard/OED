@@ -34,7 +34,7 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{props.user.email}
+				{props.user.username}
 			</div>
 			<div className="item-container p-2">
 				<b><FormattedMessage id="role" />: </b>

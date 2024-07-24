@@ -48,7 +48,7 @@ router.get('/token', async (req, res) => {
 					const userProfile = await User.getByID(decoded.data, conn);
 					res.status(200).json(
 						{
-							email: userProfile.email,
+							username: userProfile.username,
 							role: userProfile.role
 						});
 				} catch (error) {
@@ -94,9 +94,9 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		required: ['email', 'password', 'role', 'note'],
+		required: ['username', 'password', 'role', 'note'],
 		properties: {
-			email: {
+			username: {
 				type: 'string'
 			},
 			password: {
@@ -115,15 +115,15 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
-			const { email, password, role, note } = req.body;
+			const { username, password, role, note } = req.body;
 			const conn = getConnection();
 			// Check if user already exists
-			const currentUser = await User.getByEmail(email, conn);
+			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				res.status(400).send({ message: `user ${email} already exists so cannot create` });
+				res.status(400).send({ message: `user ${username} already exists so cannot create` });
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
-				const user = new User(undefined, email, hashedPassword, role, note);
+				const user = new User(undefined, username, hashedPassword, role, note);
 				await user.insert(conn);
 				res.sendStatus(200);
 			}
@@ -145,12 +145,12 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 		properties: {
 			user: {
 				type: 'object',
-				required: ['id', 'email', 'role', 'note'],
+				required: ['id', 'username', 'role', 'note'],
 				properties: {
 					id: {
 						type: 'integer'
 					},
-					email: {
+					username: {
 						type: 'string'
 					},
 					role: {
@@ -193,7 +193,7 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 
 			// update user
 			userUpdates.push(
-				User.updateUser(user.id, user.email, user.role, user.note, conn)
+				User.updateUser(user.id, user.username, user.role, user.note, conn)
 			);
 			
 			
@@ -225,9 +225,9 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		required: ['email'],
+		required: ['username'],
 		properties: {
-			email: {
+			username: {
 				type: 'string'
 			}
 		}
@@ -237,13 +237,13 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 	} else {
 		try {
 			const conn = getConnection();
-			const { email } = req.body;
+			const { username } = req.body;
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
-			if (user.email === email) {// Admins cannot delete themselves
+			if (user.username === username) {// Admins cannot delete themselves
 				res.sendStatus(400);
 			} else {
-				await User.deleteUser(email, conn);
+				await User.deleteUser(username, conn);
 				res.sendStatus(200);
 			}
 		} catch (error) {

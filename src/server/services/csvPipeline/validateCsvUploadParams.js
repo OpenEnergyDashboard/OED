@@ -92,13 +92,13 @@ const DEFAULTS = {
 }
 
 // These are the common upload params shared between meters and readings upload.
-// Note: Even though, the 'email' and 'password' properties are not used to validate the upload, 
+// Note: Even though, the 'username' and 'password' properties are not used to validate the upload, 
 // they may be attached to the request body when the CSV Pipeline handles user authentication 
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
 	meterName: new StringParam('meterName', undefined, undefined),
-	email: new StringParam('email', undefined, undefined),
+	username: new StringParam('username', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new BooleanParam('gzip'),
 	headerRow: new BooleanParam('headerRow'),

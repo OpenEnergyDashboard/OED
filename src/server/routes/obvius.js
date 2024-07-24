@@ -25,7 +25,7 @@ const listConfigfiles = require('../services/obvius/listConfigfiles');
 const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings');
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
-const { obviusEmailAndPasswordAuthMiddleware } = require('./authenticator');
+const { obviusUsernameAndPasswordAuthMiddleware } = require('./authenticator');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
 
@@ -112,17 +112,17 @@ function obviusLog(req, res, next){
  * Verifies an Obvius request via username and password.
  */
 function verifyObviusUser(req, res, next){
-	// First we ensure that the password and email parameters are provided.
+	// First we ensure that the password and username parameters are provided.
 	if (!req.param('password')) {
 		failure(req, res, 'password parameter is required.');
 		return;
-	} else if (!req.param('email')){
-		failure(req, res, 'email parameter is required.');
+	} else if (!req.param('username')){
+		failure(req, res, 'username parameter is required.');
 		return;
 	} else { // Authenticate Obvius user.
-		req.body.email = req.param('email');
+		req.body.username = req.param('username');
 		req.body.password = req.param('password');
-		obviusEmailAndPasswordAuthMiddleware('Obvius pipeline')(req, res, next);
+		obviusUsernameAndPasswordAuthMiddleware('Obvius pipeline')(req, res, next);
 	}
 }
 

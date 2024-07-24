@@ -145,7 +145,7 @@ else
 	# Create a user
 	set -e
 	if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
-		npm run createUser -- test@example.com password
+		npm run createUser -- testUser password
 		createuser_code=$?
 		if [ $createuser_code -ne 0 ]; then
 			# There was an error so stop process unless asked to continue on DB issues.
@@ -160,7 +160,7 @@ else
 			fi
 		else
 			# There was no createdb error so assume database ready for use so stop process
-			printf "%s\n" "User creation had no errors so default user 'test@example.com' with password 'password' should exist"
+			printf "%s\n" "User creation had no errors so default user 'testUser' with password 'password' should exist"
 		fi
 		# Create function to shift readings for compare - developer only
 		printf "%s\n" "Creating developer DB function"

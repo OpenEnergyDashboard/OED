@@ -21,8 +21,8 @@ const UPLOAD_METERS_ROUTE = '/api/csv/meters';
 const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 
 // The default fields and routes for the requests
-const CHAI_READINGS_REQUEST = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('email', '${testUser.email}').field('password', '${testUser.password}')`;
-const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('email', '${testUser.email}').field('password', '${testUser.password}')`;
+const CHAI_READINGS_REQUEST = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
+const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
 
 // Note there is only one description for all uploads in a test (not an array)
 // but all other keys are arrays of length number of uploads in test.

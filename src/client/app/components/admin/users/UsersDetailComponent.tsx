@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
-import { User } from '../../../types/items';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
@@ -16,10 +15,7 @@ import UserViewComponent from './UserViewComponent';
  * @returns User Detail element
  */
 export default function UserDetailComponent() {
-	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery(undefined);
-	const [localUsers, setLocalUsers] = React.useState<User[]>([]);
-
-	React.useEffect(() => { setLocalUsers(users); }, [users]);
+	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery();
 
 	return (
 		<div>
@@ -35,15 +31,16 @@ export default function UserDetailComponent() {
 					<CreateUserModalComponent />
 				</div>
 				<div className='card-container'>
-					{// display users and sort by email alphabetically
-						[...localUsers]
-							.sort((a, b) => a.email.localeCompare(b.email))
+					{// display users and sort by username alphabetically
+						[...users]
+							.sort((a, b) => a.username.localeCompare(b.username))
 							.map(user => (
 								<UserViewComponent
-									key={user.email}
+									key={user.username}
 									user={user}
 								/>
-							))}
+							))
+					}
 				</div>
 			</div>
 		</div>

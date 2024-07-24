@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
-	Alert, Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
+	Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
 	ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { userApi } from '../../../redux/api/userApi';
@@ -22,10 +22,10 @@ export default function CreateUserModal() {
 
 	// user default values
 	const userDefaults = {
-		email: '',
+		username: '',
 		password: '',
 		confirmPassword: '',
-		role: '',
+		role: UserRole['Select Role'],
 		note: '',
 		passwordMatch: true
 	};
@@ -49,7 +49,8 @@ export default function CreateUserModal() {
 	// Handlers for each type of input change
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setUserDetails(prevDetails => ({
-			...prevDetails, ...userDetails, [e.target.name]: e.target.value
+			...prevDetails,
+			[e.target.name]: e.target.value
 		}));
 	};
 
@@ -65,59 +66,80 @@ export default function CreateUserModal() {
 	};
 
 	const handleSubmit = async () => {
-		const userRole: UserRole = UserRole[userDetails.role as keyof typeof UserRole];
-		const newUser: User = { email: userDetails.email, role: userRole, password: userDetails.password, note: userDetails.note };
+		const userRole: UserRole = UserRole[userDetails.role as unknown as keyof typeof UserRole];
+		const newUser: User = { username: userDetails.username, role: userRole, password: userDetails.password, note: userDetails.note };
 		createUser(newUser)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.create.user'));
 				handleCloseModal();
 			})
-			.catch(() => {
-				showErrorNotification(translate('users.failed.to.create.user'));
+			.catch(error => {
+				showErrorNotification(translate('users.failed.to.create.user') + userDetails.username + ' ' + error.data.message);
 			});
+		resetForm();
 	};
 
-	const isFormValid = userDetails.email && userDetails.password && (userDetails.confirmPassword === userDetails.password) && userDetails.role;
+	const isFormValid = userDetails.username && userDetails.password && (userDetails.confirmPassword === userDetails.password) && userDetails.role;
 
 	return (
 		<>
 			<Button color="secondary" onClick={handleShowModal}>
-				<FormattedMessage id="create.user" />
+				{translate('create.user')}
 			</Button>
 			<Modal isOpen={showModal} toggle={handleCloseModal} size="lg">
 				<ModalHeader>
-					<FormattedMessage id="create.user" />
+					{translate('create.user')}
 				</ModalHeader>
 				<ModalBody>
 					<Container>
-						<Row>
+						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="email">Email</Label>
+									<Label for="username">
+										{translate('username')}
+									</Label>
 									<Input
-										id="email"
-										name="email"
-										type="email"
-										value={userDetails.email}
+										id="username"
+										name="username"
+										type="text"
+										value={userDetails.username}
 										onChange={e => handleStringChange(e)}
-										invalid={!userDetails.email}
+										invalid={!userDetails.username}
 										required
 									/>
 								</FormGroup>
 							</Col>
-						</Row>
-						{!userDetails.passwordMatch && (
-							<Row>
-								<Col>
-									<Alert color="danger">{translate('user.password.mismatch')}</Alert>
-								</Col>
-							</Row>
-						)}
-						<Row>
 							<Col>
 								<FormGroup>
-									<Label for="password">Password</Label>
+									<Label for="role">
+										{translate('role')}
+									</Label>
+									<Input
+										id="role"
+										name="role"
+										type="select"
+										value={userDetails.role}
+										onChange={e => handleRoleChange(e.target.value as UserRole)}
+										invalid={!userDetails.role}
+										required
+									>
+										<option value="">Select Role</option>
+										{Object.entries(UserRole).map(([role, val]) => (
+											<option value={role} key={role}>
+												{val}
+											</option>
+										))}
+									</Input>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							<Col>
+								<FormGroup>
+									<Label for="password">
+										{translate('password')}
+									</Label>
 									<Input
 										id="password"
 										name="password"
@@ -131,7 +153,9 @@ export default function CreateUserModal() {
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="confirmPassword">Confirm Password</Label>
+									<Label for="confirmPassword">
+										{translate('password.confirm')}
+									</Label>
 									<Input
 										id="confirmPassword"
 										name="confirmPassword"
@@ -150,30 +174,9 @@ export default function CreateUserModal() {
 						<Row>
 							<Col>
 								<FormGroup>
-									<Label for="role">Role</Label>
-									<Input
-										id="role"
-										name="role"
-										type="select"
-										value={userDetails.role}
-										onChange={e => handleRoleChange(e.target.value as UserRole)}
-										invalid={!userDetails.role}
-										required
-									>
-										<option value="">Select Role</option>
-										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={role} key={val}>
-												{role}
-											</option>
-										))}
-									</Input>
-								</FormGroup>
-							</Col>
-						</Row>
-						<Row>
-							<Col>
-								<FormGroup>
-									<Label for="note">Note</Label>
+									<Label for="note">
+										{translate('note')}
+									</Label>
 									<Input
 										id="note"
 										name="note"

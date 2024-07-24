@@ -9,14 +9,14 @@ const sqlFile = database.sqlFile;
 class User {
 	/**
 	 * @param id This users's ID. Should be undefined if the user is being newly created
-	 * @param email This user's email
+	 * @param username This user's username
 	 * @param passwordHash The user's passwordHash
 	 * @param role The user's role
 	 * @param note The user note
 	 */
-	constructor(id, email, passwordHash, role, note = '') {
+	constructor(id, username, passwordHash, role, note = '') {
 		this.id = id;
-		this.email = email;
+		this.username = username;
 		this.passwordHash = passwordHash;
 		this.role = role;
 		this.note = note;
@@ -41,20 +41,20 @@ class User {
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
-		return new User(row.id, row.email, row.password_hash, row.role, row.note);
+		return new User(row.id, row.username, row.password_hash, row.role, row.note);
 	}
 
 	/**
-	 * Returns a promise to retrieve the user with the given email from the database.
+	 * Returns a promise to retrieve the user with the given username from the database.
 	 * This exposes the encrypted password so should only be used on
 	 * server code and never returned to the client.
-	 * @param email the email to look up
+	 * @param username the username to look up
 	 * @param conn the connection to use.
 	 * @returns {Promise.<User>} either the user object with info or null if does not exist.
 	 */
-	static async getByEmail(email, conn) {
-		const row = await conn.oneOrNone(sqlFile('user/get_user_by_email.sql'), { email: email });
-		return row === null ? null : new User(row.id, row.email, row.password_hash, row.role, row.note);
+	static async getByUsername(username, conn) {
+		const row = await conn.oneOrNone(sqlFile('user/get_user_by_username.sql'), { username: username });
+		return row === null ? null : new User(row.id, row.username, row.password_hash, row.role, row.note);
 	}
 
 	/**
@@ -73,7 +73,7 @@ class User {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('user/get_all_users.sql'));
-		return rows.map(row => new User(row.id, row.email, undefined, row.role, row.note));
+		return rows.map(row => new User(row.id, row.username, undefined, row.role, row.note));
 	}
 
 	/**
@@ -88,13 +88,13 @@ class User {
 	}
 
 	/**
-	 * Returns a promise to update a user's email
-	 * @param id the id of the user whose email is to be updated
+	 * Returns a promise to update a user's username
+	 * @param id the id of the user whose username is to be updated
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
-	static async updateUserEmail(id, email, conn) {
-		return conn.none(sqlFile('user/update_user_email.sql'), { id: id, email: email });
+	static async updateUserUsername(id, username, conn) {
+		return conn.none(sqlFile('user/update_user_username.sql'), { id: id, username: username });
 	}
 
 	/**
@@ -109,7 +109,7 @@ class User {
 	}
 
 	/**
-	 * Returns a promise to update a user's email
+	 * Returns a promise to update a user's note
 	 * @param id the id of the user whose note is to be updated
 	 * @param note the new note
 	 * @param conn is the connection to use.
@@ -122,24 +122,24 @@ class User {
 	/**
 	 * Returns a promise to update a user
 	 * @param id the id of the user to be updated
-	 * @param email the new email
+	 * @param username the new username
 	 * @param role the new role
 	 * @param note the new note
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
-	static async updateUser(id, email, role, note, conn) {
-		return conn.none(sqlFile('user/update_user.sql'), { id: id, email: email, role: role, note: note });
+	static async updateUser(id, username, role, note, conn) {
+		return conn.none(sqlFile('user/update_user.sql'), { id: id, username: username, role: role, note: note });
 	}
 
 	/**
 	 * Returns a promise to delete a user
-	 * @param email the email of the user
+	 * @param username the username of the user
 	 * @param conn is the connection to use.
 	 * @returns {Promise<void>}
 	 */
-	static deleteUser(email, conn) {
-		return conn.none(sqlFile('user/delete_user.sql'), { email: email });
+	static deleteUser(username, conn) {
+		return conn.none(sqlFile('user/delete_user.sql'), { username: username });
 	}
 
 	/**

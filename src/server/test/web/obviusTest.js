@@ -13,7 +13,7 @@ mocha.describe('Obvius API', () => {
 	mocha.describe('upload: ', () => {
 		mocha.describe('authorized roles (Admin or Obvius):', () => {
 			mocha.it('should accept requests from Admin users', async () => {
-				const res = await chai.request(app).post('/api/obvius').send({ email: testUser.email, password: testUser.password });
+				const res = await chai.request(app).post('/api/obvius').send({ username: testUser.username, password: testUser.password });
 				expect(res).to.have.status(406); // this passes role verification but fails due to improper input
 			});
 			mocha.it('should accept requests from Obvius users', async () => {
@@ -23,7 +23,7 @@ mocha.describe('Obvius API', () => {
 				const obviusUser = new User(undefined, 'obivus@example.com', hashedPassword, User.role.OBVIUS);
 				await obviusUser.insert(conn);
 				obviusUser.password = password;
-				const res = await chai.request(app).post('/api/obvius').send({ email: obviusUser.email, password: obviusUser.password });
+				const res = await chai.request(app).post('/api/obvius').send({ username: obviusUser.username, password: obviusUser.password });
 				expect(res).to.have.status(406); // this passes role verification but fails due to improper input
 			});
 		})
@@ -37,7 +37,7 @@ mocha.describe('Obvius API', () => {
 						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
 						await unauthorizedUser.insert(conn);
 						unauthorizedUser.password = password;
-						const res = await chai.request(app).post('/api/obvius').send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+						const res = await chai.request(app).post('/api/obvius').send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						// request should respond with http code of 401 for failed user
 						expect(res).to.have.status(401);
 						// Should also return expected message

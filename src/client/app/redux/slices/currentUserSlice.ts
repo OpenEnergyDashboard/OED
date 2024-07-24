@@ -40,7 +40,7 @@ export const currentUserSlice = createSlice({
 			.addMatcher(authApi.endpoints.login.matchFulfilled,
 				(state, { payload }) => {
 					// User has logged in update state, and write to local storage
-					state.profile = { email: payload.email, role: payload.role };
+					state.profile = { username: payload.username, role: payload.role };
 					state.token = payload.token;
 					setToken(state.token);
 				});

@@ -37,6 +37,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		disableDelete: false
 	};
 
+	// get current logged in user
+	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
+
 	// user apis
 	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
@@ -47,19 +50,11 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		...userDefaults
 	});
 
-	// get current logged in user
-	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
-
-	// set user details to passed in user
-	useEffect(() => {
-		setUserDetails({ ...props.user, ...userDefaults });
-	}, [props.user]);
-
 	// if editing current logged in user, do not allow user to delete their own account
 	useEffect(() => {
 		setUserDetails({ ...userDetails, disableDelete: false });
 		if (currentLoggedInUser) {
-			if (props.user.email === currentLoggedInUser.email) {
+			if (props.user.username === currentLoggedInUser.username) {
 				setUserDetails(prevDetails => ({
 					...prevDetails, disableDelete: true
 				}));
@@ -93,35 +88,35 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		props.handleClose();
 		// set needed user details into a user and send to backend
 		const editedUser: User = {
-			id: userDetails.id, email: userDetails.email, role: userDetails.role,
+			id: userDetails.id, username: userDetails.username, role: userDetails.role,
 			password: userDetails.password, note: userDetails.note
 		};
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.user') + props.user.email);
+				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.edit.user') + props.user.email + ' ' + error.data.message);
+				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
 			});
 		resetPasswordFields();
 	};
 
-	const deleteUser = (email: string) => {
-		submitDeleteUser(email)
+	const deleteUser = (username: string) => {
+		submitDeleteUser(username)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.delete.user') + props.user.email);
+				showSuccessNotification(translate('users.successfully.delete.user') + props.user.username);
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.delete.user') + props.user.email + ' ' + error.data.message);
+				showErrorNotification(translate('users.failed.to.delete.user') + props.user.username + ' ' + error.data.message);
 			});
 	};
 
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('user.delete.confirm') + props.user.email + '?';
+	const deleteConfirmationMessage = translate('user.delete.confirm') + props.user.username + '?';
 	const deleteConfirmText = translate('delete.user');
 	const deleteRejectText = translate('cancel');
 
@@ -146,7 +141,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setShowDeleteConfirmationModal(false);
 
 		// Delete the conversion using the state object, it should only require the source and destination ids set
-		deleteUser(userDetails.email);
+		deleteUser(userDetails.username);
 	};
 	/* End Confirm Delete Modal */
 
@@ -178,7 +173,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				actionRejectText={deleteRejectText} />
 			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
 				<ModalHeader>
-					<FormattedMessage id="edit.user" />
+					{translate('edit.user')}
 					<TooltipHelpComponent page='users-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='help.admin.user' helpTextId='help.admin.user' />
@@ -189,19 +184,23 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="email"><FormattedMessage id="email" /></Label>
+									<Label for="username">
+										{translate('username')}
+									</Label>
 									<Input
-										id="email"
-										name="email"
-										type="email"
-										value={userDetails.email}
+										id="username"
+										name="username"
+										type="text"
+										value={userDetails.username}
 										onChange={handleStringChange}
 									/>
 								</FormGroup>
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="role"><FormattedMessage id="role" /></Label>
+									<Label for="role">
+										{translate('role')}
+									</Label>
 									<Input
 										id="role"
 										name="role"
@@ -221,7 +220,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="password"><FormattedMessage id="password" /></Label>
+									<Label for="password">
+										{translate('password')}
+									</Label>
 									<Input
 										id="password"
 										name="password"
@@ -233,7 +234,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="confirmPassword"><FormattedMessage id="password.confirm" /></Label>
+									<Label for="confirmPassword">
+										{translate('password.confirm')}
+									</Label>
 									<Input
 										id="confirmPassword"
 										name="confirmPassword"
@@ -242,14 +245,18 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordMatch}
 									/>
-									<FormFeedback><FormattedMessage id="user.password.mismatch" /></FormFeedback>
+									<FormFeedback>
+										{translate('user.password.mismatch')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>
 						<Row>
 							<Col>
 								<FormGroup>
-									<Label for="note">Note</Label>
+									<Label for="note">
+										{translate('note')}
+									</Label>
 									<Input
 										id="note"
 										name="note"
@@ -258,7 +265,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										onChange={handleStringChange}
 									/>
 									<FormFeedback>
-										<FormattedMessage id="error.required" />
+										{translate('error.required')}
 									</FormFeedback>
 								</FormGroup>
 							</Col>

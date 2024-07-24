@@ -83,7 +83,7 @@ export interface TooltipItems {
  */
 export interface User {
 	id?: number;
-	email: string;
+	username: string;
 	role: UserRole;
 	password?: string;
 	note?: string;
@@ -93,6 +93,7 @@ export interface User {
  * The values of this enum that needs to match the keys of User.role in src/server/models/User
  */
 export enum UserRole {
+	'Select Role' = 'invalid',
 	ADMIN = 'admin',
 	CSV = 'csv',
 	EXPORT = 'export',

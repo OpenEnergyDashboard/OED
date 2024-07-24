@@ -9,26 +9,26 @@ const { getConnection } = require('../../db');
 
 (async () => {
 	let user = new User;
-	let email;
+	let username;
 	let password;
 	let role;
 	let note;
 	const conn = getConnection();
 
 	try {
-		email = await ask('Email of user to modify: ');
+		username = await ask('Username of user to modify: ');
 	} catch (err) {
-		terminateReadline('Invalid email, no user modified');
+		terminateReadline('Invalid username, no user modified');
 	}
 
 	try {
-		user = await User.getByEmail(email, conn);
+		user = await User.getByUsername(username, conn);
 
 		if (user === null) {
-			terminateReadline('No user with that email exists');
+			terminateReadline('No user with that username exists');
 		}
 	} catch (err) {
-		terminateReadline('User email lookup failed with err: ', 1, err);
+		terminateReadline('User username lookup failed with err: ', 1, err);
 	}
 
 	password = await ask('Password: ');
@@ -83,5 +83,5 @@ const { getConnection } = require('../../db');
 		console.log('Error caught', err);
 		terminateReadline('Failed to update user\'s note with error: ', 1, err);
 	}
-terminateReadline('\nFinished updating user. \nEmail: ' + email + '\nRole: ' + role + '\nNote: ' + note);
+terminateReadline('\nFinished updating user. \nUsername: ' + username + '\nRole: ' + role + '\nNote: ' + note);
 })();
