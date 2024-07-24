@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
-import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
 import { fetchMapsDetails, setNewMap, submitEditedMaps } from '../../redux/actions/map';
