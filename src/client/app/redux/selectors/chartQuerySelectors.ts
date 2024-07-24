@@ -14,7 +14,6 @@ import {
 	selectSelectedUnit, selectThreeDState
 } from '../slices/graphSlice';
 import { omit } from 'lodash';
-import { TimeInterval } from '../../../../common/TimeInterval';
 
 // query args that 'most' graphs share
 export interface commonQueryArgs {
@@ -46,26 +45,11 @@ export const selectCommonQueryArgs = createSelector(
 	selectQueryTimeInterval,
 	selectSelectedUnit,
 	(selectedMeters, selectedGroups, queryTimeInterval, selectedUnit) => {
-		let queryTimeStamp;
-		if(queryTimeInterval.getIsBounded()) {
-			const startTs = queryTimeInterval.getStartTimestamp().clone();
-			const endTs =  queryTimeInterval.getEndTimestamp().clone();
-			const endDate = endTs.clone();
-			endDate.endOf('day');
-			if(!endTs.isSame(endDate)){
-				console.log("Added a millisecond");
-				endTs.add(1, 'millisecond');
-			}
-			queryTimeStamp = new TimeInterval(startTs, endTs);
-		}
-		else {
-			queryTimeStamp = queryTimeInterval;
-		}
 
 		// args that 'most' meters queries share
 		const meterArgs = {
 			ids: selectedMeters,
-			timeInterval: queryTimeStamp.toString(),
+			timeInterval: queryTimeInterval.toString(),
 			graphicUnitId: selectedUnit,
 			meterOrGroup: MeterOrGroup.meters
 		};
