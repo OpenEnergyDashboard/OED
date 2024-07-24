@@ -26,6 +26,7 @@ export default function MapControlsComponent() {
 
 	return (
 		<div>
+			<MapChartSelectComponent key='chart' />
 			<div key='side-options'>
 				<p style={labelStyle}>
 					{translate('map.interval')}:
@@ -37,7 +38,6 @@ export default function MapControlsComponent() {
 				</ButtonGroup>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.map.interval.tip' />
 			</div>
-			<MapChartSelectComponent key='chart' />
 		</div>
 	);
 }

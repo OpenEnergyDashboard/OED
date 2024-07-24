@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { debounce, minBy, maxBy } from 'lodash';
 import * as moment from 'moment';
 import { Datum, PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
@@ -35,7 +35,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 	const figure = React.useRef<Partial<PlotParams>>(props);
 
 	// Debounce to limit dispatch and keep reasonable history
-	const debouncedRelayout = _.debounce(
+	const debouncedRelayout = debounce(
 		(e: PlotRelayoutEvent) => {
 			// This event emits an object that contains values indicating changes in the user's graph, such as zooming.
 			if (e['xaxis.range[0]'] && e['xaxis.range[1]']) {
@@ -67,14 +67,14 @@ export const PlotOED = (props: OEDPlotProps) => {
 	// Iterating through datasets may be expensive, so useMemo()
 	// Get dataset wth min /max date
 	const minRange = React.useMemo(() => {
-		const minDataset = _.minBy(data, obj => obj.x![0]);
+		const minDataset = minBy(data, obj => obj.x![0]);
 		const min = minDataset?.x?.[0];
 		return min as Datum;
 	}, [props.data]);
 
 	// Get min/ max value from dataset
 	const maxRange = React.useMemo(() => {
-		const maxDataset = _.maxBy(data, obj => obj.x![obj.x!.length - 1]);
+		const maxDataset = maxBy(data, obj => obj.x![obj.x!.length - 1]);
 		const max = maxDataset?.x?.[maxDataset?.x?.length - 1] as Datum;
 		return max as Datum;
 	}, [props.data]);
