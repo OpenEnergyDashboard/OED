@@ -50,11 +50,11 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	let message = '';
 	try {
 		message = await backend.doPostRequest<string>('/api/csv/readings', formData);
+		dispatch(baseApi.util.invalidateTags(['Readings']));
+		return { success: true, message: message };
 	} catch (error) {
 		return { success: false, message: error.response.data };
 	}
-	dispatch(baseApi.util.invalidateTags(['Readings']));
-	return { success: true, message: message };
 };
 
 export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem,
