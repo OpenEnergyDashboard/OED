@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
+import translate from '../../../utils/translate';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
@@ -22,7 +22,7 @@ export default function UserDetailComponent() {
 			<TooltipHelpComponent page='users' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
-					<FormattedMessage id='users' />
+					{translate('users')}
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
 					</div>

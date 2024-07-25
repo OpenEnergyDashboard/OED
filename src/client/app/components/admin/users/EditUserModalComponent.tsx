@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { userApi } from '../../../redux/api/userApi';
 import { useAppSelector } from '../../../redux/reduxHooks';
@@ -207,6 +206,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										type="select"
 										value={userDetails.role}
 										onChange={handleRoleChange}
+										required
 									>
 										{Object.entries(UserRole).map(([role, val]) => (
 											<option value={val} key={val}>
@@ -275,17 +275,17 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				<ModalFooter>
 					{userDetails.disableDelete ? (
 						<div className='text-danger px-3' >
-							<FormattedMessage id="delete.self" />
+							{translate('delete.self')}
 						</div>
 					) : null}
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={userDetails.disableDelete}>
-						<FormattedMessage id="delete.user" />
+						{translate('delete.user')}
 					</Button>
 					<Button color="secondary" onClick={props.handleClose}>
-						<FormattedMessage id="cancel" />
+						{translate('cancel')}
 					</Button>
 					<Button color="primary" onClick={handleSaveChanges} disabled={!userDetails.passwordMatch}>
-						<FormattedMessage id="save.all" />
+						{translate('save.all')}
 					</Button>
 				</ModalFooter>
 			</Modal>

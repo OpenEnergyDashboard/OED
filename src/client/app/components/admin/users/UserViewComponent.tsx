@@ -6,9 +6,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Button } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
-import { User } from '../../../types/items';
 import '../../../styles/card-page.css';
+import { User } from '../../../types/items';
+import translate from '../../../utils/translate';
 import EditUserModalComponent from './EditUserModalComponent';
 
 interface UserViewComponentProps {
@@ -37,12 +37,20 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 				{props.user.username}
 			</div>
 			<div className="item-container p-2">
-				<b><FormattedMessage id="role" />: </b>
+				<b>
+					{translate('role')}
+				</b>
 				{props.user.role}
 			</div>
-			<div className="edit-btn">
+			<div className="item-container p-2">
+				<b>
+					{translate('note')}
+				</b>
+				{props.user.note ? (props.user.note.length > 50 ? props.user.note.substring(0, 50) + '...' : props.user.note) : ''}
+			</div>
+			<div className="edit-btn mt-auto">
 				<Button color='secondary' onClick={handleShow}>
-					<FormattedMessage id="edit.user" />
+					{translate('edit.user')}
 				</Button>
 				<EditUserModalComponent
 					show={showEditModal}

@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { FormattedMessage } from 'react-intl';
 import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
 	ModalBody, ModalFooter, ModalHeader, Row
@@ -41,6 +40,7 @@ export default function CreateUserModal() {
 	const [userDetails, setUserDetails] = useState(userDefaults);
 
 	const handleShowModal = () => setShowModal(true);
+
 	const handleCloseModal = () => {
 		setShowModal(false);
 		resetForm();
@@ -54,7 +54,8 @@ export default function CreateUserModal() {
 		}));
 	};
 
-	const handleRoleChange = (newRole: UserRole) => {
+	const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newRole = e.target.value as UserRole;
 		setUserDetails(prevDetails => ({
 			...prevDetails,
 			role: newRole
@@ -66,8 +67,7 @@ export default function CreateUserModal() {
 	};
 
 	const handleSubmit = async () => {
-		const userRole: UserRole = UserRole[userDetails.role as unknown as keyof typeof UserRole];
-		const newUser: User = { username: userDetails.username, role: userRole, password: userDetails.password, note: userDetails.note };
+		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		createUser(newUser)
 			.unwrap()
 			.then(() => {
@@ -120,14 +120,13 @@ export default function CreateUserModal() {
 										name="role"
 										type="select"
 										value={userDetails.role}
-										onChange={e => handleRoleChange(e.target.value as UserRole)}
+										onChange={handleRoleChange}
 										invalid={!userDetails.role}
 										required
 									>
-										<option value="">Select Role</option>
 										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={role} key={role}>
-												{val}
+											<option value={val} key={val}>
+												{role}
 											</option>
 										))}
 									</Input>
@@ -166,7 +165,7 @@ export default function CreateUserModal() {
 										required
 									/>
 									<FormFeedback>
-										<FormattedMessage id="user.password.mismatch" />
+										{translate('user.password.mismatch')}
 									</FormFeedback>
 								</FormGroup>
 							</Col>
@@ -185,7 +184,7 @@ export default function CreateUserModal() {
 										onChange={e => handleStringChange(e)}
 									/>
 									<FormFeedback>
-										<FormattedMessage id="error.required" />
+										{translate('error.required')}
 									</FormFeedback>
 								</FormGroup>
 							</Col>
@@ -194,10 +193,10 @@ export default function CreateUserModal() {
 				</ModalBody>
 				<ModalFooter>
 					<Button color="secondary" onClick={handleCloseModal}>
-						<FormattedMessage id="cancel" />
+						{translate('cancel')}
 					</Button>
 					<Button color="primary" onClick={handleSubmit} disabled={!isFormValid}>
-						<FormattedMessage id="create.user" />
+						{translate('create.user')}
 					</Button>
 				</ModalFooter>
 			</Modal>
