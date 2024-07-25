@@ -3,8 +3,8 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import translate from '../../../utils/translate';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
+import translate from '../../../utils/translate';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';

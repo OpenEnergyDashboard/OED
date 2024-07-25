@@ -139,7 +139,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 
-		// Delete the conversion using the state object, it should only require the source and destination ids set
+		// Delete the user using the username
 		deleteUser(userDetails.username);
 	};
 	/* End Confirm Delete Modal */

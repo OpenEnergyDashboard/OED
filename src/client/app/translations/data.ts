@@ -993,7 +993,7 @@ const LocaleTranslationData = {
 		"users.successfully.create.user": "L'utilisateur a été créé avec succès: ",
 		"users.successfully.delete.user": "L'utilisateur a été supprimé avec succès: ",
 		"users.successfully.edit.user": "L'utilisateur a été modifié avec succès: ",
-		"uses":"uses\u{26A1}",
+		"uses": "uses\u{26A1}",
 		"view.groups": "Visionner les groupes",
 		"visit": " ou visitez notre ",
 		"website": "site web",
