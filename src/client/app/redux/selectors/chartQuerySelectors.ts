@@ -45,7 +45,6 @@ export const selectCommonQueryArgs = createSelector(
 	selectQueryTimeInterval,
 	selectSelectedUnit,
 	(selectedMeters, selectedGroups, queryTimeInterval, selectedUnit) => {
-
 		// args that 'most' meters queries share
 		const meterArgs = {
 			ids: selectedMeters,

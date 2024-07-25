@@ -55,8 +55,8 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 		/* Adds a millisecond to the end time.
 		For the case in which the end time is the last moment of the day (date = date.endOf('day)),
 		adding a millisecond pushes the end time to the very beginning of the next day.
-		i.e the end date is 7.22.2020 at 23:59:59. Due to how OED works, the end date will be truncated to
-		7.20.2020 at 00:00:00. This is due to OED decision to graph only entire days causing the lost of the last date.
+	  For example the end date at 2020-20-7 at 23:59:59 will be truncated to
+		2020-20-7 at 00:00:00. This is due to OED decision to graph only entire days causing the lost of the last date.
 		In the case where the end date is not the last time in the day, this should not effect what users
 		should see. */
 		end = moment(toUTC(end)).add(1, 'millisecond');

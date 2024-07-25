@@ -39,8 +39,6 @@ export default function BarChartComponent() {
 		})
 	});
 
-	console.log(meterArgs);
-
 	const { data: groupData, isFetching: groupIsFetching } = readingsApi.useBarQuery(groupArgs, {
 		skip: groupShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
@@ -69,7 +67,7 @@ export default function BarChartComponent() {
 		return <h1><b>${translate('bar.raw')}</b></h1>;
 	}
 	// At least one viable dataset.
-	const enoughData = datasets.find(dataset => dataset.x!.length > 1);
+	const enoughData = datasets.find(dataset => dataset.x!.length >= 1);
 
 	if (datasets.length === 0) {
 		return <h1>
