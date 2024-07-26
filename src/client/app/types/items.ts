@@ -105,3 +105,15 @@ export enum TrueFalseType {
 	true = 'yes',
 	false = 'no'
 }
+
+// user default values
+export const userDefaults = {
+	username: '',
+	password: '',
+	confirmPassword: '',
+	note: '',
+	role: UserRole['Select Role'],
+	passwordMatch: true,
+	disableDelete: false,
+	passwordLength: true
+};

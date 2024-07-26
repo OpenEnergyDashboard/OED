@@ -8,12 +8,13 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { userApi } from '../../../redux/api/userApi';
 import { useAppSelector } from '../../../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../../../redux/slices/currentUserSlice';
-import { User, UserRole } from '../../../types/items';
+import { User, UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
 import ConfirmActionModalComponent from '../../ConfirmActionModalComponent';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
+import { tooltipBaseStyle } from '../../../styles/modalStyle';
 
 interface EditUserModalComponentProps {
 	show: boolean;
@@ -29,43 +30,36 @@ interface EditUserModalComponentProps {
  */
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
 
-	const userDefaults = {
-		password: '',
-		confirmPassword: '',
-		passwordMatch: true,
-		disableDelete: false
-	};
-
 	// get current logged in user
 	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
+
+	// user edit form state and use the defaults plus the user's data
+	const [userDetails, setUserDetails] = useState({
+		...userDefaults,
+		...props.user,
+		// if editing current logged in user, do not allow user to delete their own account
+		disableDelete: props.user.username === currentLoggedInUser.username
+	});
 
 	// user apis
 	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 
-	// user edit form state
-	const [userDetails, setUserDetails] = useState({
-		...props.user,
-		...userDefaults
-	});
-
-	// if editing current logged in user, do not allow user to delete their own account
-	useEffect(() => {
-		setUserDetails({ ...userDetails, disableDelete: false });
-		if (currentLoggedInUser) {
-			if (props.user.username === currentLoggedInUser.username) {
-				setUserDetails(prevDetails => ({
-					...prevDetails, disableDelete: true
-				}));
-			}
-		}
-	}, [currentLoggedInUser, props.user]);
-
+	// check if passwords match and if password length is at least 8
 	useEffect(() => {
 		setUserDetails(prevDetails => ({
-			...prevDetails, passwordMatch: (userDetails.password === userDetails.confirmPassword)
+			...prevDetails,
+			passwordMatch: (userDetails.password === userDetails.confirmPassword),
+			passwordLength: userDetails.password.length > 7 || userDetails.password.length === 0
 		}));
 	}, [userDetails.password, userDetails.confirmPassword]);
+
+	// check if form is valid
+	const isFormValid = () => {
+		return !!userDetails.username &&
+			(userDetails.confirmPassword === userDetails.password) &&
+			!!userDetails.role;
+	};
 
 	// Handlers for each type of input change
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,34 +76,12 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		}));
 	};
 
-	const handleSaveChanges = async () => {
-		// close modal
-		props.handleClose();
-		// set needed user details into a user and send to backend
-		const editedUser: User = {
-			id: userDetails.id, username: userDetails.username, role: userDetails.role,
-			password: userDetails.password, note: userDetails.note
-		};
-		submitUserEdits(editedUser)
-			.unwrap()
-			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
-			})
-			.catch(error => {
-				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
-			});
-		resetPasswordFields();
-	};
-
-	const deleteUser = (username: string) => {
-		submitDeleteUser(username)
-			.unwrap()
-			.then(() => {
-				showSuccessNotification(translate('users.successfully.delete.user') + props.user.username);
-			})
-			.catch(error => {
-				showErrorNotification(translate('users.failed.to.delete.user') + props.user.username + ' ' + error.data.message);
-			});
+	// Methods to reset password fields
+	const resetPasswordFields = () => {
+		setUserDetails({
+			...userDetails, password: '',
+			confirmPassword: ''
+		});
 	};
 
 	/* Confirm Delete Modal */
@@ -144,6 +116,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 	/* End Confirm Delete Modal */
 
+	// Modal show/close
 	const handleShow = () => {
 		props.handleShow();
 	};
@@ -151,14 +124,53 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	const handleClose = () => {
 		props.handleClose();
 	};
+	// End Modal show/close
 
-	const resetPasswordFields = () => {
-		setUserDetails({ ...userDetails, password: '', confirmPassword: '' });
+	const handleSaveChanges = async () => {
+		// close modal
+		props.handleClose();
+		// set needed user details into a user and send to backend
+		const editedUser: User = {
+			id: userDetails.id, username: userDetails.username, role: userDetails.role,
+			password: userDetails.password, note: userDetails.note
+		};
+		submitUserEdits(editedUser)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
+			})
+			.catch(error => {
+				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
+			});
+		resetPasswordFields();
+	};
+
+	const deleteUser = (username: string) => {
+		submitDeleteUser(username)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('users.successfully.delete.user') + props.user.username);
+			})
+			.catch(error => {
+				showErrorNotification(translate('users.failed.to.delete.user') + props.user.username + ' ' + error.data.message);
+			});
+	};
+
+	// allow enter key to submit form
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			if (isFormValid()) {
+				handleSaveChanges();
+			} else {
+				console.log('Form is not valid');
+			}
+		}
 	};
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%'
+		...tooltipBaseStyle,
+		tooltipUsersView: 'help.admin.users'
 	};
 
 	return (
@@ -175,11 +187,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					{translate('edit.user')}
 					<TooltipHelpComponent page='users-edit' />
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='help.admin.user' helpTextId='help.admin.user' />
+						<TooltipMarkerComponent page='users-edit'
+							helpTextId={tooltipStyle.tooltipUsersView}
+						/>
 					</div>
 				</ModalHeader>
 				<ModalBody>
-					<Container>
+					<Container onKeyDown={handleKeyDown}>
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
@@ -208,11 +222,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										onChange={handleRoleChange}
 										required
 									>
-										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={val} key={val}>
-												{role}
-											</option>
-										))}
+										{Object.entries(UserRole)
+											.filter(([role]) => role !== 'Select Role')
+											.map(([role, val]) => (
+												<option value={val} key={val}>
+													{role}
+												</option>
+											))}
 									</Input>
 								</FormGroup>
 							</Col>
@@ -227,9 +243,14 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id="password"
 										name="password"
 										type="password"
+										placeholder="Only enter password to update password"
 										value={userDetails.password}
 										onChange={e => handleStringChange(e)}
+										invalid={!userDetails.passwordLength}
 									/>
+									<FormFeedback>
+										{translate('user.password.length')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -284,7 +305,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<Button color="secondary" onClick={props.handleClose}>
 						{translate('cancel')}
 					</Button>
-					<Button color="primary" onClick={handleSaveChanges} disabled={!userDetails.passwordMatch}>
+					<Button color="primary" onClick={handleSaveChanges} disabled={!isFormValid()}>
 						{translate('save.all')}
 					</Button>
 				</ModalFooter>

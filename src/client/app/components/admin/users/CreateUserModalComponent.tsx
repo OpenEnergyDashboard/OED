@@ -3,15 +3,18 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
 	ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { userApi } from '../../../redux/api/userApi';
-import { User, UserRole } from '../../../types/items';
+import { User, UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import translate from '../../../utils/translate';
+import TooltipHelpComponent from '../../TooltipHelpComponent';
+import TooltipMarkerComponent from '../../TooltipMarkerComponent';
+import { tooltipBaseStyle } from '../../../styles/modalStyle';
 
 /**
  * Defines the create user modal form
@@ -19,31 +22,27 @@ import translate from '../../../utils/translate';
  */
 export default function CreateUserModal() {
 
-	// user default values
-	const userDefaults = {
-		username: '',
-		password: '',
-		confirmPassword: '',
-		role: UserRole['Select Role'],
-		note: '',
-		passwordMatch: true
-	};
+	// create user form state and use the defaults
+	const [userDetails, setUserDetails] = useState(userDefaults);
 
 	// user api
 	const [createUser] = userApi.useCreateUserMutation();
 
-	/* State */
-	// Modal show
-	const [showModal, setShowModal] = useState(false);
+	// check if passwords match
+	useEffect(() => {
+		setUserDetails(prevDetails => ({
+			...prevDetails,
+			passwordMatch: (userDetails.password === userDetails.confirmPassword),
+			passwordLength: userDetails.password.length > 7
+		}));
+	}, [userDetails.password, userDetails.confirmPassword]);
 
-	// create user form state
-	const [userDetails, setUserDetails] = useState(userDefaults);
-
-	const handleShowModal = () => setShowModal(true);
-
-	const handleCloseModal = () => {
-		setShowModal(false);
-		resetForm();
+	// check if form is valid
+	const isFormValid = () => {
+		return !!userDetails.username &&
+			!!userDetails.password &&
+			(userDetails.confirmPassword === userDetails.password) &&
+			!!(userDetails.role !== 'invalid');
 	};
 
 	// Handlers for each type of input change
@@ -55,32 +54,68 @@ export default function CreateUserModal() {
 	};
 
 	const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newRole = e.target.value as UserRole;
 		setUserDetails(prevDetails => ({
 			...prevDetails,
-			role: newRole
+			role: e.target.value as UserRole
 		}));
 	};
 
+	// Methods to reset form fields
 	const resetForm = () => {
 		setUserDetails(userDefaults);
 	};
+
+	const resetPasswordFields = () => {
+		setUserDetails({
+			...userDetails, password: '',
+			confirmPassword: ''
+		});
+	};
+	// End of reset form methods
+
+	// Modal show/close
+	const [showModal, setShowModal] = useState(false);
+
+	const handleShowModal = () => setShowModal(true);
+
+	const handleCloseModal = () => {
+		resetPasswordFields();
+		setShowModal(false);
+	};
+	// End Modal show/close
 
 	const handleSubmit = async () => {
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		createUser(newUser)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.create.user'));
+				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username);
+				resetForm();
 				handleCloseModal();
 			})
 			.catch(error => {
 				showErrorNotification(translate('users.failed.to.create.user') + userDetails.username + ' ' + error.data.message);
+				resetPasswordFields();
 			});
-		resetForm();
 	};
 
-	const isFormValid = userDetails.username && userDetails.password && (userDetails.confirmPassword === userDetails.password) && userDetails.role;
+	// allow enter key to submit form
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+			if (isFormValid()) {
+				handleSubmit();
+			} else {
+				console.log('Form is not valid');
+			}
+		}
+	};
+
+	const tooltipStyle = {
+		...tooltipBaseStyle,
+		// Only an admin can create a meter.
+		tooltipUsersView: 'help.admin.users'
+	};
 
 	return (
 		<>
@@ -90,9 +125,15 @@ export default function CreateUserModal() {
 			<Modal isOpen={showModal} toggle={handleCloseModal} size="lg">
 				<ModalHeader>
 					{translate('create.user')}
+					<TooltipHelpComponent page='users-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='users-create'
+							helpTextId={tooltipStyle.tooltipUsersView}
+						/>
+					</div>
 				</ModalHeader>
 				<ModalBody>
-					<Container>
+					<Container onKeyDown={handleKeyDown}>
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
@@ -106,7 +147,6 @@ export default function CreateUserModal() {
 										value={userDetails.username}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.username}
-										required
 									/>
 								</FormGroup>
 							</Col>
@@ -121,8 +161,7 @@ export default function CreateUserModal() {
 										type="select"
 										value={userDetails.role}
 										onChange={handleRoleChange}
-										invalid={!userDetails.role}
-										required
+										invalid={userDetails.role === UserRole['Select Role']}
 									>
 										{Object.entries(UserRole).map(([role, val]) => (
 											<option value={val} key={val}>
@@ -145,9 +184,11 @@ export default function CreateUserModal() {
 										type="password"
 										value={userDetails.password}
 										onChange={e => handleStringChange(e)}
-										invalid={!userDetails.password}
-										required
+										invalid={!userDetails.passwordLength}
 									/>
+									<FormFeedback>
+										{translate('user.password.length')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -161,8 +202,7 @@ export default function CreateUserModal() {
 										type="password"
 										value={userDetails.confirmPassword}
 										onChange={e => handleStringChange(e)}
-										invalid={userDetails.confirmPassword !== userDetails.password && userDetails.confirmPassword !== ''}
-										required
+										invalid={!userDetails.passwordMatch}
 									/>
 									<FormFeedback>
 										{translate('user.password.mismatch')}
@@ -195,7 +235,7 @@ export default function CreateUserModal() {
 					<Button color="secondary" onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color="primary" onClick={handleSubmit} disabled={!isFormValid}>
+					<Button color="primary" onClick={handleSubmit} disabled={!isFormValid()}>
 						{translate('create.user')}
 					</Button>
 				</ModalFooter>

@@ -9,6 +9,13 @@ import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
 import UserViewComponent from './UserViewComponent';
+import { Col, Row } from 'reactstrap';
+
+const tooltipStyle = {
+	display: 'inline-block',
+	fontSize: '50%',
+	tooltipUsersView: 'help.admin.users'
+};
 
 /**
  * Component which shows user details
@@ -20,38 +27,34 @@ export default function UserDetailComponent() {
 	return (
 		<div>
 			<TooltipHelpComponent page='users' />
-			<div className='container-fluid'>
-				<h2 style={titleStyle}>
+			<div className='container-fluid px-5'>
+				<h2 className='text-center'>
 					{translate('users')}
 					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='users' helpTextId='help.admin.user' />
+						<TooltipMarkerComponent page='users' helpTextId={tooltipStyle.tooltipUsersView} />
 					</div>
 				</h2>
 				<div className="edit-btn">
 					<CreateUserModalComponent />
 				</div>
 				<div className='card-container'>
-					{// display users and sort by username alphabetically
-						[...users]
-							.sort((a, b) => a.username.localeCompare(b.username))
-							.map(user => (
-								<UserViewComponent
-									key={user.username}
-									user={user}
-								/>
-							))
-					}
+					<Row className="justify-content-center">
+						{// display users and sort by username alphabetically
+							[...users]
+								.sort((a, b) => a.username.localeCompare(b.username))
+								.map(user => (
+									<Col key={user.username} xs="12" sm="6" md="4" lg="3" className="d-flex justify-content-center mb-3">
+										<UserViewComponent
+											key={user.username}
+											user={user}
+										/>
+									</Col>
+								))
+						}
+					</Row>
 				</div>
 			</div>
 		</div>
 	);
 }
 
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
-};
-
-const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%'
-};
