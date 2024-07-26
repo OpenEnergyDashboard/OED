@@ -49,9 +49,10 @@ export function showWarnNotification(message: string, position: ToastPosition = 
 		position: position,
 		autoClose: autoDismiss,
 		hideProgressBar: true,
-		pauseOnHover: false,
-		draggable: true,
-		theme: 'colored'
+		pauseOnHover: true,
+		draggable: false,
+		theme: 'colored',
+		closeOnClick: false
 	});
 }
 
@@ -66,8 +67,9 @@ export function showErrorNotification(message: string, position: ToastPosition =
 		position: position,
 		autoClose: autoDismiss,
 		hideProgressBar: true,
-		pauseOnHover: false,
-		draggable: true,
-		theme: 'colored'
+		pauseOnHover: true,
+		draggable: false,
+		theme: 'colored',
+		closeOnClick: false
 	});
 }
