@@ -26,6 +26,7 @@ import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import ErrorComponent from './router/ErrorComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import CreateUserComponent from './admin/CreateUserComponent';
+import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -60,7 +61,8 @@ const router = createBrowserRouter([
 					{ path: 'users/new', element: <CreateUserComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
-					{ path: 'users', element: <UsersDetailComponent /> }
+					{ path: 'users', element: <UsersDetailComponent /> },
+					{ path: 'visual-unit', element: <VisualUnitDetailComponent/> }
 				]
 			},
 			{
