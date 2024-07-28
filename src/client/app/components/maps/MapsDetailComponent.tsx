@@ -11,6 +11,9 @@ import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { selectMaps } from '../../redux/selectors/maps';
+	const maps: number[] = useAppSelector(selectMaps);
 
 interface MapsDetailProps {
 	maps: number[];

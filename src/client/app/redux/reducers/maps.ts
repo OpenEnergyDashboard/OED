@@ -6,7 +6,6 @@ import { MapMetadata, MapsAction, MapState } from '../../types/redux/map';
 import { ActionType } from '../../types/redux/actions';
 import { keyBy } from 'lodash';
 import { CalibratedPoint } from '../../utils/calibration';
-import { RootState } from '../../store';
 
 const defaultState: MapState = {
 	isLoading: false,
@@ -241,5 +240,4 @@ export default function maps(state = defaultState, action: MapsAction) {
 		default:
 			return state;
 	}
-}
-export const selectMapState = (state: RootState) => state.maps;
+};

@@ -19,7 +19,7 @@ import {
 } from '../../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { selectMapState } from '../reducers/maps';
+import { selectMapState } from '../selectors/maps';
 import {
 	selectChartToRender, selectGraphAreaNormalization, selectGraphState,
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit, selectSliderRangeInterval
