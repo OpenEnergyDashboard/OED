@@ -4,6 +4,7 @@
 
 import { range } from 'lodash';
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
@@ -35,11 +36,13 @@ export default function ReadingsCSVUploadComponent() {
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
 	// This is the state for the form data for readings
-	const [readingsData, setReadingsData] = React.useState<ReadingsCSVUploadPreferencesItem>(ReadingsCSVUploadDefaults);
+	const [readingsData, setReadingsData] = useState<ReadingsCSVUploadPreferencesItem>(ReadingsCSVUploadDefaults);
 	// This is the state for the file to be uploaded
-	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	// tracks whether or not a meter has been selected
 	const meterIsSelected = readingsData.meterIdentifier !== '';
+	// tracks if a new meter was created
+	const [newMeterIdentifier, setNewMeterIdentifier] = useState<string>('');
 	// tracks if file has .gzip or .csv extension
 	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
 
@@ -92,11 +95,20 @@ export default function ReadingsCSVUploadComponent() {
 	};
 	/* END of Handlers for each type of input change */
 
+	useEffect(() => {
+		if (newMeterIdentifier) {
+			const foundMeter = visibleMeters.find(meter => meter.identifier === newMeterIdentifier);
+			if (foundMeter) {
+				updateReadingsData(newMeterIdentifier);
+			}
+		}
+	}, [visibleMeters, newMeterIdentifier]);
+
 	// This gets the meter identifier from a newly created meter and updates the readingsData settings
 	// with the meterData settings, although the settings only update if user is an admin because a
 	// CSV user doesn't have access to this data
 	const handleCreateMeter = async (meterIdentifier: string) => {
-		updateReadingsData(meterIdentifier);
+		setNewMeterIdentifier(meterIdentifier);
 	};
 
 	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
