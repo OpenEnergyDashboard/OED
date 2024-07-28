@@ -11,79 +11,53 @@ import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
+import { fetchMapsDetails, setNewMap, submitEditedMaps } from '../../redux/actions/map';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectMaps } from '../../redux/selectors/maps';
+import { AppDispatch } from 'store';
+
+export default function MapsDetailComponent() {
+	const dispatch: AppDispatch = useAppDispatch();
+	// Load map IDs from state and store in number array
 	const maps: number[] = useAppSelector(selectMaps);
+	React.useEffect(() => {
+		// Load maps from state on component mount (componentDidMount)
+		dispatch(fetchMapsDetails());
+	}, []);
 
-interface MapsDetailProps {
-	maps: number[];
-	unsavedChanges: boolean;
-	fetchMapsDetails(): Promise<any>;
-	submitEditedMaps(): Promise<any>;
-	createNewMap(): any;
-}
-
-export default class MapsDetailComponent extends React.Component<MapsDetailProps> {
-	constructor(props: MapsDetailProps) {
-		super(props);
-		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
-	}
-
-	public componentDidMount() {
-		this.props.fetchMapsDetails();
-	}
-
-	public render() {
-		return (
-			<div className='flexGrowOne'>
-				<TooltipHelpComponent page='maps' />
-				<div className='container-fluid'>
-					<h2 style={titleStyle}>
-						<FormattedMessage id='maps' />
-						<div style={tooltipStyle}>
-							<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
-						</div>
-					</h2>
-					<div className="edit-btn">
-						<Link to='/calibration' onClick={() => this.props.createNewMap()}>
-							<Button color='primary'>
-								<FormattedMessage id='create.map' />
-							</Button>
-						</Link>
+	return (
+		<div className='flexGrowOne'>
+			<TooltipHelpComponent page='maps' />
+			<div className='container-fluid'>
+				<h2 className='text-center'>
+					<FormattedMessage id='maps' />
+					<div className='d-inline-block fs-5'>
+						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 					</div>
-					<div className="card-container">
-						{this.props.maps.map(mapID => (
-							<MapViewContainer key={mapID} id={mapID} />
-						))}
-					</div>
-					{hasToken() && (
-						<div className="edit-btn">
-							<Button
-								color='success'
-								disabled={!this.props.unsavedChanges}
-								onClick={this.handleSubmitClicked}
-							>
-								<FormattedMessage id='save.map.edits' />
-							</Button>
-						</div>
-					)}
+				</h2>
+				<div className="edit-btn">
+					<Link to='/calibration' onClick={() => dispatch(setNewMap())}>
+						<Button color='primary'>
+							<FormattedMessage id='create.map' />
+						</Button>
+					</Link>
 				</div>
+				<div className="card-container">
+					{maps.map(mapID => (
+						<MapViewContainer key={mapID} id={mapID} />
+					))}
+				</div>
+				{hasToken() && (
+					<div className="edit-btn">
+						<Button
+							color='success'
+							onClick={() => dispatch(submitEditedMaps())}
+						>
+							<FormattedMessage id='save.map.edits' />
+						</Button>
+					</div>
+				)}
 			</div>
-		);
-	}
-
-	private handleSubmitClicked() {
-		this.props.submitEditedMaps();
-		// Notify that the unsaved changes have been submitted
-		// this.removeUnsavedChanges();
-	}
+		</div>
+	);
 }
-
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
-};
-
-const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%'
-};

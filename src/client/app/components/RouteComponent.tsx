@@ -6,7 +6,7 @@ import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
-import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
+import MapsDetailComponent from './maps/MapsDetailComponent';
 import { useAppSelector } from '../redux/reduxHooks';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
-					{ path: 'maps', element: <MapsDetailContainer /> },
+					{ path: 'maps', element: <MapsDetailComponent /> },
 					{ path: 'users/new', element: <CreateUserComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
