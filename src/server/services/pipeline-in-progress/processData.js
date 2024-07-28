@@ -784,8 +784,8 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 	if (msgTotal.length < MAX_SIZE) {
 		msgTotal += newMsg;
 	} else if (!msgTotalWarning) {
-		msgTotal = '<h1>WARNING - The total number of messages was stopped due to size.' +
-			' The log file has all the messages.</h1>' + message + '<h1>Message lost starting now.</h1>';
+		msgTotal += '<h1>WARNING - The total number of messages was stopped due to size.' +
+			' The log file has all the messages.</h1>' + newMsg + '<h1>Messages lost starting now.</h1>';
 		// Note that warned so goes from false to true.
 		msgTotalWarning = !msgTotalWarning;
 	}
