@@ -4,8 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { Dispatch } from '@reduxjs/toolkit';
 import { baseApi } from '../../redux/api/baseApi';
-import { meterAdapter, metersApi } from '../../redux/api/metersApi';
+import { useAppDispatch } from '../../redux/reduxHooks';
 import {
 	BooleanTypes,
 	CSVUploadPreferencesForm,
@@ -15,7 +16,6 @@ import {
 } from '../../types/csvUploadForm';
 import { MeterData } from '../../types/redux/meters';
 import ApiBackend from './ApiBackend';
-
 interface MetersUploadResponse {
 	message: string;
 	meters: MeterData[];
@@ -26,9 +26,8 @@ interface ApiResponse {
 	message: string;
 }
 
-export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem,
-	readingsFile: File, dispatch: any):Promise<ApiResponse> => {
-
+export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File,
+	dispatch: Dispatch): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -57,9 +56,8 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	}
 };
 
-export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem,
-	metersFile: File, dispatch: any): Promise<ApiResponse> => {
-
+export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File,
+	dispatch: Dispatch): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -76,24 +74,10 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 
 	try {
 		const response = await backend.doPostRequest<MetersUploadResponse>('/api/csv/meters', formData);
-		const { message, meters } = response;
-		const meterNames = meters.map(meter => meter.name).join(', ');
-		// If new meters were added to DB, have redux add them to getMeters state
-		/// If meters were updated to the DB, invalidate meters
-		/// This is how the Redux metersAPI currently functions, so mirroring this functionality
-		if (uploadPreferences.update === true) {
-			dispatch(baseApi.util.invalidateTags(['MeterData']));
-			// meters were invalidated so all meter changes will now reflect in Redux state, now return
-		} else {
-			// add each new meter into Redux state without invalidating all meters
-			meters.forEach(meter => {
-				dispatch(metersApi.util.updateQueryData('getMeters', undefined, cacheDraft => {
-					meterAdapter.addOne(cacheDraft, meter);
-				}));
-			});
-		}
-		return { success: true, message: message + ' ' + meterNames };
-
+		// Meter Data was sent to the DB, invalidate meters for now
+		dispatch(baseApi.util.invalidateTags(['MeterData']));
+		// meters were invalidated so all meter changes will now reflect in Redux state, now return
+		return { success: true, message: response.message };
 	} catch (error) {
 		return { success: false, message: error.response.data };
 	}

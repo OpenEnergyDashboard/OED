@@ -22,51 +22,39 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 export default function MetersCSVUploadComponent() {
 	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferencesItem>(MetersCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-	const [isValidCSV, setIsValidCSV] = React.useState<boolean>(false);
-	// tracks if a file has been selected to be uploaded
-	const [FileIsSelected, setFileIsSelected] = React.useState<boolean>(false);
+	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
 	const dispatch = useAppDispatch();
 
-	const handleFileChange = (file: File | null) => {
-		setSelectedFile(file);
-		if (!file) {
-			setFileIsSelected(false);
-		} else {
-			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
-				setIsValidCSV(true);
-				setFileIsSelected(true);
-			} else {
-				setIsValidCSV(false);
-				setFileIsSelected(false);
-				showErrorNotification(translate('csv.file.error') + file.name);
-			}
-		}
-	};
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
-		setMeterData(prevState => ({
-			...prevState,
+		setMeterData(prevData => ({
+			...prevData,
 			[name]: value
 		}));
 	};
 
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, checked } = e.target;
-		setMeterData(prevState => ({
-			...prevState,
+		setMeterData(prevData => ({
+			...prevData,
 			[name]: checked
 		}));
 	};
 
+	const handleFileChange = (file: File) => {
+		setSelectedFile(file);
+		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
+			setIsValidFileType(true);
+		} else {
+			setIsValidFileType(false);
+			setSelectedFile(null);
+			showErrorNotification(translate('csv.file.error') + file.name);
+		}
+	};
+
 	const handleClear = () => {
-		setMeterData({
-			meterIdentifier: '',
-			gzip: false,
-			headerRow: false,
-			update: false
-		});
-		setIsValidCSV(false);
+		setMeterData(MetersCSVUploadDefaults);
+		setIsValidFileType(false);
 	};
 
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
@@ -107,8 +95,7 @@ export default function MetersCSVUploadComponent() {
 						</div>
 						<FormFileUploaderComponent
 							onFileChange={handleFileChange}
-							required
-							isInvalid={FileIsSelected}
+							isInvalid={!!selectedFile}
 						/>
 						<FormGroup>
 							<Row>
@@ -176,7 +163,7 @@ export default function MetersCSVUploadComponent() {
 						</FormGroup>
 						<div className='d-flex flex-row-reverse'>
 							<div className='p-3'>
-								<Button color='primary' type='submit' disabled={!isValidCSV}>
+								<Button color='primary' type='submit' disabled={!isValidFileType}>
 									{translate('csv.submit.button')}
 								</Button>
 							</div>

@@ -7,9 +7,6 @@ import { Col, Input, FormGroup, Label } from 'reactstrap';
 import translate from '../utils/translate';
 
 interface FileUploader {
-	reference?: React.RefObject<HTMLInputElement>;
-	required: boolean;
-	labelStyle?: React.CSSProperties;
 	isInvalid: boolean;
 	onFileChange: (file: File | null) => void;
 }
@@ -28,21 +25,19 @@ export default function FileUploaderComponent(props: FileUploader) {
 
 	return (
 		<FormGroup>
-			<Label style={props.labelStyle}>
+			<Label>
 				<div className='pb-1'>
 					{translate('csv.file')}
 				</div>
-				<Col>
-					<Input
-						innerRef={props.reference}
-						type='file'
-						name='csvfile'
-						required={props.required}
-						onChange={handleFileChange}
-						invalid={!props.isInvalid}
-					/>
-				</Col>
 			</Label>
+			<Col>
+				<Input
+					type='file'
+					name='csvfile'
+					onChange={handleFileChange}
+					invalid={!props.isInvalid}
+				/>
+			</Col>
 		</FormGroup>
 	);
 }

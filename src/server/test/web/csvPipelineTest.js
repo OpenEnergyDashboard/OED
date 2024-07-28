@@ -582,13 +582,9 @@ for (let fileKey in testCases) {
 				// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
 				const res = await eval(evalString);
 				expect(res).to.have.status(testCases[fileKey]['responseCode'][index]);
+				expect(res).to.be.html;
 				// OED returns a string with messages that we check it is what was expected.
-				try {
-					const responseText = JSON.parse(res.text);
-					expect(responseText.message).to.equal(testCases[fileKey]['responseString'][index]);
-				} catch (e) {
-					expect(res.text).to.equal(testCases[fileKey]['responseString'][index]);
-				}
+				expect(res.text).to.equal(testCases[fileKey]['responseString'][index]);
 			}
 			// You do not want to check the database until all the uploads are done.
 			// Get every meter to be sure only one with correct name.
@@ -804,13 +800,10 @@ for (let fileKey in testMeters) {
 				const res = await eval(evalString);
 				// Verify the request response code is what was expected.
 				expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
+				// This is a web request that should return html.
+				expect(res).to.be.html;
 				// OED returns a string with messages that we check it is what was expected.
-				try {
-					const responseText = JSON.parse(res.text);
-					expect(responseText.message).to.equal(testMeters[fileKey]['responseString'][index]);
-				} catch (e) {
-					expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
-				}
+				expect(res.text).to.equal(testMeters[fileKey]['responseString'][index]);
 			}
 			// You do not want to check the database until all the uploads are done.
 			// Get every meter to be sure the correct number is there.
