@@ -91,7 +91,7 @@ export default function MapControlsComponent() {
             <div style={divTopBottomPadding}>
                 <p style={labelStyle}>
                     {translate('map.interval')}:
-                    <TooltipMarkerComponent page='home' helpTextId='help.home.map.days.tip' />
+                    <TooltipMarkerComponent page='home' helpTextId='help.home.map.days.tip'/>
                 </p>
                 <Input
                     id='barDurationDays'
@@ -123,9 +123,9 @@ export default function MapControlsComponent() {
                         </FormFeedback>
                     </FormGroup>
                 }
-            </div >
+            </div>
             <MapChartSelectComponent key='chart' />
-        </div >
+        </div>
     );
 }
 
