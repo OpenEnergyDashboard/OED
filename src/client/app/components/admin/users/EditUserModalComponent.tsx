@@ -243,7 +243,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										id='password'
 										name='password'
 										type='password'
-										placeholder='Only enter password to update password'
+										placeholder={translate('user.password.edit')}
 										value={userDetails.password}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordLength}
