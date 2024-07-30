@@ -43,7 +43,7 @@ export default function UserDetailComponent() {
 							[...users]
 								.sort((a, b) => a.username.localeCompare(b.username))
 								.map(user => (
-									<Col key={user.username} xs='12' sm='6' md='4' lg='3' className='d-flex justify-content-center mb-3'>
+									<Col className="d-flex justify-content-center mb-3">
 										<UserViewComponent
 											key={user.username}
 											user={user}
