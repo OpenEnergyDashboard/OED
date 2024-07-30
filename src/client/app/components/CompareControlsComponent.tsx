@@ -16,17 +16,27 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function CompareControlsComponent() {
     const dispatch = useAppDispatch();
+
+    // This is the current compare period for graphic
     const comparePeriod = useAppSelector(selectComparePeriod);
+    // This is the current sorting order for graphic
     const compareSortingOrder = useAppSelector(selectSortingOrder);
+    // State to manage the dropdown open status for compare interval
     const [comparePeriodDropdownOpen, setComparePeriodDropdownOpen] = React.useState<boolean>(false);
+    // State to manage the dropdown open status for sorting order
     const [compareSortingDropdownOpen, setCompareSortingDropdownOpen] = React.useState<boolean>(false);
+    
+    // Updates values when the compare interval menu is used
     const handleCompare = (comparePeriod: ComparePeriod) => {
         dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }));
     };
+    
+    // Updates sorting order when the sort order menu is used
     const handleSorting = (sortingOrder: SortingOrder) => {
         dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
     };
 
+    // Updates the text in the compare interval dropdown menu when switching between intervals
     const getComparePeriodDisplayText = () => {
         switch (comparePeriod) {
             case ComparePeriod.Day:
@@ -38,6 +48,7 @@ export default function CompareControlsComponent() {
         }
     };
 
+    // Updates the text in the sort dropdown menu when switching between sorting types
     const getSortDisplayText = () => {
         switch (compareSortingOrder) {
             case SortingOrder.Alphabetical:
@@ -53,8 +64,8 @@ export default function CompareControlsComponent() {
         <div>
             <div style={divTopBottomPadding}>
                 <p style={labelStyle}>
-                    {translate('compare.interval')}:
-                    <TooltipMarkerComponent page='home' helpTextId='help.home.compare.interval.tip' />
+                    {translate('compare.period')}:
+                    <TooltipMarkerComponent page='home' helpTextId='help.home.compare.period.tip' />
                 </p>
                 <Dropdown isOpen={comparePeriodDropdownOpen} toggle={() => setComparePeriodDropdownOpen(current => !current)}>
                     <DropdownToggle caret style={dropdownToggleStyle}>
@@ -83,7 +94,7 @@ export default function CompareControlsComponent() {
                     </DropdownMenu>
                 </Dropdown>
             </div>
-            <div style={divTopBottomPadding}>
+            <div style={{...divTopBottomPadding, paddingTop: '0px'}}>
                 <p style={labelStyle}>
                     {translate('sort')}:
                     <TooltipMarkerComponent page='home' helpTextId='help.home.compare.sort.tip'/>
@@ -119,8 +130,8 @@ export default function CompareControlsComponent() {
 }
 
 const divTopBottomPadding: React.CSSProperties = {
-    paddingTop: '10px',
-    paddingBottom: '10px'
+    paddingTop: '15px',
+    paddingBottom: '15px'
 };
 
 const labelStyle: React.CSSProperties = {
