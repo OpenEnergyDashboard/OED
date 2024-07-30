@@ -86,7 +86,7 @@ export interface User {
 	username: string;
 	role: UserRole;
 	password?: string;
-	note?: string;
+	note: string;
 }
 
 /**

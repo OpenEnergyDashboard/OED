@@ -46,7 +46,7 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 				<b>
 					{translate('note')}
 				</b>
-				{props.user.note ? (props.user.note.length > 50 ? props.user.note.substring(0, 50) + '...' : props.user.note) : ''}
+				{props.user.note.slice(0, 29)}
 			</div>
 			<div className="edit-btn mt-auto">
 				<Button color='secondary' onClick={handleShow}>
