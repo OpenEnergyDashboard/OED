@@ -56,9 +56,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	// check if form is valid
 	const isFormValid = () => {
-		return !!userDetails.username &&
+		return userDetails.username &&
 			(userDetails.confirmPassword === userDetails.password) &&
-			!!userDetails.role;
+			userDetails.role;
 	};
 
 	// Handlers for each type of input change

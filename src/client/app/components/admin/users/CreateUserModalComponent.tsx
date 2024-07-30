@@ -39,10 +39,10 @@ export default function CreateUserModal() {
 
 	// check if form is valid
 	const isFormValid = () => {
-		return !!userDetails.username &&
-			!!userDetails.password &&
-			(userDetails.confirmPassword === userDetails.password) &&
-			!!(userDetails.role !== 'invalid');
+		return userDetails.username &&
+         userDetails.password &&
+         userDetails.confirmPassword === userDetails.password &&
+         userDetails.role !== 'invalid';
 	};
 
 	// Handlers for each type of input change
