@@ -46,16 +46,6 @@ export default function MapsDetailComponent() {
 						<MapViewContainer key={mapID} id={mapID} />
 					))}
 				</div>
-				{hasToken() && (
-					<div className="edit-btn">
-						<Button
-							color='success'
-							onClick={() => dispatch(submitEditedMaps())}
-						>
-							<FormattedMessage id='save.map.edits' />
-						</Button>
-					</div>
-				)}
 			</div>
 		</div>
 	);
