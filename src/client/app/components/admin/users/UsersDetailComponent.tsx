@@ -34,16 +34,16 @@ export default function UserDetailComponent() {
 						<TooltipMarkerComponent page='users' helpTextId={tooltipStyle.tooltipUsersView} />
 					</div>
 				</h2>
-				<div className="edit-btn">
+				<div className='edit-btn'>
 					<CreateUserModalComponent />
 				</div>
 				<div className='card-container'>
-					<Row className="justify-content-center">
+					<Row className='justify-content-center'>
 						{// display users and sort by username alphabetically
 							[...users]
 								.sort((a, b) => a.username.localeCompare(b.username))
 								.map(user => (
-									<Col key={user.username} xs="12" sm="6" md="4" lg="3" className="d-flex justify-content-center mb-3">
+									<Col key={user.username} xs='12' sm='6' md='4' lg='3' className='d-flex justify-content-center mb-3'>
 										<UserViewComponent
 											key={user.username}
 											user={user}

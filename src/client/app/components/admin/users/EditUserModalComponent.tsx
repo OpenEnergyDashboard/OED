@@ -197,13 +197,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="username">
+									<Label for='username'>
 										{translate('username')}
 									</Label>
 									<Input
-										id="username"
-										name="username"
-										type="text"
+										id='username'
+										name='username'
+										type='text'
 										value={userDetails.username}
 										onChange={handleStringChange}
 									/>
@@ -211,13 +211,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="role">
+									<Label for='role'>
 										{translate('role')}
 									</Label>
 									<Input
-										id="role"
-										name="role"
-										type="select"
+										id='role'
+										name='role'
+										type='select'
 										value={userDetails.role}
 										onChange={handleRoleChange}
 										required
@@ -236,14 +236,14 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="password">
+									<Label for='password'>
 										{translate('password')}
 									</Label>
 									<Input
-										id="password"
-										name="password"
-										type="password"
-										placeholder="Only enter password to update password"
+										id='password'
+										name='password'
+										type='password'
+										placeholder='Only enter password to update password'
 										value={userDetails.password}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordLength}
@@ -255,13 +255,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="confirmPassword">
+									<Label for='confirmPassword'>
 										{translate('password.confirm')}
 									</Label>
 									<Input
-										id="confirmPassword"
-										name="confirmPassword"
-										type="password"
+										id='confirmPassword'
+										name='confirmPassword'
+										type='password'
 										value={userDetails.confirmPassword}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordMatch}
@@ -275,13 +275,13 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						<Row>
 							<Col>
 								<FormGroup>
-									<Label for="note">
+									<Label for='note'>
 										{translate('note')}
 									</Label>
 									<Input
-										id="note"
-										name="note"
-										type="textarea"
+										id='note'
+										name='note'
+										type='textarea'
 										value={userDetails.note}
 										onChange={handleStringChange}
 									/>
@@ -302,10 +302,10 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={userDetails.disableDelete}>
 						{translate('delete.user')}
 					</Button>
-					<Button color="secondary" onClick={props.handleClose}>
+					<Button color='secondary' onClick={props.handleClose}>
 						{translate('cancel')}
 					</Button>
-					<Button color="primary" onClick={handleSaveChanges} disabled={!isFormValid()}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid()}>
 						{translate('save.all')}
 					</Button>
 				</ModalFooter>

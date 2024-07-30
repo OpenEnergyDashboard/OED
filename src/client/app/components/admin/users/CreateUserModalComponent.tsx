@@ -99,18 +99,6 @@ export default function CreateUserModal() {
 			});
 	};
 
-	// allow enter key to submit form
-	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			if (isFormValid()) {
-				handleSubmit();
-			} else {
-				console.log('Form is not valid');
-			}
-		}
-	};
-
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Only an admin can create a meter.
@@ -119,10 +107,10 @@ export default function CreateUserModal() {
 
 	return (
 		<>
-			<Button color="secondary" onClick={handleShowModal}>
+			<Button color='secondary' onClick={handleShowModal}>
 				{translate('create.user')}
 			</Button>
-			<Modal isOpen={showModal} toggle={handleCloseModal} size="lg">
+			<Modal isOpen={showModal} toggle={handleCloseModal} size='lg'>
 				<ModalHeader>
 					{translate('create.user')}
 					<TooltipHelpComponent page='users-create' />
@@ -133,17 +121,17 @@ export default function CreateUserModal() {
 					</div>
 				</ModalHeader>
 				<ModalBody>
-					<Container onKeyDown={handleKeyDown}>
+					<Container>
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="username">
+									<Label for='username'>
 										{translate('username')}
 									</Label>
 									<Input
-										id="username"
-										name="username"
-										type="text"
+										id='username'
+										name='username'
+										type='text'
 										value={userDetails.username}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.username}
@@ -152,13 +140,13 @@ export default function CreateUserModal() {
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="role">
+									<Label for='role'>
 										{translate('role')}
 									</Label>
 									<Input
-										id="role"
-										name="role"
-										type="select"
+										id='role'
+										name='role'
+										type='select'
 										value={userDetails.role}
 										onChange={handleRoleChange}
 										invalid={userDetails.role === UserRole['Select Role']}
@@ -175,13 +163,13 @@ export default function CreateUserModal() {
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label for="password">
+									<Label for='password'>
 										{translate('password')}
 									</Label>
 									<Input
-										id="password"
-										name="password"
-										type="password"
+										id='password'
+										name='password'
+										type='password'
 										value={userDetails.password}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordLength}
@@ -193,13 +181,13 @@ export default function CreateUserModal() {
 							</Col>
 							<Col>
 								<FormGroup>
-									<Label for="confirmPassword">
+									<Label for='confirmPassword'>
 										{translate('password.confirm')}
 									</Label>
 									<Input
-										id="confirmPassword"
-										name="confirmPassword"
-										type="password"
+										id='confirmPassword'
+										name='confirmPassword'
+										type='password'
 										value={userDetails.confirmPassword}
 										onChange={e => handleStringChange(e)}
 										invalid={!userDetails.passwordMatch}
@@ -213,13 +201,13 @@ export default function CreateUserModal() {
 						<Row>
 							<Col>
 								<FormGroup>
-									<Label for="note">
+									<Label for='note'>
 										{translate('note')}
 									</Label>
 									<Input
-										id="note"
-										name="note"
-										type="textarea"
+										id='note'
+										name='note'
+										type='textarea'
 										value={userDetails.note}
 										onChange={e => handleStringChange(e)}
 									/>
@@ -232,10 +220,10 @@ export default function CreateUserModal() {
 					</Container>
 				</ModalBody>
 				<ModalFooter>
-					<Button color="secondary" onClick={handleCloseModal}>
+					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color="primary" onClick={handleSubmit} disabled={!isFormValid()}>
+					<Button color='primary' onClick={handleSubmit} disabled={!isFormValid()}>
 						{translate('create.user')}
 					</Button>
 				</ModalFooter>

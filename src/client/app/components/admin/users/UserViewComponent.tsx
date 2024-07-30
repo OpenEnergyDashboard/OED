@@ -32,23 +32,23 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 	};
 
 	return (
-		<div className="card">
-			<div className="identifier-container">
+		<div className='card'>
+			<div className='identifier-container'>
 				{props.user.username}
 			</div>
-			<div className="item-container p-2">
+			<div className='item-container p-2'>
 				<b>
 					{translate('role')}
 				</b>
 				{props.user.role}
 			</div>
-			<div className="item-container p-2">
+			<div className='item-container p-2'>
 				<b>
 					{translate('note')}
 				</b>
 				{props.user.note ? (props.user.note.length > 50 ? props.user.note.substring(0, 50) + '...' : props.user.note) : ''}
 			</div>
-			<div className="edit-btn mt-auto">
+			<div className='edit-btn mt-auto'>
 				<Button color='secondary' onClick={handleShow}>
 					{translate('edit.user')}
 				</Button>
