@@ -5,11 +5,11 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
+import { selectOEDVersion } from '../redux/api/versionApi';
+import { useAppSelector } from '../redux/reduxHooks';
+import { selectHelpUrl } from '../redux/slices/adminSlice';
 import '../styles/tooltip.css';
 import translate from '../utils/translate';
-import { useAppSelector } from '../redux/reduxHooks';
-import { selectOEDVersion } from '../redux/api/versionApi';
-import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -27,11 +27,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 
 
 	const version = useAppSelector(selectOEDVersion);
-	// The web pages, including help/documentation use _ not . in version.
-	//  It also uses V not v and has help at the start.
-	const helpVersion = 'help' + version.replaceAll('.', '_').replace('v', 'V');
-	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
-	const helpUrl = baseHelpUrl + helpVersion;
+	const helpUrl = useAppSelector(selectHelpUrl);
 
 	const helpLinks: Record<string, Record<string, string>> = {
 		'help.admin.conversioncreate': { link: `${helpUrl}/adminConversionCreating/` },
