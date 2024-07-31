@@ -6,8 +6,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import * as moment from 'moment';
-import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
+import { parseZone } from 'moment';
 import { hasToken } from '../../utils/token';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
@@ -44,7 +43,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.modified.date" /></b>
-				{moment.parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
+				{parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
