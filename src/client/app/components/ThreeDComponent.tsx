@@ -80,7 +80,8 @@ export default function ThreeDComponent() {
 					layout={layout as Plotly.Layout}
 					config={{
 						responsive: true,
-						displayModeBar: false,
+						displayModeBar: true,
+						modeBarButtonsToRemove: ['resetCameraDefault3d'],
 						// Current Locale
 						locale,
 						// Available Locales

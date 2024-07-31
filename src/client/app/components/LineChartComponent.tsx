@@ -86,8 +86,8 @@ export default function LineChartComponent() {
 				}}
 				config={{
 					responsive: true,
-					displayModeBar: false,
-					// Current Locale
+					displayModeBar: true,
+					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],					// Current Locale
 					locale,
 					// Available Locales
 					locales: Locales

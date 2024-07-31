@@ -100,7 +100,8 @@ export default function BarChartComponent() {
 				}}
 				config={{
 					responsive: true,
-					displayModeBar: false,
+					displayModeBar: true,
+					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],
 					// Current Locale
 					locale,
 					// Available Locales
