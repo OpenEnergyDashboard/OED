@@ -10,7 +10,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
-import { fetchMapsDetails, setNewMap, submitEditedMaps } from '../../redux/actions/map';
+import { fetchMapsDetails, setNewMap} from '../../redux/actions/map';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectMaps } from '../../redux/selectors/maps';
 import { AppDispatch } from 'store';
