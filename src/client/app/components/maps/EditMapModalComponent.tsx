@@ -4,15 +4,13 @@
 
 import * as React from 'react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { ThunkDispatch } from 'redux-thunk';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { editMapDetails, submitEditedMap, removeMap } from '../../redux/actions/map';
 import { showErrorNotification } from '../../utils/notifications';
-import { State } from '../../types/redux/state';
-import { AnyAction } from 'redux';
+import { useAppDispatch } from '../../redux/reduxHooks';
+import { AppDispatch } from 'store';
 
 interface EditMapModalProps {
 	show: boolean;
@@ -24,7 +22,7 @@ interface EditMapModalProps {
 }
 
 const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose, map, setCalibration }) => {
-	const dispatch: ThunkDispatch<State, void, AnyAction> = useDispatch();
+	const dispatch: AppDispatch = useAppDispatch();
 	const [nameInput, setNameInput] = useState(map.name);
 	const [noteInput, setNoteInput] = useState(map.note || '');
 	const [circleInput, setCircleInput] = useState(map.circleSize.toString());
