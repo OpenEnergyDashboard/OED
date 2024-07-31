@@ -15,7 +15,13 @@ import * as moment from 'moment';
 export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
 	if (timeInterval.getIsBounded()) {
 		const startTimeStamp = timeInterval.getStartTimestamp().toISOString().slice(0, -1);
-		const endTimeStamp = timeInterval.getEndTimestamp().toISOString().slice(0, -1);
+		/* Clones and rewinds the end time by one millisecond.
+			In the case where the end date has been pushed forward by a millisecond for data fetching purpose in
+			the method dateRangeToTimeInterval (method below) a millisecond is subtracted in order to reverse the
+			operation and to display the correct dates in the Date Range Picker.
+			In the case where the correction is not needed incrementing by a millisecond won't change what users
+			see. */
+		const endTimeStamp = timeInterval.getEndTimestamp().clone().subtract(1,'millisecond').toISOString().slice(0, -1);
 		const startDate = new Date(startTimeStamp);
 		const endDate = new Date(endTimeStamp);
 		return [startDate, endDate];
@@ -46,7 +52,14 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 	}
 	if (start && end) {
 		start = moment(toUTC(start));
-		end = moment(toUTC(end));
+		/* Adds a millisecond to the end time.
+		For the case in which the end time is the last moment of the day (date = date.endOf('day)),
+		adding a millisecond pushes the end time to the very beginning of the next day.
+		For example the end date at 2020-07-20 at 23:59:59 will be truncated to
+		2020-07-20 at 00:00:00. This is due to OED decision to graph only entire days causing the lost of the last date.
+		In the case where the end date is not the last time in the day, this should not effect what users
+		should see. */
+		end = moment(toUTC(end)).add(1, 'millisecond');
 		return new TimeInterval(start, end);
 	}
 	// If start or end ts is missing, treat as unbounded interval
