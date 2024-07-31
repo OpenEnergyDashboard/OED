@@ -93,7 +93,7 @@ export interface User {
  * The values of this enum that needs to match the keys of User.role in src/server/models/User
  */
 export enum UserRole {
-	'Select Role' = 'invalid',
+	'user.role.select' = 'invalid',
 	ADMIN = 'admin',
 	CSV = 'csv',
 	EXPORT = 'export',

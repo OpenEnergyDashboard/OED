@@ -125,11 +125,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	const handleCloseModal = () => {
 		resetPasswordFields();
-		// allow time for resetPasswordFields to run
-		console.log('Password Reset should have happened.');
-		setTimeout(() => {
-			props.handleClose();
-		}, 0);
+		props.handleClose();
 	};
 	// End Modal show/close
 
@@ -207,7 +203,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 							<Col>
 								<FormGroup>
 									<Label for='role'>
-										{translate('role')}
+										{translate('user.role')}
 									</Label>
 									<Input
 										id='role'
@@ -218,9 +214,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										required
 									>
 										{Object.entries(UserRole)
-											.filter(([role]) => role !== 'Select Role')
-											.map(([role, val]) => (
-												<option value={val} key={val}>
+											.filter(([role]) => role !== 'user.role.select')
+											.map(([role, value]) => (
+												<option value={value} key={value}>
 													{role}
 												</option>
 											))}

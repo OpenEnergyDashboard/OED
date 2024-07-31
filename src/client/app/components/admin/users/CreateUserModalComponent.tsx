@@ -66,10 +66,11 @@ export default function CreateUserModal() {
 	};
 
 	const resetPasswordFields = () => {
-		setUserDetails({
-			...userDetails, password: '',
+		setUserDetails(prevDetails => ({
+			...prevDetails,
+			password: '',
 			confirmPassword: ''
-		});
+		}));
 	};
 	// End of reset form methods
 
@@ -141,7 +142,7 @@ export default function CreateUserModal() {
 							<Col>
 								<FormGroup>
 									<Label for='role'>
-										{translate('role')}
+										{translate('user.role')}
 									</Label>
 									<Input
 										id='role'
@@ -149,11 +150,11 @@ export default function CreateUserModal() {
 										type='select'
 										value={userDetails.role}
 										onChange={handleRoleChange}
-										invalid={userDetails.role === UserRole['Select Role']}
+										invalid={userDetails.role === UserRole['user.role.select']}
 									>
-										{Object.entries(UserRole).map(([role, val]) => (
-											<option value={val} key={val}>
-												{role}
+										{Object.entries(UserRole).map(([role, value]) => (
+											<option value={value} key={value}>
+												{role === 'user.role.select' ? translate(role) : role}
 											</option>
 										))}
 									</Input>

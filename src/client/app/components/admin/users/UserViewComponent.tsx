@@ -38,7 +38,7 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 			</div>
 			<div className="item-container p-2">
 				<b>
-					{translate('role')}
+					{translate('user.role')}
 				</b>
 				{props.user.role}
 			</div>
