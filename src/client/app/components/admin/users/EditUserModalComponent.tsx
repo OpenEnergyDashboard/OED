@@ -173,7 +173,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				actionFunction={handleDeleteUser}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal isOpen={props.show} toggle={props.handleClose} size='lg'>
+			<Modal isOpen={props.show} toggle={handleCloseModal} size='lg'>
 				<ModalHeader>
 					{translate('edit.user')}
 					<TooltipHelpComponent page='users-edit' />
@@ -293,7 +293,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<Button color='danger' onClick={handleDeleteConfirmationModalOpen} disabled={userDetails.disableDelete}>
 						{translate('delete.user')}
 					</Button>
-					<Button color='secondary' onClick={props.handleClose}>
+					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
 					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid()}>
