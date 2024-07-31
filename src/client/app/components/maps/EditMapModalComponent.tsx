@@ -100,8 +100,10 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 						<Label for="mapCircleSize"><FormattedMessage id="map.circle.size" /></Label>
 						<Input
 							id="mapCircleSize"
+							type='number'
 							value={circleInput}
 							onChange={e => setCircleInput(e.target.value)}
+							invalid={parseFloat(circleInput)<0}
 							onBlur={toggleCircleEdit}
 						/>
 					</FormGroup>
