@@ -57,7 +57,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// check if form is valid
 	const isFormValid = () => {
 		return userDetails.username &&
-			(userDetails.confirmPassword === userDetails.password) &&
+			userDetails.passwordMatch &&
+			userDetails.passwordLength &&
 			userDetails.role;
 	};
 
@@ -78,10 +79,11 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	// Methods to reset password fields
 	const resetPasswordFields = () => {
-		setUserDetails({
-			...userDetails, password: '',
+		setUserDetails(prevDetails => ({
+			...prevDetails,
+			password: '',
 			confirmPassword: ''
-		});
+		}));
 	};
 
 	/* Confirm Delete Modal */
@@ -96,12 +98,12 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// Hide the warning modal
 		setShowDeleteConfirmationModal(false);
 		// Show the edit modal
-		handleShow();
+		handleShowModal();
 	};
 
 	const handleDeleteConfirmationModalOpen = () => {
 		// Hide the edit modal
-		handleClose();
+		handleCloseModal();
 		// Show the warning modal
 		setShowDeleteConfirmationModal(true);
 	};
@@ -117,12 +119,17 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	/* End Confirm Delete Modal */
 
 	// Modal show/close
-	const handleShow = () => {
+	const handleShowModal = () => {
 		props.handleShow();
 	};
 
-	const handleClose = () => {
-		props.handleClose();
+	const handleCloseModal = () => {
+		resetPasswordFields();
+		// allow time for resetPasswordFields to run
+		console.log('Password Reset should have happened.');
+		setTimeout(() => {
+			props.handleClose();
+		}, 0);
 	};
 	// End Modal show/close
 
@@ -156,18 +163,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			});
 	};
 
-	// allow enter key to submit form
-	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			if (isFormValid()) {
-				handleSaveChanges();
-			} else {
-				console.log('Form is not valid');
-			}
-		}
-	};
-
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipUsersView: 'help.admin.users'
@@ -193,7 +188,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					</div>
 				</ModalHeader>
 				<ModalBody>
-					<Container onKeyDown={handleKeyDown}>
+					<Container>
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
