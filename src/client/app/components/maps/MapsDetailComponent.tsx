@@ -15,6 +15,10 @@ import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectMaps } from '../../redux/selectors/maps';
 import { AppDispatch } from 'store';
 
+/**
+ * Defines the maps page card view
+ * @returns Maps page element
+ */
 export default function MapsDetailComponent() {
 	const dispatch: AppDispatch = useAppDispatch();
 	// Load map IDs from state and store in number array

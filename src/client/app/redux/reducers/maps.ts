@@ -240,4 +240,4 @@ export default function maps(state = defaultState, action: MapsAction) {
 		default:
 			return state;
 	}
-};
+}
