@@ -54,14 +54,14 @@ const MapViewComponent: React.FC<MapViewProps> = ({ map, isEdited, isSubmitting,
 				<b><FormattedMessage id="map.circle.size" /></b> {map.circleSize}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="map.modified.date" /></b>
-				{moment.parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
+				<b><FormattedMessage id="note" /></b> {map.note}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.filename" /></b> {map.filename}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {map.note}
+				<b><FormattedMessage id="map.modified.date" /></b>
+				{moment.parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
