@@ -111,7 +111,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 							id="mapNote"
 							type="textarea"
 							value={noteInput}
-							onChange={e => setNoteInput(e.target.value)}
+							onChange={e => setNoteInput(e.target.value.slice(0,30))}
 						/>
 					</FormGroup>
 				</Form>
