@@ -16,6 +16,10 @@ interface CreateMapModalProps {
 
 /**
  * Defines the create map modal form
+ * @param root0
+ * @param root0.show
+ * @param root0.handleClose
+ * @param root0.createNewMap
  * @returns Map create element
  */
 function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapModalProps) {
