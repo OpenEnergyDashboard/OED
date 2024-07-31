@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import { editMapDetails, submitEditedMap, removeMap } from '../../redux/actions/map';
+import { editMapDetails, submitEditedMap, removeMap, setCalibration } from '../../redux/actions/map';
 import { showErrorNotification } from '../../utils/notifications';
 import { useAppDispatch } from '../../redux/reduxHooks';
 import { AppDispatch } from 'store';
@@ -16,12 +16,9 @@ interface EditMapModalProps {
 	show: boolean;
 	handleClose: () => void;
 	map: MapMetadata;
-	editMapDetails(map: MapMetadata): any;
-	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
-	removeMap(id: number): any;
 }
 
-const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose, map, setCalibration }) => {
+const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose, map}) => {
 	const dispatch: AppDispatch = useAppDispatch();
 	const [nameInput, setNameInput] = useState(map.name);
 	const [noteInput, setNoteInput] = useState(map.note || '');
@@ -39,22 +36,20 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 			displayable
 		};
 		dispatch(editMapDetails(updatedMap));
-		dispatch(submitEditedMap(updatedMap.id) as any).then(() => {
-			handleClose();
-		});
+		dispatch(submitEditedMap(updatedMap.id));
+		handleClose();
 	};
 
 	const handleDelete = () => {
 		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: map.name }));
 		if (consent) {
-			dispatch(removeMap(map.id) as any).then(() => {
-				handleClose();
-			});
+			dispatch(removeMap(map.id));
+			handleClose();
 		}
 	};
 
 	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
-		setCalibration(mode, map.id);
+		dispatch(setCalibration(mode, map.id));
 		handleClose();
 	};
 
