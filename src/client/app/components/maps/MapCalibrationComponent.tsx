@@ -6,8 +6,9 @@ import * as React from 'react';
 import MapCalibrationChartDisplayContainer from '../../containers/maps/MapCalibrationChartDisplayContainer';
 import MapCalibrationInfoDisplayContainer from '../../containers/maps/MapCalibrationInfoDisplayContainer';
 import MapCalibrationInitiateContainer from '../../containers/maps/MapCalibrationInitiateContainer';
-import MapsDetailContainer from '../../containers/maps/MapsDetailContainer';
+//import MapsDetailContainer from '../../containers/maps/MapsDetailContainer';
 import { CalibrationModeTypes } from '../../types/redux/map';
+import MapsDetailComponent from './MapsDetailComponent';
 
 interface MapCalibrationProps {
 	mode: CalibrationModeTypes;
@@ -47,7 +48,7 @@ export default class MapCalibrationComponent extends React.Component<MapCalibrat
 		} else { // preview mode containers
 			return (
 				<div className='container-fluid'>
-					<MapsDetailContainer />
+					<MapsDetailComponent />
 				</div>
 			);
 		}

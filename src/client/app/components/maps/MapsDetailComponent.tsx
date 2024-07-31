@@ -7,7 +7,7 @@ import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import MapViewContainer from '../../containers/maps/MapViewContainer';
+import MapViewComponent from './MapViewComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
 import { fetchMapsDetails, setNewMap} from '../../redux/actions/map';
@@ -47,7 +47,7 @@ export default function MapsDetailComponent() {
 				</div>
 				<div className="card-container">
 					{maps.map(mapID => (
-						<MapViewContainer key={mapID} id={mapID} />
+						<MapViewComponent key={mapID} mapID={mapID} />
 					))}
 				</div>
 			</div>
