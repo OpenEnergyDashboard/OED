@@ -11,7 +11,6 @@ import translate from '../../utils/translate';
 /**
  * @returns A error page that then returns to main dashboard page.
  */
-
 export default function ErrorComponent() {
 	const nav = useNavigate();
 	const refreshPage = () => {
