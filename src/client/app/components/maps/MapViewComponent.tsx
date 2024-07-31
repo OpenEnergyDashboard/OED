@@ -3,15 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { parseZone } from 'moment';
 import { hasToken } from '../../utils/token';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
-
-
+import { makeSelectMapById } from '../../redux/selectors/maps';
+import { useSelector } from 'react-redux';
 interface MapViewProps {
 	mapID: number;
 }
@@ -20,6 +20,9 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const handleShowModal = () => setShowEditModal(true);
 	const handleCloseModal = () => setShowEditModal(false);
+
+	const selectMapById = React.useMemo(makeSelectMapById, []);
+	const map = useSelector(state => selectMapById(state, mapID));
 
 	return (
 		<div className="card">
@@ -62,9 +65,6 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 				show={showEditModal}
 				handleClose={handleCloseModal}
 				map={map}
-				setCalibration={setCalibration}
-				editMapDetails={editMapDetails}
-				removeMap={removeMap}
 			/>
 		</div>
 	);

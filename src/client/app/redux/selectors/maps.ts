@@ -11,3 +11,11 @@ export const selectMaps = createSelector([selectMapState], maps => {
 		.map(key => parseInt(key))
 		.filter(key => !isNaN(key));
 });
+
+export const makeSelectMapById = () => {
+	const selectMapById = createSelector(
+		[selectMapState, (state, id) => id],
+		(maps, id) => maps.byMapID[id]
+	);
+	return selectMapById;
+};
