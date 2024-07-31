@@ -14,35 +14,18 @@ import EditMapModalComponent from './EditMapModalComponent';
 
 
 interface MapViewProps {
-	id: number;
-	map: MapMetadata;
-	isEdited: boolean;
-	isSubmitting: boolean;
-	editMapDetails(map: MapMetadata): any;
-	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
-	removeMap(id: number): any;
+	mapID: number;
 }
 
-// editMapDetails: (map: MapMetadata) => void;
-// setCalibration: (mode: CalibrationModeTypes, mapID: number) => void;
-// removeMap: (id: number) => void;
-
-const MapViewComponent: React.FC<MapViewProps> = ({ map, isEdited, isSubmitting, editMapDetails, setCalibration, removeMap }) => {
+const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
-
-	useEffect(() => {
-		if (isEdited) {
-			//updateUnsavedChanges();
-		}
-	}, [isEdited]);
-
 	const handleShowModal = () => setShowEditModal(true);
 	const handleCloseModal = () => setShowEditModal(false);
 
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{map.name} {isSubmitting ? '(Submitting)' : isEdited ? '(Edited)' : ''}
+				{map.name}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.displayable" /></b>
