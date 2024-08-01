@@ -47,7 +47,6 @@ export default function PreferencesComponent() {
 				successMessage='updated.preferences'
 				failureMessage='failed.to.submit.changes'
 			/>
-			
 			<h3 className='border-bottom'>Graph Settings</h3>
 			<div>
 				<p style={labelStyle}>
@@ -221,18 +220,18 @@ export default function PreferencesComponent() {
 			</div>
 			<div>
 				<h3 className='border-bottom mt-3'>Site Settings</h3>
-			<div>
-				<p style={titleStyle}>
-					{`${translate('site.title')}:`}
-				</p>
-				<Input
-					type='text'
-					placeholder={translate('name')}
-					value={localAdminPref.displayTitle}
-					onChange={e => makeLocalChanges('displayTitle', e.target.value)}
-					maxLength={50}
-				/>
-			</div>
+				<div>
+					<p style={titleStyle}>
+						{`${translate('site.title')}:`}
+					</p>
+					<Input
+						type='text'
+						placeholder={translate('name')}
+						value={localAdminPref.displayTitle}
+						onChange={e => makeLocalChanges('displayTitle', e.target.value)}
+						maxLength={50}
+					/>
+				</div>
 				<p style={labelStyle}>
 					{translate('default.language')}
 				</p>
@@ -316,8 +315,8 @@ export default function PreferencesComponent() {
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
 				/>
 			</div>
-			
-			
+
+
 			<Button
 				type='submit'
 				onClick={() =>
