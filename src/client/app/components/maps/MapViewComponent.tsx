@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { parseZone } from 'moment';
-import { hasToken } from '../../utils/token';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
 import { makeSelectMapById } from '../../redux/selectors/maps';
@@ -54,7 +53,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 					<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
 				</span>
 			</div>
-			{hasToken() && (
+			{(
 				<div className="edit-btn">
 					<Button color='secondary' onClick={handleShowModal}>
 						<FormattedMessage id="edit.map" />
