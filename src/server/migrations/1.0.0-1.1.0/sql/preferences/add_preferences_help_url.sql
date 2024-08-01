@@ -6,7 +6,7 @@
 
 -- You need to set default so any existing rows get that value since NOT NULL.
 ALTER TABLE preferences
-    ADD COLUMN IF NOT EXISTS default_help_url TEXT NOT NULL DEFAULT 'https://openenergydashboard.github.io/help/'
+    ADD COLUMN IF NOT EXISTS default_help_url TEXT NOT NULL DEFAULT 'https://openenergydashboard.github.io/'
 ;
 -- Now remove default since not desired.
 ALTER TABLE preferences

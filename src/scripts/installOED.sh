@@ -39,7 +39,7 @@ while test $# -gt 0; do
 			skip_db_initialize=yes
 			;;
 		"")
-			# Empty string so just ignore. Esp. happens if no install_args on docker-compose up.
+			# Empty string so just ignore. Esp. happens if no install_args on docker compose up.
 			shift
 			;;
 		*)
