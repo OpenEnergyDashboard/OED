@@ -112,7 +112,13 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 				</Form>
 				<div>
 					<Label><FormattedMessage id="map.filename" /></Label>
-					<p>{map.filename}</p>
+					<Input
+						id='mapFilename'
+						name='mapFilename'
+						type='text'
+						defaultValue={map.filename}
+						disabled>
+					</Input>
 					<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
 						<FormattedMessage id='map.upload.new.file' />
 					</Button>
