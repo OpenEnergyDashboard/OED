@@ -5,11 +5,11 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
+import { selectOEDVersion } from '../redux/api/versionApi';
+import { useAppSelector } from '../redux/reduxHooks';
+import { selectHelpUrl } from '../redux/slices/adminSlice';
 import '../styles/tooltip.css';
 import translate from '../utils/translate';
-import { useAppSelector } from '../redux/reduxHooks';
-import { selectOEDVersion } from '../redux/api/versionApi';
-import { selectBaseHelpUrl } from '../redux/slices/adminSlice';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -27,52 +27,51 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 
 
 	const version = useAppSelector(selectOEDVersion);
-	const baseHelpUrl = useAppSelector(selectBaseHelpUrl);
-	const helpUrl = baseHelpUrl + version;
+	const helpUrl = useAppSelector(selectHelpUrl);
 
 	const helpLinks: Record<string, Record<string, string>> = {
-		'help.admin.conversioncreate': { link: `${helpUrl}/adminConversionCreating.html` },
-		'help.admin.conversionedit': { link: `${helpUrl}/adminConversionEditing.html` },
-		'help.admin.conversionview': { link: `${helpUrl}/adminConversionViewing.html` },
-		'help.admin.groupcreate': { link: `${helpUrl}/adminGroupCreating.html` },
-		'help.admin.groupedit': { link: `${helpUrl}/adminGroupEditing.html` },
-		'help.admin.groupview': { link: `${helpUrl}/adminGroupViewing.html` },
-		'help.admin.header': { link: `${helpUrl}/adminPreferences.html` },
-		'help.admin.mapview': { link: `${helpUrl}/adminMapViewing.html` },
-		'help.admin.metercreate': { link: `${helpUrl}/adminMeterCreating.html` },
-		'help.admin.meteredit': { link: `${helpUrl}/adminMeterEditing.html` },
-		'help.admin.meterview': { link: `${helpUrl}/adminMeterViewing.html` },
-		'help.admin.unitcreate': { link: `${helpUrl}/adminUnitCreating.html` },
-		'help.admin.unitedit': { link: `${helpUrl}/adminUnitEditing.html` },
-		'help.admin.unitview': { link: `${helpUrl}/adminUnitViewing.html` },
-		'help.admin.user': { link: `${helpUrl}/adminUser.html` },
-		'help.csv.meters': { link: `${helpUrl}/adminMetersImport.html` },
-		'help.csv.readings': { link: `${helpUrl}/adminReadingsImport.html` },
-		'help.home.area.normalize': { link: `${helpUrl}/areaNormalization.html` },
-		'help.home.bar.days.tip': { link: `${helpUrl}/barGraphic.html#usage` },
-		'help.home.bar.interval.tip': { link: `${helpUrl}/barGraphic.html#usage` },
-		'help.home.bar.stacking.tip': { link: `${helpUrl}/barGraphic.html#barStacking` },
+		'help.admin.conversioncreate': { link: `${helpUrl}/adminConversionCreating/` },
+		'help.admin.conversionedit': { link: `${helpUrl}/adminConversionEditing/` },
+		'help.admin.conversionview': { link: `${helpUrl}/adminConversionViewing/` },
+		'help.admin.groupcreate': { link: `${helpUrl}/adminGroupCreating/` },
+		'help.admin.groupedit': { link: `${helpUrl}/adminGroupEditing/` },
+		'help.admin.groupview': { link: `${helpUrl}/adminGroupViewing/` },
+		'help.admin.header': { link: `${helpUrl}/adminPreferences/` },
+		'help.admin.mapview': { link: `${helpUrl}/adminMapViewing/` },
+		'help.admin.metercreate': { link: `${helpUrl}/adminMeterCreating/` },
+		'help.admin.meteredit': { link: `${helpUrl}/adminMeterEditing/` },
+		'help.admin.meterview': { link: `${helpUrl}/adminMeterViewing/` },
+		'help.admin.unitcreate': { link: `${helpUrl}/adminUnitCreating/` },
+		'help.admin.unitedit': { link: `${helpUrl}/adminUnitEditing/` },
+		'help.admin.unitview': { link: `${helpUrl}/adminUnitViewing/` },
+		'help.admin.user': { link: `${helpUrl}/adminUser/` },
+		'help.csv.meters': { link: `${helpUrl}/adminMetersImport/` },
+		'help.csv.readings': { link: `${helpUrl}/adminReadingsImport/` },
+		'help.home.area.normalize': { link: `${helpUrl}/areaNormalization/` },
+		'help.home.bar.days.tip': { link: `${helpUrl}/barGraphic/#usage` },
+		'help.home.bar.interval.tip': { link: `${helpUrl}/barGraphic/#usage` },
+		'help.home.bar.stacking.tip': { link: `${helpUrl}/barGraphic/#barStacking` },
 		'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
-		'help.home.chart.redraw.restore': { link: `${helpUrl}/lineGraphic.html#redrawRestore` },
-		'help.home.chart.select': { link: `${helpUrl}/graphType.html` },
-		'help.home.compare.interval.tip': { link: `${helpUrl}/compareGraphic.html#usage` },
-		'help.home.compare.sort.tip': { link: `${helpUrl}/compareGraphic.html#usage` },
-		'help.home.error.bar': { link: `${helpUrl}/errorBar.html#usage` },
-		'help.home.export.graph.data': { link: `${helpUrl}/export.html` },
-		'help.home.history': { link: `${helpUrl}/history.html` },
-		'help.home.map.interval.tip': { link: `${helpUrl}/mapGraphic.html#usage` },
+		'help.home.chart.redraw.restore': { link: `${helpUrl}/lineGraphic/#redrawRestore` },
+		'help.home.chart.select': { link: `${helpUrl}/graphType/` },
+		'help.home.compare.interval.tip': { link: `${helpUrl}/compareGraphic/#usage` },
+		'help.home.compare.sort.tip': { link: `${helpUrl}/compareGraphic/#usage` },
+		'help.home.error.bar': { link: `${helpUrl}/errorBar/#usage` },
+		'help.home.export.graph.data': { link: `${helpUrl}/export/` },
+		'help.home.history': { link: `${helpUrl}/history/` },
+		'help.home.map.interval.tip': { link: `${helpUrl}/mapGraphic/#usage` },
 		'help.home.navigation': { link: '' },
-		'help.home.select.dateRange': { link: `${helpUrl}/dateRange.html` },
-		'help.home.select.groups': { link: `${helpUrl}/graphingGroups.html` },
-		'help.home.select.maps': { link: `${helpUrl}/mapGraphic.html` },
-		'help.home.select.meters': { link: `${helpUrl}/graphingMeters.html` },
-		'help.home.select.rates': { link: `${helpUrl}/graphingRates.html` },
-		'help.home.select.units': { link: `${helpUrl}/graphingUnits.html` },
-		'help.home.readings.per.day': { link: `${helpUrl}/readingsPerDay.html` },
-		'help.home.toggle.chart.link': { link: `${helpUrl}/chartLink.html` },
-		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing.html#groupDetails` },
-		'help.groups.groupview': { link: `${helpUrl}/groupViewing.html` },
-		'help.meters.meterview': { link: `${helpUrl}/meterViewing.html` }
+		'help.home.select.dateRange': { link: `${helpUrl}/dateRange/` },
+		'help.home.select.groups': { link: `${helpUrl}/graphingGroups/` },
+		'help.home.select.maps': { link: `${helpUrl}/mapGraphic/` },
+		'help.home.select.meters': { link: `${helpUrl}/graphingMeters/` },
+		'help.home.select.rates': { link: `${helpUrl}/graphingRates/` },
+		'help.home.select.units': { link: `${helpUrl}/graphingUnits/` },
+		'help.home.readings.per.day': { link: `${helpUrl}/readingsPerDay/` },
+		'help.home.toggle.chart.link': { link: `${helpUrl}/chartLink/` },
+		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing/#groupDetails` },
+		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },
+		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` }
 	};
 
 	return (
