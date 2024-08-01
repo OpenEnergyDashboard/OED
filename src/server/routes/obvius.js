@@ -116,11 +116,17 @@ function verifyObviusUser(req, res, next){
 	if (!req.param('password')) {
 		failure(req, res, 'password parameter is required.');
 		return;
-	} else if (!req.param('username')){
+		// allowing for backwards compatibility if previous obvius meters are using email as username to login
+		// need to decide in the future if we should deprecate email or continue to allow
+	} else if (!req.param('username') && !req.param('email')) {
 		failure(req, res, 'username parameter is required.');
 		return;
 	} else { // Authenticate Obvius user.
-		req.body.username = req.param('username');
+		if (req.param('username')) {
+			req.body.username = req.param('username');
+		} else if (req.param('email')) {
+			req.body.username = req.param('email');
+		}
 		req.body.password = req.param('password');
 		obviusUsernameAndPasswordAuthMiddleware('Obvius pipeline')(req, res, next);
 	}

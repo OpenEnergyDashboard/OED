@@ -15,6 +15,9 @@ mocha.describe('Obvius API', () => {
 			mocha.it('should accept requests from Admin users', async () => {
 				const res = await chai.request(app).post('/api/obvius').send({ username: testUser.username, password: testUser.password });
 				expect(res).to.have.status(406); // this passes role verification but fails due to improper input
+				// test here for backwards compatibility using email parameter
+				const res2 = await chai.request(app).post('/api/obvius').send({ email: testUser.username, password: testUser.password });
+				expect(res2).to.have.status(406); // this passes role verification but fails due to improper input
 			});
 			mocha.it('should accept requests from Obvius users', async () => {
 				const conn = testDB.getConnection();
@@ -25,6 +28,9 @@ mocha.describe('Obvius API', () => {
 				obviusUser.password = password;
 				const res = await chai.request(app).post('/api/obvius').send({ username: obviusUser.username, password: obviusUser.password });
 				expect(res).to.have.status(406); // this passes role verification but fails due to improper input
+				// test here for backwards compatibility using email parameter
+				const res2 = await chai.request(app).post('/api/obvius').send({ email: obviusUser.username, password: obviusUser.password });
+				expect(res2).to.have.status(406); // this passes role verification but fails due to improper input
 			});
 		})
 		mocha.describe('unauthorized roles:', async () => {
@@ -42,6 +48,12 @@ mocha.describe('Obvius API', () => {
 						expect(res).to.have.status(401);
 						// Should also return expected message
 						expect(res.text).equals("Got request to 'Obvius pipeline' with invalid authorization level. Obvius role is at least required to 'Obvius pipeline'.");
+						// test here for backwards compatibility using email parameter
+						const res2 = await chai.request(app).post('/api/obvius').send({ email: unauthorizedUser.username, password: unauthorizedUser.password });
+						// request should respond with http code of 401 for failed user
+						expect(res2).to.have.status(401);
+						// Should also return expected message
+						expect(res2.text).equals("Got request to 'Obvius pipeline' with invalid authorization level. Obvius role is at least required to 'Obvius pipeline'.");
 					})
 				}
 			}
