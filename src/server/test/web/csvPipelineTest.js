@@ -24,6 +24,10 @@ const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 const CHAI_READINGS_REQUEST = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
 const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
 
+// test if email parameter works as well to allow for backwards compatibility
+const CHAI_READINGS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('email', '${testUser.username}').field('password', '${testUser.password}')`;
+const CHAI_METERS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('email', '${testUser.username}').field('password', '${testUser.password}')`;
+
 // Note there is only one description for all uploads in a test (not an array)
 // but all other keys are arrays of length number of uploads in test.
 // Note the use of double quotes for strings because some have single quotes within.
@@ -472,6 +476,13 @@ const testCases = {
 		fileName: ['pipe123AInputMeter.csv', 'pipe123BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe123: Warning parsing Reading #2. Reading value gives 30 with warning message:<br>The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #2 on meter pipe123 in pipeline: previous reading has value 15 start time 2022-11-06T01:25:00Z end time 2022-11-06T01:55:00Z and current reading has value 30 start time 2022-11-06T01:30:00Z end time 2022-11-06T02:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
+	},
+	pipe1: {
+		description: 'Testing Readings Upload using Email',
+		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('createMeter', BooleanTypesJS.true).field('meterName', 'pipe1').field('gzip', BooleanTypesJS.false)"],
+		fileName: ['pipe1Input.csv'],
+		responseCode: [200],
+		responseString: ['<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>']
 	}
 }
 
@@ -681,6 +692,45 @@ const testMeters = {
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of "pipe102" does not seem to exist with update for meters and got DB error of: No data returned from the query.'],
 		metersUploaded: []
+	},
+	pipe101: {
+		description: 'Using Email, Second meter with same name so fails but first meter exists',
+		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)"],
+		fileName: ['pipe101InputMeter.csv'],
+		responseCode: [400],
+		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of "pipe101" got database error of: duplicate key value violates unique constraint "meters_name_key"'],
+		metersUploaded: [
+			new Meter(
+				undefined, // id
+				'pipe101', // name
+				null, // URL
+				false, // enabled
+				false, //displayable
+				'other', //type
+				null, // timezone
+				undefined, // gps
+				undefined, // identifier
+				null, // note
+				undefined, //area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				undefined, // readingGap
+				undefined, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				undefined, //endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				undefined, // unitId
+				undefined, // defaultGraphicUnit
+				undefined, // area unit
+				undefined // reading frequency
+			)
+		]
 	}
 }
 

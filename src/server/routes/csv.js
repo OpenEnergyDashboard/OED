@@ -68,8 +68,12 @@ router.use(function (req, res, next) {
 				} else {
 					// If no token is found, then the request is mostly like a curl request. We require an
 					// username and password to be supplied for curl requests.
-					const { username, password } = request.body;
-					const verifiedUser = await verifyCredentials(username, password, true);
+					const { username, email, password } = request.body;
+					// allowing for backwards compatibility if previous eGuage meters are using the 'email' parameter instead of
+					// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+					// or continue to allow this backwards compatibility
+  				const user = username || email;
+					const verifiedUser = await verifyCredentials(user, password, true);
 					if (verifiedUser) {
 						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true) : cb(new Error('Invalid credentials'));
 					} else {

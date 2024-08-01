@@ -99,6 +99,10 @@ const DEFAULTS = {
 const COMMON_PROPERTIES = {
 	meterName: new StringParam('meterName', undefined, undefined),
 	username: new StringParam('username', undefined, undefined),
+	// allowing for backwards compatibility to allow for curl users to use the 'email' parameter instead of
+	// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+	// or continue to allow this backwards compatibility
+	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new BooleanParam('gzip'),
 	headerRow: new BooleanParam('headerRow'),
