@@ -41,7 +41,7 @@ export default function BarControlsComponent() {
 	// Keeps react-level state, and redux state in sync.
 	// Two different layers in state may differ especially when externally updated (chart link, history buttons.)
 	React.useEffect(() => {
-		// Assume value is valid  since it is coming from state.
+		// Assume value is valid since it is coming from state.
 		// Do not allow bad values in state.
 		const isCustom = !(['1', '7', '28'].find(days => days == barDuration.asDays().toString()));
 		setShowCustomBarDuration(isCustom);

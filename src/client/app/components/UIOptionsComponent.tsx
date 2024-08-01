@@ -9,15 +9,16 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
-import BarControlsComponent from './BarControlsComponent';
+// import BarControlsComponent from './BarControlsComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 import ChartLinkComponent from './ChartLinkComponent';
 import ChartSelectComponent from './ChartSelectComponent';
-import CompareControlsComponent from './CompareControlsComponent';
+// import CompareControlsComponent from './CompareControlsComponent';
 import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
-import MapControlsComponent from './MapControlsComponent';
+import IntervalControlsComponent from './IntervalControlsComponent';
+// import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 
 /**
@@ -72,13 +73,16 @@ export default function UIOptionsComponent() {
 				chartToRender === ChartTypes.line && <ErrorBarComponent />}
 
 			{	/* Controls specific to the bar chart. */
-				chartToRender === ChartTypes.bar && <BarControlsComponent />}
+				// chartToRender === ChartTypes.bar && <BarControlsComponent />}
+				chartToRender === ChartTypes.bar && <IntervalControlsComponent />}
 
 			{	/* Controls specific to the compare chart */
-				chartToRender === ChartTypes.compare && <CompareControlsComponent />}
+				// chartToRender === ChartTypes.compare && <CompareControlsComponent />}
+				chartToRender === ChartTypes.compare && <IntervalControlsComponent />}
 
 			{	/* Controls specific to the compare chart */
-				chartToRender === ChartTypes.map && <MapControlsComponent />}
+				// chartToRender === ChartTypes.map && <MapControlsComponent />}
+				chartToRender === ChartTypes.map && <IntervalControlsComponent />}
 
 			{ /* We can't export compare, map, radar or 3D data */
 				chartToRender !== ChartTypes.compare &&

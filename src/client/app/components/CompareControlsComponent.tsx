@@ -21,12 +21,12 @@ export default function CompareControlsComponent() {
     const comparePeriod = useAppSelector(selectComparePeriod);
     // This is the current sorting order for graphic
     const compareSortingOrder = useAppSelector(selectSortingOrder);
-    // State to manage the dropdown open status for compare interval
+    // State to manage the dropdown open status for compare period
     const [comparePeriodDropdownOpen, setComparePeriodDropdownOpen] = React.useState<boolean>(false);
     // State to manage the dropdown open status for sorting order
     const [compareSortingDropdownOpen, setCompareSortingDropdownOpen] = React.useState<boolean>(false);
     
-    // Updates values when the compare interval menu is used
+    // Updates values when the compare period menu is used
     const handleCompare = (comparePeriod: ComparePeriod) => {
         dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }));
     };
@@ -36,7 +36,7 @@ export default function CompareControlsComponent() {
         dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
     };
 
-    // Updates the text in the compare interval dropdown menu when switching between intervals
+    // Updates the text in the compare period dropdown menu when switching between periods
     const getComparePeriodDisplayText = () => {
         switch (comparePeriod) {
             case ComparePeriod.Day:
