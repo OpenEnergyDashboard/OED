@@ -1299,7 +1299,7 @@ const LocaleTranslationData = {
 		"map.calibration": "Estado de calibración: ",
 		"map.circle.size": "Tamaño del círculo: ",
 		"map.confirm.remove": "¿Estás seguro de que quieres eliminar el mapa",
-		"map.displayable": "Visuilización: ",
+		"map.displayable": "Visualización: ",
 		"map.filename": "Archivo: ",
 		"map.id": "ID del Mapa",
 		"map.interval": "Intervalo de mapa",

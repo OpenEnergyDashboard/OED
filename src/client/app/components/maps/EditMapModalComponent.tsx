@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { editMapDetails, submitEditedMap, removeMap, setCalibration } from '../../redux/actions/map';
+import { DisplayableType } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 import { useAppDispatch } from '../../redux/reduxHooks';
 import { AppDispatch } from 'store';
@@ -23,7 +24,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 	const [nameInput, setNameInput] = useState(map.name);
 	const [noteInput, setNoteInput] = useState(map.note || '');
 	const [circleInput, setCircleInput] = useState(map.circleSize.toString());
-	const [displayable, setDisplayable] = useState(map.displayable);
+	const [displayable, setDisplayable] = useState<DisplayableType>(map.displayable);
 
 	const intl = useIntl();
 
@@ -33,7 +34,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 			name: nameInput,
 			note: noteInput,
 			circleSize: parseFloat(circleInput),
-			displayable
+			displayable: displayable as DisplayableType
 		};
 		dispatch(editMapDetails(updatedMap));
 		dispatch(submitEditedMap(updatedMap.id));
@@ -78,15 +79,19 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 						/>
 					</FormGroup>
 					<FormGroup>
-						<Label for="mapDisplayable"><FormattedMessage id="map.displayable" /></Label>
+						<Label for='mapDisplayable'><FormattedMessage id='map.displayable' /></Label>
 						<Input
-							id="mapDisplayable"
-							type="select"
-							value={displayable.toString()}
-							onChange={e => setDisplayable(e.target.value === 'true')}
+							id='mapDisplayable'
+							name='mapDisplayable'
+							type='select'
+							value={displayable}
+							onChange={e => setDisplayable(e.target.value as DisplayableType)}
 						>
-							<option value="true">{intl.formatMessage({ id: 'map.is.displayable' })}</option>
-							<option value="false">{intl.formatMessage({ id: 'map.is.not.displayable' })}</option>
+							{Object.keys(DisplayableType).map(key => (
+								<option value={key} key={key}>
+									{intl.formatMessage({ id: `map.is.${key}` })}
+								</option>
+							))}
 						</Input>
 					</FormGroup>
 					<FormGroup>

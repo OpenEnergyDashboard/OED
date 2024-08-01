@@ -14,6 +14,11 @@ export enum CalibrationModeTypes {
 	unavailable = 'unavailable'
 }
 
+export enum DisplayableType {
+	displayable = 'displayable',
+	notDisplayable = 'not.displayable'
+}
+
 export interface ChangeMapModeAction {
 	type: ActionType.UpdateCalibrationMode;
 	nextMode: CalibrationModeTypes;
@@ -148,7 +153,7 @@ export interface MapData {
 export interface MapMetadata {
 	id: number;
 	name: string;
-	displayable: boolean;
+	displayable: DisplayableType;
 	note?: string;
 	filename: string;
 	modifiedDate: string;
