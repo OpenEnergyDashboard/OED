@@ -112,7 +112,7 @@ export const userDefaults = {
 	password: '',
 	confirmPassword: '',
 	note: '',
-	role: UserRole['Select Role'],
+	role: UserRole['user.role.select'],
 	passwordMatch: true,
 	disableDelete: false,
 	passwordLength: true
