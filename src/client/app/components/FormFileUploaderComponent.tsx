@@ -25,7 +25,7 @@ export default function FileUploaderComponent(props: FileUploader) {
 
 	return (
 		<FormGroup>
-			<Label>
+			<Label for='csvfile'>
 				<div className='pb-1'>
 					{translate('csv.file')}
 				</div>
@@ -34,6 +34,7 @@ export default function FileUploaderComponent(props: FileUploader) {
 				<Input
 					type='file'
 					name='csvfile'
+					id='csvfile'
 					onChange={handleFileChange}
 					invalid={!props.isInvalid}
 				/>

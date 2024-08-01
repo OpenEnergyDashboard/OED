@@ -384,11 +384,15 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						{/* Area input */}
 						<Col><FormGroup>
 							<Label for='area'>{translate('area')}</Label>
-							<Input id='area' name='area' type='number'
+							<Input
+								id='area'
+								name='area'
+								type='number'
 								min='0'
 								defaultValue={meterDetails.area}
 								onChange={e => handleNumberChange(e)}
-								invalid={meterDetails.area < 0} />
+								invalid={meterDetails.area < 0}
+							/>
 							<FormFeedback>
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>

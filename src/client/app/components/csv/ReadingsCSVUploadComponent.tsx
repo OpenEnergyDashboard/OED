@@ -4,8 +4,8 @@
 
 import { range } from 'lodash';
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import { useEffect, useState } from 'react';
+import { Button, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
@@ -55,23 +55,24 @@ export default function ReadingsCSVUploadComponent() {
 		}));
 	};
 
+	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setReadingsData(prevData => ({
+			...prevData,
+			[name]: Number(value)
+		}));
+	};
+
+	useEffect(() => {
+		console.log('Length Gap: ' + readingsData.lengthGap);
+		console.log('Length Variation: ' + readingsData.lengthVariation);
+	}, [readingsData.lengthGap, readingsData.lengthVariation]);
+
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, checked } = e.target;
 		setReadingsData(prevData => ({
 			...prevData,
 			[name]: checked
-		}));
-	};
-
-	const handlePositiveNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// don't allow the number to be set as less than zero
-		let aNumber = Number(e.target.value);
-		if (aNumber < 0) {
-			aNumber = 0;
-		}
-		setReadingsData(prevData => ({
-			...prevData,
-			[e.target.name]: aNumber
 		}));
 	};
 
@@ -384,7 +385,7 @@ export default function ReadingsCSVUploadComponent() {
 						<Row xs='1' lg='2'>
 							<Col>
 								<FormGroup>
-									<Label>
+									<Label for='endOnly'>
 										<div className='pb-1'>
 											{translate('csv.readings.param.endOnly')}
 										</div>
@@ -414,8 +415,12 @@ export default function ReadingsCSVUploadComponent() {
 										name='lengthGap'
 										min='0'
 										value={readingsData.lengthGap}
-										onChange={handlePositiveNumberChange}
+										onChange={handleNumberChange}
+										invalid={readingsData.lengthGap < 0}
 									/>
+									<FormFeedback>
+										{translate('error.negative')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -433,8 +438,12 @@ export default function ReadingsCSVUploadComponent() {
 										name='lengthVariation'
 										min='0'
 										value={readingsData.lengthVariation}
-										onChange={handlePositiveNumberChange}
+										onChange={handleNumberChange}
+										invalid={readingsData.lengthVariation < 0}
 									/>
+									<FormFeedback>
+										{translate('error.negative')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
