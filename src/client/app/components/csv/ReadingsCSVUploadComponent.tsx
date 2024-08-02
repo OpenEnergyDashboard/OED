@@ -10,7 +10,8 @@ import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
-import { BooleanTypes, ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
 import { ReadingsCSVUploadDefaults, convertBoolean } from '../../utils/csvUploadDefaults';
@@ -140,8 +141,8 @@ export default function ReadingsCSVUploadComponent() {
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
-			const { status, message } = await submitReadings(readingsData, selectedFile, dispatch);
-			if (status) {
+			const { success, message } = await submitReadings(readingsData, selectedFile, dispatch);
+			if (success) {
 				showSuccessNotification(message);
 			} else {
 				showErrorNotification(message);
@@ -308,7 +309,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='cumulative'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.cumulative')}
+											{translate('meter.cumulative')}
 										</div>
 									</Label>
 									<Input
@@ -318,8 +319,9 @@ export default function ReadingsCSVUploadComponent() {
 										value={readingsData.cumulative}
 										onChange={handleChange}
 									>
-										<option value={BooleanTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+										{Object.keys(TrueFalseType).map(key => {
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+										})}
 									</Input>
 								</FormGroup>
 							</Col>
@@ -327,7 +329,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='cumulativeReset'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.cumulative.reset')}
+											{translate('meter.cumulativeReset')}
 										</div>
 									</Label>
 									<Input
@@ -337,8 +339,9 @@ export default function ReadingsCSVUploadComponent() {
 										value={readingsData.cumulativeReset}
 										onChange={handleChange}
 									>
-										<option value={BooleanTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+										{Object.keys(TrueFalseType).map(key => {
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+										})}
 									</Input>
 								</FormGroup>
 							</Col>
@@ -348,7 +351,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='cumulativeResetStart'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.cumulative.reset.start')}
+											{translate('meter.cumulativeResetStart')}
 										</div>
 									</Label>
 									<Input
@@ -365,7 +368,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='cumulativeResetEnd'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.cumulative.reset.end')}
+											{translate('meter.cumulativeResetEnd')}
 										</div>
 									</Label>
 									<Input
@@ -384,7 +387,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='endOnly'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.endOnly')}
+											{translate('meter.endOnlyTime')}
 										</div>
 									</Label>
 									<Input
@@ -394,8 +397,9 @@ export default function ReadingsCSVUploadComponent() {
 										value={readingsData.endOnly}
 										onChange={handleChange}
 									>
-										<option value={BooleanTypes.true}> {translate('BooleanMeterTypes.true')} </option>
-										<option value={BooleanTypes.false}> {translate('BooleanMeterTypes.false')} </option>
+										{Object.keys(TrueFalseType).map(key => {
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+										})}
 									</Input>
 								</FormGroup>
 							</Col>
@@ -403,7 +407,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='lengthGap'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.length.gap')}
+											{translate('meter.readingGap')}
 										</div>
 									</Label>
 									<Input
@@ -426,7 +430,7 @@ export default function ReadingsCSVUploadComponent() {
 								<FormGroup>
 									<Label for='lengthVariation'>
 										<div className='pb-1'>
-											{translate('csv.readings.param.length.variation')}
+											{translate('meter.readingVariation')}
 										</div>
 									</Label>
 									<Input
@@ -479,8 +483,9 @@ export default function ReadingsCSVUploadComponent() {
 										value={readingsData.timeSort}
 										onChange={handleTimeSortChange}
 									>
-										<option value='increasing'> {translate('TimeSortTypes.increasing')} </option>
-										<option value='decreasing'> {translate('TimeSortTypes.decreasing')} </option>
+										{Object.keys(MeterTimeSortType).map(key => {
+											return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
+										})}
 									</Input>
 								</FormGroup>
 							</Col>

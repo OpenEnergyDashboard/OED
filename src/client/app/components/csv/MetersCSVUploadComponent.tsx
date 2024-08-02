@@ -3,7 +3,6 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { useAppDispatch } from '../../redux/reduxHooks';
 import { MetersCSVUploadPreferencesItem } from '../../types/csvUploadForm';
@@ -60,8 +59,8 @@ export default function MetersCSVUploadComponent() {
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
-			const { status, message } = await submitMeters(meterData, selectedFile, dispatch);
-			if (status) {
+			const { success, message } = await submitMeters(meterData, selectedFile, dispatch);
+			if (success) {
 				showSuccessNotification(message);
 			} else {
 				showErrorNotification(message);
@@ -152,7 +151,7 @@ export default function MetersCSVUploadComponent() {
 						</FormGroup>
 						<FormGroup>
 							<Label for='meterIdentifier'>
-								<FormattedMessage id='csv.readings.param.meter.identifier' />
+								{translate('csv.readings.param.meter.identifier')}
 								<Input
 									value={meterData.meterIdentifier}
 									id='meterIdentifier'

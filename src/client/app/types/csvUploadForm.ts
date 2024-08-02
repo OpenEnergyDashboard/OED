@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { MeterTimeSortType } from '../types/redux/meters';
+import { TrueFalseType } from '../types/items';
+
 interface CSVUploadPreferences {
 	meterIdentifier: string;
 	gzip: boolean;
@@ -13,24 +15,18 @@ interface CSVUploadPreferences {
 // Very similar to CSVUploadPreferences but uses a different Boolean type that is expected when the form is submitted.
 export interface CSVUploadPreferencesForm {
 	meterIdentifier: string;
-	gzip: BooleanTypes;
-	headerRow: BooleanTypes;
-	update: BooleanTypes;
-}
-
-export const enum BooleanTypes {
-	// Normally the values here are not used when displayed to user but the ones in data.js so translated.
-	true = 'yes',
-	false = 'no'
+	gzip: TrueFalseType;
+	headerRow: TrueFalseType;
+	update: TrueFalseType;
 }
 
 export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
-	cumulative: BooleanTypes;
-	cumulativeReset: BooleanTypes;
+	cumulative: TrueFalseType;
+	cumulativeReset: TrueFalseType;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: number;
-	endOnly: BooleanTypes;
+	endOnly: TrueFalseType;
 	honorDst: boolean;
 	lengthGap: number;
 	lengthVariation: number;
@@ -42,20 +38,20 @@ export interface ReadingsCSVUploadPreferencesItem extends CSVUploadPreferences {
 }
 
 export interface ReadingsCSVUploadPreferencesForm extends CSVUploadPreferencesForm {
-	cumulative: BooleanTypes;
-	cumulativeReset: BooleanTypes;
+	cumulative: TrueFalseType;
+	cumulativeReset: TrueFalseType;
 	cumulativeResetStart: string;
 	cumulativeResetEnd: string;
 	duplications: number;
-	endOnly: BooleanTypes;
-	honorDst: BooleanTypes;
+	endOnly: TrueFalseType;
+	honorDst: TrueFalseType;
 	lengthGap: number;
 	lengthVariation: number;
 	meterIdentifier: string;
-	refreshReadings: BooleanTypes;
-	relaxedParsing: BooleanTypes;
+	refreshReadings: TrueFalseType;
+	relaxedParsing: TrueFalseType;
 	timeSort: MeterTimeSortType;
-	useMeterZone: BooleanTypes;
+	useMeterZone: TrueFalseType;
 }
 
 // MetersCSVUpload, MetersCSVUploadPreferencesItem, MetersCSVUploadProps should be interfaces. However, at the moment does not add anything new.
