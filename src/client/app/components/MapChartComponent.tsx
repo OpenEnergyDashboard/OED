@@ -8,7 +8,7 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { useSelector } from 'react-redux';
 import {
-	selectAreaUnit, selectBarWidthDays,
+	selectAreaUnit, selectWidthDays,
 	selectGraphAreaNormalization, selectSelectedGroups,
 	selectSelectedMeters, selectSelectedUnit
 } from '../redux/slices/graphSlice';
@@ -46,7 +46,7 @@ export default function MapChartComponent() {
 
 	// converting maps to RTK has been proving troublesome, therefore using a combination of old/new stateSelectors
 	const unitID = useAppSelector(selectSelectedUnit);
-	const barDuration = useAppSelector(selectBarWidthDays);
+	const mapDuration = useAppSelector(selectWidthDays);
 	const areaNormalization = useAppSelector(selectGraphAreaNormalization);
 	const selectedAreaUnit = useAppSelector(selectAreaUnit);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
@@ -93,7 +93,7 @@ export default function MapChartComponent() {
 		const y: number[] = [];
 
 		// const timeInterval = state.graph.queryTimeInterval;
-		// const barDuration = state.graph.barDuration
+		// const mapDuration = state.graph.mapDuration
 		// Make sure there is a map with values so avoid issues.
 		if (map && map.origin && map.opposite) {
 			// The size of the original map loaded into OED.
@@ -165,10 +165,10 @@ export default function MapChartComponent() {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(meterGPSInUserGrid.x);
 							y.push(meterGPSInUserGrid.y);
-							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the mapDuration might have changed
 							// and be fetching. The unit could change from that menu so also need to check.
 							// Get the bar data to use for the map circle.
-							// const readingsData = meterReadings[timeInterval.toString()][barDuration.toISOString()][unitID];
+							// const readingsData = meterReadings[timeInterval.toString()][mapDuration.toISOString()][unitID];
 							const readingsData = meterReadings[meterID];
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData !== undefined && !meterIsFetching) {
@@ -196,13 +196,13 @@ export default function MapChartComponent() {
 									// only display a range of dates for the hover text if there is more than one day in the range
 									// Shift to UTC since want database time not local/browser time which is what moment does.
 									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-									if (barDuration.asDays() != 1) {
+									if (mapDuration.asDays() != 1) {
 										// subtracting one extra day caused by day ending at midnight of the next day.
 										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 									}
 									// The value for the circle is the average daily usage.
-									averagedReading = mapReading.reading / barDuration.asDays();
+									averagedReading = mapReading.reading / mapDuration.asDays();
 									if (areaNormalization) {
 										averagedReading /= meterArea;
 									}
@@ -240,7 +240,7 @@ export default function MapChartComponent() {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(groupGPSInUserGrid.x);
 							y.push(groupGPSInUserGrid.y);
-							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the mapDuration might have changed
 							// and be fetching. The unit could change from that menu so also need to check.
 							// Get the bar data to use for the map circle.
 							const readingsData = groupData[groupID];
@@ -269,13 +269,13 @@ export default function MapChartComponent() {
 								} else {
 									// only display a range of dates for the hover text if there is more than one day in the range
 									timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-									if (barDuration.asDays() != 1) {
+									if (mapDuration.asDays() != 1) {
 										// subtracting one extra day caused by day ending at midnight of the next day.
 										// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 										timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 									}
 									// The value for the circle is the average daily usage.
-									averagedReading = mapReading.reading / barDuration.asDays();
+									averagedReading = mapReading.reading / mapDuration.asDays();
 									if (areaNormalization) {
 										averagedReading /= groupArea;
 									}

@@ -8,7 +8,7 @@ import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import {
-	selectBarWidthDays, selectComparePeriod,
+	selectWidthDays, selectComparePeriod,
 	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState
@@ -91,7 +91,7 @@ export const selectRadarChartQueryArgs = createSelector(
 
 export const selectBarChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
-	selectBarWidthDays,
+	selectWidthDays,
 	(common, barWidthDays) => {
 		// QueryArguments to pass into the bar chart component
 		const barWidthAsDays = Math.round(barWidthDays.asDays());
@@ -139,7 +139,7 @@ export const selectCompareChartQueryArgs = createSelector(
 
 export const selectMapChartQueryArgs = createSelector(
 	selectBarChartQueryArgs,
-	selectBarWidthDays,
+	selectWidthDays,
 	(state: RootState) => state.maps,
 	(barChartArgs, barWidthDays, maps) => {
 		const durationDays = Math.round(barWidthDays.asDays());
