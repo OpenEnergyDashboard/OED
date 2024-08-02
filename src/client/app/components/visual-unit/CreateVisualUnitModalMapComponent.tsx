@@ -14,22 +14,6 @@ import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 // import { useDispatch } from 'react-redux';
 // import { fetchMetersDetailsIfNeeded } from 'actions/meters';
 
-interface Node {
-	id: string;
-	x?: number;
-	y?: number;
-}
-
-interface Link {
-	source: string;
-	target: string;
-}
-
-interface GraphData {
-	nodes: Node[];
-	links: Link[];
-}
-
 // interface MeterViewComponentProps {
 // 	meter: MeterData;
 // 	currentUser: CurrentUserState;
@@ -68,14 +52,14 @@ export default function CreateVisualUnitMapModalComponent() {
 	//   }
 	// }, [currentUnitState, meterDetails]);
 
-	const jsonData: { nodes: any[], links: any[] } = {
+	const data: { nodes: any[], links: any[] } = {
 		nodes: [],
 		links: []
 	};
 
 	const unitData = useAppSelector(selectAllUnits);
 	unitData.map(function (value) {
-		jsonData.nodes.push({
+		data.nodes.push({
 			'name': value.name,
 			'id': value.id
 		});
@@ -83,7 +67,7 @@ export default function CreateVisualUnitMapModalComponent() {
 
 	const conversionData = useAppSelector(selectConversionsDetails);
 	conversionData.map(function (value) {
-		jsonData.links.push({
+		data.links.push({
 			'source': value.sourceId,
 			'target': value.destinationId
 		});
@@ -91,64 +75,60 @@ export default function CreateVisualUnitMapModalComponent() {
 
 	useEffect(() => {
 		const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-		const width = 1200 - margin.left - margin.right;
+		const width = 600 - margin.left - margin.right;
 		const height = 600 - margin.top - margin.bottom;
+
+		const nodes = data.nodes.map(d => ({...d}));
+		const links = data.links.map(d => ({...d}));
+
+		const simulation = d3.forceSimulation(nodes)
+			.force('link', d3.forceLink(links).id((d: any) => d.id))
+			.force('charge', d3.forceManyBody().strength(-200))
+			.force('x', d3.forceX())
+			.force('y', d3.forceY());
 
 		const svg = d3.select('#sample')
 			.append('svg')
 			.attr('width', width + margin.left + margin.right)
 			.attr('height', height + margin.top + margin.bottom)
+			.attr('viewBox',
+				[-(width + margin.left + margin.right) / 2, -(height + margin.top + margin.bottom) / 2,
+					width + margin.left + margin.right, height + margin.top + margin.bottom]
+			)
 			.append('g')
 			.attr('transform', `translate(${margin.left}, ${margin.top})`);
 
-		d3.json<GraphData>('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_network.json').then(function (data) {
-			if (!data) {
-				console.error('Data is undefined or null.');
-				return;
-			}
+		// connection link style
+		const link = svg.selectAll('line')
+			.data(links)
+			.enter().append('line')
+			.style('stroke', '#aaa')
+			.attr('stroke-width', 3);
 
-			// connection link style
-			const link = svg.selectAll('line')
-				.data(jsonData.links)
-				.enter().append('line')
-				.style('stroke', '#aaa');
+		// node style
+		const node = svg.selectAll('.node')
+			.data(nodes)
+			.enter().append('circle')
+			.attr('r', 12)
+			.style('fill', '#69b3a2')
+			.text(function(d) { return d.name; });
 
-			// node style
-			const node = svg.selectAll('circle')
-				.data(jsonData.nodes)
-				.enter().append('circle')
-				.attr('r', 15)
-				.style('fill', '#69b3a2');
+		simulation.on('tick', () => {
+			link
+				.attr('x1', d => d.source.x)
+				.attr('y1', d => d.source.y)
+				.attr('x2', d => d.target.x)
+				.attr('y2', d => d.target.y);
 
-			d3.forceSimulation(jsonData.nodes)
-				.force('link', d3.forceLink()
-					.id(function (d) { return (d as Node).id; })
-					.links(jsonData.links)
-				)
-				.force('charge', d3.forceManyBody().strength(-50))
-				.force('center', d3.forceCenter(width / 2, height / 2))
-				.on('tick', ticked);
-
-			function ticked() {
-				link
-					.attr('x1', function (d) { return (d.source as d3.SimulationNodeDatum).x ?? 0; })
-					.attr('y1', function (d) { return (d.source as d3.SimulationNodeDatum).y ?? 0; })
-					.attr('x2', function (d) { return (d.target as d3.SimulationNodeDatum).x ?? 0; })
-					.attr('y2', function (d) { return (d.target as d3.SimulationNodeDatum).y ?? 0; });
-
-				node
-					.attr('cx', function (d) { return (d.x as number) + 6; })
-					.attr('cy', function (d) { return (d.y as number) - 6; });
-			}
-
-		}).catch(error => {
-			console.error('Error loading data:', error);
+			node
+				.attr('cx', d => d.x)
+				.attr('cy', d => d.y);
 		});
+
 	}, []); // Empty dependency array to run the effect only once
 
 	return (
 		<div>
-			<h2>Sample Network Graph</h2>
 			<div id="sample"></div>
 		</div>
 	);
