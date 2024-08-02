@@ -4,7 +4,6 @@
 
 -- Gets logs in table by date range. This is then ordered by time ascending.
 SELECT 
-	-- Short column names for smaller data.
 	log_type, log_message as log_msg, log_time
 FROM logmsg 
 WHERE log_type = ${logType}
