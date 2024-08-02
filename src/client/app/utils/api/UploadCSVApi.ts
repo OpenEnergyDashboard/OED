@@ -13,20 +13,15 @@ import {
 	ReadingsCSVUploadPreferencesForm,
 	ReadingsCSVUploadPreferencesItem
 } from '../../types/csvUploadForm';
-import { MeterData } from '../../types/redux/meters';
 import ApiBackend from './ApiBackend';
-interface MetersUploadResponse {
-	message: string;
-	meters: MeterData[];
-}
 
-interface ApiResponse {
-	success: boolean;
-	message: string;
+interface apiResponse {
+	status: boolean,
+	message: string
 }
 
 export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File,
-	dispatch: Dispatch): Promise<ApiResponse> => {
+	dispatch: Dispatch): Promise<apiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -49,14 +44,14 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	try {
 		message = await backend.doPostRequest<string>('/api/csv/readings', formData);
 		dispatch(baseApi.util.invalidateTags(['Readings']));
-		return { success: true, message: message };
+		return { status: true, message: message };
 	} catch (error) {
-		return { success: false, message: error.response.data };
+		return { status: false, message: error.response.data };
 	}
 };
 
 export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File,
-	dispatch: Dispatch): Promise<ApiResponse> => {
+	dispatch: Dispatch): Promise<apiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -72,12 +67,12 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 	formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
 
 	try {
-		const response = await backend.doPostRequest<MetersUploadResponse>('/api/csv/meters', formData);
+		const response = await backend.doPostRequest<string>('/api/csv/meters', formData);
 		// Meter Data was sent to the DB, invalidate meters for now
 		dispatch(baseApi.util.invalidateTags(['MeterData']));
 		// meters were invalidated so all meter changes will now reflect in Redux state, now return
-		return { success: true, message: response.message };
+		return { status: true, message: response };
 	} catch (error) {
-		return { success: false, message: error.response.data };
+		return { status: false, message: error.response.data };
 	}
 };

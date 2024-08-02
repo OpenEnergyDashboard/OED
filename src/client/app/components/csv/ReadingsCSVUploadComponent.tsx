@@ -63,11 +63,6 @@ export default function ReadingsCSVUploadComponent() {
 		}));
 	};
 
-	useEffect(() => {
-		console.log('Length Gap: ' + readingsData.lengthGap);
-		console.log('Length Variation: ' + readingsData.lengthVariation);
-	}, [readingsData.lengthGap, readingsData.lengthVariation]);
-
 	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, checked } = e.target;
 		setReadingsData(prevData => ({
@@ -85,13 +80,15 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const handleFileChange = (file: File) => {
-		setSelectedFile(file);
-		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
-			setIsValidFileType(true);
-		} else {
-			setIsValidFileType(false);
-			setSelectedFile(null);
-			showErrorNotification(translate('csv.file.error') + file.name);
+		if (file) {
+			setSelectedFile(file);
+			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
+				setIsValidFileType(true);
+			} else {
+				setIsValidFileType(false);
+				setSelectedFile(null);
+				showErrorNotification(translate('csv.file.error') + file.name);
+			}
 		}
 	};
 	/* END of Handlers for each type of input change */
@@ -143,11 +140,11 @@ export default function ReadingsCSVUploadComponent() {
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
-			const response = await submitReadings(readingsData, selectedFile, dispatch);
-			if (response.success) {
-				showSuccessNotification(response.message);
+			const { status, message } = await submitReadings(readingsData, selectedFile, dispatch);
+			if (status) {
+				showSuccessNotification(message);
 			} else {
-				showErrorNotification(response.message);
+				showErrorNotification(message);
 			}
 		}
 	};

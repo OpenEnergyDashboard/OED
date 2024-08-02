@@ -60,11 +60,11 @@ export default function MetersCSVUploadComponent() {
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		if (selectedFile) {
-			const response = await submitMeters(meterData, selectedFile, dispatch);
-			if (response.success) {
-				showSuccessNotification(response.message);
+			const { status, message } = await submitMeters(meterData, selectedFile, dispatch);
+			if (status) {
+				showSuccessNotification(message);
 			} else {
-				showErrorNotification(response.message);
+				showErrorNotification(message);
 			}
 		}
 	};
