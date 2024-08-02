@@ -17,8 +17,8 @@ interface MapViewProps {
 
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
-	const handleShowModal = () => setShowEditModal(true);
-	const handleCloseModal = () => setShowEditModal(false);
+	const handleShow = () => setShowEditModal(true);
+	const handleClose = () => setShowEditModal(false);
 
 	const selectMapById = React.useMemo(makeSelectMapById, []);
 	const map = useSelector(state => selectMapById(state, mapID));
@@ -38,7 +38,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 				<b><FormattedMessage id="map.circle.size" /></b> {map.circleSize}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {map.note}
+				<b><FormattedMessage id="note" /></b> {map.note ? map.note.slice(0,29) : ''}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.filename" /></b> {map.filename}
@@ -55,14 +55,14 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 			</div>
 			{(
 				<div className="edit-btn">
-					<Button color='secondary' onClick={handleShowModal}>
+					<Button color='secondary' onClick={handleShow}>
 						<FormattedMessage id="edit.map" />
 					</Button>
 				</div>
 			)}
 			<EditMapModalComponent
 				show={showEditModal}
-				handleClose={handleCloseModal}
+				handleClose={handleClose}
 				map={map}
 			/>
 		</div>
