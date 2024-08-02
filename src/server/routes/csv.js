@@ -121,9 +121,10 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 		} else {
 			csvFilepath = uploadedFilepath;
 		}
-		// Send the newly created meters back to the frontend
-		res.status(200).send({ message: '<h1>SUCCESS</h1>Successfully inserted the meters.'});
 
+		const conn = getConnection();
+		await uploadMeters(req, res, csvFilepath, conn);
+		success(req, res, 'Successfully inserted the meters.');
 	} catch (error) {
 		failure(req, res, error);
 
