@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as d3 from 'd3';
 import { useEffect } from 'react';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectAllUnits } from '../../redux/api/unitsApi';
+import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 // import { useSelector } from 'react-redux';
 // import { State } from 'types/redux/state';
 // import { noUnitTranslated } from 'utils/input';
@@ -65,10 +68,31 @@ export default function CreateVisualUnitMapModalComponent() {
 	//   }
 	// }, [currentUnitState, meterDetails]);
 
+	const jsonData: { nodes: any[], links: any[] } = {
+		nodes: [],
+		links: []
+	};
+
+	const unitData = useAppSelector(selectAllUnits);
+	unitData.map(function (value) {
+		jsonData.nodes.push({
+			'name': value.name,
+			'id': value.id
+		});
+	});
+
+	const conversionData = useAppSelector(selectConversionsDetails);
+	conversionData.map(function (value) {
+		jsonData.links.push({
+			'source': value.sourceId,
+			'target': value.destinationId
+		});
+	});
+
 	useEffect(() => {
 		const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-		const width = 400 - margin.left - margin.right;
-		const height = 400 - margin.top - margin.bottom;
+		const width = 1200 - margin.left - margin.right;
+		const height = 600 - margin.top - margin.bottom;
 
 		const svg = d3.select('#sample')
 			.append('svg')
@@ -85,23 +109,23 @@ export default function CreateVisualUnitMapModalComponent() {
 
 			// connection link style
 			const link = svg.selectAll('line')
-				.data(data.links)
+				.data(jsonData.links)
 				.enter().append('line')
 				.style('stroke', '#aaa');
 
 			// node style
 			const node = svg.selectAll('circle')
-				.data(data.nodes)
+				.data(jsonData.nodes)
 				.enter().append('circle')
-				.attr('r', 20)
+				.attr('r', 15)
 				.style('fill', '#69b3a2');
 
-			d3.forceSimulation(data.nodes)
+			d3.forceSimulation(jsonData.nodes)
 				.force('link', d3.forceLink()
 					.id(function (d) { return (d as Node).id; })
-					.links(data.links)
+					.links(jsonData.links)
 				)
-				.force('charge', d3.forceManyBody().strength(-400))
+				.force('charge', d3.forceManyBody().strength(-50))
 				.force('center', d3.forceCenter(width / 2, height / 2))
 				.on('tick', ticked);
 
