@@ -4,5 +4,5 @@
 # The absolute path the project root directory (OED)
 cd '/example/path/to/project/OED'
 
-# The following line should NOT need to be edited except by devs.
-docker-compose run --rm web npm run --silent refreshHourlyReadingViews &>> /dev/null &
+# The following line should NOT need to be edited except by devs or if you have an old system with only docker-compose.
+docker compose run --rm web npm run --silent refreshHourlyReadingViews &>> /dev/null &
