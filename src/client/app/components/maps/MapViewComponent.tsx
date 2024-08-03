@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button } from 'reactstrap';
 import { parseZone } from 'moment';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
@@ -18,9 +16,6 @@ interface MapViewProps {
 }
 
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
-	const [showEditModal, setShowEditModal] = useState(false);
-	const handleShow = () => setShowEditModal(true);
-	const handleClose = () => setShowEditModal(false);
 
 	const map: MapMetadata = useAppSelector((state: RootState) => selectMapById(state, mapID));
 
@@ -54,16 +49,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 					<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
 				</span>
 			</div>
-			{(
-				<div className="edit-btn">
-					<Button color='secondary' onClick={handleShow}>
-						<FormattedMessage id="edit.map" />
-					</Button>
-				</div>
-			)}
 			<EditMapModalComponent
-				show={showEditModal}
-				handleClose={handleClose}
 				map={map}
 			/>
 		</div>

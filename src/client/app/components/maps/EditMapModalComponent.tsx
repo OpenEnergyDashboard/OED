@@ -14,12 +14,13 @@ import { useAppDispatch } from '../../redux/reduxHooks';
 import { AppDispatch } from 'store';
 
 interface EditMapModalProps {
-	show: boolean;
-	handleClose: () => void;
 	map: MapMetadata;
 }
 
-const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose, map}) => {
+const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
+	const [showModal, setShowModal] = useState(false);
+	const handleShow = () => setShowModal(true);
+	const handleClose = () => setShowModal(false);
 	const dispatch: AppDispatch = useAppDispatch();
 	const [nameInput, setNameInput] = useState(map.name);
 	const [noteInput, setNoteInput] = useState(map.note || '');
@@ -64,92 +65,99 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ show, handleClose,
 	};
 
 	return (
-		<Modal isOpen={show} toggle={handleClose}>
-			<ModalHeader toggle={handleClose}>
-				<FormattedMessage id="edit.map" />
-			</ModalHeader>
-			<ModalBody>
-				<Form>
-					<FormGroup>
-						<Label for="mapName"><FormattedMessage id="map.name" /></Label>
+		<>
+			<div className="edit-btn">
+				<Button color='secondary' onClick={handleShow}>
+					<FormattedMessage id="edit.map" />
+				</Button>
+			</div>
+			<Modal isOpen={showModal} toggle={handleClose}>
+				<ModalHeader toggle={handleClose}>
+					<FormattedMessage id="edit.map" />
+				</ModalHeader>
+				<ModalBody>
+					<Form>
+						<FormGroup>
+							<Label for="mapName"><FormattedMessage id="map.name" /></Label>
+							<Input
+								id="mapName"
+								value={nameInput}
+								onChange={e => setNameInput(e.target.value)}
+							/>
+						</FormGroup>
+						<FormGroup>
+							<Label for='map.displayable'><FormattedMessage id='map.displayable' /></Label>
+							<Input
+								id='map.displayable'
+								name='map.displayable'
+								type='select'
+								value={displayable}
+								onChange={e => setDisplayable(e.target.value as DisplayableType)}
+							>
+								{Object.keys(DisplayableType).map(key => (
+									<option value={key} key={key}>
+										{intl.formatMessage({ id: `map.is.${key}` })}
+									</option>
+								))}
+							</Input>
+						</FormGroup>
+						<FormGroup>
+							<Label for="mapCircleSize"><FormattedMessage id="map.circle.size" /></Label>
+							<Input
+								id="mapCircleSize"
+								type='number'
+								value={circleInput}
+								onChange={e => setCircleInput(e.target.value)}
+								invalid={parseFloat(circleInput) < 0}
+								onBlur={toggleCircleEdit}
+							/>
+						</FormGroup>
+						<FormGroup>
+							<Label for="mapNote"><FormattedMessage id="note" /></Label>
+							<Input
+								id="mapNote"
+								type="textarea"
+								value={noteInput}
+								onChange={e => setNoteInput(e.target.value.slice(0, 30))}
+							/>
+						</FormGroup>
+					</Form>
+					<div>
+						<Label><FormattedMessage id="map.filename" /></Label>
 						<Input
-							id="mapName"
-							value={nameInput}
-							onChange={e => setNameInput(e.target.value)}
-						/>
-					</FormGroup>
-					<FormGroup>
-						<Label for='map.displayable'><FormattedMessage id='map.displayable' /></Label>
-						<Input
-							id='map.displayable'
-							name='map.displayable'
-							type='select'
-							value={displayable}
-							onChange={e => setDisplayable(e.target.value as DisplayableType)}
-						>
-							{Object.keys(DisplayableType).map(key => (
-								<option value={key} key={key}>
-									{intl.formatMessage({ id: `map.is.${key}` })}
-								</option>
-							))}
+							id='mapFilename'
+							name='mapFilename'
+							type='text'
+							defaultValue={map.filename}
+							disabled>
 						</Input>
-					</FormGroup>
-					<FormGroup>
-						<Label for="mapCircleSize"><FormattedMessage id="map.circle.size" /></Label>
-						<Input
-							id="mapCircleSize"
-							type='number'
-							value={circleInput}
-							onChange={e => setCircleInput(e.target.value)}
-							invalid={parseFloat(circleInput)<0}
-							onBlur={toggleCircleEdit}
-						/>
-					</FormGroup>
-					<FormGroup>
-						<Label for="mapNote"><FormattedMessage id="note" /></Label>
-						<Input
-							id="mapNote"
-							type="textarea"
-							value={noteInput}
-							onChange={e => setNoteInput(e.target.value.slice(0,30))}
-						/>
-					</FormGroup>
-				</Form>
-				<div>
-					<Label><FormattedMessage id="map.filename" /></Label>
-					<Input
-						id='mapFilename'
-						name='mapFilename'
-						type='text'
-						defaultValue={map.filename}
-						disabled>
-					</Input>
-					<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-						<FormattedMessage id='map.upload.new.file' />
+						<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+							<FormattedMessage id='map.upload.new.file' />
+						</Button>
+					</div>
+					<div>
+						<Label><FormattedMessage id="map.calibration" /></Label>
+						<p>
+							<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
+						</p>
+						<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
+							<FormattedMessage id='map.calibrate' />
+						</Button>
+					</div>
+				</ModalBody>
+				<ModalFooter>
+					<Button color="danger" onClick={handleDelete}>
+						<FormattedMessage id="delete.map" />
 					</Button>
-				</div>
-				<div>
-					<Label><FormattedMessage id="map.calibration" /></Label>
-					<p>
-						<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
-					</p>
-					<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
-						<FormattedMessage id='map.calibrate' />
+					<Button color="secondary" onClick={handleClose}>
+						<FormattedMessage id="cancel" />
 					</Button>
-				</div>
-			</ModalBody>
-			<ModalFooter>
-				<Button color="danger" onClick={handleDelete}>
-					<FormattedMessage id="delete.map" />
-				</Button>
-				<Button color="secondary" onClick={handleClose}>
-					<FormattedMessage id="cancel" />
-				</Button>
-				<Button color="primary" onClick={handleSave}>
-					<FormattedMessage id="save.all" />
-				</Button>
-			</ModalFooter>
-		</Modal>
+					<Button color="primary" onClick={handleSave}>
+						<FormattedMessage id="save.all" />
+					</Button>
+				</ModalFooter>
+			</Modal>
+		</>
 	);
 };
 
