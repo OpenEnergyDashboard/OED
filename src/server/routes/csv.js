@@ -126,8 +126,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 		await uploadMeters(req, res, csvFilepath, conn);
 		success(req, res, 'Successfully inserted the meters.');
 	} catch (error) {
-		// need to send back error.message because the frontend CSV API is expect a string here
-		failure(req, res, error.message);
+		failure(req, res, error);
 
 	} finally {
 		// Clean up files
