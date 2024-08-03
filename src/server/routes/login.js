@@ -26,10 +26,12 @@ router.post('/', async (req, res) => {
 		properties: {
 			username: {
 				type: 'string',
+				minLength: 3,
 				maxLength: 254
 			},
 			password: {
 				type: 'string',
+				minLength: 8,
 				maxLength: 128
 			}
 		}
