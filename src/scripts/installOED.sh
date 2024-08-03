@@ -14,6 +14,9 @@ dostart=yes
 keep_node_modules=no
 continue_on_db_error=no
 skip_db_initialize=no
+# eventually we will transition away from using an email
+username="test"
+username2="test@example.com"
 
 # Run through all flags and match
 while test $# -gt 0; do
@@ -145,9 +148,13 @@ else
 	# Create a user
 	set -e
 	if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
-		npm run createUser -- test@example.com password
+		npm run createUser -- $username password
 		createuser_code=$?
-		if [ $createuser_code -ne 0 ]; then
+		# this second username uses an email: test@example.com and we will remove this eventually
+		# as we are moving to using username instead of email
+		npm run createUser -- $username2 password
+		createuser_code2=$?
+		if [ $createuser_code -ne 0 ] || [ $createuser_code2 -ne 0 ];
 			# There was an error so stop process unless asked to continue on DB issues.
 			if [ "$continue_on_db_error" = "no" ]; then
 				# We should stop the install process. This means it won't try to bring up the web service.
@@ -160,7 +167,7 @@ else
 			fi
 		else
 			# There was no createdb error so assume database ready for use so stop process
-			printf "%s\n" "User creation had no errors so default user 'testUser' with password 'password' should exist"
+			printf "%s\n" "User creation had no errors so default user $username and $username2 with password 'password' should exist"
 		fi
 		# Create function to shift readings for compare - developer only
 		printf "%s\n" "Creating developer DB function"
