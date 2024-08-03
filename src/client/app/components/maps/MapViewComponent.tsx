@@ -9,8 +9,10 @@ import { Button } from 'reactstrap';
 import { parseZone } from 'moment';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
-import { makeSelectMapById } from '../../redux/selectors/maps';
-import { useSelector } from 'react-redux';
+import { selectMapById } from '../../redux/selectors/maps';
+import { RootState } from '../../store';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { MapMetadata } from 'types/redux/map';
 interface MapViewProps {
 	mapID: number;
 }
@@ -20,8 +22,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	const handleShow = () => setShowEditModal(true);
 	const handleClose = () => setShowEditModal(false);
 
-	const selectMapById = React.useMemo(makeSelectMapById, []);
-	const map = useSelector(state => selectMapById(state, mapID));
+	const map: MapMetadata = useAppSelector((state: RootState) => selectMapById(state, mapID));
 
 	return (
 		<div className="card">

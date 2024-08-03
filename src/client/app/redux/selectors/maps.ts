@@ -4,6 +4,7 @@
 
 import { RootState } from 'store';
 import { createSelector } from '@reduxjs/toolkit';
+import { MapMetadata } from 'types/redux/map';
 
 export const selectMapState = (state: RootState) => state.maps;
 export const selectMaps = createSelector([selectMapState], maps => {
@@ -12,10 +13,4 @@ export const selectMaps = createSelector([selectMapState], maps => {
 		.filter(key => !isNaN(key));
 });
 
-export const makeSelectMapById = () => {
-	const selectMapById = createSelector(
-		[selectMapState, (state, id) => id],
-		(maps, id) => maps.byMapID[id]
-	);
-	return selectMapById;
-};
+export const selectMapById = (state: RootState, id: number): MapMetadata => state.maps.byMapID[id];
