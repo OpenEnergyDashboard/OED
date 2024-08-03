@@ -4,7 +4,6 @@
 
 import * as React from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
-import { useAppDispatch } from '../../redux/reduxHooks';
 import { MetersCSVUploadPreferencesItem } from '../../types/csvUploadForm';
 import { submitMeters } from '../../utils/api/UploadCSVApi';
 import { MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
@@ -13,6 +12,10 @@ import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 
 /**
  * Defines the CSV Meters page
@@ -23,8 +26,17 @@ export default function MetersCSVUploadComponent() {
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
 	const dispatch = useAppDispatch();
+	// Check for admin status
+	const isAdmin = useAppSelector(selectIsAdmin);
+	// page may contain admin info so verify admin status while admin is authenticated.
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
+	// We only want displayable meters if non-admins because they still have
+	// non-displayable in state.
+	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
+	// tracks whether or not a meter has been selected
+	const meterIsSelected = meterData.meterIdentifier !== '';
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target;
 		setMeterData(prevData => ({
 			...prevData,
@@ -149,20 +161,37 @@ export default function MetersCSVUploadComponent() {
 								</Col>
 							</Row>
 						</FormGroup>
-						<FormGroup>
-							<Label for='meterIdentifier'>
-								{translate('csv.readings.param.meter.identifier')}
+						{meterData.update && (
+							<FormGroup>
+								<Label for='meterIdentifier'>
+									<div className='pb-1'>
+										{translate('csv.readings.param.meter.identifier')}
+									</div>
+								</Label>
 								<Input
-									value={meterData.meterIdentifier}
 									id='meterIdentifier'
 									name='meterIdentifier'
-									onChange={handleChange}
-								/>
-							</Label>
-						</FormGroup>
+									type='select'
+									value={meterData.meterIdentifier || ''}
+									onChange={handleSelectedMeterChange}
+									invalid={!meterIsSelected}
+								>
+									{
+										<option value={''} key={-999} hidden disabled>
+											{translate('select.meter')}
+										</option>
+									}
+									{
+										Array.from(visibleMeters).map(meter => {
+											return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
+										})
+									}
+								</Input>
+							</FormGroup>
+						)}
 						<div className='d-flex flex-row-reverse'>
 							<div className='p-3'>
-								<Button color='primary' type='submit' disabled={!isValidFileType}>
+								<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
 									{translate('csv.submit.button')}
 								</Button>
 							</div>
