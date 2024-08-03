@@ -11,6 +11,8 @@ import { selectMapById } from '../../redux/selectors/maps';
 import { RootState } from '../../store';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { MapMetadata } from 'types/redux/map';
+import translate from '../../utils/translate';
+import { LocaleDataKey } from 'translations/data';
 interface MapViewProps {
 	mapID: number;
 }
@@ -19,34 +21,42 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
 	const map: MapMetadata = useAppSelector((state: RootState) => selectMapById(state, mapID));
 
+	// Helper function checks map to see if it's calibrated
+	const getCalibrationStatus = () => {
+		const isCalibrated = map.origin && map.opposite;
+		return {
+			color: isCalibrated ? 'black' : 'gray',
+			messageId: isCalibrated ? 'map.is.calibrated' : 'map.is.not.calibrated'
+		};
+	};
+	const { color, messageId } = getCalibrationStatus();
+
 	return (
 		<div className="card">
 			<div className="identifier-container">
 				{map.name}
 			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="map.displayable" /></b>
-				<span style={{ color: map.displayable ? 'green' : 'red' }}>
-					<FormattedMessage id={map.displayable ? 'map.is.displayable' : 'map.is.not.displayable'} />
-				</span>
+			<div className={map.displayable.toString()}>
+				<b><FormattedMessage id="map.displayable" /></b> {translate(`TrueFalseType.${map.displayable.toString()}` as LocaleDataKey)}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.circle.size" /></b> {map.circleSize}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {map.note ? map.note.slice(0,29) : ''}
+				<b><FormattedMessage id="note" /></b> {map.note ? map.note.slice(0, 29) : ''}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.filename" /></b> {map.filename}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.modified.date" /></b>
+				{/* TODO I don't think this will properly internationalize. */}
 				{parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
-				<span style={{ color: map.origin && map.opposite ? 'black' : 'gray' }}>
-					<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
+				<span style={{ color }}>
+					<FormattedMessage id={messageId} />
 				</span>
 			</div>
 			<EditMapModalComponent
