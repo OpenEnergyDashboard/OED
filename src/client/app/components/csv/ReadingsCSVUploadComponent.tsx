@@ -5,7 +5,7 @@
 import { range } from 'lodash';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, Col, Container, Form, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
@@ -419,9 +419,6 @@ export default function ReadingsCSVUploadComponent() {
 										onChange={handleNumberChange}
 										invalid={readingsData.lengthGap < 0}
 									/>
-									<FormFeedback>
-										{translate('error.negative')}
-									</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -442,9 +439,6 @@ export default function ReadingsCSVUploadComponent() {
 										onChange={handleNumberChange}
 										invalid={readingsData.lengthVariation < 0}
 									/>
-									<FormFeedback>
-										{translate('error.negative')}
-									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
