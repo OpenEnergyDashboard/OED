@@ -47,88 +47,7 @@ export default function PreferencesComponent() {
 				successMessage='updated.preferences'
 				failureMessage='failed.to.submit.changes'
 			/>
-			<h3 className='border-bottom'>Graph Settings</h3>
-			<div>
-				<p style={labelStyle}>
-					<FormattedMessage id='default.graph.type' />:
-				</p>
-				{
-					Object.values(ChartTypes).map(chartType => (
-						<div className='radio' key={chartType}>
-							<label >
-								<input
-									type='radio'
-									name='chartTypes'
-									style={{ marginRight: '10px' }}
-									value={chartType}
-									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-									checked={localAdminPref.defaultChartToRender === chartType}
-								/>
-								{translate(chartType)}
-							</label>
-						</div>
-					))
-				}
-			</div>
-			<p style={labelStyle}>
-				<FormattedMessage id='default.graph.settings' />:
-			</p>
-			<div className='checkbox'>
-				<label>
-					<input
-						type='checkbox'
-						style={{ marginRight: '10px' }}
-						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
-						checked={localAdminPref.defaultBarStacking}
-					/>
-					{translate('default.bar.stacking')}
-				</label>
-			</div>
-			<div className='checkbox'>
-				<label>
-					<input
-						type='checkbox'
-						style={{ marginRight: '10px' }}
-						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
-						checked={localAdminPref.defaultAreaNormalization}
-					/>
-					{translate('default.area.normalize')}
-
-				</label>
-			</div>
-			<div>
-				<p style={labelStyle}>
-					{translate('default.area.unit')}
-
-				</p>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='areaUnitType'
-							style={{ marginRight: '10px' }}
-							value={AreaUnitType.feet}
-							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
-							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
-						/>
-						{translate('AreaUnitType.feet')}
-					</label>
-				</div>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='areaUnitType'
-							style={{ marginRight: '10px' }}
-							value={AreaUnitType.meters}
-							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
-							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
-						/>
-						{translate('AreaUnitType.meters')}
-					</label>
-				</div>
-			</div>
-			<h3 className='border-bottom mt-3'>Meter Settings</h3>
+			<h3 className='border-bottom'>{translate('meter.settings')}</h3>
 			<div>
 				<p style={titleStyle}>
 					{`${translate('default.meter.reading.frequency')}:`}
@@ -140,7 +59,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.minimum.value')}:`}
 				</p>
 				<Input
@@ -151,7 +70,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.maximum.value')}:`}
 				</p>
 				<Input
@@ -162,7 +81,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.minimum.date')}:`}
 				</p>
 				<Input
@@ -173,7 +92,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.maximum.date')}:`}
 				</p>
 				<Input
@@ -184,7 +103,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.reading.gap')}:`}
 				</p>
 				<Input
@@ -195,7 +114,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.maximum.errors')}:`}
 				</p>
 				<Input
@@ -206,7 +125,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.meter.disable.checks')}:`}
 				</p>
 				<Input
@@ -219,9 +138,9 @@ export default function PreferencesComponent() {
 				</Input>
 			</div>
 			<div>
-				<h3 className='border-bottom mt-3'>Site Settings</h3>
+				<h3 className='border-bottom mt-3'>{translate('site.settings')}</h3>
 				<div>
-					<p style={titleStyle}>
+					<p className='mt-2' style={titleStyle}>
 						{`${translate('site.title')}:`}
 					</p>
 					<Input
@@ -232,7 +151,7 @@ export default function PreferencesComponent() {
 						maxLength={50}
 					/>
 				</div>
-				<p style={labelStyle}>
+				<p className='mt-2' style={labelStyle}>
 					{translate('default.language')}
 				</p>
 				<div className='radio'>
@@ -276,7 +195,7 @@ export default function PreferencesComponent() {
 				</div>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.time.zone')}:`}
 				</p>
 				<TimeZoneSelect
@@ -284,7 +203,7 @@ export default function PreferencesComponent() {
 					handleClick={e => makeLocalChanges('defaultTimezone', e)} />
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.warning.file.size')}:`}
 				</p>
 				<Input
@@ -295,7 +214,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					{`${translate('default.file.size.limit')}:`}
 				</p>
 				<Input
@@ -306,7 +225,7 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div>
-				<p style={titleStyle}>
+				<p className='mt-2' style={titleStyle}>
 					<FormattedMessage id='default.help.url' />:
 				</p>
 				<Input
@@ -314,6 +233,87 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultHelpUrl}
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
 				/>
+			</div>
+			<h3 className='border-bottom mt-3'>{translate('graph.settings')}</h3>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					<FormattedMessage id='default.graph.type' />:
+				</p>
+				{
+					Object.values(ChartTypes).map(chartType => (
+						<div className='radio' key={chartType}>
+							<label >
+								<input
+									type='radio'
+									name='chartTypes'
+									style={{ marginRight: '10px' }}
+									value={chartType}
+									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
+									checked={localAdminPref.defaultChartToRender === chartType}
+								/>
+								{translate(chartType)}
+							</label>
+						</div>
+					))
+				}
+			</div>
+			<p className='mt-2' style={labelStyle}>
+				<FormattedMessage id='default.graph.settings' />:
+			</p>
+			<div className='checkbox'>
+				<label>
+					<input
+						type='checkbox'
+						style={{ marginRight: '10px' }}
+						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
+						checked={localAdminPref.defaultBarStacking}
+					/>
+					{translate('default.bar.stacking')}
+				</label>
+			</div>
+			<div className='checkbox'>
+				<label>
+					<input
+						type='checkbox'
+						style={{ marginRight: '10px' }}
+						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
+						checked={localAdminPref.defaultAreaNormalization}
+					/>
+					{translate('default.area.normalize')}
+
+				</label>
+			</div>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					{translate('default.area.unit')}
+
+				</p>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='areaUnitType'
+							style={{ marginRight: '10px' }}
+							value={AreaUnitType.feet}
+							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
+							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
+						/>
+						{translate('AreaUnitType.feet')}
+					</label>
+				</div>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='areaUnitType'
+							style={{ marginRight: '10px' }}
+							value={AreaUnitType.meters}
+							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
+							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
+						/>
+						{translate('AreaUnitType.meters')}
+					</label>
+				</div>
 			</div>
 
 
