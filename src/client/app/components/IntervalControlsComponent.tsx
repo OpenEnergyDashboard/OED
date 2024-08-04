@@ -7,7 +7,11 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FormFeedback, FormGroup, Input, Label, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender, graphSlice, selectBarStacking, selectWidthDays, selectComparePeriod, selectSortingOrder } from '../redux/slices/graphSlice';
+import { 
+	selectChartToRender, graphSlice,
+	selectBarStacking, selectWidthDays,
+	selectComparePeriod, selectSortingOrder
+} from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
 import translate from '../utils/translate';
