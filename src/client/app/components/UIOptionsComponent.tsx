@@ -4,19 +4,15 @@
 
 import * as React from 'react';
 import ReactTooltip from 'react-tooltip';
-import ExportComponent from '../components/ExportComponent';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
-import AreaUnitSelectComponent from './AreaUnitSelectComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
-import ChartLinkComponent from './ChartLinkComponent';
 import ChartSelectComponent from './ChartSelectComponent';
 import DateRangeComponent from './DateRangeComponent';
-import ErrorBarComponent from './ErrorBarComponent';
-import GraphicRateMenuComponent from './GraphicRateMenuComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
+import MoreOptionsComponent from './MoreOptionsComponent';
 
 /**
  * @returns the UI Control panel
@@ -62,29 +58,28 @@ export default function UIOptionsComponent() {
 			<ReactTooltip event='custom-event' className='tip' id='select-tooltips' />
 			<ChartSelectComponent />
 			<ChartDataSelectComponent />
-			<GraphicRateMenuComponent />
-			{chartToRender === ChartTypes.threeD && <ReadingsPerDaySelectComponent />}
-			<DateRangeComponent />
-			<AreaUnitSelectComponent />
-			{ /* Controls error bar, specifically for the line chart. */
-				chartToRender === ChartTypes.line && <ErrorBarComponent />}
 
-			{	/* Controls specific to the bar chart. */
-				chartToRender === ChartTypes.bar && <IntervalControlsComponent />}
+			{/* UI options for line graphic */}
+			{chartToRender == ChartTypes.line}
 
-			{	/* Controls specific to the compare chart */
-				chartToRender === ChartTypes.compare && <IntervalControlsComponent />}
+			{/* UI options for bar graphic */}
+			{chartToRender == ChartTypes.bar && <IntervalControlsComponent />}
 
-			{	/* Controls specific to the compare chart */
-				chartToRender === ChartTypes.map && <IntervalControlsComponent />}
+			{/* UI options for compare graphic */}
+			{chartToRender == ChartTypes.compare && <IntervalControlsComponent />}
 
-			{ /* We can't export compare, map, radar or 3D data */
-				chartToRender !== ChartTypes.compare &&
-				chartToRender !== ChartTypes.map &&
-				chartToRender !== ChartTypes.threeD &&
-				chartToRender !== ChartTypes.radar && <ExportComponent />
-			}
-			<ChartLinkComponent />
+			{/* UI options for map graphic */}
+			{chartToRender == ChartTypes.map && <IntervalControlsComponent />}
+
+			{/* UI options for 3D graphic */}
+			{chartToRender == ChartTypes.threeD && <ReadingsPerDaySelectComponent />}
+			{chartToRender == ChartTypes.threeD && <DateRangeComponent />}
+
+			{/* UI options for radar graphic */}
+			{chartToRender == ChartTypes.radar}
+
+			<MoreOptionsComponent />
+
 		</div>
 	);
 }

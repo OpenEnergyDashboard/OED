@@ -201,5 +201,11 @@ export const selectAdminPreferences = createAppSelector(
 
 export const selectHelpUrl = createAppSelector(
 	[selectBaseHelpUrl, selectOEDVersion],
-	(baseUrl, version) => baseUrl + version
+	(baseHelpUrl, version) => {
+		// The web pages, including help/documentation use _ not . in version.
+		//  It also uses V not v and has help at the start.
+		const helpVersion = 'help' + version.replaceAll('.', '_').replace('v', 'V');
+		const helpUrl = baseHelpUrl + helpVersion;
+		return helpUrl;
+	}
 );

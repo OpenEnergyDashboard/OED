@@ -342,7 +342,7 @@ export default function MapChartComponent() {
 	const layout: any = {
 		// Either the actual map name or text to say it is not available.
 		title: {
-			text: (map) ? map.name : 'There\'s not an available map'
+			text: (map) ? map.name : translate('map.unavailable')
 		},
 		width: 1000,
 		height: 1000,

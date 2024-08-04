@@ -170,9 +170,7 @@ function formatThreeDData(
 
 		// Use the first index of each row/day to extract the dates for the yLabels
 		if (j === 0) {
-			// Trimming the year from YYYY to YY was the only method that worked for fixing overlapping ticks and labels on y axis
-			// TODO find better approach as full year YYYY may be desired behavior for users.
-			yDataToRender.push(dateTS.format(moment.localeData().longDateFormat('L').replace(/YYYY/g, 'YY')));
+			yDataToRender.push(dateTS.format('YYYY-MM-DD HH:mm:ss'));
 		}
 
 		const time = midpointTS.format('LT');
@@ -192,7 +190,7 @@ function formatThreeDData(
 		hoverinfo: 'text',
 		hovertext: hoverText
 	}];
-	const layout = setThreeDLayout(unitLabel);
+	const layout = setThreeDLayout(unitLabel, yDataToRender);
 	return [formattedData, layout];
 }
 
@@ -225,9 +223,30 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 /**
  * Utility to get / set 3D graphic plotlyLayout
  * @param zLabelText 3D data to be formatted
+ * @param yDataToRender Data range for yaxis
  * @returns plotly layout object.
  */
-function setThreeDLayout(zLabelText: string = 'Resource Usage') {
+function setThreeDLayout(zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
+	// Convert date strings to JavaScript Date objects and then get dataRange
+	const dateObjects = yDataToRender.map(dateStr => new Date(dateStr));
+	const dataMin = Math.min(...dateObjects.map(date => date.getTime()));
+	const dataMax = Math.max(...dateObjects.map(date => date.getTime()));
+	const dataRange = dataMax - dataMin;
+
+	//Calculate nTicks for small num of days on y-axis; possibly a better way
+	let nTicks, dTick = 'd1';
+	if (dataRange <= 864000000) { // 1 Day (need 2 ticks)
+		nTicks = 2;
+	} else if (dataRange <= 172800000) { // 2 days
+		nTicks = 3;
+	} else if (dataRange <= 259200000) { // 3 Days
+		nTicks = 4;
+	} else if (dataRange <= 345600000) { // 4 Days
+		nTicks = 5;
+	} else { // Anything else; use default nTicks/dTick
+		nTicks = 0;
+		dTick = '';
+	}
 	// responsible for setting Labels
 	return {
 		// Eliminate margin
@@ -239,7 +258,10 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage') {
 				title: { text: translate('threeD.x.axis.label') }
 			},
 			yaxis: {
-				title: { text: translate('threeD.y.axis.label') }
+				nticks: nTicks,
+				dtick: dTick,
+				title: { text: translate('threeD.y.axis.label') },
+				tickangle: 0 // This lets y-axis dates appear horizontally rather overlapping ticks
 			},
 			zaxis: {
 				title: { text: zLabelText }
