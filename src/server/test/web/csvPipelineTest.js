@@ -518,8 +518,9 @@ const testCases = {
 	},
 	pipe130: {
 		description: 'Testing Readings Upload using Email',
-		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('createMeter', BooleanTypesJS.true).field('meterName', 'pipe130').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('meterIdentifier', 'pipe130').field('gzip', BooleanTypesJS.false)"],
 		fileName: ['pipe130Input.csv'],
+		createMeter: true,
 		responseCode: [200],
 		responseString: ['<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>']
 	}
@@ -629,7 +630,7 @@ metersUpload: an array where each entry is a meter object that is what should be
 */
 const testMeters = {
 	pipe100: {
-		description: 'Second meter upload where incorrectly provides meter name so fails',
+		description: 'Second meter upload where incorrectly provides meter identifier so fails',
 		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
 		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
 		responseCode: [200, 400],
@@ -746,11 +747,11 @@ const testMeters = {
 		metersUploaded: []
 	},
 	pipe103: {
-		description: 'Uploading meters using Email. First succeeds then the second meter upload fails because it incorrectly provides meter name',
-		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterName', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
+		description: 'Uploading meters using Email. First succeeds then the second meter upload fails because it incorrectly provides meter identifier',
+		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
 		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
 		responseCode: [200, 400],
-		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name provided ("pipe100") in request with update for meters but more than one meter in CSV so not processing'],
+		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter identifier provided ("pipe100") in request with update for meters but more than one meter in CSV so not processing'],
 		metersUploaded: [
 			new Meter(
 				undefined, // id
