@@ -54,6 +54,7 @@ export default function HeaderButtonsComponent() {
 		// The should ones tell if see but not selectable.
 		shouldHomeButtonDisabled: true,
 		shouldAdminButtonDisabled: true,
+		shouldUsersButtonDisabled: true,
 		shouldGroupsButtonDisabled: true,
 		shouldMetersButtonDisabled: true,
 		shouldMapsButtonDisabled: true,
@@ -88,6 +89,7 @@ export default function HeaderButtonsComponent() {
 			...prevState,
 			shouldHomeButtonDisabled: pathname === '/',
 			shouldAdminButtonDisabled: pathname === '/admin',
+			shouldUsersButtonDisabled: pathname === '/users',
 			shouldGroupsButtonDisabled: pathname === '/groups',
 			shouldMetersButtonDisabled: pathname === '/meters',
 			shouldMapsButtonDisabled: pathname === '/maps',
@@ -210,6 +212,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/admin">
 								<FormattedMessage id='admin.settings' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldUsersButtonDisabled}
+								tag={Link}
+								to="/users">
+								<FormattedMessage id='users' />
 							</DropdownItem>
 							<DropdownItem divider />
 							<DropdownItem

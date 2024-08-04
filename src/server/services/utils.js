@@ -25,9 +25,12 @@ function ask(question) {
  * @param {*} message what to place in log
  * @param {*} errorCode code the process returns on exit
  */
-function terminateReadline(message, errorCode = 0) {
+function terminateReadline(message, errorCode = 0, error = null) {
 	if (message) {
 		log.info(message);
+	}
+	if (error) {
+		log.error(error);
 	}
 	rl.close();
 	process.exit(errorCode);
