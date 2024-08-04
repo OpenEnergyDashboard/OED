@@ -136,33 +136,6 @@ mocha.describe('meters API', () => {
 		expect(res.body).to.have.lengthOf(4);
 		expectMetersToBeEquivalent(res.body, 4, false, unitId);
 	});
-	mocha.describe('Admin role:', () => {
-		let token;
-		// Since this .before is in the middle of tests, it should not have issues as
-		// documented in usersTest.js.
-		mocha.before(async () => {
-			let res = await chai.request(app).post('/api/login')
-				.send({ username: testUser.username, password: testUser.password });
-			token = res.body.token;
-		});
-		mocha.it('returns all meters', async () => {
-			const conn = testDB.getConnection();
-			await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
-				'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
-				1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-				Unit.areaUnitType.METERS, '13:57:19').insert(conn);
-			await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
-				'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
-				2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-				Unit.areaUnitType.METERS, '13:57:19').insert(conn);
-			await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, '+03', gps,
-				'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
-				3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-				Unit.areaUnitType.METERS, '13:57:19').insert(conn);
-			await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, '+04', gps,
-				'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
-				4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-				Unit.areaUnitType.METERS, '13:57:19').insert(conn);
 
 	mocha.describe('Admin role & CSV role:', () => {
 		for (const role in User.role) {
@@ -172,7 +145,7 @@ mocha.describe('meters API', () => {
 				// documented in usersTest.js.
 				mocha.before(async () => {
 					let res = await chai.request(app).post('/api/login')
-						.send({ email: testUser.email, password: testUser.password });
+						.send({ username: testUser.username, password: testUser.password });
 					token = res.body.token;
 				});
 				mocha.it('returns all meters', async () => {
