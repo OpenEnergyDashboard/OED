@@ -39,7 +39,7 @@ export default function PreferencesComponent() {
 	};
 
 	return (
-		<div>
+		<div className='d-flex flex-column '>
 			<UnsavedWarningComponent
 				hasUnsavedChanges={hasChanges}
 				changes={localAdminPref}
@@ -47,7 +47,7 @@ export default function PreferencesComponent() {
 				successMessage='updated.preferences'
 				failureMessage='failed.to.submit.changes'
 			/>
-			<h3 className='border-bottom mt-3'>{translate('graph.settings')}</h3>
+			<h3 className='border-bottom'>{translate('graph.settings')}</h3>
 			<div>
 				<p className='mt-2' style={labelStyle}>
 					<FormattedMessage id='default.graph.type' />:
@@ -129,7 +129,7 @@ export default function PreferencesComponent() {
 				</div>
 			</div>
 
-			<h3 className='border-bottom'>{translate('meter.settings')}</h3>
+			<h3 className='border-bottom mt-3'>{translate('meter.settings')}</h3>
 			<div>
 				<p style={titleStyle}>
 					{`${translate('default.meter.reading.frequency')}:`}
@@ -330,6 +330,7 @@ export default function PreferencesComponent() {
 						})
 				}
 				disabled={!hasChanges}
+				className='align-self-end mt-3'
 			>
 				{translate('submit')}
 			</Button>
