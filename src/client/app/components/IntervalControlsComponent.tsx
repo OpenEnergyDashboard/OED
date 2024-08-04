@@ -7,7 +7,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { FormFeedback, FormGroup, Input, Label, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { 
+import {
 	selectChartToRender, graphSlice,
 	selectBarStacking, selectWidthDays,
 	selectComparePeriod, selectSortingOrder
