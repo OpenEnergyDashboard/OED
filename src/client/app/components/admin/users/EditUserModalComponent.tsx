@@ -59,7 +59,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		return userDetails.username &&
 			userDetails.passwordMatch &&
 			userDetails.passwordLength &&
-			userDetails.role;
+			userDetails.role &&
+			userDetails.username.length > 2;
 	};
 
 	// Handlers for each type of input change
@@ -197,6 +198,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										type='text'
 										value={userDetails.username}
 										onChange={handleStringChange}
+										invalid={!userDetails.username || userDetails.username.length < 3}
 									/>
 								</FormGroup>
 							</Col>

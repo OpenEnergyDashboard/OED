@@ -151,14 +151,19 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 						type: 'integer'
 					},
 					username: {
-						type: 'string'
-					},
+						type: 'string',
+						minLength: 3,
+						maxLength: 254
+							},
 					role: {
 						type: 'string',
 						enum: Object.values(User.role)
 					},
 					password: {
-						type: 'string'
+						type: 'string',
+						// TODO Do not have minLength: 8 because this is optional. Nice if could check if present.
+						maxLength: 128
+		
 					},
 					note: {
 						type: 'string'

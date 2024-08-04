@@ -41,9 +41,10 @@ export default function CreateUserModal() {
 	// check if form is valid
 	const isFormValid = () => {
 		return userDetails.username &&
-				userDetails.passwordMatch &&
-				userDetails.passwordLength &&
-				userDetails.role !== 'invalid';
+			userDetails.passwordMatch &&
+			userDetails.passwordLength &&
+			userDetails.role !== 'invalid' &&
+			userDetails.username.length > 2;
 	};
 
 	// Handlers for each type of input change
@@ -136,7 +137,7 @@ export default function CreateUserModal() {
 										type='text'
 										value={userDetails.username}
 										onChange={e => handleStringChange(e)}
-										invalid={!userDetails.username}
+										invalid={!userDetails.username || userDetails.username.length < 3}
 									/>
 								</FormGroup>
 							</Col>
