@@ -2,6 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-DELETE 
-FROM users 
-WHERE username = ${username};
+UPDATE users
+SET username = ${username}, role = ${role}, note = ${note}
+WHERE id = ${id};

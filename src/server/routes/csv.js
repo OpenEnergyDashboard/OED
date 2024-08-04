@@ -66,9 +66,14 @@ router.use(function (req, res, next) {
 					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token (either unauthorized or logged out'));
 				} else {
 					// If no token is found, then the request is mostly like a curl request. We require an
-					// email and password to be supplied for curl requests.
-					const { email, password } = request.body;
-					const verifiedUser = await verifyCredentials(email, password, true);
+					// username and password to be supplied for curl requests.
+					const { username, email, password } = request.body;
+					// TODO:
+					// Allowing for backwards compatibility if any users are still using the 'email' parameter instead of
+					// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+					// or continue to allow this backwards compatibility
+  				const user = username || email;
+					const verifiedUser = await verifyCredentials(user, password, true);
 					if (verifiedUser) {
 						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true) : cb(new Error('Invalid credentials'));
 					} else {

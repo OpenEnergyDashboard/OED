@@ -66,12 +66,17 @@ const DEFAULTS = {
 }
 
 // These are the common upload params shared between meters and readings upload.
-// Note: Even though, the 'email' and 'password' properties are not used to validate the upload, 
+// Note: Even though, the 'username' and 'password' properties are not used to validate the upload, 
 // they may be attached to the request body when the CSV Pipeline handles user authentication 
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
 	meterIdentifier: new StringParam('meterIdentifier', undefined, undefined),
+	username: new StringParam('username', undefined, undefined),
+	// TODO:
+	// Allowing for backwards compatibility to allow for curl users to use the 'email' parameter instead of
+	// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+	// or continue to allow this backwards compatibility
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new BooleanParam('gzip'),
@@ -125,7 +130,7 @@ function validateRequestParams(body, schema) {
 			} else if (err.name === 'required') {
 				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + `${err.argument} must be provided as the field ${err.argument}=.\n`;
 			} else if (err.name === 'additionalProperties') {
-				responseMessage = 'User Error: ' + responseMessage  + err.path + ': '+ err.argument + ' is an unexpected argument.\n';
+				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + err.argument + ' is an unexpected argument.\n';
 			} else {
 				responseMessage = responseMessage + err.path + ': ' + 'has message: ' + err.message;
 			}

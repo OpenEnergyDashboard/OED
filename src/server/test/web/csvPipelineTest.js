@@ -21,8 +21,12 @@ const UPLOAD_METERS_ROUTE = '/api/csv/meters';
 const UPLOAD_READINGS_ROUTE = '/api/csv/readings';
 
 // The default fields and routes for the requests
-const CHAI_READINGS_REQUEST = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('email', '${testUser.email}').field('password', '${testUser.password}')`;
-const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('email', '${testUser.email}').field('password', '${testUser.password}')`;
+const CHAI_READINGS_REQUEST = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
+const CHAI_METERS_REQUEST = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('username', '${testUser.username}').field('password', '${testUser.password}')`;
+
+// test if email parameter works as well to allow for backwards compatibility
+const CHAI_READINGS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_READINGS_ROUTE}').field('email', '${testUser.username}').field('password', '${testUser.password}')`;
+const CHAI_METERS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_METERS_ROUTE}').field('email', '${testUser.username}').field('password', '${testUser.password}')`;
 
 // Note there is only one description for all uploads in a test (not an array)
 // but all other keys are arrays of length number of uploads in test.
@@ -511,6 +515,13 @@ const testCases = {
 		fileName: ['pipe123AInputMeter.csv', 'pipe123BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe123: Warning parsing Reading #2. Reading value gives 30 with warning message:<br>The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #2 on meter pipe123 in pipeline: previous reading has value 15 start time 2022-11-06T01:25:00Z end time 2022-11-06T01:55:00Z and current reading has value 30 start time 2022-11-06T01:30:00Z end time 2022-11-06T02:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
+	},
+	pipe130: {
+		description: 'Testing Readings Upload using Email',
+		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('createMeter', BooleanTypesJS.true).field('meterName', 'pipe130').field('gzip', BooleanTypesJS.false)"],
+		fileName: ['pipe130Input.csv'],
+		responseCode: [200],
+		responseString: ['<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>']
 	}
 }
 
@@ -733,6 +744,76 @@ const testMeters = {
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter identifier of "pipe102" does not seem to exist with update for meters and got DB error of: No data returned from the query.'],
 		metersUploaded: []
+	},
+	pipe103: {
+		description: 'Uploading meters using Email. First succeeds then the second meter upload fails because it incorrectly provides meter name',
+		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterName', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
+		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
+		responseCode: [200, 400],
+		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name provided ("pipe100") in request with update for meters but more than one meter in CSV so not processing'],
+		metersUploaded: [
+			new Meter(
+				undefined, // id
+				'pipe100', // name
+				null, // URL
+				false, // enabled
+				false, //displayable
+				'other', //type
+				null, // timezone
+				undefined, // gps
+				undefined, // identifier
+				null, // note
+				undefined, //area
+				undefined, // cumulative
+				undefined, //cumulativeReset
+				undefined, // cumulativeResetStart
+				undefined, // cumulativeResetEnd
+				undefined, // readingGap
+				undefined, // readingVariation
+				undefined, //readingDuplication
+				undefined, // timeSort
+				undefined, //endOnlyTime
+				undefined, // reading
+				undefined, // startTimestamp
+				undefined, // endTimestamp
+				undefined, // previousEnd
+				undefined, // unitId
+				undefined, // defaultGraphicUnit
+				undefined, // area unit
+				undefined // reading frequency
+			),
+			new Meter(
+				undefined, // id
+				'pipe100b', // name
+				'123.45.6.0', // URL
+				true, // enabled
+				true, //displayable
+				'obvius', //type
+				'US/Central', // timezone
+				// null, // timezone
+				gps, // gps
+				'pipe100b id', // identifier
+				'my Note', // note
+				33, //area
+				true, // cumulative
+				true, //cumulativeReset
+				'14:44:00', // cumulativeResetStart
+				'15:55:00', // cumulativeResetEnd
+				12.34, // readingGap
+				56.78, // readingVariation
+				7, //readingDuplication
+				'decreasing', // timeSort
+				true, //endOnlyTime
+				89.90, // reading
+				'1666-07-08 17:13:19', // startTimestamp
+				'1777-08-09 05:07:11', // endTimestamp
+				'1888-09-10 11:12:13+00:00', // previousEnd
+				undefined, // unitId
+				undefined, // defaultGraphicUnit
+				Unit.areaUnitType.METERS,// area unit
+				undefined // reading frequency
+			)
+		]
 	}
 }
 
@@ -778,7 +859,7 @@ for (let fileKey in testMeters) {
 			const conn = testDB.getConnection();
 			// The first test, second meter needs to have the ids for units put to what they actually are.
 			// Cannot do above since not inserted into DB until the beforeEach().
-			if (fileKey === 'pipe100') {
+			if (fileKey === 'pipe100' || fileKey === 'pipe103') {
 				testMeters[fileKey]['metersUploaded'][1].unitId = meterUnit.id;
 				testMeters[fileKey]['metersUploaded'][1].defaultGraphicUnit = graphUnit.id;
 			}
