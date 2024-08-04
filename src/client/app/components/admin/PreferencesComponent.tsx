@@ -47,6 +47,88 @@ export default function PreferencesComponent() {
 				successMessage='updated.preferences'
 				failureMessage='failed.to.submit.changes'
 			/>
+			<h3 className='border-bottom mt-3'>{translate('graph.settings')}</h3>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					<FormattedMessage id='default.graph.type' />:
+				</p>
+				{
+					Object.values(ChartTypes).map(chartType => (
+						<div className='radio' key={chartType}>
+							<label >
+								<input
+									type='radio'
+									name='chartTypes'
+									style={{ marginRight: '10px' }}
+									value={chartType}
+									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
+									checked={localAdminPref.defaultChartToRender === chartType}
+								/>
+								{translate(chartType)}
+							</label>
+						</div>
+					))
+				}
+			</div>
+			<p className='mt-2' style={labelStyle}>
+				<FormattedMessage id='default.graph.settings' />:
+			</p>
+			<div className='checkbox'>
+				<label>
+					<input
+						type='checkbox'
+						style={{ marginRight: '10px' }}
+						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
+						checked={localAdminPref.defaultBarStacking}
+					/>
+					{translate('default.bar.stacking')}
+				</label>
+			</div>
+			<div className='checkbox'>
+				<label>
+					<input
+						type='checkbox'
+						style={{ marginRight: '10px' }}
+						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
+						checked={localAdminPref.defaultAreaNormalization}
+					/>
+					{translate('default.area.normalize')}
+
+				</label>
+			</div>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					{translate('default.area.unit')}
+
+				</p>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='areaUnitType'
+							style={{ marginRight: '10px' }}
+							value={AreaUnitType.feet}
+							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
+							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
+						/>
+						{translate('AreaUnitType.feet')}
+					</label>
+				</div>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='areaUnitType'
+							style={{ marginRight: '10px' }}
+							value={AreaUnitType.meters}
+							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
+							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
+						/>
+						{translate('AreaUnitType.meters')}
+					</label>
+				</div>
+			</div>
+
 			<h3 className='border-bottom'>{translate('meter.settings')}</h3>
 			<div>
 				<p style={titleStyle}>
@@ -234,88 +316,6 @@ export default function PreferencesComponent() {
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
 				/>
 			</div>
-			<h3 className='border-bottom mt-3'>{translate('graph.settings')}</h3>
-			<div>
-				<p className='mt-2' style={labelStyle}>
-					<FormattedMessage id='default.graph.type' />:
-				</p>
-				{
-					Object.values(ChartTypes).map(chartType => (
-						<div className='radio' key={chartType}>
-							<label >
-								<input
-									type='radio'
-									name='chartTypes'
-									style={{ marginRight: '10px' }}
-									value={chartType}
-									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
-									checked={localAdminPref.defaultChartToRender === chartType}
-								/>
-								{translate(chartType)}
-							</label>
-						</div>
-					))
-				}
-			</div>
-			<p className='mt-2' style={labelStyle}>
-				<FormattedMessage id='default.graph.settings' />:
-			</p>
-			<div className='checkbox'>
-				<label>
-					<input
-						type='checkbox'
-						style={{ marginRight: '10px' }}
-						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
-						checked={localAdminPref.defaultBarStacking}
-					/>
-					{translate('default.bar.stacking')}
-				</label>
-			</div>
-			<div className='checkbox'>
-				<label>
-					<input
-						type='checkbox'
-						style={{ marginRight: '10px' }}
-						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
-						checked={localAdminPref.defaultAreaNormalization}
-					/>
-					{translate('default.area.normalize')}
-
-				</label>
-			</div>
-			<div>
-				<p className='mt-2' style={labelStyle}>
-					{translate('default.area.unit')}
-
-				</p>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='areaUnitType'
-							style={{ marginRight: '10px' }}
-							value={AreaUnitType.feet}
-							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
-							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
-						/>
-						{translate('AreaUnitType.feet')}
-					</label>
-				</div>
-				<div className='radio'>
-					<label>
-						<input
-							type='radio'
-							name='areaUnitType'
-							style={{ marginRight: '10px' }}
-							value={AreaUnitType.meters}
-							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
-							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
-						/>
-						{translate('AreaUnitType.meters')}
-					</label>
-				</div>
-			</div>
-
 
 			<Button
 				type='submit'
