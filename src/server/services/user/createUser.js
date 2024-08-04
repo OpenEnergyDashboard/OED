@@ -18,8 +18,8 @@ const moment = require('moment');
 	const cmdArgs = process.argv;
 	if (cmdArgs.length !== 4) {
 		username = await ask('Username of user to create: ');
-		if (username.length < 5) {
-			terminateReadline('Username must be a minimum of 5 characters, no user created.');
+		if (username.length < 4) {
+			terminateReadline('Username must be a minimum of 4 characters, no user created.');
 		} else {
 			password = await ask('Password: ');
 		}
@@ -27,8 +27,8 @@ const moment = require('moment');
 		username = cmdArgs[2];
 		password = cmdArgs[3];
 
-		if (username.length < 5) {
-			terminateReadline('Username must be a minimum of 5 characters, no user created.');
+		if (username.length < 4) {
+			terminateReadline('Username must be a minimum of 4 characters, no user created.');
 		}
 	}
 
