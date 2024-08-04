@@ -154,7 +154,7 @@ else
 		# as we are moving to using username instead of email
 		npm run createUser -- $username2 password
 		createuser_code2=$?
-		if [ $createuser_code -ne 0 ] || [ $createuser_code2 -ne 0 ];
+		if [ $createuser_code -ne 0 ] || [ $createuser_code2 -ne 0 ]; then
 			# There was an error so stop process unless asked to continue on DB issues.
 			if [ "$continue_on_db_error" = "no" ]; then
 				# We should stop the install process. This means it won't try to bring up the web service.
