@@ -2,15 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { RootState } from 'store';
-import { createSelector } from '@reduxjs/toolkit';
-import { MapMetadata } from 'types/redux/map';
+import { RootState } from "store";
+import { MapState } from "types/redux/map";
+import { createAppSelector } from "./selectors";
 
 export const selectMapState = (state: RootState) => state.maps;
-export const selectMaps = createSelector([selectMapState], maps => {
-	return Object.keys(maps.byMapID)
-		.map(key => parseInt(key))
-		.filter(key => !isNaN(key));
-});
+export const selectMaps = createAppSelector([selectMapState], (maps) =>
+	Object.keys(maps.byMapID)
+		.map((key) => parseInt(key))
+		.filter((key) => !isNaN(key))
+);
 
-export const selectMapById = (state: RootState, id: number): MapMetadata => state.maps.byMapID[id];
+export const selectMapById = (id: number) =>
+	createAppSelector([selectMapState], (maps: MapState) => maps.byMapID[id]);

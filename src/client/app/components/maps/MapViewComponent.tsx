@@ -8,7 +8,6 @@ import { parseZone } from 'moment';
 import '../../styles/card-page.css';
 import EditMapModalComponent from './EditMapModalComponent';
 import { selectMapById } from '../../redux/selectors/maps';
-import { RootState } from '../../store';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { MapMetadata } from 'types/redux/map';
 import translate from '../../utils/translate';
@@ -19,7 +18,7 @@ interface MapViewProps {
 
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
-	const map: MapMetadata = useAppSelector((state: RootState) => selectMapById(state, mapID));
+	const map: MapMetadata = useAppSelector(selectMapById(mapID));
 
 	// Helper function checks map to see if it's calibrated
 	const getCalibrationStatus = () => {
