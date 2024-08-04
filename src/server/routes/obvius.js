@@ -114,7 +114,7 @@ function obviusLog(req, res, next){
 function verifyObviusUser(req, res, next){
 	// First we ensure that the password and username parameters are provided.
 	const password = req.param('password');
-	// TODO This is allowing for backwards compatibility if previous eGuage meters are using the 'email' parameter
+	// TODO This is allowing for backwards compatibility if previous obvius meters are using the'email' parameter
 	// instead of the 'username' parameter to login. Developers need to decide in the future if we should deprecate
 	// email or continue to allow this backwards compatibility
 	const username = req.param('username') || req.param('email');
