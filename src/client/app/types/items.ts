@@ -93,7 +93,7 @@ export interface User {
  * The values of this enum that needs to match the keys of User.role in src/server/models/User
  */
 export enum UserRole {
-	'user.role.select' = 'invalid',
+	INVALID = 'invalid',
 	ADMIN = 'admin',
 	CSV = 'csv',
 	EXPORT = 'export',
@@ -112,7 +112,7 @@ export const userDefaults = {
 	password: '',
 	confirmPassword: '',
 	note: '',
-	role: UserRole['user.role.select'],
+	role: UserRole.INVALID,
 	passwordMatch: true,
 	disableDelete: false,
 	passwordLength: true

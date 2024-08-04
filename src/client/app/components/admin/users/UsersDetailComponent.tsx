@@ -3,13 +3,13 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { Col, Container, Row } from 'reactstrap';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
 import translate from '../../../utils/translate';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
 import UserViewComponent from './UserViewComponent';
-import { Col, Row } from 'reactstrap';
 
 const tooltipStyle = {
 	display: 'inline-block',
@@ -37,22 +37,23 @@ export default function UserDetailComponent() {
 				<div className='edit-btn'>
 					<CreateUserModalComponent />
 				</div>
-				<div className='card-container'>
+				<Container className='card-container'>
 					<Row className='justify-content-center'>
 						{// display users and sort by username alphabetically
 							[...users]
 								.sort((a, b) => a.username.localeCompare(b.username))
 								.map(user => (
-									<Col key={user.username} className="d-flex justify-content-center mb-3">
-										<UserViewComponent
-											key={user.username}
-											user={user}
-										/>
+									<Col
+										key={user.username}
+										className="d-flex justify-content-center mb-3"
+										xs="auto"
+									>
+										<UserViewComponent user={user} />
 									</Col>
 								))
 						}
 					</Row>
-				</div>
+				</Container>
 			</div>
 		</div>
 	);

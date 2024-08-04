@@ -27,6 +27,7 @@ export default function CreateUserModal() {
 
 	// user api
 	const [createUser] = userApi.useCreateUserMutation();
+	const userRoleIsSelected = userDetails.role !== UserRole.INVALID;
 
 	// check if passwords match
 	useEffect(() => {
@@ -40,9 +41,9 @@ export default function CreateUserModal() {
 	// check if form is valid
 	const isFormValid = () => {
 		return userDetails.username &&
-        userDetails.passwordMatch &&
+				userDetails.passwordMatch &&
 				userDetails.passwordLength &&
-        userDetails.role !== 'invalid';
+				userDetails.role !== 'invalid';
 	};
 
 	// Handlers for each type of input change
@@ -150,13 +151,20 @@ export default function CreateUserModal() {
 										type='select'
 										value={userDetails.role}
 										onChange={handleRoleChange}
-										invalid={userDetails.role === UserRole['user.role.select']}
+										invalid={!userRoleIsSelected}
 									>
-										{Object.entries(UserRole).map(([role, value]) => (
-											<option value={value} key={value}>
-												{role === 'user.role.select' ? translate(role) : role}
-											</option>
-										))}
+										<option value={UserRole.INVALID} key={UserRole.INVALID} hidden disabled>
+											{translate('user.role.select')}
+										</option>
+										{
+											Object.entries(UserRole)
+												.filter(([role]) => role !== 'INVALID')
+												.map(([role, value]) => (
+													<option value={value} key={value}>
+														{role}
+													</option>
+												))
+										}
 									</Input>
 								</FormGroup>
 							</Col>

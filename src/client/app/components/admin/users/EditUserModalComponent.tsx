@@ -214,7 +214,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										required
 									>
 										{Object.entries(UserRole)
-											.filter(([role]) => role !== 'user.role.select')
+											.filter(([role]) => role !== 'INVALID')
 											.map(([role, value]) => (
 												<option value={value} key={value}>
 													{role}
