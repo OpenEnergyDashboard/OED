@@ -14,7 +14,7 @@ import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
 import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
-import UsersDetailComponent from './admin/UsersDetailComponent';
+import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
@@ -25,7 +25,6 @@ import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import ErrorComponent from './router/ErrorComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import CreateUserComponent from './admin/CreateUserComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -57,7 +56,6 @@ const router = createBrowserRouter([
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'maps', element: <MapsDetailComponent /> },
-					{ path: 'users/new', element: <CreateUserComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
 					{ path: 'users', element: <UsersDetailComponent /> }

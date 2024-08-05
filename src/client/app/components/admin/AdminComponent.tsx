@@ -7,23 +7,12 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import PreferencesComponent from './PreferencesComponent';
-import ManageUsersLinkButtonComponent from './users/ManageUsersLinkButtonComponent';
 
 /**
  * React component that defines the admin page
  * @returns Admin page element
  */
 export default function AdminComponent() {
-
-	const bottomPaddingStyle: React.CSSProperties = {
-		paddingBottom: '15px'
-	};
-
-	const sectionTitleStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0,
-		paddingBottom: '5px'
-	};
 	const titleStyle: React.CSSProperties = {
 		textAlign: 'center'
 	};
@@ -34,21 +23,15 @@ export default function AdminComponent() {
 	return (
 		<div>
 			<TooltipHelpComponent page='admin' />
+			<h2 style={titleStyle}>
+				<FormattedMessage id='admin.settings' />
+				<div style={tooltipStyle}>
+					<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
+				</div>
+			</h2>
 			<div className='container-fluid'>
-				<h2 style={titleStyle}>
-					<FormattedMessage id='admin.panel' />
-					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='admin' helpTextId='help.admin.header' />
-					</div>
-				</h2>
-				<div className='row'>
-					<div className='col-12 col-lg-6'>
-						<div style={bottomPaddingStyle}>
-							<p style={sectionTitleStyle}><FormattedMessage id='manage' />:</p>
-							<div>
-								<ManageUsersLinkButtonComponent />
-							</div>
-						</div>
+				<div className='d-inline-flex flex-column align-items-center justify-content-center w-100'>
+					<div className='col-12 col-lg-6 border border-4 rounded p-4 vw-50'>
 						<PreferencesComponent />
 					</div>
 				</div>

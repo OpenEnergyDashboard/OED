@@ -142,7 +142,7 @@ mocha.describe('meters API', () => {
 		// documented in usersTest.js.
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
-				.send({ email: testUser.email, password: testUser.password });
+				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
 		mocha.it('returns all meters', async () => {
@@ -187,7 +187,7 @@ mocha.describe('meters API', () => {
 
 					// login
 					let res = await chai.request(app).post('/api/login')
-						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
 

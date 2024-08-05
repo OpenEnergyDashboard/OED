@@ -8,6 +8,7 @@
 const { chai, mocha, expect, app, testDB, testUser, recreateDB } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
+const { log } = require('console');
 
 mocha.describe('Users API', () => {
 	mocha.describe('Admin role', () => {
@@ -20,7 +21,7 @@ mocha.describe('Users API', () => {
 			// .before finishes.
 			await recreateDB();
 			let res = await chai.request(app).post('/api/login')
-				.send({ email: testUser.email, password: testUser.password });
+				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
 		mocha.it('retrieves users', async () => {
@@ -41,15 +42,15 @@ mocha.describe('Users API', () => {
 			// Note later testing found the issue was somewhere else but leaving this to be sure
 			// and to remind me about this since it took up too much of my life.
 			const conn = testDB.getConnection();
-			const user = { email: 'a@ex.com', password: 'abc', role: User.role.CSV };
+			const user = { username: 'a@ex.com', password: 'abc', role: User.role.CSV, note: 'test note' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(200);
-			const dbUser = await User.getByEmail(user.email, conn);
+			const dbUser = await User.getByUsername(user.username, conn);
 			expect(dbUser.role).to.equal(user.role);
 		});
 		mocha.it('rejects invalid user creation', async () => {
 			const conn = testDB.getConnection();
-			const user = { email: 'a@ex.com', password: 'abc' };
+			const user = { username: 'a@ex.com', password: 'abc' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(400);
 			const users = await User.getAll(conn);
@@ -58,23 +59,32 @@ mocha.describe('Users API', () => {
 		mocha.it('update role', async () => {
 			const conn = testDB.getConnection();
 			const password = await bcrypt.hash('password', 10);
-			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
+			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV, 'test note');
 			await csv.insert(conn);
-			const obvius = new User(undefined, 'obvius@example.com', password, User.role.OBVIUS);
+			const csvUser = await User.getByUsername(csv.username, conn);
+			const obvius = new User(undefined, 'obvius@example.com', password, User.role.OBVIUS, 'test note');
 			await obvius.insert(conn);
-			const users = await User.getAll(conn);
-			expect(users).to.have.lengthOf(3);
-			const res = await chai.request(app).post('/api/users/edit').set('token', token).send({
-				users: [
-					{ email: testUser.email, role: testUser.role },
-					{ email: csv.email, role: User.role.OBVIUS },
-					{ email: obvius.email, role: User.role.CSV }
-				]
+			const obviusUser = await User.getByUsername(obvius.username, conn);
+			const retrievedTestUser = await User.getByUsername(testUser.username, conn);
+
+			const res1 = await chai.request(app).post('/api/users/edit').set('token', token).send({
+				user: { id: retrievedTestUser.id, username: retrievedTestUser.username, role: retrievedTestUser.role, note: 'test note' }
 			});
-			expect(res).to.have.status(200);
-			const modifiedCsv = await User.getByEmail(csv.email, conn);
+			expect(res1).to.have.status(200);
+			
+			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
+				user: { id: csvUser.id, username: csv.username, role: User.role.OBVIUS, note: 'test note' }
+			});
+			expect(res2).to.have.status(200);
+
+			const res3 = await chai.request(app).post('/api/users/edit').set('token', token).send({
+				user: { id: obviusUser.id, username: obvius.username, role: User.role.CSV, note: 'test note' }
+			});
+			expect(res3).to.have.status(200);
+
+			const modifiedCsv = await User.getByUsername(csv.username, conn);
 			expect(modifiedCsv.role).to.equal(User.role.OBVIUS);
-			const modifiedObvius = await User.getByEmail(obvius.email, conn);
+			const modifiedObvius = await User.getByUsername(obvius.username, conn);
 			expect(modifiedObvius.role).to.equal(User.role.CSV);
 		});
 		mocha.it('deletes a user', async () => {
@@ -82,11 +92,11 @@ mocha.describe('Users API', () => {
 			const password = await bcrypt.hash('password', 10);
 			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
 			await csv.insert(conn);
-			const dbUser = await User.getByEmail(csv.email, conn);
-			expect(dbUser.email).to.equal(csv.email);
-			const res = await chai.request(app).post('/api/users/delete').set('token', token).send({ email: csv.email });
+			const dbUser = await User.getByUsername(csv.username, conn);
+			expect(dbUser.username).to.equal(csv.username);
+			const res = await chai.request(app).post('/api/users/delete').set('token', token).send({ username: csv.username });
 			expect(res).to.have.status(200);
-			expect((await User.getAll(conn)).filter(user => user === csv.email)).to.have.length(0);
+			expect((await User.getAll(conn)).filter(user => user === csv.username)).to.have.length(0);
 		});
 	});
 
@@ -105,7 +115,7 @@ mocha.describe('Users API', () => {
 
 					// login
 					let res = await chai.request(app).post('/api/login')
-						.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
 				mocha.it('should reject request to retrieve users', async () => {

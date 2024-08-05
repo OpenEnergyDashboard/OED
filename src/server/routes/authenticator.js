@@ -44,15 +44,15 @@ authMiddleware = (req, res, next) => {
 };
 
 /**
- * Middleware that checks the request body for the email and password parameters. If the body contains the email and password parameters, then next 
+ * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next 
  * is executed. Otherwise, the server responds with a 400 error.
  */
 function credentialsRequestValidationMiddleware(req, res, next) {
 	const validParams = {
 		type: 'object',
-		required: ['email', 'password'],
+		required: ['username', 'password'],
 		properties: {
-			email: {
+			username: {
 				type: 'string',
 				minLength: 5,
 				maxLength: 254
@@ -71,15 +71,15 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 }
 
 /**
- * Verifies the email and password of a user.
- * @param {string} email 
+ * Verifies the username and password of a user.
+ * @param {string} username 
  * @param {string} password 
  * @param {boolean} returnUser 
  * @returns true if the user exists in the database. False otherwise. Returns the user itself if returnUser is set to true and user is verified.
  */
-async function verifyCredentials(email, password, returnUser = false) {
+async function verifyCredentials(username, password, returnUser = false) {
 	const conn = getConnection();
-	const user = await User.getByEmail(email, conn);
+	const user = await User.getByUsername(username, conn);
 	let isValid;
 	if (user === null) {
 		// User did not exist so return false.
@@ -136,14 +136,14 @@ function csvAuthMiddleware(action) {
 }
 
 /**
- * Returns middleware that only authenticates an Admin or Obvius user via email and password credentials.
+ * Returns middleware that only authenticates an Admin or Obvius user via username and password credentials.
  * @param {string} action - is a phrase or word that can be prefixed by 'to' for the proper response and warning messages.
  */
-function obviusEmailAndPasswordAuthMiddleware(action) {
+function obviusUsernameAndPasswordAuthMiddleware(action) {
 	return function (req, res, next) {
 		credentialsRequestValidationMiddleware(req, res, async () => {
 			try {
-				const user = await verifyCredentials(req.body.email, req.body.password, true);
+				const user = await verifyCredentials(req.body.username, req.body.password, true);
 				if (user) {
 					if (isUserAuthorized(user, User.role.OBVIUS)) {
 						next();
@@ -161,7 +161,7 @@ function obviusEmailAndPasswordAuthMiddleware(action) {
 				}
 			} catch (error) {
 				if (error.message === 'No data returned from the query.') {
-					res.status(400).send(`No user corresponding to the email: ${escapeHtml(req.body.email)} was found. Please make a request with a valid email.`);
+					res.status(400).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. Please make a request with a valid username.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
 					res.status(500).send('Internal OED Server Error for Obvius request.');
@@ -208,7 +208,7 @@ module.exports = {
 	authMiddleware,
 	csvAuthMiddleware,
 	exportAuthMiddleware,
-	obviusEmailAndPasswordAuthMiddleware,
+	obviusUsernameAndPasswordAuthMiddleware,
 	optionalAuthMiddleware,
 	verifyCredentials
 };
