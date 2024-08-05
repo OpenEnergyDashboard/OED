@@ -16,6 +16,7 @@ interface MapViewProps {
 	mapID: number;
 }
 
+//TODO: Migrate to RTK
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
 	const map: MapMetadata = useAppSelector(selectMapById(mapID));

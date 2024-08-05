@@ -16,6 +16,7 @@ interface EditMapModalProps {
 	map: MapMetadata;
 }
 
+// TODO: Migrate to RTK
 const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);

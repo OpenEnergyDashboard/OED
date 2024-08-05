@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// TODO: Migrate to RTK
+
 import { ActionType, Dispatch, GetState, Thunk } from '../../types/redux/actions';
 import * as t from '../../types/redux/map';
 import { CalibrationModeTypes, MapData, MapMetadata } from '../../types/redux/map';

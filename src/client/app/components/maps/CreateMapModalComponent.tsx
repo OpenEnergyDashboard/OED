@@ -23,6 +23,8 @@ interface CreateMapModalProps {
  * @returns Map create element
  */
 function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapModalProps) {
+	// TODO: Get rid of props, migrate to RTK, finish modal
+	// Once modal is finished, it will be used in MapsDetailComponent
 	const [nameInput, setNameInput] = useState('');
 	const [noteInput, setNoteInput] = useState('');
 

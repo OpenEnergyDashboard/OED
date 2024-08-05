@@ -19,6 +19,7 @@ import { AppDispatch } from 'store';
  * Defines the maps page card view
  * @returns Maps page element
  */
+// TODO: Migrate to RTK
 export default function MapsDetailComponent() {
 	const dispatch: AppDispatch = useAppDispatch();
 	// Load map IDs from state and store in number array
@@ -38,6 +39,7 @@ export default function MapsDetailComponent() {
 						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 					</div>
 				</h2>
+					{ /* TODO: Change Link to <CreateMapModalComponent /> when it is completed */ }
 				<div className="edit-btn">
 					<Link to='/calibration' onClick={() => dispatch(setNewMap())}>
 						<Button color='primary'>
