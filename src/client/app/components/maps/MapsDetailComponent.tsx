@@ -10,7 +10,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewComponent from './MapViewComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import '../../styles/card-page.css';
-import { fetchMapsDetails, setNewMap} from '../../redux/actions/map';
+import { fetchMapsDetails, setNewMap } from '../../redux/actions/map';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectMaps } from '../../redux/selectors/maps';
 import { AppDispatch } from 'store';
@@ -39,7 +39,7 @@ export default function MapsDetailComponent() {
 						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 					</div>
 				</h2>
-					{ /* TODO: Change Link to <CreateMapModalComponent /> when it is completed */ }
+				{ /* TODO: Change Link to <CreateMapModalComponent /> when it is completed */}
 				<div className="edit-btn">
 					<Link to='/calibration' onClick={() => dispatch(setNewMap())}>
 						<Button color='primary'>

@@ -16,12 +16,10 @@ interface CreateMapModalProps {
 
 /**
  * Defines the create map modal form
- * @param root0
- * @param root0.show
- * @param root0.handleClose
- * @param root0.createNewMap
+ * params not given since props should be going away and painful. Remove eslint command when fixed.
  * @returns Map create element
  */
+/* eslint-disable-next-line */
 function CreateMapModalComponent({ show, handleClose, createNewMap }: CreateMapModalProps) {
 	// TODO: Get rid of props, migrate to RTK, finish modal
 	// Once modal is finished, it will be used in MapsDetailComponent
