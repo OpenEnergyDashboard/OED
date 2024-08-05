@@ -2,16 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { parseZone } from 'moment';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { parseZone } from 'moment';
-import '../../styles/card-page.css';
-import EditMapModalComponent from './EditMapModalComponent';
-import { selectMapById } from '../../redux/selectors/maps';
-import { useAppSelector } from '../../redux/reduxHooks';
-import { MapMetadata } from 'types/redux/map';
-import translate from '../../utils/translate';
 import { LocaleDataKey } from 'translations/data';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectMapById } from '../../redux/selectors/maps';
+import '../../styles/card-page.css';
+import translate from '../../utils/translate';
+import EditMapModalComponent from './EditMapModalComponent';
 interface MapViewProps {
 	mapID: number;
 }
@@ -19,7 +18,7 @@ interface MapViewProps {
 //TODO: Migrate to RTK
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
-	const map: MapMetadata = useAppSelector(selectMapById(mapID));
+	const map = useAppSelector(selectMapById(mapID));
 
 	// Helper function checks map to see if it's calibrated
 	const getCalibrationStatus = () => {

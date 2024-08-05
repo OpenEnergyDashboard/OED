@@ -31,7 +31,6 @@ function mapStateToProps(state: State) {
 	// Holds Plotly mapping info.
 	const data = [];
 	// Holds the image to use.
-	let image;
 	if (state.maps.selectedMap !== 0) {
 		const mapID = state.maps.selectedMap;
 		if (state.maps.byMapID[mapID]) {
@@ -48,7 +47,6 @@ function mapStateToProps(state: State) {
 		const colors: string[] = [];
 		// If there is no map then use a new, empty image as the map. I believe this avoids errors
 		// and gives the blank screen.
-		image = (map) ? map.image : new Image();
 		// Arrays to hold the Plotly grid location (x, y) for circles to place on map.
 		const x: number[] = [];
 		const y: number[] = [];
@@ -60,8 +58,8 @@ function mapStateToProps(state: State) {
 		if (map && map.origin && map.opposite) {
 			// The size of the original map loaded into OED.
 			const imageDimensions: Dimensions = {
-				width: image.width,
-				height: image.height
+				width: map.imgWidth,
+				height: map.imgHeight
 			};
 			// Determine the dimensions so within the Plotly coordinates on the user map.
 			const imageDimensionNormalized = normalizeImageDimensions(imageDimensions);
@@ -325,7 +323,7 @@ function mapStateToProps(state: State) {
 		},
 		images: [{
 			layer: 'below',
-			source: (image) ? image.src : '',
+			source: map?.mapSource,
 			xref: 'x',
 			yref: 'y',
 			x: 0,

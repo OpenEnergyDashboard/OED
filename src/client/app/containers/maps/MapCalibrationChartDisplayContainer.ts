@@ -28,8 +28,8 @@ function mapStateToProps(state: State) {
 		}
 	}
 	const imageDimensions: Dimensions = normalizeImageDimensions({
-		width: map.image.width,
-		height: map.image.height
+		width: map.imgWidth,
+		height: map.imgHeight
 	});
 	const settings = state.maps.calibrationSettings;
 	const backgroundTrace = createBackgroundTrace(imageDimensions, settings);
@@ -49,7 +49,7 @@ function mapStateToProps(state: State) {
 	};
 	const data = [backgroundTrace, dataPointTrace];
 
-	const imageSource = map.image.src;
+	const imageSource = map.mapSource;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {

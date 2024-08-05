@@ -145,6 +145,7 @@ export interface MapData {
  *  @param name
  *  @param displayable
  */
+
 export interface MapMetadata {
 	id: number;
 	name: string;
@@ -154,13 +155,16 @@ export interface MapMetadata {
 	modifiedDate: string;
 	origin?: GPSPoint;
 	opposite?: GPSPoint;
-	image: HTMLImageElement;
-	calibrationMode?: CalibrationModeTypes;
-	currentPoint?: CalibratedPoint;
-	calibrationSet?: CalibratedPoint[];
-	calibrationResult?: CalibrationResult;
+	mapSource: string;
 	northAngle: number;
 	circleSize: number;
+	// image: HTMLImageElement;
+	imgHeight: number;
+	imgWidth: number;
+	calibrationMode?: CalibrationModeTypes;
+	currentPoint?: CalibratedPoint;
+	calibrationSet: CalibratedPoint[];
+	calibrationResult?: CalibrationResult;
 }
 
 /**

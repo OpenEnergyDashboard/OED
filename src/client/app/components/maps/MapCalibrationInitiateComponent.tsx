@@ -4,8 +4,12 @@
 
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { FormattedMessage, WrappedComponentProps, injectIntl } from 'react-intl';
-import { logToServer } from '../../redux/actions/logs';
+import { FormattedMessage } from 'react-intl';
+import { updateMapMode, updateMapSource } from '../../redux/actions/map';
+import { logsApi } from '../../redux/api/logApi';
+import { selectMapById } from '../../redux/api/mapsApi';
+import { useTranslate } from '../../redux/componentHooks';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 
@@ -16,169 +20,167 @@ import { showErrorNotification } from '../../utils/notifications';
  * Other configurations could also be selected during this phase;
  */
 
-interface MapInitiateProps {
-	map: MapMetadata
-	updateMapMode(nextMode: CalibrationModeTypes): any;
-	onSourceChange(data: MapMetadata): any;
-}
+// interface MapInitiateProps {
+// 	map: MapMetadata
+// 	updateMapMode(nextMode: CalibrationModeTypes): any;
+// 	onSourceChange(data: MapMetadata): any;
+// }
 
-interface MapInitiateState {
-	filename: string;
-	mapName: string;
-	angle: string;
-}
+// interface MapInitiateState {
+// 	filename: string;
+// 	mapName: string;
+// 	angle: string;
+// }
 
-type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
+// type MapInitiatePropsWithIntl = MapInitiateProps & WrappedComponentProps;
 
-class MapCalibrationInitiateComponent extends React.Component<MapInitiatePropsWithIntl, MapInitiateState > {
-	private readonly fileInput: any;
-	private notifyBadNumber() {
-		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.number'})}`);
-	}
-	private notifyBadDigit360() {
-		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.digita'})}`);
-	}
-	private notifyBadDigit0() {
-		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.digitb'})}`);
-	}
-	private notifyBadMapLoad() {
-		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.load'})}`);
-	}
-	private notifyBadName() {
-		showErrorNotification(`${this.props.intl.formatMessage({id: 'map.bad.name'})}`);
-	}
+/**
+ * @returns TODO
+ */
+export default function MapCalibrationInitiateComponent() {
+	const translate = useTranslate();
+	const [logToServer] = logsApi.useLogToServerMutation();
+	const dispatch = useAppDispatch();
+	const [mapName, setMapName] = React.useState<string>('');
+	const [angle, setAngle] = React.useState<string>('');
+	const fileRef = React.useRef<HTMLInputElement>(null);
+	const mapData = useAppSelector(state => selectMapById(state, state.maps.selectedMap));
+	// const [mapData] = useAppSelector(state => selectEntityDisplayData(state, {
+	// 	type: EntityType.MAP,
+	// 	id: state.localEdits.mapCalibration.calibratingMap
+	// }));
 
-	constructor(props: MapInitiatePropsWithIntl) {
-		super(props);
-		this.state = {
-			filename: '',
-			mapName: '',
-			angle: ''
-		};
-		this.fileInput = React.createRef();
-		this.handleInput = this.handleInput.bind(this);
-		this.confirmUpload = this.confirmUpload.bind(this);
-		this.handleNameInput = this.handleNameInput.bind(this);
-		this.handleAngleInput = this.handleAngleInput.bind(this);
-		this.handleAngle = this.handleAngle.bind(this);
-		this.notifyBadNumber = this.notifyBadNumber.bind(this);
-		this.notifyBadDigit360 = this.notifyBadDigit360.bind(this);
-		this.notifyBadDigit0 = this.notifyBadDigit0.bind(this);
-		this.notifyBadMapLoad = this.notifyBadMapLoad.bind(this);
-		this.notifyBadName = this.notifyBadName.bind(this);
-	}
 
-	public render() {
-		return (
-			<form onSubmit={this.confirmUpload}>
-				<label>
-					<FormattedMessage id='map.new.upload' />
-					<br/>
-					<input type='file' ref={this.fileInput} />
-				</label>
-				<br />
-				<label>
-					<FormattedMessage id='map.new.name' />
-					<br/>
-					<textarea id={'text'} cols={50} value={this.state.mapName} onChange={this.handleNameInput}/>
-				</label>
-				<br/>
-				<label>
-					<FormattedMessage id='map.new.angle'/>
-					<br/>
-					<input type='text' value={this.state.angle} onChange={this.handleAngleInput}/>
-				</label>
-				<br/>
-				<FormattedMessage id='map.new.submit'>
-					{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
-				</FormattedMessage>
-			</form>
-		);
-	}
-
-	private async confirmUpload(event: any) {
-		const bcheck = this.handleAngle(event);
+	const notify = (key: 'map.bad.number' | 'map.bad.digita' | 'map.bad.digitb' | 'map.bad.load' | 'map.bad.name') => {
+		showErrorNotification(translate(key));
+	};
+	const confirmUpload = async (event: React.FormEvent<HTMLFormElement>) => {
+		const bcheck = handleAngle(event);
 		if (bcheck) {
-			if (this.fileInput.current.files.length === 0) {
-				this.notifyBadMapLoad();
+			if (!fileRef.current?.files || fileRef.current.files.length === 0) {
+				notify('map.bad.load');
 			}
-			else if (this.state.mapName.trim() === '')	{
-				this.notifyBadName();
+			else if (mapName.trim() === '') {
+				notify('map.bad.name');
 			}
 			else {
-				await this.handleInput(event);
-				this.props.updateMapMode(CalibrationModeTypes.calibrate);
+				await processImgUpload(event);
 			}
 		}
-	}
+	};
 
-	private handleAngle(event: any) {
+	const handleAngle = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const pattern = /^[-+]?\d+(\.\d+)?$/;
-		if (!pattern.test(this.state.angle)) {
-			this.notifyBadNumber();
+		if (!pattern.test(angle)) {
+			notify('map.bad.number');
+
 			return false;
 		}
 		else {
-			if (parseFloat(this.state.angle) > 360) {
-				this.notifyBadDigit360();
+			if (parseFloat(angle) > 360) {
+				notify('map.bad.digita');
 				return false;
 			}
-			else if (parseFloat(this.state.angle) < 0) {
-				this.notifyBadDigit0();
+			else if (parseFloat(angle) < 0) {
+				notify('map.bad.digitb');
 				return false;
 			}
 			else {
 				return true;
 			}
 		}
-	}
+	};
 
-	private async handleInput(event: any) {
+	const processImgUpload = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		try {
-			const imageURL = await this.getDataURL();
-			this.setState({filename: this.fileInput.current.files[0].name});
-			const image = new Image();
-			image.src = imageURL;
-			const source: MapMetadata = {
-				...this.props.map,
-				name: this.state.mapName,
-				filename: this.fileInput.current.files[0].name,
-				image,
-				northAngle: parseFloat(this.state.angle)
-			};
-			await this.props.onSourceChange(source);
+			const mapMetaData = await processImgMapMetaData();
+			dispatch(updateMapSource(mapMetaData));
+			dispatch(updateMapMode(CalibrationModeTypes.calibrate));
 		} catch (err) {
-			logToServer('error', `Error, map source image uploading: ${err}`)();
+			logToServer({ level: 'error', message: `Error, map source image uploading: ${err}` });
 		}
-	}
+	};
 
-	private handleNameInput(event: ChangeEvent<HTMLTextAreaElement>) {
-		this.setState({
-			mapName: event.target.value
-		});
-	}
+	const handleNameInput = (event: ChangeEvent<HTMLTextAreaElement>) => { setMapName(event.target.value); };
 
-	private handleAngleInput(event: React.FormEvent<HTMLInputElement>) {
-		this.setState({
-			angle: event.currentTarget.value
-		});
-	}
+	const handleAngleInput = (event: React.FormEvent<HTMLInputElement>) => { setAngle(event.currentTarget.value); };
 
-	private getDataURL(): Promise<string> {
+	// Takes image from upload, derives dimensions, and generates MapMetaData Object for redux state.
+	// No longer using Image element in Redux state for serializability purposes. Store img.src only.
+	const processImgMapMetaData = (): Promise<MapMetadata> => {
 		return new Promise((resolve, reject) => {
-			const file = this.fileInput.current.files[0];
-			const fileReader = new FileReader();
-			fileReader.onloadend = () => {
-				if (typeof fileReader.result === 'string') {
-					resolve(fileReader.result);
-				}
-			};
-			fileReader.onerror = reject;
-			fileReader.readAsDataURL(file);
-		});
-	}
-}
+			const file = fileRef.current?.files?.[0];
+			if (!file) {
+				reject('No File Found');
 
-export default injectIntl(MapCalibrationInitiateComponent);
+			} else {
+
+				const fileReader = new FileReader();
+				// Fire when loading complete
+				fileReader.onloadend = () => {
+					// When file upload completed, use the result to create an image
+					// use image, to extract image dimensions;
+					if (typeof fileReader.result === 'string') {
+						img.src = fileReader.result;
+					}
+				};
+				fileReader.onerror = reject;
+				// begin file read
+				fileReader.readAsDataURL(file);
+				const img = new Image();
+				// Fire when image load complete.
+				img.onload = () => {
+					// resolve mapMetadata from image.
+					// Not storing image in state, instead extract relevang values
+					resolve({
+						...mapData,
+						imgWidth: img.width,
+						imgHeight: img.height,
+						filename: file.name,
+						name: mapName,
+						northAngle: parseFloat(angle),
+						// Save the image source only
+						// Does not store the Image Obpect in redux for serializability reasons.
+						// use mapSource to recreate images when needed.
+						mapSource: img.src
+					});
+
+				};
+				// file when image error
+				img.onerror = error => {
+					reject(error);
+				};
+
+			}
+
+		});
+	};
+
+	return (
+		<form onSubmit={confirmUpload}>
+			<label>
+				<FormattedMessage id='map.new.upload' />
+				<br />
+				<input type='file' ref={fileRef} />
+			</label>
+			<br />
+			<label>
+				<FormattedMessage id='map.new.name' />
+				<br />
+				<textarea id={'text'} cols={50} value={mapName} onChange={handleNameInput} />
+			</label>
+			<br />
+			<label>
+				<FormattedMessage id='map.new.angle' />
+				<br />
+				<input type='text' value={angle} onChange={handleAngleInput} />
+			</label>
+			<br />
+			<FormattedMessage id='map.new.submit'>
+				{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
+			</FormattedMessage>
+		</form>
+	);
+}

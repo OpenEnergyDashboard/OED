@@ -27,6 +27,7 @@ export const baseApi = createApi({
 	// The types of tags that any injected endpoint may, provide, or invalidate.
 	// Must be defined here, for use in injected endpoints
 	tagTypes: [
+		'MapsData',
 		'MeterData',
 		'GroupData',
 		'GroupChildrenData',

@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
+import { processGraphLink } from '../../redux/actions/extraActions';
+import { mapsApi } from '../../redux/api/mapsApi';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { deleteToken, getToken, hasToken } from '../../utils/token';
 import { fetchMapsDetails } from '../actions/map';
@@ -16,7 +18,6 @@ import { userApi } from '../api/userApi';
 import { versionApi } from '../api/versionApi';
 import { createThunkSlice } from '../sliceCreators';
 import { currentUserSlice } from './currentUserSlice';
-import { processGraphLink } from '../../redux/actions/extraActions';
 
 export interface AppState {
 	initComplete: boolean;
@@ -96,6 +97,8 @@ export const appStateSlice = createThunkSlice({
 				// Request meter/group/details post-auth
 				dispatch(metersApi.endpoints.getMeters.initiate());
 				dispatch(groupsApi.endpoints.getGroups.initiate());
+				dispatch(mapsApi.endpoints.getMapDetails.initiate());
+
 			},
 			{
 				settled: state => {

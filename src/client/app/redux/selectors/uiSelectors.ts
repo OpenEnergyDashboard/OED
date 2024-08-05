@@ -147,11 +147,10 @@ export const selectChartTypeCompatibility = createAppSelector(
 		if (chartToRender === ChartTypes.map && mapState.selectedMap !== 0) {
 			const mp = mapState.byMapID[mapState.selectedMap];
 			// filter meters;
-			const image = mp.image;
 			// The size of the original map loaded into OED.
 			const imageDimensions: Dimensions = {
-				width: image.width,
-				height: image.height
+				width: mp.imgWidth,
+				height: mp.imgHeight
 			};
 			// Determine the dimensions so within the Plotly coordinates on the user map.
 			const imageDimensionNormalized = normalizeImageDimensions(imageDimensions);

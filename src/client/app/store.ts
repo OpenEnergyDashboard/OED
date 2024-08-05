@@ -3,20 +3,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { configureStore } from '@reduxjs/toolkit';
-import { rootReducer } from './redux/rootReducer';
-import { baseApi } from './redux/api/baseApi';
-import { Dispatch } from './types/redux/actions';
-import { listenerMiddleware } from './redux/listenerMiddleware';
 import { setGlobalDevModeChecks } from 'reselect';
+import { baseApi } from './redux/api/baseApi';
+import { devToolsConfig } from './redux/devToolConfig';
+import { listenerMiddleware } from './redux/listenerMiddleware';
+import { rootReducer } from './redux/rootReducer';
+import { Dispatch } from './types/redux/actions';
 
 export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
 		immutableCheck: false,
 		serializableCheck: false
-	})
-		.prepend(listenerMiddleware.middleware)
-		.concat(baseApi.middleware)
+	}).prepend(listenerMiddleware.middleware)
+		.concat(baseApi.middleware),
+	devTools: devToolsConfig
+
 });
 
 // stability check for ALL createSelector instances.

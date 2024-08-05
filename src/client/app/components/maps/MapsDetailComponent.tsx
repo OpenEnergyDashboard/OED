@@ -6,14 +6,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
+import { selectMapIds } from '../../redux/api/mapsApi';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import MapViewComponent from './MapViewComponent';
-import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import '../../styles/card-page.css';
-import { fetchMapsDetails, setNewMap } from '../../redux/actions/map';
+import { setNewMap } from '../../redux/actions/map';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
-import { selectMaps } from '../../redux/selectors/maps';
-import { AppDispatch } from 'store';
+import '../../styles/card-page.css';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import MapViewComponent from './MapViewComponent';
 
 /**
  * Defines the maps page card view
@@ -21,13 +20,9 @@ import { AppDispatch } from 'store';
  */
 // TODO: Migrate to RTK
 export default function MapsDetailComponent() {
-	const dispatch: AppDispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	// Load map IDs from state and store in number array
-	const maps: number[] = useAppSelector(selectMaps);
-	React.useEffect(() => {
-		// Load maps from state on component mount (componentDidMount)
-		dispatch(fetchMapsDetails());
-	}, []);
+	const maps = useAppSelector(state => selectMapIds(state));
 
 	return (
 		<div className='flexGrowOne'>
