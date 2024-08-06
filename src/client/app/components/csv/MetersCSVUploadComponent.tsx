@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
-import { MetersCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import { MetersCSVUploadPreferences } from '../../types/csvUploadForm';
 import { submitMeters } from '../../utils/api/UploadCSVApi';
 import { MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -22,7 +22,7 @@ import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelec
  * @returns CSV Meters page element
  */
 export default function MetersCSVUploadComponent() {
-	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferencesItem>(MetersCSVUploadDefaults);
+	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferences>(MetersCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
 	const dispatch = useAppDispatch();

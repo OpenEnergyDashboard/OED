@@ -7,33 +7,31 @@
 import { Dispatch } from '@reduxjs/toolkit';
 import { baseApi } from '../../redux/api/baseApi';
 import {
-	CSVUploadPreferencesForm,
-	MetersCSVUploadPreferencesItem,
-	ReadingsCSVUploadPreferencesForm,
-	ReadingsCSVUploadPreferencesItem
+	CSVUploadPreferences,
+	MetersCSVUploadPreferences,
+	ReadingsCSVUploadPreferences
 } from '../../types/csvUploadForm';
 import ApiBackend from './ApiBackend';
-import { TrueFalseType } from '../../types/items';
 
 interface ApiResponse {
 	success: boolean,
 	message: string
 }
 
-export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferencesItem, readingsFile: File,
+export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferences, readingsFile: File,
 	dispatch: Dispatch): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
-	const uploadPreferencesForm: ReadingsCSVUploadPreferencesForm = {
+	const uploadPreferencesForm: ReadingsCSVUploadPreferences = {
 		...uploadPreferences,
-		gzip: uploadPreferences.gzip ? TrueFalseType.true : TrueFalseType.false,
-		headerRow: uploadPreferences.headerRow ? TrueFalseType.true : TrueFalseType.false,
-		update: uploadPreferences.update ? TrueFalseType.true : TrueFalseType.false,
-		refreshReadings: uploadPreferences.refreshReadings ? TrueFalseType.true : TrueFalseType.false,
-		honorDst: uploadPreferences.honorDst ? TrueFalseType.true : TrueFalseType.false,
-		relaxedParsing: uploadPreferences.relaxedParsing ? TrueFalseType.true : TrueFalseType.false,
-		useMeterZone: uploadPreferences.useMeterZone ? TrueFalseType.true : TrueFalseType.false
+		gzip: uploadPreferences.gzip,
+		headerRow: uploadPreferences.headerRow,
+		update: uploadPreferences.update,
+		refreshReadings: uploadPreferences.refreshReadings,
+		honorDst: uploadPreferences.honorDst,
+		relaxedParsing: uploadPreferences.relaxedParsing,
+		useMeterZone: uploadPreferences.useMeterZone
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());
@@ -50,16 +48,16 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	}
 };
 
-export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferencesItem, metersFile: File,
+export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences, metersFile: File,
 	dispatch: Dispatch): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
-	const uploadPreferencesForm: CSVUploadPreferencesForm = {
+	const uploadPreferencesForm: CSVUploadPreferences = {
 		...uploadPreferences,
-		gzip: uploadPreferences.gzip ? TrueFalseType.true : TrueFalseType.false,
-		headerRow: uploadPreferences.headerRow ? TrueFalseType.true : TrueFalseType.false,
-		update: uploadPreferences.update ? TrueFalseType.true : TrueFalseType.false
+		gzip: uploadPreferences.gzip,
+		headerRow: uploadPreferences.headerRow,
+		update: uploadPreferences.update
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());

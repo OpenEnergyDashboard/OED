@@ -23,10 +23,9 @@ const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
-const { BooleanTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 
 /** Middleware validation */
-const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
+const { normalizeBoolean, validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 
@@ -72,7 +71,7 @@ router.use(function (req, res, next) {
 					// Allowing for backwards compatibility if any users are still using the 'email' parameter instead of
 					// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
 					// or continue to allow this backwards compatibility
-  				const user = username || email;
+					const user = username || email;
 					const verifiedUser = await verifyCredentials(user, password, true);
 					if (verifiedUser) {
 						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true) : cb(new Error('Invalid credentials'));
@@ -109,7 +108,7 @@ router.use(function (req, res, next) {
 });
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip === BooleanTypesJS.true;
+	const isGzip = normalizeBoolean(req.body.gzip);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
@@ -154,8 +153,8 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
-	const isGzip = (req.body.gzip === BooleanTypesJS.true);
-	const isRefreshReadings = (req.body.refreshReadings === BooleanTypesJS.true);
+	const isGzip = normalizeBoolean(req.body.gzip);
+	const isRefreshReadings = normalizeBoolean(req.body.refreshReadings);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	let isAllReadingsOk;

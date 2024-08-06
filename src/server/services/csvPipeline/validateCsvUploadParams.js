@@ -19,15 +19,30 @@ MeterTimeSortTypesJS = Object.freeze({
 	decreasing: 'decreasing',
 });
 
-/**
- * Enum of Boolean types.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-BooleanTypesJS = Object.freeze({
-	true: 'yes',
-	false: 'no',
-});
+// This function allows for curl users to continue to use 'yes' or 'no' and also allows string
+// values of true or false if the change is made.
+const normalizeBoolean = (input) => {
+	if (typeof input === 'string') {
+		input = input.toLowerCase();
+	}
+
+	switch (input) {
+		case 'yes':
+		case 'true':
+		case true:
+			return true;
+		case 'no':
+		case 'false':
+		case false:
+			return false;
+		default:
+			return input; // Return the original value if it does not match any of the boolean representations
+	}
+};
+
+// This is to allow curl users to still send 'yes' and 'no' for parameters sent,
+// The frontend will just use standard boolean values to send to the API
+BooleanCheckArray = ['yes', 'no', 'true', 'false', true, false];
 
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
 // a choice for a particular parameter, then these defaults will be used.
@@ -42,26 +57,26 @@ BooleanTypesJS = Object.freeze({
 // we should change these strings to booleans.
 const DEFAULTS = {
 	common: {
-		gzip: BooleanTypesJS.true,
-		headerRow: BooleanTypesJS.false,
-		update: BooleanTypesJS.false
+		gzip: true,
+		headerRow: false,
+		update: false
 	},
 	meters: {
 	},
 	readings: {
-		cumulative: BooleanTypesJS.meter,
-		cumulativeReset: BooleanTypesJS.meter,
+		cumulative: false,
+		cumulativeReset: false,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: undefined,
 		endOnly: undefined,
-		honorDst: BooleanTypesJS.false,
+		honorDst: false,
 		lengthGap: undefined,
 		lengthVariation: undefined,
-		refreshReadings: BooleanTypesJS.false,
-		relaxedParsing: BooleanTypesJS.false,
+		refreshReadings: false,
+		relaxedParsing: false,
 		timeSort: undefined,
-		useMeterZone: BooleanTypesJS.false
+		useMeterZone: false
 	}
 }
 
@@ -79,9 +94,9 @@ const COMMON_PROPERTIES = {
 	// or continue to allow this backwards compatibility
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
-	gzip: new BooleanParam('gzip'),
-	headerRow: new BooleanParam('headerRow'),
-	update: new BooleanParam('update')
+	gzip: new EnumParam('gzip', BooleanCheckArray),
+	headerRow: new EnumParam('headerRow', BooleanCheckArray),
+	update: new EnumParam('update', BooleanCheckArray)
 }
 
 // This sets the validation schemas for jsonschema.
@@ -99,19 +114,19 @@ const VALIDATION = {
 		required: ['meterIdentifier'],
 		properties: {
 			...COMMON_PROPERTIES,
-			cumulative: new EnumParam('cumulative', [BooleanTypesJS.true, BooleanTypesJS.false]),
-			cumulativeReset: new EnumParam('cumulativeReset', [BooleanTypesJS.true, BooleanTypesJS.false]),
+			cumulative: new EnumParam('cumulative', BooleanCheckArray),
+			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
 			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
-			endOnly: new EnumParam('endOnly', [BooleanTypesJS.true, BooleanTypesJS.false]),
-			honorDst: new BooleanParam('honorDst'),
+			endOnly: new EnumParam('endOnly', BooleanCheckArray),
+			honorDst: new EnumParam('honorDst', BooleanCheckArray),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			refreshReadings: new BooleanParam('refreshReadings'),
-			relaxedParsing: new BooleanParam('relaxedParsing'),
+			refreshReadings: new EnumParam('refreshReadings', BooleanCheckArray),
+			relaxedParsing: new EnumParam('relaxedParsing', BooleanCheckArray),
 			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
-			useMeterZone: new BooleanParam('useMeterZone'),
+			useMeterZone: new EnumParam('useMeterZone', BooleanCheckArray),
 		},
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
@@ -227,5 +242,5 @@ module.exports = {
 	validateMetersCsvUploadParams,
 	validateReadingsCsvUploadParams,
 	MeterTimeSortTypesJS,
-	BooleanTypesJS
+	normalizeBoolean
 };

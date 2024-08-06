@@ -10,11 +10,11 @@ import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
-import { ReadingsCSVUploadPreferencesItem } from '../../types/csvUploadForm';
+import { ReadingsCSVUploadPreferences } from '../../types/csvUploadForm';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
-import { ReadingsCSVUploadDefaults, convertBoolean } from '../../utils/csvUploadDefaults';
+import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
@@ -37,7 +37,7 @@ export default function ReadingsCSVUploadComponent() {
 	// non-displayable in state.
 	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
 	// This is the state for the form data for readings
-	const [readingsData, setReadingsData] = useState<ReadingsCSVUploadPreferencesItem>(ReadingsCSVUploadDefaults);
+	const [readingsData, setReadingsData] = useState<ReadingsCSVUploadPreferences>(ReadingsCSVUploadDefaults);
 	// This is the state for the file to be uploaded
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	// tracks whether or not a meter has been selected
@@ -77,6 +77,15 @@ export default function ReadingsCSVUploadComponent() {
 		setReadingsData(prevData => ({
 			...prevData,
 			timeSort: newTimeSort
+		}));
+	};
+
+	// need this change function because input type select expects a string as value
+	const handleTrueFalseSelectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setReadingsData(prevData => ({
+			...prevData,
+			[name]: value === 'true'
 		}));
 	};
 
@@ -120,14 +129,14 @@ export default function ReadingsCSVUploadComponent() {
 		setReadingsData(prevData => ({
 			...prevData,
 			meterIdentifier: selectedMeter.identifier,
-			cumulative: convertBoolean(selectedMeter.cumulative),
-			cumulativeReset: convertBoolean(selectedMeter.cumulativeReset),
+			cumulative: selectedMeter.cumulative,
+			cumulativeReset: selectedMeter.cumulativeReset,
 			cumulativeResetStart: selectedMeter.cumulativeResetStart,
 			cumulativeResetEnd: selectedMeter.cumulativeResetEnd,
 			duplications: Number(selectedMeter.readingDuplication),
 			lengthGap: selectedMeter.readingGap,
 			lengthVariation: selectedMeter.readingVariation,
-			endOnly: convertBoolean(selectedMeter.endOnlyTime),
+			endOnly: selectedMeter.endOnlyTime,
 			timeSort: MeterTimeSortType[selectedMeter.timeSort as keyof typeof MeterTimeSortType],
 			useMeterZone: false
 		}));
@@ -316,8 +325,8 @@ export default function ReadingsCSVUploadComponent() {
 										type='select'
 										id='cumulative'
 										name='cumulative'
-										value={readingsData.cumulative}
-										onChange={handleChange}
+										value={readingsData.cumulative ? 'true' : 'false'}
+										onChange={handleTrueFalseSelectChange}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -336,8 +345,8 @@ export default function ReadingsCSVUploadComponent() {
 										type='select'
 										id='cumulativeReset'
 										name='cumulativeReset'
-										value={readingsData.cumulativeReset}
-										onChange={handleChange}
+										value={readingsData.cumulativeReset ? 'true' : 'false'}
+										onChange={handleTrueFalseSelectChange}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -394,8 +403,8 @@ export default function ReadingsCSVUploadComponent() {
 										type='select'
 										id='endOnly'
 										name='endOnly'
-										value={readingsData.endOnly}
-										onChange={handleChange}
+										value={readingsData.endOnly ? 'true' : 'false'}
+										onChange={handleTrueFalseSelectChange}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);

@@ -9,7 +9,6 @@ const Point = require('../../models/Point');
 const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions, insertUnits, insertConversions } = require('../../util/insertData')
 const { redoCik } = require('../../services/graph/redoCik');
-const { BooleanTypesJS } = require('../../services/csvPipeline/validateCsvUploadParams');
 const util = require('util');
 const fs = require('fs');
 const csv = require('csv');
@@ -42,7 +41,7 @@ const CHAI_METERS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_METERS_ROUTE
 const testCases = {
 	pipe1: {
 		description: 'Ascending time readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe1').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe1').field('gzip', false)"],
 		fileName: ['pipe1Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -50,7 +49,7 @@ const testCases = {
 	},
 	pipe2: {
 		description: 'Descending time readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe2').field('gzip', BooleanTypesJS.false).field('timeSort', 'decreasing')"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe2').field('gzip', false).field('timeSort', 'decreasing')"],
 		fileName: ['pipe2Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -58,7 +57,7 @@ const testCases = {
 	},
 	pipe3: {
 		description: 'Cumulative time readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe3').field('gzip', BooleanTypesJS.false).field('cumulative', BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe3').field('gzip', false).field('cumulative', true)"],
 		fileName: ['pipe3Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -66,7 +65,7 @@ const testCases = {
 	},
 	pipe4: {
 		description: 'Cumulative, descending time readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe4').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('cumulative',true).field('meterIdentifier','pipe4').field('gzip', false)"],
 		fileName: ['pipe4Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -74,7 +73,7 @@ const testCases = {
 	},
 	pipe5: {
 		description: 'Cumulative time readings with reset with default cumulative reset',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe5').field('gzip', BooleanTypesJS.false).field('cumulative', BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe5').field('gzip', false).field('cumulative', true).field('cumulativeReset',true)"],
 		createMeter: true,
 		fileName: ['pipe5Input.csv'],
 		responseCode: [400],
@@ -82,7 +81,7 @@ const testCases = {
 	},
 	pipe6: {
 		description: 'Cumulative time readings with reset with cumulative reset around midnight',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe6').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe6').field('gzip',false)"],
 		fileName: ['pipe6Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -90,7 +89,7 @@ const testCases = {
 	},
 	pipe7: {
 		description: 'Cumulative time readings with reset with cumulative reset around noon which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe7').field('gzip', BooleanTypesJS.false).field('cumulative', BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15')"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier', 'pipe7').field('gzip', false).field('cumulative', true).field('cumulativeReset',true).field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15')"],
 		fileName: ['pipe7Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -98,7 +97,7 @@ const testCases = {
 	},
 	pipe8: {
 		description: 'Cumulative time readings with reset with cumulative reset tight around midnight',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','00:00').field('cumulativeResetEnd','00:00.001').field('meterIdentifier','pipe8').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('cumulativeResetStart','00:00').field('cumulativeResetEnd','00:00.001').field('meterIdentifier','pipe8').field('gzip',false)"],
 		fileName: ['pipe8Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -106,7 +105,7 @@ const testCases = {
 	},
 	pipe9: {
 		description: 'Cumulative time readings with reset without cumulative reset which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe9').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('meterIdentifier','pipe9').field('gzip', false)"],
 		fileName: ['pipe9Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -114,7 +113,7 @@ const testCases = {
 	},
 	pipe10: {
 		description: 'Cumulative time readings changing at noon with default cumulative reset',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('meterIdentifier','pipe10').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('meterIdentifier','pipe10').field('gzip',false)"],
 		fileName: ['pipe10Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -122,7 +121,7 @@ const testCases = {
 	},
 	pipe11: {
 		description: 'Cumulative time readings changing at noon without cumulative reset which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe11').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('meterIdentifier','pipe11').field('gzip',false)"],
 		fileName: ['pipe11Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -130,7 +129,7 @@ const testCases = {
 	},
 	pipe12: {
 		description: 'Cumulative time readings changing at noon with cumulative reset at noon',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15').field('meterIdentifier','pipe12').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('cumulativeResetStart','11:45').field('cumulativeResetEnd','12:15').field('meterIdentifier','pipe12').field('gzip',false)"],
 		fileName: ['pipe12Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -138,7 +137,7 @@ const testCases = {
 	},
 	pipe13: {
 		description: 'Cumulative time readings changing at noon with cumulative reset at midnight which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe13').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe13').field('gzip',false)"],
 		fileName: ['pipe13Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -146,7 +145,7 @@ const testCases = {
 	},
 	pipe14: {
 		description: 'Ascending time readings with length variation and default time variation',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe14').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe14').field('gzip',false)"],
 		fileName: ['pipe14Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -154,7 +153,7 @@ const testCases = {
 	},
 	pipe15: {
 		description: 'Ascending time readings with length variation where length variation set small so warns on 2 readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe15').field('lengthVariation','60').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe15').field('lengthVariation','60').field('gzip',false)"],
 		fileName: ['pipe15Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -162,7 +161,7 @@ const testCases = {
 	},
 	pipe16: {
 		description: 'Ascending time readings with length variation and length variation set so warns on 1 reading',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe16').field('lengthVariation','120').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe16').field('lengthVariation','120').field('gzip',false)"],
 		fileName: ['pipe16Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -170,7 +169,7 @@ const testCases = {
 	},
 	pipe17: {
 		description: 'Ascending time readings with length variation and gap where length variation set so all pass but gap not big enough so warns on 2 reading',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe17').field('lengthVariation','121').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe17').field('lengthVariation','121').field('gzip',false)"],
 		fileName: ['pipe17Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -178,7 +177,7 @@ const testCases = {
 	},
 	pipe18: {
 		description: 'Ascending time readings with gaps and small time gap so 1 passes and 1 warns',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe18').field('lengthGap','60').field('lengthVariation','121').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe18').field('lengthGap','60').field('lengthVariation','121').field('gzip',false)"],
 		fileName: ['pipe18Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -186,7 +185,7 @@ const testCases = {
 	},
 	pipe19: {
 		description: 'Ascending time readings with gap and just right size time gap',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe19').field('lengthGap','120').field('lengthVariation','121').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe19').field('lengthGap','120').field('lengthVariation','121').field('gzip',false)"],
 		fileName: ['pipe19Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -194,7 +193,7 @@ const testCases = {
 	},
 	pipe20: {
 		description: 'Cumulative time readings with header',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe20').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('headerRow',true).field('cumulative',true).field('meterIdentifier','pipe20').field('gzip',false)"],
 		fileName: ['pipe20Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -202,7 +201,7 @@ const testCases = {
 	},
 	pipe21: {
 		description: 'Cumulative time readings with duplication',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('duplications','3').field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe21').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('duplications','3').field('cumulative',true).field('meterIdentifier','pipe21').field('gzip',false)"],
 		fileName: ['pipe21Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -210,7 +209,7 @@ const testCases = {
 	},
 	pipe22: {
 		description: 'Cumulative time readings with default cumulative reset with negative reading which in incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('meterIdentifier','pipe22').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('meterIdentifier','pipe22').field('gzip',false)"],
 		fileName: ['pipe22Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -218,7 +217,7 @@ const testCases = {
 	},
 	pipe23: {
 		description: 'Ascending time readings that are end only',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('endOnly',BooleanTypesJS.true).field('meterIdentifier','pipe23').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('endOnly',true).field('meterIdentifier','pipe23').field('gzip',false)"],
 		fileName: ['pipe23Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -226,7 +225,7 @@ const testCases = {
 	},
 	pipe24: {
 		description: 'Descending time readings that are end only',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('endOnly',BooleanTypesJS.true).field('meterIdentifier','pipe24').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('timeSort','decreasing').field('endOnly',true).field('meterIdentifier','pipe24').field('gzip',false)"],
 		fileName: ['pipe24Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -234,7 +233,7 @@ const testCases = {
 	},
 	pipe25: {
 		description: 'Descending, cumulative time readings that are end only',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('timeSort','decreasing').field('endOnly',BooleanTypesJS.true).field('meterIdentifier','pipe25').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('timeSort','decreasing').field('endOnly',true).field('meterIdentifier','pipe25').field('gzip',false)"],
 		fileName: ['pipe25Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -242,7 +241,7 @@ const testCases = {
 	},
 	pipe26: {
 		description: 'Ascending time readings with bad start date/time which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe26').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe26').field('gzip',false)"],
 		fileName: ['pipe26Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -250,7 +249,7 @@ const testCases = {
 	},
 	pipe27: {
 		description: 'Ascending time readings with bad end date/time which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe27').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe27').field('gzip',false)"],
 		createMeter: true,
 		fileName: ['pipe27Input.csv'],
 		responseCode: [400],
@@ -259,7 +258,7 @@ const testCases = {
 	// Pipe28 removed since stronger tests on dates cause it to fail.
 	pipe29: {
 		description: 'Cumulative time readings with bad reading value which in incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe29').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('meterIdentifier','pipe29').field('gzip',false)"],
 		fileName: ['pipe29Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -268,7 +267,7 @@ const testCases = {
 	pipe30: {
 
 		description: 'Ascending time readings with bad reading value which in incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe30').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe30').field('gzip',false)"],
 		fileName: ['pipe30Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -276,7 +275,7 @@ const testCases = {
 	},
 	pipe31: {
 		description: 'Cumulative time readings with gaps with length variation but still needs to drop 2 readings with gap',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe31').field('cumulative',BooleanTypesJS.true).field('lengthVariation','121').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe31').field('cumulative',true).field('lengthVariation','121').field('gzip',false)"],
 		fileName: ['pipe31Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -284,7 +283,7 @@ const testCases = {
 	},
 	pipe32: {
 		description: 'Cumulative time readings with one reading start before end of previous so dropped',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe32').field('cumulative',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe32').field('cumulative',true).field('gzip',false)"],
 		fileName: ['pipe32Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -292,7 +291,7 @@ const testCases = {
 	},
 	pipe33: {
 		description: 'Cumulative time readings with negative reading which is incorrect',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe33').field('cumulative',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe33').field('cumulative',true).field('gzip',false)"],
 		fileName: ['pipe33Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -300,7 +299,7 @@ const testCases = {
 	},
 	pipe34: {
 		description: 'Ascending time readings with one reading start/end the same so dropped',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe34').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe34').field('gzip',false)"],
 		fileName: ['pipe34Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -308,7 +307,7 @@ const testCases = {
 	},
 	pipe35: {
 		description: 'Ascending time readings that are end only with two readings time the same so dropped',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('refreshReadings',BooleanTypesJS.true).field('meterIdentifier','pipe35').field('endOnly',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('refreshReadings',true).field('meterIdentifier','pipe35').field('endOnly',true).field('gzip',false)"],
 		fileName: ['pipe35Input.csv'],
 		createMeter: true,
 		responseCode: [400],
@@ -317,7 +316,7 @@ const testCases = {
 
 	pipe40: {
 		description: 'Cumulative time zipped readings with header',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('cumulative',BooleanTypesJS.true).field('meterIdentifier', 'pipe40')"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('headerRow',true).field('cumulative',true).field('meterIdentifier', 'pipe40')"],
 		fileName: ['pipe40Input.csv.gz'],
 		createMeter: true,
 		responseCode: [400],
@@ -325,7 +324,7 @@ const testCases = {
 	},
 	pipe50: {
 		description: 'Ascending time readings with two readings uploads where update readings',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe50')", CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe50')"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe50')", CHAI_READINGS_REQUEST + ".field('gzip', false).field('update',true).field('meterIdentifier', 'pipe50')"],
 		fileName: ['pipe50AInput.csv', 'pipe50BInput.csv'],
 		createMeter: true,
 		responseCode: [200, 200],
@@ -333,7 +332,7 @@ const testCases = {
 	},
 	pipe51: {
 		description: 'Ascending time readings with two readings uploads without update so no changes',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe51').field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe51').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe51').field('gzip',false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe51').field('gzip',false)"],
 		fileName: ['pipe51AInput.csv', 'pipe51BInput.csv'],
 		createMeter: true,
 		responseCode: [200, 200],
@@ -341,7 +340,7 @@ const testCases = {
 	},
 	pipe52: {
 		description: 'Cumulative time readings with default reset with two uploads to add more readings with a reset',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe52').field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('meterIdentifier','pipe52').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('cumulative',true).field('meterIdentifier','pipe52').field('gzip',false)", CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('meterIdentifier','pipe52').field('gzip',false)"],
 		fileName: ['pipe52AInput.csv', 'pipe52BInput.csv'],
 		createMeter: true,
 		responseCode: [400, 200],
@@ -349,7 +348,7 @@ const testCases = {
 	},
 	pipe60: {
 		description: 'Cumulative time readings with three readings uploads',
-		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe60').field('cumulative', BooleanTypesJS.true)", CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe60').field('cumulative', BooleanTypesJS.true)", CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe60').field('cumulative', BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe60').field('cumulative', true)", CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe60').field('cumulative', true)", CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe60').field('cumulative', true)"],
 		fileName: ['pipe60AInput.csv', 'pipe60BInput.csv', 'pipe60CInput.csv'],
 		createMeter: true,
 		responseCode: [400, 200, 200],
@@ -357,168 +356,168 @@ const testCases = {
 	},
 	pipe70: {
 		description: 'Create meter cumulative reset around noon with reading upload with reset at midnight which is incorrect',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe70').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe70').field('gzip',false)"],
 		fileName: ['pipe70AInputMeter.csv', 'pipe70BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe70: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe70 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45:00; cumulativeResetEnd 12:15:00; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe70: Error parsing Reading #4. Reading value of 96 gives -48 with error message:<br>A negative meterReading has been detected but either cumulativeReset is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>For reading #4 on meter pipe70 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value -48 start time 2021-06-04T00:00:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 11:45:00; cumulativeResetEnd 12:15:00; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe71: {
 		description: 'Create meter cumulative reset around midnight with reading upload with reset at midnight',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('cumulativeReset',BooleanTypesJS.true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe71').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('cumulative',true).field('cumulativeReset',true).field('cumulativeResetStart','23:45').field('cumulativeResetEnd','00:15').field('meterIdentifier','pipe71').field('gzip',false)"],
 		fileName: ['pipe71AInputMeter.csv', 'pipe71BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe71: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe71 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 23:45; cumulativeResetEnd 00:15; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe71</li></ol>']
 	},
 	pipe72: {
 		description: 'Create meter with modest length variation and gap with reading upload where warn on larger gaps',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe72').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe72').field('gzip',false)"],
 		fileName: ['pipe72AInputMeter.csv', 'pipe72BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe72: Warning parsing Reading #4. Reading value gives 96 with warning message:<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 60 seconds.<br>For reading #4 on meter pipe72 in pipeline: previous reading has value 72 start time 2021-06-03T00:00:00Z end time 2021-06-04T00:00:00Z and current reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 60; lengthVariation 120; onlyEndTime false<br><br>For meter pipe72: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 120 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe72 in pipeline: previous reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z and current reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:04:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 60; lengthVariation 120; onlyEndTime false<br>']
 	},
 	pipe73: {
 		description: 'Create meter with modest length variation and gap with reading upload that changes these values so fewer warnings; also checks floating point values in reading upload',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe73').field('lengthGap','120.1').field('lengthVariation','120.2').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe73').field('lengthGap','120.1').field('lengthVariation','120.2').field('gzip',false)"],
 		fileName: ['pipe73AInputMeter.csv', 'pipe73BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe73: Warning parsing Reading #5. Reading value gives 120 with warning message:<br>The previous reading has a different time length than the current reading and exceeds the tolerance of 120.2 seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>For reading #5 on meter pipe73 in pipeline: previous reading has value 96 start time 2021-06-04T00:02:00Z end time 2021-06-05T00:00:00Z and current reading has value 120 start time 2021-06-05T00:00:00Z end time 2021-06-06T00:04:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 120.1; lengthVariation 120.2; onlyEndTime false<br>']
 	},
 	pipe74: {
 		description: 'Create meter with duplication with reading upload',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('cumulative',BooleanTypesJS.true).field('meterIdentifier','pipe74').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('cumulative',true).field('meterIdentifier','pipe74').field('gzip',false)"],
 		fileName: ['pipe74AInputMeter.csv', 'pipe74BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe74: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe74 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 3; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe74</li></ol>']
 	},
 	pipe75: {
 		description: 'Create meter with decreasing with reading upload',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe75').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe75').field('gzip', false)"],
 		fileName: ['pipe75AInputMeter.csv', 'pipe75BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2>']
 	},
 	pipe76: {
 		description: 'Create meter with end only with reading upload',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip',BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe76').field('gzip',BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip',false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe76').field('gzip',false)"],
 		fileName: ['pipe76AInputMeter.csv', 'pipe76BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe76: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe76 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 1970-01-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe76</li></ol>']
 	},
 	pipe80: {
 		description: 'Two meter uploads where second sets cumulative with reading upload; all without headers',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false)", CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe80')", CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe80')"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', false)", CHAI_METERS_REQUEST + ".field('gzip', false).field('update',true).field('meterIdentifier', 'pipe80')", CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe80')"],
 		fileName: ['pipe80AInputMeter.csv', 'pipe80BInputMeter.csv', 'pipe80CInput.csv'],
 		responseCode: [200, 200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe80: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe80 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe80</li></ol>']
 	},
 	pipe90: {
 		description: 'Two meter uploads with header and zipped where second sets cumulative & reset, renames meter then reading upload',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe90x')", CHAI_READINGS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('meterIdentifier', 'pipe90')"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true)", CHAI_METERS_REQUEST + ".field('headerRow',true).field('update',true).field('meterIdentifier', 'pipe90x')", CHAI_READINGS_REQUEST + ".field('gzip', false).field('meterIdentifier', 'pipe90')"],
 		fileName: ['pipe90AInputMeter.csv.gz', 'pipe90BInputMeter.csv.gz', 'pipe90CInput.csv'],
 		responseCode: [200, 200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe90: Error parsing Reading #1. Reading value gives 24 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe90 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 24 start time 2021-06-01T00:00:00Z end time 2021-06-02T00:00:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset true; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe90</li></ol>']
 	},
 	pipe110: {
 		description: 'Create meter with timezone with hourly reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe110').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe110').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe110AInputMeter.csv', 'pipe110BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe110: Warning parsing Reading #2. Reading value gives 120 with warning message:<br>Reading #2 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T01:00:00-06:00 endTimestamp of 2022-03-13T03:00:00-05:00 reading value of 120 and the first part has a startTimestamp of 2022-03-13T01:00:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 120. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe110 in pipeline: previous reading has value 60 start time 2022-03-13T00:00:00Z end time 2022-03-13T01:00:00Z and current reading has value 120 start time 2022-03-13T02:00:00Z end time 2022-03-13T03:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe111: {
 		description: 'Create meter with timezone with daily reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe111').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe111').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe111AInputMeter.csv', 'pipe111BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe111: Warning parsing Reading #2. Reading value gives 2760 with warning message:<br>Reading #2 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T00:00:00-06:00 endTimestamp of 2022-03-14T00:00:00-05:00 reading value of 2760 and the first part has a startTimestamp of 2022-03-13T00:00:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 240. This is only a notification and should not be an issue.<br>Reading #2 crossed into daylight savings so it needs to be split where the second part is now being used. The original reading had startTimestamp of 2022-03-13T00:00:00-06:00 endTimestamp of 2022-03-14T00:00:00-05:00 reading value of 2760 and the second part has a startTimestamp of 2022-03-13T03:00:00Z endTimestamp of 2022-03-14T00:00:00Z reading value of 2520. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe111 in pipeline: previous reading has value 1440 start time 2022-03-12T00:00:00Z end time 2022-03-13T00:00:00Z and current reading has value 2760 start time 2022-03-13T00:00:00Z end time 2022-03-14T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe112: {
 		description: 'Create meter with timezone with 15-minute reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe112').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe112').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe112AInputMeter.csv', 'pipe112BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe112: Warning parsing Reading #2. Reading value gives 30 with warning message:<br>Reading #2 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T01:45:00-06:00 endTimestamp of 2022-03-13T03:00:00-05:00 reading value of 30 and the first part has a startTimestamp of 2022-03-13T01:45:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 30. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe112 in pipeline: previous reading has value 15 start time 2022-03-13T01:30:00Z end time 2022-03-13T01:45:00Z and current reading has value 30 start time 2022-03-13T02:45:00Z end time 2022-03-13T03:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe113: {
 		description: 'Create meter with timezone with 23-minute reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe113').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe113').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe113AInputMeter.csv', 'pipe113BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe113: Warning parsing Reading #2. Reading value gives 46 with warning message:<br>Reading #2 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the first part has a startTimestamp of 2022-03-13T01:46:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 28. This is only a notification and should not be an issue.<br>Reading #2 crossed into daylight savings so it needs to be split where the second part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the second part has a startTimestamp of 2022-03-13T03:00:00Z endTimestamp of 2022-03-13T03:09:00Z reading value of 18. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe113 in pipeline: previous reading has value 23 start time 2022-03-13T01:23:00Z end time 2022-03-13T01:46:00Z and current reading has value 46 start time 2022-03-13T02:46:00Z end time 2022-03-13T03:09:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe114: {
 		description: 'Create cumulative meter with timezone with 23-minute reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe114').field('honorDst', BooleanTypesJS.true).field('cumulative',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe114').field('honorDst', true).field('cumulative',true).field('gzip', false)"],
 		fileName: ['pipe114AInputMeter.csv', 'pipe114BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe114: Error parsing Reading #1. Reading value gives 0 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe114 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 0 start time 2022-03-13T01:00:00Z end time 2022-03-13T01:23:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe114: Warning parsing Reading #3. Reading value gives 46 with warning message:<br>Reading #3 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the first part has a startTimestamp of 2022-03-13T01:46:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 28. This is only a notification and should not be an issue.<br>Reading #3 crossed into daylight savings so it needs to be split where the second part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the second part has a startTimestamp of 2022-03-13T03:00:00Z endTimestamp of 2022-03-13T03:09:00Z reading value of 18. This is only a notification and should not be an issue.<br>For reading #3 on meter pipe114 in pipeline: previous reading has value 23 start time 2022-03-13T01:23:00Z end time 2022-03-13T01:46:00Z and current reading has value 46 start time 2022-03-13T02:46:00Z end time 2022-03-13T03:09:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe114</li></ol>']
 	},
 	pipe115: {
 		description: 'Create meter with timezone with end-only reading upload into DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe115').field('honorDst', BooleanTypesJS.true).field('endOnly', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe115').field('honorDst', true).field('endOnly', true).field('gzip', false)"],
 		fileName: ['pipe115AInputMeter.csv', 'pipe115BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe115: Error parsing Reading #1. Reading value gives -99 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe115 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value -99 start time 1970-01-01T00:00:00Z end time 2022-03-13T01:23:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe115: Warning parsing Reading #3. Reading value gives 46 with warning message:<br>Reading #3 crossed into daylight savings so it needs to be split where the first part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the first part has a startTimestamp of 2022-03-13T01:46:00Z endTimestamp of 2022-03-13T02:00:00Z reading value of 28. This is only a notification and should not be an issue.<br>Reading #3 crossed into daylight savings so it needs to be split where the second part is now being used. The original reading had startTimestamp of 2022-03-13T01:46:00-06:00 endTimestamp of 2022-03-13T03:09:00-05:00 reading value of 46 and the second part has a startTimestamp of 2022-03-13T03:00:00Z endTimestamp of 2022-03-13T03:09:00Z reading value of 18. This is only a notification and should not be an issue.<br>For reading #3 on meter pipe115 in pipeline: previous reading has value 23 start time 2022-03-13T01:23:00Z end time 2022-03-13T02:46:00Z and current reading has value 46 start time 2022-03-13T02:46:00Z end time 2022-03-13T03:09:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe115</li></ol>']
 	},
 	pipe116: {
 		description: 'Create meter with timezone with hourly reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe116').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe116').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe116AInputMeter.csv', 'pipe116BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe116: Error parsing Reading #2. Reading value gives -1 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:00:00-05:00 and endTimestamp of 2022-11-06T01:00:00-06:00 and value of -1. This should not be an issue but the reading is lost.<br>For reading #2 on meter pipe116 in pipeline: previous reading has value 60 start time 2022-11-06T00:00:00Z end time 2022-11-06T01:00:00Z and current reading has value -1 start time 2022-11-06T00:00:00Z end time 2022-11-06T01:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe116: Warning parsing Reading #3. Reading value gives 120 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:00:00-06:00 endTimestamp of 2022-11-06T02:00:00-06:00 reading value of 120. The used part has startTimestamp of 2022-11-06T01:00:00Z and endTimestamp of 2022-11-06T02:00:00Z and value of 120. This is only a notification and should not be an issue.<br>For reading #3 on meter pipe116 in pipeline: previous reading has value -1 start time 2022-11-06T00:00:00Z end time 2022-11-06T01:00:00Z and current reading has value 120 start time 2022-11-06T01:00:00Z end time 2022-11-06T02:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #2 for meter pipe116</li></ol>']
 	},
 	pipe117: {
 		description: 'Create meter with timezone with daily reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe117').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe117').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe117AInputMeter.csv', 'pipe117BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe117: Warning parsing Reading #2. Reading value gives 2880 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T00:00:00-05:00 endTimestamp of 2022-11-07T00:00:00-06:00 reading value of 3000. The used part has startTimestamp of 2022-11-06T00:00:00Z and endTimestamp of 2022-11-07T00:00:00Z and value of 2880. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe117 in pipeline: previous reading has value 1440 start time 2022-11-05T00:00:00Z end time 2022-11-06T00:00:00Z and current reading has value 2880 start time 2022-11-06T00:00:00Z end time 2022-11-07T00:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe118: {
 		description: 'Create meter with timezone with 15-minute reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe118').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe118').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe118AInputMeter.csv', 'pipe118BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe118: Error parsing Reading #2. Reading value gives -1 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:45:00-05:00 and endTimestamp of 2022-11-06T01:00:00-06:00 and value of -1. This should not be an issue but the reading is lost.<br>For reading #2 on meter pipe118 in pipeline: previous reading has value 15 start time 2022-11-06T01:30:00Z end time 2022-11-06T01:45:00Z and current reading has value -1 start time 2022-11-06T00:45:00Z end time 2022-11-06T01:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe118: Error parsing Reading #3. Reading value gives -2 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:00:00-06:00 and endTimestamp of 2022-11-06T01:15:00-06:00 and value of -2. This should not be an issue but the reading is lost.<br>For reading #3 on meter pipe118 in pipeline: previous reading has value -1 start time 2022-11-06T00:45:00Z end time 2022-11-06T01:00:00Z and current reading has value -2 start time 2022-11-06T01:00:00Z end time 2022-11-06T01:15:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe118: Error parsing Reading #4. Reading value gives -3 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:15:00-06:00 and endTimestamp of 2022-11-06T01:30:00-06:00 and value of -3. This should not be an issue but the reading is lost.<br>For reading #4 on meter pipe118 in pipeline: previous reading has value -2 start time 2022-11-06T01:00:00Z end time 2022-11-06T01:15:00Z and current reading has value -3 start time 2022-11-06T01:15:00Z end time 2022-11-06T01:30:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe118: Error parsing Reading #5. Reading value gives -4 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:30:00-06:00 and endTimestamp of 2022-11-06T01:45:00-06:00 and value of -4. This should not be an issue but the reading is lost.<br>For reading #5 on meter pipe118 in pipeline: previous reading has value -3 start time 2022-11-06T01:15:00Z end time 2022-11-06T01:30:00Z and current reading has value -4 start time 2022-11-06T01:30:00Z end time 2022-11-06T01:45:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe118: Warning parsing Reading #6. Reading value gives 30 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:45:00-06:00 endTimestamp of 2022-11-06T02:00:00-06:00 reading value of 30. The used part has startTimestamp of 2022-11-06T01:45:00Z and endTimestamp of 2022-11-06T02:00:00Z and value of 30. This is only a notification and should not be an issue.<br>For reading #6 on meter pipe118 in pipeline: previous reading has value -4 start time 2022-11-06T01:30:00Z end time 2022-11-06T01:45:00Z and current reading has value 30 start time 2022-11-06T01:45:00Z end time 2022-11-06T02:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #2 for meter pipe118</li><li>Dropped Reading #3 for meter pipe118</li><li>Dropped Reading #4 for meter pipe118</li><li>Dropped Reading #5 for meter pipe118</li></ol>']
 	},
 	pipe119: {
 		description: 'Create meter with timezone with 23-minute reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe119').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe119').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe119AInputMeter.csv', 'pipe119BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe119: Error parsing Reading #2. Reading value gives -1 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:46:00-05:00 and endTimestamp of 2022-11-06T01:09:00-06:00 and value of -1. This should not be an issue but the reading is lost.<br>For reading #2 on meter pipe119 in pipeline: previous reading has value 23 start time 2022-11-06T01:23:00Z end time 2022-11-06T01:46:00Z and current reading has value -1 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe119: Error parsing Reading #3. Reading value gives -2 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:09:00-06:00 and endTimestamp of 2022-11-06T01:32:00-06:00 and value of -2. This should not be an issue but the reading is lost.<br>For reading #3 on meter pipe119 in pipeline: previous reading has value -1 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z and current reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe119: Warning parsing Reading #4. Reading value gives 18 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:32:00-06:00 endTimestamp of 2022-11-06T01:55:00-06:00 reading value of 46. The used part has startTimestamp of 2022-11-06T01:46:00Z and endTimestamp of 2022-11-06T01:55:00Z and value of 18. This is only a notification and should not be an issue.<br>For reading #4 on meter pipe119 in pipeline: previous reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z and current reading has value 18 start time 2022-11-06T01:32:00Z end time 2022-11-06T01:55:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #2 for meter pipe119</li><li>Dropped Reading #3 for meter pipe119</li></ol>']
 	},
 	pipe120: {
 		description: 'Create cumulative meter with timezone with 23-minute reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe120').field('honorDst', BooleanTypesJS.true).field('cumulative',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe120').field('honorDst', true).field('cumulative',true).field('gzip', false)"],
 		fileName: ['pipe120AInputMeter.csv', 'pipe120BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe120: Error parsing Reading #1. Reading value gives 0 with error message:<br>The first ever reading must be dropped when dealing with cumulative data.<br>For reading #1 on meter pipe120 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value 0 start time 2022-11-06T01:00:00Z end time 2022-11-06T01:23:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe120: Error parsing Reading #3. Reading value gives 0 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:46:00-05:00 and endTimestamp of 2022-11-06T01:09:00-06:00 and value of 0. This should not be an issue but the reading is lost.<br>For reading #3 on meter pipe120 in pipeline: previous reading has value 23 start time 2022-11-06T01:23:00Z end time 2022-11-06T01:46:00Z and current reading has value 0 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe120: Error parsing Reading #4. Reading value gives 0 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:09:00-06:00 and endTimestamp of 2022-11-06T01:32:00-06:00 and value of 0. This should not be an issue but the reading is lost.<br>For reading #4 on meter pipe120 in pipeline: previous reading has value 0 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z and current reading has value 0 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><br>For meter pipe120: Warning parsing Reading #5. Reading value gives 18 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:32:00-06:00 endTimestamp of 2022-11-06T01:55:00-06:00 reading value of 46. The used part has startTimestamp of 2022-11-06T01:46:00Z and endTimestamp of 2022-11-06T01:55:00Z and value of 18. This is only a notification and should not be an issue.<br>For reading #5 on meter pipe120 in pipeline: previous reading has value 0 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z and current reading has value 18 start time 2022-11-06T01:32:00Z end time 2022-11-06T01:55:00Z with timeSort increasing; duplications 1; cumulative true; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe120</li><li>Dropped Reading #3 for meter pipe120</li><li>Dropped Reading #4 for meter pipe120</li></ol>']
 	},
 	pipe121: {
 		description: 'Create end-only meter with timezone with 23-minute reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe121').field('honorDst', BooleanTypesJS.true).field('endOnly', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe121').field('honorDst', true).field('endOnly', true).field('gzip', false)"],
 		fileName: ['pipe121AInputMeter.csv', 'pipe121BInput.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe121: Error parsing Reading #1. Reading value gives -99 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe121 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value -99 start time 1970-01-01T00:00:00Z end time 2022-11-06T01:23:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe121: Error parsing Reading #3. Reading value gives -1 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:46:00-05:00 and endTimestamp of 2022-11-06T01:09:00-06:00 and value of -1. This should not be an issue but the reading is lost.<br>For reading #3 on meter pipe121 in pipeline: previous reading has value 23 start time 2022-11-06T01:23:00Z end time 2022-11-06T01:46:00Z and current reading has value -1 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe121: Error parsing Reading #4. Reading value gives -2 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:09:00-06:00 and endTimestamp of 2022-11-06T01:32:00-06:00 and value of -2. This should not be an issue but the reading is lost.<br>For reading #4 on meter pipe121 in pipeline: previous reading has value -1 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z and current reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe121: Warning parsing Reading #5. Reading value gives 18 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:32:00-06:00 endTimestamp of 2022-11-06T01:55:00-06:00 reading value of 46. The used part has startTimestamp of 2022-11-06T01:46:00Z and endTimestamp of 2022-11-06T01:55:00Z and value of 18. This is only a notification and should not be an issue.<br>For reading #5 on meter pipe121 in pipeline: previous reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z and current reading has value 18 start time 2022-11-06T01:32:00Z end time 2022-11-06T01:55:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe121</li><li>Dropped Reading #3 for meter pipe121</li><li>Dropped Reading #4 for meter pipe121</li></ol>']
 	},
 	pipe122: {
 		description: 'Create end-only meter with timezone with two 23-minute reading upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe122').field('honorDst', BooleanTypesJS.true).field('endOnly', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe122').field('honorDst', BooleanTypesJS.true).field('endOnly', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe122').field('honorDst', true).field('endOnly', true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe122').field('honorDst', true).field('endOnly', true).field('gzip', false)"],
 		fileName: ['pipe122AInputMeter.csv', 'pipe122BInput.csv', 'pipe122CInput.csv'],
 		responseCode: [200, 400, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe122: Error parsing Reading #1. Reading value gives -99 with error message:<br>The first ever reading must be dropped when dealing only with endTimestamps.<br>For reading #1 on meter pipe122 in pipeline: previous reading has value 0 start time 1970-01-01T00:00:00Z end time 1970-01-01T00:00:00Z and current reading has value -99 start time 1970-01-01T00:00:00Z end time 2022-11-06T01:23:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe122: Error parsing Reading #3. Reading value gives -1 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:46:00-05:00 and endTimestamp of 2022-11-06T01:09:00-06:00 and value of -1. This should not be an issue but the reading is lost.<br>For reading #3 on meter pipe122 in pipeline: previous reading has value 23 start time 2022-11-06T01:23:00Z end time 2022-11-06T01:46:00Z and current reading has value -1 start time 2022-11-06T00:46:00Z end time 2022-11-06T01:09:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe122</li><li>Dropped Reading #3 for meter pipe122</li></ol>', '<h1>FAILURE</h1><h2>It looks like the insert of the readings had issues with some or all of the readings where the processing of the readings returned these warning(s)/error(s):</h2><br>For meter pipe122: Error parsing Reading #1. Reading value gives -2 with error message:<br>This reading is entirely within the shift time from daylight savings to standard time so it is dropped. The dropped reading  had startTimestamp of 2022-11-06T01:09:00-06:00 and endTimestamp of 2022-11-06T01:32:00-06:00 and value of -2. This should not be an issue but the reading is lost.<br>For reading #1 on meter pipe122 in pipeline: previous reading has value -1 start time 2022-11-06T01:46:00Z end time 2022-11-06T01:09:00Z and current reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><br>For meter pipe122: Warning parsing Reading #2. Reading value gives 18 with warning message:<br>This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading so its reading will be prorated where the original values were: startTimestamp of 2022-11-06T01:32:00-06:00 endTimestamp of 2022-11-06T01:55:00-06:00 reading value of 46. The used part has startTimestamp of 2022-11-06T01:46:00Z and endTimestamp of 2022-11-06T01:55:00Z and value of 18. This is only a notification and should not be an issue.<br>For reading #2 on meter pipe122 in pipeline: previous reading has value -2 start time 2022-11-06T01:09:00Z end time 2022-11-06T01:32:00Z and current reading has value 18 start time 2022-11-06T01:32:00Z end time 2022-11-06T01:55:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime true<br><h2>Readings Dropped and should have previous messages</h2><ol><li>Dropped Reading #1 for meter pipe122</li></ol>']
 	},
 	pipe123: {
 		description: 'Create meter with timezone with 30-minute reading with gap upload from DST',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe123').field('honorDst', BooleanTypesJS.true).field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('headerRow',true).field('gzip', false)", CHAI_READINGS_REQUEST + ".field('meterIdentifier','pipe123').field('honorDst', true).field('gzip', false)"],
 		fileName: ['pipe123AInputMeter.csv', 'pipe123BInput.csv'],
 		responseCode: [200, 200],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>SUCCESS</h1><h2>It looks like the insert of the readings was a success.</h2><h3>However, note that the processing of the readings returned these warning(s):</h3><br>For meter pipe123: Warning parsing Reading #2. Reading value gives 30 with warning message:<br>The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>There is a gap in time between this reading and the previous reading that exceeds the allowed amount of 0 seconds.<br>For reading #2 on meter pipe123 in pipeline: previous reading has value 15 start time 2022-11-06T01:25:00Z end time 2022-11-06T01:55:00Z and current reading has value 30 start time 2022-11-06T01:30:00Z end time 2022-11-06T02:00:00Z with timeSort increasing; duplications 1; cumulative false; cumulativeReset false; cumulativeResetStart 00:00:00; cumulativeResetEnd 23:59:59.999999; lengthGap 0; lengthVariation 0; onlyEndTime false<br>']
 	},
 	pipe130: {
 		description: 'Testing Readings Upload using Email',
-		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('meterIdentifier', 'pipe130').field('gzip', BooleanTypesJS.false)"],
+		chaiRequest: [CHAI_READINGS_REQUEST_EMAIL + ".field('meterIdentifier', 'pipe130').field('gzip', false)"],
 		fileName: ['pipe130Input.csv'],
 		createMeter: true,
 		responseCode: [200],
@@ -631,7 +630,7 @@ metersUpload: an array where each entry is a meter object that is what should be
 const testMeters = {
 	pipe100: {
 		description: 'Second meter upload where incorrectly provides meter identifier so fails',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', false).field('headerRow',true)", CHAI_METERS_REQUEST + ".field('gzip', false).field('update',true).field('meterIdentifier', 'pipe100').field('headerRow',true)"],
 		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter identifier provided ("pipe100") in request with update for meters but more than one meter in CSV so not processing'],
@@ -701,7 +700,7 @@ const testMeters = {
 	},
 	pipe101: {
 		description: 'Second meter with same name so fails but first meter exists',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', false).field('headerRow',true)"],
 		fileName: ['pipe101InputMeter.csv'],
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter name of "pipe101" got database error of: duplicate key value violates unique constraint "meters_name_key"'],
@@ -740,7 +739,7 @@ const testMeters = {
 	},
 	pipe102: {
 		description: 'Update meter where name does not exist so fails',
-		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true).field('update',BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_METERS_REQUEST + ".field('gzip', false).field('headerRow',true).field('update',true)"],
 		fileName: ['pipe102InputMeter.csv'],
 		responseCode: [400],
 		responseString: ['<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter identifier of "pipe102" does not seem to exist with update for meters and got DB error of: No data returned from the query.'],
@@ -748,7 +747,7 @@ const testMeters = {
 	},
 	pipe103: {
 		description: 'Uploading meters using Email. First succeeds then the second meter upload fails because it incorrectly provides meter identifier',
-		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('headerRow',BooleanTypesJS.true)", CHAI_METERS_REQUEST_EMAIL + ".field('gzip', BooleanTypesJS.false).field('update',BooleanTypesJS.true).field('meterIdentifier', 'pipe100').field('headerRow',BooleanTypesJS.true)"],
+		chaiRequest: [CHAI_METERS_REQUEST_EMAIL + ".field('gzip', false).field('headerRow',true)", CHAI_METERS_REQUEST_EMAIL + ".field('gzip', false).field('update',true).field('meterIdentifier', 'pipe100').field('headerRow',true)"],
 		fileName: ['pipe100InputMeter.csv', 'pipe100InputMeter.csv'],
 		responseCode: [200, 400],
 		responseString: ['<h1>SUCCESS</h1>Successfully inserted the meters.', '<h1>FAILURE</h1>CSVPipelineError: Failed to upload meters due to internal OED Error: Meter identifier provided ("pipe100") in request with update for meters but more than one meter in CSV so not processing'],
