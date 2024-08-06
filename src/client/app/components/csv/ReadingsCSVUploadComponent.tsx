@@ -112,6 +112,15 @@ export default function ReadingsCSVUploadComponent() {
 		}
 	}, [visibleMeters, newMeterIdentifier]);
 
+	useEffect(() => {
+		if (readingsData.cumulative === false) {
+			setReadingsData(prevData => ({
+				...prevData,
+				cumulativeReset: false
+			}));
+		}
+	}, [readingsData.cumulative]);
+
 	// This gets the meter identifier from a newly created meter and updates the readingsData settings
 	// with the meterData settings, although the settings only update if user is an admin because a
 	// CSV user doesn't have access to this data
@@ -322,9 +331,9 @@ export default function ReadingsCSVUploadComponent() {
 										</div>
 									</Label>
 									<Input
-										type='select'
 										id='cumulative'
 										name='cumulative'
+										type='select'
 										value={readingsData.cumulative ? 'true' : 'false'}
 										onChange={handleTrueFalseSelectChange}
 									>
@@ -341,17 +350,28 @@ export default function ReadingsCSVUploadComponent() {
 											{translate('meter.cumulativeReset')}
 										</div>
 									</Label>
-									<Input
-										type='select'
-										id='cumulativeReset'
-										name='cumulativeReset'
-										value={readingsData.cumulativeReset ? 'true' : 'false'}
-										onChange={handleTrueFalseSelectChange}
-									>
-										{Object.keys(TrueFalseType).map(key => {
-											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-										})}
-									</Input>
+									{readingsData.cumulative === true ? (
+										<Input
+											type='select'
+											id='cumulativeReset'
+											name='cumulativeReset'
+											value={readingsData.cumulativeReset ? 'true' : 'false'}
+											onChange={handleTrueFalseSelectChange}
+										>
+											{Object.keys(TrueFalseType).map(key => {
+												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+											})}
+										</Input>
+									) : (
+										<Input
+											id='cumulativeReset'
+											name='cumulativeReset'
+											type='select'
+											disabled
+										>
+											<option value='no'>Unavailable</option>
+										</Input>
+									)}
 								</FormGroup>
 							</Col>
 						</Row>
@@ -370,6 +390,7 @@ export default function ReadingsCSVUploadComponent() {
 										onChange={handleChange}
 										value={readingsData.cumulativeResetStart}
 										placeholder='HH:MM:SS'
+										disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
 									/>
 								</FormGroup>
 							</Col>
@@ -387,6 +408,7 @@ export default function ReadingsCSVUploadComponent() {
 										onChange={handleChange}
 										value={readingsData.cumulativeResetEnd}
 										placeholder='HH:MM:SS'
+										disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
 									/>
 								</FormGroup>
 							</Col>
