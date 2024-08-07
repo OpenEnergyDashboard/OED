@@ -17,7 +17,7 @@ import translate from '../utils/translate';
  */
 export default function LoginComponent() {
 	// Local State
-	const [email, setEmail] = useState<string>('');
+	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	// Html Element Reference used for focus()
@@ -31,7 +31,7 @@ export default function LoginComponent() {
 
 	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-		await login({ email: email, password: password })
+		await login({ username: username, password: password })
 			.unwrap()
 			.then(() => {
 				// No error, success!
@@ -49,13 +49,13 @@ export default function LoginComponent() {
 		<div>
 			<Form style={formStyle}>
 				<FormGroup>
-					<Label for='email'>{translate('email')}</Label>
+					<Label for='username'>{translate('username')}</Label>
 					<Input
-						id='email'
+						id='username'
 						type='text'
-						autoComplete='email'
-						value={email}
-						onChange={e => setEmail(e.target.value)}
+						autoComplete='username'
+						value={username}
+						onChange={e => setUsername(e.target.value)}
 					/>
 				</FormGroup>
 				<FormGroup>
@@ -73,7 +73,7 @@ export default function LoginComponent() {
 					outline
 					type='submit'
 					onClick={handleSubmit}
-					disabled={!email.length || !password.length}
+					disabled={!username.length || !password.length}
 				>
 					<FormattedMessage id='submit' />
 				</Button>
