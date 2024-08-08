@@ -110,8 +110,18 @@ export default function CreateVisualUnitMapModalComponent() {
 			.data(nodes)
 			.enter().append('circle')
 			.attr('r', 12)
-			.style('fill', '#69b3a2')
-			.text(function(d) { return d.name; });
+			.style('fill', '#69b3a2');
+
+		// label style
+		const label = svg.selectAll('.label')
+			.data(nodes)
+			.enter()
+			.append('text')
+			.text(function (d) { return d.name; })
+			.style('text-anchor', 'middle')
+			.style('fill', '#555')
+			.style('font-family', 'Arial')
+			.style('font-size', 12);
 
 		simulation.on('tick', () => {
 			link
@@ -123,6 +133,10 @@ export default function CreateVisualUnitMapModalComponent() {
 			node
 				.attr('cx', d => d.x)
 				.attr('cy', d => d.y);
+
+			label
+				.attr('x', function(d){ return d.x; })
+				.attr('y', function (d) {return d.y - 10; });
 		});
 
 	}, []); // Empty dependency array to run the effect only once
