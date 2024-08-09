@@ -5,7 +5,7 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { FormFeedback, FormGroup, Input, Label, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
+import { FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import {
 	selectChartToRender, graphSlice,
@@ -46,10 +46,6 @@ export default function IntervalControlsComponent() {
 	const [daysCustom, setDaysCustom] = React.useState<number>(duration.asDays());
 	// True if custom duration input for bar or map is active.
 	const [showCustomDuration, setShowCustomDuration] = React.useState<boolean>(false);
-	// State to manage the dropdown open status for compare period.
-	const [comparePeriodDropdownOpen, setComparePeriodDropdownOpen] = React.useState<boolean>(false);
-	// State to manage the dropdown open status for sorting order.
-	const [compareSortingDropdownOpen, setCompareSortingDropdownOpen] = React.useState<boolean>(false);
 
 	const handleChangeBarStacking = () => {
 		if (chartType === ChartTypes.bar) {
@@ -68,7 +64,7 @@ export default function IntervalControlsComponent() {
 		setDays(isCustom ? CUSTOM_INPUT : duration.asDays().toString());
 	}, [duration]);
 
-	// Returns true if this is a valid duration for bar and map.
+	// Returns true if this is a valid duration.
 	const daysValid = (days: number) => {
 		return Number.isInteger(days) && days >= MIN_DAYS && days <= MAX_DAYS;
 	};
@@ -110,76 +106,67 @@ export default function IntervalControlsComponent() {
 	};
 
 	// Updates values when the compare period menu is used.
-	const handleCompare = (comparePeriod: ComparePeriod) => {
+	const handleComparePeriodChange = (value: string) => {
 		if (chartType === ChartTypes.compare) {
-			dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod, currentTime: moment() }));
+			const period = value as unknown as ComparePeriod;
+			dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod: period, currentTime: moment() }));
 		}
 	};
 
 	// Updates sorting order when the sort order menu is used.
-	const handleSorting = (sortingOrder: SortingOrder) => {
+	const handleSortingChange = (value: string) => {
 		if (chartType === ChartTypes.compare) {
+			const sortingOrder = value as unknown as SortingOrder;
 			dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
-		}
-	};
-
-	// Updates the text in the compare period dropdown menu when switching between periods.
-	const getComparePeriodDisplayText = () => {
-		switch (comparePeriod) {
-			case ComparePeriod.Day:
-				return translate('day');
-			case ComparePeriod.Week:
-				return translate('week');
-			case ComparePeriod.FourWeeks:
-				return translate('4.weeks');
-			default:
-				return '';
-		}
-	};
-
-	// Updates the text in the sort dropdown menu when switching between sorting types.
-	const getSortDisplayText = () => {
-		switch (compareSortingOrder) {
-			case SortingOrder.Alphabetical:
-				return translate('alphabetically');
-			case SortingOrder.Ascending:
-				return translate('ascending');
-			case SortingOrder.Descending:
-				return translate('descending');
-			default:
-				return '';
 		}
 	};
 
 	return (
 		<div>
 			{chartType === ChartTypes.bar && (
-				<div className='checkbox'>
+				<div className='checkbox' style={divTopBottomPadding}>
 					<input type='checkbox' style={{ marginRight: '10px' }} onChange={handleChangeBarStacking} checked={barStacking} id='barStacking' />
 					<label htmlFor='barStacking'>{translate('bar.stacking')}</label>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.bar.stacking.tip' />
 				</div>
 			)}
-			{(chartType === ChartTypes.bar || chartType === ChartTypes.map) && (
+			{(chartType === ChartTypes.bar || chartType === ChartTypes.map || chartType === ChartTypes.compare) && (
 				<div style={divTopBottomPadding}>
 					<p style={labelStyle}>
-						{chartType === ChartTypes.bar ? translate('bar.interval') : translate('map.interval')}:
-						<TooltipMarkerComponent page='home' helpTextId={chartType === ChartTypes.bar ? 'help.home.bar.days.tip' : 'help.home.map.days.tip'} />
+						{(chartType === ChartTypes.bar && translate('bar.interval')) ||
+							(chartType === ChartTypes.map && translate('map.interval')) ||
+							(chartType === ChartTypes.compare && translate('compare.period'))}:
+						<TooltipMarkerComponent page='home' helpTextId={
+							chartType === ChartTypes.bar ? 'help.home.bar.days.tip' :
+								chartType === ChartTypes.map ? 'help.home.map.days.tip' :
+									'help.home.compare.period.tip'
+						} />
 					</p>
 					<Input
 						id='durationDays'
 						name='durationDays'
 						type='select'
-						value={days}
-						onChange={e => handleDaysChange(e.target.value)}
+						value={chartType === ChartTypes.compare ? comparePeriod?.toString() : days}
+						onChange={e => chartType === ChartTypes.compare ? handleComparePeriodChange(e.target.value) : handleDaysChange(e.target.value)}
 					>
-						<option value='1'>{translate('day')}</option>
-						<option value='7'>{translate('week')}</option>
-						<option value='28'>{translate('4.weeks')}</option>
-						<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
+						{chartType !== ChartTypes.compare && (
+							<>
+								<option value='1'>{translate('day')}</option>
+								<option value='7'>{translate('week')}</option>
+								<option value='28'>{translate('4.weeks')}</option>
+								<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
+							</>
+						)}
+						{chartType === ChartTypes.compare && (
+							<>
+								<option value={ComparePeriod.Day.toString()}>{translate('day')}</option>
+								<option value={ComparePeriod.Week.toString()}>{translate('week')}</option>
+								<option value={ComparePeriod.FourWeeks.toString()}>{translate('4.weeks')}</option>
+							</>
+						)}
 					</Input>
-					{/* This has a little more spacing at bottom than optimal. */}
-					{showCustomDuration &&
+					{/* TODO: Compare is currently not ready for a custom option. */}
+					{showCustomDuration && chartType !== ChartTypes.compare &&
 						<FormGroup>
 							<Label for='days'>{translate('bar.days.enter')}:</Label>
 							<Input id='days' name='days' type='number'
@@ -200,89 +187,32 @@ export default function IntervalControlsComponent() {
 			)}
 			{chartType === ChartTypes.map && <MapChartSelectComponent key='chart' />}
 			{chartType === ChartTypes.compare && (
-				<>
-					<div style={divTopBottomPadding}>
-						<p style={labelStyle}>
-							{translate('compare.period')}:
-							<TooltipMarkerComponent page='home' helpTextId='help.home.compare.period.tip' />
-						</p>
-						<Dropdown isOpen={comparePeriodDropdownOpen} toggle={() => setComparePeriodDropdownOpen(current => !current)}>
-							<DropdownToggle caret style={dropdownToggleStyle}>
-								{getComparePeriodDisplayText()}
-							</DropdownToggle>
-							<DropdownMenu>
-								<DropdownItem
-									active={comparePeriod === ComparePeriod.Day}
-									onClick={() => handleCompare(ComparePeriod.Day)}
-								>
-									{translate('day')}
-								</DropdownItem>
-								<DropdownItem
-									active={comparePeriod === ComparePeriod.Week}
-									onClick={() => handleCompare(ComparePeriod.Week)}
-								>
-									{translate('week')}
-								</DropdownItem>
-								<DropdownItem
-									active={comparePeriod === ComparePeriod.FourWeeks}
-									onClick={() => handleCompare(ComparePeriod.FourWeeks)}
-								>
-									{translate('4.weeks')}
-								</DropdownItem>
-								{/* TODO: Add custom option. Compare is currently not ready for this. */}
-							</DropdownMenu>
-						</Dropdown>
-					</div>
-					<div style={{ ...divTopBottomPadding, paddingTop: '0px' }}>
-						<p style={labelStyle}>
-							{translate('sort')}:
-							<TooltipMarkerComponent page='home' helpTextId='help.home.compare.sort.tip' />
-						</p>
-						<Dropdown isOpen={compareSortingDropdownOpen} toggle={() => setCompareSortingDropdownOpen(current => !current)}>
-							<DropdownToggle caret style={dropdownToggleStyle}>
-								{getSortDisplayText()}
-							</DropdownToggle>
-							<DropdownMenu>
-								<DropdownItem
-									active={compareSortingOrder === SortingOrder.Alphabetical}
-									onClick={() => handleSorting(SortingOrder.Alphabetical)}
-								>
-									{translate('alphabetically')}
-								</DropdownItem>
-								<DropdownItem
-									active={compareSortingOrder === SortingOrder.Ascending}
-									onClick={() => handleSorting(SortingOrder.Ascending)}
-								>
-									{translate('ascending')}
-								</DropdownItem>
-								<DropdownItem
-									active={compareSortingOrder === SortingOrder.Descending}
-									onClick={() => handleSorting(SortingOrder.Descending)}
-								>
-									{translate('descending')}
-								</DropdownItem>
-							</DropdownMenu>
-						</Dropdown>
-					</div>
-				</>
+				<div style={divTopBottomPadding}>
+					<p style={labelStyle}>
+						{translate('sort')}:
+						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.sort.tip' />
+					</p>
+					<Input
+						type="select"
+						value={compareSortingOrder?.toString()}
+						onChange={e => handleSortingChange(e.target.value)}
+					>
+						<option value={SortingOrder.Alphabetical.toString()}>{translate('alphabetically')}</option>
+						<option value={SortingOrder.Ascending.toString()}>{translate('ascending')}</option>
+						<option value={SortingOrder.Descending.toString()}>{translate('descending')}</option>
+					</Input>
+				</div>
 			)}
 		</div>
 	);
 }
 
 const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '15px',
+	paddingTop: '0px',
 	paddingBottom: '15px'
 };
 
 const labelStyle: React.CSSProperties = {
 	fontWeight: 'bold',
 	margin: 0
-};
-
-const dropdownToggleStyle: React.CSSProperties = {
-	backgroundColor: '#ffffff',
-	color: '#000000',
-	border: '1px solid #ced4da',
-	boxShadow: 'none'
 };
