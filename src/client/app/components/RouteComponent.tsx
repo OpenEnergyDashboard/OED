@@ -25,6 +25,7 @@ import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import ErrorComponent from './router/ErrorComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
