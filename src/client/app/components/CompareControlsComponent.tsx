@@ -13,7 +13,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent'
 import IntervalControlsComponent from './IntervalControlsComponent';
 
 /**
- * @returns controls for bar page.
+ * @returns controls for compare page.
  */
 export default function CompareControlsComponent() {
     const dispatch = useAppDispatch();

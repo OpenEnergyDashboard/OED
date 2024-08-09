@@ -7,7 +7,7 @@ import IntervalControlsComponent from './IntervalControlsComponent';
 import MapChartSelectComponent from './MapChartSelectComponent';
 
 /**
- * @returns controls for bar page.
+ * @returns controls for map page.
  */
 export default function MapControlsComponent() {
     return (
