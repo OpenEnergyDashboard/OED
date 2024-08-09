@@ -46,7 +46,7 @@ export default function CreateVisualUnitMapModalComponent() {
 		const simulation = d3.forceSimulation(nodes)
 			.force('link', d3.forceLink(links)
 				.id((d: any) => d.id)					/* Set all link ids (from data.links) */
-				.distance(60)							/* This controls how long each link is */
+				.distance(90)							/* This controls how long each link is */
 			)
 			.force('charge', d3.forceManyBody()			/* Create new many-body force */
 				.strength(-500)							/* This controls the 'repelling' force on each node */
@@ -66,7 +66,7 @@ export default function CreateVisualUnitMapModalComponent() {
 		svg.append('defs').append('marker')
 			.attr('id', 'arrow-end')
 			.attr('viewBox', '0 -5 10 10')
-			.attr('refX', 20)
+			.attr('refX', 25)
 			.attr('refY', 0)
 			.attr('markerWidth', 4)
 			.attr('markerHeight', 4)
@@ -78,7 +78,7 @@ export default function CreateVisualUnitMapModalComponent() {
 		svg.append('defs').append('marker')
 			.attr('id', 'arrow-start')
 			.attr('viewBox', '0 -5 10 10')
-			.attr('refX', 20)
+			.attr('refX', 25)
 			.attr('refY', 0)
 			.attr('markerWidth', 4)
 			.attr('markerHeight', 4)
@@ -99,7 +99,7 @@ export default function CreateVisualUnitMapModalComponent() {
 		const node = svg.selectAll('.node')
 			.data(nodes)
 			.enter().append('circle')
-			.attr('r', 16)					/* Node radius */
+			.attr('r', 20)					/* Node radius */
 			.style('fill', '#69b3a2');
 
 		/* Drag behavior */
@@ -133,7 +133,7 @@ export default function CreateVisualUnitMapModalComponent() {
 
 			label
 				.attr('x', function(d){ return d.x; })
-				.attr('y', function (d) {return d.y + 15; });
+				.attr('y', function (d) {return d.y - 25; });
 		});
 
 		// eslint-disable-next-line jsdoc/require-jsdoc
