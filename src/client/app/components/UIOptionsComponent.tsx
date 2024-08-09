@@ -7,10 +7,12 @@ import ReactTooltip from 'react-tooltip';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
+import BarControlsComponent from './BarControlsComponent';
 import ChartDataSelectComponent from './ChartDataSelectComponent';
 import ChartSelectComponent from './ChartSelectComponent';
+import CompareControlsComponent from './CompareControlsComponent';
 import DateRangeComponent from './DateRangeComponent';
-import IntervalControlsComponent from './IntervalControlsComponent';
+import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 import MoreOptionsComponent from './MoreOptionsComponent';
 
@@ -63,13 +65,13 @@ export default function UIOptionsComponent() {
 			{chartToRender == ChartTypes.line}
 
 			{/* UI options for bar graphic */}
-			{chartToRender == ChartTypes.bar && <IntervalControlsComponent />}
+			{chartToRender == ChartTypes.bar && <BarControlsComponent />}
 
 			{/* UI options for compare graphic */}
-			{chartToRender == ChartTypes.compare && <IntervalControlsComponent />}
+			{chartToRender == ChartTypes.compare && <CompareControlsComponent />}
 
 			{/* UI options for map graphic */}
-			{chartToRender == ChartTypes.map && <IntervalControlsComponent />}
+			{chartToRender == ChartTypes.map && <MapControlsComponent />}
 
 			{/* UI options for 3D graphic */}
 			{chartToRender == ChartTypes.threeD && <ReadingsPerDaySelectComponent />}
