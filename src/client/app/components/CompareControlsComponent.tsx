@@ -21,44 +21,44 @@ export default function CompareControlsComponent() {
     const chartType = useAppSelector(selectChartToRender);
 
     // This is the current sorting order for graphic
-	const compareSortingOrder = chartType === ChartTypes.compare ? useAppSelector(selectSortingOrder) : undefined;
+    const compareSortingOrder = chartType === ChartTypes.compare ? useAppSelector(selectSortingOrder) : undefined;
 
     // Updates sorting order when the sort order menu is used.
-	const handleSortingChange = (value: string) => {
-		if (chartType === ChartTypes.compare) {
-			const sortingOrder = value as unknown as SortingOrder;
-			dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
-		}
-	};
+    const handleSortingChange = (value: string) => {
+        if (chartType === ChartTypes.compare) {
+            const sortingOrder = value as unknown as SortingOrder;
+            dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
+        }
+    };
 
     return (
         <div>
             {<IntervalControlsComponent key='interval' />}
             <div style={divTopBottomPadding}>
-					<p style={labelStyle}>
-						{translate('sort')}:
-						<TooltipMarkerComponent page='home' helpTextId='help.home.compare.sort.tip' />
-					</p>
-					<Input
-						type="select"
-						value={compareSortingOrder?.toString()}
-						onChange={e => handleSortingChange(e.target.value)}
-					>
-						<option value={SortingOrder.Alphabetical.toString()}>{translate('alphabetically')}</option>
-						<option value={SortingOrder.Ascending.toString()}>{translate('ascending')}</option>
-						<option value={SortingOrder.Descending.toString()}>{translate('descending')}</option>
-					</Input>
-				</div>
+                <p style={labelStyle}>
+                    {translate('sort')}:
+                    <TooltipMarkerComponent page='home' helpTextId='help.home.compare.sort.tip' />
+                </p>
+                <Input
+                    type="select"
+                    value={compareSortingOrder?.toString()}
+                    onChange={e => handleSortingChange(e.target.value)}
+                >
+                    <option value={SortingOrder.Alphabetical.toString()}>{translate('alphabetically')}</option>
+                    <option value={SortingOrder.Ascending.toString()}>{translate('ascending')}</option>
+                    <option value={SortingOrder.Descending.toString()}>{translate('descending')}</option>
+                </Input>
+            </div>
         </div >
     );
 }
 
 const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
+    paddingTop: '0px',
+    paddingBottom: '15px'
 };
 
 const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
+    fontWeight: 'bold',
+    margin: 0
 };
