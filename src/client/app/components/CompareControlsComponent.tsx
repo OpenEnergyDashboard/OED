@@ -5,8 +5,7 @@
 import * as React from 'react';
 import { Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender, graphSlice, selectSortingOrder } from '../redux/slices/graphSlice';
-import { ChartTypes } from '../types/redux/graph';
+import { graphSlice, selectSortingOrder } from '../redux/slices/graphSlice';
 import { SortingOrder } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent'
@@ -18,17 +17,13 @@ import IntervalControlsComponent from './IntervalControlsComponent';
 export default function CompareControlsComponent() {
     const dispatch = useAppDispatch();
 
-    const chartType = useAppSelector(selectChartToRender);
-
     // This is the current sorting order for graphic
-    const compareSortingOrder = chartType === ChartTypes.compare ? useAppSelector(selectSortingOrder) : undefined;
-
+    const compareSortingOrder = useAppSelector(selectSortingOrder);
+    
     // Updates sorting order when the sort order menu is used.
     const handleSortingChange = (value: string) => {
-        if (chartType === ChartTypes.compare) {
-            const sortingOrder = value as unknown as SortingOrder;
-            dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
-        }
+        const sortingOrder = value as unknown as SortingOrder;
+        dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
     };
 
     return (
