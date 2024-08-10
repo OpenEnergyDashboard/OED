@@ -10,10 +10,10 @@ import MapChartSelectComponent from './MapChartSelectComponent';
  * @returns controls for map page.
  */
 export default function MapControlsComponent() {
-    return (
-        <div>
-            {<IntervalControlsComponent key='interval' />}
-            {<MapChartSelectComponent key='chart' />}
-        </div >
-    );
+	return (
+		<div>
+			{<IntervalControlsComponent key='interval' />}
+			{<MapChartSelectComponent key='chart' />}
+		</div >
+	);
 }
