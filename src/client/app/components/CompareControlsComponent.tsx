@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectSortingOrder } from '../redux/slices/graphSlice';
 import { SortingOrder } from '../utils/calculateCompare';
 import translate from '../utils/translate';
-import TooltipMarkerComponent from './TooltipMarkerComponent'
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 
 /**

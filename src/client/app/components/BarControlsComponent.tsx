@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectBarStacking } from '../redux/slices/graphSlice';
 import translate from '../utils/translate';
-import TooltipMarkerComponent from './TooltipMarkerComponent'
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 
 /**
