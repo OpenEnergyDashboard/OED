@@ -233,11 +233,9 @@ export default function CreateMeterModalComponent() {
 									handleNumberChange(e);
 								}}
 								invalid={!unitIsSelected}>
-								{
-									<option value={-999} key={-999} hidden disabled>
-										{translate('select.unit')}
-									</option>
-								}
+								<option value={-999} key={-999} hidden disabled>
+									{translate('select.unit')}
+								</option>
 								{
 									Array.from(compatibleUnits).map(unit =>
 										<option key={unit.id} value={unit.id}>
