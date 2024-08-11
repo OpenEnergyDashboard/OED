@@ -321,31 +321,31 @@ export default function PreferencesComponent() {
 				/>
 			</div>
 			<div className='d-flex justify-content-end mt-3'>
-					<Button
-							type='button'
-							onClick={discardChanges}
-							disabled={!hasChanges}
-							style={{ marginRight: '20px' }}
-						>
-							{translate('discard')}
-					</Button>
-					<Button
-						type='submit'
-						onClick={() =>
-							submitPreferences(localAdminPref)
-								.unwrap()
-								.then(() => {
-									showSuccessNotification(translate('updated.preferences'));
-								})
-								.catch(() => {
-									showErrorNotification(translate('failed.to.submit.changes'));
-								})
-						}
-						disabled={!hasChanges}
-					>
-						{translate('submit')}
-					</Button>
-				</div>
+				<Button
+					type='button'
+					onClick={discardChanges}
+					disabled={!hasChanges}
+					style={{ marginRight: '20px' }}
+				>
+					{translate('discard')}
+				</Button>
+				<Button
+					type='submit'
+					onClick={() =>
+						submitPreferences(localAdminPref)
+							.unwrap()
+							.then(() => {
+								showSuccessNotification(translate('updated.preferences'));
+							})
+							.catch(() => {
+								showErrorNotification(translate('failed.to.submit.changes'));
+							})
+					}
+					disabled={!hasChanges}
+				>
+					{translate('submit')}
+				</Button>
+			</div>
 		</div >
 	);
 }
