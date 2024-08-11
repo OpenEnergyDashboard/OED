@@ -8,6 +8,7 @@ import * as React from 'react';
 import {
 	selectAreaUnit, selectBarWidthDays,
 	selectGraphAreaNormalization, selectSelectedGroups,
+	selectSelectedMap,
 	selectSelectedMeters, selectSelectedUnit
 } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
@@ -56,7 +57,7 @@ export default function MapChartComponent() {
 
 	// RTK Types Disagree with maps ts types so, use old until migration completer for maps.
 	// This is also an issue when trying to refactor maps reducer into slice.
-	const selectedMap = useAppSelector(state => state.maps.selectedMap);
+	const selectedMap = useAppSelector(selectSelectedMap);
 	const map = useAppSelector(state => selectMapById(state, selectedMap));
 
 	if (meterIsFetching || groupIsFetching) {

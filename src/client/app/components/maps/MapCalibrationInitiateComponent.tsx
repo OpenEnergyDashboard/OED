@@ -10,6 +10,7 @@ import { logsApi } from '../../redux/api/logApi';
 import { selectMapById } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { selectSelectedMap } from '../../redux/slices/graphSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 
@@ -44,12 +45,7 @@ export default function MapCalibrationInitiateComponent() {
 	const [mapName, setMapName] = React.useState<string>('');
 	const [angle, setAngle] = React.useState<string>('');
 	const fileRef = React.useRef<HTMLInputElement>(null);
-	const mapData = useAppSelector(state => selectMapById(state, state.maps.selectedMap));
-	// const [mapData] = useAppSelector(state => selectEntityDisplayData(state, {
-	// 	type: EntityType.MAP,
-	// 	id: state.localEdits.mapCalibration.calibratingMap
-	// }));
-
+	const mapData = useAppSelector(state => selectMapById(state, selectSelectedMap(state)));
 
 	const notify = (key: 'map.bad.number' | 'map.bad.digita' | 'map.bad.digitb' | 'map.bad.load' | 'map.bad.name') => {
 		showErrorNotification(translate(key));

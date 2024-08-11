@@ -5,9 +5,8 @@ import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
-import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
-import MapsDetailComponent from './maps/MapsDetailComponent';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import AppLayout from './AppLayout';
@@ -17,14 +16,15 @@ import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
+import { MapCalibrationComponent2 } from './maps/MapCalibrationComponent';
+import MapsDetailComponent from './maps/MapsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
+import ErrorComponent from './router/ErrorComponent';
 import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
-import ErrorComponent from './router/ErrorComponent';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
-					{ path: 'calibration', element: <MapCalibrationContainer /> },
+					{ path: 'calibration', element: <MapCalibrationComponent2 /> },
 					{ path: 'maps', element: <MapsDetailComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },

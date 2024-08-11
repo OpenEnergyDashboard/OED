@@ -4,17 +4,17 @@
 
 // TODO: Migrate to RTK
 
+import * as moment from 'moment';
 import { ActionType, Dispatch, GetState, Thunk } from '../../types/redux/actions';
 import * as t from '../../types/redux/map';
 import { CalibrationModeTypes, MapData, MapMetadata } from '../../types/redux/map';
-import { calibrate, CalibratedPoint, CalibrationResult, CartesianPoint, Dimensions, GPSPoint } from '../../utils/calibration';
 import { State } from '../../types/redux/state';
-import MapsApi from '../../utils/api/MapsApi';
 import ApiBackend from '../../utils/api/ApiBackend';
+import MapsApi from '../../utils/api/MapsApi';
+import { calibrate, CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint } from '../../utils/calibration';
+import { browserHistory } from '../../utils/history';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
-import * as moment from 'moment';
-import { browserHistory } from '../../utils/history';
 import { logToServer } from './logs';
 
 const mapsApi = new MapsApi(new ApiBackend());
@@ -160,7 +160,7 @@ export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	};
 }
 
-function hasCartesian(point: CalibratedPoint) {
+export function hasCartesian(point: CalibratedPoint) {
 	return point.cartesian.x !== -1 && point.cartesian.y !== -1;
 }
 
@@ -189,13 +189,9 @@ function isReadyForCalculation(state: State): boolean {
 function prepareDataToCalculation(state: State): CalibrationResult {
 	const mapID = state.maps.calibratingMap;
 	const mp = state.maps.editedMaps[mapID];
-	const imageDimensions: Dimensions = {
-		width: mp.imgWidth,
-		height: mp.imgHeight
-	};
 	// Since mp is defined above, calibrationSet is defined.
 	/* eslint-disable @typescript-eslint/no-non-null-assertion */
-	const result = calibrate(mp.calibrationSet!, imageDimensions, mp.northAngle);
+	const result = calibrate(mp);
 	return result;
 	/* eslint-enable @typescript-eslint/no-non-null-assertion */
 }

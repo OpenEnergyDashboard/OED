@@ -4,13 +4,10 @@
 
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../../store';
-// TODO Should be env variable?
-const baseHref = (document.getElementsByTagName('base')[0] || {}).href;
 
 export const baseApi = createApi({
 	reducerPath: 'api',
 	baseQuery: fetchBaseQuery({
-		baseUrl: baseHref,
 		prepareHeaders: (headers, { getState }) => {
 			const state = getState() as RootState;
 			// For each api call attempt to set the JWT token in the request header
@@ -21,7 +18,6 @@ export const baseApi = createApi({
 		},
 		// Default Behavior assumes all responses are json
 		// use content type because API responses are varied
-		// TODO Validate Behavior against all endpoints
 		responseHandler: 'content-type'
 	}),
 	// The types of tags that any injected endpoint may, provide, or invalidate.

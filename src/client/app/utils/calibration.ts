@@ -177,12 +177,19 @@ export function gpsToUserGrid(size: Dimensions, gps: GPSPoint, originGPS: GPSPoi
  * origin and opposite points. It also calculates the relative error for this
  * scale by finding the maximum difference between the calculated scale and the
  * one from each pair of calibration points. It returns all three of these values.
- * @param calibrationSet All the points clicked by the user for calibration.
- * @param imageDimensions The dimensions of the original map to use from the user.
- * @param northAngle The angle between true north and straight up on the map image.
+ * @param map TODO
+ * calibrationSet All the points clicked by the user for calibration.
+ * imageDimensions The dimensions of the original map to use from the user.
+ * northAngle The angle between true north and straight up on the map image.
  * @returns The error and the origin & opposite point in GPS to use for mapping.
  */
-export function calibrate(calibrationSet: CalibratedPoint[], imageDimensions: Dimensions, northAngle: number): CalibrationResult {
+export function calibrate(map: MapMetadata): CalibrationResult {
+	const { calibrationSet, northAngle } = map;
+	const imageDimensions: Dimensions = {
+		width: map.imgWidth,
+		height: map.imgHeight
+	};
+	// calibrationSet: CalibratedPoint[], imageDimensions: Dimensions, northAngle: number
 	// Normalize dimensions to grid used in Plotly
 	const normalizedDimensions = normalizeImageDimensions(imageDimensions);
 	// Array to hold the map scale for each pair of points.

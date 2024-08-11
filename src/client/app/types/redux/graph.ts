@@ -60,6 +60,7 @@ export interface GraphState {
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;
+	selectedMap: number;
 	selectedAreaUnit: AreaUnitType;
 	rangeSliderInterval: TimeInterval;
 	barDuration: moment.Duration;

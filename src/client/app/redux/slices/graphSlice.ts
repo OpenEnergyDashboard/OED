@@ -17,12 +17,15 @@ import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } 
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
+import { mapsApi } from '../../redux/api/mapsApi';
 
 const defaultState: GraphState = {
 	selectedMeters: [],
 	selectedGroups: [],
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
+	// TODO appropriate default value?
+	selectedMap: 0,
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	barDuration: moment.duration(4, 'weeks'),
@@ -58,6 +61,9 @@ export const graphSlice = createSlice({
 	name: 'graph',
 	initialState: initialState,
 	reducers: {
+		updateSelectedMaps: (state, action: PayloadAction<number>) => {
+			state.current.selectedMap = action.payload;
+		},
 		updateSelectedMeters: (state, action: PayloadAction<number[]>) => {
 			state.current.selectedMeters = action.payload;
 		},
@@ -355,6 +361,16 @@ export const graphSlice = createSlice({
 					});
 				}
 			)
+			.addMatcher(
+				mapsApi.endpoints.getMapDetails.matchFulfilled,
+				({ current }, action) => {
+					// On Fetch fulfilled
+					// If there is only one map, selectedMap is the id of the only map. ie; display map automatically if only 1 map
+					if (!current.hotlinked && action.payload.ids.length === 1) {
+						current.selectedMap = action.payload.ids[0];
+					}
+				}
+			)
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
 				if (!current.hotlinked) {
 					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload;
@@ -374,6 +390,7 @@ export const graphSlice = createSlice({
 		selectBarStacking: state => state.current.barStacking,
 		selectBarWidthDays: state => state.current.barDuration,
 		selectMapBarWidthDays: state => state.current.mapsBarDuration,
+		selectSelectedMap: state => state.current.selectedMap,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
 		selectChartToRender: state => state.current.chartToRender,
@@ -411,7 +428,7 @@ export const {
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectMapBarWidthDays
+	selectMapBarWidthDays, selectSelectedMap
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -428,6 +445,7 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateMapsBarDuration
+	updateSelectedMetersOrGroups, updateMapsBarDuration,
+	updateSelectedMaps
 } = graphSlice.actions;
 

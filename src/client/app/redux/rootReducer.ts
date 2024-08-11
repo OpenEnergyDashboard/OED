@@ -8,14 +8,16 @@ import { adminSlice } from './slices/adminSlice';
 import { appStateSlice } from './slices/appStateSlice';
 import { currentUserSlice } from './slices/currentUserSlice';
 import { graphSlice } from './slices/graphSlice';
-import maps from './reducers/maps';
+// import maps from './reducers/maps';
+import { localEditsSlice } from './slices/localEditsSlice';
 
 export const rootReducer = combineReducers({
 	appState: appStateSlice.reducer,
 	graph: graphSlice.reducer,
 	admin: adminSlice.reducer,
 	currentUser: currentUserSlice.reducer,
+	localEdits: localEditsSlice.reducer,
 	// RTK Query's Derived Reducers
-	[baseApi.reducerPath]: baseApi.reducer,
-	maps
+	[baseApi.reducerPath]: baseApi.reducer
+	// maps
 });

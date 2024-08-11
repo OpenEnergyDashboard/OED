@@ -4,6 +4,7 @@
 
 import { sortBy } from 'lodash';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMapById } from '../../redux/api/mapsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { selectChartLinkHideOptions } from '../../redux/slices/appStateSlice';
@@ -19,10 +20,9 @@ import {
 } from '../../utils/calibration';
 import { metersInGroup, unitsCompatibleWithMeters } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { selectMapState } from '../selectors/maps';
 import {
 	selectChartToRender, selectGraphAreaNormalization, selectGraphState,
-	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit, selectSliderRangeInterval
+	selectSelectedGroups, selectSelectedMap, selectSelectedMeters, selectSelectedUnit, selectSliderRangeInterval
 } from '../slices/graphSlice';
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
@@ -131,11 +131,12 @@ export const selectChartTypeCompatibility = createAppSelector(
 	[
 		selectCurrentAreaCompatibility,
 		selectChartToRender,
+		selectSelectedMap,
 		selectMeterDataById,
 		selectGroupDataById,
-		selectMapState
+		state => selectMapById(state, selectSelectedMap(state))
 	],
-	(areaCompat, chartToRender, meterDataById, groupDataById, mapState) => {
+	(areaCompat, chartToRender, selectedMap, meterDataById, groupDataById, selectedMapMetadata) => {
 		// Deep Copy previous selector's values, and update as needed based on current ChartType(s)
 		const compatibleMeters = new Set<number>(Array.from(areaCompat.compatibleMeters));
 		const incompatibleMeters = new Set<number>(Array.from(areaCompat.incompatibleMeters));
@@ -144,13 +145,12 @@ export const selectChartTypeCompatibility = createAppSelector(
 		const incompatibleGroups = new Set<number>(Array.from(areaCompat.incompatibleGroups));
 
 		// ony run this check if we are displaying a map chart
-		if (chartToRender === ChartTypes.map && mapState.selectedMap !== 0) {
-			const mp = mapState.byMapID[mapState.selectedMap];
+		if (chartToRender === ChartTypes.map && selectedMap !== 0) {
 			// filter meters;
 			// The size of the original map loaded into OED.
 			const imageDimensions: Dimensions = {
-				width: mp.imgWidth,
-				height: mp.imgHeight
+				width: selectedMapMetadata.imgWidth,
+				height: selectedMapMetadata.imgHeight
 			};
 			// Determine the dimensions so within the Plotly coordinates on the user map.
 			const imageDimensionNormalized = normalizeImageDimensions(imageDimensions);
@@ -167,19 +167,19 @@ export const selectChartTypeCompatibility = createAppSelector(
 			// and upper, right corners of the user map.
 			// The gps value can be null from the database. Note using gps !== null to check for both null and undefined
 			// causes TS to complain about the unknown case so not used.
-			const origin = mp.origin;
-			const opposite = mp.opposite;
+			const origin = selectedMapMetadata.origin;
+			const opposite = selectedMapMetadata.opposite;
 			compatibleMeters.forEach(meterID => {
 				// This meter's GPS value.
 				const gps = meterDataById[meterID].gps;
-				if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
+				if (origin && opposite && gps) {
 					// Get the GPS degrees per unit of Plotly grid for x and y. By knowing the two corners
 					// (or really any two distinct points) you can calculate this by the change in GPS over the
 					// change in x or y which is the map's width & height in this case.
-					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
+					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, selectedMapMetadata.northAngle);
 					// Convert GPS of meter to grid on user map. See calibration.ts for more info on this.
-					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
-					if (!(itemMapInfoOk(meterID, DataType.Meter, mp, gps) &&
+					const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, selectedMapMetadata.northAngle);
+					if (!(itemMapInfoOk(meterID, DataType.Meter, selectedMapMetadata, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid))) {
 						incompatibleMeters.add(meterID);
 					}
@@ -192,10 +192,10 @@ export const selectChartTypeCompatibility = createAppSelector(
 			// The below code follows the logic for meters shown above. See comments above for clarification on the below code.
 			compatibleGroups.forEach(groupID => {
 				const gps = groupDataById[groupID].gps;
-				if (origin !== undefined && opposite !== undefined && gps !== undefined && gps !== null) {
-					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, mp.northAngle);
-					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, mp.northAngle);
-					if (!(itemMapInfoOk(groupID, DataType.Group, mp, gps) &&
+				if (origin && opposite && gps) {
+					const scaleOfMap = calculateScaleFromEndpoints(origin, opposite, imageDimensionNormalized, selectedMapMetadata.northAngle);
+					const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, selectedMapMetadata.northAngle);
+					if (!(itemMapInfoOk(groupID, DataType.Group, selectedMapMetadata, gps) &&
 						itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid))) {
 						incompatibleGroups.add(groupID);
 					}
@@ -435,7 +435,7 @@ export const selectChartLink = createAppSelector(
 		selectGraphState,
 		selectChartLinkHideOptions,
 		selectSliderRangeInterval,
-		state => state.maps.selectedMap
+		selectSelectedMap
 	],
 	(current, chartLinkHideOptions, rangeSliderInterval, selectedMap) => {
 		// Determine the beginning of the URL to add arguments to.

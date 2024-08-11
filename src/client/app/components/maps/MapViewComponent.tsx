@@ -7,10 +7,10 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { LocaleDataKey } from 'translations/data';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { selectMapById } from '../../redux/selectors/maps';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
 import EditMapModalComponent from './EditMapModalComponent';
+import { selectMapById } from '../../redux/api/mapsApi';
 interface MapViewProps {
 	mapID: number;
 }
@@ -18,7 +18,7 @@ interface MapViewProps {
 //TODO: Migrate to RTK
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
-	const map = useAppSelector(selectMapById(mapID));
+	const map = useAppSelector(state => selectMapById(state, mapID));
 
 	// Helper function checks map to see if it's calibrated
 	const getCalibrationStatus = () => {

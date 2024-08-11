@@ -1,6 +1,7 @@
 import { createEntityAdapter, EntityState } from '@reduxjs/toolkit';
 import { pick } from 'lodash';
 import * as moment from 'moment';
+import { createAppSelector } from '../../redux/selectors/selectors';
 import { RootState } from '../../store';
 import { MapData, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -115,7 +116,6 @@ export const mapsApi = baseApi.injectEndpoints({
 							showSuccessNotification(translate('updated.map.without.calibration'));
 						}
 						// Cleanup LocalEditsSLice
-						// TODO Centralize localEditCleanup. Should be same as others.
 						// api.dispatch(localEditsSlice.actions.removeOneEdit({ type: EntityType.MAP, id: map.id }));
 					}).catch(() => {
 						showErrorNotification(translate('failed.to.edit.map'));
@@ -145,3 +145,11 @@ export const {
 	selectEntities: selectMapDataById,
 	selectTotal: selectTotalMaps
 } = mapsAdapter.getSelectors(selectMapApiData);
+
+export const selectMapSelectOptions = createAppSelector(
+	[selectAllMaps],
+	allMaps => allMaps.map(map => (
+		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) }
+	)));
+
+
