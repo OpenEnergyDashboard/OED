@@ -6,8 +6,7 @@ import * as moment from 'moment';
 import { processGraphLink } from '../../redux/actions/extraActions';
 import { mapsApi } from '../../redux/api/mapsApi';
 import { LanguageTypes } from '../../types/redux/i18n';
-import { deleteToken, getToken, hasToken } from '../../utils/token';
-import { fetchMapsDetails } from '../actions/map';
+import { getToken, hasToken } from '../../utils/token';
 import { authApi } from '../api/authApi';
 import { conversionsApi } from '../api/conversionsApi';
 import { groupsApi } from '../api/groupsApi';
@@ -61,6 +60,7 @@ export const appStateSlice = createThunkSlice({
 			async (_: void, { dispatch }) => {
 				// These queries will trigger a api request, and add a subscription to the store.
 				// Typically they return an unsubscribe method, however we always want to be subscribed to any cache changes for these endpoints.
+				// Unlike QueryHooks used in other components, these Queries will remain indefinitely subscribed;
 				dispatch(preferencesApi.endpoints.getPreferences.initiate());
 				dispatch(versionApi.endpoints.getVersion.initiate());
 				dispatch(unitsApi.endpoints.getUnitsDetails.initiate());
@@ -68,7 +68,7 @@ export const appStateSlice = createThunkSlice({
 				dispatch(conversionsApi.endpoints.getCikDetails.initiate());
 
 				// Older style thunk fetch cycle for maps until migration
-				dispatch(fetchMapsDetails());
+				// dispatch(fetchMapsDetails());
 
 				// If user is an admin, they receive additional meter details.
 				// To avoid sending duplicate requests upon startup, verify user then fetch
@@ -89,7 +89,6 @@ export const appStateSlice = createThunkSlice({
 					} catch {
 						// User had a token that isn't valid or getUserDetails threw an error.
 						// Assume token is invalid. Delete if any
-						deleteToken();
 						dispatch(currentUserSlice.actions.clearCurrentUser());
 					}
 
@@ -101,6 +100,7 @@ export const appStateSlice = createThunkSlice({
 
 			},
 			{
+				// Callback triggers when thunk completes, on either success OR failure.
 				settled: state => {
 					state.initComplete = true;
 				}

@@ -60,6 +60,8 @@ const initialState: History<GraphState> = {
 export const graphSlice = createSlice({
 	name: 'graph',
 	initialState: initialState,
+	// Current History Implementation tracks ANY action defined in 'reducers' using IsAnyOf(...graphslice.actions)
+	// To update the current graphState without causing a history entry to be created, utilize the 'Extra Reducers' property
 	reducers: {
 		updateSelectedMaps: (state, action: PayloadAction<number>) => {
 			state.current.selectedMap = action.payload;
@@ -247,6 +249,8 @@ export const graphSlice = createSlice({
 
 	},
 	extraReducers: builder => {
+		// Current History Implementation tracks ANY action defined in 'reducers'
+		// To update graphState without causing a history entry to be created, utilize the 'Extra Reducers' property
 		builder
 			.addCase(
 				updateHistory,
