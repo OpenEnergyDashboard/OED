@@ -320,32 +320,32 @@ export default function PreferencesComponent() {
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
 				/>
 			</div>
-			
-			<Button
-					type='button'
-					onClick={discardChanges}
-					disabled={!hasChanges}
-					className='mr-2'
-				>
-					{translate('discard')}
-				</Button>
-			<Button
-				type='submit'
-				onClick={() =>
-					submitPreferences(localAdminPref)
-						.unwrap()
-						.then(() => {
-							showSuccessNotification(translate('updated.preferences'));
-						})
-						.catch(() => {
-							showErrorNotification(translate('failed.to.submit.changes'));
-						})
-				}
-				disabled={!hasChanges}
-				className='align-self-end mt-3'
-			>
-				{translate('submit')}
-			</Button>
+			<div className='d-flex justify-content-end mt-3'>
+					<Button
+							type='button'
+							onClick={discardChanges}
+							disabled={!hasChanges}
+							style={{ marginRight: '20px' }}
+						>
+							{translate('discard')}
+					</Button>
+					<Button
+						type='submit'
+						onClick={() =>
+							submitPreferences(localAdminPref)
+								.unwrap()
+								.then(() => {
+									showSuccessNotification(translate('updated.preferences'));
+								})
+								.catch(() => {
+									showErrorNotification(translate('failed.to.submit.changes'));
+								})
+						}
+						disabled={!hasChanges}
+					>
+						{translate('submit')}
+					</Button>
+				</div>
 		</div >
 	);
 }
