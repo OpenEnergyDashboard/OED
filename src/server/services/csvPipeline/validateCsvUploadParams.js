@@ -90,8 +90,9 @@ const COMMON_PROPERTIES = {
 	username: new StringParam('username', undefined, undefined),
 	// TODO:
 	// Allowing for backwards compatibility to allow for curl users to use the 'email' parameter instead of
-	// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
-	// or continue to allow this backwards compatibility
+	// the 'username' parameter to login. Also allowing to use 'meterName' vs 'meterIdentifier'. Developers need
+	// to decide in the future if we should deprecate email & meterName or continue to allow this backwards compatibility.
+	meterName: new StringParam('meterName', undefined, undefined),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
 	gzip: new EnumParam('gzip', BooleanCheckArray),
@@ -111,7 +112,6 @@ const VALIDATION = {
 	},
 	readings: {
 		type: 'object',
-		required: ['meterIdentifier'],
 		properties: {
 			...COMMON_PROPERTIES,
 			cumulative: new EnumParam('cumulative', BooleanCheckArray),
@@ -128,6 +128,10 @@ const VALIDATION = {
 			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
 			useMeterZone: new EnumParam('useMeterZone', BooleanCheckArray),
 		},
+		anyOf: [
+			{ required: ['meterIdentifier'] },
+			{ required: ['meterName'] }
+		],
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
 }

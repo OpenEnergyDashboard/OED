@@ -17,21 +17,35 @@ const Meter = require('../../models/Meter');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterIdentifier, headerRow, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
+	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = normalizeBoolean(headerRow);
 	const shouldUpdate = normalizeBoolean(update);
 	let shouldHonorDst = normalizeBoolean(honorDst);
 	let shouldRelaxedParsing = normalizeBoolean(relaxedParsing);
 	let shouldUseMeterZone = normalizeBoolean(useMeterZone);
-	let meter = await Meter.getByIdentifier(meterIdentifier, conn)
-		.catch(async err => {
-			// If Meter does not exist, we do not know what to do with the readings so we error out.
-			throw new CSVPipelineError(
-				`User Error: Meter with identifier '${meterIdentifier}' not found.`,
-				err.message
-			);
-		});
+	// TODO:
+	// Allowing for backwards compatibility if any users are still using the 'meterName' parameter instead of
+	// the 'meterIdentifier' parameter to login. Developers need to decide in the future if we should deprecate
+	// using 'meterName' or continue to allow this backwards compatibility
+	let meter;
+	try {
+		if (meterIdentifier) {
+			meter = await Meter.getByIdentifier(meterIdentifier, conn);
+		} else {
+			meter = await Meter.getByName(meterName, conn);
+		}
+	} catch (error) {
+		// If Meter does not exist, we do not know what to do with the readings so we error out.
+		let errorMessage = meterIdentifier
+		? `User Error: Meter with identifier '${meterIdentifier}' not found.`
+		: `User Error: Meter with name '${meterName}' not found.`;
+
+		throw new CSVPipelineError(
+			errorMessage,
+			error.message
+		);
+	}
 	// Handle other parameter defaults
 	let { timeSort, duplications, cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 		lengthGap, lengthVariation, endOnly } = req.body;
