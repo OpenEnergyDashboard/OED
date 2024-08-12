@@ -327,7 +327,7 @@ export default function PreferencesComponent() {
 					disabled={!hasChanges}
 					style={{ marginRight: '20px' }}
 				>
-					{translate('discard')}
+					{translate('discard.changes')}
 				</Button>
 				<Button
 					type='submit'
