@@ -91,13 +91,20 @@ export default function IntervalControlsComponent() {
 		}
 	};
 
-	// Updates values when the compare period menu is used.
-	const handleComparePeriodChange = (value: string) => {
-		if (chartType === ChartTypes.compare) {
-			const period = value as unknown as ComparePeriod;
-			dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod: period, currentTime: moment() }));
-		}
-	};
+	// Define the initial set of options for the dropdown when the chart type is not 'compare'.
+	const options = [
+		{ label: 'day', value: '1' },
+		{ label: 'week', value: '7' },
+		{ label: '4.weeks', value: '28' }
+	];
+
+	// If the chart type is 'compare', we change the options to reflect comparison periods.
+	if (chartType === ChartTypes.compare) {
+		options.length = 0; // Clear the previous options
+		Object.entries(ComparePeriod).forEach(([key, value]) => {
+			options.push({ label: key, value: value.toString() });
+		});
+	}
 
 	return (
 		<div>
@@ -117,23 +124,16 @@ export default function IntervalControlsComponent() {
 					name='durationDays'
 					type='select'
 					value={chartType === ChartTypes.compare ? comparePeriod?.toString() : days}
-					onChange={e => chartType === ChartTypes.compare ? handleComparePeriodChange(e.target.value) : handleDaysChange(e.target.value)}
+					onChange={e => handleDaysChange(e.target.value)}
 				>
-					{chartType !== ChartTypes.compare && (
-						<>
-							<option value='1'>{translate('day')}</option>
-							<option value='7'>{translate('week')}</option>
-							<option value='28'>{translate('4.weeks')}</option>
-							<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
-						</>
-					)}
-					{chartType === ChartTypes.compare && (
-						<>
-							<option value={ComparePeriod.Day.toString()}>{translate('day')}</option>
-							<option value={ComparePeriod.Week.toString()}>{translate('week')}</option>
-							<option value={ComparePeriod.FourWeeks.toString()}>{translate('4.weeks')}</option>
-						</>
-					)}
+					{options.map(option => (
+						<option value={option.value} key={option.label}>
+							{translate(option.label)}
+						</option>
+					))}
+					<option value={CUSTOM_INPUT}>
+						{translate('custom.value')}
+					</option>
 				</Input>
 				{/* TODO: Compare is currently not ready for a custom option. */}
 				{showCustomDuration && chartType !== ChartTypes.compare &&
