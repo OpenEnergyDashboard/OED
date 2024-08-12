@@ -36,13 +36,13 @@ const normalizeBoolean = (input) => {
 		case false:
 			return false;
 		default:
-			return input; // Return the original value if it does not match any of the boolean representations
+			return 'normalizeBoolean error'; // Return the original value if it does not match any of the boolean representations
 	}
 };
 
 // This is to allow curl users to still send 'yes' and 'no' for parameters sent,
 // The frontend will just use standard boolean values to send to the API
-BooleanCheckArray = ['yes', 'no', 'true', 'false', true, false];
+const BooleanCheckArray = ['yes', 'no', 'true', 'false', true, false];
 
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
 // a choice for a particular parameter, then these defaults will be used.
@@ -64,8 +64,8 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
-		cumulative: false,
-		cumulativeReset: false,
+		cumulative: undefined,
+		cumulativeReset: undefined,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
 		duplications: undefined,
@@ -161,7 +161,6 @@ function validateRequestParams(body, schema) {
 	}
 }
 
-
 /**
  * Middleware that validates a request to upload readings via the CSV Pipeline and sets defaults for upload parameters.
  * @param {express.Request} req 
@@ -175,35 +174,39 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
+	
+	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
+		relaxedParsing, useMeterZone } = req.body; // extract query parameters
 
-	const { cumulative, duplications,
-		gzip, headerRow, timeSort, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
-	if (!cumulative) {
+	if (cumulative === undefined) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
 	}
-	if (!duplications) {
+	if (cumulativeReset === undefined) {
+		req.body.cumulativeReset = DEFAULTS.readings.cumulativeReset;
+	}
+	if (duplications === undefined) {
 		req.body.duplications = DEFAULTS.readings.duplications;
 	}
-	if (!gzip) {
+	if (gzip === undefined) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
-	if (!headerRow) {
+	if (headerRow === undefined) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
-	if (!timeSort) {
+	if (timeSort === undefined) {
 		req.body.timeSort = DEFAULTS.readings.timeSort;
 	}
-	if (!update) {
+	if (update === undefined) {
 		req.body.update = DEFAULTS.common.update;
 	}
-	if (!honorDst) {
+	if (honorDst === undefined) {
 		req.body.honorDst = DEFAULTS.readings.honorDst;
 	}
-	if (!relaxedParsing) {
+	if (relaxedParsing === undefined) {
 		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
 	}
-	if (!useMeterZone) {
+	if (useMeterZone === undefined) {
 		req.body.useMeterZone = DEFAULTS.readings.useMeterZone;
 	}
 	next();
@@ -226,13 +229,13 @@ function validateMetersCsvUploadParams(req, res, next) {
 	const { gzip, headerRow, update } = req.body; // Extract query parameters
 
 	// Set default values of not supplied parameters.
-	if (!gzip) {
+	if (gzip === undefined) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
-	if (!headerRow) {
+	if (headerRow === undefined) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
-	if (!update) {
+	if (update === undefined) {
 		req.body.update = DEFAULTS.common.update;
 	}
 	next();

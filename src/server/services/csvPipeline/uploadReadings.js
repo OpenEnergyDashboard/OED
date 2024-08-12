@@ -82,7 +82,7 @@ async function uploadReadings(req, res, filepath, conn) {
 	} else {
 		readingTimeSort = timeSort;
 	}
-	
+
 	if (cumulative === undefined) {
 		if (meter.cumulative === null) {
 			// This probably should not happen with a new DB but keep just in case.
