@@ -19,7 +19,12 @@ class EgaugeRequestor {
 		// Information expected by the eGauge API and needed by OED.
 		const url = new URL(`https://${meter.url}`);
 		this.apiUrl = `${url.origin}/api`; // can we add an ending slash??
-		this.username = url.searchParams.get('username');
+		// TODO:
+		// Allowing for backwards compatibility if previous eGuage meters are using the 'email' parameter instead of
+		// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+		// or continue to allow this backwards compatibility
+		const username = url.searchParams.get('username') || url.searchParams.get('email');
+		this.username = username;
 		this.password = url.searchParams.get('password');
 		this.registerName = url.searchParams.get('registerName');
 		this.meter = meter;
