@@ -3,14 +3,12 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Col, Input, FormGroup, FormText, Label } from 'reactstrap';
+import { Col, Input, FormGroup, Label } from 'reactstrap';
+import translate from '../utils/translate';
 
 interface FileUploader {
-	reference: React.RefObject<HTMLInputElement>;
-	required: boolean;
-	formText: string;
-	labelStyle?: React.CSSProperties;
+	isInvalid: boolean;
+	onFileChange: (file: File | null) => void;
 }
 
 /**
@@ -19,17 +17,28 @@ interface FileUploader {
  * @returns File uploader element
  */
 export default function FileUploaderComponent(props: FileUploader) {
+
+	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0] || null;
+		props.onFileChange(file);
+	};
+
 	return (
 		<FormGroup>
-			<Label style={props.labelStyle}>
-				<FormattedMessage id='csv.file' />
+			<Label for='csvfile'>
+				<div className='pb-1'>
+					{translate('csv.file')}
+				</div>
 			</Label>
 			<Col>
-				<Input innerRef={props.reference} type='file' name='csvfile' required={props.required} />
+				<Input
+					type='file'
+					name='csvfile'
+					id='csvfile'
+					onChange={handleFileChange}
+					invalid={!props.isInvalid}
+				/>
 			</Col>
-			<FormText color='muted'>
-				<FormattedMessage id={props.formText}/>
-			</FormText>
 		</FormGroup>
 	);
 }

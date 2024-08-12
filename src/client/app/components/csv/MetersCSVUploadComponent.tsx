@@ -3,108 +3,207 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { FormattedMessage } from 'react-intl';
-import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
-import { MODE } from '../../containers/csv/UploadCSVContainer';
-import { MetersCSVUploadProps } from '../../types/csvUploadForm';
+import { Button, Col, Container, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import { MetersCSVUploadPreferences } from '../../types/csvUploadForm';
+import { submitMeters } from '../../utils/api/UploadCSVApi';
+import { MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import translate from '../../utils/translate';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
-import { AppDispatch } from '../../store';
-import { baseApi } from '../../redux/api/baseApi';
-import { connect } from 'react-redux';
-const mapDispatchToProps = (dispatch: AppDispatch) => {
-	return {
-		resetApiCache: () => dispatch(baseApi.util.invalidateTags(['MeterData']))
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { authApi, authPollInterval } from '../../redux/api/authApi';
+import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
+import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
+
+/**
+ * Defines the CSV Meters page
+ * @returns CSV Meters page element
+ */
+export default function MetersCSVUploadComponent() {
+	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferences>(MetersCSVUploadDefaults);
+	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
+	const dispatch = useAppDispatch();
+	// Check for admin status
+	const isAdmin = useAppSelector(selectIsAdmin);
+	// page may contain admin info so verify admin status while admin is authenticated.
+	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
+	// We only want displayable meters if non-admins because they still have
+	// non-displayable in state.
+	const { visibleMeters } = useAppSelector(selectVisibleMeterAndGroupData);
+	// tracks whether or not a meter has been selected
+	const meterIsSelected = meterData.meterIdentifier !== '';
+
+	const handleSelectedMeterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setMeterData(prevData => ({
+			...prevData,
+			[name]: value
+		}));
 	};
-};
-type ResetProp = { resetApiCache: () => void }
-type MetersCsvUploadPropWithCacheDispatch = MetersCSVUploadProps & ResetProp
-class MetersCSVUploadComponent extends React.Component<MetersCsvUploadPropWithCacheDispatch> {
-	private fileInput: React.RefObject<HTMLInputElement>;
 
-	constructor(props: MetersCsvUploadPropWithCacheDispatch) {
-		super(props);
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleSetMeterName = this.handleSetMeterName.bind(this);
-		this.fileInput = React.createRef<HTMLInputElement>();
-	}
+	const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, checked } = e.target;
+		setMeterData(prevData => ({
+			...prevData,
+			[name]: checked
+		}));
+	};
 
-	private async handleSubmit(e: React.MouseEvent<HTMLFormElement>) {
-		try {
-			e.preventDefault();
-			const current = this.fileInput.current as HTMLInputElement;
-			const { files } = current;
-			if (files && (files as FileList).length !== 0) {
-				await this.props.submitCSV(files[0]);
-				// TODO Using an alert is not the best. At some point this should be integrated
-				// with react.
-				showSuccessNotification('<h1>SUCCESS</h1>The meter upload was a success.');
-			}
-		} catch (error) {
-			// A failed axios request should result in an error.
-			showErrorNotification(error.response.data as string);
+	const handleFileChange = (file: File) => {
+		setSelectedFile(file);
+		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
+			setIsValidFileType(true);
+		} else {
+			setIsValidFileType(false);
+			setSelectedFile(null);
+			showErrorNotification(translate('csv.file.error') + file.name);
 		}
-		// Refetch meters details by invalidating its api cache.
-		this.props.resetApiCache();
+	};
 
-	}
+	const handleClear = () => {
+		setMeterData(MetersCSVUploadDefaults);
+		setIsValidFileType(false);
+	};
 
-	private handleSetMeterName(e: React.ChangeEvent<HTMLInputElement>) {
-		const target = e.target;
-		this.props.setMeterName(MODE.meters, target.value);
-	}
+	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		if (selectedFile) {
+			const { success, message } = await submitMeters(meterData, selectedFile, dispatch);
+			if (success) {
+				showSuccessNotification(message);
+			} else {
+				showErrorNotification(message);
+			}
+		}
+	};
 
-	public render() {
-		const titleStyle: React.CSSProperties = {
-			fontWeight: 'bold',
-			paddingBottom: '5px'
-		};
+	const tooltipStyle = {
+		display: 'inline-block',
+		fontSize: '50%',
+		tooltipReadings: 'help.csv.meters'
+	};
 
-		const checkboxStyle: React.CSSProperties = {
-			paddingBottom: '15px'
-		};
+	const checkBox = {
+		display: 'flex'
+	};
 
-		const formStyle: React.CSSProperties = {
-			display: 'flex',
-			justifyContent: 'center',
-			padding: '20px'
-		};
-
-		return (
-			<div style={formStyle}>
-				<Form onSubmit={this.handleSubmit}>
-					<FormFileUploaderComponent formText='csv.upload.meters' reference={this.fileInput} required labelStyle={titleStyle} />
-					<FormGroup check style={checkboxStyle}>
-						<Label>
-							<Input checked={this.props.gzip} type='checkbox' name='gzip' onChange={this.props.toggleGzip} />
-							<FormattedMessage id='csv.common.param.gzip' />
-						</Label>
-					</FormGroup>
-					<FormGroup check style={checkboxStyle}>
-						<Label check>
-							<Input checked={this.props.headerRow} type='checkbox' name='headerRow' onChange={this.props.toggleHeaderRow} />
-							<FormattedMessage id='csv.common.param.header.row' />
-						</Label>
-					</FormGroup>
-					<FormGroup check style={checkboxStyle}>
-						<Label check>
-							<Input checked={this.props.update} type='checkbox' name='update' onChange={this.props.toggleUpdate} />
-							<FormattedMessage id='csv.common.param.update' />
-						</Label>
-					</FormGroup>
-					<FormGroup>
-						<Label style={titleStyle}>
-							<FormattedMessage id='csv.readings.param.meter.name' />
-						</Label>
-						<Input value={this.props.meterName} name='meterName' onChange={this.handleSetMeterName} />
-					</FormGroup>
-					<Button color='secondary' type='submit'>
-						<FormattedMessage id='csv.submit.button' />
-					</Button>
-				</Form>
-			</div>
-		);
-	}
-
+	return (
+		<Container className="min-vh-100">
+			<TooltipHelpComponent page='help.csv.meters' />
+			<Form onSubmit={handleSubmit}>
+				<Row className="justify-content-md-center">
+					<Col md='auto'>
+						<div className="text-center">
+							<h2>
+								{translate('csv.upload.meters')}
+								<div style={tooltipStyle}>
+									<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
+								</div>
+							</h2>
+						</div>
+						<FormFileUploaderComponent
+							onFileChange={handleFileChange}
+							isInvalid={!!selectedFile}
+						/>
+						<FormGroup>
+							<Row>
+								<Col>
+									<Label for='gzip'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='gzip'
+												name='gzip'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.gzip')}
+											</div>
+										</div>
+									</Label>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<Label for='headerRow'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='headerRow'
+												name='headerRow'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.header.row')}
+											</div>
+										</div>
+									</Label>
+								</Col>
+							</Row>
+							<Row>
+								<Col>
+									<Label for='update'>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='update'
+												name='update'
+												onChange={handleCheckboxChange}
+											/>
+											<div className='ps-2'>
+												{translate('csv.common.param.update')}
+											</div>
+										</div>
+									</Label>
+								</Col>
+							</Row>
+						</FormGroup>
+						{meterData.update && (
+							<FormGroup>
+								<Label for='meterIdentifier'>
+									<div className='pb-1'>
+										{translate('csv.readings.param.meter.identifier')}
+									</div>
+								</Label>
+								<Input
+									id='meterIdentifier'
+									name='meterIdentifier'
+									type='select'
+									value={meterData.meterIdentifier || ''}
+									onChange={handleSelectedMeterChange}
+									invalid={!meterIsSelected}
+								>
+									{
+										<option value={''} key={-999} hidden disabled>
+											{translate('select.meter')}
+										</option>
+									}
+									{
+										Array.from(visibleMeters).map(meter => {
+											return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
+										})
+									}
+								</Input>
+							</FormGroup>
+						)}
+						<div className='d-flex flex-row-reverse'>
+							<div className='p-3'>
+								<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
+									{translate('csv.submit.button')}
+								</Button>
+							</div>
+							<div className='p-3'>
+								<Button color='secondary' type='reset' onClick={handleClear}>
+									{translate('csv.clear.button')}
+								</Button>
+							</div>
+						</div>
+					</Col>
+				</Row>
+			</Form>
+		</Container>
+	);
 }
-export default connect(null, mapDispatchToProps)(MetersCSVUploadComponent);
