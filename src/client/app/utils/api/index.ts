@@ -5,17 +5,13 @@
  */
 
 import ApiBackend from './ApiBackend';
-import UploadCSVApi from './UploadCSVApi';
 import LogsApi from './LogsApi';
 
 const apiBackend = new ApiBackend();
 
 // All specific backends share the same ApiBackend
-const uploadCSVApi = new UploadCSVApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
 
-
 export {
-	logsApi,
-	uploadCSVApi
+	logsApi
 };

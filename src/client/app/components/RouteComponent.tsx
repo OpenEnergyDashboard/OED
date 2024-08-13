@@ -4,7 +4,6 @@
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import UploadCSVContainer from '../containers/csv/UploadCSVContainer';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import LocaleTranslationData from '../translations/data';
@@ -25,6 +24,8 @@ import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
+import MetersCSVUploadComponent from './csv/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from './csv/ReadingsCSVUploadComponent';
 
 /**
  * @returns the router component Responsible for client side routing.

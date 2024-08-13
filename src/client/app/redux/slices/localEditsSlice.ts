@@ -1,3 +1,6 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { createEntityAdapter } from '@reduxjs/toolkit';
 import { PlotMouseEvent } from 'plotly.js';
 import { createThunkSlice } from '../../redux/sliceCreators';
@@ -49,7 +52,6 @@ export const localEditsSlice = createThunkSlice({
 			// Stripped offerCurrentGPS thunk into a single reducer for simplicity. The only missing functionality are the serverlogs
 			// Current axios approach doesn't require dispatch, however if moved to rtk will. thunks for this adds complexity
 			// For simplicity, these logs can instead be tabulated in a middleware.(probably.)
-			// const map = localEditAdapter.getSelectors().selectById(state.mapEdits, state.calibratingMap);
 			const map = state.mapEdits.entities[state.calibratingMap];
 
 			const point = map.currentPoint;
