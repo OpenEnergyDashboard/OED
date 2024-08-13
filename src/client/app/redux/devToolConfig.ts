@@ -1,5 +1,6 @@
 import { DevToolsEnhancerOptions } from '@reduxjs/toolkit';
-import { mapsAdapter, mapsApi, mapsInitialState } from './api/mapsApi';
+import { mapsApi } from './api/mapsApi';
+import { mapsAdapter, mapsInitialState } from './entityAdapters';
 
 export const devToolsConfig: DevToolsEnhancerOptions = {
 	actionSanitizer: action => {

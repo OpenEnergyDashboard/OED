@@ -1,13 +1,13 @@
-import { createEntityAdapter, EntityState } from '@reduxjs/toolkit';
 import { pick } from 'lodash';
 import * as moment from 'moment';
+import { MapDataState, mapsAdapter, mapsInitialState } from '../../redux/entityAdapters';
 import { createAppSelector } from '../../redux/selectors/selectors';
+import { emtpyMapMetadata, localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { RootState } from '../../store';
 import { MapData, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import { baseApi } from './baseApi';
-// import { logToServer } from '../../redux/actions/logs';
 
 // Helper function to extract image dimensions from the mapSource
 const mapResponseImgSrcToDimensions = (response: MapMetadata[]) => Promise.all(
@@ -15,24 +15,16 @@ const mapResponseImgSrcToDimensions = (response: MapMetadata[]) => Promise.all(
 		new Promise<MapMetadata>(resolve => {
 			const img = new Image();
 			img.onload = () => {
-				resolve({ ...mapData, imgWidth: img.width, imgHeight: img.height });
+				resolve({ ...emtpyMapMetadata, ...mapData, imgWidth: img.width, imgHeight: img.height });
 			};
 			img.onerror = () => {
-				// TODO default to falsy value, 0, on error.
-				resolve({ ...mapData, imgWidth: 0, imgHeight: 0 });
+				resolve({ ...emtpyMapMetadata, ...mapData });
 			};
 			img.src = mapData.mapSource;
 		})
 	)
 );
 
-
-export const mapsAdapter = createEntityAdapter<MapMetadata>({
-	sortComparer: (meterA, meterB) => meterA.name?.localeCompare(meterB.name, undefined, { sensitivity: 'accent' })
-
-});
-export const mapsInitialState = mapsAdapter.getInitialState();
-export type MapDataState = EntityState<MapMetadata, number>;
 
 
 export const mapsApi = baseApi.injectEndpoints({
@@ -116,7 +108,7 @@ export const mapsApi = baseApi.injectEndpoints({
 							showSuccessNotification(translate('updated.map.without.calibration'));
 						}
 						// Cleanup LocalEditsSLice
-						// api.dispatch(localEditsSlice.actions.removeOneEdit({ type: EntityType.MAP, id: map.id }));
+						api.dispatch(localEditsSlice.actions.removeOneEdit(map.id));
 					}).catch(() => {
 						showErrorNotification(translate('failed.to.edit.map'));
 					});
@@ -128,7 +120,16 @@ export const mapsApi = baseApi.injectEndpoints({
 				url: 'api/maps/delete',
 				method: 'POST',
 				body: { id }
-			})
+			}),
+			onQueryStarted: (arg, api) => {
+				api.queryFulfilled
+					//Cleanup Local Edits if any for deleted entity
+					.then(() => {
+						api.dispatch(localEditsSlice.actions.removeOneEdit(arg));
+					})
+					.catch();
+			},
+			invalidatesTags: ['MapsData']
 		}),
 		getMapById: build.query<MapData, number>({
 			query: id => `api/maps/${id}`
@@ -151,5 +152,3 @@ export const selectMapSelectOptions = createAppSelector(
 	allMaps => allMaps.map(map => (
 		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) }
 	)));
-
-

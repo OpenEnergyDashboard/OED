@@ -5,12 +5,12 @@
 import { parseZone } from 'moment';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { LocaleDataKey } from 'translations/data';
+import { selectMapById } from '../../redux/api/mapsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
 import EditMapModalComponent from './EditMapModalComponent';
-import { selectMapById } from '../../redux/api/mapsApi';
 interface MapViewProps {
 	mapID: number;
 }
@@ -18,11 +18,15 @@ interface MapViewProps {
 //TODO: Migrate to RTK
 const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 
-	const map = useAppSelector(state => selectMapById(state, mapID));
+	const apiMap = useAppSelector(state => selectMapById(state, mapID));
+	const localEditMap = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, mapID));
+
+	// Use local data first, if any
+	const mapToDisplay = localEditMap ?? apiMap;
 
 	// Helper function checks map to see if it's calibrated
 	const getCalibrationStatus = () => {
-		const isCalibrated = map.origin && map.opposite;
+		const isCalibrated = mapToDisplay.origin && mapToDisplay.opposite;
 		return {
 			color: isCalibrated ? 'black' : 'gray',
 			messageId: isCalibrated ? 'map.is.calibrated' : 'map.is.not.calibrated'
@@ -33,24 +37,24 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{map.name}
+				{`${mapToDisplay.name}:${localEditMap ? ' (Unsaved Edits)' : ''}`}
 			</div>
-			<div className={map.displayable.toString()}>
-				<b><FormattedMessage id="map.displayable" /></b> {translate(`TrueFalseType.${map.displayable.toString()}` as LocaleDataKey)}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="map.circle.size" /></b> {map.circleSize}
+			<div className={mapToDisplay.displayable.toString()}>
+				<b><FormattedMessage id="map.displayable" /></b> {translate(`TrueFalseType.${mapToDisplay.displayable.toString()}`)}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {map.note ? map.note.slice(0, 29) : ''}
+				<b><FormattedMessage id="map.circle.size" /></b> {mapToDisplay.circleSize}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="map.filename" /></b> {map.filename}
+				<b><FormattedMessage id="note" /></b> {mapToDisplay.note ? mapToDisplay.note.slice(0, 29) + ' ...' : ''}
+			</div>
+			<div className="item-container">
+				<b><FormattedMessage id="map.filename" /></b> {mapToDisplay.filename}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.modified.date" /></b>
 				{/* TODO I don't think this will properly internationalize. */}
-				{parseZone(map.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
+				{parseZone(apiMap.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
@@ -59,7 +63,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 				</span>
 			</div>
 			<EditMapModalComponent
-				map={map}
+				map={mapToDisplay}
 			/>
 		</div>
 	);

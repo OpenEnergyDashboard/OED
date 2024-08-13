@@ -1,12 +1,13 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
+import { PlotMouseEvent } from 'plotly.js';
 import { hasCartesian } from '../../redux/actions/map';
 import { createThunkSlice } from '../../redux/sliceCreators';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { calibrate, CalibratedPoint, CartesianPoint, GPSPoint } from '../../utils/calibration';
-import { mapsAdapter } from '../../redux/api/mapsApi';
-import { PlotMouseEvent } from 'plotly.js';
+import { mapsAdapter } from '../../redux/entityAdapters';
 
 const localEditAdapter = createEntityAdapter<MapMetadata>();
+const localSelectors = localEditAdapter.getSelectors();
 export const localEditsSlice = createThunkSlice({
 	name: 'localEdits',
 	initialState: {
@@ -17,9 +18,7 @@ export const localEditsSlice = createThunkSlice({
 		calibrationSettings: {
 			calibrationThreshold: 3,
 			showGrid: false
-
 		}
-
 	},
 	reducers: create => ({
 		incrementCounter: create.reducer<void>(state => {
@@ -28,17 +27,32 @@ export const localEditsSlice = createThunkSlice({
 		toggleMapShowGrid: create.reducer<void>(state => {
 			state.calibrationSettings.showGrid;
 		}),
+		setOneEdit: create.reducer<MapMetadata>((state, { payload }) => {
+			localEditAdapter.setOne(state.mapEdits, payload);
+		}),
+		removeOneEdit: create.reducer<number>((state, { payload }) => {
+			localEditAdapter.removeOne(state.mapEdits, payload);
+		}),
+		updateMapCalibrationMode: create.reducer<{ id: number, mode: CalibrationModeTypes }>((state, { payload }) => {
+			state.calibratingMap = payload.id;
+			localEditAdapter.updateOne(state.mapEdits, {
+				id: payload.id,
+				changes: { calibrationMode: payload.mode }
+			});
+		}),
 		createNewMap: create.reducer(state => {
 			state.newMapIdCounter++;
 			const temporaryID = state.newMapIdCounter * -1;
-			localEditAdapter.setOne(state.mapEdits, { ...emptyMetadata, id: temporaryID });
+			localEditAdapter.setOne(state.mapEdits, { ...emtpyMapMetadata, id: temporaryID });
 			state.calibratingMap = temporaryID;
 		}),
 		offerCurrentGPS: create.reducer<GPSPoint>((state, { payload }) => {
 			// Stripped offerCurrentGPS thunk into a single reducer for simplicity. The only missing functionality are the serverlogs
 			// Current axios approach doesn't require dispatch, however if moved to rtk will. thunks for this adds complexity
 			// For simplicity, these logs can instead be tabulated in a middleware.(probably.)
-			const map = localEditAdapter.getSelectors().selectById(state.mapEdits, state.calibratingMap);
+			// const map = localEditAdapter.getSelectors().selectById(state.mapEdits, state.calibratingMap);
+			const map = state.mapEdits.entities[state.calibratingMap];
+
 			const point = map.currentPoint;
 			if (point && hasCartesian(point)) {
 				point.gps = payload;
@@ -63,8 +77,9 @@ export const localEditsSlice = createThunkSlice({
 					eligiblePoints.push(point);
 				}
 			}
-			const xValue = eligiblePoints[0].x as number;
-			const yValue = eligiblePoints[0].y as number;
+			// TODO VERIFY
+			const xValue = eligiblePoints[0]?.x as number;
+			const yValue = eligiblePoints[0]?.y as number;
 			const clickedPoint: CartesianPoint = {
 				x: Number(xValue.toFixed(6)),
 				y: Number(yValue.toFixed(6))
@@ -80,8 +95,6 @@ export const localEditsSlice = createThunkSlice({
 				id: state.calibratingMap,
 				changes: { currentPoint }
 			});
-
-
 		}),
 		resetCalibration: create.reducer<number>((state, { payload }) => {
 			localEditAdapter.updateOne(state.mapEdits, {
@@ -96,12 +109,11 @@ export const localEditsSlice = createThunkSlice({
 	}),
 
 	selectors: {
-		selectCalibrationMapId: state => state.calibratingMap
+		selectCalibrationMapId: state => state.calibratingMap,
+		selectLocalEdit: (state, id: number) => localSelectors.selectById(state.mapEdits, id)
 	}
 });
-
-// MAP Stuff TODO RELOCATE
-const emptyMetadata: MapMetadata = {
+export const emtpyMapMetadata: MapMetadata = {
 	id: 0,
 	name: '',
 	displayable: false,

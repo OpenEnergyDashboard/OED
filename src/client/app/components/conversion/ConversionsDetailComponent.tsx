@@ -7,11 +7,12 @@ import { FormattedMessage } from 'react-intl';
 import SpinnerComponent from '../SpinnerComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi, stableEmptyConversions } from '../../redux/api/conversionsApi';
-import { stableEmptyUnitDataById, unitsAdapter, unitsApi } from '../../redux/api/unitsApi';
+import { stableEmptyUnitDataById, unitsApi } from '../../redux/api/unitsApi';
 import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
+import { unitsAdapter } from '../../redux/entityAdapters';
 
 /**
  * Defines the conversions page card view

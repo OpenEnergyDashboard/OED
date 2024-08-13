@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { ChangeEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { updateMapMode, updateMapSource } from '../../redux/actions/map';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { logsApi } from '../../redux/api/logApi';
 import { selectMapById } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
@@ -92,8 +92,8 @@ export default function MapCalibrationInitiateComponent() {
 		event.preventDefault();
 		try {
 			const mapMetaData = await processImgMapMetaData();
-			dispatch(updateMapSource(mapMetaData));
-			dispatch(updateMapMode(CalibrationModeTypes.calibrate));
+			dispatch(localEditsSlice.actions.setOneEdit(mapMetaData));
+			dispatch(localEditsSlice.actions.updateMapCalibrationMode({ id: mapData.id, mode: CalibrationModeTypes.calibrate }));
 		} catch (err) {
 			logToServer({ level: 'error', message: `Error, map source image uploading: ${err}` });
 		}
@@ -129,7 +129,7 @@ export default function MapCalibrationInitiateComponent() {
 				// Fire when image load complete.
 				img.onload = () => {
 					// resolve mapMetadata from image.
-					// Not storing image in state, instead extract relevang values
+					// Not storing image in state, instead extract relevant values
 					resolve({
 						...mapData,
 						imgWidth: img.width,

@@ -2,15 +2,17 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { debounce, isEqual } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Label, Input } from 'reactstrap';
+import { Link } from 'react-router-dom';
+import { Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { mapsApi, selectMapById } from '../../redux/api/mapsApi';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import { editMapDetails, submitEditedMap, removeMap, setCalibration } from '../../redux/actions/map';
 import { showErrorNotification } from '../../utils/notifications';
-import { useAppDispatch } from '../../redux/reduxHooks';
-import { AppDispatch } from 'store';
 
 interface EditMapModalProps {
 	map: MapMetadata;
@@ -19,47 +21,65 @@ interface EditMapModalProps {
 // TODO: Migrate to RTK
 const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 	const [showModal, setShowModal] = useState(false);
-	const handleShow = () => setShowModal(true);
-	const handleClose = () => setShowModal(false);
-	const dispatch: AppDispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	const [nameInput, setNameInput] = useState(map.name);
 	const [noteInput, setNoteInput] = useState(map.note || '');
-	const [circleInput, setCircleInput] = useState(map.circleSize.toString());
+	const [circleInput, setCircleInput] = useState(map.circleSize);
 	const [displayable, setDisplayable] = useState(map.displayable);
-
+	const [submitEdit] = mapsApi.useEditMapMutation();
+	const [deleteMap] = mapsApi.useDeleteMapMutation();
+	// Only used to track stable reference changes to reset form.
+	const apiMapCache = useAppSelector(state => selectMapById(state, map.id));
 	const intl = useIntl();
 
+
+	const handleShow = () => setShowModal(true);
+	const handleClose = () => setShowModal(false);
+	const updatedMap = (): MapMetadata => ({
+		...map,
+		name: nameInput,
+		note: noteInput,
+		circleSize: circleInput,
+		displayable: displayable
+	});
+	const debouncedLocalUpdate = React.useMemo(() => debounce(
+		(map: MapMetadata) => !isEqual(map, updatedMap()) && dispatch(localEditsSlice.actions.setOneEdit(map)),
+		1000
+	), []);
+	React.useEffect(() => { debouncedLocalUpdate(updatedMap()); }, [nameInput, noteInput, circleInput, displayable]);
+
+	// Sync with API Cache changes, if any.
+	React.useEffect(() => {
+		setNameInput(map.name);
+		setNoteInput(map.note || '');
+		setCircleInput(map.circleSize);
+		setDisplayable(map.displayable);
+	}, [apiMapCache]);
+
 	const handleSave = () => {
-		const updatedMap = {
-			...map,
-			name: nameInput,
-			note: noteInput,
-			circleSize: parseFloat(circleInput),
-			displayable: displayable
-		};
-		dispatch(editMapDetails(updatedMap));
-		dispatch(submitEditedMap(updatedMap.id));
+		submitEdit(updatedMap());
 		handleClose();
 	};
 
 	const handleDelete = () => {
 		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: map.name }));
 		if (consent) {
-			dispatch(removeMap(map.id));
+			deleteMap(map.id);
 			handleClose();
 		}
 	};
 
 	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
-		dispatch(setCalibration(mode, map.id));
+		// Add/update entry to localEdits Slice
+		dispatch(localEditsSlice.actions.setOneEdit(updatedMap()));
+		// Update Calibration Mode
+		dispatch(localEditsSlice.actions.updateMapCalibrationMode({ mode, id: map.id }));
 		handleClose();
 	};
 
+	const circIsValid = circleInput > 0.0 && circleInput <= 2.0;
 	const toggleCircleEdit = () => {
-		const regtest = /^\d+(\.\d+)?$/;
-		if (regtest.test(circleInput) && parseFloat(circleInput) <= 2.0) {
-			setCircleInput(circleInput);
-		} else {
+		if (!circIsValid) {
 			showErrorNotification(intl.formatMessage({ id: 'invalid.number' }));
 		}
 	};
@@ -102,9 +122,10 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 							<Input
 								id="mapCircleSize"
 								type='number'
-								value={circleInput}
-								onChange={e => setCircleInput(e.target.value)}
-								invalid={parseFloat(circleInput) < 0}
+								value={String(circleInput)}
+								onChange={e => setCircleInput(parseFloat(e.target.value))}
+								invalid={!circIsValid}
+								step={0.1}
 								onBlur={toggleCircleEdit}
 							/>
 						</FormGroup>
@@ -114,7 +135,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 								id="mapNote"
 								type="textarea"
 								value={noteInput}
-								onChange={e => setNoteInput(e.target.value.slice(0, 30))}
+								onChange={e => setNoteInput(e.target.value)}
 							/>
 						</FormGroup>
 					</Form>
@@ -127,18 +148,22 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 							defaultValue={map.filename}
 							disabled>
 						</Input>
-						<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-							<FormattedMessage id='map.upload.new.file' />
-						</Button>
+						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+							<Button color='primary' >
+								<FormattedMessage id='map.upload.new.file' />
+							</Button>
+						</Link>
 					</div>
 					<div>
 						<Label><FormattedMessage id="map.calibration" /></Label>
 						<p>
 							<FormattedMessage id={map.origin && map.opposite ? 'map.is.calibrated' : 'map.is.not.calibrated'} />
 						</p>
-						<Button color='primary' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
-							<FormattedMessage id='map.calibrate' />
-						</Button>
+						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.calibrate)}>
+							<Button color='primary' >
+								<FormattedMessage id='map.calibrate' />
+							</Button>
+						</Link>
 					</div>
 				</ModalBody>
 				<ModalFooter>
@@ -148,7 +173,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 					<Button color="secondary" onClick={handleClose}>
 						<FormattedMessage id="cancel" />
 					</Button>
-					<Button color="primary" onClick={handleSave}>
+					<Button color="primary" onClick={handleSave} disabled={!circIsValid}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

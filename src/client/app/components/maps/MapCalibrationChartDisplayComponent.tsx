@@ -11,7 +11,7 @@ import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import Locales from '../../types/locales';
 import { CalibrationSettings } from '../../types/redux/map';
 import { Dimensions, normalizeImageDimensions } from '../../utils/calibration';
-import { mapsAdapter } from '../../redux/api/mapsApi';
+import { selectMapById } from '../../redux/api/mapsApi';
 
 /**
  * @returns TODO DO ME
@@ -22,7 +22,7 @@ export default function MapCalibrationChartDisplayContainer() {
 	const y: number[] = [];
 	const texts: string[] = [];
 	const currentLanguange = useAppSelector(selectSelectedLanguage);
-	const map = useAppSelector(state => mapsAdapter.getSelectors().selectById(state.localEdits.mapEdits, state.localEdits.calibratingMap));
+	const map = useAppSelector(state => selectMapById(state, state.localEdits.calibratingMap));
 
 	const settings = useAppSelector(state => state.localEdits.calibrationSettings);
 	const points = map.calibrationSet;

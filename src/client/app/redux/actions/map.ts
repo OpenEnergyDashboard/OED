@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-ignore
+// @ts-nocheck
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -8,7 +11,6 @@ import * as moment from 'moment';
 import { ActionType, Dispatch, GetState, Thunk } from '../../types/redux/actions';
 import * as t from '../../types/redux/map';
 import { CalibrationModeTypes, MapData, MapMetadata } from '../../types/redux/map';
-import { State } from '../../types/redux/state';
 import ApiBackend from '../../utils/api/ApiBackend';
 import MapsApi from '../../utils/api/MapsApi';
 import { calibrate, CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint } from '../../utils/calibration';
@@ -16,6 +18,7 @@ import { browserHistory } from '../../utils/history';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import translate from '../../utils/translate';
 import { logToServer } from './logs';
+import { RootState } from 'store';
 
 const mapsApi = new MapsApi(new ApiBackend());
 
@@ -135,8 +138,8 @@ export function updateCurrentCartesian(currentCartesian: CartesianPoint): t.Upda
  */
 export function offerCurrentGPS(currentGPS: GPSPoint): Thunk {
 	return (dispatch: Dispatch, getState: GetState) => {
-		const mapID = getState().maps.calibratingMap;
-		const point = getState().maps.editedMaps[mapID].currentPoint;
+		const mapID = getState().localEdits.calibratingMap;
+		const point = getState().localEdits.mapEdits.entities[mapID].currentPoint;
 		if (point && hasCartesian(point)) {
 			point.gps = currentGPS;
 			dispatch(updateCalibrationSet(point));
@@ -173,12 +176,10 @@ function updateCalibrationSet(calibratedPoint: CalibratedPoint): t.AppendCalibra
  * @param state The redux state
  * @returns Result of safety check
  */
-function isReadyForCalculation(state: State): boolean {
+function isReadyForCalculation(state: RootState): boolean {
 	const calibrationThreshold = 3;
 	// assume calibrationSet is defined, as offerCurrentGPS indicates through point that the map is defined.
-	/* eslint-disable @typescript-eslint/no-non-null-assertion */
-	return state.maps.editedMaps[state.maps.calibratingMap].calibrationSet!.length >= calibrationThreshold;
-	/* eslint-enable @typescript-eslint/no-non-null-assertion */
+	return state.localEdits.mapEdits.entities[state.localEdits.calibratingMap].calibrationSet.length >= calibrationThreshold;
 }
 
 /**
@@ -186,9 +187,10 @@ function isReadyForCalculation(state: State): boolean {
  * @param state The redux state
  * @returns Result of map calibration
  */
-function prepareDataToCalculation(state: State): CalibrationResult {
-	const mapID = state.maps.calibratingMap;
-	const mp = state.maps.editedMaps[mapID];
+function prepareDataToCalculation(state: RootState): CalibrationResult {
+	// TODO FIX BEFORE PR
+	const mapID = state.localEdits.calibratingMap;
+	const mp = state.localEdits.mapEdits.entities[mapID];
 	// Since mp is defined above, calibrationSet is defined.
 	/* eslint-disable @typescript-eslint/no-non-null-assertion */
 	const result = calibrate(mp);

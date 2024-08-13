@@ -16,7 +16,7 @@ import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
-import { MapCalibrationComponent2 } from './maps/MapCalibrationComponent';
+import { MapCalibrationComponent } from './maps/MapCalibrationComponent';
 import MapsDetailComponent from './maps/MapsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
@@ -54,7 +54,7 @@ const router = createBrowserRouter([
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
-					{ path: 'calibration', element: <MapCalibrationComponent2 /> },
+					{ path: 'calibration', element: <MapCalibrationComponent /> },
 					{ path: 'maps', element: <MapsDetailComponent /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },

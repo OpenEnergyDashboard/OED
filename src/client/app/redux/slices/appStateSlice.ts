@@ -75,16 +75,12 @@ export const appStateSlice = createThunkSlice({
 				if (hasToken()) {
 					// User has a session token verify before requesting meter/group details
 					try {
-						await dispatch(authApi.endpoints.verifyToken.initiate(getToken()))
-							.unwrap()
-							.catch(e => { throw e; });
+						await dispatch(authApi.endpoints.verifyToken.initiate(getToken())).unwrap();
 						// Token is valid if not errored out by this point,
 						// Apis will now use the token in headers via baseAPI's Prepare Headers
 						dispatch(currentUserSlice.actions.setUserToken(getToken()));
 						//  Get userDetails with verified token in headers
-						await dispatch(userApi.endpoints.getUserDetails.initiate(undefined, { subscribe: false }))
-							.unwrap()
-							.catch(e => { throw e; });
+						await dispatch(userApi.endpoints.getUserDetails.initiate(undefined, { subscribe: false })).unwrap();
 
 					} catch {
 						// User had a token that isn't valid or getUserDetails threw an error.

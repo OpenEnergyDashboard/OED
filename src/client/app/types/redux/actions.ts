@@ -4,7 +4,7 @@
 
 import { Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { State } from './state';
+import { RootState } from 'store';
 
 export enum ActionType {
 
@@ -35,15 +35,15 @@ export enum ActionType {
  * The type of the redux-thunk dispatch function.
  * Uses the overloaded version from Redux-Thunk.
  */
-export type Dispatch = ThunkDispatch<State, void, Action<any>>;
+export type Dispatch = ThunkDispatch<RootState, void, Action<any>>;
 
 /**
  * The type of the redux-thunk getState function.
  */
-export type GetState = () => State;
+export type GetState = () => RootState;
 
 /**
  * The type of promissory actions used in the project.
  * Returns a promise, no extra argument, uses the global state.
  */
-export type Thunk = ThunkAction<Promise<any>, State, void, Action>;
+export type Thunk = ThunkAction<Promise<any>, RootState, void, Action>;

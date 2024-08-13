@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { NamedIDItem } from 'types/items';
 import { RawReadings } from 'types/readings';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -11,13 +10,8 @@ import { MeterData } from '../../types/redux/meters';
 import { durationFormat } from '../../utils/durationFormat';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
+import { MeterDataState, meterAdapter, metersInitialState } from '../../redux/entityAdapters';
 
-export const meterAdapter = createEntityAdapter<MeterData>({
-	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
-
-});
-export const metersInitialState = meterAdapter.getInitialState();
-export type MeterDataState = EntityState<MeterData, number>;
 
 export const metersApi = baseApi.injectEndpoints({
 	endpoints: builder => ({

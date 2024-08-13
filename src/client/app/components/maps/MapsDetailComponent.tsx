@@ -8,11 +8,11 @@ import { Link } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import { selectMapIds } from '../../redux/api/mapsApi';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { setNewMap } from '../../redux/actions/map';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import MapViewComponent from './MapViewComponent';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 
 /**
  * Defines the maps page card view
@@ -22,8 +22,7 @@ import MapViewComponent from './MapViewComponent';
 export default function MapsDetailComponent() {
 	const dispatch = useAppDispatch();
 	// Load map IDs from state and store in number array
-	const maps = useAppSelector(state => selectMapIds(state));
-
+	const mapIds = useAppSelector(state => selectMapIds(state));
 	return (
 		<div className='flexGrowOne'>
 			<TooltipHelpComponent page='maps' />
@@ -36,14 +35,14 @@ export default function MapsDetailComponent() {
 				</h2>
 				{ /* TODO: Change Link to <CreateMapModalComponent /> when it is completed */}
 				<div className="edit-btn">
-					<Link to='/calibration' onClick={() => dispatch(setNewMap())}>
+					<Link to='/calibration' onClick={() => dispatch(localEditsSlice.actions.createNewMap())}>
 						<Button color='primary'>
 							<FormattedMessage id='create.map' />
 						</Button>
 					</Link>
 				</div>
 				<div className="card-container">
-					{maps.map(mapID => (
+					{mapIds.map(mapID => (
 						<MapViewComponent key={mapID} mapID={mapID} />
 					))}
 				</div>
