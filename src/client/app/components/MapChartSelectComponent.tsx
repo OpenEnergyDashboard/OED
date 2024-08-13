@@ -34,11 +34,6 @@ export default function MapChartSelectComponent() {
 	const selectedMapData = useAppSelector(state => selectMapById(state, selectSelectedMap(state)));
 
 
-	const selectedMap = {
-		label: selectedMapData.name,
-		value: selectedMapData.id
-	};
-
 	//useIntl instead of injectIntl and WrappedComponentProps
 	const intl = useIntl();
 
@@ -51,7 +46,7 @@ export default function MapChartSelectComponent() {
 			<div style={divBottomPadding}>
 				<SingleSelectComponent
 					options={sortedMaps}
-					selectedOption={(selectedMap.value === 0) ? undefined : selectedMap}
+					selectedOption={selectedMapData ? { label: selectedMapData.name, value: selectedMapData.id } : undefined}
 					placeholder={intl.formatMessage(messages.selectMap)}
 					onValueChange={selected => dispatch(updateSelectedMaps(selected.value))}
 				/>
