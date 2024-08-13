@@ -5,12 +5,10 @@
 import * as React from 'react';
 import { ChangeEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { logsApi } from '../../redux/api/logApi';
-import { selectMapById } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
-import { selectSelectedMap } from '../../redux/slices/graphSlice';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 
