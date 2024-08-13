@@ -13,7 +13,7 @@ import { Dispatch } from './types/redux/actions';
 export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
-		immutableCheck: false,
+		// immutableCheck: false,
 		serializableCheck: false
 	}).prepend(listenerMiddleware.middleware)
 		.concat(baseApi.middleware),
