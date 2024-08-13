@@ -6,7 +6,7 @@ import * as React from 'react';
 import { ChangeEvent, FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { logsApi } from '../../redux/api/logApi';
-import { mapsApi, selectMapById } from '../../redux/api/mapsApi';
+import { mapsApi } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
@@ -23,7 +23,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 	const [logToServer] = logsApi.useLogToServerMutation();
 	const [value, setValue] = React.useState<string>('');
 	const showGrid = useAppSelector(state => state.localEdits.calibrationSettings.showGrid);
-	const mapData = useAppSelector(state => selectMapById(state, state.localEdits.calibratingMap));
+	const mapData = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, state.localEdits.calibratingMap));
 	const resultDisplay = (mapData.calibrationResult)
 		? `x: ${mapData.calibrationResult.maxError.x}%, y: ${mapData.calibrationResult.maxError.y}%`
 		: translate('need.more.points');
@@ -64,6 +64,8 @@ export default function MapCalibrationInfoDisplayComponent() {
 	};
 
 	const handleChanges = () => {
+		console.log('MapID: ', mapData.id);
+
 		if (mapData.id < 0) {
 			createNewMap(mapData);
 		} else {

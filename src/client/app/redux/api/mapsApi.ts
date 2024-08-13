@@ -55,12 +55,13 @@ export const mapsApi = baseApi.injectEndpoints({
 					opposite: (map.calibrationResult) ? map.calibrationResult.opposite : undefined
 				}
 			}),
-			onQueryStarted: (map, api) => {
+			onQueryStarted: async (map, api) => {
 				api.queryFulfilled
 					// TODO Serverlogs migrate to rtk Query to drop axios?
 					// Requires dispatch so inconvenient
-					.then(() => {
+					.then(e => {
 						if (map.calibrationResult) {
+							const { data } = e;
 							// logToServer('info', 'New calibrated map uploaded to database');
 							showSuccessNotification(translate('upload.new.map.with.calibration'));
 						} else {

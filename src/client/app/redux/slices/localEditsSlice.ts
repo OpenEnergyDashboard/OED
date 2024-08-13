@@ -25,7 +25,7 @@ export const localEditsSlice = createThunkSlice({
 			state.newMapIdCounter++;
 		}),
 		toggleMapShowGrid: create.reducer<void>(state => {
-			state.calibrationSettings.showGrid;
+			state.calibrationSettings.showGrid = !state.calibrationSettings.showGrid;
 		}),
 		setOneEdit: create.reducer<MapMetadata>((state, { payload }) => {
 			localEditAdapter.setOne(state.mapEdits, payload);
@@ -41,10 +41,10 @@ export const localEditsSlice = createThunkSlice({
 			});
 		}),
 		createNewMap: create.reducer(state => {
-			state.newMapIdCounter++;
+			state.newMapIdCounter = state.newMapIdCounter + 1;
 			const temporaryID = state.newMapIdCounter * -1;
-			localEditAdapter.setOne(state.mapEdits, { ...emtpyMapMetadata, id: temporaryID });
 			state.calibratingMap = temporaryID;
+			localEditAdapter.setOne(state.mapEdits, { ...emtpyMapMetadata, id: temporaryID });
 		}),
 		offerCurrentGPS: create.reducer<GPSPoint>((state, { payload }) => {
 			// Stripped offerCurrentGPS thunk into a single reducer for simplicity. The only missing functionality are the serverlogs
@@ -78,8 +78,8 @@ export const localEditsSlice = createThunkSlice({
 				}
 			}
 			// TODO VERIFY
-			const xValue = eligiblePoints[0]?.x as number;
-			const yValue = eligiblePoints[0]?.y as number;
+			const xValue = eligiblePoints[0].x as number;
+			const yValue = eligiblePoints[0].y as number;
 			const clickedPoint: CartesianPoint = {
 				x: Number(xValue.toFixed(6)),
 				y: Number(yValue.toFixed(6))

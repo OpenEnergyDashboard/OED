@@ -55,4 +55,4 @@ export const authApi = baseApi.injectEndpoints({
 });
 
 // Poll interval in milliseconds (1 minute)
-export const authPollInterval = 60000;
+export const authPollInterval = 1000 * 60 * 60;
