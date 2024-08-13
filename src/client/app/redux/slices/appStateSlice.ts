@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as moment from 'moment';
-import { processGraphLink } from '../../redux/actions/extraActions';
+import { processGraphLink } from '../../redux/slices/graphSlice';
 import { mapsApi } from '../../redux/api/mapsApi';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { getToken, hasToken } from '../../utils/token';

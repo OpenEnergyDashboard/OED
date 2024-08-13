@@ -2,16 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
 import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import {
-	clearGraphHistory, historyStepBack,
-	historyStepForward, processGraphLink,
-	updateHistory, updateSliderRange
-} from '../../redux/actions/extraActions';
 import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
@@ -452,4 +447,15 @@ export const {
 	updateSelectedMetersOrGroups, updateMapsBarDuration,
 	updateSelectedMaps
 } = graphSlice.actions;
+
+
+// Defined as External Reducers for middleware history implementation.
+// Extenrally defined actions to be acted upon in 'graphSlice.extraReducers'
+export const historyStepBack = createAction('graph/historyStepBack');
+export const historyStepForward = createAction('graph/historyStepForward');
+export const updateHistory = createAction<GraphState>('graph/updateHistory');
+export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
+export const clearGraphHistory = createAction('graph/clearHistory');
+export const updateSliderRange = createAction<TimeInterval>('graph/UpdateSliderRange');
+
 

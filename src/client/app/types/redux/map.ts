@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from './actions';
-import { CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint } from '../../utils/calibration';
+import { CalibratedPoint, CalibrationResult, GPSPoint } from '../../utils/calibration';
 
 /**
  * 'initiate', 'calibrate' or 'unavailable'
@@ -14,106 +13,7 @@ export enum CalibrationModeTypes {
 	unavailable = 'unavailable'
 }
 
-export interface ChangeMapModeAction {
-	type: ActionType.UpdateCalibrationMode;
-	nextMode: CalibrationModeTypes;
-}
 
-export interface RequestMapsDetailsAction {
-	type: ActionType.RequestMapsDetails;
-}
-
-export interface ReceiveMapsDetailsAction {
-	type: ActionType.ReceiveMapsDetails;
-	data: MapData[];
-}
-
-export interface UpdateMapSourceAction {
-	type: ActionType.UpdateMapSource;
-	data: MapMetadata;
-}
-
-export interface ChangeGridDisplayAction {
-	type: ActionType.ChangeGridDisplay;
-}
-
-export interface UpdateSelectedMapAction {
-	type: ActionType.UpdateSelectedMap;
-	mapID: number;
-}
-
-export interface UpdateCurrentCartesianAction {
-	type: ActionType.UpdateCurrentCartesian;
-	currentCartesian: CartesianPoint;
-}
-
-export interface ResetCurrentPointAction {
-	type: ActionType.ResetCurrentPoint;
-}
-
-export interface AppendCalibrationSetAction {
-	type: ActionType.AppendCalibrationSet;
-	calibratedPoint: CalibratedPoint;
-}
-
-export interface UpdateCalibrationResultAction {
-	type: ActionType.UpdateCalibrationResults;
-	result: CalibrationResult;
-}
-
-export interface DeleteMapAction {
-	type: ActionType.DeleteMap;
-	mapID: number;
-}
-
-export interface EditMapDetailsAction {
-	type: ActionType.EditMapDetails;
-	map: MapMetadata;
-}
-
-export interface SubmitEditedMapAction {
-	type: ActionType.SubmitEditedMap;
-	mapID: number;
-}
-
-export interface ConfirmEditedMapAction {
-	type: ActionType.ConfirmEditedMap;
-	mapID: number;
-}
-
-export interface SetCalibrationAction {
-	type: ActionType.SetCalibration;
-	mapID: number;
-	mode: CalibrationModeTypes;
-}
-
-export interface IncrementCounterAction {
-	type: ActionType.IncrementCounter;
-}
-
-export interface ResetCalibrationAction {
-	type: ActionType.ResetCalibration;
-	mapID: number;
-}
-
-export type MapsAction =
-	| ChangeMapModeAction
-	| UpdateSelectedMapAction
-	| RequestMapsDetailsAction
-	| ReceiveMapsDetailsAction
-	| UpdateMapSourceAction
-	| ChangeGridDisplayAction
-	| EditMapDetailsAction
-	| SubmitEditedMapAction
-	| ConfirmEditedMapAction
-	| UpdateCurrentCartesianAction
-	| ResetCurrentPointAction
-	| AppendCalibrationSetAction
-	| UpdateCalibrationResultAction
-	| SetCalibrationAction
-	| ResetCalibrationAction
-	| IncrementCounterAction
-	| DeleteMapAction;
 
 /**
  * data format stored in the database

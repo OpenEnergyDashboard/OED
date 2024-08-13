@@ -4,8 +4,7 @@
 
 import { isAnyOf } from '@reduxjs/toolkit';
 import { AppListener } from '../listenerMiddleware';
-import { graphSlice } from '../slices/graphSlice';
-import { updateHistory } from '../../redux/actions/extraActions';
+import { graphSlice, updateHistory } from '../slices/graphSlice';
 
 export const graphHistoryListener = (startListening: AppListener) => {
 	startListening({

@@ -8,7 +8,7 @@ import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { updateSliderRange } from '../redux/actions/extraActions';
+import { updateSliderRange } from '../redux/slices/graphSlice';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';

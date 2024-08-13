@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { clearGraphHistory } from '../redux/actions/extraActions';
+import { clearGraphHistory } from '../redux/slices/graphSlice';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 import {

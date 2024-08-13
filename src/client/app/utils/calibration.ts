@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { showErrorNotification } from './notifications';
-import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
 import { MapMetadata } from '../types/redux/map';
 import translate from './translate';
+import { logToServer } from '../redux/actions/logs';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -79,6 +79,7 @@ export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, 
 	if (map === undefined) { return false; }
 	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
 	if (!isValidGPSInput(`${gps.latitude},${gps.longitude}`)) {
+		// Find way to migrate to RTKQuery logs since dispatch is required, thunks are most likely the
 		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
 	}

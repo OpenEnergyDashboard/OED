@@ -1,6 +1,5 @@
 import { createEntityAdapter } from '@reduxjs/toolkit';
 import { PlotMouseEvent } from 'plotly.js';
-import { hasCartesian } from '../../redux/actions/map';
 import { createThunkSlice } from '../../redux/sliceCreators';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { calibrate, CalibratedPoint, CartesianPoint, GPSPoint } from '../../utils/calibration';
@@ -131,4 +130,8 @@ export const emtpyMapMetadata: MapMetadata = {
 	calibrationResult: undefined,
 	northAngle: 0,
 	circleSize: 0
+};
+
+const hasCartesian = (point: CalibratedPoint) => {
+	return point.cartesian.x !== -1 && point.cartesian.y !== -1;
 };
