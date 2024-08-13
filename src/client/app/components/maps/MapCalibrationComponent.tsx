@@ -10,7 +10,6 @@ import { CalibrationModeTypes } from '../../types/redux/map';
 import MapCalibrationChartDisplayComponent from './MapCalibrationChartDisplayComponent';
 import MapCalibrationInfoDisplayComponent from './MapCalibrationInfoDisplayComponent';
 import MapCalibrationInitiateComponent from './MapCalibrationInitiateComponent';
-import { selectMapById } from '../../redux/api/mapsApi';
 
 /**
  * @returns Calibration Component corresponding to current step invloved
@@ -18,9 +17,10 @@ import { selectMapById } from '../../redux/api/mapsApi';
 export const MapCalibrationComponent = () => {
 	const mapToCalibrate = useAppSelector(localEditsSlice.selectors.selectCalibrationMapId);
 	const calibrationMode = useAppSelector(state => {
-		const data = selectMapById(state, mapToCalibrate);
+		const data = localEditsSlice.selectors.selectLocalEdit(state, mapToCalibrate);
 		return data?.calibrationMode ?? CalibrationModeTypes.unavailable;
 	});
+	console.log(calibrationMode);
 	if (calibrationMode === CalibrationModeTypes.initiate) {
 		return (
 			<div className='container-fluid'>
