@@ -56,15 +56,16 @@ const router = createBrowserRouter([
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationComponent /> },
 					{ path: 'maps', element: <MapsDetailComponent /> },
-					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
+					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> },
+					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'users', element: <UsersDetailComponent /> }
 				]
 			},
 			{
 				element: <RoleOutlet role={UserRole.CSV} />,
 				children: [
-					{ path: 'csv', element: <UploadCSVContainer /> }
+					{ path: 'csvReadings', element: <ReadingsCSVUploadComponent /> }
 				]
 			},
 			{ path: '*', element: <NotFound /> }

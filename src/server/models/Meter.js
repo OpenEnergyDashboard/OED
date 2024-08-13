@@ -167,6 +167,17 @@ class Meter {
 	}
 
 	/**
+	 * Returns a promise to retrieve the meter with the given identifier from the database.
+	 * @param identifier the meter's identifier
+	 * @param conn the connection to be used.
+	 * @returns {Promise.<Meter>}
+	 */
+	static async getByIdentifier(identifier, conn) {
+		const row = await conn.one(sqlFile('meter/get_meter_by_identifier.sql'), { identifier: identifier });
+		return Meter.mapRow(row);
+	}
+
+	/**
 	 * Returns a promise to get all of the meters from the database
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<array.<Meter>>}

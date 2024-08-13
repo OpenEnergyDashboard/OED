@@ -58,7 +58,8 @@ export default function HeaderButtonsComponent() {
 		shouldGroupsButtonDisabled: true,
 		shouldMetersButtonDisabled: true,
 		shouldMapsButtonDisabled: true,
-		shouldCSVButtonDisabled: true,
+		shouldCSVMetersButtonDisabled: true,
+		shouldCSVReadingsButtonDisabled: true,
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
@@ -93,7 +94,8 @@ export default function HeaderButtonsComponent() {
 			shouldGroupsButtonDisabled: pathname === '/groups',
 			shouldMetersButtonDisabled: pathname === '/meters',
 			shouldMapsButtonDisabled: pathname === '/maps',
-			shouldCSVButtonDisabled: pathname === '/csv',
+			shouldCSVMetersButtonDisabled: pathname === '/csvMeters',
+			shouldCSVReadingsButtonDisabled: pathname === '/csvReadings',
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions'
 		}));
@@ -173,11 +175,18 @@ export default function HeaderButtonsComponent() {
 								<FormattedMessage id='conversions' />
 							</DropdownItem>
 							<DropdownItem
-								style={state.csvViewableLinkStyle}
-								disabled={state.shouldCSVButtonDisabled}
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldCSVMetersButtonDisabled}
 								tag={Link}
-								to="/csv">
-								<FormattedMessage id='csv' />
+								to="/csvMeters">
+								<FormattedMessage id='csvMeters' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.csvViewableLinkStyle}
+								disabled={state.shouldCSVReadingsButtonDisabled}
+								tag={Link}
+								to="/csvReadings">
+								<FormattedMessage id='csvReadings' />
 							</DropdownItem>
 							<DropdownItem
 								disabled={state.shouldGroupsButtonDisabled}

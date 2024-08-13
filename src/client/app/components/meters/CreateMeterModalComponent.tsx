@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useState } from 'react';
@@ -14,7 +15,8 @@ import {
 	MAX_ERRORS, MAX_VAL, MIN_DATE,
 	MIN_DATE_MOMENT, MIN_VAL,
 	isValidCreateMeter,
-	selectDefaultCreateMeterValues, selectCreateMeterUnitCompatibility
+	selectCreateMeterUnitCompatibility,
+	selectDefaultCreateMeterValues
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -28,11 +30,16 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
+interface CreateMeterModalProps {
+	onCreateMeter?: (meterIdentifier: string) => void; // Define the type of the callback function
+}
+
 /**
  * Defines the create meter modal form
+ * @param props for create meter to return the identifier
  * @returns Meter create element
  */
-export default function CreateMeterModalComponent() {
+export default function CreateMeterModalComponent(props: CreateMeterModalProps): React.JSX.Element {
 	// Tracks whether a unit/ default unit has been selected.
 	// RTKQ Mutation to submit add meter
 	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
@@ -152,6 +159,15 @@ export default function CreateMeterModalComponent() {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(translate('meter.successfully.create.meter'));
 					resetState();
+					// if props exist, then return the identifier
+					//  or return the name if identifier is not set because the identifier will be set from the name
+					if (props.onCreateMeter) {
+						if (meterDetails.identifier === '') {
+							props.onCreateMeter(meterDetails.name);
+						} else {
+							props.onCreateMeter(meterDetails.identifier);
+						}
+					}
 				})
 				.catch(err => {
 					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
@@ -161,7 +177,6 @@ export default function CreateMeterModalComponent() {
 			showErrorNotification(translate('meter.input.error'));
 		}
 	};
-
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -367,11 +382,15 @@ export default function CreateMeterModalComponent() {
 						{/* Area input */}
 						<Col><FormGroup>
 							<Label for='area'>{translate('area')}</Label>
-							<Input id='area' name='area' type='number'
+							<Input
+								id='area'
+								name='area'
+								type='number'
 								min='0'
 								defaultValue={meterDetails.area}
 								onChange={e => handleNumberChange(e)}
-								invalid={meterDetails.area < 0} />
+								invalid={meterDetails.area < 0}
+							/>
 							<FormFeedback>
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>
@@ -495,15 +514,9 @@ export default function CreateMeterModalComponent() {
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}>
-								<option> 1 </option>
-								<option> 2 </option>
-								<option> 3 </option>
-								<option> 4 </option>
-								<option> 5 </option>
-								<option> 6 </option>
-								<option> 7 </option>
-								<option> 8 </option>
-								<option> 9 </option>
+								{range(1, 10).map(i => (
+									<option key={i} value={`${i}`}> {i} </option>
+								))}
 							</Input>
 						</FormGroup></Col>
 					</Row>
