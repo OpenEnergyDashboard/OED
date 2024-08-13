@@ -59,9 +59,8 @@ export const mapsApi = baseApi.injectEndpoints({
 				api.queryFulfilled
 					// TODO Serverlogs migrate to rtk Query to drop axios?
 					// Requires dispatch so inconvenient
-					.then(e => {
+					.then(() => {
 						if (map.calibrationResult) {
-							const { data } = e;
 							// logToServer('info', 'New calibrated map uploaded to database');
 							showSuccessNotification(translate('upload.new.map.with.calibration'));
 						} else {
