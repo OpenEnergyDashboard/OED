@@ -101,14 +101,15 @@ export default function LineChartComponent() {
 							const startTS = utc(e['xaxis.range[0]']);
 							const endTS = utc(e['xaxis.range[1]']);
 							const workingTimeInterval = new TimeInterval(startTS, endTS);
-							dispatch(updateSliderRange(workingTimeInterval));
+							dispatch(updateSliderRange(workingTimeInterval.toString()));
 						}
 						else if (e['xaxis.range']) {
 							// this case is when the slider knobs are dragged.
 							const range = e['xaxis.range']!;
 							const startTS = range && range[0];
 							const endTS = range && range[1];
-							dispatch(updateSliderRange(new TimeInterval(utc(startTS), utc(endTS))));
+							const interval = new TimeInterval(utc(startTS), utc(endTS));
+							dispatch(updateSliderRange(interval.toString()));
 
 						}
 					}, 500, { leading: false, trailing: true })

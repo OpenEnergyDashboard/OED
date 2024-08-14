@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAction, createSelector, createSlice } from '@reduxjs/toolkit';
 import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
 import { ActionMeta } from 'react-select';
@@ -21,12 +21,12 @@ const defaultState: GraphState = {
 	selectedAreaUnit: AreaUnitType.none,
 	// TODO appropriate default value?
 	selectedMap: 0,
-	queryTimeInterval: TimeInterval.unbounded(),
-	rangeSliderInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(4, 'weeks'),
-	mapsBarDuration: moment.duration(4, 'weeks'),
+	queryTimeIntervalString: TimeInterval.unbounded().toString(),
+	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
+	barDuration: moment.duration(4, 'weeks').toISOString(),
+	mapsBarDuration: moment.duration(4, 'weeks').toISOString(),
+	compareTimeIntervalString: calculateCompareTimeInterval(ComparePeriod.Week, moment()).toString(),
 	comparePeriod: ComparePeriod.Week,
-	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
 	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
@@ -83,29 +83,29 @@ export const graphSlice = createSlice({
 			state.current.selectedAreaUnit = action.payload;
 		},
 		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.barDuration = action.payload;
+			state.current.barDuration = action.payload.toISOString();
 		},
 		updateMapsBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.mapsBarDuration = action.payload;
+			state.current.mapsBarDuration = action.payload.toISOString();
 		},
-		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+		updateTimeInterval: (state, action: PayloadAction<string>) => {
 			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
 			// clearing when already unbounded should be a no-op
-			if (action.payload.getIsBounded() || state.current.queryTimeInterval.getIsBounded()) {
-				state.current.queryTimeInterval = action.payload;
+			if (TimeInterval.fromString(action.payload).getIsBounded() || TimeInterval.fromString(state.current.queryTimeIntervalString).getIsBounded()) {
+				state.current.queryTimeIntervalString = action.payload.toString();
 			}
 		},
-		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			if (action.payload.getIsBounded() || state.current.rangeSliderInterval.getIsBounded()) {
-				state.current.rangeSliderInterval = action.payload;
+		changeSliderRange: (state, action: PayloadAction<string>) => {
+			if (TimeInterval.fromString(action.payload).getIsBounded() || TimeInterval.fromString(state.current.rangeSliderIntervalString).getIsBounded()) {
+				state.current.rangeSliderIntervalString = action.payload.toString();
 			}
 		},
 		resetRangeSliderStack: state => {
-			state.current.rangeSliderInterval = TimeInterval.unbounded();
+			state.current.rangeSliderIntervalString = TimeInterval.unbounded().toString();
 		},
 		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
 			state.current.comparePeriod = action.payload.comparePeriod;
-			state.current.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime);
+			state.current.compareTimeIntervalString = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime).toString();
 		},
 		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
 			state.current.chartToRender = action.payload;
@@ -234,8 +234,8 @@ export const graphSlice = createSlice({
 			}
 		},
 		resetTimeInterval: state => {
-			if (!state.current.queryTimeInterval.equals(TimeInterval.unbounded())) {
-				state.current.queryTimeInterval = TimeInterval.unbounded();
+			if (!TimeInterval.fromString(state.current.queryTimeIntervalString).equals(TimeInterval.unbounded())) {
+				state.current.queryTimeIntervalString = TimeInterval.unbounded().toString();
 			}
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
@@ -247,6 +247,10 @@ export const graphSlice = createSlice({
 		// Current History Implementation tracks ANY action defined in 'reducers'
 		// To update graphState without causing a history entry to be created, utilize the 'Extra Reducers' property
 		builder
+			.addCase(
+				setGraphSliceState,
+				(_state, action) => action.payload
+			)
 			.addCase(
 				updateHistory,
 				(state, action) => {
@@ -285,7 +289,7 @@ export const graphSlice = createSlice({
 			.addCase(
 				updateSliderRange,
 				(state, { payload }) => {
-					state.current.rangeSliderInterval = payload;
+					state.current.rangeSliderIntervalString = payload;
 				}
 			)
 			.addCase(
@@ -304,7 +308,7 @@ export const graphSlice = createSlice({
 								current.selectedAreaUnit = value as AreaUnitType;
 								break;
 							case 'barDuration':
-								current.barDuration = moment.duration(parseInt(value), 'days');
+								current.barDuration = moment.duration(parseInt(value), 'days').toISOString();
 								break;
 							case 'barStacking':
 								current.barStacking = value === 'true';
@@ -315,7 +319,7 @@ export const graphSlice = createSlice({
 							case 'comparePeriod':
 								{
 									current.comparePeriod = validateComparePeriod(value);
-									current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment());
+									current.compareTimeIntervalString = calculateCompareTimeInterval(validateComparePeriod(value), moment()).toString();
 								}
 								break;
 							case 'compareSortingOrder':
@@ -347,7 +351,7 @@ export const graphSlice = createSlice({
 								current.threeD.readingInterval = parseInt(value);
 								break;
 							case 'serverRange':
-								current.queryTimeInterval = TimeInterval.fromString(value);
+								current.queryTimeIntervalString = value;
 								break;
 							case 'sliderRange':
 								// TODO omitted for now re-implement later.
@@ -387,8 +391,6 @@ export const graphSlice = createSlice({
 		selectThreeDState: state => state.current.threeD,
 		selectShowMinMax: state => state.current.showMinMax,
 		selectBarStacking: state => state.current.barStacking,
-		selectBarWidthDays: state => state.current.barDuration,
-		selectMapBarWidthDays: state => state.current.mapsBarDuration,
 		selectSelectedMap: state => state.current.selectedMap,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
@@ -398,17 +400,50 @@ export const graphSlice = createSlice({
 		selectSelectedMeters: state => state.current.selectedMeters,
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
-		selectQueryTimeInterval: state => state.current.queryTimeInterval,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
-		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
-		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
-		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
-		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
+		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
+		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
+		selectQueryTimeIntervalString: state => state.current.queryTimeIntervalString,
+		selectCompareTimeIntervalString: state => state.current.compareTimeIntervalString,
+		selectSliderRangeIntervalString: state => state.current.rangeSliderIntervalString,
+
+		// Memoized selector(s) becuase creating new TimeInterval.fromString(), each execution leads to unnecessary re-renders
+		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
+		selectQueryTimeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.queryTimeIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
+		selectSliderRangeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.rangeSliderIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
+		selectCompareTimeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.compareTimeIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
+		selectBarWidthDays: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.barDuration,
+			durationString => {
+				return moment.duration(durationString);
+			}
+		),
+		selectMapBarWidthDays: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.mapsBarDuration,
+			durationString => {
+				return moment.duration(durationString);
+			}
+		)
 	}
 });
 
@@ -456,6 +491,7 @@ export const historyStepForward = createAction('graph/historyStepForward');
 export const updateHistory = createAction<GraphState>('graph/updateHistory');
 export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
 export const clearGraphHistory = createAction('graph/clearHistory');
-export const updateSliderRange = createAction<TimeInterval>('graph/UpdateSliderRange');
+export const updateSliderRange = createAction<string>('graph/UpdateSliderRange');
+export const setGraphSliceState = createAction<History<GraphState>>('graph/SetGraphSliceState');
 
 

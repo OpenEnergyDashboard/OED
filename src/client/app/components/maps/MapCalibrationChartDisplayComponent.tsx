@@ -10,7 +10,7 @@ import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import Locales from '../../types/locales';
 import { CalibrationSettings } from '../../types/redux/map';
-import { Dimensions, normalizeImageDimensions } from '../../utils/calibration';
+import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
 
 /**
  * @returns TODO DO ME
@@ -93,8 +93,26 @@ export default function MapCalibrationChartDisplayContainer() {
 			locale: currentLanguange
 		}}
 		onClick={(event: PlotMouseEvent) => {
+			// trace 0 keeps a transparent trace of closely positioned points used for calibration(backgroundTrace),
+			// trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
+			// event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
+			// so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
 			event.event.preventDefault();
-			dispatch(localEditsSlice.actions.updateCurrentCartesian(event));
+			const eligiblePoints = [];
+			for (const point of event.points) {
+				const traceNumber = point.curveNumber;
+				if (traceNumber === 0) {
+					eligiblePoints.push(point);
+				}
+			}
+			// TODO VERIFY
+			const xValue = eligiblePoints[0].x as number;
+			const yValue = eligiblePoints[0].y as number;
+			const clickedPoint: CartesianPoint = {
+				x: Number(xValue.toFixed(6)),
+				y: Number(yValue.toFixed(6))
+			};
+			dispatch(localEditsSlice.actions.updateCurrentCartesian(clickedPoint));
 		}}
 	/>;
 }

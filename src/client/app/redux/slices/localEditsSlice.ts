@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import { createEntityAdapter } from '@reduxjs/toolkit';
-import { PlotMouseEvent } from 'plotly.js';
+import { mapsAdapter } from '../../redux/entityAdapters';
 import { createThunkSlice } from '../../redux/sliceCreators';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { calibrate, CalibratedPoint, CartesianPoint, GPSPoint } from '../../utils/calibration';
-import { mapsAdapter } from '../../redux/entityAdapters';
 
 const localEditAdapter = createEntityAdapter<MapMetadata>();
 const localSelectors = localEditAdapter.getSelectors();
@@ -65,30 +64,10 @@ export const localEditsSlice = createThunkSlice({
 				}
 			}
 		}),
-		updateCurrentCartesian: create.reducer<PlotMouseEvent>((state, { payload }) => {
-			// repourposed getClickedCoordinate Events from previous maps implementatinon moved to reducer
-			// trace 0 keeps a transparent trace of closely positioned points used for calibration(backgroundTrace),
-			// trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
-			// event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
-			// so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
-			const eligiblePoints = [];
-			for (const point of payload.points) {
-				const traceNumber = point.curveNumber;
-				if (traceNumber === 0) {
-					eligiblePoints.push(point);
-				}
-			}
-			// TODO VERIFY
-			const xValue = eligiblePoints[0].x as number;
-			const yValue = eligiblePoints[0].y as number;
-			const clickedPoint: CartesianPoint = {
-				x: Number(xValue.toFixed(6)),
-				y: Number(yValue.toFixed(6))
-			};
-
+		updateCurrentCartesian: create.reducer<CartesianPoint>((state, { payload }) => {
 			// update calibrating map with new datapoint
 			const currentPoint: CalibratedPoint = {
-				cartesian: clickedPoint,
+				cartesian: payload,
 				gps: { longitude: -1, latitude: -1 }
 			};
 

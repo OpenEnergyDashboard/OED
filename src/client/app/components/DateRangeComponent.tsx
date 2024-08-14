@@ -28,8 +28,8 @@ export default function DateRangeComponent() {
 	const datePickerVisible = chartType !== ChartTypes.compare;
 
 	const handleChange = (value: Value) => {
-		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
-		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
+		dispatch(updateTimeInterval(dateRangeToTimeInterval(value).toString()));
+		dispatch(changeSliderRange(dateRangeToTimeInterval(value).toString()));
 	};
 
 

@@ -40,7 +40,7 @@ export const ExpandComponent = () => {
 	const dispatch = useAppDispatch();
 	return (
 		<img src='./expand.png' style={{ height: '25px' }}
-			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded())); }}
+			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded().toString())); }}
 		/>
 	);
 };
@@ -70,7 +70,7 @@ export const RefreshGraphComponent = () => {
 		<img
 			src='./refresh.png'
 			style={{ height: '25px', transform: `rotate(${time}deg)`, visibility: iconVisible ? 'visible' : 'hidden' }}
-			onClick={() => { !somethingFetching && dispatch(updateTimeInterval(sliderInterval)); }}
+			onClick={() => { !somethingFetching && dispatch(updateTimeInterval(sliderInterval.toString())); }}
 		/>
 	);
 };

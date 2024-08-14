@@ -27,6 +27,7 @@ import {
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
 import { createAppSelector } from './selectors';
+import moment from 'moment';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
@@ -459,10 +460,10 @@ export const selectChartLink = createAppSelector(
 		}
 		linkText += `chartType=${current.chartToRender}`;
 		// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
-		linkText += `&serverRange=${current.queryTimeInterval.toString()}`;
+		linkText += `&serverRange=${current.queryTimeIntervalString.toString()}`;
 		switch (current.chartToRender) {
 			case ChartTypes.bar:
-				linkText += `&barDuration=${current.barDuration.asDays()}`;
+				linkText += `&barDuration=${moment.duration(current.barDuration).asDays()}`;
 				linkText += `&barStacking=${current.barStacking}`;
 				break;
 			case ChartTypes.line:

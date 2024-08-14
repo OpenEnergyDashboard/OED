@@ -5,6 +5,7 @@ import { pick } from 'lodash';
 import * as moment from 'moment';
 import { MapDataState, mapsAdapter, mapsInitialState } from '../../redux/entityAdapters';
 import { createAppSelector } from '../../redux/selectors/selectors';
+import { setGraphSliceState } from '../../redux/slices/graphSlice';
 import { emtpyMapMetadata, localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { RootState } from '../../store';
 import { MapData, MapMetadata } from '../../types/redux/map';
@@ -125,12 +126,21 @@ export const mapsApi = baseApi.injectEndpoints({
 				body: { id }
 			}),
 			onQueryStarted: (arg, api) => {
+				const s = api.getState() as RootState;
 				api.queryFulfilled
 					//Cleanup Local Edits if any for deleted entity
 					.then(() => {
+						// set current to 0 if current selected is arg
+						const updatedCurrent = s.graph.current.selectedMap === arg ? { ...s.graph.current, selectedMap: 0 } : s.graph.current;
+						// filter entries with this id
+						const filteredPrev = s.graph.prev.filter(graphState => graphState.selectedMap === arg);
+						const filteredNext = s.graph.next.filter(graphState => graphState.selectedMap === arg);
+						api.dispatch(setGraphSliceState({ prev: filteredPrev, current: updatedCurrent, next: filteredNext }));
 						api.dispatch(localEditsSlice.actions.removeOneEdit(arg));
 					})
 					.catch();
+
+
 			},
 			invalidatesTags: ['MapsData']
 		}),

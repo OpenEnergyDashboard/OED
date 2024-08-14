@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
-import { TimeInterval } from '../../../../common/TimeInterval';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
@@ -62,17 +60,20 @@ export interface GraphState {
 	selectedUnit: number;
 	selectedMap: number;
 	selectedAreaUnit: AreaUnitType;
-	rangeSliderInterval: TimeInterval;
-	barDuration: moment.Duration;
-	mapsBarDuration: moment.Duration;
 	comparePeriod: ComparePeriod;
-	compareTimeInterval: TimeInterval;
 	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	lineGraphRate: LineGraphRate;
 	showMinMax: boolean;
 	threeD: ThreeDState;
-	queryTimeInterval: TimeInterval;
 	hotlinked: boolean;
+	// save time intervals as strings.
+	// convert to TimeInterval w/ TimeInterval.fromString()
+	rangeSliderIntervalString: string;
+	compareTimeIntervalString: string;
+	queryTimeIntervalString: string;
+	// save duration as string
+	barDuration: string;
+	mapsBarDuration: string;
 }
