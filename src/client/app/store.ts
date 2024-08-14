@@ -13,7 +13,7 @@ export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
 		// immutableCheck: false,
-		serializableCheck: false
+		// serializableCheck: false
 	}).prepend(listenerMiddleware.middleware)
 		.concat(baseApi.middleware),
 	devTools: devToolsConfig
