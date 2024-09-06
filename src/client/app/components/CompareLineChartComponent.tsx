@@ -4,7 +4,7 @@
 
 import { debounce, cloneDeep } from 'lodash';
 import { utc } from 'moment';
-import * as moment from 'moment';
+// import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
@@ -35,9 +35,8 @@ export default function CompareLineChartComponent() {
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const shiftInterval = useAppSelector(selectShiftTimeInterval);
-	const { args, shouldSkipQuery, argsDeps } = useAppSelector(selectCompareLineQueryArgs);
-	// getting the shift amount for the shifted data
 	const shiftAmount = useAppSelector(selectShiftAmount);
+	const { args, shouldSkipQuery, argsDeps } = useAppSelector(selectCompareLineQueryArgs);
 
 	// getting the time interval of current data
 	const timeInterval = graphState.queryTimeInterval;
@@ -45,7 +44,7 @@ export default function CompareLineChartComponent() {
 	// when shift amount is updated
 	const [newTimeInterval, setNewTimeInterval] = React.useState(cloneDeep(timeInterval));
 
-	// Fetch data, and derive plotly points
+	// Fetch original data, and derive plotly points
 	const { data, isFetching } = graphState.threeD.meterOrGroup === MeterOrGroup.meters ?
 		readingsApi.useLineQuery(args,
 			{
@@ -67,19 +66,7 @@ export default function CompareLineChartComponent() {
 				})
 			});
 
-	// Tracking changes of the shiftAmount and timeInternval in order to update the shifted data
-	React.useEffect(() => {
-		const startDate = timeInterval.getStartTimestamp();
-		const endDate = timeInterval.getEndTimestamp();
-		if (startDate !== null || endDate !== null) {
-			const { shiftedStart, shiftedEnd } = shiftDateFunc(startDate, endDate, shiftAmount);
-			const newInterval = new TimeInterval(shiftedStart, shiftedEnd);
-			setNewTimeInterval(newInterval);
-		}
-	}, [shiftAmount, timeInterval])
-
-
-	// Tracking the changes for custom shift date
+	// Update shifted time interval for shifted data
 	React.useEffect(() => {
 		const startDate = timeInterval.getStartTimestamp();
 		const endDate = timeInterval.getEndTimestamp();
@@ -92,7 +79,7 @@ export default function CompareLineChartComponent() {
 				setNewTimeInterval(newShitedInterval);
 			}
 		}
-	}, [shiftInterval])
+	}, [shiftInterval, timeInterval, shiftAmount])
 
 	// Getting the shifted data
 	const { data: dataNew, isFetching: isFetchingNew } = graphState.threeD.meterOrGroup === MeterOrGroup.meters ?
@@ -162,6 +149,7 @@ export default function CompareLineChartComponent() {
 							tickfont: { color: '#1AA5F0' },
 							overlaying: 'x',
 							side: 'top',
+
 						}
 					}}
 					config={{
@@ -198,58 +186,4 @@ export default function CompareLineChartComponent() {
 		);
 
 	}
-}
-
-/**
- * shifting date function
- * @param originalStart  start date of current graph data
- * @param endoriginalEndDate end date of current graph data
- * @param shiftType shifting amount in week, month, or year
- * @returns shifted start and shifted end dates for the new data
- */
-function shiftDateFunc(originalStart: moment.Moment, originalEnd: moment.Moment, shiftType: ShiftAmount) {
-	let shiftedStart: moment.Moment;
-	let shiftedEnd: moment.Moment;
-
-	const originalRangeDays = originalEnd.diff(originalStart, 'days');
-
-	switch (shiftType) {
-		case 'none':
-			shiftedStart = originalStart.clone();
-			shiftedEnd = originalEnd.clone();
-			break;
-
-		case 'week':
-			shiftedStart = originalStart.clone().subtract(7, 'days');
-			shiftedEnd = originalEnd.clone().subtract(7, 'days');
-			break;
-
-		case 'month':
-			shiftedStart = originalStart.clone().subtract(1, 'months');
-			shiftedEnd = shiftedStart.clone().add(originalRangeDays, 'days');
-
-			if (shiftedEnd.isSameOrAfter(originalStart)) {
-				shiftedEnd = originalStart.clone().subtract(1, 'days');
-			} else if (originalStart.date() === 1 && originalEnd.date() === originalEnd.daysInMonth()) {
-				shiftedEnd = shiftedStart.clone().endOf('month');
-			}
-			break;
-
-		case 'year':
-			shiftedStart = originalStart.clone().subtract(1, 'years');
-			shiftedEnd = originalEnd.clone().subtract(1, 'years');
-
-			if (originalStart.isLeapYear() && originalStart.month() === 1 && originalStart.date() === 29) {
-				shiftedStart = originalStart.clone().subtract(1, 'years').startOf('month').add(1, 'days');
-			} else if (originalEnd.isLeapYear() && originalEnd.month() === 1 && originalEnd.date() === 29) {
-				shiftedEnd = originalEnd.clone().subtract(1, 'years').endOf('month').subtract(1, 'days');
-			}
-			break;
-
-		default:
-			shiftedStart = originalStart.clone();
-			shiftedEnd = originalEnd.clone();
-	}
-
-	return { shiftedStart, shiftedEnd };
 }
