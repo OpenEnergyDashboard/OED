@@ -45,7 +45,22 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
                 });
 
-                // Add BG2 here
+                mocha.it('BG2: 7 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
+                    //loads data into database
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh)
+                    //gets unit ID
+                    const unitId = await getUnitId('kWh');
+                    //load data from mcsv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_7.csv')
+
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
+                        .query({ 
+                            timeInterval: ETERNITY.toString(), 
+                            barWidthDays: '7',
+                            graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                });
 
 
                 mocha.it('BG3: 28 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () =>{
