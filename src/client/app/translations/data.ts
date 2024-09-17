@@ -29,7 +29,7 @@ const LocaleTranslationData = {
 		"as.meter.unit": "as meter unit",
 		"as.meter.defaultgraphicunit": "as meter default graphic unit",
 		"bar": "Bar",
-		"bar.days.enter": "Enter in days and then hit enter",
+		"days.enter": "Enter in days and then hit enter",
 		"bar.interval": "Bar Interval",
 		"bar.raw": "Cannot create bar graph on raw units such as temperature",
 		"bar.stacking": "Bar Stacking",

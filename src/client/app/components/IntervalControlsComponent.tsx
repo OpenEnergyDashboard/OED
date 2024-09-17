@@ -14,7 +14,7 @@ import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
- * @returns interval controls for the bar, map, and compare pages
+ * @returns Interval controls for the bar, map, and compare pages
  */
 export default function IntervalControlsComponent() {
 	const dispatch = useAppDispatch();
@@ -44,7 +44,7 @@ export default function IntervalControlsComponent() {
 	React.useEffect(() => {
 		// Assume value is valid since it is coming from state.
 		// Do not allow bad values in state.
-		const isCustom = !(['1', '7', '28'].find(days => days == duration.asDays().toString()));
+		const isCustom = !['1', '7', '28'].includes(duration.asDays().toString());
 		setShowCustomDuration(isCustom);
 		setDaysCustom(duration.asDays());
 		setDays(isCustom ? CUSTOM_INPUT : duration.asDays().toString());
@@ -60,8 +60,8 @@ export default function IntervalControlsComponent() {
 		if (value === CUSTOM_INPUT) {
 			// Set menu value from standard value to special value to show custom
 			// and show the custom input area.
-			setDays(CUSTOM_INPUT);
 			setShowCustomDuration(true);
+			setDays(CUSTOM_INPUT);
 		} else {
 			// Set the standard menu value, hide the custom duration input
 			// and duration for graphing.
@@ -91,28 +91,43 @@ export default function IntervalControlsComponent() {
 		}
 	};
 
-	// Define the initial set of options for the dropdown when the chart type is not 'compare'.
-	const options = [
-		{ label: 'day', value: '1' },
-		{ label: 'week', value: '7' },
-		{ label: '4.weeks', value: '28' }
-	];
+	// Handles change for compare period dropdown
+	const handleComparePeriodChange = (value: string) => {
+		const period = value as unknown as ComparePeriod;
+		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod: period, currentTime: moment() }));
+	};
 
-	// If the chart type is 'compare', we change the options to reflect comparison periods.
-	if (chartType === ChartTypes.compare) {
-		options.length = 0; // Clear the previous options
-		Object.entries(ComparePeriod).forEach(([key, value]) => {
-			options.push({ label: key, value: value.toString() });
-		});
-	}
+	const comparePeriodTranslations: Record<keyof typeof ComparePeriod, string> = {
+		Day: 'day',
+		Week: 'week',
+		FourWeeks: '4.weeks'
+	};
+
+	// Defines the set of options for the dropdown
+	const options = chartType === ChartTypes.compare
+		? Object.entries(ComparePeriod).map(([key, value]) => (
+			<option value={value} key={key}>
+				{translate(comparePeriodTranslations[key as keyof typeof comparePeriodTranslations])}
+			</option>
+		))
+		: (
+			<>
+				<option value='1'>{translate('day')}</option>
+				<option value='7'>{translate('week')}</option>
+				<option value='28'>{translate('4.weeks')}</option>
+				<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
+			</>
+		);
 
 	return (
 		<div>
 			<div style={divTopBottomPadding}>
 				<p style={labelStyle}>
-					{(chartType === ChartTypes.bar && translate('bar.interval')) ||
-						(chartType === ChartTypes.map && translate('map.interval')) ||
-						(chartType === ChartTypes.compare && translate('compare.period'))}:
+					{translate(
+						chartType === ChartTypes.bar ? 'bar.interval' :
+							chartType === ChartTypes.map ? 'map.interval' :
+								'compare.period'
+					)}:
 					<TooltipMarkerComponent page='home' helpTextId={
 						chartType === ChartTypes.bar ? 'help.home.bar.days.tip' :
 							chartType === ChartTypes.map ? 'help.home.map.days.tip' :
@@ -124,30 +139,27 @@ export default function IntervalControlsComponent() {
 					name='durationDays'
 					type='select'
 					value={chartType === ChartTypes.compare ? comparePeriod?.toString() : days}
-					onChange={e => handleDaysChange(e.target.value)}
+					onChange={e => chartType === ChartTypes.compare ? handleComparePeriodChange(e.target.value) : handleDaysChange(e.target.value)}
 				>
-					{options.map(option => (
-						<option value={option.value} key={option.label}>
-							{translate(option.label)}
-						</option>
-					))}
-					<option value={CUSTOM_INPUT}>
-						{translate('custom.value')}
-					</option>
+					{options}
 				</Input>
 				{/* TODO: Compare is currently not ready for a custom option. */}
 				{showCustomDuration && chartType !== ChartTypes.compare &&
 					<FormGroup>
-						<Label for='days'>{translate('bar.days.enter')}:</Label>
-						<Input id='days' name='days' type='number'
+						<Label for='days'>{translate('days.enter')}:</Label>
+						<Input
+							id='days'
+							name='days'
+							type='number'
 							onChange={e => handleCustomDaysChange(Number(e.target.value))}
 							// This grabs each key hit and then finishes input when hit enter.
-							onKeyDown={e => { handleEnter(e.key); }}
+							onKeyDown={e => handleEnter(e.key)}
 							step='1'
 							min={MIN_DAYS}
 							max={MAX_DAYS}
 							value={daysCustom}
-							invalid={!daysValid(daysCustom)} />
+							invalid={!daysValid(daysCustom)}
+						/>
 						<FormFeedback>
 							<FormattedMessage id="error.bounds" values={{ min: MIN_DAYS, max: MAX_DAYS }} />
 						</FormFeedback>
