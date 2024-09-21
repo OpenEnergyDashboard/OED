@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+// eslint-disable-next-line max-len
 import { selectQueryTimeInterval, selectShiftAmount, selectShiftTimeInterval, updateShiftAmount, updateShiftTimeInterval } from '../redux/slices/graphSlice';
 import translate from '../utils/translate';
 import { FormattedMessage } from 'react-intl';
@@ -26,9 +27,22 @@ export default function CompareLineControlsComponent() {
 	const [shiftOption, setShiftOption] = React.useState<ShiftAmount>(shiftAmount);
 	// Hold value to track whether custom data range picker should show up or not
 	const [showDatePicker, setShowDatePicker] = React.useState(false);
-	const shiftAmountNotSelected = shiftAmount === ShiftAmount.none;
+	// Hold value to store the custom date range for the shift interval
+	const [customDateRange, setCustomDateRange] = React.useState<Value>(timeIntervalToDateRange(shiftInterval));
 
-	// Update shifting option when shift data interval is chosen
+	// Add this useEffect to update the shift interval when the shift option changes
+	React.useEffect(() => {
+		if (shiftOption !== ShiftAmount.custom) {
+			updateShiftInterval(shiftOption);
+		}
+	}, [shiftOption, timeInterval]);
+
+	// Update custom date range value when shift interval changes
+	React.useEffect(() => {
+		setCustomDateRange(timeIntervalToDateRange(shiftInterval));
+	}, [shiftInterval]);
+
+	// Handle changes in shift option (week, month, year, or custom)
 	const handleShiftOptionChange = (value: string) => {
 		if (value === 'custom') {
 			setShiftOption(ShiftAmount.custom);
@@ -36,23 +50,10 @@ export default function CompareLineControlsComponent() {
 			setShowDatePicker(true);
 		} else {
 			setShowDatePicker(false);
-			if (value === 'none') {
-				setShiftOption(ShiftAmount.none);
-				dispatch(updateShiftAmount(ShiftAmount.none));
-				updateShiftInterval(ShiftAmount.none);
-			} else if (value === 'week') {
-				setShiftOption(ShiftAmount.week);
-				dispatch(updateShiftAmount(ShiftAmount.week));
-				updateShiftInterval(ShiftAmount.week);
-			} else if (value === 'month') {
-				setShiftOption(ShiftAmount.month);
-				dispatch(updateShiftAmount(ShiftAmount.month));
-				updateShiftInterval(ShiftAmount.month);
-			} else if (value === 'year') {
-				setShiftOption(ShiftAmount.year);
-				dispatch(updateShiftAmount(ShiftAmount.year));
-				updateShiftInterval(ShiftAmount.year);
-			}
+			const newShiftOption = value as ShiftAmount;
+			setShiftOption(newShiftOption);
+			dispatch(updateShiftAmount(newShiftOption));
+			updateShiftInterval(newShiftOption);
 		}
 	};
 
@@ -65,12 +66,13 @@ export default function CompareLineControlsComponent() {
 			const newInterval = new TimeInterval(shiftedStart, shiftedEnd);
 			dispatch(updateShiftTimeInterval(newInterval));
 		}
-	}
+	};
 
 	// Update date when the data range picker is used in custome shifting option
 	const handleShiftDateChange = (value: Value) => {
+		setCustomDateRange(value);
 		dispatch(updateShiftTimeInterval(dateRangeToTimeInterval(value)));
-	}
+	};
 
 	return (
 		<>
@@ -84,7 +86,7 @@ export default function CompareLineControlsComponent() {
 					name='shiftDateInput'
 					type='select'
 					value={shiftOption}
-					invalid={shiftAmountNotSelected}
+					invalid={shiftAmount === ShiftAmount.none}
 					onChange={e => handleShiftOptionChange(e.target.value)}
 				>
 					<option value="none" hidden disabled>{translate('select.shift.amount')}</option>
@@ -93,15 +95,16 @@ export default function CompareLineControlsComponent() {
 					<option value="year">{translate('1.year')}</option>
 					<option value="custom">{translate('custom.date.range')}</option>
 				</Input>
+				{/* Show date picker when custom date range is selected */}
 				{showDatePicker &&
 					<DateRangePicker
-						value={timeIntervalToDateRange(shiftInterval)}
+						value={customDateRange}
 						onChange={handleShiftDateChange}
-						calendarProps={{ defaultView: 'year' }}
 						minDate={new Date(1970, 0, 1)}
 						maxDate={new Date()}
 						locale={locale} // Formats Dates, and Calendar months base on locale
 						calendarIcon={null}
+						calendarProps={{ defaultView: 'year' }}
 					/>}
 
 			</div>
@@ -115,11 +118,11 @@ const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };
 /**
  * shifting date function to find the shifted start date and shifted end date
  * @param originalStart  start date of current graph data
- * @param endoriginalEndDate end date of current graph data
+ * @param originalEnd end date of current graph data
  * @param shiftType shifting amount in week, month, or year
  * @returns shifted start and shifted end dates for the new data
  */
-function shiftDateFunc(originalStart: moment.Moment, originalEnd: moment.Moment, shiftType: ShiftAmount) {
+export function shiftDateFunc(originalStart: moment.Moment, originalEnd: moment.Moment, shiftType: ShiftAmount) {
 	let shiftedStart: moment.Moment;
 	let shiftedEnd: moment.Moment;
 
