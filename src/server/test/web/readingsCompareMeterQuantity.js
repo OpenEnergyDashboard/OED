@@ -36,7 +36,6 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected);
 				});
 
-				// Add C2 here
 				mocha.it('C2: 7 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh', async () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
