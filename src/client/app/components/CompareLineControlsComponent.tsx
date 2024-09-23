@@ -12,6 +12,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
+import { showErrorNotification } from '../utils/notifications';
 
 /**
  * @returns compare line control page
@@ -53,6 +54,38 @@ export default function CompareLineControlsComponent() {
 			const newShiftOption = value as ShiftAmount;
 			setShiftOption(newShiftOption);
 			dispatch(updateShiftAmount(newShiftOption));
+
+			// notify user when original data or shift data cross leap year
+			const startDate = timeInterval.getStartTimestamp();
+			const endDate = timeInterval.getEndTimestamp();
+
+			if (startDate && endDate) {
+				const { shiftedStart, shiftedEnd } = shiftDateFunc(startDate, endDate, newShiftOption);
+				// Check if original or shifted date range is a leap year
+				const originalIsLeapYear = startDate.isLeapYear() || endDate.isLeapYear();
+				const shiftedIsLeapYear = shiftedStart.isLeapYear() || shiftedEnd.isLeapYear();
+
+				// Check if the original date range crosses Feb 29, which causes unaligned graph
+				const originalCrossFeb29 = (
+					startDate.isLeapYear() &&
+					startDate.isBefore(moment(`${startDate.year()}-03-01`)) &&
+					endDate.isAfter(moment(`${startDate.year()}-02-28`))
+				);
+
+				// Check if the shifted date range crosses Feb 29, which causes unaligned graph
+				const shiftedCrossFeb29 = (
+					shiftedStart.isLeapYear() &&
+					shiftedStart.isBefore(moment(`${shiftedStart.year()}-03-01`)) &&
+					shiftedEnd.isAfter(moment(`${shiftedStart.year()}-02-28`))
+				);
+
+				if (originalCrossFeb29 && !shiftedIsLeapYear) {
+					showErrorNotification('shifted.data.crosses.leap.year.to.non.leap.year');
+				} else if (shiftedCrossFeb29 && !originalIsLeapYear) {
+					showErrorNotification('shifted.data.may.not.align.appropriate.due.to.leap.year');
+				}
+			}
+			// Update shift interval when shift option changes
 			updateShiftInterval(newShiftOption);
 		}
 	};

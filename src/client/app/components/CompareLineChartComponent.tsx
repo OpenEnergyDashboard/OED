@@ -70,7 +70,7 @@ export default function CompareLineChartComponent() {
 		const { shiftedStart, shiftedEnd } = shiftDateFunc(start, end, shift);
 		const newShiftedInterval = new TimeInterval(shiftedStart, shiftedEnd);
 		dispatch(updateShiftTimeInterval(newShiftedInterval));
-	}, [dispatch]);
+	}, []);
 
 	// Update shifted interval based on current interval and shift amount
 	React.useEffect(() => {

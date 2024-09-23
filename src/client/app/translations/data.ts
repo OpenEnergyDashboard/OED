@@ -517,7 +517,9 @@ const LocaleTranslationData = {
 		"compare.line.days.enter": "Enter in days and then hit enter",
 		"please.set.the.date.range": "Please choose date range",
 		"select.shift.amount": "Select shift amount",
-		"custom.date.range": "Custom date range"
+		"custom.date.range": "Custom date range",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriate",
+		"origin.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriate"
 	},
 	"fr": {
 		"3D": "3D",
@@ -1029,7 +1031,9 @@ const LocaleTranslationData = {
 		"compare.line.days.enter": "Enter in days and then hit enter\u{26A1}",
 		"please.set.the.date.range": "Please choose date range\u{26A1}",
 		"select.shift.amount": "Select shift amount\u{26A1}",
-		"custom.date.range": "Custom date range\u{26A1}"
+		"custom.date.range": "Custom date range\u{26A1}",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriate\u{26A1}",
+		"origin.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriate\u{26A1}"
 	},
 	"es": {
 		"3D": "3D",
@@ -1542,7 +1546,9 @@ const LocaleTranslationData = {
 		"compare.line.days.enter": "Enter in days and then hit enter\u{26A1}",
 		"please.set.the.date.range": "Please choose date range\u{26A1}",
 		"select.shift.amount": "Select shift amount\u{26A1}",
-		"custom.date.range": "Custom date range\u{26A1}"
+		"custom.date.range": "Custom date range\u{26A1}",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriate\u{26A1}",
+		"origin.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriate\u{26A1}"
 	}
 }
 
