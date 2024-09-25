@@ -12,7 +12,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { showErrorNotification } from '../utils/notifications';
+import { showWarnNotification } from '../utils/notifications';
 
 /**
  * @returns compare line control page
@@ -80,9 +80,9 @@ export default function CompareLineControlsComponent() {
 				);
 
 				if (originalCrossFeb29 && !shiftedIsLeapYear) {
-					showErrorNotification('shifted.data.crosses.leap.year.to.non.leap.year');
+					showWarnNotification(translate('original.data.crosses.leap.year.to.non.leap.year'));
 				} else if (shiftedCrossFeb29 && !originalIsLeapYear) {
-					showErrorNotification('shifted.data.may.not.align.appropriate.due.to.leap.year');
+					showWarnNotification(translate('shifted.data.crosses.leap.year.to.non.leap.year'));
 				}
 			}
 			// Update shift interval when shift option changes
