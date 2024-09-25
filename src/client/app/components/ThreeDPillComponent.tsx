@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import { Badge } from 'reactstrap';
 import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
@@ -40,6 +41,17 @@ export default function ThreeDPillComponent() {
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
 	});
 
+	// when there is only one meter, it must be selected as a default (there is no other option)
+	useEffect(() => {
+		if (meterPillData.length === 1) {
+			const singleMeter = meterPillData[0];
+			dispatch(updateThreeDMeterOrGroupInfo({
+				meterOrGroupID: singleMeter.meterOrGroupID,
+				meterOrGroup: singleMeter.meterOrGroup
+			}));
+		}
+	}, [meterPillData, dispatch]);
+
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(
 		updateThreeDMeterOrGroupInfo({
@@ -47,6 +59,7 @@ export default function ThreeDPillComponent() {
 			meterOrGroup: pillData.meterOrGroup
 		})
 	);
+
 
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
 	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
