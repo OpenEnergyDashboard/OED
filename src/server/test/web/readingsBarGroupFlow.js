@@ -24,8 +24,6 @@ mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for bar charts', () => {
             mocha.describe('for quantity groups', () => {
-
-                // Add BG15 here
                 mocha.it('BG15: should have daily points for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () =>{
                     //load data into database
                     await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWGroups, groupDatakWh);
