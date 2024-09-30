@@ -209,10 +209,10 @@ export default function MapChartComponent() {
 									//The Color checked if negative
 									if(averagedReading >= 0){
 										colors.push(getGraphColor(meterID, DataType.Meter));
-										}
-										else{
-											colors.push(getGraphColor(6, DataType.Meter));
-										}
+									}
+									else{
+										colors.push(getGraphColor(6, DataType.Meter));
+									}
 								}
 								// The hover text.
 								hoverText.push(`<b> ${timeReading} </b> <br> ${label}: ${averagedReading.toPrecision(6)} ${unitLabel}`);
@@ -305,7 +305,7 @@ export default function MapChartComponent() {
 			// The circle size is set to area below. Thus, we need to convert from wanting a max
 			// diameter of minDimension * maxFeatureFraction to an area.
 			const maxCircleSize = Math.PI * Math.pow(minDimension * maxFeatureFraction / 2, 2);
-			const minCircleSize = Math.PI * Math.pow(minDimension * maxFeatureFraction / (10*2), 2)
+			const minCircleSize = Math.PI * Math.pow(minDimension * maxFeatureFraction / (10*2), 2);
 			// Find the largest circle which is usage.
 			const largestCircleSize = Math.max(...size);
 			const smallestCircleSize = Math.min(...size);
@@ -315,8 +315,8 @@ export default function MapChartComponent() {
 			const minShift = 10*scaling + 5;
 
 			for(let i=0;i<size.length;i++){
-                size[i]+=minShift;
-            }
+				size[i]+=minShift;
+			}
 
 
 			// Per https://plotly.com/javascript/reference/scatter/:
