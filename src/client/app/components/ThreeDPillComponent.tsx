@@ -41,16 +41,18 @@ export default function ThreeDPillComponent() {
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
 	});
 
-	// when there is only one meter, it must be selected as a default (there is no other option)
+	// when there is only one choice, it must be selected as a default (there is no other option)
 	useEffect(() => {
-		if (meterPillData.length === 1) {
-			const singleMeter = meterPillData[0];
+		const combinedPillData = [...meterPillData, ...groupPillData];
+
+		if (combinedPillData.length === 1) {
+			const singlePill = combinedPillData[0];
 			dispatch(updateThreeDMeterOrGroupInfo({
-				meterOrGroupID: singleMeter.meterOrGroupID,
-				meterOrGroup: singleMeter.meterOrGroup
+				meterOrGroupID: singlePill.meterOrGroupID,
+				meterOrGroup: singlePill.meterOrGroup
 			}));
 		}
-	}, [meterPillData, dispatch]);
+	}, [meterPillData, groupPillData, dispatch]);
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(
