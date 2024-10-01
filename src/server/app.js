@@ -39,6 +39,7 @@ const ciks = require('./routes/ciks');
 // Create a limit of 200 requests/5 seconds
 const generalLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
+	//limit: 200, // 200 requests
 	limit: 200, // 200 requests
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false // Disable the `X-RateLimit-*` headers
