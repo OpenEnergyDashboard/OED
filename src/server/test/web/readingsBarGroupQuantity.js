@@ -140,8 +140,56 @@ mocha.describe('readings API', () => {
                 // Add BG10 here
 
                 mocha.it('BG10: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU', async () =>{
+                    const unitData = unitDatakWh.concat([
+                        {
+                            // u3
+                            name: 'MJ', 
+                            identifier: 'megaJoules', 
+                            unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: false, 
+                            note: 'MJ' 
+                        },
+                        { 
+                            // u16
+                            name: 'BTU', 
+                            identifier: '', 
+                            unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                            secInRate: 3600, 
+                            typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: true, 
+                            note: 'OED created standard unit' 
+                        }
+                    ]);
+                    
+                    const conversionData = conversionDatakWh.concat([
+                        { 
+                            // c2
+                            sourceName: 'kWh', 
+                            destinationName: 'MJ', 
+                            bidirectional: true, 
+                            slope: 3.6, 
+                            intercept: 0, 
+                            note: 'kWh → MJ' 
+                        },
+                        { 
+                            // c3
+                            sourceName: 'MJ', 
+                            destinationName: 'BTU', 
+                            bidirectional: true, 
+                            slope: 947.8, 
+                            intercept: 0, 
+                            note: 'MJ → BTU' 
+                        }
+                    ]);
+
                     //load data into database
-                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+                    await prepareTest(unitData, conversionData, meterDatakWhGroups, groupDatakWh);
                     //get unit ID since the DB could use any value.
                     const unitId = await getUnitId('BTU');
                     // Load the expected response data from the corresponding csv file
