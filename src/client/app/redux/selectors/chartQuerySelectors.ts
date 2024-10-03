@@ -92,17 +92,17 @@ export const selectCompareLineQueryArgs = createSelector(
 		const args: CompareLineReadingApiArgs =
 			threeD.meterOrGroup === MeterOrGroup.meters
 				? {
-						ids: [threeD.meterOrGroupID!],
-						timeInterval: queryTimeInterval.toString(),
-						graphicUnitId: selectedUnit,
-						meterOrGroup: threeD.meterOrGroup!,
-				  }
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				}
 				: {
-						ids: [threeD.meterOrGroupID!],
-						timeInterval: queryTimeInterval.toString(),
-						graphicUnitId: selectedUnit,
-						meterOrGroup: threeD.meterOrGroup!,
-				  };
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				};
 		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
 		const argsDeps = threeD.meterOrGroup === MeterOrGroup.meters ? lineChartDeps.meterDeps : lineChartDeps.groupDeps;
 		return { args, shouldSkipQuery, argsDeps };
@@ -220,6 +220,6 @@ export const selectAllChartQueryArgs = createSelector(
 		compare,
 		map,
 		threeD,
-		compareLine,
+		compareLine
 	})
 );
