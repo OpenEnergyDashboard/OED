@@ -129,15 +129,12 @@ mocha.describe('readings API', () => {
                             graphicUnitId: unitId });
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
-                            
                 });
                 // Add BG7 here
 
                 // Add BG8 here
 
                 // Add BG9 here
-
-                // Add BG10 here
 
                 mocha.it('BG10: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU', async () =>{
                     const unitData = unitDatakWh.concat([
@@ -202,7 +199,6 @@ mocha.describe('readings API', () => {
                             graphicUnitId: unitId });
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected, GROUP_ID);
-
                 });
 
                 // Add BG11 here
