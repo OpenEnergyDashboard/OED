@@ -144,7 +144,7 @@ export default function IntervalControlsComponent() {
 						</option>
 					}
 				</Input>
-				{showCustomDuration &&
+				{showCustomDuration && chartType !== ChartTypes.compare &&
 					<FormGroup>
 						<Label for='days'>{translate('days.enter')}:</Label>
 						<Input
