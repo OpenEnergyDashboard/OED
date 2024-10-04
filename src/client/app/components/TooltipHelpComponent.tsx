@@ -9,7 +9,7 @@ import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectHelpUrl } from '../redux/slices/adminSlice';
 import '../styles/tooltip.css';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -20,7 +20,7 @@ interface TooltipHelpProps {
  * @returns ToolTipHelpComponent
  */
 export default function TooltipHelpComponent(props: TooltipHelpProps) {
-
+	const translate = useTranslate();
 	/**
 	 * @returns JSX to create the help icons with links
 	 */

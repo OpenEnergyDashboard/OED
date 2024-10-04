@@ -29,7 +29,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString } from '../../utils/input';
 import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -40,6 +40,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Group create element
  */
 export default function CreateGroupModalComponent() {
+	const translate = useTranslate();
 	const [createGroup] = groupsApi.useCreateGroupMutation();
 
 	// Meters state

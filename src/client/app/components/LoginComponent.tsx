@@ -9,13 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 
 /**
  * @returns The login page for users or admins.
  */
 export default function LoginComponent() {
+	const translate = useTranslate();
 	// Local State
 	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');

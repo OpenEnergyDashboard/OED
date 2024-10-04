@@ -16,7 +16,7 @@ import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } fro
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 
@@ -24,6 +24,7 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);

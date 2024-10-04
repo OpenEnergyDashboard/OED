@@ -8,13 +8,14 @@ import { Button, ButtonGroup, Dropdown, DropdownItem, DropdownMenu, DropdownTogg
 import { graphSlice, selectComparePeriod, selectSortingOrder } from '../redux/slices/graphSlice';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { ComparePeriod, SortingOrder } from '../utils/calculateCompare';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * @returns controls for the compare page
  */
 export default function CompareControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const comparePeriod = useAppSelector(selectComparePeriod);
 	const compareSortingOrder = useAppSelector(selectSortingOrder);

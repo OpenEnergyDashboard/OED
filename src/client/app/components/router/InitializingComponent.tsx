@@ -4,12 +4,13 @@
 
 import * as React from 'react';
 import SpinnerComponent from '../SpinnerComponent';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 
 /**
  * @returns A simple loading spinner used to indicate that the startup init sequence is in progress
  */
 export default function InitializingComponent() {
+	const translate = useTranslate();
 	return (
 		<div style={{
 			width: '100%', height: '100%',

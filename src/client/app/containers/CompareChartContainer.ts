@@ -6,7 +6,7 @@
 
 import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
@@ -47,6 +47,7 @@ interface CompareChartContainerProps {
  * @returns The props object
  */
 function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps): any {
+	const translate = useTranslate();
 	const comparePeriod = selectComparePeriod(state);
 	const compareTimeInterval = selectCompareTimeInterval(state);
 	const datasets: any[] = [];

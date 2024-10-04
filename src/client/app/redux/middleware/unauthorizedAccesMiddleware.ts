@@ -4,11 +4,12 @@
 
 import { isAsyncThunkAction, isRejected } from '@reduxjs/toolkit';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import { AppListener } from '../listenerMiddleware';
 import { authApi } from '../api/authApi';
 
 export const unauthorizedRequestListener = (startListening: AppListener) => {
+	const translate = useTranslate();
 	startListening({
 		predicate: action => {
 			// Listens for rejected async thunks. if no payload then its an RTK internal call that needs to also be filtered.

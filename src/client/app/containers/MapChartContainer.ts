@@ -22,9 +22,10 @@ import {
 } from '../utils/calibration';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 function mapStateToProps(state: State) {
+	const translate = useTranslate();
 	const unitID = state.graph.selectedUnit;
 	// Map to use.
 	let map;

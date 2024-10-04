@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { selectShowMinMax } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';
 import getGraphColor from '../../utils/getGraphColor';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import { createAppSelector } from './selectors';
 import { selectScalingFromEntity, selectNameFromEntity } from './entitySelectors';
 import { selectPlotlyMeterDeps, selectPlotlyGroupDeps, selectFromLineReadingsResult } from './plotlyDataSelectors';
@@ -57,6 +57,7 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 					yData.push(readingValue);
 					// All hover have the date, meter name and value.
 					const hoverStart = `<b> ${timeReading.format('ddd, ll LTS')} </b> <br> ${label}: ${readingValue.toPrecision(6)} ${lineUnitLabel}`;
+					const translate = useTranslate();
 					if (showMinMax && reading.max != null) {
 						// We want to show min/max. Note if the data is raw for this meter then all the min/max values are null.
 						// In this case we still push the min/max but plotly will not show them. This is a little extra work

@@ -13,7 +13,7 @@ import { graphSlice, selectChartToRender } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes } from '../types/redux/graph';
 import { State } from '../types/redux/state';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -21,6 +21,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Chart select element
  */
 export default function ChartSelectComponent() {
+	const translate = useTranslate();
 	const currentChartToRender = useAppSelector(selectChartToRender);
 	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);

@@ -8,13 +8,14 @@ import { FormattedMessage } from 'react-intl';
 import { FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectBarStacking, selectBarWidthDays } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * @returns controls for the Options Ui page.
  */
 export default function BarControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// The min/max days allowed for user selection

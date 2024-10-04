@@ -10,7 +10,7 @@
 
 import { Thunk, Dispatch, GetState } from '../../types/redux/actions';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import * as t from '../../types/redux/conversions';
 import { conversionsApi } from '../../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
@@ -18,6 +18,7 @@ import { conversionsSlice } from '../reducers/conversions';
 
 
 export function fetchConversionsDetails(): Thunk {
+	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
 		if (!getState().conversions.isFetching) {

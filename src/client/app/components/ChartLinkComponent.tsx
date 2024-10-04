@@ -11,13 +11,14 @@ import { selectChartLink } from '../redux/selectors/uiSelectors';
 import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * @returns chartLinkComponent
  */
 export default function ChartLinkComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const [linkTextVisible, setLinkTextVisible] = React.useState<boolean>(false);
 	const linkText = useAppSelector(selectChartLink);

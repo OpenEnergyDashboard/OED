@@ -4,7 +4,7 @@
 
 import { GPSPoint } from './calibration';
 import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
-import translate from './translate';
+import { useTranslate } from '../redux/componentHooks';
 import { sortBy } from 'lodash';
 
 /**
@@ -87,6 +87,7 @@ export const NoUnit: UnitData = {
  * @returns a unit to represent no unit with translated identifier
  */
 export function noUnitTranslated(): UnitData {
+	const translate = useTranslate();
 	// Untranslated no unit.
 	const unit = NoUnit;
 	// Make the identifier be translated.

@@ -10,7 +10,7 @@ import { useAppSelector } from '../../../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../../../redux/slices/currentUserSlice';
 import { User, UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
-import translate from '../../../utils/translate';
+import { useTranslate } from '../../../redux/componentHooks';
 import ConfirmActionModalComponent from '../../ConfirmActionModalComponent';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
@@ -29,7 +29,7 @@ interface EditUserModalComponentProps {
  * @returns User edit element
  */
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
-
+	const translate = useTranslate();
 	// get current logged in user
 	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
 

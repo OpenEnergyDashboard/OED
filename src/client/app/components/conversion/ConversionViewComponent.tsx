@@ -12,7 +12,7 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
 import { conversionArrow } from '../../utils/conversionArrow';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import EditConversionModalComponent from './EditConversionModalComponent';
 
 interface ConversionViewComponentProps {
@@ -25,6 +25,7 @@ interface ConversionViewComponentProps {
  * @returns Single conversion element
  */
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
+	const translate = useTranslate();
 	// Don't check if admin since only an admin is allow to route to this page.
 
 	// Edit Modal Show

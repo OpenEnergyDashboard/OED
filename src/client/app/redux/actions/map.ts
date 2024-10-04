@@ -16,7 +16,7 @@ import {
 import {State} from '../../types/redux/state';
 import {mapsApi} from '../../utils/api';
 import {showErrorNotification, showSuccessNotification} from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import * as moment from 'moment';
 import {browserHistory} from '../../utils/history';
 import {logToServer} from './logs';
@@ -232,6 +232,7 @@ export function submitCalibratingMap(): Thunk {
  * submit a new map to database at the end of a calibration session
  */
 export function submitNewMap(): Thunk {
+	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapID = getState().maps.calibratingMap;
 		const map = getState().maps.editedMaps[mapID];
@@ -266,6 +267,7 @@ export function submitNewMap(): Thunk {
  * @param mapID the edited map being updated at database
  */
 export function submitEditedMap(mapID: number): Thunk {
+	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const map = getState().maps.editedMaps[mapID];
 		dispatch(submitMapEdits(mapID));
@@ -307,6 +309,7 @@ export function submitEditedMap(mapID: number): Thunk {
  * @param mapID map to be removed
  */
 export function removeMap(mapID: number): Thunk {
+	const translate = useTranslate();
 	return async (dispatch: Dispatch) => {
 		try {
 			await mapsApi.delete(mapID);

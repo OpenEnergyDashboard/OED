@@ -17,7 +17,7 @@ import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSe
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 /**
@@ -27,6 +27,7 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns Plotly BarChart
  */
 export default function BarChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);

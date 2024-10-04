@@ -15,7 +15,7 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 /**
@@ -23,6 +23,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Conversion create element
  */
 export default function CreateConversionModalComponent() {
+	const translate = useTranslate();
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation();
 	// Want units in sorted order by identifier regardless of case.
 

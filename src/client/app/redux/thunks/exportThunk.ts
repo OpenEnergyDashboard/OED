@@ -20,7 +20,7 @@ import { ConversionData } from '../../types/redux/conversions';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
 import graphExport, { downloadRawCSV } from '../../utils/exportData';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import { createAppThunk } from './appThunk';
 import { selectAnythingFetching } from '../../redux/selectors/apiSelectors';
 import { RootState } from '../../store';
@@ -115,6 +115,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 export const exportRawReadings = createAppThunk(
 	'graph/ExportRaw',
 	async (_arg, api) => {
+		const translate = useTranslate();
 		const state = api.getState();
 		if (!selectCanExport(state)) {
 			return api.rejectWithValue('Data Fetch In Progress, Or No data');

@@ -6,7 +6,7 @@ import { showErrorNotification } from './notifications';
 import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
 import { MapMetadata } from '../types/redux/map';
-import translate from './translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * Defines a Cartesian Point with x & y
@@ -107,6 +107,7 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * @returns true if string is GPS and false otherwise.
  */
 export function isValidGPSInput(input: string): boolean {
+	const translate = useTranslate();
 	if (input.indexOf(',') === -1) { // if there is no comma
 		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
 		return false;

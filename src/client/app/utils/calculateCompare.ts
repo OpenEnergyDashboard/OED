@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * 'Day', 'Week' or 'FourWeeks'
@@ -159,6 +159,7 @@ export interface ComparePeriodLabels {
  * @returns human-readable names for the compare period as {{prev: string, current: string}}
  */
 export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePeriodLabels {
+	const translate = useTranslate();
 	switch (comparePeriod) {
 		case ComparePeriod.Day:
 			return { prev: translate('yesterday'), current: translate('today') };
@@ -180,6 +181,7 @@ export function getComparePeriodLabels(comparePeriod: ComparePeriod): ComparePer
  * @returns The label summary
  */
 export function getCompareChangeSummary(change: number, name: string, labels: ComparePeriodLabels): string {
+	const translate = useTranslate();
 	if (isNaN(change)) {
 		return `${name} ${translate('has.no.data')}`;
 	}

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectShowMinMax } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -13,6 +13,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Error Bar checkbox with tooltip and label
  */
 export default function ErrorBarComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const showMinMax = useAppSelector(selectShowMinMax);
 

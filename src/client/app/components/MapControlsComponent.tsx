@@ -8,13 +8,14 @@ import * as React from 'react';
 import { Button, ButtonGroup } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMapBarWidthDays, updateMapsBarDuration } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import MapChartSelectComponent from './MapChartSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 /**
  * @returns Map page controls
  */
 export default function MapControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const barDuration = useAppSelector(selectMapBarWidthDays);
 
