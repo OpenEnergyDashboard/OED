@@ -38,17 +38,20 @@ export default function IntervalControlsComponent() {
 	const [daysCustom, setDaysCustom] = React.useState<number>(duration.asDays());
 	// True if custom duration input for bar or map is active.
 	const [showCustomDuration, setShowCustomDuration] = React.useState<boolean>(false);
+	// Define a flag to track if custom input is actively being used
+	const [isCustomInput, setIsCustomInput] = React.useState<boolean>(false);
 
 	// Keeps react-level state, and redux state in sync.
 	// Two different layers in state may differ especially when externally updated (chart link, history buttons.)
 	React.useEffect(() => {
-		// Assume value is valid since it is coming from state.
-		// Do not allow bad values in state.
-		const isCustom = !['1', '7', '28'].includes(duration.asDays().toString());
-		setShowCustomDuration(isCustom);
-		setDaysCustom(duration.asDays());
-		setDays(isCustom ? CUSTOM_INPUT : duration.asDays().toString());
-	}, [duration]);
+		// If user is in custom input mode, don't reset to standard options
+		if (!isCustomInput) {
+			const isCustom = !['1', '7', '28'].includes(duration.asDays().toString());
+			setShowCustomDuration(isCustom);
+			setDaysCustom(duration.asDays());
+			setDays(isCustom ? CUSTOM_INPUT : duration.asDays().toString());
+		}
+	}, [duration, isCustomInput]);
 
 	// Returns true if this is a valid duration.
 	const daysValid = (days: number) => {
@@ -57,6 +60,7 @@ export default function IntervalControlsComponent() {
 
 	// Updates values when the standard duration menu for bar or map is used.
 	const handleDaysChange = (value: string) => {
+		setIsCustomInput(false);
 		if (value === CUSTOM_INPUT) {
 			// Set menu value from standard value to special value to show custom
 			// and show the custom input area.
@@ -73,6 +77,7 @@ export default function IntervalControlsComponent() {
 
 	// Updates value when the custom duration input is used for bar or map.
 	const handleCustomDaysChange = (value: number) => {
+		setIsCustomInput(true);
 		setDaysCustom(value);
 	};
 
@@ -103,22 +108,6 @@ export default function IntervalControlsComponent() {
 		FourWeeks: '4.weeks'
 	};
 
-	// Defines the set of options for the dropdown
-	const options = chartType === ChartTypes.compare
-		? Object.entries(ComparePeriod).map(([key, value]) => (
-			<option value={value} key={key}>
-				{translate(comparePeriodTranslations[key as keyof typeof comparePeriodTranslations])}
-			</option>
-		))
-		: (
-			<>
-				<option value='1'>{translate('day')}</option>
-				<option value='7'>{translate('week')}</option>
-				<option value='28'>{translate('4.weeks')}</option>
-				<option value={CUSTOM_INPUT}>{translate('custom.value')}</option>
-			</>
-		);
-
 	return (
 		<div>
 			<div style={divTopBottomPadding}>
@@ -130,7 +119,7 @@ export default function IntervalControlsComponent() {
 					)}:
 					<TooltipMarkerComponent page='home' helpTextId={
 						chartType === ChartTypes.bar ? 'help.home.bar.days.tip' :
-							chartType === ChartTypes.map ? 'help.home.map.days.tip' :
+							chartType === ChartTypes.map ? 'help.home.map.interval.tip' :
 								'help.home.compare.period.tip'
 					} />
 				</p>
@@ -141,10 +130,21 @@ export default function IntervalControlsComponent() {
 					value={chartType === ChartTypes.compare ? comparePeriod?.toString() : days}
 					onChange={e => chartType === ChartTypes.compare ? handleComparePeriodChange(e.target.value) : handleDaysChange(e.target.value)}
 				>
-					{options}
+					{Object.entries(ComparePeriod).map(
+						([key, value]) => (
+							<option value={value} key={key}>
+								{translate(comparePeriodTranslations[key as keyof typeof comparePeriodTranslations])}
+							</option>
+						)
+					)}
+					{/* TODO: Compare is currently not ready for the custom option. */}
+					{chartType !== ChartTypes.compare &&
+						<option value={CUSTOM_INPUT}>
+							{translate('custom.value')}
+						</option>
+					}
 				</Input>
-				{/* TODO: Compare is currently not ready for a custom option. */}
-				{showCustomDuration && chartType !== ChartTypes.compare &&
+				{showCustomDuration &&
 					<FormGroup>
 						<Label for='days'>{translate('days.enter')}:</Label>
 						<Input
