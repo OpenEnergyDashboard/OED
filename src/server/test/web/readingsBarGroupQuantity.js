@@ -203,7 +203,6 @@ mocha.describe('readings API', () => {
 
                 // Add BG11 here
 
-                // Add BG12 here
                 mocha.it('BG12: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () =>{
                     const unitData = unitDatakWh.concat([
                         {
