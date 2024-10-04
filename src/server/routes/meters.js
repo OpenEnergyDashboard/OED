@@ -25,10 +25,10 @@ router.use(optionalAuthenticator);
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
  * @param meter
- * @param loggedInAsAdmin
+ * @param hasFullAccess
  * @returns {{id, name}}
  */
-function formatMeterForResponse(meter, loggedInAsAdmin) {
+function formatMeterForResponse(meter, hasFullAccess) {
 	const formattedMeter = {
 		id: meter.id,
 		name: null,
@@ -68,7 +68,7 @@ function formatMeterForResponse(meter, loggedInAsAdmin) {
 
 	// Only logged in Admins can see url, types, timezones, and internal names
 	// and lots of other items now.
-	if (loggedInAsAdmin) {
+	if (hasFullAccess) {
 		formattedMeter.name = meter.name;
 		formattedMeter.url = meter.url;
 		formattedMeter.meterType = meter.type;
@@ -108,13 +108,13 @@ router.get('/', async (req, res) => {
 		const conn = getConnection();
 		let query;
 		const token = req.headers.token || req.body.token || req.query.token;
-		const loggedInAsAdmin = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN));
+		const isAuthorizedCSV = req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.CSV));
 		// Because groups can use hidden meters, everyone gets all meters but we filter the
 		// information given about the meter after getting it.
 		query = Meter.getAll;
 
 		const rows = await query(conn);
-		res.json(rows.map(row => formatMeterForResponse(row, loggedInAsAdmin)));
+		res.json(rows.map(row => formatMeterForResponse(row, isAuthorizedCSV)));
 	} catch (err) {
 		log.error(`Error while performing GET all meters query: ${err}`, err);
 	}

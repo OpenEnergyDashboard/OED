@@ -8,18 +8,6 @@ const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSch
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
 
-/**
- * Enum of CSV input type sorting.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-TimeSortTypesJS = Object.freeze({
-	increasing: 'increasing',
-	decreasing: 'decreasing',
-	// meter means to use value stored on meter or the default if not.
-	meter: 'meter value or default'
-});
-
 // This is only used for meter page inputs but put here so next one above that related to.
 /**
  * Enum of CSV input type sorting.
@@ -31,27 +19,30 @@ MeterTimeSortTypesJS = Object.freeze({
 	decreasing: 'decreasing',
 });
 
-/**
- * Enum of Boolean types.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-BooleanTypesJS = Object.freeze({
-	true: 'yes',
-	false: 'no',
-});
+// This function allows for curl users to continue to use 'yes' or 'no' and also allows string
+// values of true or false if the change is made.
+const normalizeBoolean = (input) => {
+	if (typeof input === 'string') {
+		input = input.toLowerCase();
+	}
 
-/**
- * Enum of Boolean types.
- * This enum needs to be kept in sync with the enum in src/client/app/types/csvUploadForm.ts 
- * @enum {string}
- */
-BooleanMeterTypesJS = Object.freeze({
-	true: 'yes',
-	false: 'no',
-	// meter means to use value stored on meter or the default if not.
-	meter: 'meter value or default'
-});
+	switch (input) {
+		case 'yes':
+		case 'true':
+		case true:
+			return true;
+		case 'no':
+		case 'false':
+		case false:
+			return false;
+		default:
+			return 'normalizeBoolean error'; // Return the original value if it does not match any of the boolean representations
+	}
+};
+
+// This is to allow curl users to still send 'yes' and 'no' for parameters sent,
+// The frontend will just use standard boolean values to send to the API
+const BooleanCheckArray = ['yes', 'no', 'true', 'false', true, false];
 
 // These are the default values of CSV Pipeline upload parameters. If a user does not specify
 // a choice for a particular parameter, then these defaults will be used.
@@ -66,28 +57,26 @@ BooleanMeterTypesJS = Object.freeze({
 // we should change these strings to booleans.
 const DEFAULTS = {
 	common: {
-		gzip: BooleanTypesJS.true,
-		headerRow: BooleanTypesJS.false,
-		update: BooleanTypesJS.false
+		gzip: true,
+		headerRow: false,
+		update: false
 	},
 	meters: {
 	},
 	readings: {
-		timeSort: undefined,
-		duplications: undefined,
-		cumulative: BooleanMeterTypesJS.meter,
-		cumulativeReset: BooleanMeterTypesJS.meter,
+		cumulative: undefined,
+		cumulativeReset: undefined,
 		cumulativeResetStart: undefined,
 		cumulativeResetEnd: undefined,
+		duplications: undefined,
+		endOnly: undefined,
+		honorDst: false,
 		lengthGap: undefined,
 		lengthVariation: undefined,
-		endOnly: undefined,
-		createMeter: BooleanTypesJS.false,
-		refreshReadings: BooleanTypesJS.false,
-		refreshHourlyReadings: BooleanTypesJS.false,
-		honorDst: BooleanTypesJS.false,
-		relaxedParsing: BooleanTypesJS.false,
-		useMeterZone: BooleanTypesJS.false
+		refreshReadings: false,
+		relaxedParsing: false,
+		timeSort: undefined,
+		useMeterZone: false
 	}
 }
 
@@ -97,17 +86,18 @@ const DEFAULTS = {
 // (i.e. when the user performs a curl request to the pipeline). Thus, we list these properties 
 // here so that they do not falsely trigger the 'additionalProperties' User Error.
 const COMMON_PROPERTIES = {
-	meterName: new StringParam('meterName', undefined, undefined),
+	meterIdentifier: new StringParam('meterIdentifier', undefined, undefined),
 	username: new StringParam('username', undefined, undefined),
 	// TODO:
 	// Allowing for backwards compatibility to allow for curl users to use the 'email' parameter instead of
-	// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
-	// or continue to allow this backwards compatibility
+	// the 'username' parameter to login. Also allowing to use 'meterName' vs 'meterIdentifier'. Developers need
+	// to decide in the future if we should deprecate email & meterName or continue to allow this backwards compatibility.
+	meterName: new StringParam('meterName', undefined, undefined),
 	email: new StringParam('email', undefined, undefined),
 	password: new StringParam('password', undefined, undefined),
-	gzip: new BooleanParam('gzip'),
-	headerRow: new BooleanParam('headerRow'),
-	update: new BooleanParam('update')
+	gzip: new EnumParam('gzip', BooleanCheckArray),
+	headerRow: new EnumParam('headerRow', BooleanCheckArray),
+	update: new EnumParam('update', BooleanCheckArray)
 }
 
 // This sets the validation schemas for jsonschema.
@@ -122,25 +112,26 @@ const VALIDATION = {
 	},
 	readings: {
 		type: 'object',
-		required: ['meterName'],
 		properties: {
 			...COMMON_PROPERTIES,
-			timeSort: new EnumParam('timeSort', [TimeSortTypesJS.increasing, TimeSortTypesJS.decreasing, TimeSortTypesJS.meter]),
-			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
-			cumulative: new EnumParam('cumulative', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
-			cumulativeReset: new EnumParam('cumulativeReset', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
+			cumulative: new EnumParam('cumulative', BooleanCheckArray),
+			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
 			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
+			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
+			endOnly: new EnumParam('endOnly', BooleanCheckArray),
+			honorDst: new EnumParam('honorDst', BooleanCheckArray),
 			lengthGap: new StringParam('lengthGap', undefined, undefined),
 			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
-			endOnly: new EnumParam('endOnly', [BooleanMeterTypesJS.true, BooleanMeterTypesJS.false, BooleanMeterTypesJS.meter]),
-			createMeter: new BooleanParam('createMeter'),
-			refreshReadings: new BooleanParam('refreshReadings'),
-			refreshHourlyReadings: new BooleanParam('refreshHourlyReadings'),
-			honorDst: new BooleanParam('honorDst'),
-			relaxedParsing: new BooleanParam('relaxedParsing'),
-			useMeterZone: new BooleanParam('useMeterZone')
+			refreshReadings: new EnumParam('refreshReadings', BooleanCheckArray),
+			relaxedParsing: new EnumParam('relaxedParsing', BooleanCheckArray),
+			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
+			useMeterZone: new EnumParam('useMeterZone', BooleanCheckArray),
 		},
+		anyOf: [
+			{ required: ['meterIdentifier'] },
+			{ required: ['meterName'] }
+		],
 		additionalProperties: false // This protects us from unintended parameters as well as typos.
 	}
 }
@@ -158,7 +149,7 @@ function validateRequestParams(body, schema) {
 			} else if (err.name === 'required') {
 				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + `${err.argument} must be provided as the field ${err.argument}=.\n`;
 			} else if (err.name === 'additionalProperties') {
-				responseMessage = 'User Error: ' + responseMessage  + err.path + ': '+ err.argument + ' is an unexpected argument.\n';
+				responseMessage = 'User Error: ' + responseMessage + err.path + ': ' + err.argument + ' is an unexpected argument.\n';
 			} else {
 				responseMessage = responseMessage + err.path + ': ' + 'has message: ' + err.message;
 			}
@@ -174,7 +165,6 @@ function validateRequestParams(body, schema) {
 	}
 }
 
-
 /**
  * Middleware that validates a request to upload readings via the CSV Pipeline and sets defaults for upload parameters.
  * @param {express.Request} req 
@@ -188,38 +178,39 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
+	
+	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
+		relaxedParsing, useMeterZone } = req.body; // extract query parameters
 
-	const { createMeter, cumulative, duplications,
-		gzip, headerRow, timeSort, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 	// Set default values of not supplied parameters.
-	if (!createMeter) {
-		req.body.createMeter = DEFAULTS.readings.createMeter;
-	}
-	if (!cumulative) {
+	if (cumulative === undefined) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
 	}
-	if (!duplications) {
+	if (cumulativeReset === undefined) {
+		req.body.cumulativeReset = DEFAULTS.readings.cumulativeReset;
+	}
+	if (duplications === undefined) {
 		req.body.duplications = DEFAULTS.readings.duplications;
 	}
-	if (!gzip) {
+	if (gzip === undefined) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
-	if (!headerRow) {
+	if (headerRow === undefined) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
-	if (!timeSort) {
+	if (timeSort === undefined) {
 		req.body.timeSort = DEFAULTS.readings.timeSort;
 	}
-	if (!update) {
+	if (update === undefined) {
 		req.body.update = DEFAULTS.common.update;
 	}
-	if (!honorDst) {
+	if (honorDst === undefined) {
 		req.body.honorDst = DEFAULTS.readings.honorDst;
 	}
-	if (!relaxedParsing) {
+	if (relaxedParsing === undefined) {
 		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
 	}
-	if (!useMeterZone) {
+	if (useMeterZone === undefined) {
 		req.body.useMeterZone = DEFAULTS.readings.useMeterZone;
 	}
 	next();
@@ -242,13 +233,13 @@ function validateMetersCsvUploadParams(req, res, next) {
 	const { gzip, headerRow, update } = req.body; // Extract query parameters
 
 	// Set default values of not supplied parameters.
-	if (!gzip) {
+	if (gzip === undefined) {
 		req.body.gzip = DEFAULTS.common.gzip;
 	}
-	if (!headerRow) {
+	if (headerRow === undefined) {
 		req.body.headerRow = DEFAULTS.common.headerRow;
 	}
-	if (!update) {
+	if (update === undefined) {
 		req.body.update = DEFAULTS.common.update;
 	}
 	next();
@@ -257,8 +248,6 @@ function validateMetersCsvUploadParams(req, res, next) {
 module.exports = {
 	validateMetersCsvUploadParams,
 	validateReadingsCsvUploadParams,
-	TimeSortTypesJS,
 	MeterTimeSortTypesJS,
-	BooleanMeterTypesJS,
-	BooleanTypesJS
+	normalizeBoolean
 };

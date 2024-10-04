@@ -11,12 +11,12 @@ const { log } = require('../../log');
  * Validate an array of Readings value according to certain criteria
  * @param {Reading[]} arrayToValidate
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
- * @param {string} meterName name of meter being checked
+ * @param {string} meterIdentifier identifier of meter being checked
  */
-function validateReadings(arrayToValidate, conditionSet, meterName = undefined) {
+function validateReadings(arrayToValidate, conditionSet, meterIdentifier = undefined) {
 	/* tslint:disable:no-string-literal */
-	const { validDates, errMsg: errMsgDate } = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2, meterName);
-	const { validValues, errMsg: errMsgValue } = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2, meterName);
+	const { validDates, errMsg: errMsgDate } = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2, meterIdentifier);
+	const { validValues, errMsg: errMsgValue } = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2, meterIdentifier);
 	/* tslint:enable:no-string-literal */
 	const errMsg = errMsgDate + errMsgValue;
 	return {
@@ -31,8 +31,9 @@ function validateReadings(arrayToValidate, conditionSet, meterName = undefined) 
  * @param {Moment} minDate inclusive earliest acceptable date (won't be rejected)
  * @param {Moment} maxDate inclusive latest acceptable date (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
-function checkDate(arrayToValidate, minDate, maxDate, maxError, meterName) {
+function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier) {
 	let validDates = true;
 	let errMsg = '';
 	if (minDate === null && maxDate === null) {
@@ -45,7 +46,7 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterName) {
 			break;
 		}
 		if (reading.startTimestamp < minDate) {
-			const newErrMsg = `error when checking reading time for #${readingNumber} on meter ${meterName}: ` +
+			const newErrMsg = `error when checking reading time for #${readingNumber} on meter ${meterIdentifier}: ` +
 				`time ${reading.startTimestamp} is earlier than lower bound ${minDate} ` +
 				`with reading ${reading.reading} and endTimestamp ${reading.endTimestamp}`;
 			log.error(newErrMsg);
@@ -54,9 +55,9 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterName) {
 			validDates = false;
 		}
 		if (reading.endTimestamp > maxDate) {
-			const newErrMsg = `error when checking reading time for #${readingNumber} on meter ${meterName}: ` +
-				`time ${reading.endTimestamp} is later than upper bound ${maxDate} ` +
-				`with reading ${reading.reading} and startTimestamp ${reading.startTimestamp}`;
+			const newErrMsg = `error when checking reading time for #${readingNumber} on meter ${meterIdentifier}: ` +
+			`time ${reading.endTimestamp} is later than upper bound ${maxDate} ` +
+			`with reading ${reading.reading} and startTimestamp ${reading.startTimestamp}`;
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
@@ -72,8 +73,9 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterName) {
  * @param {number} minVal inclusive minimum acceptable reading value (won't be rejected)
  * @param {number} maxVal inclusive maximum acceptable reading value (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
-function checkValue(arrayToValidate, minVal, maxVal, maxError, meterName) {
+function checkValue(arrayToValidate, minVal, maxVal, maxError, meterIdentifier) {
 	let validValues = true;
 	let errMsg = '';
 	let readingNumber = 0;
@@ -83,17 +85,17 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError, meterName) {
 			break;
 		}
 		if (reading.reading < minVal) {
-			const newErrMsg = `error when checking reading value for #${readingNumber} on meter ${meterName}: ` +
-				`value ${reading.reading} is smaller than lower bound ${minVal} ` +
-				`with startTimestamp ${reading.startTimestamp} and endTimestamp ${reading.endTimestamp}`;
+			const newErrMsg = `error when checking reading value for #${readingNumber} on meter ${meterIdentifier}: ` +
+			`value ${reading.reading} is smaller than lower bound ${minVal} ` +
+			`with startTimestamp ${reading.startTimestamp} and endTimestamp ${reading.endTimestamp}`;
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validValues = false;
 		} else if (reading.reading > maxVal) {
-			const newErrMsg = `error when checking reading value for #${readingNumber} on meter ${meterName}: ` +
-				`value ${reading.reading} is larger than upper bound ${maxVal} ` +
-				`with startTimestamp ${reading.startTimestamp} and endTimestamp ${reading.endTimestamp}`;
+			const newErrMsg = `error when checking reading value for #${readingNumber} on meter ${meterIdentifier}: ` +
+			`value ${reading.reading} is larger than upper bound ${maxVal} ` +
+			`with startTimestamp ${reading.startTimestamp} and endTimestamp ${reading.endTimestamp}`;
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
@@ -107,8 +109,9 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError, meterName) {
  * Check and report unequal intervals. Can be ignore by passing null interval
  * @param {Readings[]} arrayToValidate
  * @param {number} threshold the maximum allowed difference between consecutive data points' intervals
+ * @param {string} meterIdentifier identifier of meter being checked.
  */
-function checkIntervals(arrayToValidate, threshold, meterName) {
+function checkIntervals(arrayToValidate, threshold, meterIdentifier) {
 	let validIntervals = true;
 	let errMsg = '';
 
@@ -130,9 +133,9 @@ function checkIntervals(arrayToValidate, threshold, meterName) {
 		const currGap = reading.startTimestamp.diff(lastTime, 'seconds');
 		// Compare the current time gap with the expected interval. Terminate if the difference is larger than the accepted threshold
 		if (Math.abs(currGap - interval) > threshold) {
-			const newErrMsg = `warning when checking reading gap for #${readingNumber} on meter ${meterName}: ` + 
-			`time gap is detected between current start time ${reading.startTimestamp} and previous end time ${lastTime} that exceeds threshold of ${threshold} ` +
-			`with current reading ${reading.reading} and endTimestamp ${reading.endTimestamp}`;			
+			const newErrMsg = `warning when checking reading gap for #${readingNumber} on meter ${meterIdentifier}: ` + 
+				`time gap is detected between current start time ${reading.startTimestamp} and previous end time ${lastTime} that exceeds threshold of ${threshold} ` +
+				`with current reading ${reading.reading} and endTimestamp ${reading.endTimestamp}`;		
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
 			validIntervals = false;
