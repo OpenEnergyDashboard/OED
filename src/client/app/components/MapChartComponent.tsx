@@ -356,9 +356,9 @@
 					 // circle size. Force max to be at least minValue (note min negative so shift other way).
 					 // TODO Must be internationalized.
 					 showInfoNotification('Some values are close to zero so the small circle sizes may be a little larger to be visible');
-					 shift = max - minValue;
+					 shift = min - minValue;
 				 } else {
-					 shift = min - 0.0000123;
+					 shift = min + max;
 				 }
 			 } else if (min >= minValue) {
 				 // There are no values smaller than desired so all circles will be big enough.
