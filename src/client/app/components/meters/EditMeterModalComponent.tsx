@@ -43,7 +43,6 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
-	const translate = useTranslate();
 	const [editMeter] = metersApi.useEditMeterMutation();
 	// since this selector is shared amongst many other modals, we must use a selector factory in order
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
@@ -69,6 +68,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
+	const translate = useTranslate();
 
 	React.useEffect(() => {
 		if (localMeterEdits.cumulative === false) {

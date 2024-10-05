@@ -26,7 +26,6 @@ interface GroupViewComponentProps {
  * @returns Group info card element
  */
 export default function GroupViewComponent(props: GroupViewComponentProps) {
-	const translate = useTranslate();
 	// Don't check if admin since only an admin is allowed to route to this page.
 
 	// Edit Modal Show
@@ -46,6 +45,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
+	const translate = useTranslate();
 
 
 	return (

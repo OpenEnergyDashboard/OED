@@ -25,9 +25,9 @@ export interface UnsavedWarningProps {
  * @returns Component that prompts before navigating away from current page
  */
 export function UnsavedWarningComponent(props: UnsavedWarningProps) {
-	const translate = useTranslate();
 	const { hasUnsavedChanges, submitChanges, changes } = props;
 	const blocker = useBlocker(hasUnsavedChanges);
+	const translate = useTranslate();
 	const handleSubmit = async () => {
 		submitChanges(changes)
 			.unwrap()

@@ -15,7 +15,6 @@ interface TimeZoneSelectProps {
 }
 
 const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick }) => {
-	const translate = useTranslate();
 
 	const getTimeZones = () => {
 		const zoneNames = moment.tz.names();
@@ -25,6 +24,7 @@ const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick })
 			return { value: zoneName, label: `${zoneName} (${abbrev})` };
 		});
 	};
+	const translate = useTranslate();
 	const resetTimeZone = [{ value: null, label: translate('timezone.no') }];
 	const options = [...resetTimeZone, ...getTimeZones()];
 

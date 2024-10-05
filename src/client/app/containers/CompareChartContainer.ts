@@ -47,7 +47,6 @@ interface CompareChartContainerProps {
  * @returns The props object
  */
 function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps): any {
-	const translate = useTranslate();
 	const comparePeriod = selectComparePeriod(state);
 	const compareTimeInterval = selectCompareTimeInterval(state);
 	const datasets: any[] = [];
@@ -134,6 +133,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 	const areaNormalization = selectGraphAreaNormalization(state);
+	const translate = useTranslate();
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
 		if (areaNormalization) {

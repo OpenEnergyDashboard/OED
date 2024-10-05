@@ -12,12 +12,12 @@ import { useTranslate } from '../../redux/componentHooks';
  * @returns A error page that then returns to main dashboard page.
  */
 export default function ErrorComponent() {
-	const translate = useTranslate();
 	const nav = useNavigate();
 	const refreshPage = () => {
 		nav('/');
 		window.location.reload();
 	};
+	const translate = useTranslate();
 	return (
 		<AppLayout>
 			{/* Pass div as child prop to AppLayout */}

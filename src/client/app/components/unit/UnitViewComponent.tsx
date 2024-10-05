@@ -23,7 +23,6 @@ interface UnitViewComponentProps {
  * @returns Unit info card element
  */
 export default function UnitViewComponent(props: UnitViewComponentProps) {
-	const translate = useTranslate();
 	// Don't check if admin since only an admin is allow to route to this page.
 
 	// Edit Modal Show
@@ -36,6 +35,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 	const handleClose = () => {
 		setShowEditModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

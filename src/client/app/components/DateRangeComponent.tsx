@@ -22,7 +22,6 @@ import { ChartTypes } from '../types/redux/graph';
  * @returns Date Range Calendar Picker
  */
 export default function DateRangeComponent() {
-	const translate = useTranslate();
 	const dispatch: Dispatch = useAppDispatch();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
@@ -33,6 +32,7 @@ export default function DateRangeComponent() {
 		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
 		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
 	};
+	const translate = useTranslate();
 
 
 	return (

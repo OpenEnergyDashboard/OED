@@ -18,7 +18,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns chartLinkComponent
  */
 export default function ChartLinkComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const [linkTextVisible, setLinkTextVisible] = React.useState<boolean>(false);
 	const linkText = useAppSelector(selectChartLink);
@@ -26,6 +25,7 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const ref = React.useRef<HTMLDivElement>(null);
+	const translate = useTranslate();
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard.writeText(linkText)

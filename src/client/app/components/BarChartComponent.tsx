@@ -27,7 +27,6 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns Plotly BarChart
  */
 export default function BarChartComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
@@ -56,6 +55,7 @@ export default function BarChartComponent() {
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
+	const translate = useTranslate();
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;

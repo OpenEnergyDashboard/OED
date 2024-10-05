@@ -18,7 +18,6 @@ import { conversionsSlice } from '../reducers/conversions';
 
 
 export function fetchConversionsDetails(): Thunk {
-	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
 		if (!getState().conversions.isFetching) {
@@ -59,6 +58,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 		const conversionDataIndex = getState().conversions.submitting.findIndex(conversionData => ((
 			conversionData.sourceId === editedConversion.sourceId) &&
 			conversionData.destinationId === editedConversion.destinationId));
+		const translate = useTranslate();
 
 		// If the editedConversion is not already being submitted
 		if (conversionDataIndex === -1) {
@@ -87,6 +87,7 @@ export function submitEditedConversion(editedConversion: t.ConversionData, shoul
 // Add conversion to database
 export function addConversion(conversion: t.ConversionData): Dispatch {
 	return async (dispatch: Dispatch) => {
+		const translate = useTranslate();
 		try {
 			// Attempt to add conversion to database
 			await conversionsApi.addConversion(conversion);
@@ -117,6 +118,7 @@ export function deleteConversion(conversion: t.ConversionData): (dispatch: Dispa
 			// Inform the store we are about to work on this conversion
 			// Update the submitting state array
 			dispatch(conversionsSlice.actions.submitEditedConversion(conversion));
+			const translate = useTranslate();
 			try {
 				// Attempt to delete the conversion from the database
 				await conversionsApi.delete(conversion);

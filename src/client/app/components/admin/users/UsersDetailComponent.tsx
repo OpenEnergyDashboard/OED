@@ -22,8 +22,8 @@ const tooltipStyle = {
  * @returns User Detail element
  */
 export default function UserDetailComponent() {
-	const translate = useTranslate();
 	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery();
+	const translate = useTranslate();
 
 	return (
 		<div>

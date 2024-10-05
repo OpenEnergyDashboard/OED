@@ -15,7 +15,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns controls for the Options Ui page.
  */
 export default function BarControlsComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// The min/max days allowed for user selection
@@ -90,6 +89,7 @@ export default function BarControlsComponent() {
 			dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
 		}
 	};
+	const translate = useTranslate();
 
 	return (
 		<div>

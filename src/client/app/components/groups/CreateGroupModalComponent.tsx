@@ -40,7 +40,6 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Group create element
  */
 export default function CreateGroupModalComponent() {
-	const translate = useTranslate();
 	const [createGroup] = groupsApi.useCreateGroupMutation();
 
 	// Meters state
@@ -126,6 +125,7 @@ export default function CreateGroupModalComponent() {
 		);
 	}, [state.area, state.areaUnit, state.name, state.deepMeters]);
 	/* End State */
+	const translate = useTranslate();
 
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
 	// or if any other errors are encountered.

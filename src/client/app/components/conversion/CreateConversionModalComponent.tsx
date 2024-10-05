@@ -23,7 +23,6 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Conversion create element
  */
 export default function CreateConversionModalComponent() {
-	const translate = useTranslate();
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation();
 	// Want units in sorted order by identifier regardless of case.
 
@@ -99,6 +98,7 @@ export default function CreateConversionModalComponent() {
 		...tooltipBaseStyle,
 		tooltipCreateConversionView: 'help.admin.conversioncreate'
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

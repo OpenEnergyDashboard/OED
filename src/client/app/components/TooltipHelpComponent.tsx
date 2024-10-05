@@ -20,7 +20,6 @@ interface TooltipHelpProps {
  * @returns ToolTipHelpComponent
  */
 export default function TooltipHelpComponent(props: TooltipHelpProps) {
-	const translate = useTranslate();
 	/**
 	 * @returns JSX to create the help icons with links
 	 */
@@ -73,6 +72,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },
 		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` }
 	};
+	const translate = useTranslate();
 
 	return (
 		<div style={divStyle}>

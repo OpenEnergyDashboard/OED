@@ -19,9 +19,9 @@ import { AreaUnitType } from './getAreaUnitConversion';
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,
 	selectedAreaUnit: AreaUnitType): { unitLabel: string, needsRateScaling: boolean } {
-	const translate = useTranslate();
 	let unitLabel: string = '';
 	let needsRateScaling = false;
+	const translate = useTranslate();
 	// Quantity and flow units have different unit labels.
 	// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
 	// Bar graphics are always quantities.

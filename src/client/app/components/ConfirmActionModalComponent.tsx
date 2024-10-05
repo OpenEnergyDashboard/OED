@@ -41,10 +41,10 @@ interface ConfirmActionModalComponentProps {
  * @returns A modal component that executes the actionFunction on confirmation and handleClose on rejection.
  */
 export default function ConfirmActionModalComponent(props: ConfirmActionModalComponentProps) {
-	const translate = useTranslate();
 	const handleClose = () => {
 		props.handleClose();
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

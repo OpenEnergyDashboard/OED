@@ -13,9 +13,9 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Error Bar checkbox with tooltip and label
  */
 export default function ErrorBarComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const showMinMax = useAppSelector(selectShowMinMax);
+	const translate = useTranslate();
 
 	return (
 		<div className='checkbox'>

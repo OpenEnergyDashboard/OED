@@ -25,7 +25,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
-	const translate = useTranslate();
 	const [logout] = authApi.useLogoutMutation();
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
@@ -75,6 +74,7 @@ export default function HeaderButtonsComponent() {
 	// TODO Re-implement AFTER RTK Migration
 	// hard-coded for the time being. Rework w/admin pages
 	const unsavedChangesState = false;
+	const translate = useTranslate();
 
 
 	// Must update in case the version was not set when the page was loaded.

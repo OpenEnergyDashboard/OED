@@ -232,10 +232,10 @@ export function submitCalibratingMap(): Thunk {
  * submit a new map to database at the end of a calibration session
  */
 export function submitNewMap(): Thunk {
-	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const mapID = getState().maps.calibratingMap;
 		const map = getState().maps.editedMaps[mapID];
+		const translate = useTranslate();
 		try {
 			const acceptableMap: MapData = {
 				...map,
@@ -267,10 +267,10 @@ export function submitNewMap(): Thunk {
  * @param mapID the edited map being updated at database
  */
 export function submitEditedMap(mapID: number): Thunk {
-	const translate = useTranslate();
 	return async (dispatch: Dispatch, getState: GetState) => {
 		const map = getState().maps.editedMaps[mapID];
 		dispatch(submitMapEdits(mapID));
+		const translate = useTranslate();
 		try {
 			const acceptableMap: MapData = {
 				...map,
@@ -309,8 +309,8 @@ export function submitEditedMap(mapID: number): Thunk {
  * @param mapID map to be removed
  */
 export function removeMap(mapID: number): Thunk {
-	const translate = useTranslate();
 	return async (dispatch: Dispatch) => {
+		const translate = useTranslate();
 		try {
 			await mapsApi.delete(mapID);
 			dispatch(deleteMap(mapID));

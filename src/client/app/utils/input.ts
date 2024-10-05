@@ -87,9 +87,9 @@ export const NoUnit: UnitData = {
  * @returns a unit to represent no unit with translated identifier
  */
 export function noUnitTranslated(): UnitData {
-	const translate = useTranslate();
 	// Untranslated no unit.
 	const unit = NoUnit;
+	const translate = useTranslate();
 	// Make the identifier be translated.
 	unit.identifier = translate('unit.none');
 	return unit;

@@ -34,7 +34,6 @@ interface EditConversionModalComponentProps {
  * @returns Conversion edit element
  */
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
-	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -58,6 +57,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	};
 	/* End State */
+	const translate = useTranslate();
 
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together

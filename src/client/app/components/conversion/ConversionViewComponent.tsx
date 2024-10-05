@@ -25,7 +25,6 @@ interface ConversionViewComponentProps {
  * @returns Single conversion element
  */
 export default function ConversionViewComponent(props: ConversionViewComponentProps) {
-	const translate = useTranslate();
 	// Don't check if admin since only an admin is allow to route to this page.
 
 	// Edit Modal Show
@@ -45,6 +44,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 		unitDataById[props.conversion.destinationId]?.identifier);
 
 	// Unlike the details component, we don't check if units are loaded since must come through that page.
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

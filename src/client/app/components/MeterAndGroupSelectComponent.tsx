@@ -25,7 +25,6 @@ import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
  * @returns A React-Select component.
  */
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
@@ -40,6 +39,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		const newMetersOrGroups = newValues.map(option => option.value);
 		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

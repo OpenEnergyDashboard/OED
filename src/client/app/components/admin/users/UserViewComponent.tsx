@@ -21,7 +21,6 @@ interface UserViewComponentProps {
  * @returns User card element
  */
 export default function UserViewComponent(props: UserViewComponentProps) {
-	const translate = useTranslate();
 	const [showEditModal, setShowEditModal] = useState(false);
 
 	const handleShow = () => {
@@ -31,6 +30,7 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 	const handleClose = () => {
 		setShowEditModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

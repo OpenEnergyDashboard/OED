@@ -19,7 +19,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Rate selection element
  */
 export default function GraphicRateMenuComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// Graph state
@@ -49,6 +48,7 @@ export default function GraphicRateMenuComponent() {
 	}
 	// Array of select options created from the rates
 	const rateOptions: SelectOption[] = [];
+	const translate = useTranslate();
 
 	//Loop over our rates object to create the selects for the dropdown
 	Object.entries(LineGraphRates).forEach(([rateKey, rateValue]) => {

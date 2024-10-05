@@ -115,7 +115,6 @@ export const exportGraphReadingsThunk = createAppThunk(
 export const exportRawReadings = createAppThunk(
 	'graph/ExportRaw',
 	async (_arg, api) => {
-		const translate = useTranslate();
 		const state = api.getState();
 		if (!selectCanExport(state)) {
 			return api.rejectWithValue('Data Fetch In Progress, Or No data');
@@ -140,6 +139,7 @@ export const exportRawReadings = createAppThunk(
 		const fileSize = (count * 0.082 / 1000);
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
+		const translate = useTranslate();
 		if (fileSize <= adminState.defaultWarningFileSize) {
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;

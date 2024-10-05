@@ -9,7 +9,6 @@ import { AppListener } from '../listenerMiddleware';
 import { authApi } from '../api/authApi';
 
 export const unauthorizedRequestListener = (startListening: AppListener) => {
-	const translate = useTranslate();
 	startListening({
 		predicate: action => {
 			// Listens for rejected async thunks. if no payload then its an RTK internal call that needs to also be filtered.
@@ -18,6 +17,7 @@ export const unauthorizedRequestListener = (startListening: AppListener) => {
 		effect: (action: any, { dispatch }): void => {
 			// Look for token failed responses from server
 			const unAuthorizedTokenRequest = (action.payload.status === 401 || action.payload.data?.message === 'Failed to authenticate token.');
+			const translate = useTranslate();
 			if (unAuthorizedTokenRequest) {
 				dispatch(authApi.endpoints.logout.initiate());
 				showErrorNotification(translate('invalid.token.login'));

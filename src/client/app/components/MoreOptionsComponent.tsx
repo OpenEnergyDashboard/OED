@@ -22,13 +22,13 @@ import { useTranslate } from '../redux/componentHooks';
  * @returns Custom Modal depending on selected graph type
  */
 export default function MoreOptionsComponent() {
-	const translate = useTranslate();
 	const chartToRender = useAppSelector(selectChartToRender);
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);
 	const handleClose = () => {
 		setShowModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

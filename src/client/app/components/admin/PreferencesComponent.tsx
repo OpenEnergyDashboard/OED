@@ -23,7 +23,6 @@ import { defaultAdminState } from '../../redux/slices/adminSlice';
  * @returns Preferences Component for Administrative use
  */
 export default function PreferencesComponent() {
-	const translate = useTranslate();
 	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
 	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(cloneDeep(adminPreferences));
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();
@@ -42,6 +41,7 @@ export default function PreferencesComponent() {
 	const discardChanges = () => {
 		setLocalAdminPref(cloneDeep(adminPreferences));
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className='d-flex flex-column '>

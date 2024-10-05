@@ -17,11 +17,11 @@ interface FileUploader {
  * @returns File uploader element
  */
 export default function FileUploaderComponent(props: FileUploader) {
-	const translate = useTranslate();
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0] || null;
 		props.onFileChange(file);
 	};
+	const translate = useTranslate();
 
 	return (
 		<FormGroup>

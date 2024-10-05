@@ -15,7 +15,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns controls for the compare page
  */
 export default function CompareControlsComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const comparePeriod = useAppSelector(selectComparePeriod);
 	const compareSortingOrder = useAppSelector(selectSortingOrder);
@@ -26,6 +25,7 @@ export default function CompareControlsComponent() {
 	const handleSortingButton = (sortingOrder: SortingOrder) => {
 		dispatch(graphSlice.actions.changeCompareSortingOrder(sortingOrder));
 	};
+	const translate = useTranslate();
 
 	return (
 		<div>

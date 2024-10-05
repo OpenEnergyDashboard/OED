@@ -29,7 +29,6 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns radar plotly component
  */
 export default function RadarChartComponent() {
-	const translate = useTranslate();
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectRadarChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
@@ -67,6 +66,7 @@ export default function RadarChartComponent() {
 	}
 	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
+	const translate = useTranslate();
 
 	// Add all valid data from existing meters to the radar plot
 	for (const meterID of selectedMeters) {

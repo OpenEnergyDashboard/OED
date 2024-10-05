@@ -16,7 +16,6 @@ import { useTranslate } from '../redux/componentHooks';
  * @returns The login page for users or admins.
  */
 export default function LoginComponent() {
-	const translate = useTranslate();
 	// Local State
 	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
@@ -29,6 +28,7 @@ export default function LoginComponent() {
 	// The naming of the returned objects is arbitrary
 	// Equivalent Auto-Derived Method
 	const [login] = authApi.endpoints.login.useMutation(); // authApi.useLoginMutation()
+	const translate = useTranslate();
 
 	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();

@@ -12,9 +12,9 @@ import {logToServer} from '../../redux/actions/logs';
 import { useTranslate } from '../../redux/componentHooks';
 
 function mapStateToProps(state: State) {
-	const translate = useTranslate();
 	const mapID = state.maps.calibratingMap;
 	const map = state.maps.editedMaps[mapID];
+	const translate = useTranslate();
 	const resultDisplay = (map.calibrationResult) ?
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: translate('need.more.points');

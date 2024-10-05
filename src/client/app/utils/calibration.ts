@@ -107,7 +107,6 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * @returns true if string is GPS and false otherwise.
  */
 export function isValidGPSInput(input: string): boolean {
-	const translate = useTranslate();
 	if (input.indexOf(',') === -1) { // if there is no comma
 		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
 		return false;
@@ -121,6 +120,7 @@ export function isValidGPSInput(input: string): boolean {
 	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
 	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 	const result = latitudeConstraint && longitudeConstraint;
+	const translate = useTranslate();
 	if (!result) {
 		// TODO It would be nice to return the error and then notify as desired.
 		showErrorNotification(translate('input.gps.range') + input);

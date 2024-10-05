@@ -17,7 +17,6 @@ import { useTranslate } from '../redux/componentHooks';
  * @returns List of selected groups and meters as reactstrap Pills Badges
  */
 export default function ThreeDPillComponent() {
-	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -82,6 +81,7 @@ export default function ThreeDPillComponent() {
 			);
 		});
 	};
+	const translate = useTranslate();
 
 	return (
 		<div style={pillContainer}>

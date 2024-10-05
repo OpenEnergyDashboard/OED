@@ -24,7 +24,6 @@ interface MeterViewComponentProps {
  * @returns Meter info card element
  */
 export default function MeterViewComponent(props: MeterViewComponentProps) {
-	const translate = useTranslate();
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);
 	// Check for admin status
@@ -43,6 +42,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 		setShowEditModal(false);
 	};
 	// Only display limited data if not an admin.
+	const translate = useTranslate();
 	return (
 		<div className="card">
 			<div className="identifier-container">

@@ -20,12 +20,12 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function AreaUnitSelectComponent() {
 	const dispatch = useAppDispatch();
-	const translate = useTranslate();
 	const graphState = useAppSelector(selectGraphState);
 	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
+	const translate = useTranslate();
 
 	Object.keys(AreaUnitType).forEach(unitKey => {
 		// don't allow normalization by no unit
