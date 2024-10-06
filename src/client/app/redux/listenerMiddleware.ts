@@ -11,7 +11,7 @@ import { unauthorizedRequestListener } from './middleware/unauthorizedAccesMiddl
 
 export const listenerMiddleware = createListenerMiddleware();
 
-export const startAppListening = listenerMiddleware.startListening.withTypes< RootState, AppDispatch>();
+export const startAppListening = listenerMiddleware.startListening.withTypes<RootState, AppDispatch>();
 export const addAppListener = addListener.withTypes<RootState, AppDispatch>();
 export type AppListener = typeof startAppListening;
 

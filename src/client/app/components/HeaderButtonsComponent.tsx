@@ -8,7 +8,6 @@ import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
 import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
-import { clearGraphHistory } from '../redux/actions/extraActions';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
@@ -19,6 +18,7 @@ import { UserRole } from '../types/items';
 import translate from '../utils/translate';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { clearGraphHistory } from '../redux/slices/graphSlice';
 
 /**
  * React Component that defines the header buttons at the top of a page

@@ -9,9 +9,8 @@ import * as React from 'react';
 import 'react-calendar/dist/Calendar.css';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectChartToRender} from '../redux/slices/graphSlice';
+import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectChartToRender } from '../redux/slices/graphSlice';
 import '../styles/DateRangeCustom.css';
-import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -22,15 +21,15 @@ import { ChartTypes } from '../types/redux/graph';
  * @returns Date Range Calendar Picker
  */
 export default function DateRangeComponent() {
-	const dispatch: Dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const chartType = useAppSelector(selectChartToRender);
-	const datePickerVisible =  chartType !== ChartTypes.compare;
+	const datePickerVisible = chartType !== ChartTypes.compare;
 
 	const handleChange = (value: Value) => {
-		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
-		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
+		dispatch(updateTimeInterval(dateRangeToTimeInterval(value).toString()));
+		dispatch(changeSliderRange(dateRangeToTimeInterval(value).toString()));
 	};
 
 

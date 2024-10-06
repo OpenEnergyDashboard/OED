@@ -5,17 +5,13 @@
  */
 
 import ApiBackend from './ApiBackend';
-import MapsApi from './MapsApi';
 import LogsApi from './LogsApi';
 
 const apiBackend = new ApiBackend();
 
 // All specific backends share the same ApiBackend
-const mapsApi = new MapsApi(apiBackend);
 const logsApi = new LogsApi(apiBackend);
 
-
 export {
-	mapsApi,
 	logsApi
 };

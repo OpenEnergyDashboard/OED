@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectForwardHistory, selectPrevHistory } from '../redux/slices/graphSlice';
-import { historyStepBack, historyStepForward } from '../redux/actions/extraActions';
+import { historyStepBack, historyStepForward } from '../redux/slices/graphSlice';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
