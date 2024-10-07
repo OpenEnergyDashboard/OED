@@ -291,13 +291,6 @@ export default function MapChartComponent() {
 				}
 			}
 
-			// TODO DEBUG Using amp 1, 2 & 3 from test data that within map. This arbitrarily changes the value for testing.
-			// It does not change the hover value.
-			// size[0] = 300;
-			// size[1] = 100;
-			// size[2] = -1;
-			// size = size.slice(0, x.length);
-
 			// TODO Using the following seems to have no impact on the code. It has been noticed that this function is called
 			// many times for each change. Someone should look at why that is happening and why some have no items in the arrays.
 			// if (size.length > 0) {
