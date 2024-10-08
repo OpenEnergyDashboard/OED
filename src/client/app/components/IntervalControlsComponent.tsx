@@ -46,7 +46,8 @@ export default function IntervalControlsComponent() {
 	React.useEffect(() => {
 		// If user is in custom input mode, don't reset to standard options
 		if (!isCustomInput) {
-			const isCustom = !['1', '7', '28'].includes(duration.asDays().toString());
+			const durationValues = Object.values(ComparePeriod) as string[];
+			const isCustom = !(durationValues.includes(duration.asDays().toString()));
 			setShowCustomDuration(isCustom);
 			setDaysCustom(duration.asDays());
 			setDays(isCustom ? CUSTOM_INPUT : duration.asDays().toString());
