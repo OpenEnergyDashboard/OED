@@ -13,7 +13,7 @@ import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectC
 import '../styles/DateRangeCustom.css';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
 
@@ -32,6 +32,7 @@ export default function DateRangeComponent() {
 		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
 		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
 	};
+	const translate = useTranslate();
 
 
 	return (

@@ -4,7 +4,7 @@
 
 import { LineGraphRate } from 'types/redux/graph';
 import { UnitData, UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import { AreaUnitType } from './getAreaUnitConversion';
 
 // Has functions for use with graphics
@@ -19,9 +19,9 @@ import { AreaUnitType } from './getAreaUnitConversion';
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,
 	selectedAreaUnit: AreaUnitType): { unitLabel: string, needsRateScaling: boolean } {
-
 	let unitLabel: string = '';
 	let needsRateScaling = false;
+	const translate = useTranslate();
 	// Quantity and flow units have different unit labels.
 	// Look up the type of unit if it is for quantity/flow/raw and decide what to do.
 	// Bar graphics are always quantities.
@@ -60,6 +60,7 @@ export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: Li
  * @returns y-axis label
  */
 export function barUnitLabel(selectUnitState: UnitData, areaNormalization: boolean, selectedAreaUnit: AreaUnitType): string {
+	const translate = useTranslate();
 	let unitLabel: string = '';
 	// Quantity and flow units have different unit labels.
 	// Look up the type of unit if it is for quantity/flow (should not be raw) and decide what to do.

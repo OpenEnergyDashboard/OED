@@ -9,11 +9,12 @@ import MapCalibrationInfoDisplayComponent from '../../components/maps/MapCalibra
 import {changeGridDisplay, dropCalibration, offerCurrentGPS, submitCalibratingMap} from '../../redux/actions/map';
 import {GPSPoint} from '../../utils/calibration';
 import {logToServer} from '../../redux/actions/logs';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 
 function mapStateToProps(state: State) {
 	const mapID = state.maps.calibratingMap;
 	const map = state.maps.editedMaps[mapID];
+	const translate = useTranslate();
 	const resultDisplay = (map.calibrationResult) ?
 		`x: ${map.calibrationResult.maxError.x}%, y: ${map.calibrationResult.maxError.y}%`
 		: translate('need.more.points');

@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
@@ -95,6 +95,7 @@ export default function ThreeDPillComponent() {
 			);
 		});
 	};
+	const translate = useTranslate();
 
 	return (
 		<div style={pillContainer}>

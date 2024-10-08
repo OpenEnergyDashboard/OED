@@ -13,7 +13,7 @@ import { graphSlice, selectChartToRender } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes } from '../types/redux/graph';
 import { State } from '../types/redux/state';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -28,6 +28,7 @@ export default function ChartSelectComponent() {
 	const sortedMaps = sortBy(values(mapsById).map(map => (
 		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
 	)), 'label');
+	const translate = useTranslate();
 
 	return (
 		<>

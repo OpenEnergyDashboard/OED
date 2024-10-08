@@ -26,7 +26,7 @@ import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -68,6 +68,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
+	const translate = useTranslate();
 
 	React.useEffect(() => {
 		if (localMeterEdits.cumulative === false) {

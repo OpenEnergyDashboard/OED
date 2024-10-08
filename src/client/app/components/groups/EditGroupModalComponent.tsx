@@ -35,7 +35,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -147,6 +147,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		);
 	}, [groupState.area, groupState.areaUnit, groupState.name, groupState.deepMeters]);
 	/* End State */
+	const translate = useTranslate();
 
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together

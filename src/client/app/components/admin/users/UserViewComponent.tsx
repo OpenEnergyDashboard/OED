@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Button } from 'reactstrap';
 import '../../../styles/card-page.css';
 import { User } from '../../../types/items';
-import translate from '../../../utils/translate';
+import { useTranslate } from '../../../redux/componentHooks';
 import EditUserModalComponent from './EditUserModalComponent';
 
 interface UserViewComponentProps {
@@ -30,6 +30,7 @@ export default function UserViewComponent(props: UserViewComponentProps) {
 	const handleClose = () => {
 		setShowEditModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

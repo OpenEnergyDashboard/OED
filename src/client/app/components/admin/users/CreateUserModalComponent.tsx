@@ -11,7 +11,7 @@ import {
 import { userApi } from '../../../redux/api/userApi';
 import { User, UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
-import translate from '../../../utils/translate';
+import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import { tooltipBaseStyle } from '../../../styles/modalStyle';
@@ -21,7 +21,6 @@ import { tooltipBaseStyle } from '../../../styles/modalStyle';
  * @returns CreateUserModal component
  */
 export default function CreateUserModal() {
-
 	// create user form state and use the defaults
 	const [userDetails, setUserDetails] = useState(userDefaults);
 
@@ -86,6 +85,7 @@ export default function CreateUserModal() {
 		setShowModal(false);
 	};
 	// End Modal show/close
+	const translate = useTranslate();
 
 	const handleSubmit = async () => {
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };

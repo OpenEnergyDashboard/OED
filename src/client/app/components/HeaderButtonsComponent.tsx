@@ -16,7 +16,7 @@ import { selectHelpUrl } from '../redux/slices/adminSlice';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
@@ -74,6 +74,7 @@ export default function HeaderButtonsComponent() {
 	// TODO Re-implement AFTER RTK Migration
 	// hard-coded for the time being. Rework w/admin pages
 	const unsavedChangesState = false;
+	const translate = useTranslate();
 
 
 	// Must update in case the version was not set when the page was loaded.

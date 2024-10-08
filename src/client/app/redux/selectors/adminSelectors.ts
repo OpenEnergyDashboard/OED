@@ -14,7 +14,7 @@ import { UnitData, UnitType } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import { selectAllUnits, selectUnitDataById } from '../api/unitsApi';
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors';
 import { createAppSelector } from './selectors';
@@ -217,7 +217,7 @@ export const selectIsValidConversion = createAppSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
-
+		const translate = useTranslate();
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			return [false, translate('conversion.create.destination.meter')];

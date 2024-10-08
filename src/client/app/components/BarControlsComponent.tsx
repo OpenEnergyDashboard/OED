@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { FormFeedback, FormGroup, Input, Label } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectBarStacking, selectBarWidthDays } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -89,6 +89,7 @@ export default function BarControlsComponent() {
 			dispatch(graphSlice.actions.updateBarDuration(moment.duration(value, 'days')));
 		}
 	};
+	const translate = useTranslate();
 
 	return (
 		<div>

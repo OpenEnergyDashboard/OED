@@ -22,7 +22,7 @@ import Locales from '../types/locales';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 /**
@@ -66,6 +66,7 @@ export default function RadarChartComponent() {
 	}
 	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
+	const translate = useTranslate();
 
 	// Add all valid data from existing meters to the radar plot
 	for (const meterID of selectedMeters) {

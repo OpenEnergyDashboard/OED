@@ -32,7 +32,7 @@ import {
 } from '../utils/calibration';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 import { showInfoNotification } from '../utils/notifications';
 
@@ -40,7 +40,6 @@ import { showInfoNotification } from '../utils/notifications';
  * @returns map component
  */
 export default function MapChartComponent() {
-
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectMapChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsFetching } = readingsApi.useBarQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsFetching } = readingsApi.useBarQuery(groupArgs, { skip: groupShouldSkip });
@@ -72,6 +71,7 @@ export default function MapChartComponent() {
 	const data = [];
 	// Holds the image to use.
 	let image;
+	const translate = useTranslate();
 	if (selectedMap !== 0) {
 		const mapID = selectedMap;
 		if (byMapID[mapID]) {

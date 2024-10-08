@@ -15,7 +15,7 @@ import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import ExportComponent from '../components/ExportComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * Modal popup control for various graph types
@@ -28,6 +28,7 @@ export default function MoreOptionsComponent() {
 	const handleClose = () => {
 		setShowModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import { stableEmptyUsers, userApi } from '../../../redux/api/userApi';
-import translate from '../../../utils/translate';
+import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
@@ -23,6 +23,7 @@ const tooltipStyle = {
  */
 export default function UserDetailComponent() {
 	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery();
+	const translate = useTranslate();
 
 	return (
 		<div>

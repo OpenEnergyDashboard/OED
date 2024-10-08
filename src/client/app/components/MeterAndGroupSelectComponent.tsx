@@ -16,7 +16,7 @@ import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 /**
@@ -39,6 +39,7 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 		const newMetersOrGroups = newValues.map(option => option.value);
 		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

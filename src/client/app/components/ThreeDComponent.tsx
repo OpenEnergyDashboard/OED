@@ -20,7 +20,7 @@ import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import Plot from 'react-plotly.js';
@@ -46,6 +46,7 @@ export default function ThreeDComponent() {
 	const threeDData = data;
 	let layout = {};
 	let dataToRender = null;
+	const translate = useTranslate();
 
 
 	if (!meterOrGroupID) {
@@ -124,6 +125,7 @@ function formatThreeDData(
 	const currentSelectedRate = graphState.lineGraphRate;
 	let unitLabel = '';
 	let needsRateScaling = false;
+	const translate = useTranslate();
 	if (graphingUnit !== -99) {
 		const selectUnitState = unitDataById[graphState.selectedUnit];
 		if (selectUnitState !== undefined) {
@@ -232,6 +234,7 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage', yDataToRender: s
 	const dataMin = Math.min(...dateObjects.map(date => date.getTime()));
 	const dataMax = Math.max(...dateObjects.map(date => date.getTime()));
 	const dataRange = dataMax - dataMin;
+	const translate = useTranslate();
 
 	//Calculate nTicks for small num of days on y-axis; possibly a better way
 	let nTicks, dTick = 'd1';

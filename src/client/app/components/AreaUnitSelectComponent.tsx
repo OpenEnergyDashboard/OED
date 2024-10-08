@@ -11,7 +11,7 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -20,12 +20,12 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  */
 export default function AreaUnitSelectComponent() {
 	const dispatch = useAppDispatch();
-
 	const graphState = useAppSelector(selectGraphState);
 	const unitDataById = useAppSelector(selectUnitDataById);
 
 	// Array of select options created from the area unit enum
 	const unitOptions: StringSelectOption[] = [];
+	const translate = useTranslate();
 
 	Object.keys(AreaUnitType).forEach(unitKey => {
 		// don't allow normalization by no unit

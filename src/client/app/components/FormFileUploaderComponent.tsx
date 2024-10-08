@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { Col, Input, FormGroup, Label } from 'reactstrap';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 interface FileUploader {
 	isInvalid: boolean;
@@ -17,11 +17,11 @@ interface FileUploader {
  * @returns File uploader element
  */
 export default function FileUploaderComponent(props: FileUploader) {
-
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0] || null;
 		props.onFileChange(file);
 	};
+	const translate = useTranslate();
 
 	return (
 		<FormGroup>

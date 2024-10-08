@@ -11,7 +11,7 @@ import { selectChartLink } from '../redux/selectors/uiSelectors';
 import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -25,6 +25,7 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const ref = React.useRef<HTMLDivElement>(null);
+	const translate = useTranslate();
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard.writeText(linkText)

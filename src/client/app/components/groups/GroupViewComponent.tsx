@@ -13,7 +13,7 @@ import { useAppSelector } from '../../redux/reduxHooks';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import '../../styles/card-page.css';
 import { noUnitTranslated } from '../../utils/input';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import EditGroupModalComponent from './EditGroupModalComponent';
 
 interface GroupViewComponentProps {
@@ -45,6 +45,7 @@ export default function GroupViewComponent(props: GroupViewComponentProps) {
 	// Set up to display the units associated with the group as the unit identifier.
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
+	const translate = useTranslate();
 
 
 	return (

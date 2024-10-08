@@ -10,7 +10,7 @@ import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectReadingsPerDaySelectData } from '../redux/selectors/threeDSelectors';
 import { selectThreeDReadingInterval, updateThreeDReadingInterval } from '../redux/slices/graphSlice';
 import { ReadingInterval } from '../types/redux/graph';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -29,6 +29,7 @@ export default function ReadingsPerDaySelect() {
 			...selectReadingsPerDaySelectData(currentData ?? stableEmptyThreeDReadings, readingInterval)
 		})
 	});
+	const translate = useTranslate();
 
 	return (
 		<div>

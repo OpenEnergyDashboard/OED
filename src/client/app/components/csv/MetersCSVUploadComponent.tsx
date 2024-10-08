@@ -8,7 +8,7 @@ import { MetersCSVUploadPreferences } from '../../types/csvUploadForm';
 import { submitMeters } from '../../utils/api/UploadCSVApi';
 import { MetersCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -51,6 +51,7 @@ export default function MetersCSVUploadComponent() {
 			[name]: checked
 		}));
 	};
+	const translate = useTranslate();
 
 	const handleFileChange = (file: File) => {
 		setSelectedFile(file);

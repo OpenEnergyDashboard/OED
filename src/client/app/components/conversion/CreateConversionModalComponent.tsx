@@ -15,7 +15,7 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
 /**
@@ -98,6 +98,7 @@ export default function CreateConversionModalComponent() {
 		...tooltipBaseStyle,
 		tooltipCreateConversionView: 'help.admin.conversioncreate'
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

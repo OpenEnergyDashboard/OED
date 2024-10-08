@@ -10,7 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
 import '../../styles/card-page.css';
 import { UnitData } from 'types/redux/units';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import { LocaleDataKey } from 'translations/data';
 
 interface UnitViewComponentProps {
@@ -35,6 +35,7 @@ export default function UnitViewComponent(props: UnitViewComponentProps) {
 	const handleClose = () => {
 		setShowEditModal(false);
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

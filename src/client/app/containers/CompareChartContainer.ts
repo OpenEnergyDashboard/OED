@@ -6,7 +6,7 @@
 
 import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
@@ -133,6 +133,7 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
 	const areaNormalization = selectGraphAreaNormalization(state);
+	const translate = useTranslate();
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
 		if (areaNormalization) {

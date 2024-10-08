@@ -22,7 +22,7 @@ import {
 } from '../utils/calibration';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 function mapStateToProps(state: State) {
 	const unitID = state.graph.selectedUnit;
@@ -32,6 +32,7 @@ function mapStateToProps(state: State) {
 	const data = [];
 	// Holds the image to use.
 	let image;
+	const translate = useTranslate();
 	if (state.maps.selectedMap !== 0) {
 		const mapID = state.maps.selectedMap;
 		if (state.maps.byMapID[mapID]) {

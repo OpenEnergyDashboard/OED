@@ -13,7 +13,7 @@ import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 
@@ -41,6 +41,7 @@ export default function PreferencesComponent() {
 	const discardChanges = () => {
 		setLocalAdminPref(cloneDeep(adminPreferences));
 	};
+	const translate = useTranslate();
 
 	return (
 		<div className='d-flex flex-column '>

@@ -12,7 +12,7 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
 import { conversionArrow } from '../../utils/conversionArrow';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import EditConversionModalComponent from './EditConversionModalComponent';
 
 interface ConversionViewComponentProps {
@@ -44,6 +44,7 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 		unitDataById[props.conversion.destinationId]?.identifier);
 
 	// Unlike the details component, we don't check if units are loaded since must come through that page.
+	const translate = useTranslate();
 
 	return (
 		<div className="card">

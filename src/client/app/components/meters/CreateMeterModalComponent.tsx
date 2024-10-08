@@ -25,7 +25,7 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -100,6 +100,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		setShowModal(false);
 		resetState();
 	};
+	const translate = useTranslate();
 
 	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
 	// that create starts from an empty template.

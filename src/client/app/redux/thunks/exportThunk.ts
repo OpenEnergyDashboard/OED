@@ -20,7 +20,7 @@ import { ConversionData } from '../../types/redux/conversions';
 import { ChartTypes, MeterOrGroup } from '../../types/redux/graph';
 import graphExport, { downloadRawCSV } from '../../utils/exportData';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../componentHooks';
 import { createAppThunk } from './appThunk';
 import { selectAnythingFetching } from '../../redux/selectors/apiSelectors';
 import { RootState } from '../../store';
@@ -139,6 +139,7 @@ export const exportRawReadings = createAppThunk(
 		const fileSize = (count * 0.082 / 1000);
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
+		const translate = useTranslate();
 		if (fileSize <= adminState.defaultWarningFileSize) {
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;

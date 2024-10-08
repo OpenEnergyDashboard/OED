@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import AppLayout from '../../components/AppLayout';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 
 /**
  * @returns A error page that then returns to main dashboard page.
@@ -17,6 +17,7 @@ export default function ErrorComponent() {
 		nav('/');
 		window.location.reload();
 	};
+	const translate = useTranslate();
 	return (
 		<AppLayout>
 			{/* Pass div as child prop to AppLayout */}

@@ -16,7 +16,7 @@ import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } fro
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 
@@ -66,6 +66,7 @@ export default function LineChartComponent() {
 
 	// Check if there is at least one valid graph
 	const enoughData = data.find(data => data.x!.length > 1);
+	const translate = useTranslate();
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (data.length === 0) {

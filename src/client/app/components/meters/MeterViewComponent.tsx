@@ -10,7 +10,7 @@ import { MeterData } from 'types/redux/meters';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectGraphicName, selectUnitName } from '../../redux/selectors/adminSelectors';
 import '../../styles/card-page.css';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import EditMeterModalComponent from './EditMeterModalComponent';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 
@@ -42,6 +42,7 @@ export default function MeterViewComponent(props: MeterViewComponentProps) {
 		setShowEditModal(false);
 	};
 	// Only display limited data if not an admin.
+	const translate = useTranslate();
 	return (
 		<div className="card">
 			<div className="identifier-container">

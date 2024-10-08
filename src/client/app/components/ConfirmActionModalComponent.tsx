@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import '../styles/modal.css';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 
 interface ConfirmActionModalComponentProps {
@@ -41,10 +41,10 @@ interface ConfirmActionModalComponentProps {
  * @returns A modal component that executes the actionFunction on confirmation and handleClose on rejection.
  */
 export default function ConfirmActionModalComponent(props: ConfirmActionModalComponentProps) {
-
 	const handleClose = () => {
 		props.handleClose();
 	};
+	const translate = useTranslate();
 
 	return (
 		<>

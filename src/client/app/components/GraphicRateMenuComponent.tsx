@@ -11,7 +11,7 @@ import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -48,6 +48,7 @@ export default function GraphicRateMenuComponent() {
 	}
 	// Array of select options created from the rates
 	const rateOptions: SelectOption[] = [];
+	const translate = useTranslate();
 
 	//Loop over our rates object to create the selects for the dropdown
 	Object.entries(LineGraphRates).forEach(([rateKey, rateValue]) => {

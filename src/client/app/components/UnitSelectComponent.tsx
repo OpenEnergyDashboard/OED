@@ -11,7 +11,7 @@ import { GroupedOption, SelectOption } from '../types/items';
 // import { FormattedMessage } from 'react-intl';
 import { Badge } from 'reactstrap';
 import { graphSlice, selectSelectedUnit } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectUnitDataById, unitsApi } from '../redux/api/unitsApi';
 
@@ -38,6 +38,7 @@ export default function UnitSelectComponent() {
 	}
 
 	const onChange = (newValue: SelectOption) => dispatch(graphSlice.actions.updateSelectedUnit(newValue?.value));
+	const translate = useTranslate();
 
 	return (
 		<div style={divBottomPadding}>

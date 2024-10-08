@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 
 /**
@@ -28,6 +28,7 @@ export default function LoginComponent() {
 	// The naming of the returned objects is arbitrary
 	// Equivalent Auto-Derived Method
 	const [login] = authApi.endpoints.login.useMutation(); // authApi.useLoginMutation()
+	const translate = useTranslate();
 
 	const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();

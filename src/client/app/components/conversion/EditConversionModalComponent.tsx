@@ -14,7 +14,7 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -57,6 +57,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	};
 	/* End State */
+	const translate = useTranslate();
 
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together

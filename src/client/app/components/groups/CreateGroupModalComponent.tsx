@@ -29,7 +29,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString } from '../../utils/input';
 import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -125,6 +125,7 @@ export default function CreateGroupModalComponent() {
 		);
 	}, [state.area, state.areaUnit, state.name, state.deepMeters]);
 	/* End State */
+	const translate = useTranslate();
 
 	// Sums the area of the group's deep meters. It will tell the admin if any meters are omitted from the calculation,
 	// or if any other errors are encountered.
