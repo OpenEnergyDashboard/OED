@@ -463,7 +463,7 @@ export const selectChartLink = createAppSelector(
 		linkText += `&serverRange=${current.queryTimeInterval.toString()}`;
 		switch (current.chartToRender) {
 			case ChartTypes.bar:
-				linkText += `&barDuration=${current.barDuration.asDays()}`;
+				linkText += `&duration=${current.duration.asDays()}`;
 				linkText += `&barStacking=${current.barStacking}`;
 				break;
 			case ChartTypes.line:

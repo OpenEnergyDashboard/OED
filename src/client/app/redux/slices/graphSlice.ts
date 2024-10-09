@@ -25,8 +25,7 @@ const defaultState: GraphState = {
 	selectedAreaUnit: AreaUnitType.none,
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
-	barDuration: moment.duration(4, 'weeks'),
-	mapsBarDuration: moment.duration(4, 'weeks'),
+	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
 	compareSortingOrder: SortingOrder.Descending,
@@ -81,11 +80,8 @@ export const graphSlice = createSlice({
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.current.selectedAreaUnit = action.payload;
 		},
-		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.barDuration = action.payload;
-		},
-		updateMapsBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.mapsBarDuration = action.payload;
+		updateDuration: (state, action: PayloadAction<moment.Duration>) => {
+			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
@@ -308,8 +304,8 @@ export const graphSlice = createSlice({
 							case 'areaUnit':
 								current.selectedAreaUnit = value as AreaUnitType;
 								break;
-							case 'barDuration':
-								current.barDuration = moment.duration(parseInt(value), 'days');
+							case 'duration':
+								current.duration = moment.duration(parseInt(value), 'days');
 								break;
 							case 'barStacking':
 								current.barStacking = value === 'true';
@@ -382,8 +378,7 @@ export const graphSlice = createSlice({
 		selectThreeDState: state => state.current.threeD,
 		selectShowMinMax: state => state.current.showMinMax,
 		selectBarStacking: state => state.current.barStacking,
-		selectBarWidthDays: state => state.current.barDuration,
-		selectMapBarWidthDays: state => state.current.mapsBarDuration,
+		selectWidthDays: state => state.current.duration,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
 		selectChartToRender: state => state.current.chartToRender,
@@ -413,7 +408,7 @@ export const {
 	selectAreaUnit, selectShowMinMax,
 	selectGraphState, selectPrevHistory,
 	selectThreeDState, selectBarStacking,
-	selectSortingOrder, selectBarWidthDays,
+	selectSortingOrder, selectWidthDays,
 	selectSelectedUnit, selectLineGraphRate,
 	selectComparePeriod, selectChartToRender,
 	selectForwardHistory, selectSelectedMeters,
@@ -432,7 +427,7 @@ export const {
 	setShowMinMax, setGraphState,
 	setBarStacking, toggleShowMinMax,
 	changeBarStacking, resetTimeInterval,
-	updateBarDuration, changeSliderRange,
+	updateDuration, changeSliderRange,
 	updateTimeInterval, updateSelectedUnit,
 	changeChartToRender, updateComparePeriod,
 	updateSelectedMeters, updateLineGraphRate,

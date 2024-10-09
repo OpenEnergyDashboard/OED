@@ -5,7 +5,7 @@
 import { createSelector } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { BarReadings } from 'types/readings';
-import { selectBarWidthDays } from '../../redux/slices/graphSlice';
+import { selectWidthDays } from '../../redux/slices/graphSlice';
 import { DataType } from '../../types/Datasources';
 import { MeterOrGroup } from '../../types/redux/graph';
 import getGraphColor from '../../utils/getGraphColor';
@@ -18,7 +18,7 @@ export const selectPlotlyBarDeps = createAppSelector(
 	[
 		selectPlotlyMeterDeps,
 		selectPlotlyGroupDeps,
-		selectBarWidthDays
+		selectWidthDays
 	],
 	(meterDeps, groupDeps, barDuration) => {
 		const barMeterDeps = { ...meterDeps, barDuration };
