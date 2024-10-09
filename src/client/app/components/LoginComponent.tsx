@@ -22,7 +22,7 @@ export default function LoginComponent() {
 
 	// Html Element Reference used for focus()
 	const inputRef = useRef<HTMLInputElement>(null);
-	const navigate = useNavigate();
+	// const navigate = useNavigate();
 
 	// Grab the derived loginMutation from the API
 	// The naming of the returned objects is arbitrary
@@ -36,7 +36,7 @@ export default function LoginComponent() {
 			.then(() => {
 				// No error, success!
 				showSuccessNotification(translate('login.success'));
-				navigate('/');
+				// showModal = false;
 			})
 			.catch(() => {
 				// Error on login Mutation
@@ -78,7 +78,7 @@ export default function LoginComponent() {
 					<FormattedMessage id='submit' />
 				</Button>
 			</Form>
-		</div >
+		</div>
 	);
 }
 
