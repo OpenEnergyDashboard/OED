@@ -230,7 +230,8 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false,
+			displayModeBar: true,
+			modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],
 			locale,
 			locales: Locales // makes locales available for use
 		}
