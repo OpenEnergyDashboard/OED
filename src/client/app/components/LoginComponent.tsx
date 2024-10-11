@@ -16,8 +16,7 @@ interface LoginProp {
 }
 
 /**
- * @param root0.handleClose
- * @param root0.handleClose.handleClose
+ * @param handleClose Function to close modal after login
  * @returns The login page for users or admins.
  */
 export default function LoginComponent({ handleClose }: LoginProp) {
