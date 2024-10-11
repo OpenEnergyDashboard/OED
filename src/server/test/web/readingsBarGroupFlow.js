@@ -11,21 +11,17 @@ const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
-    createTimeString,
     expectReadingToEqualExpected,
     getUnitId,
     ETERNITY,
     METER_ID,
-    GROUP_ID,
-    unitDatakWh,
-    conversionDatakWh,
-    meterDatakWh } = require('../../util/readingsUtils');
+    GROUP_ID, } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for bar charts', () => {
-            mocha.describe('for quantity groups', () => {
-                mocha.it('BG15: expected_bar_group_ri_15-20_mu_kW_gu_kW_st_-inf_et_inf_bd_13.csv', async () =>{
+            mocha.describe('for flow groups', () => {
+                mocha.it('BG15: should have daily points for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () =>{
                     const unitDatakW = [
                         { 
                             // u4
