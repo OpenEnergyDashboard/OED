@@ -274,8 +274,6 @@ export default function HeaderButtonsComponent() {
 							</DropdownItem>
 							<DropdownItem
 								style={state.logoutLinkStyle}
-								tag={Link}
-								to='/'
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
