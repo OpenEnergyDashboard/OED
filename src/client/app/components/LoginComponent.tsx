@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-// import { useNavigate } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
@@ -17,6 +16,8 @@ interface LoginProp {
 }
 
 /**
+ * @param root0.handleClose
+ * @param root0.handleClose.handleClose
  * @returns The login page for users or admins.
  */
 export default function LoginComponent({ handleClose }: LoginProp) {
@@ -26,7 +27,6 @@ export default function LoginComponent({ handleClose }: LoginProp) {
 
 	// Html Element Reference used for focus()
 	const inputRef = useRef<HTMLInputElement>(null);
-	// const navigate = useNavigate();
 
 	// Grab the derived loginMutation from the API
 	// The naming of the returned objects is arbitrary
