@@ -6,7 +6,19 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
-import { DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
+import {
+	DropdownItem,
+	DropdownMenu,
+	DropdownToggle,
+	Modal,
+	ModalBody,
+	ModalFooter,
+	ModalHeader,
+	Nav,
+	NavLink,
+	Navbar,
+	UncontrolledDropdown
+} from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { clearGraphHistory } from '../redux/actions/extraActions';
 import { authApi } from '../redux/api/authApi';
@@ -295,18 +307,18 @@ export default function HeaderButtonsComponent() {
 			<>
 				<Modal isOpen={showModal} toggle={handleClose}>
 					<ModalHeader>
-						Login to OED Here
+						Enter username and password
 					</ModalHeader>
 					<ModalBody>
-						<LoginComponent />
+						<LoginComponent handleClose={handleClose}/>
 					</ModalBody>
-					<ModalFooter>
+					{/* <ModalFooter>
 						<button
 							className='btn btn-danger'
 							onClick={handleClose}>
 							Close
 						</button>
-					</ModalFooter>
+					</ModalFooter> */}
 				</Modal>
 			</>
 
