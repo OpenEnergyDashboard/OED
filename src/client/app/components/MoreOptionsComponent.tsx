@@ -32,7 +32,7 @@ export default function MoreOptionsComponent() {
 	return (
 		<>
 			{
-				<div style={{marginTop: '10px'}}>
+				<div style={{ marginTop: '10px' }}>
 					<Button color='secondary' outline onClick={handleShow}>
 						{translate('more.options')}
 					</Button>
@@ -74,6 +74,13 @@ export default function MoreOptionsComponent() {
 							{chartToRender == ChartTypes.radar && <DateRangeComponent />}
 							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
+
+							{/*More UI options for compare line */}
+							{chartToRender === ChartTypes.compareLine && <GraphicRateMenuComponent />}
+							{chartToRender === ChartTypes.compareLine && <AreaUnitSelectComponent />}
+							{chartToRender === ChartTypes.compareLine && <ErrorBarComponent />}
+							{chartToRender === ChartTypes.compareLine && <ExportComponent />}
+							{chartToRender === ChartTypes.compareLine && <ChartLinkComponent />}
 						</ModalBody>
 						<ModalFooter></ModalFooter>
 					</Modal>

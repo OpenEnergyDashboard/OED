@@ -13,7 +13,8 @@ export enum ChartTypes {
 	compare = 'compare',
 	map = 'map',
 	radar = 'radar',
-	threeD = '3D'
+	threeD = '3D',
+	compareLine = 'compare.line'
 }
 
 // Rates that can be graphed, only relevant to line graphs.
@@ -55,6 +56,14 @@ export interface ThreeDState {
 	readingInterval: ReadingInterval;
 }
 
+export enum ShiftAmount {
+	week = 'week',
+	month = 'month',
+	year = 'year',
+	custom = 'custom',
+	none = 'none'
+}
+
 export interface GraphState {
 	areaNormalization: boolean;
 	selectedMeters: number[];
@@ -73,4 +82,6 @@ export interface GraphState {
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;
 	hotlinked: boolean;
+	shiftAmount: ShiftAmount;
+	shiftTimeInterval: TimeInterval;
 }

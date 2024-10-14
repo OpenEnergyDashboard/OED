@@ -15,6 +15,7 @@ import RadarChartComponent from './RadarChartComponent';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
 import PlotNavComponent from './PlotNavComponent';
+import CompareLineChartComponent from './CompareLineChartComponent';
 
 /**
  * React component that controls the dashboard
@@ -39,6 +40,7 @@ export default function DashboardComponent() {
 						{chartToRender === ChartTypes.map && <MapChartComponent />}
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
 						{chartToRender === ChartTypes.radar && <RadarChartComponent />}
+						{chartToRender === ChartTypes.compareLine && <CompareLineChartComponent />}
 					</div>
 				</div>
 			</div>

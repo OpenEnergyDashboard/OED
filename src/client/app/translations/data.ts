@@ -47,7 +47,7 @@ const LocaleTranslationData = {
 		"clipboard.copied": "Copied To Clipboard",
 		"clipboard.not.copied": "Failed to Copy To Clipboard",
 		"close": "Close",
-		"compare": "Compare",
+		"compare": "Compare bar",
 		"compare.period": "Compare Period",
 		"compare.raw": "Cannot create comparison graph on raw units such as temperature",
 		"confirm.action": "Confirm Action",
@@ -508,7 +508,19 @@ const LocaleTranslationData = {
 		"week": "Week",
 		"yes": "yes",
 		"yesterday": "Yesterday",
-		"you.cannot.create.a.cyclic.group": "You cannot create a cyclic group"
+		"you.cannot.create.a.cyclic.group": "You cannot create a cyclic group",
+		"compare.line": "Compare line",
+		"shift.date.interval": "Shift Date Interval",
+		"1.month": "1 month",
+		"1.year": "1 year",
+		"2.months": "2 months",
+		"1.week": "1 week",
+		"compare.line.days.enter": "Enter in days and then hit enter",
+		"please.set.the.date.range": "Please choose date range",
+		"select.shift.amount": "Select shift amount",
+		"custom.date.range": "Custom date range",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriately",
+		"original.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriately"
 	},
 	"fr": {
 		"3D": "3D",
@@ -1010,7 +1022,20 @@ const LocaleTranslationData = {
 		"week": "Semaine",
 		"yes": " yes\u{26A1}",
 		"yesterday": "Hier",
-		"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique"
+		"you.cannot.create.a.cyclic.group": "Vous ne pouvez pas créer un groupe cyclique",
+		"compare.line": "Compare line\u{26A1}",
+		"shift.date.interval": "Shift Date Interval\u{26A1}",
+		"a few seconds": "a few seconds\u{26A1}",
+		"1.month": "1 month\u{26A1}",
+		"1.year": "1 year\u{26A1}",
+		"2.months": "2 months\u{26A1}",
+		"1.week": "1 week\u{26A1}",
+		"compare.line.days.enter": "Enter in days and then hit enter\u{26A1}",
+		"please.set.the.date.range": "Please choose date range\u{26A1}",
+		"select.shift.amount": "Select shift amount\u{26A1}",
+		"custom.date.range": "Custom date range\u{26A1}",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriately\u{26A1}",
+		"original.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriately\u{26A1}"
 	},
 	"es": {
 		"3D": "3D",
@@ -1513,7 +1538,20 @@ const LocaleTranslationData = {
 		"week": "semana",
 		"yes": "sí",
 		"yesterday": "Ayer",
-		"you.cannot.create.a.cyclic.group": "No se puede crear un grupo cíclico"
+		"you.cannot.create.a.cyclic.group": "No se puede crear un grupo cíclico",
+		"compare.line": "Compare line\u{26A1}",
+		"shift.date.interval": "Shift Date Interval\u{26A1}",
+		"a few seconds": "a few seconds\u{26A1}",
+		"1.month": "1 month\u{26A1}",
+		"1.year": "1 year\u{26A1}",
+		"2.months": "2 months\u{26A1}",
+		"1.week": "1 week\u{26A1}",
+		"compare.line.days.enter": "Enter in days and then hit enter\u{26A1}",
+		"please.set.the.date.range": "Please choose date range\u{26A1}",
+		"select.shift.amount": "Select shift amount\u{26A1}",
+		"custom.date.range": "Custom date range\u{26A1}",
+		"shifted.data.crosses.leap.year.to.non.leap.year": "Shifted data crosses a leap year so the graph might not align appropriately\u{26A1}",
+		"original.data.crosses.leap.year.to.non.leap.year": "Original data crosses a leap year so the graph might not align appropriately\u{26A1}"
 	}
 }
 
