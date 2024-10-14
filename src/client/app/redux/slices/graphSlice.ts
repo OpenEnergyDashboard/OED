@@ -418,8 +418,7 @@ export const {
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectMapBarWidthDays, selectShiftAmount,
-	selectShiftTimeInterval
+	selectShiftAmount, selectShiftTimeInterval
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -436,7 +435,7 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateMapsBarDuration,
-	updateShiftAmount, updateShiftTimeInterval
+	updateSelectedMetersOrGroups, updateShiftAmount,
+	updateShiftTimeInterval
 } = graphSlice.actions;
 
