@@ -137,7 +137,6 @@ mocha.describe('readings API', () => {
 
                 // Add BG10 here
 
-                // Add BG11 here
                 mocha.it('BG11: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU reverse conversion', async () => {
                     //load data into database
                     const unitData = unitDatakWh.concat([
