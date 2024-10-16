@@ -308,6 +308,7 @@ function mapStateToProps(state: State) {
 
 	// set map background image
 	const layout: any = {
+		margin: { b: 0, l: 0, r: 0 }, // Eliminate bottom, left, and right margins
 		// Either the actual map name or text to say it is not available.
 		title: {
 			text: (map) ? map.name : translate('map.unavailable')
