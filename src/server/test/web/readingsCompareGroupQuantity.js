@@ -37,8 +37,22 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 
-				// Add CG2 here
-
+				// Case CG2
+				mocha.it(' 7 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh ', async () => {
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					const expected = [14017.4841100155, 14605.4957015091];
+					// for compare, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-30 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P7D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				});
 				// Add CG3 here
 
 				// Add CG4 here
