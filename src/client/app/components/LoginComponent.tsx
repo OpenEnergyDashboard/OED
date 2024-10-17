@@ -17,6 +17,7 @@ interface LoginProp {
 
 /**
  * @param handleClose Function to close modal after login
+ * @param handleClose.handleClose See above ESLint wants this
  * @returns The login page for users or admins.
  */
 export default function LoginComponent({ handleClose }: LoginProp) {
