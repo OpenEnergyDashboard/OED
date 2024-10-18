@@ -7,6 +7,7 @@ import { utc } from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import * as Plotly from "plotly.js";
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi, stableEmptyBarReadings } from '../redux/api/readingsApi';
@@ -52,6 +53,14 @@ export default function BarChartComponent() {
 	const raw = useAppSelector(selectIsRaw);
 	const unitLabel = useAppSelector(selectBarUnitLabel);
 
+	// Manage button states with useState
+  const [listOfButtons, setListOfButtons] = React.useState<Plotly.ModeBarDefaultButtons[]>([
+    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'
+  ]);
+
+  const advancedButtons: Plotly.ModeBarDefaultButtons[] = [
+    'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'
+  ];
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
@@ -101,7 +110,15 @@ export default function BarChartComponent() {
 				config={{
 					responsive: true,
 					displayModeBar: true,
-					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+            name: 'more-options',
+            title: 'More Options',
+            icon: Plotly.Icons.pencil,
+            click: function () {
+              setListOfButtons(advancedButtons); // Update the state
+            }
+          }],
 					// Current Locale
 					locale,
 					// Available Locales

@@ -328,7 +328,8 @@ export default function RadarChartComponent() {
 				useResizeHandler={true}
 				config={{
 					displayModeBar: true,
-					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],					responsive: true,
+					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],					
+					responsive: true,
 					locales: Locales // makes locales available for use
 				}}
 				layout={layout}
