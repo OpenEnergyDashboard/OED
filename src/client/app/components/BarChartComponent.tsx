@@ -7,7 +7,7 @@ import { utc } from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
-import * as Plotly from "plotly.js";
+import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi, stableEmptyBarReadings } from '../redux/api/readingsApi';
@@ -53,15 +53,16 @@ export default function BarChartComponent() {
 	const raw = useAppSelector(selectIsRaw);
 	const unitLabel = useAppSelector(selectBarUnitLabel);
 
-	// Manage button states with useState
-  const [listOfButtons, setListOfButtons] = React.useState<Plotly.ModeBarDefaultButtons[]>([
-    'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'
-  ]);
-
-  const advancedButtons: Plotly.ModeBarDefaultButtons[] = [
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = [
+		'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = [
     'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'
   ];
 
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+	
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
 
@@ -114,9 +115,10 @@ export default function BarChartComponent() {
 					modeBarButtonsToAdd: [{
             name: 'more-options',
             title: 'More Options',
-            icon: Plotly.Icons.pencil,
+            icon: Icons.pencil,
             click: function () {
-              setListOfButtons(advancedButtons); // Update the state
+							// # of items must differ so the length can tell which list of buttons is being set
+              setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
             }
           }],
 					// Current Locale
