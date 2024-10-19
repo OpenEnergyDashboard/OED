@@ -7,6 +7,7 @@ import { utc } from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
@@ -56,6 +57,14 @@ export default function LineChartComponent() {
 	// Use Query Data to derive plotly datasets memoized selector
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+		'zoomOut2d', 'autoScale2d','resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d','autoScale2d','resetScale2d'];
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
 
 
@@ -87,7 +96,16 @@ export default function LineChartComponent() {
 				config={{
 					responsive: true,
 					displayModeBar: true,
-					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],					// Current Locale
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+						name: 'more-options',
+						title: 'More Options',
+						icon: Icons.pencil,
+						click: function () {
+							// # of items must differ so the length can tell which list of buttons is being set
+							setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+						}
+					}],
 					locale,
 					// Available Locales
 					locales: Locales

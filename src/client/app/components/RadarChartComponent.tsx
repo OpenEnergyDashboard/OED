@@ -7,6 +7,7 @@ import * as moment from 'moment';
 import { Layout } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
@@ -66,6 +67,14 @@ export default function RadarChartComponent() {
 	}
 	// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 	const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
+
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
+		'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	// Add all valid data from existing meters to the radar plot
 	for (const meterID of selectedMeters) {
@@ -328,7 +337,16 @@ export default function RadarChartComponent() {
 				useResizeHandler={true}
 				config={{
 					displayModeBar: true,
-					modeBarButtonsToRemove: ['select2d','lasso2d','autoScale2d','resetScale2d'],					
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+						name: 'more-options',
+						title: 'More Options',
+						icon: Icons.pencil,
+						click: function () {
+							// # of items must differ so the length can tell which list of buttons is being set
+							setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+						}
+					}],
 					responsive: true,
 					locales: Locales // makes locales available for use
 				}}
