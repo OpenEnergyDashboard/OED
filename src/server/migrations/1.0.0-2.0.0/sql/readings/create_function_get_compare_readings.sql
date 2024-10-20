@@ -3,6 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
+This isn't technically needed as no function signature changed and a startup of OED should
+replace the functions but do just to show/be safe.
+ */
+
+/*
 This shouldn't ever be looking at more than a few weeks of data, so we don't need to deal with compression.
  */
 
