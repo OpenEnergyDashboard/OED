@@ -12,13 +12,17 @@ const { log } = require('../../log');
  * @param {Reading[]} arrayToValidate
  * @param {dict} conditionSet used to validate readings (minVal, maxVal, minDate, maxDate, threshold, maxError)
  * @param {string} meterIdentifier identifier of meter being checked
+ * @returns {object} { validReadings, invalidReadings, errMsg }
  */
 function validateReadings(arrayToValidate, conditionSet, meterIdentifier = undefined) {
 	/* tslint:disable:no-string-literal */
 	const { validDates, errMsg: errMsgDate } = checkDate(arrayToValidate, conditionSet['minDate'], conditionSet['maxDate'], conditionSet['maxError'] / 2, meterIdentifier);
 	const { validValues, errMsg: errMsgValue } = checkValue(arrayToValidate, conditionSet['minVal'], conditionSet['maxVal'], conditionSet['maxError'] / 2, meterIdentifier);
 	/* tslint:enable:no-string-literal */
+	const validReadings = validDates.filter(reading => validValues.includes(reading));
+	const invalidReadings = [...invalidDates, ...invalidValues];
 	const errMsg = errMsgDate + errMsgValue;
+
 	return {
 		validReadings: validDates && validValues,
 		errMsg,
@@ -32,14 +36,18 @@ function validateReadings(arrayToValidate, conditionSet, meterIdentifier = undef
  * @param {Moment} maxDate inclusive latest acceptable date (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
  * @param {string} meterIdentifier identifier of meter being checked.
+ * @returns {object} { validDates, invalidDates, errMsg }
  */
 function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier) {
-	let validDates = true;
+	let validDates = [];
+	let invalidDates = [];
 	let errMsg = '';
-	if (minDate === null && maxDate === null) {
-		return { validDates, errMsg };
-	}
 	let readingNumber = 0;
+
+	if (minDate === null && maxDate === null) {
+		return { validDates: arrayToValidate, invalidDates: [], errMsg };
+	}
+
 	for (const reading of arrayToValidate) {
 		readingNumber++;
 		if (maxError <= 0) {
@@ -53,18 +61,20 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier)
 			errMsg += '<br>' + newErrMsg + '<br>';
 			--maxError;
 			validDates = false;
-		}
-		if (reading.endTimestamp > maxDate) {
+		} else if (reading.endTimestamp > maxDate) {
 			const newErrMsg = `error when checking reading time for #${readingNumber} on meter ${meterIdentifier}: ` +
 			`time ${reading.endTimestamp} is later than upper bound ${maxDate} ` +
 			`with reading ${reading.reading} and startTimestamp ${reading.startTimestamp}`;
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
+			invalidDates.push(reading);
 			--maxError;
-			validDates = false;
+		} else {
+			validDates.push(reading);
 		}
 	}
-	return { validDates, errMsg };
+
+	return { validDates, invalidDates, errMsg };
 }
 
 /**
@@ -74,11 +84,14 @@ function checkDate(arrayToValidate, minDate, maxDate, maxError, meterIdentifier)
  * @param {number} maxVal inclusive maximum acceptable reading value (won't be rejected)
  * @param {number} maxError maximum number of errors to be reported, ignore the rest
  * @param {string} meterIdentifier identifier of meter being checked.
+ * @returns {object} { validValues, invalidValues, errMsg }
  */
 function checkValue(arrayToValidate, minVal, maxVal, maxError, meterIdentifier) {
 	let validValues = true;
+	let invalidValues = [];
 	let errMsg = '';
 	let readingNumber = 0;
+
 	for (const reading of arrayToValidate) {
 		readingNumber++;
 		if (maxError <= 0) {
@@ -98,11 +111,14 @@ function checkValue(arrayToValidate, minVal, maxVal, maxError, meterIdentifier) 
 			`with startTimestamp ${reading.startTimestamp} and endTimestamp ${reading.endTimestamp}`;
 			log.error(newErrMsg);
 			errMsg += '<br>' + newErrMsg + '<br>';
+			invalidValues.push(reading);
 			--maxError;
-			validValues = false;
+		} else {
+			validValues.push(reading);
 		}
 	}
-	return { validValues, errMsg };
+
+	return { validValues, invalidValues, errMsg };
 }
 
 /**
