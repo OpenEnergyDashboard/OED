@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+CREATE TYPE disable_checks_enum AS ENUM (
+	'no_reject_bad',
+	'no_reject_all',
+	'yes_no_checks'
+);
 -- create preferences table
 CREATE TABLE IF NOT EXISTS preferences (
 	id SERIAL PRIMARY KEY,
@@ -21,6 +26,6 @@ CREATE TABLE IF NOT EXISTS preferences (
     default_meter_maximum_date TIMESTAMP NOT NULL,
 	default_meter_reading_gap REAL NOT NULL,
     default_meter_maximum_errors INTEGER NOT NULL,
-	default_meter_disable_checks BOOLEAN NOT NULL,
+	default_meter_disable_checks disable_checks_enum NOT NULL,
 	default_help_url TEXT DEFAULT NULL
 );

@@ -660,17 +660,31 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		prevEndTimestampTz = endTimestampTz;
 	}
 	// Validate data if conditions given
-	if (conditionSet !== undefined && !conditionSet['disableChecks']) {
-		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
-		if (!validReadings) {
-			errMsg = `<h2>For meter ${meterName}: error when validating data so all reading are rejected</h2>`;
-			log.error(errMsg);
-			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
-			// This empties the result array. Should be fast and okay with const.
-			result.splice(0, result.length);
-			isAllReadingsOk = false;
-			return { result, isAllReadingsOk, msgTotal };
+	if (conditionSet !== undefined) {
+		const disableChecks = conditionSet['disableChecks'];
+
+		if (disableChecks != 'yes_no_checks') {
+			const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));}
+
+		
+			if (!validReadings) {
+				if (disableChecks === 'no_reject_all'){
+				errMsg = `<h2>For meter ${meterName}: error when validating data so all reading are rejected</h2>`;
+				log.error(errMsg);
+				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+				// This empties the result array. Should be fast and okay with const.
+				result.splice(0, result.length);
+				isAllReadingsOk = false;
+				return { result, isAllReadingsOk, msgTotal };
+				} else if (disableChecks === 'no_reject_bad') {
+					errMsg = '<h2>For meter ${meterName}: error when validating some readings, but valid readings are accepted</h2>';
+					log.warn(errMsg);
+					({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+					// only keep valid readings, leave the invalid ones out of the result
+					isAllReadingsOk = false;
+				}
+			}
 		}
 	}
 	// Update the meter to contain information for the last reading in the data file.
