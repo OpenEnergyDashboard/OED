@@ -31,6 +31,8 @@ export interface UnitData {
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
 	note: string;
+	defaultMeterMinimumValue:number,
+	defaultMeterMaximumValue:number
 }
 
 export interface UnitEditData {

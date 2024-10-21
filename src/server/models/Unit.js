@@ -18,8 +18,10 @@ class Unit {
 	 * @param {*} displayable Can be none, all, or admin. Restrict the type of user that can see this unit.
 	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
+	 * @param {*} defaultMeterMinimumValue The default minimum value for meters.
+	 * @param {*} defaultMeterMaximumValue The default maximum value for meters.
 	 */
-	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay, note) {
+	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay,defaultMeterMinimumValue, defaultMeterMaximumValue, note) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
@@ -29,6 +31,8 @@ class Unit {
 		this.suffix = suffix;
 		this.displayable = displayable;
 		this.preferredDisplay = preferredDisplay;
+		this.defaultMeterMinimumValue = defaultMeterMinimumValue;
+		this.defaultMeterMaximumValue = defaultMeterMaximumValue;
 		this.note = note;
 	}
 
