@@ -34,6 +34,8 @@ export default function CreateUnitModalComponent() {
 		secInRate: 3600,
 		suffix: '',
 		note: '',
+		defaultMeterMinimumValue:-999999999999,
+		defaultMeterMaximumValue:999999999999,
 		// These two values are necessary but are not used.
 		// The client code makes the id for the selected unit and default graphic unit be -99
 		// so it can tell it is not yet assigned and do the correct logic for that case.
@@ -266,6 +268,39 @@ export default function CreateUnitModalComponent() {
 								<FormattedMessage id="error.required" />
 							</FormFeedback>
 						</FormGroup></Col>
+
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* default Meter Minimum Value input */}
+						<Col><FormGroup>
+							<Label for='defaultMeterMinimumValue'>{translate('default.meter.minimum.value')}</Label>
+							<Input
+								id='defaultMeterMinimumValue'
+								name='defaultMeterMinimumValue'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								defaultValue={state.defaultMeterMinimumValue}
+								maxLength={50} />
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* default Meter Maximum Value input input */}
+						<Col><FormGroup>
+							<Label for='defaultMeterMaximumValue'>{translate('default.meter.maximum.value')}</Label>
+							<Input
+								id='defaultMeterMaximumValue'
+								name='defaultMeterMaximumValue'
+								type='number'
+								onChange={e => handleNumberChange(e)}
+								defaultValue={state.defaultMeterMaximumValue}
+								maxLength={50} />
+							<FormFeedback>
+								<FormattedMessage id="error.required" />
+							</FormFeedback>
+						</FormGroup></Col>
+
+
 					</Row>
 					{/* Note input */}
 					<FormGroup>
