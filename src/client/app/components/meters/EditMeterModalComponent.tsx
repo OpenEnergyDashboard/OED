@@ -75,6 +75,33 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 	}, [localMeterEdits.cumulative]);
 
+	useEffect(() => {
+		if (localMeterEdits.displayable === false) {
+			// This will hold the overall message for the admin alert.
+			let msg = '';
+			// This will hold the names of groups that are affected.
+			let groups = '';
+			// Tells if the change should be cancelled.
+			let cancel = false;
+			// Checks every group for the meter being edited.
+			for (const groupId of Object.values(groupDataByID)) {
+				if (groupId.deepMeters.includes(meterState.id)) {
+					groups += `${groupId.name}\n`;
+				}
+			}
+			if (groups != '') {
+				// There is a message to display to the user.
+				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.displayable.verify')}\n`
+				msg += `${groups + '\n' + translate('edit.verify')}\n`
+				cancel = !window.confirm(msg);
+				if (cancel) {
+					// User asks to remove change
+					setLocalMeterEdits(details => ({ ...details, displayable: true }));
+				}
+			}
+		}
+	}, [localMeterEdits.displayable])
+
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
