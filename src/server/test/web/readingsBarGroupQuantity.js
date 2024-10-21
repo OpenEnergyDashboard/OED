@@ -230,13 +230,13 @@ mocha.describe('readings API', () => {
                     ]);
                     const conversionData = conversionDatakWh.concat([
                         {
-                            // c2
-                            sourceName: 'kWh',
-                            destinationName: 'MJ',
+                            // c6
+                            sourceName: 'MJ',
+                            destinationName: 'kWh',
                             bidirectional: true,
-                            slope: 3.6,
+                            slope: 1 / 3.6,
                             intercept: 0,
-                            note: 'kWh → MJ'
+                            note: 'MJ → kWh'
                         },
                         {
                             // c3
