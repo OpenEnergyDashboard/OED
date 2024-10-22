@@ -5,24 +5,28 @@
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { useNavigate } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import translate from '../utils/translate';
 
 
+interface LoginProp {
+	handleClose: () => void;
+}
+
 /**
+ * @param handleClose Function to close modal after login
+ * @param handleClose.handleClose Needed by ESLint see above
  * @returns The login page for users or admins.
  */
-export default function LoginComponent() {
+export default function LoginComponent({ handleClose }: LoginProp) {
 	// Local State
 	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
 
 	// Html Element Reference used for focus()
 	const inputRef = useRef<HTMLInputElement>(null);
-	const navigate = useNavigate();
 
 	// Grab the derived loginMutation from the API
 	// The naming of the returned objects is arbitrary
@@ -36,7 +40,7 @@ export default function LoginComponent() {
 			.then(() => {
 				// No error, success!
 				showSuccessNotification(translate('login.success'));
-				navigate('/');
+				handleClose();
 			})
 			.catch(() => {
 				// Error on login Mutation
@@ -69,16 +73,31 @@ export default function LoginComponent() {
 						innerRef={inputRef}
 					/>
 				</FormGroup>
-				<Button
-					outline
-					type='submit'
-					onClick={handleSubmit}
-					disabled={!username.length || !password.length}
-				>
-					<FormattedMessage id='submit' />
-				</Button>
+				<div className='row'>
+					<div className='col'>
+						<Button
+							outline
+							type='submit'
+							onClick={handleSubmit}
+							disabled={!username.length || !password.length}
+						>
+							<FormattedMessage id='submit' />
+						</Button>
+					</div>
+					<div className='col'>
+						<Button
+							outline
+							type='button'
+							onClick={handleClose}
+						>
+							<FormattedMessage id='close' />
+						</Button>
+					</div>
+				</div>
+
+
 			</Form>
-		</div >
+		</div>
 	);
 }
 
