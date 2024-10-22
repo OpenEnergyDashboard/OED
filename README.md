@@ -34,7 +34,7 @@ See the full licensing agreement [here](LICENSE.txt)
 
 ## Contributions ##
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our [Contributor License Agreement](https://openenergydashboard.github.io/developer/cla.html). Web pages with [information for developers](https://openenergydashboard.github.io/developer/) is available. If you have any questions or concerns feel free to at engage@OpenEnergyDashboard.org.
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our [Contributor License Agreement](https://openenergydashboard.org/developer/cla/). Web pages with [information for developers](https://openenergydashboard.github.io/developer/) is available. If you have any questions or concerns feel free to at engage@OpenEnergyDashboard.org.
 
 ## Code of Conduct ##
 
