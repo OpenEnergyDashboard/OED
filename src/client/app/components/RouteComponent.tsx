@@ -13,7 +13,6 @@ import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
-import LoginComponent from './LoginComponent';
 import AdminComponent from './admin/AdminComponent';
 import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
@@ -47,7 +46,6 @@ const router = createBrowserRouter([
 		path: '/', element: <AppLayout />, errorElement: <ErrorComponent />,
 		children: [
 			{ index: true, element: <HomeComponent /> },
-			{ path: 'login', element: <LoginComponent /> },
 			{ path: 'groups', element: <GroupsDetailComponent /> },
 			{ path: 'meters', element: <MetersDetailComponent /> },
 			{ path: 'graph', element: <GraphLink /> },
