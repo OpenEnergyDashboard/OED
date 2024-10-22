@@ -28,7 +28,7 @@ mocha.describe('readings API', () => {
 					// Get the unit ID since the DB could use any value
 					const unitId = await getUnitId('thing unit');
 					// Expected was taken from the `curr use, prev use` column for this test case, since this is a compare readings test
-					const expected = [796223.09710977, 823044.7588312];
+					const expected = [7962.23097109771, 8230.447588311996];
 
 					// Create a request to the API and save the response
 					// Note: the api paths are located in app.js, but this specific one points to compareReadings.js
