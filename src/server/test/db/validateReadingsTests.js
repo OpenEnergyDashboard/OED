@@ -27,12 +27,15 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		)).map(reading => checkDate([reading], minDate, maxDate, Number.MAX_VALUE));
 		for (let i = 0; i < 4; ++i) {
 			if (i % 2 === 0) {
-				expect(results[i].validDates).to.equal(true);
+				expect(results[i].validDates.length).to.be.greaterThan(0);
+				expect(results[i].invalidDates.length).to.equal(0);
 			} else {
-				expect(results[i].validDates).to.equal(false);
+				expect(results[i].validDates.length).to.equal(0);
+				expect(results[i].invalidDates.length).to.be.greaterThan(0);
 			}
 		}
 	});
+
 	mocha.it('detects out-of-bound data', async () => {
 		const minVal = 10;
 		const maxVal = 20;
@@ -46,9 +49,11 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 		)).map(reading => checkValue([reading], minVal, maxVal, Number.MAX_VALUE));
 		for (let i = 0; i < 7; ++i) {
 			if (i % 2 === 0) {
-				expect(results[i].validValues).to.equal(false);
+				expect(results[i].validValues.length).to.equal(0);
+				expect(results[i].invalidValues.length).to.be.greaterThan(0);
 			} else {
-				expect(results[i].validValues).to.equal(true);
+				expect(results[i].validValues.length).to.be.greaterThan(0);
+				expect(results[i].invalidValues.length).to.equal(0);
 			}
 		}
 	});
@@ -92,10 +97,26 @@ mocha.describe('PIPELINE: Validate Readings', () => {
 						new Reading(undefined, 20, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:01:01')),
 						new Reading(undefined, 0, moment('1970-01-01 00:01:30'), moment('1970-01-01 00:02:01'))];
 
+		let mixedData = [
+			new Reading(undefined, 0, moment('1970-01-01 00:00:00'), moment('1970-01-01 00:01:00')), // valid
+			new Reading(undefined, 30, moment('1970-01-01 00:01:00'), moment('1970-01-01 00:02:00')), // invalid (value too high)
+			new Reading(undefined, 0, moment('1969-01-01 00:00:00'), moment('1969-01-01 00:01:00')), // invalid (date too early)
+			new Reading(undefined, 10, moment('1980-01-01 00:00:00'), moment('1980-01-01 01:00:00'))  // valid
+		];
+
+		const result = validateReadings(mixedData, conditionSet);
+
 		expect(checkIntervals(badIntervals, conditionSet['threshold']).validIntervals).to.equal(false);
 		expect(validateReadings(badDate, conditionSet).validReadings).to.equal(false);
 		expect(validateReadings(badValue, conditionSet).validReadings).to.equal(false);
 		expect(validateReadings(goodData, conditionSet).validReadings).to.equal(true);
 
+		expect(result.validReadings.length).to.equal(2);
+		expect(result.validReadings[0].reading).to.equal(0);
+		expect(result.validReadings[1].reading).to.equal(10);
+
+		expect(result.invalidReadings.length).to.equal(2);
+		expect(result.invalidReadings[0].reading).to.equal(30);
+		expect(result.invalidReadings[1].startTimestamp.isBefore('1970-01-01 00:00:00')).to.equal(true);
 	});
 });
