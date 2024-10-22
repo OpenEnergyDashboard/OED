@@ -293,7 +293,7 @@ export default function HeaderButtonsComponent() {
 			<>
 				<Modal isOpen={showModal} toggle={handleClose}>
 					<ModalHeader>
-						Enter username and password
+						{translate('log.in')}
 					</ModalHeader>
 					<ModalBody>
 						<LoginComponent handleClose={handleClose}/>
