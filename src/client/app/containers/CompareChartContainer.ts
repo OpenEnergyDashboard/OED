@@ -7,7 +7,9 @@
 import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import translate from '../utils/translate';
+import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import Locales from '../types/locales';
 import * as moment from 'moment';
 import { UnitRepresentType } from '../types/redux/units';
@@ -83,6 +85,14 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 			}
 		}
 	}
+
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
+		'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	// Get the time shift for this comparison as a moment duration
 	const compareShift = calculateCompareShift(comparePeriod);
@@ -230,7 +240,17 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		data: datasets,
 		layout,
 		config: {
-			displayModeBar: false,
+			displayModeBar: true,
+			modeBarButtonsToRemove: listOfButtons,
+			modeBarButtonsToAdd: [{
+				name: 'more-options',
+				title: 'More Options',
+				icon: Icons.pencil,
+				click: function () {
+					// # of items must differ so the length can tell which list of buttons is being set
+					setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+				}
+			}],
 			locale,
 			locales: Locales // makes locales available for use
 		}
