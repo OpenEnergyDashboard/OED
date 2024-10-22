@@ -13,7 +13,7 @@ const { prepareTest,
 	METER_ID,
 	unitDataThing,
 	conversionDataThing_36,
-	meterDataThing_36} = require('../../util/readingsUtils');
+	meterDataThing_36 } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {

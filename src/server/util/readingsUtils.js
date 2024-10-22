@@ -356,4 +356,3 @@ module.exports = {
     conversionDataThing_36,
     meterDataThing_36
 };
-// groupDatakWh (meterDatakWhGroups with meterDatakWh, meterDatakWhOther)

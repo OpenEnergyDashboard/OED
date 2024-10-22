@@ -12,15 +12,12 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
-    // createTimeString,
     getUnitId,
     ETERNITY,
     METER_ID,
     GROUP_ID,
-    unitDatakWh,
-    conversionDatakWh,
-    meterDatakWhGroups,
-    groupDatakWh } = require('../../util/readingsUtils');
+    unitDataThing,
+    conversionDataThing_36} = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -123,40 +120,6 @@ mocha.describe('readings API', () => {
                 mocha.it(
                     "LG25: should have daily points for 15 + 20 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36",
                     async () => {
-                        const unitData = [
-                            {
-                                name: 'Thing_36',
-                                identifier: '',
-                                unitRepresent: Unit.unitRepresentType.FLOW,
-                                secInRate: 36,
-                                typeOfUnit: Unit.unitType.METER,
-                                suffix: '',
-                                displayable: Unit.displayableType.NONE,
-                                preferredDisplay: false,
-                                note: 'special unit'
-                            },
-                            {
-                                name: 'thing unit',
-                                identifier: '',
-                                unitRepresent: Unit.unitRepresentType.FLOW,
-                                secInRate: 3600,
-                                typeOfUnit: Unit.unitType.UNIT,
-                                suffix: '',
-                                displayable: Unit.displayableType.ALL,
-                                preferredDisplay: false,
-                                note: 'special unit'
-                            }
-                        ];
-                        const conversionData = [
-                            {
-                                sourceName: 'Thing_36',
-                                destinationName: 'thing unit',
-                                bidirectional: false,
-                                slope: 1,
-                                intercept: 0,
-                                note: 'Thing_36 → thing unit'
-                            }
-                        ];
                         const meterData = [
                             {
                                 name: 'Thing_36 thing unit',
@@ -195,7 +158,7 @@ mocha.describe('readings API', () => {
                             }
                         ]
                         // Load the data into the database
-                        await prepareTest(unitData, conversionData, meterData, groupData);
+                        await prepareTest(unitDataThing, conversionDataThing_36, meterData, groupData);
                         // Get the unit ID since the DB could use any value.
                         const unitId = await getUnitId('thing unit');
                         // Load the expected response data from the corresponding csv file
