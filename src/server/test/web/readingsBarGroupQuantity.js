@@ -135,6 +135,70 @@ mocha.describe('readings API', () => {
                 // Add BG8 here
 
                 // Add BG9 here
+                mocha.it('BG9: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion', async () => {
+                    
+                    const unitData = unitDatakWh.concat([
+                        {
+                            // u3
+                            name: 'MJ', 
+                            identifier: 'megaJoules', 
+                            unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: true, 
+                            note: 'MJ' 
+                        }
+                    ]);
+                    
+                    const conversionData = conversionDatakWh.concat([
+                        
+                        { 
+                            // c6
+                            sourceName: 'MJ',
+                            destinationName: 'kWh',
+                            bidirectional: true,
+                            slope: 1 / 3.6,
+                            intercept: 0,
+                            note: 'MJ → KWh' 
+                        }
+                    ]);
+                    const meterData = [
+                        {
+                            name: 'Electric_Utility MJ Reverse',
+                            unit: 'Electric_Utility',
+                            displayable: true,
+                            gps: undefined,
+                            defaultGraphicUnit: 'MJ',
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+                
+                    // Load data into the database
+                    await prepareTest(unitData, conversionData, meterDatakWhGroups, groupDatakWh, meterData);
+                
+                    // Get unit ID for MJ
+                    const unitId = await getUnitId('MJ');
+                
+                    // Load expected response data from the corresponding CSV file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_MJ_st_-inf_et_inf_bd_1.csv');
+                
+                    // Create a request to the API for unbounded reading times and save the response
+                    const result = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
+                        .query({ 
+                            timeInterval: ETERNITY.toString(), 
+                            barWidthDays: '1',
+                            graphicUnitId: unitId 
+                        });
+                
+                    // Check that the API reading matches the expected data from the CSV
+                    expectReadingToEqualExpected(result, expected, GROUP_ID);
+                });
 
                 mocha.it('BG10: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU', async () =>{
                     const unitData = unitDatakWh.concat([
