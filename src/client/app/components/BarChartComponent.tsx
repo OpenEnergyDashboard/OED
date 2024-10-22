@@ -81,6 +81,7 @@ export default function BarChartComponent() {
 				data={datasets}
 				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
 					bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp

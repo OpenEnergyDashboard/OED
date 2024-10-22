@@ -78,6 +78,7 @@ export default function LineChartComponent() {
 				data={data}
 				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
