@@ -198,8 +198,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			}
 			if (groups != '') {
 				// There is a message to display to the user.
-				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.edit.displayable.warning')}\n`
-				msg += `${groups + '\n' + translate('meter.edit.displayable.verify')}\n`
+				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.edit.displayable.warning')}\n`;
+				msg += `${groups + '\n' + translate('meter.edit.displayable.verify')}\n`;
 				save = window.confirm(msg);
 			}
 		}
