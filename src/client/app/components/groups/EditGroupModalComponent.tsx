@@ -818,7 +818,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				showErrorNotification(msg);
 			} else {
 				// If msg is not empty, warns the admin and asks if they want to apply changes.
-				msg += `\n${translate('edit.verify')}`;
+				msg += `\n${translate('group.edit.verify')}`;
 				cancel = !window.confirm(msg);
 			}
 		}

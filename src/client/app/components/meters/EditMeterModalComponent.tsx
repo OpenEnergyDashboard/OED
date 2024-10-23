@@ -75,33 +75,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 	}, [localMeterEdits.cumulative]);
 
-	useEffect(() => {
-		if (localMeterEdits.displayable === false) {
-			// This will hold the overall message for the admin alert.
-			let msg = '';
-			// This will hold the names of groups that are affected.
-			let groups = '';
-			// Tells if the change should be cancelled.
-			let cancel = false;
-			// Checks every group for the meter being edited.
-			for (const groupId of Object.values(groupDataByID)) {
-				if (groupId.deepMeters.includes(meterState.id)) {
-					groups += `${groupId.name}\n`;
-				}
-			}
-			if (groups != '') {
-				// There is a message to display to the user.
-				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.displayable.verify')}\n`
-				msg += `${groups + '\n' + translate('edit.verify')}\n`
-				cancel = !window.confirm(msg);
-				if (cancel) {
-					// User asks to remove change
-					setLocalMeterEdits(details => ({ ...details, displayable: true }));
-				}
-			}
-		}
-	}, [localMeterEdits.displayable])
-
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
@@ -205,6 +178,34 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalMeterEdits({ ...localMeterEdits, [e.target.name]: JSON.parse(e.target.value) });
+	};
+
+	// Function handles the selection of a new displayable.
+	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// If there is a potential issue then the admin will decide if save happens. Otherwise, the value is put into state.
+		let save = true;
+		if (!JSON.parse(e.target.value)) {
+			// This will hold the overall message for the admin alert.
+			let msg = '';
+			// This will hold the names of groups that are affected.
+			let groups = '';
+			// Tells if the change should be cancelled.
+			// Checks for groups that include the meter being edited.
+			for (const groupId of Object.values(groupDataByID)) {
+				if (groupId.deepMeters.includes(meterState.id)) {
+					groups += `${groupId.name}\n`;
+				}
+			}
+			if (groups != '') {
+				// There is a message to display to the user.
+				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.edit.displayable.warning')}\n`
+				msg += `${groups + '\n' + translate('meter.edit.displayable.verify')}\n`
+				save = window.confirm(msg);
+			}
+		}
+		if (save) {
+			handleBooleanChange(e);
+		}
 	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -333,7 +334,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='displayable'
 								type='select'
 								value={localMeterEdits.displayable?.toString()}
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => handleDisplayableChange(e)}
 								invalid={localMeterEdits.displayable && localMeterEdits.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
