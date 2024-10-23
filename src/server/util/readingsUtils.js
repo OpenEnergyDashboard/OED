@@ -277,6 +277,62 @@ const groupDatakWh = [
     }
 ];
 
+// These are the 2D arrays for units and conversions to feed into the database
+// For Thing units.
+const unitDataThing = [
+    {
+        // u14
+        name: 'Thing_36',
+        identifier: '',
+        unitRepresent: Unit.unitRepresentType.FLOW,
+        secInRate: 36,
+        typeOfUnit: Unit.unitType.METER,
+        suffix: '',
+        displayable: Unit.displayableType.NONE,
+        preferredDisplay: false,
+        note: 'special unit'
+    },
+    {
+        // u15
+        name: 'thing unit',
+        identifier: '',
+        unitRepresent: Unit.unitRepresentType.FLOW,
+        secInRate: 3600,
+        typeOfUnit: Unit.unitType.UNIT,
+        suffix: '',
+        displayable: Unit.displayableType.ALL,
+        preferredDisplay: false,
+        note: 'special unit'
+    }
+];
+
+const conversionDataThing_36 = [
+    {
+        // c15
+        sourceName: 'Thing_36',
+        destinationName: 'thing unit',
+        bidirectional: false,
+        slope: 1,
+        intercept: 0,
+        note: 'Thing_36 → thing unit'
+    }
+];
+
+const meterDataThing_36 = [
+    {
+        name: 'Thing_36 thing unit',
+        unit: 'Thing_36',
+        defaultGraphicUnit: 'thing unit',
+        displayable: true,
+        gps: undefined,
+        note: 'special meter',
+        file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+        deleteFile: false,
+        readingFrequency: '15 minutes',
+        id: METER_ID
+    }
+]
+
 module.exports = {
     prepareTest,
     parseExpectedCsv,
@@ -295,5 +351,8 @@ module.exports = {
     conversionDatakWh,
     meterDatakWh,
     meterDatakWhGroups,
-    groupDatakWh
+    groupDatakWh,
+    unitDataThing,
+    conversionDataThing_36,
+    meterDataThing_36
 };

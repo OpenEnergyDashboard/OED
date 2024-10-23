@@ -14,7 +14,10 @@ const { prepareTest,
     expectReadingToEqualExpected,
     getUnitId,
     ETERNITY,
-    METER_ID } = require('../../util/readingsUtils');
+    METER_ID,
+    unitDataThing,
+    conversionDataThing_36,
+    meterDataThing_36 } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -84,59 +87,7 @@ mocha.describe('readings API', () => {
                     expectReadingToEqualExpected(res, expected);
                 });
                 mocha.it('L25: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
-                    const unitData = [
-                        {
-                            // u14
-                            name: 'Thing_36',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.FLOW,
-                            secInRate: 36,
-                            typeOfUnit: Unit.unitType.METER,
-                            suffix: '',
-                            displayable: Unit.displayableType.NONE,
-                            preferredDisplay: false,
-                            note: 'special unit'
-                        },
-                        {
-                            // u15
-                            name: 'thing unit',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.FLOW,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: false,
-                            note: 'special unit'
-                        }
-                    ];
-                    const conversionData = [
-                        {
-                            // c15
-                            sourceName: 'Thing_36',
-                            destinationName: 'thing unit',
-                            bidirectional: false,
-                            slope: 1,
-                            intercept: 0,
-                            note: 'Thing_36 → thing unit'
-                        }
-                    ];
-                    const meterData = [
-                        {
-                            name: 'Thing_36 thing unit',
-                            unit: 'Thing_36',
-                            defaultGraphicUnit: 'thing unit',
-                            displayable: true,
-                            gps: undefined,
-                            note: 'special meter',
-                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-                            deleteFile: false,
-                            readingFrequency: '15 minutes',
-                            id: METER_ID
-                        }
-                    ];
-
-                    await prepareTest(unitData, conversionData, meterData);
+                    await prepareTest(unitDataThing, conversionDataThing_36, meterDataThing_36);
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('thing unit');
                     // Reuse same file as flow since value should be the same values.
