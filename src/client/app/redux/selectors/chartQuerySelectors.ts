@@ -14,6 +14,7 @@ import {
 	selectSelectedUnit, selectThreeDState
 } from '../slices/graphSlice';
 import { omit } from 'lodash';
+import { selectLineChartDeps } from './lineChartSelectors';
 
 // query args that 'most' graphs share
 export interface commonQueryArgs {
@@ -25,6 +26,7 @@ export interface commonQueryArgs {
 
 // endpoint specific args
 export interface LineReadingApiArgs extends commonQueryArgs { }
+export interface CompareLineReadingApiArgs extends commonQueryArgs { }
 export interface BarReadingApiArgs extends commonQueryArgs { barWidthDays: number }
 
 // ThreeD only queries a single id so extend common, but omit ids array
@@ -78,6 +80,32 @@ export const selectLineChartQueryArgs = createSelector(
 		const meterShouldSkip = common.meterSkip;
 		const groupShouldSkip = common.groupSkip;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
+	}
+);
+
+export const selectCompareLineQueryArgs = createSelector(
+	selectQueryTimeInterval,
+	selectSelectedUnit,
+	selectThreeDState,
+	selectLineChartDeps,
+	(queryTimeInterval, selectedUnit, threeD, lineChartDeps) => {
+		const args: CompareLineReadingApiArgs =
+			threeD.meterOrGroup === MeterOrGroup.meters
+				? {
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				}
+				: {
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				};
+		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
+		const argsDeps = threeD.meterOrGroup === MeterOrGroup.meters ? lineChartDeps.meterDeps : lineChartDeps.groupDeps;
+		return { args, shouldSkipQuery, argsDeps };
 	}
 );
 
@@ -185,11 +213,13 @@ export const selectAllChartQueryArgs = createSelector(
 	selectCompareChartQueryArgs,
 	selectMapChartQueryArgs,
 	selectThreeDQueryArgs,
-	(line, bar, compare, map, threeD) => ({
+	selectCompareLineQueryArgs,
+	(line, bar, compare, map, threeD, compareLine) => ({
 		line,
 		bar,
 		compare,
 		map,
-		threeD
+		threeD,
+		compareLine
 	})
 );
