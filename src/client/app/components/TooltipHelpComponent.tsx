@@ -54,7 +54,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
 		'help.home.chart.redraw.restore': { link: `${helpUrl}/lineGraphic/#redrawRestore` },
 		'help.home.chart.select': { link: `${helpUrl}/graphType/` },
-		'help.home.compare.interval.tip': { link: `${helpUrl}/compareGraphic/#usage` },
+		'help.home.compare.period.tip': { link: `${helpUrl}/compareGraphic/#usage` },
 		'help.home.compare.sort.tip': { link: `${helpUrl}/compareGraphic/#usage` },
 		'help.home.error.bar': { link: `${helpUrl}/errorBar/#usage` },
 		'help.home.export.graph.data': { link: `${helpUrl}/export/` },

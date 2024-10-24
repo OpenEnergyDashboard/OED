@@ -55,7 +55,7 @@ function mapStateToProps(state: State) {
 
 		// Figure out what time interval the bar is using since user bar data for now.
 		const timeInterval = state.graph.queryTimeInterval;
-		const barDuration = state.graph.barDuration;
+		const mapDuration = state.graph.duration;
 		// Make sure there is a map with values so avoid issues.
 		if (map && map.origin && map.opposite) {
 			// The size of the original map loaded into OED.
@@ -129,11 +129,11 @@ function mapStateToProps(state: State) {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(meterGPSInUserGrid.x);
 							y.push(meterGPSInUserGrid.y);
-							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the mapDuration might have changed
 							// and be fetching. The unit could change from that menu so also need to check.
-							if (byMeterID[timeInterval.toString()] !== undefined && byMeterID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+							if (byMeterID[timeInterval.toString()] !== undefined && byMeterID[timeInterval.toString()][mapDuration.toISOString()] !== undefined) {
 								// Get the bar data to use for the map circle.
-								const readingsData = byMeterID[timeInterval.toString()][barDuration.toISOString()][unitID];
+								const readingsData = byMeterID[timeInterval.toString()][mapDuration.toISOString()][unitID];
 								// This protects against there being no readings or that the data is being updated.
 								if (readingsData !== undefined && !readingsData.isFetching) {
 									// Meter name to include in hover on graph.
@@ -160,13 +160,13 @@ function mapStateToProps(state: State) {
 										// only display a range of dates for the hover text if there is more than one day in the range
 										// Shift to UTC since want database time not local/browser time which is what moment does.
 										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-										if (barDuration.asDays() != 1) {
+										if (mapDuration.asDays() != 1) {
 											// subtracting one extra day caused by day ending at midnight of the next day.
 											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 										}
 										// The value for the circle is the average daily usage.
-										averagedReading = mapReading.reading / barDuration.asDays();
+										averagedReading = mapReading.reading / mapDuration.asDays();
 										if (state.graph.areaNormalization) {
 											averagedReading /= meterArea;
 										}
@@ -206,11 +206,11 @@ function mapStateToProps(state: State) {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(groupGPSInUserGrid.x);
 							y.push(groupGPSInUserGrid.y);
-							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the barDuration might have changed
+							// Make sure the bar reading data is available. The timeInterval should be fine (but checked) but the mapDuration might have changed
 							// and be fetching. The unit could change from that menu so also need to check.
-							if (byGroupID[timeInterval.toString()] !== undefined && byGroupID[timeInterval.toString()][barDuration.toISOString()] !== undefined) {
+							if (byGroupID[timeInterval.toString()] !== undefined && byGroupID[timeInterval.toString()][mapDuration.toISOString()] !== undefined) {
 								// Get the bar data to use for the map circle.
-								const readingsData = byGroupID[timeInterval.toString()][barDuration.toISOString()][unitID];
+								const readingsData = byGroupID[timeInterval.toString()][mapDuration.toISOString()][unitID];
 								// This protects against there being no readings or that the data is being updated.
 								if (readingsData !== undefined && !readingsData.isFetching) {
 									// Group name to include in hover on graph.
@@ -236,13 +236,13 @@ function mapStateToProps(state: State) {
 									} else {
 										// only display a range of dates for the hover text if there is more than one day in the range
 										timeReading = `${moment.utc(mapReading.startTimestamp).format('ll')}`;
-										if (barDuration.asDays() != 1) {
+										if (mapDuration.asDays() != 1) {
 											// subtracting one extra day caused by day ending at midnight of the next day.
 											// Going from DB unit timestamp that is UTC so force UTC with moment, as usual.
 											timeReading += ` - ${moment.utc(mapReading.endTimestamp).subtract(1, 'days').format('ll')}`;
 										}
 										// The value for the circle is the average daily usage.
-										averagedReading = mapReading.reading / barDuration.asDays();
+										averagedReading = mapReading.reading / mapDuration.asDays();
 										if (state.graph.areaNormalization) {
 											averagedReading /= groupArea;
 										}
@@ -308,6 +308,7 @@ function mapStateToProps(state: State) {
 
 	// set map background image
 	const layout: any = {
+		margin: { b: 0, l: 0, r: 0 }, // Eliminate bottom, left, and right margins
 		// Either the actual map name or text to say it is not available.
 		title: {
 			text: (map) ? map.name : translate('map.unavailable')
