@@ -37,9 +37,9 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
+	const translate = useTranslate();
 	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
 	const [deleteUnit] = unitsApi.useDeleteUnitMutation();
-	const translate = useTranslate();
 
 	// Set existing unit values
 	const values = { ...props.unit };

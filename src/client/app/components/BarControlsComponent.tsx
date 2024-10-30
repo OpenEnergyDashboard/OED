@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectBarStacking } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 
@@ -13,6 +13,7 @@ import IntervalControlsComponent from './IntervalControlsComponent';
  * @returns controls for bar page.
  */
 export default function BarControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	const barStacking = useAppSelector(selectBarStacking);

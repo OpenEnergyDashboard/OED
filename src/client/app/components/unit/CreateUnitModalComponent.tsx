@@ -21,8 +21,8 @@ import { showSuccessNotification, showErrorNotification } from '../../utils/noti
  * @returns Unit create element
  */
 export default function CreateUnitModalComponent() {
-	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
 	const translate = useTranslate();
+	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
 
 	const defaultValues = {
 		name: '',

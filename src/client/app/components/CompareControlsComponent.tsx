@@ -7,7 +7,7 @@ import { Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectSortingOrder } from '../redux/slices/graphSlice';
 import { SortingOrder } from '../utils/calculateCompare';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 
@@ -15,6 +15,7 @@ import IntervalControlsComponent from './IntervalControlsComponent';
  * @returns controls for compare page.
  */
 export default function CompareControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// This is the current sorting order for graphic

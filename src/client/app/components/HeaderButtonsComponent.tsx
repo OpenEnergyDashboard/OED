@@ -16,7 +16,7 @@ import { selectHelpUrl } from '../redux/slices/adminSlice';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import LoginComponent from './LoginComponent';
@@ -26,6 +26,7 @@ import LoginComponent from './LoginComponent';
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
+	const translate = useTranslate();
 	const [logout] = authApi.useLogoutMutation();
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.

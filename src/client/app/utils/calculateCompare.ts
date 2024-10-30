@@ -4,7 +4,7 @@
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import translate from '../utils/translate';
+import translate from './translate';
 
 /**
  * 'Day', 'Week' or 'FourWeeks'

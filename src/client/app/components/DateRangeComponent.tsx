@@ -13,7 +13,7 @@ import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectC
 import '../styles/DateRangeCustom.css';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
 
@@ -22,6 +22,7 @@ import { ChartTypes } from '../types/redux/graph';
  * @returns Date Range Calendar Picker
  */
 export default function DateRangeComponent() {
+	const translate = useTranslate();
 	const dispatch: Dispatch = useAppDispatch();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);

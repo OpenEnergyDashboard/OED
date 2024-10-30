@@ -15,13 +15,14 @@ import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import ExportComponent from '../components/ExportComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * Modal popup control for various graph types
  * @returns Custom Modal depending on selected graph type
  */
 export default function MoreOptionsComponent() {
+	const translate = useTranslate();
 	const chartToRender = useAppSelector(selectChartToRender);
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);

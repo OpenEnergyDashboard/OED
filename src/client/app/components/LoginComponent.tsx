@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
 import { authApi } from '../redux/api/authApi';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 
 interface LoginProp {
@@ -21,6 +21,7 @@ interface LoginProp {
  * @returns The login page for users or admins.
  */
 export default function LoginComponent({ handleClose }: LoginProp) {
+	const translate = useTranslate();
 	// Local State
 	const [username, setUsername] = useState<string>('');
 	const [password, setPassword] = useState<string>('');

@@ -52,8 +52,21 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected);
 				});
 
-				// Add C3 here
-
+				mocha.it('C3: 28 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kWh', async () => {
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('kWh');
+					const expected = [108269.924822581, 108889.847659507];
+					// for compare, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
+						.query({
+							curr_start: '2022-10-09 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P28D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected);
+				});
 				// Add C4 here
 
 				// Add C5 here

@@ -6,6 +6,7 @@
 
 import { connect } from 'react-redux';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
+// When this container gets converted to component,migrate to useTranslate() from componentHooks.ts
 import translate from '../utils/translate';
 import Plot from 'react-plotly.js';
 import Locales from '../types/locales';
