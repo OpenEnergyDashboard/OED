@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { sortBy } from 'lodash';
 import * as React from 'react';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -51,7 +51,8 @@ export default function CreateGroupModalComponent() {
 	const unitsDataById = useAppSelector(selectUnitDataById);
 	// Which units are possible for graphing state
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
-
+	// Obtaining language
+	const locale = useAppSelector(selectSelectedLanguage);
 	// Since creating group the initial values are effectively nothing or the desired defaults.
 	const defaultValues: GroupData = {
 		// ID not needed, assigned by DB, add here for TS
@@ -233,11 +234,11 @@ export default function CreateGroupModalComponent() {
 		// The id is not really needed so set to -1 since same function for edit.
 		const groupDeepMeter = metersInChangedGroup(state);
 		// Get meters that okay for this group in a format the component can display.
-		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
+		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter, locale);
 		// Get groups okay for this group. Similar to meters.
 		// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
 		// in this case so set to -1 so it never matches in this function.
-		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
+		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter, locale);
 		// Update the state
 		setGroupChildrenState(groupChildrenState => ({
 			...groupChildrenState,
@@ -523,7 +524,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
 	}
 
 	/**
@@ -542,7 +544,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
 	}
 
 	/**

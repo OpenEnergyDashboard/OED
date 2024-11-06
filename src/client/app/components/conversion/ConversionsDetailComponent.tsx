@@ -12,6 +12,8 @@ import { ConversionData } from '../../types/redux/conversions';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 
 /**
  * Defines the conversions page card view
@@ -19,7 +21,7 @@ import CreateConversionModalComponent from './CreateConversionModalComponent';
  */
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
-
+	const locale = useAppSelector(selectSelectedLanguage);
 	// Conversions state
 	const { data: conversionsState = stableEmptyConversions, isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
 	// Units DataById
@@ -68,10 +70,9 @@ export default function ConversionsDetailComponent() {
 							{
 								Object.values(conversionsState)
 									.sort((conversionA: ConversionData, conversionB: ConversionData) =>
-										((unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase() >
-											(unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase()) ? 1 :
-											(((unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase() >
-												(unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase()) ? -1 : 0))
+										((unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase().localeCompare((
+											unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase(), locale,
+										{ sensitivity: 'accent'})))
 									.map(conversionData => (
 										<ConversionViewComponent
 											conversion={conversionData}

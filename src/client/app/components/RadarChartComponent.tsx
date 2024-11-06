@@ -13,13 +13,14 @@ import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
 import {
 	selectAreaUnit, selectGraphAreaNormalization, selectLineGraphRate,
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../redux/slices/graphSlice';
 import { DataType } from '../types/Datasources';
 import Locales from '../types/locales';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import { useTranslate } from '../redux/componentHooks';
@@ -71,17 +72,13 @@ export default function RadarChartComponent() {
 	// Add all valid data from existing meters to the radar plot
 	for (const meterID of selectedMeters) {
 		if (meterReadings) {
-			const meterArea = meterDataById[meterID].area;
+			const entity = meterDataById[meterID];
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (meterArea > 0 && meterDataById[meterID].areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ?
-					meterArea * getAreaUnitConversion(meterDataById[meterID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = meterReadings[meterID];
 				if (readingsData) {
-					const label = meterDataById[meterID].identifier;
+					const label = entity.identifier;
 					const colorID = meterID;
 					// TODO If we are sure the data is always defined then remove this commented out code.
 					// Be consistent for all graphing and groups below.
@@ -132,17 +129,13 @@ export default function RadarChartComponent() {
 	for (const groupID of selectedGroups) {
 		// const byGroupID = state.readings.line.byGroupID[groupID];
 		if (groupData) {
-			const groupArea = groupDataById[groupID].area;
+			const entity = groupDataById[groupID];
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
-				// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ?
-					groupArea * getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = groupData[groupID];
 				if (readingsData) {
-					const label = groupDataById[groupID].name;
+					const label = entity.name;
 					const colorID = groupID;
 					// if (readingsData.readings === undefined) {
 					// 	throw new Error('Unacceptable condition: readingsData.readings is undefined.');

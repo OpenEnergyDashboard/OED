@@ -18,6 +18,7 @@ import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectMapChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectAreaScalingFromEntity } from '../redux/selectors/entitySelectors';
 import { DataType } from '../types/Datasources';
 import { State } from '../types/redux/state';
 import { UnitRepresentType } from '../types/redux/units';
@@ -30,7 +31,7 @@ import {
 	itemMapInfoOk,
 	normalizeImageDimensions
 } from '../utils/calibration';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
@@ -144,25 +145,20 @@ export default function MapChartComponent() {
 
 			for (const meterID of selectedMeters) {
 				// Get meter id number.
-				// Get meter GPS value.
-				const gps = meterDataById[meterID].gps;
+				const entity = meterDataById[meterID];
 				// filter meters with actual gps coordinates.
-				if (gps !== undefined && gps !== null && meterReadings !== undefined) {
-					let meterArea = meterDataById[meterID].area;
+				if (entity.gps !== undefined && entity.gps !== null && meterReadings !== undefined) {
 					// we either don't care about area, or we do in which case there needs to be a nonzero area
-					if (!areaNormalization || (meterArea > 0 && meterDataById[meterID].areaUnit != AreaUnitType.none)) {
-						if (areaNormalization) {
-							// convert the meter area into the proper unit, if needed
-							meterArea *= getAreaUnitConversion(meterDataById[meterID].areaUnit, selectedAreaUnit);
-						}
+					if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+						const meterArea = selectAreaScalingFromEntity(entity, selectedAreaUnit, areaNormalization);
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.
 						// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 						// it coordinates on the true north map and then rotating/shifting to the user map.
-						const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
+						const meterGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, entity.gps, origin, scaleOfMap, map.northAngle);
 						// Only display items within valid info and within map.
-						if (itemMapInfoOk(meterID, DataType.Meter, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
+						if (itemMapInfoOk(meterID, DataType.Meter, map, entity.gps) && itemDisplayableOnMap(imageDimensionNormalized, meterGPSInUserGrid)) {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(meterGPSInUserGrid.x);
 							y.push(meterGPSInUserGrid.y);
@@ -174,7 +170,7 @@ export default function MapChartComponent() {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData !== undefined && !meterIsFetching) {
 								// Meter name to include in hover on graph.
-								const label = meterDataById[meterID].identifier;
+								const label = entity.identifier;
 								// The usual color for this meter.
 								colors.push(getGraphColor(meterID, DataType.Meter));
 								if (!readingsData) {
@@ -220,24 +216,20 @@ export default function MapChartComponent() {
 
 			for (const groupID of selectedGroups) {
 				// Get group id number.
-				// Get group GPS value.
-				const gps = groupDataById[groupID].gps;
+				const entity = groupDataById[groupID];
 				// Filter groups with actual gps coordinates.
-				if (gps !== undefined && gps !== null && groupData !== undefined) {
-					let groupArea = groupDataById[groupID].area;
-					if (!areaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
-						if (areaNormalization) {
-							// convert the meter area into the proper unit, if needed
-							groupArea *= getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit);
-						}
+				if (entity.gps !== undefined && entity.gps !== null && groupData !== undefined) {
+					// we either don't care about area, or we do in which case there needs to be a nonzero area
+					if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+						const groupArea = selectAreaScalingFromEntity(entity, selectedAreaUnit, areaNormalization);
 						// Convert the gps value to the equivalent Plotly grid coordinates on user map.
 						// First, convert from GPS to grid units. Since we are doing a GPS calculation, this happens on the true north map.
 						// It must be on true north map since only there are the GPS axis parallel to the map axis.
 						// To start, calculate the user grid coordinates (Plotly) from the GPS value. This involves calculating
 						// it coordinates on the true north map and then rotating/shifting to the user map.
-						const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, gps, origin, scaleOfMap, map.northAngle);
+						const groupGPSInUserGrid: CartesianPoint = gpsToUserGrid(imageDimensionNormalized, entity.gps, origin, scaleOfMap, map.northAngle);
 						// Only display items within valid info and within map.
-						if (itemMapInfoOk(groupID, DataType.Group, map, gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
+						if (itemMapInfoOk(groupID, DataType.Group, map, entity.gps) && itemDisplayableOnMap(imageDimensionNormalized, groupGPSInUserGrid)) {
 							// The x, y value for Plotly to use that are on the user map.
 							x.push(groupGPSInUserGrid.x);
 							y.push(groupGPSInUserGrid.y);
@@ -248,7 +240,7 @@ export default function MapChartComponent() {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData && !groupIsFetching) {
 								// Group name to include in hover on graph.
-								const label = groupDataById[groupID].name;
+								const label = entity.name;
 								// The usual color for this group.
 								colors.push(getGraphColor(groupID, DataType.Group));
 								if (!readingsData) {

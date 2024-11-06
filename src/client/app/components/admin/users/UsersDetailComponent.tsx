@@ -10,6 +10,8 @@ import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import CreateUserModalComponent from './CreateUserModalComponent';
 import UserViewComponent from './UserViewComponent';
+import { selectSelectedLanguage } from '../../../redux/slices/appStateSlice';
+import { useAppSelector } from '../../../redux/reduxHooks';
 
 const tooltipStyle = {
 	display: 'inline-block',
@@ -22,6 +24,7 @@ const tooltipStyle = {
  * @returns User Detail element
  */
 export default function UserDetailComponent() {
+	const locale = useAppSelector(selectSelectedLanguage);
 	const translate = useTranslate();
 	const { data: users = stableEmptyUsers } = userApi.useGetUsersQuery();
 
@@ -42,7 +45,7 @@ export default function UserDetailComponent() {
 					<Row className='justify-content-center'>
 						{// display users and sort by username alphabetically
 							[...users]
-								.sort((a, b) => a.username.localeCompare(b.username))
+								.sort((a, b) => a.username.localeCompare(b.username, locale, { sensitivity : 'accent' }))
 								.map(user => (
 									<Col
 										key={user.username}

@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // TODO it is a bad practice to import store anywhere other than index.tsx These utils need to be converted into selectors.
-
-import { get, sortBy } from 'lodash';
+import { get } from 'lodash';
 import React from 'react';
 import { selectCik } from '../redux/api/conversionsApi';
 import { selectAllGroups, selectGroupDataById } from '../redux/api/groupsApi';
@@ -13,6 +12,7 @@ import { store } from '../store';
 import { DataType } from '../types/Datasources';
 import { SelectOption } from '../types/items';
 import { GroupData } from '../types/redux/groups';
+import { LanguageTypes } from 'types/redux/i18n';
 
 /**
  * The intersect operation of two sets.
@@ -139,9 +139,10 @@ export function metersInChangedGroup(changedGroupState: GroupData): number[] {
  * Get options for the meter menu on the group page.
  * @param defaultGraphicUnit The groups current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The groups current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @param locale Current language from Redux state.
  * @returns The current meter options for this group.
  */
-export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMeters: number[] = [], locale: LanguageTypes): SelectOption[] {
 	// deepMeters has a default value since it is optional for the type of state but it should always be set in the code.
 	const state = store.getState();
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
@@ -176,7 +177,8 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
 
 	// We want the options sorted by meter identifier.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return sortBy(options, item => item.label?.toLowerCase(), 'asc');
+	return options.sort((itemA, itemB) => itemA.label.toLowerCase()?.
+		localeCompare(itemB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 }
 
 /**
@@ -184,9 +186,11 @@ export function getMeterMenuOptionsForGroup(defaultGraphicUnit: number, deepMete
  * @param groupId The id of the group being worked on.
  * @param defaultGraphicUnit The group's current default graphic unit which may have been updated from what is in Redux state.
  * @param deepMeters The group's current deep meters (all recursively) which may have been updated from what is in Redux state.
+ * @param locale Current language from Redux state.
  * @returns The current group options for this group.
  */
-export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = []): SelectOption[] {
+export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit: number, deepMeters: number[] = [], locale: LanguageTypes):
+SelectOption[] {
 	// Get the currentGroup's compatible units. We need to use the current deep meters to get it right.
 	// First must get a set from the array of meter numbers.
 	const deepMetersSet = new Set(deepMeters);
@@ -221,7 +225,9 @@ export function getGroupMenuOptionsForGroup(groupId: number, defaultGraphicUnit:
 
 	// We want the options sorted by group name.
 	// Had to make item.label? potentially undefined due to start up race conditions
-	return sortBy(options, item => item.label?.toLowerCase(), 'asc');
+	return options.sort((itemA, itemB) => itemA.label.toLowerCase()?.
+		localeCompare(itemB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
+
 }
 
 /**

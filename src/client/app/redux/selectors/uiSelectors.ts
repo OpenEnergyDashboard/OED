@@ -1,12 +1,11 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-
-import { sortBy } from 'lodash';
+import { LanguageTypes } from 'types/redux/i18n';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { selectChartLinkHideOptions } from '../../redux/slices/appStateSlice';
+import { selectChartLinkHideOptions, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes } from '../../types/redux/graph';
@@ -236,9 +235,10 @@ export const selectMeterGroupSelectData = createAppSelector(
 		selectMeterDataById,
 		selectGroupDataById,
 		selectSelectedMeters,
-		selectSelectedGroups
+		selectSelectedGroups,
+		selectSelectedLanguage
 	],
-	(chartTypeCompatibility, meterDataById, groupDataById, selectedMeters, selectedGroups) => {
+	(chartTypeCompatibility, meterDataById, groupDataById, selectedMeters, selectedGroups, selectSelectedLanguage) => {
 		// Destructure Previous Selectors's values
 		const { compatibleMeters, incompatibleMeters, compatibleGroups, incompatibleGroups } = chartTypeCompatibility;
 
@@ -257,16 +257,16 @@ export const selectMeterGroupSelectData = createAppSelector(
 		});
 
 		// The Multiselect's current selected value(s) as compatible/ incompatible options
-		const selectedMeterOptions = getSelectOptionsByEntity(compatibleSelectedMeters, incompatibleSelectedMeters, meterDataById);
-		const selectedGroupOptions = getSelectOptionsByEntity(compatibleSelectedGroups, incompatibleSelectedGroups, groupDataById);
+		const selectedMeterOptions = getSelectOptionsByEntity(compatibleSelectedMeters, incompatibleSelectedMeters, meterDataById, selectSelectedLanguage);
+		const selectedGroupOptions = getSelectOptionsByEntity(compatibleSelectedGroups, incompatibleSelectedGroups, groupDataById, selectSelectedLanguage);
 
 		// All selected values even if not graph-able. Non compatible will be visually marked as disabled in custom react-select component(s)
 		const allSelectedMeterValues = selectedMeterOptions.compatible.concat(selectedMeterOptions.incompatible);
 		const allSelectedGroupValues = selectedGroupOptions.compatible.concat(selectedGroupOptions.incompatible);
 
 		// List of options with metadata for react-select independent of currently selected. (Used to Populate the Select List(s))
-		const meterSelectOptions = getSelectOptionsByEntity(compatibleMeters, incompatibleMeters, meterDataById);
-		const groupSelectOptions = getSelectOptionsByEntity(compatibleGroups, incompatibleGroups, groupDataById);
+		const meterSelectOptions = getSelectOptionsByEntity(compatibleMeters, incompatibleMeters, meterDataById, selectSelectedLanguage);
+		const groupSelectOptions = getSelectOptionsByEntity(compatibleGroups, incompatibleGroups, groupDataById, selectSelectedLanguage);
 
 		// Format The generated selectOptions into grouped options for the React-Select component
 		const meterGroupedOptions: GroupedOption[] = [
@@ -292,9 +292,10 @@ export const selectUnitSelectData = createAppSelector(
 		selectVisibleUnitOrSuffixState,
 		selectSelectedMeters,
 		selectSelectedGroups,
-		selectGraphAreaNormalization
+		selectGraphAreaNormalization,
+		selectSelectedLanguage
 	],
-	(unitDataById, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization) => {
+	(unitDataById, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization, selectSelectedLanguage) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
 		// Holds all units that are not compatible with selected meters/groups
@@ -345,7 +346,7 @@ export const selectUnitSelectData = createAppSelector(
 		}
 
 		// Ready to display unit. Put selectable ones before non-selectable ones.
-		const unitOptions = getSelectOptionsByEntity(compatibleUnits, incompatibleUnits, unitDataById);
+		const unitOptions = getSelectOptionsByEntity(compatibleUnits, incompatibleUnits, unitDataById, selectSelectedLanguage);
 		const unitsGroupedOptions: GroupedOption[] = [
 			{
 				label: 'Units',
@@ -366,12 +367,14 @@ export const selectUnitSelectData = createAppSelector(
  * @param compatibleItems - compatible items to make select options for
  * @param incompatibleItems - incompatible items to make select options for
  * @param entityDataById - current redux state, must be one of UnitsState, MetersState, or GroupsState
+ * @param locale - the current selected language taken from redux state
  * @returns Two Lists: Compatible, and Incompatible selectOptions for use as grouped React-Select options
  */
 export function getSelectOptionsByEntity(
 	compatibleItems: Set<number>,
 	incompatibleItems: Set<number>,
-	entityDataById: MeterDataByID | GroupDataByID | UnitDataById
+	entityDataById: MeterDataByID | GroupDataByID | UnitDataById,
+	locale: LanguageTypes
 ) {
 	//The final list of select options to be displayed
 	const compatibleItemOptions = Object.entries(entityDataById)
@@ -409,9 +412,10 @@ export function getSelectOptionsByEntity(
 				defaultGraphicUnit: defaultGraphicUnit
 			} as SelectOption;
 		});
-
-	const compatible = sortBy(compatibleItemOptions, item => item.label.toLowerCase(), 'asc');
-	const incompatible = sortBy(incompatibleItemOptions, item => item.label.toLowerCase(), 'asc');
+	const compatible = compatibleItemOptions.sort((itemA, itemB) => itemA.label.toLowerCase().
+		localeCompare(itemB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
+	const incompatible = incompatibleItemOptions.sort((itemA, itemB) => itemA.label.toLowerCase()?.
+		localeCompare(itemB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	return { compatible, incompatible };
 }
 
