@@ -18,6 +18,7 @@ import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../re
 import { UserRole } from '../types/items';
 import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
+import ThemeSelectorComponent from './ThemeSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import LoginComponent from './LoginComponent';
 
@@ -255,6 +256,7 @@ export default function HeaderButtonsComponent() {
 						</DropdownToggle>
 						<DropdownMenu>
 							<LanguageSelectorComponent />
+							<ThemeSelectorComponent />
 							<DropdownItem
 								style={state.showOptionsStyle}
 								className='d-none d-lg-block'

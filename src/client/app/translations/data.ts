@@ -425,6 +425,7 @@ const LocaleTranslationData = {
 		"submit.changes": "Submit changes",
 		"submit.new.user": "Submit new user",
 		"the.unit.of.meter": "The unit of meter",
+		"theme": "Theme",
 		"this.four.weeks": "These four weeks",
 		"timezone.no": "No timezone",
 		"this.week": "This week",
