@@ -16,7 +16,7 @@ import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } fro
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 
@@ -24,6 +24,7 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
@@ -78,6 +79,7 @@ export default function LineChartComponent() {
 				data={data}
 				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges

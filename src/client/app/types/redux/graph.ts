@@ -62,8 +62,7 @@ export interface GraphState {
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
 	rangeSliderInterval: TimeInterval;
-	barDuration: moment.Duration;
-	mapsBarDuration: moment.Duration;
+	duration: moment.Duration;
 	comparePeriod: ComparePeriod;
 	compareTimeInterval: TimeInterval;
 	compareSortingOrder: SortingOrder;

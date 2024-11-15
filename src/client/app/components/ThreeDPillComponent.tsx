@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import { Badge } from 'reactstrap';
 import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
@@ -10,13 +11,14 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
  * @returns List of selected groups and meters as reactstrap Pills Badges
  */
 export default function ThreeDPillComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -39,6 +41,19 @@ export default function ThreeDPillComponent() {
 		const isDisabled = !isAreaCompatible && graphState.areaNormalization;
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
 	});
+
+	// when there is only one choice, it must be selected as a default (there is no other option)
+	useEffect(() => {
+		const combinedPillData = [...meterPillData, ...groupPillData];
+
+		if (combinedPillData.length === 1) {
+			const singlePill = combinedPillData[0];
+			dispatch(updateThreeDMeterOrGroupInfo({
+				meterOrGroupID: singlePill.meterOrGroupID,
+				meterOrGroup: singlePill.meterOrGroup
+			}));
+		}
+	}, [meterPillData, groupPillData]);
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(

@@ -11,7 +11,7 @@ import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -19,6 +19,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns Rate selection element
  */
 export default function GraphicRateMenuComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// Graph state

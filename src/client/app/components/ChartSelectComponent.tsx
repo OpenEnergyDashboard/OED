@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { sortBy, values } from 'lodash';
+import { values } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -13,21 +13,27 @@ import { graphSlice, selectChartToRender } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes } from '../types/redux/graph';
 import { State } from '../types/redux/state';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 
 /**
  *  A component that allows users to select which chart should be displayed.
  * @returns Chart select element
  */
 export default function ChartSelectComponent() {
+	const translate = useTranslate();
 	const currentChartToRender = useAppSelector(selectChartToRender);
+	const locale = useAppSelector(selectSelectedLanguage);
 	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);
 	const mapsById = useSelector((state: State) => state.maps.byMapID);
-	const sortedMaps = sortBy(values(mapsById).map(map => (
+
+	const maps = values(mapsById).map(map => (
 		{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
-	)), 'label');
+	));
+	const sortedMaps = maps.sort((mapA, mapB) => mapA.label.toLowerCase().
+		localeCompare(mapB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 
 	return (
 		<>

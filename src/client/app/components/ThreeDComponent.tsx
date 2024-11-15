@@ -20,6 +20,9 @@ import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
 import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
+// Both translates are used since some are in the function component where the React Hook is okay
+// and some are in other functions where the older method is needed.
+import { useTranslate } from '../redux/componentHooks';
 import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
@@ -32,6 +35,7 @@ import Locales from '../types/locales';
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const translate = useTranslate();
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);

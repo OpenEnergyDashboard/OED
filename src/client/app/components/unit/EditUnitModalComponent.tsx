@@ -39,9 +39,9 @@ interface EditUnitModalComponentProps {
  * @returns Unit edit element
  */
 export default function EditUnitModalComponent(props: EditUnitModalComponentProps) {
+	const translate = useTranslate();
 	const [submitEditedUnit] = unitsApi.useEditUnitMutation();
 	const [deleteUnit] = unitsApi.useDeleteUnitMutation();
-	const translate = useTranslate();
 	const CUSTOM_INPUT = '-99';
 
 	// Set existing unit values

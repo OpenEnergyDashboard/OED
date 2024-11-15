@@ -16,7 +16,7 @@ import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -27,7 +27,7 @@ import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
  * @returns CSV Readings page element
  */
 export default function ReadingsCSVUploadComponent() {
-
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);

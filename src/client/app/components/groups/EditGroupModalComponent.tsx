@@ -2,8 +2,9 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { cloneDeep, isEqual, difference, sortBy, filter } from 'lodash';
+import { cloneDeep, isEqual, difference, filter } from 'lodash';
 import * as React from 'react';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 // Realize that * is already imported from react
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -35,7 +36,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -57,12 +58,14 @@ interface EditGroupModalComponentProps {
  * @returns Group edit element
  */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
+	const locale = useAppSelector(selectSelectedLanguage);
+	const translate = useTranslate();
 	const [submitGroupEdits] = groupsApi.useEditGroupMutation();
 	const [deleteGroup] = groupsApi.useDeleteGroupMutation();
 	// Meter state
 	const meterDataById = useAppSelector(selectMeterDataById);
-	// Group state used on other pages
 	const groupDataById = useAppSelector(selectGroupDataById);
+	// Group state used on other pages
 	// Make a local copy of the group data so we can update during the edit process.
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
@@ -345,9 +348,9 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
 			// Get meters that okay for this group in a format the component can display.
-			const possibleMeters = getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters);
+			const possibleMeters = getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters, locale);
 			// Get groups okay for this group. Similar to meters.
-			const possibleGroups = getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters);
+			const possibleGroups = getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters, locale);
 			// Update the state
 			setGroupChildrenState(groupChildrenState => ({
 				...groupChildrenState,
@@ -927,7 +930,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
 	}
 
 	/**
@@ -948,7 +952,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
 	}
 
 	/**
@@ -972,7 +977,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
-		listedMeters.sort();
+		listedMeters.sort((meterA, meterB) => meterA.toLowerCase().localeCompare(meterB.toLowerCase(), locale, { sensitivity : 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			listedMeters.push(translate('meter.hidden'));
@@ -1003,7 +1008,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
-		listedGroups.sort();
+		listedGroups.sort((groupA, groupB) => groupA.toLowerCase().localeCompare(
+			groupB.toLowerCase(), locale, { sensitivity : 'accent' }));
 		if (hasHidden) {
 			// There are hidden groups so note at bottom of list.
 			listedGroups.push(translate('group.hidden'));
@@ -1031,7 +1037,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display.
-		listedDeepMeters.sort();
+		listedDeepMeters.sort((deepMeterA, deepMeterB) => deepMeterA.toLowerCase().localeCompare(
+			deepMeterB.toLowerCase(), locale, { sensitivity : 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			// This should never happen to an admin.

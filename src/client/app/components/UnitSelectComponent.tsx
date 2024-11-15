@@ -11,7 +11,7 @@ import { GroupedOption, SelectOption } from '../types/items';
 // import { FormattedMessage } from 'react-intl';
 import { Badge } from 'reactstrap';
 import { graphSlice, selectSelectedUnit } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectUnitDataById, unitsApi } from '../redux/api/unitsApi';
 
@@ -19,6 +19,7 @@ import { selectUnitDataById, unitsApi } from '../redux/api/unitsApi';
  * @returns A React-Select component for UI Options Panel
  */
 export default function UnitSelectComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const unitSelectOptions = useAppSelector(selectUnitSelectData);
 	const selectedUnitID = useAppSelector(selectSelectedUnit);

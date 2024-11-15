@@ -17,7 +17,7 @@ import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSe
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 
 /**
@@ -27,6 +27,7 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns Plotly BarChart
  */
 export default function BarChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
@@ -81,6 +82,7 @@ export default function BarChartComponent() {
 				data={datasets}
 				style={{ width: '100%', height: '100%', minHeight: '700px' }}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
 					bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp

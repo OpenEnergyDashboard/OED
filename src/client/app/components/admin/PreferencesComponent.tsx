@@ -13,7 +13,7 @@ import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 
@@ -23,6 +23,7 @@ import { defaultAdminState } from '../../redux/slices/adminSlice';
  * @returns Preferences Component for Administrative use
  */
 export default function PreferencesComponent() {
+	const translate = useTranslate();
 	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
 	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(cloneDeep(adminPreferences));
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();

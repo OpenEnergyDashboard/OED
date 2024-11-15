@@ -14,6 +14,8 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectCompareChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import { LanguageTypes } from 'types/redux/i18n';
 
 /**
  * Component that defines compare chart
@@ -28,6 +30,7 @@ export default function MultiCompareChartComponent() {
 	const sortingOrder = useAppSelector(selectSortingOrder);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 	const meterDataByID = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -74,7 +77,7 @@ export default function MultiCompareChartComponent() {
 		}
 	});
 
-	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder);
+	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder, locale);
 
 
 	// Compute how much space should be used in the bootstrap grid system
@@ -139,22 +142,13 @@ function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeri
 /**
  * @param ids An array of items being compared that contain but are more than the id
  * @param sortingOrder The desired order or the comparison items based on change
+ * @param locale Current language selected from Redux state
  * @returns An array of items being compared in desired sortingOrder
  */
-function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
+function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder, locale: LanguageTypes): CompareEntity[] {
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
-			ids.sort((a, b) => {
-				const identifierA = a.identifier.toLowerCase();
-				const identifierB = b.identifier.toLowerCase();
-				if (identifierA < identifierB) {
-					return -1;
-				}
-				if (identifierA > identifierB) {
-					return 1;
-				}
-				return 0;
-			});
+			ids.sort((idA, idB) => idA.identifier.toLowerCase().localeCompare(idB.identifier.toLowerCase(), locale, { sensitivity: 'accent' }));
 			break;
 		case SortingOrder.Ascending:
 			ids.sort((a, b) => {

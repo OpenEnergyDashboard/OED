@@ -13,7 +13,7 @@ import { useAppSelector } from '../../redux/reduxHooks';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import '../../styles/card-page.css';
 import { noUnitTranslated } from '../../utils/input';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import EditGroupModalComponent from './EditGroupModalComponent';
 
 interface GroupViewComponentProps {
@@ -26,6 +26,7 @@ interface GroupViewComponentProps {
  * @returns Group info card element
  */
 export default function GroupViewComponent(props: GroupViewComponentProps) {
+	const translate = useTranslate();
 	// Don't check if admin since only an admin is allowed to route to this page.
 
 	// Edit Modal Show

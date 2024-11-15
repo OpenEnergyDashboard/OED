@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
-import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
+import { DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalHeader, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { clearGraphHistory } from '../redux/actions/extraActions';
 import { authApi } from '../redux/api/authApi';
@@ -16,15 +16,17 @@ import { selectHelpUrl } from '../redux/slices/adminSlice';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import LoginComponent from './LoginComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
+	const translate = useTranslate();
 	const [logout] = authApi.useLogoutMutation();
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
@@ -150,6 +152,17 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
+	// Handle modal visibility
+	const [showModal, setShowModal] = useState<boolean>(false);
+
+	const handleClose = () => {
+		setShowModal(false);
+	};
+
+	const handleShow = () => {
+		setShowModal(true);
+	};
+
 	return (
 		<div>
 			<Navbar expand>
@@ -257,14 +270,11 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem divider />
 							<DropdownItem
 								style={state.loginLinkStyle}
-								tag={Link}
-								to='/login'>
+								onClick={handleShow}>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.logoutLinkStyle}
-								tag={Link}
-								to='/'
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
@@ -281,6 +291,17 @@ export default function HeaderButtonsComponent() {
 					</NavLink>
 				</Nav>
 			</Navbar>
+			<>
+				<Modal isOpen={showModal} toggle={handleClose}>
+					<ModalHeader>
+						{translate('log.in')}
+					</ModalHeader>
+					<ModalBody>
+						<LoginComponent handleClose={handleClose}/>
+					</ModalBody>
+				</Modal>
+			</>
+
 		</div>
 	);
 }
