@@ -350,187 +350,201 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</div>
 				</ModalHeader>
 				{/* when any of the unit are changed call one of the functions. */}
-				<ModalBody><Container>
-					<Row xs='1' lg='2'>
-						{/* Identifier input */}
-						<Col><FormGroup>
-							<Label for='identifier'>{translate('identifier')}</Label>
-							<Input
-								id='identifier'
-								name='identifier'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								value={state.identifier}
-								placeholder='Identifier' />
-						</FormGroup></Col>
-						{/* Name input */}
-						<Col><FormGroup>
-							<Label for='name'>{translate('name')}</Label>
-							<Input
-								id='name'
-								name='name'
-								type='text'
-								autoComplete='on'
-								onChange={e => handleStringChange(e)}
-								value={state.name}
-								invalid={state.name === ''} />
-							<FormFeedback>
-								<FormattedMessage id="error.required" />
-							</FormFeedback>
-						</FormGroup></Col>
-					</Row>
-					<Row xs='1' lg='2'>
-						{/* Type of unit input */}
-						<Col><FormGroup>
-							<Label for='typeOfUnit'>{translate('unit.type.of.unit')}</Label>
-							<Input
-								id='typeOfUnit'
-								name='typeOfUnit'
-								type='select'
-								onChange={e => handleStringChange(e)}
-								value={state.typeOfUnit}
-								invalid={state.typeOfUnit !== UnitType.suffix && state.suffix !== ''}>
-								{Object.keys(UnitType).map(key => {
-									return (<option value={key} key={key} disabled={state.suffix !== '' && key !== UnitType.suffix}>
-										{translate(`UnitType.${key}`)}</option>);
-								})}
-							</Input>
-							<FormFeedback>
-								<FormattedMessage id="unit.type.of.unit.suffix" />
-							</FormFeedback>
-						</FormGroup></Col>
-						{/* Unit represent input */}
-						<Col><FormGroup>
-							<Label for='unitRepresent'>{translate('unit.represent')}</Label>
-							<Input
-								id='unitRepresent'
-								name='unitRepresent'
-								type='select'
-								value={state.unitRepresent}
-								disabled={inConversions()}
-								onChange={e => handleStringChange(e)}>
-								{Object.keys(UnitRepresentType).map(key => {
-									return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>);
-								})}
-							</Input>
-						</FormGroup></Col>
-					</Row>
-					<Row xs='1' lg='2'>
-						{/* Displayable type input */}
-						<Col><FormGroup>
-							<Label for='displayable'>{translate('displayable')}</Label>
-							<Input
-								id='displayable'
-								name='displayable'
-								type='select'
-								value={state.displayable}
-								onChange={e => handleStringChange(e)}
-								invalid={state.displayable !== DisplayableType.none && (state.typeOfUnit === UnitType.meter || state.suffix !== '')}>
-								{Object.keys(DisplayableType).map(key => {
-									return (<option value={key} key={key} disabled={(state.typeOfUnit === UnitType.meter || state.suffix !== '') && key !== DisplayableType.none}>
-										{translate(`DisplayableType.${key}`)}</option>);
-								})}
-							</Input>
-							<FormFeedback>
-								{state.displayable !== DisplayableType.none && state.typeOfUnit === UnitType.meter ? (
-									<FormattedMessage id="error.displayable.meter" />
-								) : (
-									<FormattedMessage id="error.displayable.suffix.input" />
-								)}
-							</FormFeedback>
-						</FormGroup></Col>
-						{/* Preferred display input */}
-						<Col><FormGroup>
-							<Label for='preferredDisplay'>{translate('unit.preferred.display')}</Label>
-							<Input
-								id='preferredDisplay'
-								name='preferredDisplay'
-								type='select'
-								value={state.preferredDisplay.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-								})}
-							</Input>
-						</FormGroup></Col>
-					</Row>
-					<Row xs='1' lg='2'>
-						{/* Seconds in rate input */}
-						<Col>
-							<FormGroup>
-								<Label for='secInRate'>{translate('unit.sec.in.rate')}</Label>
-								<Input
-									id='secInRate'
-									name='secInRate'
-									type='select'
-									value={rate}
-									onChange={e => handleRateChange(e)}>
-									{Object.entries(LineGraphRates).map(
-										([rateKey, rateValue]) => (
-											<option value={rateValue * 3600} key={rateKey}>
-												{translate(rateKey)}
-											</option>
-										)
+				<ModalBody>
+					<Container>
+						<Row xs='1' lg='2'>
+							{/* Identifier input */}
+							<Col>
+								<FormGroup>
+									<Label for='identifier'>{translate('identifier')}</Label>
+									<Input
+										id='identifier'
+										name='identifier'
+										type='text'
+										autoComplete='on'
+										onChange={e => handleStringChange(e)}
+										value={state.identifier}
+										placeholder='Identifier' />
+								</FormGroup>
+							</Col>
+							{/* Name input */}
+							<Col>
+								<FormGroup>
+									<Label for='name'>{translate('name')}</Label>
+									<Input
+										id='name'
+										name='name'
+										type='text'
+										autoComplete='on'
+										onChange={e => handleStringChange(e)}
+										value={state.name}
+										invalid={state.name === ''} />
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							{/* Type of unit input */}
+							<Col>
+								<FormGroup>
+									<Label for='typeOfUnit'>{translate('unit.type.of.unit')}</Label>
+									<Input
+										id='typeOfUnit'
+										name='typeOfUnit'
+										type='select'
+										onChange={e => handleStringChange(e)}
+										value={state.typeOfUnit}
+										invalid={state.typeOfUnit !== UnitType.suffix && state.suffix !== ''}>
+										{Object.keys(UnitType).map(key => {
+											return (<option value={key} key={key} disabled={state.suffix !== '' && key !== UnitType.suffix}>
+												{translate(`UnitType.${key}`)}</option>);
+										})}
+									</Input>
+									<FormFeedback>
+										<FormattedMessage id="unit.type.of.unit.suffix" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							{/* Unit represent input */}
+							<Col>
+								<FormGroup>
+									<Label for='unitRepresent'>{translate('unit.represent')}</Label>
+									<Input
+										id='unitRepresent'
+										name='unitRepresent'
+										type='select'
+										value={state.unitRepresent}
+										disabled={inConversions()}
+										onChange={e => handleStringChange(e)}>
+										{Object.keys(UnitRepresentType).map(key => {
+											return (<option value={key} key={key}>{translate(`UnitRepresentType.${key}`)}</option>);
+										})}
+									</Input>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							{/* Displayable type input */}
+							<Col>
+								<FormGroup>
+									<Label for='displayable'>{translate('displayable')}</Label>
+									<Input
+										id='displayable'
+										name='displayable'
+										type='select'
+										value={state.displayable}
+										onChange={e => handleStringChange(e)}
+										invalid={state.displayable !== DisplayableType.none && (state.typeOfUnit === UnitType.meter || state.suffix !== '')}>
+										{Object.keys(DisplayableType).map(key => {
+											return (<option value={key} key={key} disabled={(state.typeOfUnit === UnitType.meter || state.suffix !== '') && key !== DisplayableType.none}>
+												{translate(`DisplayableType.${key}`)}</option>);
+										})}
+									</Input>
+									<FormFeedback>
+										{state.displayable !== DisplayableType.none && state.typeOfUnit === UnitType.meter ? (
+											<FormattedMessage id="error.displayable.meter" />
+										) : (
+											<FormattedMessage id="error.displayable.suffix.input" />
+										)}
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							{/* Preferred display input */}
+							<Col>
+								<FormGroup>
+									<Label for='preferredDisplay'>{translate('unit.preferred.display')}</Label>
+									<Input
+										id='preferredDisplay'
+										name='preferredDisplay'
+										type='select'
+										value={state.preferredDisplay.toString()}
+										onChange={e => handleBooleanChange(e)}>
+										{Object.keys(TrueFalseType).map(key => {
+											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+										})}
+									</Input>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							{/* Seconds in rate input */}
+							<Col>
+								<FormGroup>
+									<Label for='secInRate'>{translate('unit.sec.in.rate')}</Label>
+									<Input
+										id='secInRate'
+										name='secInRate'
+										type='select'
+										value={rate}
+										onChange={e => handleRateChange(e)}>
+										{Object.entries(LineGraphRates).map(
+											([rateKey, rateValue]) => (
+												<option value={rateValue * 3600} key={rateKey}>
+													{translate(rateKey)}
+												</option>
+											)
+										)}
+										<option value={CUSTOM_INPUT}>
+											{translate('custom.value')}
+										</option>
+									</Input>
+									{showCustomInput && (
+										<>
+											<Label for="customRate">
+												{translate('unit.sec.in.rate.enter')}
+											</Label>
+											<Input
+												id="customRate"
+												name="customRate"
+												type="number"
+												value={customRate}
+												min={1}
+												invalid={!customRateValid(customRate)}
+												onChange={e => handleCustomRateChange(e)}
+												// This grabs each key hit and then finishes input when hit enter.
+												onKeyDown={e => { handleEnter(e.key); }}
+											/>
+										</>
 									)}
-									<option value={CUSTOM_INPUT}>
-										{translate('custom.value')}
-									</option>
-								</Input>
-								{showCustomInput && (
-									<>
-										<Label for="customRate">
-											{translate('unit.sec.in.rate.enter')}
-										</Label>
-										<Input
-											id="customRate"
-											name="customRate"
-											type="number"
-											value={customRate}
-											min={1}
-											invalid={!customRateValid(customRate)}
-											onChange={e => handleCustomRateChange(e)}
-											// This grabs each key hit and then finishes input when hit enter.
-											onKeyDown={e => { handleEnter(e.key); }}
-										/>
-									</>
-								)}
-								<FormFeedback>
-									<FormattedMessage id="error.greater" values={{ min: '0' }} />
-									{translate('and')}{translate('an.integer')}
-								</FormFeedback>
-							</FormGroup>
-						</Col>
-						{/* Suffix input */}
-						<Col>
-							<FormGroup>
-								<Label for='suffix'>{translate('unit.suffix')}</Label>
-								<Input
-									id='suffix'
-									name='suffix'
-									type='text'
-									value={state.suffix}
-									placeholder='Suffix'
-									onChange={e => handleStringChange(e)}
-									invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
-								<FormFeedback>
-									<FormattedMessage id="error.required" />
-								</FormFeedback>
-							</FormGroup>
-						</Col>
-					</Row>
-					{/* Note input */}
-					<FormGroup>
-						<Label for='note'>{translate('unit')}</Label>
-						<Input
-							id='note'
-							name='note'
-							type='textarea'
-							value={state.note}
-							placeholder='Note'
-							onChange={e => handleStringChange(e)} />
-					</FormGroup>
-				</Container></ModalBody>
+									<FormFeedback>
+										<FormattedMessage id="error.greater" values={{ min: '0' }} />
+										{translate('and')}{translate('an.integer')}
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							{/* Suffix input */}
+							<Col>
+								<FormGroup>
+									<Label for='suffix'>{translate('unit.suffix')}</Label>
+									<Input
+										id='suffix'
+										name='suffix'
+										type='text'
+										value={state.suffix}
+										placeholder='Suffix'
+										onChange={e => handleStringChange(e)}
+										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
+									<FormFeedback>
+										<FormattedMessage id="error.required" />
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Note input */}
+						<FormGroup>
+							<Label for='note'>{translate('unit')}</Label>
+							<Input
+								id='note'
+								name='note'
+								type='textarea'
+								value={state.note}
+								placeholder='Note'
+								onChange={e => handleStringChange(e)} />
+						</FormGroup>
+					</Container>
+				</ModalBody>
 				<ModalFooter>
 					<Button variant="warning" color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="unit.delete.unit" />
