@@ -346,6 +346,7 @@ export default function CreateUnitModalComponent() {
 						</Row>
 						<Row xs="1" lg="2">
 							{/* Seconds in rate input */}
+							//?? 2 lines or 1?
 							<Col>
 								<FormGroup>
 									<Label for="secInRate">{translate('unit.sec.in.rate')}</Label>
