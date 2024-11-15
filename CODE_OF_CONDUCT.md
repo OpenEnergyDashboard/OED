@@ -55,7 +55,8 @@ further defined and clarified by project maintainers.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at leadership@OpenEnergyDashboard.org. All
+reported by contacting the project team via the [Contact page](https://openenergydashboard.org/contact/),
+using the contact form and selecting the leadership topic/area. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
@@ -63,10 +64,10 @@ Further details of specific enforcement policies may be posted separately.
 
 Project maintainers who do not follow or enforce the Code of Conduct in good
 faith may face temporary or permanent repercussions as determined by other
-members of the project's leadership. If your concern revolves around a project 
-maintainer or you have concerns contacting us via the leadership email then you 
-can directly contact the main project coordinator at 
-StevenHussLederman@OpenEnergyDashboard.org. If the issue involves the main project
+members of the project's leadership. If your concern revolves around a project
+maintainer or you have concerns contacting us via the contact form then you
+can directly contact the main project coordinator via Discord (@SteveOED).
+If the issue involves the main project
 coordinator then please contact other project leadership or other project members.
 
 ## Attribution

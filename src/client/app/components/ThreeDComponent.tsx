@@ -11,6 +11,7 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
+import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
 import { selectGraphState } from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
@@ -18,7 +19,7 @@ import { GroupDataByID } from '../types/redux/groups';
 import { MeterDataByID } from '../types/redux/meters';
 import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 // Both translates are used since some are in the function component where the React Hook is okay
 // and some are in other functions where the older method is needed.
@@ -138,23 +139,13 @@ function formatThreeDData(
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
-			const meterArea = meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[selectedMeterOrGroupID].area
+			const entity = meterOrGroup === MeterOrGroup.meters ?
+				meterDataById[selectedMeterOrGroupID]
 				:
-				groupDataById[selectedMeterOrGroupID].area;
+				groupDataById[selectedMeterOrGroupID];
+			const scaling = selectScalingFromEntity(entity, graphState.selectedAreaUnit, graphState.areaNormalization, rateScaling);
 
-			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[selectedMeterOrGroupID].areaUnit
-				:
-				groupDataById[selectedMeterOrGroupID].areaUnit;
-
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = graphState.areaNormalization ?
-					meterArea * getAreaUnitConversion(areaUnit, graphState.selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!graphState.areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
 				zDataToRender = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
