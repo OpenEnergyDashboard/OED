@@ -47,6 +47,10 @@ export default function CreateUnitModalComponent() {
 	const CUSTOM_INPUT = '-99';
 	const [showModal, setShowModal] = useState(false);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/development
 	// Handlers for each type of input change
 	const [state, setState] = useState(defaultValues);
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
