@@ -249,7 +249,7 @@ export default function RadarChartComponent() {
 						angularaxis: {
 							// TODO Attempts to format the dates to remove the time did not work with plotly
 							// choosing the tick values which is desirable. Also want time if limited time range.
-							direction: 'clockwise',
+							direction: 'counterclockwise',
 							showgrid: true,
 							gridcolor: '#ddd',
 							nticks: maxTicks

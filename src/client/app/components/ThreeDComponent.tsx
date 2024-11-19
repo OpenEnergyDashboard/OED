@@ -205,4 +205,3 @@ function formatThreeDData(
 	const layout = setThreeDLayout(unitLabel, yDataToRender);
 	return [formattedData, layout];
 }
-
