@@ -31,20 +31,22 @@ export interface UnitData {
 	displayable: DisplayableType;
 	preferredDisplay: boolean;
 	note: string;
+	maxVal: number;
+	minVal: number;
 }
 
-export interface UnitEditData {
-	id: number;
-	name: string;
-	identifier: string;
-	unitRepresent: string;
-	secInRate: number;
-	typeOfUnit: UnitType;
-	suffix: string;
-	displayable: DisplayableType;
-	preferredDisplay: boolean;
-	note: string;
-}
+// export interface UnitEditData {
+// 	id: number;
+// 	name: string;
+// 	identifier: string;
+// 	unitRepresent: string;
+// 	secInRate: number;
+// 	typeOfUnit: UnitType;
+// 	suffix: string;
+// 	displayable: DisplayableType;
+// 	preferredDisplay: boolean;
+// 	note: string;
+// }
 
 export interface UnitDataById extends Record<number, UnitData> { }
 

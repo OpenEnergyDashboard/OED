@@ -16,7 +16,7 @@ function formatUnitForResponse(item) {
 	return {
 		id: item.id, name: item.name, identifier: item.identifier, unitRepresent: item.unitRepresent,
 		secInRate: item.secInRate, typeOfUnit: item.typeOfUnit, suffix: item.suffix,
-		displayable: item.displayable, preferredDisplay: item.preferredDisplay, note: item.note
+		displayable: item.displayable, preferredDisplay: item.preferredDisplay, note: item.note, minVal: item.minVal, maxVal: item.maxVal
 	};
 }
 
@@ -77,10 +77,15 @@ router.post('/edit', async (req, res) => {
 			},
 			note: {
 				type: 'string'
+			},
+			minVal: {
+				type: 'number',
+			},
+			maxVal: {
+				type: 'number',
 			}
 		}
 	};
-
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
@@ -102,6 +107,8 @@ router.post('/edit', async (req, res) => {
 			unit.secInRate = req.body.secInRate;
 			unit.suffix = req.body.suffix;
 			unit.note = req.body.note;
+			unit.minVal = req.body.minVal;
+			unit.maxVal = req.body.maxVal;
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
@@ -117,7 +124,7 @@ router.post('/edit', async (req, res) => {
 router.post('/addUnit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
-		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay'],
+		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal'],
 		properties: {
 			// Removed id from properties list since it is set to undefined no matter what is passed.
 			name: {
@@ -160,6 +167,12 @@ router.post('/addUnit', async (req, res) => {
 					{ type: 'string' },
 					{ type: 'null' }
 				]
+			},
+			minVal: {
+				type: 'number'
+			},
+			maxVal: {
+				type: 'number'
 			}
 		}
 	};
@@ -181,7 +194,9 @@ router.post('/addUnit', async (req, res) => {
 					req.body.suffix,
 					req.body.displayable,
 					req.body.preferredDisplay,
-					req.body.note
+					req.body.note,
+					req.body.minVal,
+					req.body.maxVal
 				);
 				await newUnit.insert(t);
 			});

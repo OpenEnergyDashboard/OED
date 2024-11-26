@@ -15,6 +15,7 @@ import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { unitsApi } from '../../redux/api/unitsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import { MAX_VAL,  MIN_VAL } from '../../redux/selectors/adminSelectors';
 
 /**
  * Defines the create unit modal form
@@ -38,7 +39,9 @@ export default function CreateUnitModalComponent() {
 		// The client code makes the id for the selected unit and default graphic unit be -99
 		// so it can tell it is not yet assigned and do the correct logic for that case.
 		// The units API expects these values to be undefined on call so that the database can assign their values.
-		id: -99
+		id: -99,
+		minVal: MIN_VAL,
+		maxVal: MAX_VAL
 	};
 
 	/* State */
@@ -264,6 +267,34 @@ export default function CreateUnitModalComponent() {
 								invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* minVal input */}
+						<Col><FormGroup>
+							<Label for='minVal'>{translate('minVal')}</Label>
+							<Input id='minVal' name='minVal' type='number'
+								onChange={e => handleNumberChange(e)}
+								min={MIN_VAL}
+								max={state.maxVal}
+								defaultValue={state.minVal}
+								invalid={state?.minVal < MIN_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }} />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* maxVal input */}
+						<Col><FormGroup>
+							<Label for='maxVal'>{translate('maxVal')}</Label>
+							<Input id='maxVal' name='maxVal' type='number'
+								onChange={e => handleNumberChange(e)}
+								min={state.minVal}
+								max={MAX_VAL}
+								defaultValue={state.maxVal}
+								invalid={state?.maxVal > MAX_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }} />
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>

@@ -19,7 +19,7 @@ class Unit {
 	 * @param {*} preferredDisplay True if this unit is always displayed. If not, the user needs to ask to see (for future enhancement).
 	 * @param {*} note Note about this unit.
 	 */
-	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay, note) {
+	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay, note, minVal, maxVal) {
 		this.id = id;
 		this.name = name;
 		this.identifier = identifier;
@@ -30,6 +30,8 @@ class Unit {
 		this.displayable = displayable;
 		this.preferredDisplay = preferredDisplay;
 		this.note = note;
+		this.minVal = minVal;
+		this.maxVal = maxVal;
 	}
 
 	/**
@@ -39,7 +41,7 @@ class Unit {
 	 */
 	static mapRow(row) {
 		return new Unit(row.id, row.name, row.identifier, row.unit_represent, row.sec_in_rate,
-			row.type_of_unit, row.suffix, row.displayable, row.preferred_display, row.note);
+			row.type_of_unit, row.suffix, row.displayable, row.preferred_display, row.note, row.min_val, row.max_val);
 	}
 
 	/**

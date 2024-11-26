@@ -11,5 +11,7 @@ UPDATE units
 		suffix = ${suffix},
 		displayable = ${displayable},
 		preferred_display = ${preferredDisplay},
-		note = ${note}
+		note = ${note},
+		max_val = ${maxVal},
+		min_val = ${minVal}
 	WHERE id = ${id};
