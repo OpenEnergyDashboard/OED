@@ -14,4 +14,4 @@ CREATE TABLE IF NOT EXISTS cik (
 );
 
 -- TODO It is important that a redoCik is done after this to recreate cik.
--- MUST ADD THIS TO THE 1.1 MIGRATION.
+-- MUST ADD THIS TO THE 2.0 MIGRATION.

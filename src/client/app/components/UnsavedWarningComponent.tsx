@@ -32,14 +32,12 @@ export function UnsavedWarningComponent(props: UnsavedWarningProps) {
 		submitChanges(changes)
 			.unwrap()
 			.then(() => {
-				//TODO translate me
 				showSuccessNotification(translate('unsaved.success'));
 				if (blocker.state === 'blocked') {
 					blocker.proceed();
 				}
 			})
 			.catch(() => {
-				//TODO translate me
 				showErrorNotification(translate('unsaved.failure'));
 				if (blocker.state === 'blocked') {
 					blocker.proceed();

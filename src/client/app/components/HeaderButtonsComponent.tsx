@@ -36,7 +36,7 @@ export default function HeaderButtonsComponent() {
 	const version = useAppSelector(selectOEDVersion);
 	const helpUrl = useAppSelector(selectHelpUrl);
 	// options help
-	const optionsHelp = helpUrl + '/optionsMenu.html';
+	const optionsHelp = helpUrl + '/optionsMenu/';
 
 	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 	const loggedIn = useAppSelector(selectIsLoggedIn);
@@ -64,6 +64,7 @@ export default function HeaderButtonsComponent() {
 		shouldCSVReadingsButtonDisabled: true,
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
+		shouldVisualUnitMapButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
 		menuTitle: '',
 		// link to help page for page choices. Should not see default but use general help URL.
@@ -99,7 +100,8 @@ export default function HeaderButtonsComponent() {
 			shouldCSVMetersButtonDisabled: pathname === '/csvMeters',
 			shouldCSVReadingsButtonDisabled: pathname === '/csvReadings',
 			shouldUnitsButtonDisabled: pathname === '/units',
-			shouldConversionsButtonDisabled: pathname === '/conversions'
+			shouldConversionsButtonDisabled: pathname === '/conversions',
+			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
 		}));
 	}, [pathname]);
 
@@ -127,7 +129,7 @@ export default function HeaderButtonsComponent() {
 			display: pathname === '/' ? 'block' : 'none'
 		};
 		// Admin help or regular user page
-		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
+		const neededPage = loggedInAsAdmin ? '/adminPageChoices/' : '/pageChoices/';
 		const currentPageChoicesHelp = helpUrl + neededPage;
 
 		setState(prevState => ({
@@ -226,6 +228,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/units">
 								<FormattedMessage id='units' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldVisualUnitMapButtonDisabled}
+								tag={Link}
+								to="/visual-unit">
+								<FormattedMessage id='visual.unit' />
 							</DropdownItem>
 							<DropdownItem divider style={state.adminViewableLinkStyle} />
 							<DropdownItem

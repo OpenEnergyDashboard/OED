@@ -70,7 +70,8 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.toggle.chart.link': { link: `${helpUrl}/chartLink/` },
 		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing/#groupDetails` },
 		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },
-		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` }
+		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` },
+		'help.admin.unitconversionvisuals': { link: `${helpUrl}/adminUnitVisual/` }
 	};
 
 	return (

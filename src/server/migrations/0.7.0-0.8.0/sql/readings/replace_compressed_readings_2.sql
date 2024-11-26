@@ -45,13 +45,9 @@ DECLARE
 		
 
 		+------+-------------------
-		| TODO |
+		| Note |
 		+------+
 		- Note that the above documentation does not account for the increase in data when packaged in JSON format.
-		- This function is complicated by the fact that groups can contain meters with different levels of granularity.
-		We address this now by having sites pick a site-level reading frequency. (Not done)
-		- When resource generalization is implemented in OED, this function will need to be done in a 
-		meter-by-meter basis, since different resource meters will have different levels of granularity.
 	*/
 BEGIN
 
