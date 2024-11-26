@@ -43,8 +43,8 @@ async function readEgaugeData(meter, conn) {
 		isEndOnly = false, //true
 		shouldUpdate = false,
 		conditionSet = {
-			minVal: meter.minVal,
-			maxVal: meter.maxVal,
+			minVal: minVal,
+			maxVal: maxVal,
 			minDate: meter.minDate,
 			maxDate: meter.maxDate,
 			threshold: readingGap,

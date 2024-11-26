@@ -82,7 +82,9 @@ export const NoUnit: UnitData = {
 	suffix: '',
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
-	note: ''
+	note: '',
+	minVal: -Infinity,
+	maxVal: Infinity
 };
 
 /**

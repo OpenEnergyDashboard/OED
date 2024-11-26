@@ -67,6 +67,17 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const [validMeter, setValidMeter] = useState(isValidMeter(localMeterEdits));
 
+	useEffect(() => {
+		const selectedUnit = unitDataById[localMeterEdits.unitId];
+		if (selectedUnit) {
+			setLocalMeterEdits(edits => ({
+				...edits,
+				minVal: selectedUnit.minVal,
+				maxVal: selectedUnit.maxVal
+			}));
+		}
+	}, [localMeterEdits.unitId, unitDataById]);
+
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 	/* End State */
 
@@ -75,6 +86,19 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			setLocalMeterEdits(details => ({ ...details, cumulativeReset: false }));
 		}
 	}, [localMeterEdits.cumulative]);
+
+	const handleUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedUnitId = Number(e.target.value);
+		const selectedUnit = unitDataById[selectedUnitId];
+		if (selectedUnit) {
+			setLocalMeterEdits({
+				...localMeterEdits,
+				unitId: selectedUnitId,
+				minVal: selectedUnit.minVal,
+				maxVal: selectedUnit.maxVal
+			});
+		}
+	};
 
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
@@ -279,7 +303,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='unitId'
 								type='select'
 								value={localMeterEdits.unitId}
-								onChange={e => handleNumberChange(e)}>
+								onChange={handleUnitChange}>
 								{Array.from(compatibleUnits).map(unit => {
 									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
@@ -599,7 +623,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					<Row xs='1' lg='2'>
 						{/* minVal input */}
 						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Label for='minVal'>{translate('minVal')}</Label>
 							<Input
 								id='minVal'
 								name='minVal'
@@ -615,7 +639,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* maxVal input */}
 						<Col><FormGroup>
-							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Label for='maxVal'>{translate('maxVal')}</Label>
 							<Input
 								id='maxVal'
 								name='maxVal'

@@ -21,6 +21,7 @@ import { conversionArrow } from '../../utils/conversionArrow';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { MAX_VAL,  MIN_VAL } from '../../redux/selectors/adminSelectors';
 
 interface EditUnitModalComponentProps {
 	show: boolean;
@@ -193,7 +194,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| props.unit.preferredDisplay != state.preferredDisplay
 				|| props.unit.secInRate != state.secInRate
 				|| props.unit.suffix != state.suffix
-				|| props.unit.note != state.note;
+				|| props.unit.note != state.note
+				|| props.unit.minVal != state.minVal
+				|| props.unit.maxVal != state.maxVal;
 		} else {
 			// Tell user that not going to update due to input issues.
 			showErrorNotification(`${translate('unit.input.error')}`);
@@ -415,6 +418,36 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
 							<FormFeedback>
 								<FormattedMessage id="error.required" />
+							</FormFeedback>
+						</FormGroup></Col>
+					</Row>
+					<Row xs='1' lg='2'>
+						{/* minVal input */}
+						<Col><FormGroup>
+							<Label for='minVal'>{translate('minVal')}</Label>
+							<Input id='minVal' name='minVal' type='number'
+								onChange={e => handleNumberChange(e)}
+								min={MIN_VAL}
+								max={state.maxVal}
+								defaultValue={state.minVal}
+								required value={state.minVal}
+								invalid={state?.minVal < MIN_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }} />
+							</FormFeedback>
+						</FormGroup></Col>
+						{/* maxVal input */}
+						<Col><FormGroup>
+							<Label for='maxVal'>{translate('maxVal')}</Label>
+							<Input id='maxVal' name='maxVal' type='number'
+								onChange={e => handleNumberChange(e)}
+								min={state.minVal}
+								max={MAX_VAL}
+								defaultValue={state.maxVal}
+								required value={state.maxVal}
+								invalid={state?.maxVal > MAX_VAL || state?.minVal > state?.maxVal} />
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }} />
 							</FormFeedback>
 						</FormGroup></Col>
 					</Row>

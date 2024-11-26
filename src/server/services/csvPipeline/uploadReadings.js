@@ -189,8 +189,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 
 	const conditionSet = {
-		minVal: meter.minVal,
-		maxVal: meter.maxVal,
+		minVal: minVal,
+		maxVal: maxVal,
 		minDate: meter.minDate,
 		maxDate: meter.maxDate,
 		threshold: meter.readingGap,

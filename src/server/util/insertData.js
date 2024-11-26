@@ -427,8 +427,8 @@ async function insertMeters(metersToInsert, conn) {
 					await conn.none(query);
 				}
 				const conditionSet = {
-					minVal: meter.minVal,
-					maxVal: meter.maxVal,
+					minVal: minVal,
+					maxVal: maxVal,
 					minDate: meter.minDate,
 					maxDate: meter.maxDate,
 					threshold: meter.readingGap,
