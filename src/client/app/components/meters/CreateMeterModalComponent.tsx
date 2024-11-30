@@ -18,7 +18,7 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
-import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { GPSPoint, isValidGPSInputNew } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
@@ -141,7 +141,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		// If the user input a value then gpsInput should be a string.
 		// null came from the DB and it is okay to just leave it - Not a string.
 		if (typeof gpsInput === 'string') {
-			if (isValidGPSInput(gpsInput)) {
+			const {validGps, message} = isValidGPSInputNew(gpsInput);
+			if (validGps) {
 				const gpsValues = gpsInput.split(',').map(value => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
@@ -153,6 +154,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
 				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
+				showErrorNotification(message);
 				inputOk = false;
 			}
 		}
