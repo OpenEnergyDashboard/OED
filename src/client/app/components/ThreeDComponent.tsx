@@ -31,8 +31,7 @@ import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import {setHelpLayout} from '../utils/setLayout';
-import {setThreeDLayout} from '../utils/setLayout';
+import {setHelpLayout, setThreeDLayout} from '../utils/setLayout';
 
 /**
  * Component used to render 3D graphics
@@ -193,7 +192,6 @@ function formatThreeDData(
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
-
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
@@ -207,5 +205,4 @@ function formatThreeDData(
 	const layout = setThreeDLayout(unitLabel, yDataToRender);
 	return [formattedData, layout];
 }
-
 

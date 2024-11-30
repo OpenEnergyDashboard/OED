@@ -26,7 +26,6 @@ import { lineUnitLabel } from '../utils/graphics';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 import {setHelpLayout} from '../utils/setLayout';
-//import {setThreeDLayout} from '../utils/setLayout';
 
 
 // Display Plotly Buttons Feature
