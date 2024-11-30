@@ -128,6 +128,38 @@ export function isValidGPSInput(input: string): boolean {
 }
 
 /**
+ * Checks if the string is a valid GPS representation. This requires it to be two numbers
+ * separated by a comma and the GPS values to be within allowed values.
+ * Note it causes a popup if the GPS values are not valid.
+ * @param input The string to check for GPS values
+ * @returns true if string is GPS and false otherwise.
+ */
+export function isValidGPSInputNew(input: string){
+	let message = '';
+	let validGps = true;
+	if (input.indexOf(',') === -1) { // if there is no comma
+		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
+		message = 'Input is missing a comma'; //Translate later
+		validGps = false;
+	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
+		message = 'Input has too many commas'; //Translate later
+		validGps = false;
+	}
+	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
+	const array = input.split(',').map((value: string) => parseFloat(value));
+	const latitudeIndex = 0;
+	const longitudeIndex = 1;
+	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+	const result = latitudeConstraint && longitudeConstraint;
+	if (!result) {
+		// TODO It would be nice to return the error and then notify as desired.
+		showErrorNotification(translate('input.gps.range') + input);
+	}
+	return {validGps,message};
+}
+
+/**
  * Calculates the GPS unit per coordinate unit.
  * @param origin The GPS value for the origin that was computed during calibration.
  * 	This is the bottom, left corner of the user map.
