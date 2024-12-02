@@ -154,7 +154,9 @@ export function isValidGPSInputNew(input: string){
 	const result = latitudeConstraint && longitudeConstraint;
 	if (!result) {
 		// TODO It would be nice to return the error and then notify as desired.
-		showErrorNotification(translate('input.gps.range') + input);
+		//showErrorNotification(translate('input.gps.range') + input);
+		validGps = false;
+		message = translate('input.gps.range') + input;
 	}
 	return {validGps,message};
 }

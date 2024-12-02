@@ -213,7 +213,7 @@ export default function CreateGroupModalComponent() {
 				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
 				// so leaving code commented out.
 				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
-				showErrorNotification(translate(message));
+				showErrorNotification(message);
 				inputOk = false;
 			}
 		}
