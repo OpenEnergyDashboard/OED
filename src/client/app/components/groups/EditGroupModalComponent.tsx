@@ -26,7 +26,7 @@ import { DataType } from '../../types/Datasources';
 import { SelectOption, TrueFalseType } from '../../types/items';
 import { GroupData } from '../../types/redux/groups';
 import { UnitData } from '../../types/redux/units';
-import { GPSPoint, isValidGPSInputNew } from '../../utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import {
 	GroupCase,
 	getCompatibilityChangeCase,
@@ -293,7 +293,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// If the user input a value then gpsInput should be a string
 			// null came from DB and it is okay to just leave it - Not a String.
 			if (typeof gpsInput === 'string') {
-				const {validGps,message} = isValidGPSInputNew(gpsInput);
+				const {validGps,message} = isValidGPSInput(gpsInput);
 				if (validGps) {
 					// Clearly gpsInput is a string but TS complains about the split so cast.
 					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));

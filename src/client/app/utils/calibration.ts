@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { showErrorNotification } from './notifications';
 import { logToServer } from '../redux/actions/logs';
 import { DataType } from '../types/Datasources';
 import { MapMetadata } from '../types/redux/map';
@@ -78,7 +77,7 @@ export interface Dimensions {
 export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
 	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
-	const {validGps} = isValidGPSInputNew(`${gps.latitude},${gps.longitude}`);
+	const {validGps} = isValidGPSInput(`${gps.latitude},${gps.longitude}`);
 	if (!validGps) {
 		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
@@ -107,35 +106,7 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * @param input The string to check for GPS values
  * @returns true if string is GPS and false otherwise.
  */
-export function isValidGPSInput(input: string): boolean {
-	if (input.indexOf(',') === -1) { // if there is no comma
-		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
-		return false;
-	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		return false;
-	}
-	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-	const array = input.split(',').map((value: string) => parseFloat(value));
-	const latitudeIndex = 0;
-	const longitudeIndex = 1;
-	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
-	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
-	const result = latitudeConstraint && longitudeConstraint;
-	if (!result) {
-		// TODO It would be nice to return the error and then notify as desired.
-		showErrorNotification(translate('input.gps.range') + input);
-	}
-	return result;
-}
-
-/**
- * Checks if the string is a valid GPS representation. This requires it to be two numbers
- * separated by a comma and the GPS values to be within allowed values.
- * Note it causes a popup if the GPS values are not valid.
- * @param input The string to check for GPS values
- * @returns true if string is GPS and false otherwise.
- */
-export function isValidGPSInputNew(input: string){
+export function isValidGPSInput(input: string){
 	let message = '';
 	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma

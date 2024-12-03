@@ -20,7 +20,7 @@ import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
 import { DisableChecksType, UnitRepresentType } from '../../types/redux/units';
-import { GPSPoint, isValidGPSInputNew } from '../../utils/calibration';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString, NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
@@ -122,7 +122,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// If the user input a value then gpsInput should be a string.
 			// null came from the DB and it is okay to just leave it - Not a string.
 			if (typeof gpsInput === 'string') {
-				const {validGps, message} = isValidGPSInputNew(gpsInput);
+				const {validGps, message} = isValidGPSInput(gpsInput);
 				if (validGps) {
 					// Clearly gpsInput is a string but TS complains about the split so cast.
 					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
