@@ -209,10 +209,6 @@ export default function CreateGroupModalComponent() {
 				};
 				// gpsInput must be of type string but TS does not think so so cast.
 			} else if ((gpsInput as string).length !== 0) {
-				// GPS not okay. Only true if some input.
-				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
-				// so leaving code commented out.
-				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
 				showErrorNotification(message);
 				inputOk = false;
 			}

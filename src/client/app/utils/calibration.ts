@@ -67,7 +67,8 @@ export interface Dimensions {
 }
 
 /**
- * Returns true if item (meter or group) and map and reasonably defined and false otherwise.
+ * Returns true if item (meter or group) and map and reasonably defined
+ * Returns false and a message about the reason the input is invalid otherwise
  * @param itemID ID to be used for logging errors
  * @param type DataType to distinguish between meter and group
  * @param map map info to check
@@ -111,10 +112,10 @@ export function isValidGPSInput(input: string){
 	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
 		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
-		message = 'GPS Input is missing a comma'; //Translate later
+		message = translate('gps.missing.comma');
 		validGps = false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		message = 'GPS Input has too many commas'; //Translate later
+		message = translate('gps.many.comma');
 		validGps = false;
 	}
 	if(validGps){
