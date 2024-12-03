@@ -78,7 +78,8 @@ export interface Dimensions {
 export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
 	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
-	if (!isValidGPSInput(`${gps.latitude},${gps.longitude}`)) {
+	const {validGps} = isValidGPSInputNew(`${gps.latitude},${gps.longitude}`);
+	if (!validGps) {
 		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
 	}

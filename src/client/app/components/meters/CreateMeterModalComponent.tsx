@@ -151,9 +151,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				};
 			} else if (gpsInput.length !== 0) {
 				// GPS not okay. Only true if some input.
-				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
-				// so leaving code commented out.
-				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
 				showErrorNotification(message);
 				inputOk = false;
 			}

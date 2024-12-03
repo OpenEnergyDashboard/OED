@@ -303,10 +303,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						latitude: gpsValues[latitudeIndex]
 					};
 				} else if ((gpsInput as string).length !== 0) {
-					// GPS not okay and there since non-zero length value.
-					// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
-					// so leaving code commented out.
-					// showErrorNotification(translate('input.gps.range') + groupState.gps + '.');
 					showErrorNotification(message);
 					inputOk = false;
 				}
