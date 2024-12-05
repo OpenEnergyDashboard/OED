@@ -111,7 +111,6 @@ export function isValidGPSInput(input: string){
 	let message = '';
 	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
-		// TODO It would be nice to tell user that comma is missing but need to check all uses to be sure don't get ''.
 		message = translate('gps.missing.comma');
 		validGps = false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
@@ -127,8 +126,6 @@ export function isValidGPSInput(input: string){
 		const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 		const result = latitudeConstraint && longitudeConstraint;
 		if (!result) {
-			// TODO It would be nice to return the error and then notify as desired.
-			//showErrorNotification(translate('input.gps.range') + input);
 			validGps = false;
 			message = translate('input.gps.range') + input;
 		}
