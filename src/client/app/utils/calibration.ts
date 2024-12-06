@@ -78,7 +78,7 @@ export interface Dimensions {
 export function itemMapInfoOk(itemID: number, type: DataType, map: MapMetadata, gps?: GPSPoint): boolean {
 	if (map === undefined) { return false; }
 	if ((gps === null || gps === undefined) || map.origin === undefined || map.opposite === undefined) { return false; }
-	const {validGps} = isValidGPSInput(`${gps.latitude},${gps.longitude}`);
+	const { validGps } = isValidGPSInput(`${gps.latitude},${gps.longitude}`);
 	if (!validGps) {
 		logToServer('error', `Found invalid ${type === DataType.Meter ? 'meter' : 'group'} gps stored in database, id = ${itemID}`)();
 		return false;
@@ -107,7 +107,7 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * @param input The string to check for GPS values
  * @returns true if string is GPS and false otherwise.
  */
-export function isValidGPSInput(input: string){
+export function isValidGPSInput(input: string) {
 	let message = '';
 	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
@@ -117,7 +117,7 @@ export function isValidGPSInput(input: string){
 		message = translate('gps.many.comma');
 		validGps = false;
 	}
-	if(validGps){
+	if (validGps) {
 		// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
 		const array = input.split(',').map((value: string) => parseFloat(value));
 		const latitudeIndex = 0;
@@ -130,7 +130,7 @@ export function isValidGPSInput(input: string){
 			message = translate('input.gps.range') + input;
 		}
 	}
-	return {validGps,message};
+	return { validGps, message };
 }
 
 /**

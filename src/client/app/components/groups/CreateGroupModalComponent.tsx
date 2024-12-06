@@ -198,7 +198,7 @@ export default function CreateGroupModalComponent() {
 		// If the user input a value then gpsInput should be a string.
 		// null came from the DB and it is okay to just leave it - Not a string.
 		if (typeof gpsInput === 'string') {
-			const {validGps,message} = isValidGPSInput(gpsInput);
+			const { validGps, message } = isValidGPSInput(gpsInput);
 			if (validGps) {
 				// Clearly gpsInput is a string but TS complains about the split so cast.
 				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
@@ -524,7 +524,7 @@ export default function CreateGroupModalComponent() {
 		});
 		// Want chosen in sorted order.
 		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
-			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -544,7 +544,7 @@ export default function CreateGroupModalComponent() {
 		});
 		// Want chosen in sorted order.
 		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
-			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**

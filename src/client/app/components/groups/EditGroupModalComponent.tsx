@@ -293,7 +293,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// If the user input a value then gpsInput should be a string
 			// null came from DB and it is okay to just leave it - Not a String.
 			if (typeof gpsInput === 'string') {
-				const {validGps,message} = isValidGPSInput(gpsInput);
+				const { validGps, message } = isValidGPSInput(gpsInput);
 				if (validGps) {
 					// Clearly gpsInput is a string but TS complains about the split so cast.
 					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
@@ -936,7 +936,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		});
 		// Want chosen in sorted order.
 		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
-			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -958,7 +958,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		});
 		// Want chosen in sorted order.
 		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
-			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent'}));
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -982,7 +982,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
-		listedMeters.sort((meterA, meterB) => meterA.toLowerCase().localeCompare(meterB.toLowerCase(), locale, { sensitivity : 'accent' }));
+		listedMeters.sort((meterA, meterB) => meterA.toLowerCase().localeCompare(meterB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			listedMeters.push(translate('meter.hidden'));
@@ -1014,7 +1014,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		});
 		// Sort for display. Before were sorted by id so not okay here.
 		listedGroups.sort((groupA, groupB) => groupA.toLowerCase().localeCompare(
-			groupB.toLowerCase(), locale, { sensitivity : 'accent' }));
+			groupB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden groups so note at bottom of list.
 			listedGroups.push(translate('group.hidden'));
@@ -1043,7 +1043,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		});
 		// Sort for display.
 		listedDeepMeters.sort((deepMeterA, deepMeterB) => deepMeterA.toLowerCase().localeCompare(
-			deepMeterB.toLowerCase(), locale, { sensitivity : 'accent' }));
+			deepMeterB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			// This should never happen to an admin.
