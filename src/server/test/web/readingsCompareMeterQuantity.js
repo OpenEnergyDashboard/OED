@@ -106,7 +106,7 @@ mocha.describe('readings API', () => {
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
 							curr_start: '2022-10-09 00:00:00',
-							curr_end: '2022-10-31 17:12:34', 
+							curr_end: '2022-10-31 17:12:34',
 							shift: 'P28D',
 							graphicUnitId: unitId
 						});
@@ -170,7 +170,7 @@ mocha.describe('readings API', () => {
 							// u2
 							name: 'Electric_Utility',
 							identifier: '',
-							unitRepresent: Unit.unitRepresentType.QUANTITY, 
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
 							secInRate: 3600,
 							typeOfUnit: Unit.unitType.METER,
 							suffix: '',
@@ -221,7 +221,7 @@ mocha.describe('readings API', () => {
 							// c11
 							sourceName: 'Electric_Utility',
 							destinationName: 'kg CO₂',
-							bidrectional: false,
+							bidirectional: false,
 							slope: 0.709,
 							intercept: 0,
 							note: 'Electric_Utility → kg CO₂'
