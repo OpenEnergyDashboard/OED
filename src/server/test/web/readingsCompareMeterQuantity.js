@@ -271,6 +271,8 @@ mocha.describe('readings API', () => {
 							shift: 'P1D',
 							graphicUnitId: unitID
 						});
+
+					expectCompareToEqualExpected(res, expected);
 				});
 
 				mocha.it('C14: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as lbs of CO2 & chained & reversed', async () => {
