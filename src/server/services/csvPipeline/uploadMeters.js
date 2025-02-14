@@ -8,7 +8,6 @@ const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean } = require('./validateCsvUploadParams');
-const { type } = require('os');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -66,7 +65,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Verify area unit - have to parse float to ensure it can read in integer numbers like "33"
 			const areaInput = parseFloat(meter[9]);
 			if (areaInput) {
-				if (!isValidArea(areaInput)){
+				if (!isValidArea(areaInput)) {
 					let msg = `For meter ${meter[0]} the area entry of ${areaInput} is invalid. Area must be a number greater than 0.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
@@ -74,16 +73,16 @@ async function uploadMeters(req, res, filepath, conn) {
 
 			const timeSortValue = meter[17];
 			if (timeSortValue) {
-				if (!isValidTimeSort(timeSortValue)){
+				if (!isValidTimeSort(timeSortValue)) {
 					let msg = `For meter ${meter[0]} the time sort ${timeSortValue} is invalid. Valid options are increasing or decreasing.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
 
 			const timezone = meter[5];
-			if (timezone){
-				if (!isValidTimeZone(timezone)){
-					let msg = `For meter ${meter[0]}, ${timeSortValue} is not a valid time zone.`;
+			if (timezone) {
+				if (!isValidTimeZone(timezone)) {
+					let msg = `For meter ${meter[0]}, ${timezone} is not a valid time zone.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
@@ -91,7 +90,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Verify area unit provided
 			const areaUnitString = meter[25];
 			if (areaUnitString) {
-				if (!isValidAreaUnit(areaUnitString)){
+				if (!isValidAreaUnit(areaUnitString)) {
 					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid. Unit must be feet, meters, or none.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
@@ -100,7 +99,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Verify meter type
 			const meterTypeString = meter[4];
 			if (meterTypeString) {
-				if (!isValidMeterType(meterTypeString)){
+				if (!isValidMeterType(meterTypeString)) {
 					let msg = `For meter ${meter[0]} the meter type of ${meterTypeString} is invalid. Valid types include:
 								egauge, mamac, metasys, obvius, and other. `;
 					throw new CSVPipelineError(msg, undefined, 500);
@@ -210,7 +209,7 @@ function switchGPS(gpsString) {
  */
 function isValidArea(areaInput) {
 	// must be a number and must be non-negative
-	if (Number.isInteger(areaInput) && areaInput > 0){
+	if (Number.isInteger(areaInput) && areaInput > 0) {
 		return true;
 	} else {
 		return false;
@@ -225,7 +224,7 @@ function isValidArea(areaInput) {
 function isValidAreaUnit(areaUnit) {
 	const validTypes = ['feet', 'meters', 'none'];
 	// must be one of the three values
-	if (validTypes.includes(areaUnit)){
+	if (validTypes.includes(areaUnit)) {
 		return true;
 	} else {
 		return false;
@@ -239,7 +238,7 @@ function isValidAreaUnit(areaUnit) {
  */
 function isValidTimeSort(timeSortValue) {
 	// must be one of the three values
-	if (timeSortValue == 'increasing' || timeSortValue == 'decreasing'){
+	if (timeSortValue == 'increasing' || timeSortValue == 'decreasing') {
 		return true;
 	} else {
 		return false;
@@ -253,7 +252,7 @@ function isValidTimeSort(timeSortValue) {
  */
 function isValidMeterType(meterTypeString) {
 	const validTypes = ['egauge', 'mamac', 'metasys', 'obvius', 'other'];
-	if (validTypes.includes(meterTypeString)){
+	if (validTypes.includes(meterTypeString)) {
 		return true;
 	} else {
 		return false;
@@ -268,7 +267,7 @@ function isValidMeterType(meterTypeString) {
 function isValidTimeZone(zone) {
 	// check against the built in timezones, must use a try catch since it does not return a boolean
 	try {
-		new Intl.DateTimeFormat(undefined, {timeZone : zone});
+		new Intl.DateTimeFormat(undefined, { timeZone: zone });
 		return true;
 	} catch (e) {
 		return false;
@@ -300,7 +299,7 @@ async function getUnitId(unitName, expectedUnitType, conn) {
  * @param {number} rowIndex - The current row index for error reporting.
  */
 function validateBooleanFields(meter, rowIndex) {
-// all inputs that involve a true or false all bieng validated together.
+	// all inputs that involve a true or false all being validated together.
 	const booleanFields = {
 		2: 'enabled',
 		3: 'displayable',
@@ -310,7 +309,7 @@ function validateBooleanFields(meter, rowIndex) {
 		32: 'disableChecks'
 	};
 
-// this array has values which may be left empty
+	// this array has values which may be left empty
 	const booleanUndefinedAcceptable = [
 		'cumulative', 'reset', 'end only', 'disableChecks'
 	];
@@ -344,23 +343,23 @@ function validateMinMaxValues(meter, rowIndex) {
 	const minValue = Number(meter[27]);
 	const maxValue = Number(meter[28]);
 
-	if (isNaN(minValue)){
+	if (isNaN(minValue) && isNaN(maxValue)) {
 		// do nothing, pass it through
-	} else if (isNaN(minValue) || minValue < -9007199254740991 || minValue >= maxValue){
+	} else if (isNaN(minValue) || minValue < -9007199254740991 || minValue > maxValue) {
 		throw new CSVPipelineError(
 			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
-            `Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
 			undefined,
 			500
 		);
 	}
 
-	if (isNaN(maxValue)){
+	if (isNaN(maxValue)) {
 		// do nothing, pass it through
-	} else if (isNaN(maxValue) || maxValue > 9007199254740991 || minValue >= maxValue){
+	} else if (isNaN(maxValue) || maxValue > 9007199254740991 || minValue > maxValue) {
 		throw new CSVPipelineError(
 			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
-            `Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
 			undefined,
 			500
 		);
