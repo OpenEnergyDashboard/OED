@@ -161,8 +161,7 @@ mocha.describe('readings API', () => {
 				// Add C11 here
 
 				// Add C12 here
-
-				// Add C13 here
+				
 				mocha.it('C13: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as metric ton of CO2 & chained', async () => {
 					// Adding units u2, u10, u11, u12
 					const unitData = [
