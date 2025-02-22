@@ -233,21 +233,23 @@ mocha.describe('readings API', () => {
 							note: 'MJ → BTU'
 						}
 					]);
-					// redefining the meterData as the unit is different
-					const meterData = [
-						{
-							name: 'Electric Utility pound of CO₂',
-							unit: 'Electric_Utility',
-							displayable: true,
-							gps: undefined,
-							note: 'special meter',
-							file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-							deleteFile: false,
-							readingFrequency: '15 minutes',
-							id: METER_ID
-						}
-					];
 					
+					// load data into database
+					await prepareTest(unitData, conversionData, meterDatakWh);
+
+					// Get the unit ID since the DB could use any value
+					const unitId = await getUnitId('BTU');
+					const expected = [10645752.224022, 11490184.2415072];
+					// for compare, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+							});
+						expectCompareToEqualExpected(res, expected);
+					});
 
 				// Add C11 here
 
