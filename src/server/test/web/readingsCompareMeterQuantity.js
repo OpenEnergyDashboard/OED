@@ -156,7 +156,6 @@ mocha.describe('readings API', () => {
 
 				// Add C9 here
 
-				// Add C10 here
 				mocha.it('C10: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU', async () => {
 					// Use predefined unit and conversion data
 					const unitData = unitDatakWh.concat([
