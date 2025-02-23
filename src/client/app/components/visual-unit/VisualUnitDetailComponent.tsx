@@ -10,6 +10,8 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { selectCik } from '../../redux/api/conversionsApi';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
+import { titleStyle } from '../../styles/modalStyle';
+
 
 /**
  * Defines the units and conversion graphics view.
@@ -20,11 +22,6 @@ export default function VisualUnitDetailComponent() {
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const cikData = useAppSelector(selectCik);
 
-
-
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
-	};
 
 	const tooltipStyle = {
 		display: 'inline-block',

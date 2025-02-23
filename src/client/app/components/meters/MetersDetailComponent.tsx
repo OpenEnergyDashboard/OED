@@ -13,6 +13,8 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
+import { titleStyle } from '../../styles/modalStyle';
+
 
 /**
  * Defines the meters page card view
@@ -60,10 +62,6 @@ export default function MetersDetailComponent() {
 		</div >
 	);
 }
-
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
-};
 
 const tooltipStyle = {
 	display: 'inline-block',

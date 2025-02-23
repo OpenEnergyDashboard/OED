@@ -10,6 +10,8 @@ import HeaderButtonsComponent from './HeaderButtonsComponent';
 import LogoComponent from './LogoComponent';
 import MenuModalComponent from './MenuModalComponent';
 import { selectDisplayTitle } from '../redux/slices/adminSlice';
+import { largeTitleStyle } from '../styles/modalStyle';
+import { smallTitleStyle } from '../styles/modalStyle';
 
 /**
  * React component that controls the header strip at the top of all pages
@@ -54,10 +56,5 @@ export default function HeaderComponent() {
 		</div>
 	);
 }
-const largeTitleStyle = {
-	display: 'inline-block'
-};
-const smallTitleStyle = {
-	display: 'inline-block',
-	marginTop: '10px'
-};
+
+

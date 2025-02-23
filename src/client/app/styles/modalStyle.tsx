@@ -30,3 +30,16 @@ export const divTopBottomPadding: React.CSSProperties = {
 	paddingTop: '0px',
 	paddingBottom: '15px'
 };
+
+export const largeTitleStyle = {
+	display: 'inline-block'
+};
+
+export const smallTitleStyle = {
+	display: 'inline-block',
+	marginTop: '10px'
+};
+
+export const titleStyle: React.CSSProperties = {
+	textAlign: 'center'
+};
