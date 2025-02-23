@@ -19,3 +19,14 @@ export const tooltipBaseStyle = {
 	display: 'inline-block',
 	fontSize: '60%'
 };
+
+// Needed to make this component work well if width is made small.
+export const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};
+
+export const divTopBottomPadding: React.CSSProperties = {
+	paddingTop: '0px',
+	paddingBottom: '15px'
+};

@@ -12,7 +12,7 @@ import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { useAppSelector } from '../redux/reduxHooks';
-
+import { labelStyle } from '../styles/modalStyle';
 /**
  * Component used to select the desired map
  * @returns Map Chart element
@@ -21,10 +21,7 @@ export default function MapChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
 		paddingBottom: '15px'
 	};
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
+
 	const messages = defineMessages({
 		selectMap: {id: 'select.map'}
 	});

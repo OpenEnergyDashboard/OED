@@ -20,6 +20,8 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
 import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
+import { labelStyle } from '../../styles/modalStyle';
+
 
 
 /**
@@ -446,11 +448,6 @@ export default function PreferencesComponent() {
 		</div >
 	);
 }
-
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
 
 const titleStyle: React.CSSProperties = {
 	fontWeight: 'bold',
