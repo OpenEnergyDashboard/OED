@@ -31,6 +31,7 @@ import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
  * Component used to render 3D graphics
@@ -86,7 +87,7 @@ export default function ThreeDComponent() {
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
 				: <Plot
-					style={{ width: '100%', height: '100%', minHeight: '700px' }}
+					style={fullSizeContainer}
 					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
 					config={{

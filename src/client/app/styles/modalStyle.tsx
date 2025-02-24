@@ -43,3 +43,10 @@ export const smallTitleStyle = {
 export const titleStyle: React.CSSProperties = {
 	textAlign: 'center'
 };
+
+export const fullSizeContainer: React.CSSProperties = {
+	width: '100%',
+	height: '100%',
+	minHeight: '700px'
+};
+
