@@ -13,7 +13,7 @@ import {
 	updateHistory, updateSliderRange
 } from '../../redux/actions/extraActions';
 import { SelectOption } from '../../types/items';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
@@ -39,7 +39,9 @@ const defaultState: GraphState = {
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
 	},
-	hotlinked: false
+	hotlinked: false,
+	shiftAmount: ShiftAmount.none,
+	shiftTimeInterval: TimeInterval.unbounded()
 };
 
 interface History<T> {
@@ -87,6 +89,17 @@ export const graphSlice = createSlice({
 			if (action.payload.getIsBounded() || state.current.queryTimeInterval.getIsBounded()) {
 				state.current.queryTimeInterval = action.payload;
 			}
+		},
+		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			// same as updateTimeInterval, always update if action is bounded,
+			// else only set unbounded if current isn't already unbounded.
+			// clearing when already unbounded should be a no-op
+			if (action.payload.getIsBounded() || state.current.shiftTimeInterval.getIsBounded()) {
+				state.current.shiftTimeInterval = action.payload;
+			}
+		},
+		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
+			state.current.shiftAmount = action.payload;
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			if (action.payload.getIsBounded() || state.current.rangeSliderInterval.getIsBounded()) {
@@ -347,6 +360,12 @@ export const graphSlice = createSlice({
 							case 'unitID':
 								current.selectedUnit = parseInt(value);
 								break;
+							case 'shiftAmount':
+								current.shiftAmount = value as ShiftAmount;
+								break;
+							case 'shiftTimeInterval':
+								current.shiftTimeInterval = TimeInterval.fromString(value);
+								break;
 						}
 					});
 				}
@@ -387,7 +406,9 @@ export const graphSlice = createSlice({
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
 		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
-		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
+		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
+		selectShiftAmount: state => state.current.shiftAmount,
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval
 	}
 });
 
@@ -405,7 +426,8 @@ export const {
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
-	selectPlotlySliderMax, selectPlotlySliderMin
+	selectPlotlySliderMax, selectPlotlySliderMin,
+	selectShiftAmount, selectShiftTimeInterval
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -422,6 +444,7 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups
+	updateSelectedMetersOrGroups, updateShiftAmount,
+	updateShiftTimeInterval
 } = graphSlice.actions;
 

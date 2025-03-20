@@ -207,6 +207,8 @@ mocha.describe('readings API', () => {
                         expectReadingToEqualExpected(res, expected, GROUP_ID);
                     }
                 );
+
+                // Add LG26 here
             });
         });
     });

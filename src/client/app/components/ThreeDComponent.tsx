@@ -213,7 +213,7 @@ function formatThreeDData(
  * @param fontSize current application state
  * @returns plotly layout object.
  */
-function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
+export function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
 	return {
 		'xaxis': {
 			'visible': false

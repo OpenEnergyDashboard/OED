@@ -74,7 +74,7 @@ export default function BarChartComponent() {
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
 
 	if (raw) {
-		return <h1><b>${translate('bar.raw')}</b></h1>;
+		return <h1><b>{translate('bar.raw')}</b></h1>;
 	}
 	// At least one viable dataset.
 	const enoughData = datasets.find(dataset => dataset.x!.length >= 1);

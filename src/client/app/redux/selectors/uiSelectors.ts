@@ -8,7 +8,7 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { selectChartLinkHideOptions, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
-import { ChartTypes } from '../../types/redux/graph';
+import { ChartTypes, ShiftAmount } from '../../types/redux/graph';
 import { GroupDataByID } from '../../types/redux/groups';
 import { MeterDataByID } from '../../types/redux/meters';
 import { UnitDataById, UnitRepresentType } from '../../types/redux/units';
@@ -485,6 +485,12 @@ export const selectChartLink = createAppSelector(
 				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
 				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
 				linkText += `&readingInterval=${current.threeD.readingInterval}`;
+				break;
+			case ChartTypes.compareLine:
+				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
+				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
+				linkText += `&shiftAmount=${current.shiftAmount}`;
+				current.shiftAmount === ShiftAmount.custom && (linkText += `&shiftTimeInterval=${current.shiftTimeInterval}`);
 				break;
 		}
 		const unitID = current.selectedUnit;

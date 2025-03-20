@@ -18,9 +18,9 @@ import { selectAllUnits, selectUnitDataById } from '../api/unitsApi';
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors';
 import { createAppSelector } from './selectors';
 import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { DisableChecksType } from '../../types/redux/units';
+import { MAX_VAL, MIN_VAL } from '../../utils/input';
 
-export const MIN_VAL = Number.MIN_SAFE_INTEGER;
-export const MAX_VAL = Number.MAX_SAFE_INTEGER;
 export const MIN_DATE_MOMENT = moment(0).utc();
 export const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
 export const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
@@ -51,7 +51,7 @@ export const selectPossibleMeterUnits = createAppSelector(
 		});
 		// Put in alphabetical order.
 		possibleMeterUnits = new Set(Array.from(possibleMeterUnits).sort((unitA, unitB) => unitA.identifier.toLowerCase().
-			localeCompare(unitB.identifier.toLowerCase(), locale, { sensitivity: 'accent'})));
+			localeCompare(unitB.identifier.toLowerCase(), locale, { sensitivity: 'accent' })));
 		// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 		return possibleMeterUnits.add(noUnitTranslated());
 	}
@@ -307,12 +307,12 @@ export const selectDefaultCreateMeterValues = createAppSelector(
 			previousEnd: '',
 			areaUnit: AreaUnitType.none,
 			readingFrequency: adminPreferences.defaultMeterReadingFrequency,
-			minVal: adminPreferences.defaultMeterMinimumValue,
-			maxVal: adminPreferences.defaultMeterMaximumValue,
 			minDate: adminPreferences.defaultMeterMinimumDate,
 			maxDate: adminPreferences.defaultMeterMaximumDate,
 			maxError: adminPreferences.defaultMeterMaximumErrors,
-			disableChecks: adminPreferences.defaultMeterDisableChecks
+			minVal: MIN_VAL,
+			maxVal: MAX_VAL,
+			disableChecks: DisableChecksType.reject_all
 		};
 		return defaultValues;
 	}

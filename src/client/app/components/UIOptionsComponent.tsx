@@ -15,6 +15,7 @@ import DateRangeComponent from './DateRangeComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 import MoreOptionsComponent from './MoreOptionsComponent';
+import CompareLineControlsComponent from './CompareLineControlsComponent';
 
 /**
  * @returns the UI Control panel
@@ -79,6 +80,10 @@ export default function UIOptionsComponent() {
 
 			{/* UI options for radar graphic */}
 			{chartToRender == ChartTypes.radar}
+
+			{	/* Controls specific to the compare line chart */}
+			{chartToRender === ChartTypes.compareLine && <DateRangeComponent />}
+			{chartToRender === ChartTypes.compareLine && <CompareLineControlsComponent />}
 
 			<MoreOptionsComponent />
 

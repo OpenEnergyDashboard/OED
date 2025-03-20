@@ -212,6 +212,14 @@ mocha.describe('readings API', () => {
 						});
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
+
+                // Add CG17 here
+
+                // Add CG18 here
+
+                // Add CG19 here
+
+                // Add CG20 here
 			});
 		});
 	});

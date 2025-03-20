@@ -550,57 +550,6 @@ mocha.describe('readings API', () => {
                         .query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected)
                 });
-                mocha.it('L23: should have raw points for middle readings of 15 minute for a 14 day period and quantity units & kWh as MJ', async () => {
-                    const unitData = unitDatakWh.concat([
-                        {
-                            // u3
-                            name: 'MJ',
-                            identifier: 'megaJoules',
-                            unitRepresent: Unit.unitRepresentType.QUANTITY,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: false,
-                            note: 'MJ'
-                        }
-                    ]);
-                    const conversionData = conversionDatakWh.concat([
-                        {
-                            // c2
-                            sourceName: 'kWh',
-                            destinationName: 'MJ',
-                            bidirectional: true,
-                            slope: 3.6,
-                            intercept: 0,
-                            note: 'kWh → MJ'
-                        }
-                    ]);
-                    const meterData = [
-                        {
-                            name: 'Electric_Utility MJ',
-                            unit: 'Electric_Utility',
-                            defaultGraphicUnit: 'MJ',
-                            displayable: true,
-                            gps: undefined,
-                            note: 'special meter',
-                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
-                            deleteFile: false,
-                            readingFrequency: '15 minutes',
-                            id: METER_ID
-                        }
-                    ];
-
-                    await prepareTest(unitData, conversionData, meterData);
-                    // Get the unit ID since the DB could use any value.
-                    const unitId = await getUnitId('MJ');
-                    // Reuse same file as flow since value should be the same values.
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_MJ_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
-
-                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-                        .query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'), graphicUnitId: unitId });
-                    expectReadingToEqualExpected(res, expected)
-                });
                 mocha.it('L24: should have raw points for middle readings of 15 minute for a 14 day period and raw units & C as F with intercept', async () => {
                     const unitData = [
                         {

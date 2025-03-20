@@ -11,12 +11,8 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import {
-	MAX_DATE, MAX_DATE_MOMENT,
-	MAX_ERRORS, MAX_VAL, MIN_DATE,
-	MIN_DATE_MOMENT, MIN_VAL,
-	isValidCreateMeter,
-	selectCreateMeterUnitCompatibility,
-	selectDefaultCreateMeterValues
+	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS, MIN_DATE, MIN_DATE_MOMENT,
+	isValidCreateMeter, selectCreateMeterUnitCompatibility, selectDefaultCreateMeterValues
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -29,6 +25,9 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { DisableChecksType } from '../../types/redux/units';
+import { NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
 
 interface CreateMeterModalProps {
 	onCreateMeter?: (meterIdentifier: string) => void; // Define the type of the callback function
@@ -55,6 +54,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 	const [meterDetails, setMeterDetails] = useState(defaultValues);
 	const unitIsSelected = meterDetails.unitId !== -999;
 	const defaultGaphicUnitIsSelected = meterDetails.defaultGraphicUnit !== -999;
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	const { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits } = useAppSelector(state =>
 		// Type assertion due to conflicting GPS Property
@@ -92,6 +92,26 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 	const handleTimeZoneChange = (timeZone: string) => {
 		setMeterDetails({ ...meterDetails, ['timeZone']: timeZone });
 	};
+
+	const handleUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedUnitId = Number(e.target.value);
+		let selectedUnit;
+		if (selectedUnitId === -99) {
+			// No unit so set specially
+			selectedUnit = NoUnit;
+		} else {
+			selectedUnit = unitDataById[selectedUnitId];
+		}
+
+		setMeterDetails(details => ({
+			...details,
+			unitId: selectedUnitId,
+			minVal: selectedUnit.minVal,
+			maxVal: selectedUnit.maxVal,
+			disableChecks: selectedUnit.disableChecks
+		}));
+	};
+
 	// Reset the state to default values
 	const resetState = () => {
 		setMeterDetails(defaultValues);
@@ -242,9 +262,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							</Label>
 							<Input id='unitId' name='unitId' type='select'
 								value={meterDetails.unitId}
-								onChange={e => {
-									handleNumberChange(e);
-								}}
+								onChange={handleUnitChange}
 								invalid={!unitIsSelected}>
 								<option value={-999} key={-999} hidden disabled>
 									{translate('select.unit')}
@@ -541,12 +559,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					<Row xs='1' lg='2'>
 						{/* minVal input */}
 						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Label for='minVal'>{translate('min.value')}</Label>
 							<Input id='minVal' name='minVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={MIN_VAL}
 								max={meterDetails.maxVal}
-								defaultValue={meterDetails.minVal}
+								value={meterDetails.minVal}
 								invalid={meterDetails?.minVal < MIN_VAL || meterDetails?.minVal > meterDetails?.maxVal} />
 							<FormFeedback>
 								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: meterDetails.maxVal }} />
@@ -554,12 +572,12 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						</FormGroup></Col>
 						{/* maxVal input */}
 						<Col><FormGroup>
-							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Label for='maxVal'>{translate('max.value')}</Label>
 							<Input id='maxVal' name='maxVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={meterDetails.minVal}
 								max={MAX_VAL}
-								defaultValue={meterDetails.maxVal}
+								value={meterDetails.maxVal}
 								invalid={meterDetails?.maxVal > MAX_VAL || meterDetails?.minVal > meterDetails?.maxVal} />
 							<FormFeedback>
 								<FormattedMessage id="error.bounds" values={{ min: meterDetails.minVal, max: MAX_VAL }} />
@@ -614,17 +632,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							</FormFeedback>
 						</FormGroup></Col>
 						<Col><FormGroup>
-							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
+							<Label for='disableChecks'>{translate('disable.checks')}</Label>
 							<Input id='disableChecks' name='disableChecks' type='select'
-								defaultValue={meterDetails.disableChecks?.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{
-									Object.keys(TrueFalseType).map(key =>
-										<option value={key} key={key}>
-											{translate(`TrueFalseType.${key}`)}
-										</option>
-									)
-								}
+								value={meterDetails.disableChecks}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(DisableChecksType).map(key => {
+									return (<option value={key} key={key} >
+										{translate(`DisableChecksType.${key}`)}</option>);
+								})}
 							</Input>
 						</FormGroup></Col>
 					</Row>

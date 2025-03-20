@@ -146,6 +146,10 @@ mocha.describe('readings API', () => {
                         .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected)
                 });
+
+                // Add L26 here
+
+                // Add L27 here
             });
         });
     });
