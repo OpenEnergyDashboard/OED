@@ -14,7 +14,6 @@ import { selectMeterDataById } from '../redux/api/metersApi';
 import { useTranslate } from '../redux/componentHooks';
 import { pill, pillBox, pillBoxLabel, pillContainer, pills } from '../styles/modalStyle';
 
-
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
  * @returns List of selected groups and meters as reactstrap Pills Badges

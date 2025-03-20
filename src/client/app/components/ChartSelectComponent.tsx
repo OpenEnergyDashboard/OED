@@ -17,6 +17,7 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { labelStyle } from '../styles/modalStyle';
+
 /**
  *  A component that allows users to select which chart should be displayed.
  * @returns Chart select element

@@ -16,7 +16,6 @@ import { useAppSelector } from '../../redux/reduxHooks';
 import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the conversions page card view
  * @returns Conversion page element

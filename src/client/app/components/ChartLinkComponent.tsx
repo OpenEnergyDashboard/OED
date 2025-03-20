@@ -82,5 +82,3 @@ export default function ChartLinkComponent() {
 		return null;
 	}
 }
-
-

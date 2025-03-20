@@ -12,7 +12,6 @@ import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the units and conversion graphics view.
  * @returns Units visual graphics page element
@@ -21,7 +20,6 @@ export default function VisualUnitDetailComponent() {
 	/* Get conversion data from redux */
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const cikData = useAppSelector(selectCik);
-
 
 	const tooltipStyle = {
 		display: 'inline-block',

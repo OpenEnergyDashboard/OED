@@ -13,6 +13,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { useAppSelector } from '../redux/reduxHooks';
 import { labelStyle } from '../styles/modalStyle';
+
 /**
  * Component used to select the desired map
  * @returns Map Chart element

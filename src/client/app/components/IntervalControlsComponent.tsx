@@ -15,8 +15,6 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { labelStyle } from '../styles/modalStyle';
 import { divTopBottomPadding } from '../styles/modalStyle';
 
-
-
 /**
  * @returns Interval controls for the bar, map, and compare pages
  */

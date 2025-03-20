@@ -22,8 +22,6 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { labelStyle } from '../../styles/modalStyle';
 
-
-
 /**
  * @returns Preferences Component for Administrative use
  */

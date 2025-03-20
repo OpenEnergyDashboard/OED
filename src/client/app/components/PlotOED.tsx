@@ -13,8 +13,6 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectPlotlySliderMax, selectPlotlySliderMin } from '../redux/slices/graphSlice';
 import { fullSizeContainer } from '../styles/modalStyle';
 
-
-
 export interface OEDPlotProps {
 	data: Partial<Plotly.PlotData>[];
 	layout: Partial<Plotly.Layout>;

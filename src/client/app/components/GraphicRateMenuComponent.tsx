@@ -15,7 +15,6 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { labelStyle } from '../styles/modalStyle';
 
-
 /**
  * React component that controls the line graph rate menu
  * @returns Rate selection element

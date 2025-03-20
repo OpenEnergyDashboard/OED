@@ -13,7 +13,6 @@ import IntervalControlsComponent from './IntervalControlsComponent';
 import { labelStyle } from '../styles/modalStyle';
 import { divTopBottomPadding } from '../styles/modalStyle';
 
-
 /**
  * @returns controls for compare page.
  */

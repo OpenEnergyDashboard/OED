@@ -14,7 +14,6 @@ import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the units page card view
  * @returns Units page element

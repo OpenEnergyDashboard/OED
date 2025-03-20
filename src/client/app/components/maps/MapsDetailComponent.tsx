@@ -12,7 +12,6 @@ import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 interface MapsDetailProps {
 	maps: number[];
 	unsavedChanges: boolean;

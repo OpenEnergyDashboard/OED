@@ -14,7 +14,6 @@ import GroupViewComponent from './GroupViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the groups page card view
  * @returns Groups page element

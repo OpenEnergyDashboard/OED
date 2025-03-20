@@ -22,7 +22,6 @@ import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
 import { fullSizeContainer } from '../styles/modalStyle';
 
-
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
  * component, which is what will be visible on the page. Makes it possible to access

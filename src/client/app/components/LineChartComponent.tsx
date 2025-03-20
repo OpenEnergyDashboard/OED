@@ -21,7 +21,6 @@ import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 import { fullSizeContainer } from '../styles/modalStyle';
 
-
 /**
  * @returns plotlyLine graphic
  */

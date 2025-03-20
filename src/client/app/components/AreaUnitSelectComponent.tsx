@@ -13,8 +13,7 @@ import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { labelStyle } from '../styles/modalStyle';
-import { bottomSpace } from '../styles/modalStyle';
+import { labelStyle, bottomSpace } from '../styles/modalStyle';
 
 /**
  * React Component that creates the area unit selector dropdown

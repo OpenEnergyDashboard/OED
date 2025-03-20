@@ -15,7 +15,6 @@ import MeterViewComponent from './MeterViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { titleStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the meters page card view
  * @returns Meters page element
