@@ -15,6 +15,7 @@ import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { titleStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the conversions page card view
@@ -34,12 +35,10 @@ export default function ConversionsDetailComponent() {
 	});
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		// For now, only an admin can see the conversion page.
 		tooltipConversionView: 'help.admin.conversionview'
 	};
-
 	return (
 		<div className='flexGrowOne'>
 			{(conversionsFetching || unitsFetching) ? (

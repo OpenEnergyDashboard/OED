@@ -13,6 +13,7 @@ import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { titleStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the groups page card view
@@ -29,11 +30,10 @@ export default function GroupsDetailComponent() {
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
 		tooltipGroupView: isAdmin ? 'help.admin.groupview' : 'help.groups.groupview'
-	};
+	};	
 
 	return (
 		<div className='flexGrowOne'>

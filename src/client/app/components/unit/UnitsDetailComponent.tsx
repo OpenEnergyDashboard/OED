@@ -13,6 +13,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
 import { titleStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the units page card view
@@ -65,8 +66,8 @@ export default function UnitsDetailComponent() {
 }
 
 const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%',
+	...tooltipBaseStyle,
 	// For now, only an admin can see the unit page.
 	tooltipUnitView: 'help.admin.unitview'
 };
+

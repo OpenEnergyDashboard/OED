@@ -2,22 +2,19 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+export const checkboxStyle: React.CSSProperties = {
+	marginRight: '10px',
+};
+
+export const footerStyle: React.CSSProperties = {
+	borderTop: '1px #e1e4e8 solid',
+	padding: '10px 0px',
+	textAlign: 'center',
+	width: '100%'
+};
+
 export const formInputStyle: React.CSSProperties = {
 	paddingBottom: '5px'
-};
-
-export const tableStyle: React.CSSProperties = {
-	width: '90%',
-	margin: 'auto'
-};
-
-export const requiredStyle: React.CSSProperties = {
-	color: 'red'
-};
-
-export const tooltipBaseStyle = {
-	display: 'inline-block',
-	fontSize: '60%'
 };
 
 // Needed to make this component work well if width is made small.
@@ -26,13 +23,12 @@ export const labelStyle: React.CSSProperties = {
 	margin: 0
 };
 
-export const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
-};
-
 export const largeTitleStyle = {
 	display: 'inline-block'
+};
+
+export const requiredStyle: React.CSSProperties = {
+	color: 'red'
 };
 
 export const smallTitleStyle = {
@@ -40,25 +36,18 @@ export const smallTitleStyle = {
 	marginTop: '10px'
 };
 
+export const tableStyle: React.CSSProperties = {
+	width: '90%',
+	margin: 'auto'
+};
+
+export const tooltipBaseStyle = {
+	display: 'inline-block',
+	fontSize: '60%'
+};
+
 export const titleStyle: React.CSSProperties = {
 	textAlign: 'center'
-};
-
-export const fullSizeContainer: React.CSSProperties = {
-	width: '100%',
-	height: '100%',
-	minHeight: '700px'
-};
-
-export const bottomSpace: React.CSSProperties = {
-	paddingBottom: '10px'
-};
-
-export const footerStyle: React.CSSProperties = {
-	borderTop: '1px #e1e4e8 solid',
-	padding: '10px 0px',
-	textAlign: 'center',
-	width: '100%'
 };
 
 export const wellStyle: React.CSSProperties = {
@@ -70,8 +59,21 @@ export const wellStyle: React.CSSProperties = {
 	border: '1px solid #e3e3e3'
 };
 
-// TODO Styling for the component, may need to be converted into .css files
-// TODO ISSUE when many meters selected they are cut off.
+export const bottomSpace: React.CSSProperties = {
+	paddingBottom: '10px'
+};
+
+export const divTopBottomPadding: React.CSSProperties = {
+	paddingTop: '0px',
+	paddingBottom: '15px'
+};
+
+export const fullSizeContainer: React.CSSProperties = {
+	width: '100%',
+	height: '100%',
+	minHeight: '700px'
+};
+
 export const pillContainer: React.CSSProperties = {
 	display: 'flex',
 	justifyContent: 'space-between',
@@ -113,3 +115,4 @@ export const pill: React.CSSProperties = {
 	userSelect: 'none',
 	cursor: 'pointer'
 };
+

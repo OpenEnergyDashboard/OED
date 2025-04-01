@@ -13,7 +13,9 @@ import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { labelStyle, bottomSpace } from '../styles/modalStyle';
+import { checkboxStyle, labelStyle } from '../styles/modalStyle';
+import { bottomSpace } from '../styles/modalStyle';
+
 
 /**
  * React Component that creates the area unit selector dropdown
@@ -51,7 +53,7 @@ export default function AreaUnitSelectComponent() {
 			<div className='checkbox'>
 				<input
 					type='checkbox'
-					style={{ marginRight: '10px' }}
+					style={checkboxStyle}
 					onChange={handleToggleAreaNormalization}
 					checked={graphState.areaNormalization}
 					id='areaNormalization'

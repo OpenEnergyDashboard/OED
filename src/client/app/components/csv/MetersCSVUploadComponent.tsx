@@ -17,7 +17,7 @@ import { authApi, authPollInterval } from '../../redux/api/authApi';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import SpinnerComponent from '../SpinnerComponent';
-
+import { tooltipBaseStyle } from 'styles/modalStyle';
 /**
  * Defines the CSV Meters page
  * @returns CSV Meters page element
@@ -93,10 +93,10 @@ export default function MetersCSVUploadComponent() {
 	};
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		tooltipReadings: 'help.csv.meters'
 	};
+	
 
 	const checkBox = {
 		display: 'flex'
