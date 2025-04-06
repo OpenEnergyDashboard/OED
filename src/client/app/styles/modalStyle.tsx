@@ -4,9 +4,20 @@
 
 import React from "react";
 
+export const bottomSpace: React.CSSProperties = {
+	paddingBottom: '10px'
+};
+
 export const divTopBottomPadding: React.CSSProperties = {
 	paddingTop: '0px',
 	paddingBottom: '15px'
+};
+
+export const footerStyle: React.CSSProperties = {
+	borderTop: '1px #e1e4e8 solid',
+	padding: '10px 0px',
+	textAlign: 'center',
+	width: '100%'
 };
 
 export const fullSizeContainer: React.CSSProperties = {
@@ -50,6 +61,16 @@ export const tooltipBaseStyle = {
 	display: 'inline-block',
 	fontSize: '60%'
 };
+
+export const wellStyle: React.CSSProperties = {
+	wordWrap: 'break-word',
+	padding: '9px',
+	minHeight: '20px',
+	marginBottom: '20px',
+	backgroundColor: '#f5f5f5',
+	border: '1px solid #e3e3e3'
+};
+
 
 
 
