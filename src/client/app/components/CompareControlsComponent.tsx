@@ -11,6 +11,7 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
 import { labelStyle } from '../styles/modalStyle';
+import { divTopBottomPadding } from '../styles/modalStyle';
 
 /**
  * @returns controls for compare page.
@@ -50,9 +51,6 @@ export default function CompareControlsComponent() {
 	);
 }
 
-const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
-};
+
 
 

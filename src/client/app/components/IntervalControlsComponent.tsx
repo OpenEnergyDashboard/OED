@@ -13,6 +13,7 @@ import { ComparePeriod } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { labelStyle } from '../styles/modalStyle';
+import { divTopBottomPadding } from '../styles/modalStyle';
 
 /**
  * @returns Interval controls for the bar, map, and compare pages
@@ -172,9 +173,5 @@ export default function IntervalControlsComponent() {
 	);
 }
 
-const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
-};
 
 

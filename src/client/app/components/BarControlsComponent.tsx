@@ -8,6 +8,7 @@ import { graphSlice, selectBarStacking } from '../redux/slices/graphSlice';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
+import { divTopBottomPadding } from '../styles/modalStyle';
 
 /**
  * @returns controls for bar page.
@@ -34,7 +35,3 @@ export default function BarControlsComponent() {
 	);
 }
 
-const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
-};
