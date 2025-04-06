@@ -19,6 +19,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 
 /**
@@ -86,7 +87,7 @@ export default function LineChartComponent() {
 		return (
 			<Plot
 				data={data}
-				style={{ width: '100%', height: '100%', minHeight: '700px' }}
+				style={fullSizeContainer}
 				layout={{
 					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					autosize: true, showlegend: true,

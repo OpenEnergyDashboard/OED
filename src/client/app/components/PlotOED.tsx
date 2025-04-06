@@ -11,6 +11,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectPlotlySliderMax, selectPlotlySliderMin } from '../redux/slices/graphSlice';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 
 
@@ -84,7 +85,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 	const end = rangeSliderMax ?? maxRange;
 
 	return (
-		<Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
+		<Plot style={fullSizeContainer}
 			data={props.data}
 			onRelayout={debouncedRelayout}
 			onUpdate={trackPlotly}

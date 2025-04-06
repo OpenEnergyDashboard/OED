@@ -9,6 +9,12 @@ export const divTopBottomPadding: React.CSSProperties = {
 	paddingBottom: '15px'
 };
 
+export const fullSizeContainer: React.CSSProperties = {
+	width: '100%',
+	height: '100%',
+	minHeight: '700px'
+};
+
 export const formInputStyle: React.CSSProperties = {
 	paddingBottom: '5px'
 };

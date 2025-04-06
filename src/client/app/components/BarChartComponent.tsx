@@ -20,6 +20,7 @@ import { selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -88,7 +89,7 @@ export default function BarChartComponent() {
 		return (
 			<Plot
 				data={datasets}
-				style={{ width: '100%', height: '100%', minHeight: '700px' }}
+				style={fullSizeContainer}
 				layout={{
 					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					barmode: (barStacking ? 'stack' : 'group'),
