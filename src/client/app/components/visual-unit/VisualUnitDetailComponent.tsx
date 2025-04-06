@@ -10,7 +10,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { selectCik } from '../../redux/api/conversionsApi';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { titleStyle } from '../../styles/modalStyle';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the units and conversion graphics view.
@@ -22,8 +22,7 @@ export default function VisualUnitDetailComponent() {
 	const cikData = useAppSelector(selectCik);
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		// For now, only an admin can see the unit visualization page.
 		tooltipVisualUnitView: 'help.admin.unitconversionvisuals'
 	};

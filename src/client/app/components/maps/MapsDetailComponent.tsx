@@ -10,7 +10,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { titleStyle } from '../../styles/modalStyle';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -44,11 +44,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 			marginRight: '40%'
 		};
 
-		const tooltipStyle = {
-			display: 'inline-block',
-			fontSize: '50%'
-		};
-
 		return (
 			<div className='flexGrowOne'>
 				{/* <UnsavedWarningContainer /> */}
@@ -56,7 +51,7 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 				<div className='container-fluid'>
 					<h2 style={titleStyle}>
 						<FormattedMessage id='maps' />
-						<div style={tooltipStyle}>
+						<div style={tooltipBaseStyle}>
 							<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 						</div>
 					</h2>

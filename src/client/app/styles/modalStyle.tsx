@@ -114,7 +114,7 @@ export const titleStyle: React.CSSProperties = {
 
 export const tooltipBaseStyle = {
 	display: 'inline-block',
-	fontSize: '60%'
+	fontSize: '50%'
 };
 
 export const wellStyle: React.CSSProperties = {
