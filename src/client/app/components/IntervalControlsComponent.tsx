@@ -12,6 +12,7 @@ import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod } from '../utils/calculateCompare';
 import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * @returns Interval controls for the bar, map, and compare pages
@@ -176,7 +177,4 @@ const divTopBottomPadding: React.CSSProperties = {
 	paddingBottom: '15px'
 };
 
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
+

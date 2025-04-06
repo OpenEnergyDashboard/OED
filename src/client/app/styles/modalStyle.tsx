@@ -19,3 +19,9 @@ export const tooltipBaseStyle = {
 	display: 'inline-block',
 	fontSize: '60%'
 };
+
+export const labelStyle: React.CSSProperties = {
+	fontWeight: 'bold',
+	margin: 0
+};
+

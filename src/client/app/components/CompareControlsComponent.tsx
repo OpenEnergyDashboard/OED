@@ -10,6 +10,7 @@ import { SortingOrder } from '../utils/calculateCompare';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import IntervalControlsComponent from './IntervalControlsComponent';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * @returns controls for compare page.
@@ -54,7 +55,4 @@ const divTopBottomPadding: React.CSSProperties = {
 	paddingBottom: '15px'
 };
 
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
+

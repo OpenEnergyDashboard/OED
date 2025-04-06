@@ -13,6 +13,7 @@ import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * React Component that creates the area unit selector dropdown
@@ -41,10 +42,6 @@ export default function AreaUnitSelectComponent() {
 		dispatch(graphSlice.actions.toggleAreaNormalization());
 	};
 
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
 	const bottomSpace: React.CSSProperties = {
 		paddingBottom: '10px'
 	};
