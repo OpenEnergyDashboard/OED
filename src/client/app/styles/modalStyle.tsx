@@ -88,6 +88,12 @@ export const requiredStyle: React.CSSProperties = {
 	color: 'red'
 };
 
+export const rowFlexStart: React.CSSProperties = {
+	display: 'flex',
+	flexDirection: 'row',
+	justifyContent: 'start'
+};
+
 export const smallTitleStyle: React.CSSProperties = {
 	display: 'inline-block',
 	marginTop: '10px'

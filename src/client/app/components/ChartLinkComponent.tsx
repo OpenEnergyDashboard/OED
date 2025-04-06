@@ -13,7 +13,7 @@ import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/grap
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { wellStyle } from '../styles/modalStyle';
+import { wellStyle, rowFlexStart } from '../styles/modalStyle';
 
 /**
  * @returns chartLinkComponent
@@ -42,7 +42,7 @@ export default function ChartLinkComponent() {
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
 			<div>
-				<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'start' }}>
+				<div style={rowFlexStart}>
 					<ButtonGroup >
 						<Button outline onClick={handleButtonClick} >
 							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', gap: '1em', alignItems: 'center' }}>
