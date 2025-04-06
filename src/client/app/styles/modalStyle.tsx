@@ -2,6 +2,8 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import React from "react";
+
 export const divTopBottomPadding: React.CSSProperties = {
 	paddingTop: '0px',
 	paddingBottom: '15px'
@@ -16,8 +18,17 @@ export const labelStyle: React.CSSProperties = {
 	margin: 0
 };
 
+export const largeTitleStyle: React.CSSProperties = {
+	display: 'inline-block'
+};
+
 export const requiredStyle: React.CSSProperties = {
 	color: 'red'
+};
+
+export const smallTitleStyle: React.CSSProperties = {
+	display: 'inline-block',
+	marginTop: '10px'
 };
 
 export const tableStyle: React.CSSProperties = {
