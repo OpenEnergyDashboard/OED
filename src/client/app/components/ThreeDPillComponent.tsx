@@ -12,6 +12,7 @@ import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { useTranslate } from '../redux/componentHooks';
+import { pillContainer, pillBoxLabel, pillBox, pills, pill } from '../styles/modalStyle';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
@@ -119,45 +120,3 @@ export default function ThreeDPillComponent() {
 		</div >
 	);
 }
-
-// TODO Styling for the component, may need to be converted into .css files
-const pillContainer: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'space-between',
-	margin: '0px',
-	padding: '0px',
-	minHeight: '100px',
-	maxHeight: '100px'
-};
-
-const pillBoxLabel: React.CSSProperties = {
-	alignItems: 'start',
-	textAlign: 'left',
-	margin: '0px',
-	padding: '0px'
-};
-
-const pillBox: React.CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	justifyContent: 'left',
-	width: '45%',
-	maxWidth: '45%',
-	margin: '0px',
-	padding: '0px'
-};
-
-const pills: React.CSSProperties = {
-	display: 'flex',
-	flexWrap: 'wrap',
-	justifyContent: 'left',
-	overflowY: 'auto',
-	maxHeight: '120px',
-	paddingRight: '8px'
-};
-
-const pill: React.CSSProperties = {
-	margin: '2px',
-	userSelect: 'none',
-	cursor: 'pointer'
-};
