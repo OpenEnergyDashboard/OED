@@ -7,15 +7,13 @@ import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import PreferencesComponent from './PreferencesComponent';
+import { titleStyle } from '../../styles/modalStyle';
 
 /**
  * React component that defines the admin page
  * @returns Admin page element
  */
 export default function AdminComponent() {
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
-	};
 	const tooltipStyle = {
 		display: 'inline',
 		fontSize: '50%'

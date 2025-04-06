@@ -25,6 +25,10 @@ export const tableStyle: React.CSSProperties = {
 	margin: 'auto'
 };
 
+export const titleStyle: React.CSSProperties = {
+	textAlign: 'center'
+};
+
 export const tooltipBaseStyle = {
 	display: 'inline-block',
 	fontSize: '60%'

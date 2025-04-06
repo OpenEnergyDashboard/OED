@@ -10,6 +10,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { titleStyle } from '../../styles/modalStyle';
 
 interface MapsDetailProps {
 	maps: number[];
@@ -30,10 +31,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	public render() {
-
-		const titleStyle: React.CSSProperties = {
-			textAlign: 'center'
-		};
 
 		const tableStyle: React.CSSProperties = {
 			marginLeft: '5%',

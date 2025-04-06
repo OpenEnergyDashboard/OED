@@ -19,6 +19,7 @@ import { logsApi } from '../../utils/api';
 import translate from '../../utils/translate';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../../utils/dateRangeCompatibility';
+import { titleStyle } from '../../styles/modalStyle';
 
 // number of log messages to display per page
 const PER_PAGE = 20;
@@ -337,9 +338,6 @@ const headerStyle: React.CSSProperties = {
 };
 const bodyStyle: React.CSSProperties = {
 	textAlign: 'left'
-};
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
 };
 
 const tableStyle: React.CSSProperties = {
