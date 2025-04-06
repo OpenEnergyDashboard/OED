@@ -20,7 +20,7 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
 import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
-import { labelStyle } from '../../styles/modalStyle';
+import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
 
 
 /**
@@ -103,7 +103,7 @@ export default function PreferencesComponent() {
 								<input
 									type='radio'
 									name='chartTypes'
-									style={{ marginRight: '10px' }}
+									style={checkboxStyle}
 									value={chartType}
 									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
 									checked={localAdminPref.defaultChartToRender === chartType}
@@ -121,7 +121,7 @@ export default function PreferencesComponent() {
 				<label>
 					<input
 						type='checkbox'
-						style={{ marginRight: '10px' }}
+						style={checkboxStyle}
 						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
 						checked={localAdminPref.defaultBarStacking}
 					/>
@@ -132,7 +132,7 @@ export default function PreferencesComponent() {
 				<label>
 					<input
 						type='checkbox'
-						style={{ marginRight: '10px' }}
+						style={checkboxStyle}
 						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
 						checked={localAdminPref.defaultAreaNormalization}
 					/>
@@ -150,7 +150,7 @@ export default function PreferencesComponent() {
 						<input
 							type='radio'
 							name='areaUnitType'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							value={AreaUnitType.feet}
 							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
@@ -163,7 +163,7 @@ export default function PreferencesComponent() {
 						<input
 							type='radio'
 							name='areaUnitType'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							value={AreaUnitType.meters}
 							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
@@ -272,7 +272,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.en}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}
@@ -285,7 +285,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.fr}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}
@@ -298,7 +298,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.es}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}

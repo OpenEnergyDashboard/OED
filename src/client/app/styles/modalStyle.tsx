@@ -8,6 +8,10 @@ export const bottomSpace: React.CSSProperties = {
 	paddingBottom: '10px'
 };
 
+export const checkboxStyle: React.CSSProperties = {
+	marginRight: '10px'
+};
+
 export const divTopBottomPadding: React.CSSProperties = {
 	paddingTop: '0px',
 	paddingBottom: '15px'
