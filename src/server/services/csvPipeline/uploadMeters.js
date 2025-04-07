@@ -7,7 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
-const { normalizeBoolean } = require('./validateCsvUploadParams');
+const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -221,14 +221,14 @@ function isValidArea(areaInput) {
  * @param areaUnit the provided area for the meter
  * @returns true or false
  */
-function isValidAreaUnit(areaUnit) {
-	const validTypes = ['feet', 'meters', 'none'];
-	// must be one of the three values
-	if (validTypes.includes(areaUnit)) {
-		return true;
-	} else {
-		return false;
-	}
+function isValidAreaUnit(areaUnit) { 
+    const validTypes = Object.values(Unit.areaUnitType); 
+    // must be one of the three values 
+    if (validTypes.includes(areaUnit)) { 
+        return true; 
+    } else { 
+        return false; 
+    } 
 }
 
 /**
@@ -237,8 +237,9 @@ function isValidAreaUnit(areaUnit) {
  * @returns true or false
  */
 function isValidTimeSort(timeSortValue) {
+	const validTimes = Object.values(MeterTimeSortTypesJS);
 	// must be one of the three values
-	if (timeSortValue == 'increasing' || timeSortValue == 'decreasing') {
+	if (validTimes.includes(timeSort)) {
 		return true;
 	} else {
 		return false;
@@ -251,7 +252,7 @@ function isValidTimeSort(timeSortValue) {
  * @returns true or false
  */
 function isValidMeterType(meterTypeString) {
-	const validTypes = ['egauge', 'mamac', 'metasys', 'obvius', 'other'];
+	const validTypes = Object.values(Meter.type);
 	if (validTypes.includes(meterTypeString)) {
 		return true;
 	} else {
