@@ -62,8 +62,8 @@ async function uploadMeters(req, res, filepath, conn) {
 				meter[6] = switchGPS(gpsInput);
 			}
 
-			// Verify area unit - have to parse float to ensure it can read in integer numbers like "33"
-			const areaInput = parseFloat(meter[9]);
+			// verify the area input
+			const areaInput = meter[9];
 			if (areaInput) {
 				if (!isValidArea(areaInput)) {
 					let msg = `For meter ${meter[0]} the area entry of ${areaInput} is invalid. Area must be a number greater than 0.`;
@@ -208,8 +208,13 @@ function switchGPS(gpsString) {
  * @returns true or false
  */
 function isValidArea(areaInput) {
+	// check for non-number input, which is not allowed
+	if (Number.isNaN(areaInput)){
+		return false;
+	}
+
 	// must be a number and must be non-negative
-	if (Number.isInteger(areaInput) && areaInput > 0) {
+	if (areaInput > 0) {
 		return true;
 	} else {
 		return false;
@@ -239,7 +244,7 @@ function isValidAreaUnit(areaUnit) {
 function isValidTimeSort(timeSortValue) {
 	const validTimes = Object.values(MeterTimeSortTypesJS);
 	// must be one of the three values
-	if (validTimes.includes(timeSort)) {
+	if (validTimes.includes(timeSortValue)) {
 		return true;
 	} else {
 		return false;
