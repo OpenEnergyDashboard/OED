@@ -352,10 +352,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		if (loggedInAsAdmin) {
 			// Get meters that okay for this group in a format the component can display.
 			const possibleMeters =
-			getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, meterData,locale);
+				getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, meterData, locale);
 			// Get groups okay for this group. Similar to meters.
 			const possibleGroups =
-			getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, groupsData, locale);
+				getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, groupsData, locale);
 			// Update the state
 			setGroupChildrenState(groupChildrenState => ({
 				...groupChildrenState,

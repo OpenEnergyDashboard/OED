@@ -163,7 +163,7 @@ export function getMeterMenuOptionsForGroup(
 		} as SelectOption;
 
 		const compatibilityChangeCase =
-		getCompatibilityChangeCase(currentUnits, meter.id, DataType.Meter, defaultGraphicUnit, [], globalCiksState, meterDataById);
+			getCompatibilityChangeCase(currentUnits, meter.id, DataType.Meter, defaultGraphicUnit, [], globalCiksState, meterDataById);
 
 		if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
 			// This meter was not compatible with the ones in the group so disable it as a choice.
@@ -222,7 +222,7 @@ export function getGroupMenuOptionsForGroup(
 			} as SelectOption;
 
 			const compatibilityChangeCase =
-			getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit, group.deepMeters, globalCiksState, meterDataById);
+				getCompatibilityChangeCase(currentUnits, group.id, DataType.Group, defaultGraphicUnit, group.deepMeters, globalCiksState, meterDataById);
 			if (compatibilityChangeCase === GroupCase.NoCompatibleUnits) {
 				option.isDisabled = true;
 			} else {
@@ -272,7 +272,7 @@ export function getCompatibilityChangeCase(
 	currentDefaultGraphicUnit: number,
 	deepMeters: number[],
 	globalCiksState: CikData[],
-	meterDataById: Record<number, MeterData> ): GroupCase {
+	meterDataById: Record<number, MeterData>): GroupCase {
 	// Determine the compatible units for meter or group represented by the id.
 	const newUnits = getCompatibleUnits(idToAdd, type, deepMeters, globalCiksState, meterDataById);
 	// Returns the associated case.

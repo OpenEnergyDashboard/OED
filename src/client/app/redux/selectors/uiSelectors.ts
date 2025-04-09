@@ -80,7 +80,7 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 				else {
 					// Get the set of units compatible with the current group (through its deepMeters attribute)
 					// TODO If a meter in a group is not visible to this user then it is not in Redux state and this fails.
-					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId, groupDataById), meterDataById,globalCikState);
+					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId, groupDataById), meterDataById, globalCikState);
 					compatibleUnits.has(selectedUnitId) ? compatibleGroups.add(groupId) : incompatibleGroups.add(groupId);
 				}
 			});

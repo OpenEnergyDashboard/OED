@@ -100,7 +100,7 @@ export const selectGraphicUnitCompatibility = createAppSelector(
 		// If unit is not 'no unit'
 		if (unitId != -99) {
 			// Find all units compatible with the selected unit
-			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId,globalCiksState);
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId, globalCiksState);
 			possibleGraphicUnits.forEach(unit => {
 				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
 				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id === -99) {

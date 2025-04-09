@@ -47,7 +47,7 @@ export default function CreateGroupModalComponent() {
 	const globalCikState = useAppSelector(selectCik);
 	// Meters state
 	const metersDataById = useAppSelector(selectMeterDataById);
-	const metersData =  useAppSelector(selectAllMeters);
+	const metersData = useAppSelector(selectAllMeters);
 	// Groups state
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const groupsData = useAppSelector(selectAllGroups);
