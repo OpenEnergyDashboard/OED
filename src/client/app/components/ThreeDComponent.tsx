@@ -24,7 +24,6 @@ import { lineUnitLabel } from '../utils/graphics';
 // Both translates are used since some are in the function component where the React Hook is okay
 // and some are in other functions where the older method is needed.
 import { useTranslate } from '../redux/componentHooks';
-import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import Plot from 'react-plotly.js';
@@ -79,7 +78,7 @@ export default function ThreeDComponent() {
 		// Special Case where meter frequency is greater than 12 hour intervals
 		layout = setHelpLayout(translate('threeD.incompatible'));
 	} else {
-		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
+		[dataToRender, layout] = formatThreeDData(translate, threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
 	}
 
 	return (
@@ -117,6 +116,7 @@ export default function ThreeDComponent() {
 
 /**
  * Formats Readings for plotly 3d surface
+ * @param translate translate function for internationalization
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
  * @param meterDataById redux meters state
@@ -126,6 +126,7 @@ export default function ThreeDComponent() {
  * @returns Data, and Layout objects for a 3D Plotly Graph
  */
 function formatThreeDData(
+	translate: (messageID: string) => string,
 	data: ThreeDReading,
 	selectedMeterOrGroupID: number,
 	meterDataById: MeterDataByID,
@@ -203,6 +204,6 @@ function formatThreeDData(
 		hoverinfo: 'text',
 		hovertext: hoverText
 	}];
-	const layout = setThreeDLayout(unitLabel, yDataToRender);
+	const layout = setThreeDLayout(translate, unitLabel, yDataToRender);
 	return [formattedData, layout];
 }

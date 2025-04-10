@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import translate from './translate';
-
 /**
  * Utility to get/ set help text plotlyLayout
  * @param helpText 3D data to be formatted
@@ -32,11 +30,12 @@ export function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize
 
 /**
  * Utility to get / set 3D graphic plotlyLayout
+ * @param translate translate function for internationalization
  * @param zLabelText 3D data to be formatted
  * @param yDataToRender Data range for yaxis
  * @returns plotly layout object.
  */
-export function setThreeDLayout(zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
+export function setThreeDLayout(translate: (messageID: string) => string, zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
 	// Convert date strings to JavaScript Date objects and then get dataRange
 	const dateObjects = yDataToRender.map(dateStr => new Date(dateStr));
 	const dataMin = Math.min(...dateObjects.map(date => date.getTime()));

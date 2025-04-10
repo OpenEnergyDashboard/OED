@@ -11,7 +11,6 @@ import { selectCompareLineQueryArgs } from '../redux/selectors/chartQuerySelecto
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
 import { selectGraphState, selectShiftAmount } from '../redux/slices/graphSlice';
 import ThreeDPillComponent from './ThreeDPillComponent';
@@ -21,11 +20,13 @@ import { MeterOrGroup, ShiftAmount } from '../types/redux/graph';
 import { showInfoNotification, showWarnNotification } from '../utils/notifications';
 import { setHelpLayout } from './ThreeDComponent';
 import { toast } from 'react-toastify';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * @returns plotlyLine graphic
  */
 export default function CompareLineChartComponent() {
+	const translate = useTranslate();
 	const graphState = useAppSelector(selectGraphState);
 	const meterOrGroupID = useAppSelector(selectThreeDComponentInfo).meterOrGroupID;
 	const unitLabel = useAppSelector(selectLineUnitLabel);
