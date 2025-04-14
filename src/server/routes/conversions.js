@@ -235,7 +235,7 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 	if (!validatorResult.valid) {
 		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
-	} else {
+		} else {
 		try {
 			const conn = getConnection();
 			const result = await simulateDeleteConversion(req.body, conn);
