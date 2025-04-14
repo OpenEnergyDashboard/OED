@@ -9,6 +9,7 @@ import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectAllUnits, selectUnitDataResult } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
+import { selectRefreshingReadings } from '../../redux/slices/appStateSlice';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
@@ -25,9 +26,11 @@ export default function UnitsDetailComponent() {
 	const { status } = useAppSelector(selectUnitDataResult);
 	const unitData = useAppSelector(selectAllUnits);
 
+	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
+
 	return (
 		<div className='flexGrowOne'>
-			{status === QueryStatus.pending ? (
+			{status === QueryStatus.pending || isRefreshingReadings ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
