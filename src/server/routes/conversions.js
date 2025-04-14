@@ -8,6 +8,8 @@ const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
+const Unit = require('../models/Unit');
+const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 
 const router = express.Router();
 
@@ -175,6 +177,18 @@ router.post('/delete', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
+			// Get the source and destination units for the conversion
+			const source = await Unit.getById(req.body.sourceId, conn);
+			const dest = await Unit.getById(req.body.destinationId, conn);
+			// Check if the source or the destination is a suffix unit
+			if (source.typeOfUnit === 'suffix') {
+				log.info('Suffix unit is used in conversion deletion as source.');
+				await removeAdditionalConversionsAndUnits(source, conn);
+			}
+			if (dest.typeOfUnit === 'suffix') {
+				log.info('Suffix unit is used in conversion deletion as destination.');
+				await removeAdditionalConversionsAndUnits(dest, conn);
+			}
 			// Don't worry about checking if the conversion already exists
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
 			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
