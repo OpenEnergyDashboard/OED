@@ -252,6 +252,11 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		const conn = getConnection();
 		const unitId = req.body.id;
 		try {
+			const unit = await Unit.getById(req.body.id, conn);
+			if (unit.typeOfUnit === 'suffix') {
+				log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
+				await removeAdditionalConversionsAndUnits(unit, conn);
+			}
 			// Don't worry about checking if the unit already exists
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
 			await Unit.delete(unitId, conn);
