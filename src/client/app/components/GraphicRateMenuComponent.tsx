@@ -13,6 +13,7 @@ import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph'
 import { UnitRepresentType } from '../types/redux/units';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { getSelectStyles } from '../styles/theme-styling';
 
 /**
  * React component that controls the line graph rate menu
@@ -86,6 +87,7 @@ export default function GraphicRateMenuComponent() {
 								} as LineGraphRate));
 							}
 						}}
+						styles={getSelectStyles()}
 					/>
 				</div>
 			}
