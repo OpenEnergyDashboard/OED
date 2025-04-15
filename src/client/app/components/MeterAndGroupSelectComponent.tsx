@@ -146,5 +146,3 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
 	})
 };
-
-

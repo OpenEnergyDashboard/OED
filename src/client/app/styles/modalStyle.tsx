@@ -43,22 +43,19 @@ export const largeTitleStyle: React.CSSProperties = {
 	display: 'inline-block'
 };
 
-
-// TODO Styling for the component, may need to be converted into .css files
-export const pillContainer: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'space-between',
-	margin: '0px',
-	padding: '0px',
-	minHeight: '100px',
-	maxHeight: '100px'
+export const pill: React.CSSProperties = {
+	margin: '2px',
+	userSelect: 'none',
+	cursor: 'pointer'
 };
 
-export const pillBoxLabel: React.CSSProperties = {
-	alignItems: 'start',
-	textAlign: 'left',
-	margin: '0px',
-	padding: '0px'
+export const pills: React.CSSProperties = {
+	display: 'flex',
+	flexWrap: 'wrap',
+	justifyContent: 'left',
+	overflowY: 'auto',
+	maxHeight: '120px',
+	paddingRight: '8px'
 };
 
 export const pillBox: React.CSSProperties = {
@@ -71,19 +68,21 @@ export const pillBox: React.CSSProperties = {
 	padding: '0px'
 };
 
-export const pills: React.CSSProperties = {
-	display: 'flex',
-	flexWrap: 'wrap',
-	justifyContent: 'left',
-	overflowY: 'auto',
-	maxHeight: '120px',
-	paddingRight: '8px'
+export const pillBoxLabel: React.CSSProperties = {
+	alignItems: 'start',
+	textAlign: 'left',
+	margin: '0px',
+	padding: '0px'
 };
 
-export const pill: React.CSSProperties = {
-	margin: '2px',
-	userSelect: 'none',
-	cursor: 'pointer'
+// TODO Styling for the component, may need to be converted into .css files
+export const pillContainer: React.CSSProperties = {
+	display: 'flex',
+	justifyContent: 'space-between',
+	margin: '0px',
+	padding: '0px',
+	minHeight: '100px',
+	maxHeight: '100px'
 };
 
 export const requiredStyle: React.CSSProperties = {
@@ -123,7 +122,3 @@ export const wellStyle: React.CSSProperties = {
 	backgroundColor: '#f5f5f5',
 	border: '1px solid #e3e3e3'
 };
-
-
-
-
