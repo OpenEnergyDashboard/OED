@@ -24,6 +24,7 @@ export interface AppState {
 	chartLinkHideOptions: boolean;
 	selectedLanguage: LanguageTypes;
 	refreshingReadings: boolean;
+	languageManuallySet: boolean; 
 }
 
 const defaultState: AppState = {
@@ -31,7 +32,8 @@ const defaultState: AppState = {
 	optionsVisibility: true,
 	selectedLanguage: LanguageTypes.en,
 	chartLinkHideOptions: false,
-	refreshingReadings: false
+	refreshingReadings: false,
+	languageManuallySet: false 
 };
 
 export const appStateSlice = createThunkSlice({
@@ -52,6 +54,7 @@ export const appStateSlice = createThunkSlice({
 		updateSelectedLanguage: create.reducer<LanguageTypes>((state, action) => {
 			state.selectedLanguage = action.payload;
 			moment.locale(action.payload);
+			state.languageManuallySet = true;
 		}),
 		setChartLinkOptionsVisibility: create.reducer<boolean>((state, action) => {
 			state.chartLinkHideOptions = action.payload;
@@ -118,8 +121,10 @@ export const appStateSlice = createThunkSlice({
 				}
 			})
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
-				state.selectedLanguage = action.payload.defaultLanguage;
-				moment.locale(action.payload.defaultLanguage);
+				if (!state.languageManuallySet) {
+					state.selectedLanguage = action.payload.defaultLanguage;
+					moment.locale(action.payload.defaultLanguage);
+				}
 			});
 	},
 	selectors: {
