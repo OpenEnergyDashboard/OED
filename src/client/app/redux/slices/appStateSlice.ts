@@ -24,7 +24,7 @@ export interface AppState {
 	chartLinkHideOptions: boolean;
 	selectedLanguage: LanguageTypes;
 	refreshingReadings: boolean;
-	languageManuallySet: boolean; 
+	languageManuallySet: boolean;
 }
 
 const defaultState: AppState = {
@@ -33,7 +33,7 @@ const defaultState: AppState = {
 	selectedLanguage: LanguageTypes.en,
 	chartLinkHideOptions: false,
 	refreshingReadings: false,
-	languageManuallySet: false 
+	languageManuallySet: false
 };
 
 export const appStateSlice = createThunkSlice({
