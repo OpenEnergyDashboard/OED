@@ -13,7 +13,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { useAppSelector } from '../../redux/reduxHooks';
-import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { selectRefreshingReadings, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
@@ -23,6 +23,8 @@ import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
 	const locale = useAppSelector(selectSelectedLanguage);
+	// Track when the readings are done being refreshed
+	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
 	// Conversions state
 	const { data: conversionsState = stableEmptyConversions, isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
 	// Units DataById
@@ -41,7 +43,7 @@ export default function ConversionsDetailComponent() {
 
 	return (
 		<div className='flexGrowOne'>
-			{(conversionsFetching || unitsFetching) ? (
+			{(conversionsFetching || unitsFetching || isRefreshingReadings) ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
