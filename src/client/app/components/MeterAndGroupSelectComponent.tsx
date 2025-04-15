@@ -20,6 +20,7 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 import { labelStyle } from '../styles/modalStyle';
+
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options

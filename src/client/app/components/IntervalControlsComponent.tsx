@@ -172,6 +172,3 @@ export default function IntervalControlsComponent() {
 		</div>
 	);
 }
-
-
-

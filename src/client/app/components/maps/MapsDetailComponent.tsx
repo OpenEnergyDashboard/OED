@@ -31,7 +31,6 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 	}
 
 	public render() {
-
 		const tableStyle: React.CSSProperties = {
 			marginLeft: '5%',
 			marginRight: '5%'
