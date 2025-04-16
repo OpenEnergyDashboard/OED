@@ -84,7 +84,7 @@ mocha.describe('readings API', () => {
 						expectRangeToEqualExpected(res, expected);
 					});
 
-                mocha.it('LR25: should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
+                mocha.it('LR25: range should have daily points for 15 minute reading intervals and flow units with +-inf start/end time & thing as thing where rate is 36', async () => {
                     const unitData = [
                         {   
                             // u14
