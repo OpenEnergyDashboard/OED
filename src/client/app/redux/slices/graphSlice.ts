@@ -365,7 +365,6 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
-
 						}
 					});
 				}

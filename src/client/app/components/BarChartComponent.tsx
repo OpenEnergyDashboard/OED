@@ -16,7 +16,7 @@ import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/sel
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectBarStacking } from '../redux/slices/graphSlice';
+import { selectSliderRangeInterval ,selectBarStacking } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
@@ -34,6 +34,7 @@ export default function BarChartComponent() {
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
 	const locale = useAppSelector(selectSelectedLanguage);
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
@@ -103,6 +104,8 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString()
+							, sliderRangeInterval.getEndTimestamp()?.toISOString()],
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,
