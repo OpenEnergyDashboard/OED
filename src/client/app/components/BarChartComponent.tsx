@@ -104,8 +104,8 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString()
-							, sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()],
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,

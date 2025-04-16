@@ -98,8 +98,8 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString()
-							, sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()],
 						showgrid: true,
 						gridcolor: '#ddd'
 					}
