@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import Plot from 'react-plotly.js';
 import * as moment from 'moment';
 import { useAppSelector } from '../redux/reduxHooks';
@@ -48,7 +48,7 @@ const CompareChartComponent: React.FC<CompareChartComponentProps> = ({ entity })
 	const selectUnitState = unitDataById[graphingUnit];
 	const locale = useAppSelector(selectSelectedLanguage);
 
-	const translate = useAppSelector(useTranslate);
+	const translate = useTranslate();
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.

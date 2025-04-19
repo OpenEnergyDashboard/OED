@@ -5,7 +5,8 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { UncontrolledAlert } from 'reactstrap';
-import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
+//import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
+import CompareChartComponent, { CompareEntity } from './CompareChartComponent';
 import { selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSortingOrder } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
@@ -111,7 +112,7 @@ export default function MultiCompareChartComponent() {
 						issues, this TS error is being suppressed for now.
 						eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						@ts-ignore */}
-						<CompareChartContainer
+						<CompareChartComponent
 							key={compareEntity.id + compareEntity.name}
 							entity={compareEntity}
 						/>
