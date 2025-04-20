@@ -276,7 +276,12 @@ mocha.describe('readings API', () => {
                     const expected = await parseExpectedCsv('expected_line_ri_15_mu_kW_gu_kW_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
 
                     const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                        .query({
+                            curr_start: '2022-09-21 00:00:00',
+                            curr_end: '2022-10-05 17:00:00',
+                            shift: 'P14D',
+                            graphicUnitId: unitId
+                        });
                     expectReadingToEqualExpected(res, expected)
                 });
             });
