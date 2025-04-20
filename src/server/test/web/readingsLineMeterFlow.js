@@ -244,13 +244,13 @@ mocha.describe('readings API', () => {
                     ];
                     const conversionData = [
                         {
-                            // c5
-                            sourceName: 'Degrees',
-                            destinationName: 'C',
+                            // c4
+                            sourceName: 'Electric',
+                            destinationName: 'kW',
                             bidirectional: false,
                             slope: 1,
                             intercept: 0,
-                            note: 'Degrees → C'
+                            note: 'Electric → kW'
 
                         }
                     ];
@@ -273,7 +273,7 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kW');
                     // Reuse same file as flow since value should be the same values.
-                    const expected = await parseExpectedCsv('expected_line_ri_15_mu_kW_gu_kW_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
 
                     const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
                         .query({
