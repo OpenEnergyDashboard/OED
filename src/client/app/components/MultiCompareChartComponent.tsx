@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { UncontrolledAlert } from 'reactstrap';
-//import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
 import CompareChartComponent, { CompareEntity } from './CompareChartComponent';
 import { selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSortingOrder } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
