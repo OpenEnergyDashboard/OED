@@ -243,7 +243,6 @@ const CompareChartComponent: React.FC<CompareChartComponentProps> = ({ entity })
 					title: translate('toggle.options'),
 					icon: Icons.pencil,
 					click: function () {
-						// # of items must differ so the length can tell which list of buttons is being set
 						setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
 					}
 				}],

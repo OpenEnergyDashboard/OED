@@ -134,6 +134,10 @@ export default function MultiCompareChartComponent() {
  * @returns The fraction change in usage where negative means less usage
  */
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number): number {
+	if(!usedToThisPointLastTimePeriod || isNaN(usedToThisPointLastTimePeriod)) {
+		// Return NaN if the previous usage is 0 or NaN. This filters out infinity.
+		return NaN;
+	}
 	return -1 + (currentPeriodUsage / usedToThisPointLastTimePeriod);
 }
 
