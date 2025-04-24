@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 
 import * as React from 'react';
 import { useState } from 'react';
@@ -36,11 +37,11 @@ export interface CompareEntity {
 	prevTotalUsage?: number;
 }
 
-interface CompareChartComponentProps {
+interface CompareBarComponentProps {
 	entity: CompareEntity;
 }
 
-const CompareChartComponent: React.FC<CompareChartComponentProps> = ({ entity }) => {
+const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => {
 	const comparePeriod = useAppSelector(selectComparePeriod);
 	const compareTimeInterval = useAppSelector(selectCompareTimeInterval);
 	const periodLabels = getComparePeriodLabels(comparePeriod);
@@ -78,10 +79,7 @@ const CompareChartComponent: React.FC<CompareChartComponentProps> = ({ entity })
 		}
 	}
 
-	/* TODO When I click this icon it crashes OED. The error relates to using a Hook (useState, I think)
-	outside a component. This does not use a component as the other graphics do as it is
-	a container. It either needs a modified solution or the component needs to be converted.
-	Only after the component has been converted uncomment the code below and in plotly config
+
 	// Display Plotly Buttons Feature:
 	// The number of items in defaultButtons and advancedButtons must differ as discussed below */
 	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
@@ -253,4 +251,4 @@ const CompareChartComponent: React.FC<CompareChartComponentProps> = ({ entity })
 	);
 };
 
-export default CompareChartComponent;
+export default CompareBarComponent;
