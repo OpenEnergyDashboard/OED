@@ -45,6 +45,7 @@ class Meter {
 	 * @param maxDate inclusive latest acceptable date (won't be rejected)
 	 * @param maxError maximum number of errors to be reported, ignore the rest
 	 * @param disableChecks disable checks on meter for conditionSet 
+	 * @param locationId location id to associate with weather data
 	 */
 	// The start/end timestamps are the default start/end timestamps that are set to the first
 	// day of time in moment. As always, we want to use UTC.
@@ -60,7 +61,7 @@ class Meter {
 		reading = 0.0, startTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'), endTimestamp = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 		previousEnd = moment(0).utc(), unitId = -99, defaultGraphicUnit = -99, areaUnit = Unit.areaUnitType.NONE, readingFrequency = '00:15:00',
 		minVal = Number.MIN_SAFE_INTEGER, maxVal = Number.MAX_SAFE_INTEGER, minDate = moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
-		maxDate = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'), maxError = 75, disableChecks = Unit.disableChecksType.REJECT_ALL) {
+		maxDate = moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'), maxError = 75, disableChecks = Unit.disableChecksType.REJECT_ALL, locationId) {
 		// In order for the CSV pipeline to work, the order of the parameters needs to match the order that the fields are declared.
 		// In addition, each new parameter has to be added at the very end.
 		this.id = id;
@@ -97,6 +98,7 @@ class Meter {
 		this.maxDate = maxDate;
 		this.maxError = maxError;
 		this.disableChecks = disableChecks;
+		this.locationId = locationId;
 	}
 
 	/**
@@ -149,7 +151,7 @@ class Meter {
 			row.gps, row.identifier, row.note, row.area, row.cumulative, row.cumulative_reset, row.cumulative_reset_start,
 			row.cumulative_reset_end, row.reading_gap, row.reading_variation, row.reading_duplication, row.time_sort,
 			row.end_only_time, row.reading, row.start_timestamp, row.end_timestamp, row.previous_end, row.unit_id, row.default_graphic_unit, row.area_unit, row.reading_frequency,
-			row.min_val, row.max_val, row.min_date, row.max_date, row.max_error, row.disable_checks);
+			row.min_val, row.max_val, row.min_date, row.max_date, row.max_error, row.disable_checks, row.location_id);
 		meter.unitId = Meter.convertUnitValue(meter.unitId);
 		meter.defaultGraphicUnit = Meter.convertUnitValue(meter.defaultGraphicUnit);
 		return meter;
@@ -249,7 +251,7 @@ class Meter {
 		reading = this.reading, startTimestamp = this.startTimestamp, endTimestamp = this.endTimestamp,
 		previousEnd = this.previousEnd, unitId = this.unitId, defaultGraphicUnit = this.defaultGraphicUnit, areaUnit = this.areaUnit,
 		readingFrequency = this.readingFrequency, minVal = this.minVal, maxVal = this.maxVal, minDate = this.minDate,
-		maxDate = this.maxDate, maxError = this.maxError, disableChecks = this.disableChecks) {
+		maxDate = this.maxDate, maxError = this.maxError, disableChecks = this.disableChecks, locationId = this.locationId) {
 		this.name = name;
 		this.url = url;
 		this.enabled = enabled;
@@ -283,6 +285,7 @@ class Meter {
 		this.maxDate = maxDate;
 		this.maxError = maxError;
 		this.disableChecks = disableChecks;
+		this.locationId = locationId;
 	}
 
 	/**

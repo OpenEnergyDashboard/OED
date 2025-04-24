@@ -314,7 +314,8 @@ export const selectDefaultCreateMeterValues = createAppSelector(
 			maxError: adminPreferences.defaultMeterMaximumErrors,
 			minVal: MIN_VAL,
 			maxVal: MAX_VAL,
-			disableChecks: DisableChecksType.reject_all
+			disableChecks: DisableChecksType.reject_all,
+			locationId: 0
 		};
 		return defaultValues;
 	}

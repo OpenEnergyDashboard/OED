@@ -81,6 +81,9 @@ router.post('/', async (req, res) => {
 				},
 				defaultHelpUrl: {
 					type: 'string'
+				},
+				defaultLocationId: {
+					type: 'number'
 				}
 			}
 		}

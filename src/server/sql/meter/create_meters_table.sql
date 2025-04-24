@@ -70,5 +70,6 @@ CREATE TABLE IF NOT EXISTS meters (
     min_date TIMESTAMP NOT NULL DEFAULT '1970-01-01 00:00:00+00:00',
     max_date TIMESTAMP NOT NULL DEFAULT '6970-01-01 00:00:00+00:00',
     max_error INTEGER NOT NULL DEFAULT 75,
-    disable_checks disable_checks_type NOT NULL DEFAULT 'reject_all'
+    disable_checks disable_checks_type NOT NULL DEFAULT 'reject_all',
+    location_id INTEGER REFERENCES locations(id)
 );

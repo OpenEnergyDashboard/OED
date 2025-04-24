@@ -64,6 +64,7 @@ function formatMeterForResponse(meter, hasFullAccess) {
 		maxDate: null,
 		maxError: null,
 		disableChecks: null,
+		locationId: null
 	};
 
 	// Only logged in Admins can see url, types, timezones, and internal names
@@ -95,6 +96,7 @@ function formatMeterForResponse(meter, hasFullAccess) {
 		formattedMeter.maxDate = meter.maxDate;
 		formattedMeter.maxError = meter.maxError;
 		formattedMeter.disableChecks = meter.disableChecks;
+		formattedMeter.locationId = meter.locationId;
 	}
 
 	return formattedMeter;
@@ -250,7 +252,8 @@ function validateMeterParams(params) {
 				type: 'string',
 				minLength: 1,
 				enum: Object.values(Unit.disableChecksType)
-			}
+			},
+			locationId: {type: 'number'}
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);
@@ -300,7 +303,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 				moment(req.body.minDate),
 				moment(req.body.maxDate),
 				req.body.maxError,
-				req.body.disableChecks
+				req.body.disableChecks,
+				req.body.locationId
 			);
 			// Put any changed values from updatedMeter into meter.
 			merge(meter, updatedMeter);
@@ -363,7 +367,8 @@ router.post('/addMeter', async (req, res) => {
 				moment(req.body.minDate),
 				moment(req.body.maxDate),
 				req.body.maxError,
-				req.body.disableChecks
+				req.body.disableChecks,
+				req.body.locationId
 			);
 			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);

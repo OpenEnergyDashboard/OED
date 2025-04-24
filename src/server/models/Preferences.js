@@ -24,10 +24,11 @@ class Preferences {
 	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
 	 * @param {String} defaultHelpUrl - Option to set the default help page url
+	 * @param {Number} defaultLocationId - Option to set the default location
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
 		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency,
-		defaultMeterMinimumDate, defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl) {
+		defaultMeterMinimumDate, defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl, defaultLocationId) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -43,6 +44,7 @@ class Preferences {
 		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
 		this.defaultHelpUrl = defaultHelpUrl;
+		this.defaultLocationId = defaultLocationId;
 	}
 
 	/**
@@ -79,7 +81,8 @@ class Preferences {
 			row.default_meter_maximum_date,
 			row.default_meter_reading_gap,
 			row.default_meter_maximum_errors,
-			row.default_help_url
+			row.default_help_url,
+			row.defaultLocationId
 		);
 	}
 
@@ -116,7 +119,8 @@ class Preferences {
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
 				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors,
-				defaultHelpUrl: preferences.defaultHelpUrl
+				defaultHelpUrl: preferences.defaultHelpUrl,
+				defaultLocationId: preferences.defaultLocationId
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
 		// input so return the new preferences. Easier just to return them all and only

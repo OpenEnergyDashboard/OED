@@ -19,5 +19,7 @@ CREATE TABLE IF NOT EXISTS preferences (
     default_meter_maximum_date TIMESTAMP NOT NULL,
 	default_meter_reading_gap REAL NOT NULL,
     default_meter_maximum_errors INTEGER NOT NULL,
-	default_help_url TEXT DEFAULT NULL
+	default_help_url TEXT DEFAULT NULL,
+	default_location_id INTEGER DEFAULT 0,
+    CONSTRAINT fk_preferences_location FOREIGN KEY (default_location_id) REFERENCES location(id)
 );

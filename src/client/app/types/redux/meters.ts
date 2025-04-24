@@ -58,6 +58,7 @@ export interface MeterData {
 	maxDate: string;
 	maxError: number;
 	disableChecks: DisableChecksType;
+	locationId: number;
 }
 
 export interface MeterDataByID extends Record<number, MeterData> { }
