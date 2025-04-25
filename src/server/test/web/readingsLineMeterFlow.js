@@ -12,6 +12,7 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
+    createTimeString,
     getUnitId,
     ETERNITY,
     METER_ID } = require('../../util/readingsUtils');
