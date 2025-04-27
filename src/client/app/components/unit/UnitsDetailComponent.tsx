@@ -15,6 +15,7 @@ import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
 import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
+
 /**
  * Defines the units page card view
  * @returns Units page element
@@ -27,10 +28,9 @@ export default function UnitsDetailComponent() {
 	const unitData = useAppSelector(selectAllUnits);
 
 	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
-
 	return (
 		<div className='flexGrowOne'>
-			{status === QueryStatus.pending || isRefreshingReadings ? (
+			{status === QueryStatus.pending || isRefreshingReadings ? ( 
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>

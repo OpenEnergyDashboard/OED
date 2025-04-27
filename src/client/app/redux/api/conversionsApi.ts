@@ -8,6 +8,7 @@ import { baseApi } from './baseApi';
 import { CikData } from '../../types/redux/ciks';
 import { setRefresingReadings } from '../../redux/slices/appStateSlice';
 
+
 export const conversionsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		getConversionsDetails: builder.query<ConversionData[], void>({
@@ -24,17 +25,19 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: conversion
 			}),
-			onQueryStarted: async (_arg, api) => {
-				api.queryFulfilled
-					.then(() => {
-						api.dispatch(
-							conversionsApi.endpoints.refresh.initiate({
-								redoCik: true,
-								refreshReadingViews: false
-							}));
-					});
+			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+				try {
+					await queryFulfilled;
+					dispatch(
+						conversionsApi.endpoints.refresh.initiate({
+							redoCik: true,
+							refreshReadingViews: false
+						})
+					);
+				} catch (err) {
+					console.error('addConversion failed', err);
+				}
 			}
-
 		}),
 		deleteConversion: builder.mutation<void, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
 			query: conversion => ({
