@@ -273,13 +273,11 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kW');
                     // Reuse same file as flow since value should be the same values.
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
 
                     const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
                         .query({
-                            curr_start: '2022-09-21 00:00:00',
-                            curr_end: '2022-10-05 17:00:00',
-                            shift: 'P14D',
+                            timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'),
                             graphicUnitId: unitId
                         });
                     expectReadingToEqualExpected(res, expected)
