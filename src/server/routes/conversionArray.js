@@ -9,10 +9,12 @@ const { refreshAllReadingViews } = require('../services/refreshAllReadingViews')
 
 const router = express.Router();
 
+const { adminAuthMiddleware } = require('./authenticator');
+
 /**
  * Route for redoing Cik and/or refreshing reading views.
  */
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', adminAuthMiddleware('refresh system data'), async (req, res) => {
 	if (req.body.redoCik) {
 		const conn = getConnection();
 		await redoCik(conn);
