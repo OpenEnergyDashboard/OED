@@ -208,7 +208,6 @@ mocha.describe('readings API', () => {
                     }
                 );
 
-                // Add LG26 here
                 mocha .it("LG26: should have hourly points for middle readings for 15 minute for a 60 day period and flow units with +-inf start/end time & kW as kW", 
                     async () => {
                         const unitDatakW = [
