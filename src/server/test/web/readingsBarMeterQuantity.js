@@ -615,6 +615,7 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
+
                 mocha.it('B14: 1 day bars for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as lbs of CO2 & chained & reversed', async () => {
                     const unitData = [
                         {
@@ -745,7 +746,6 @@ mocha.describe('readings API', () => {
                     // Check that the API reading is equal to what it is expected to equal
                     expectReadingToEqualExpected(res, expected);
                 });
-
             });
         });
     });

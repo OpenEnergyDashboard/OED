@@ -16,11 +16,12 @@ import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
-import { DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
+import { DisableChecksType, DisplayableType, UnitData, UnitRepresentType, UnitType } from '../../types/redux/units';
 import { conversionArrow } from '../../utils/conversionArrow';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { MIN_VAL, MAX_VAL } from '../../utils/input';
 import { LineGraphRates } from '../../types/redux/graph';
 import { customRateValid, isCustomRate } from '../../utils/unitInput';
 
@@ -75,6 +76,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
+	};
+
+	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	};
 
 	/**
@@ -198,6 +203,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// - The custom rate is a positive integer
 		const validUnit = state.name !== '' &&
 			(state.typeOfUnit !== UnitType.suffix || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
+			&& state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal
 			&& customRateValid(Number(state.secInRate));
 		// Compare original props to state to see if edit made. Check above avoids thinking edit happened if
 		// custom edit started without enter hit.
@@ -210,7 +216,10 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			|| props.unit.preferredDisplay !== state.preferredDisplay
 			|| props.unit.secInRate !== state.secInRate
 			|| props.unit.suffix !== state.suffix
-			|| props.unit.note !== state.note;
+			|| props.unit.note !== state.note
+			|| props.unit.minVal != state.minVal
+			|| props.unit.maxVal != state.maxVal
+			|| props.unit.disableChecks != state.disableChecks;
 		setCanSave(validUnit && editMade);
 	}, [state]);
 
@@ -554,6 +563,48 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								</FormGroup>
 							</Col>
 						</Row>
+						<Row xs='1' lg='2'>
+							{/* minVal input */}
+							<Col><FormGroup>
+								<Label for='minVal'>{translate('min.value')}</Label>
+								<Input id='minVal' name='minVal' type='number'
+									onChange={e => handleNumberChange(e)}
+									min={MIN_VAL}
+									max={state.maxVal}
+									required value={state.minVal}
+									invalid={state?.minVal < MIN_VAL || state?.minVal > state?.maxVal} />
+								<FormFeedback>
+									<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: state.maxVal }} />
+								</FormFeedback>
+							</FormGroup></Col>
+							{/* maxVal input */}
+							<Col><FormGroup>
+								<Label for='maxVal'>{translate('max.value')}</Label>
+								<Input id='maxVal' name='maxVal' type='number'
+									onChange={e => handleNumberChange(e)}
+									min={state.minVal}
+									max={MAX_VAL}
+									required value={state.maxVal}
+									invalid={state?.maxVal > MAX_VAL || state?.minVal > state?.maxVal} />
+								<FormFeedback>
+									<FormattedMessage id="error.bounds" values={{ min: state.minVal, max: MAX_VAL }} />
+								</FormFeedback>
+							</FormGroup></Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							{/* DisableChecks input */}
+							<Col><FormGroup>
+								<Label for='disableChecks'>{translate('disable.checks')}</Label>
+								<Input id='disableChecks' name='disableChecks' type='select'
+									onChange={e => handleStringChange(e)}
+									value={state.disableChecks}>
+									{Object.keys(DisableChecksType).map(key => {
+										return (<option value={key} key={key} >
+											{translate(`DisableChecksType.${key}`)}</option>);
+									})}
+								</Input>
+							</FormGroup></Col>
+						</Row>
 						{/* Note input */}
 						<FormGroup>
 							<Label for='note'>{translate('note')}</Label>
@@ -564,8 +615,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								value={state.note}
 								onChange={e => handleStringChange(e)} />
 						</FormGroup>
-					</Container>
-				</ModalBody>
+					</Container></ModalBody>
 				<ModalFooter>
 					<Button variant="warning" color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="unit.delete.unit" />

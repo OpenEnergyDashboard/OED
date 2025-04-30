@@ -12,6 +12,7 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
+    createTimeString,
     getUnitId,
     ETERNITY,
     METER_ID } = require('../../util/readingsUtils');
@@ -150,6 +151,72 @@ mocha.describe('readings API', () => {
                 // Add L26 here
 
                 // Add L27 here
+                mocha.it('L27: should have raw points for middle readings for 15 minute for a 14 day period and flow units & kW as kW', async () => {
+                    const unitData = [
+                        {
+                            // u4
+                            name: 'kW',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true,
+                            note: 'kilowatts'
+                        },
+                        {
+                            // u5
+                            name: 'Electric',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '', displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
+                    ];
+                    const conversionData = [
+                        {
+                            // c4
+                            sourceName: 'Electric',
+                            destinationName: 'kW',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'Electric → kW'
+
+                        }
+                    ];
+                    const meterData = [
+                        {
+                            name: 'Electric kW',
+                            unit: 'Electric',
+                            defaultGraphicUnit: 'kW',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+
+                    await prepareTest(unitData, conversionData, meterData);
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kW');
+                    // Reuse same file as flow since value should be the same values.
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_2022-09-21%00#00#00_et_2022-10-05%00#00#00.csv');
+
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({
+                            timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-05', '00:00:00'),
+                            graphicUnitId: unitId
+                        });
+                    expectReadingToEqualExpected(res, expected)
+                });
             });
         });
     });

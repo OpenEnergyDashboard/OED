@@ -9,9 +9,11 @@ import SpinnerComponent from '../../components/SpinnerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectAllUnits, selectUnitDataResult } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
+import { selectRefreshingReadings } from '../../redux/slices/appStateSlice';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the units page card view
@@ -24,9 +26,11 @@ export default function UnitsDetailComponent() {
 	const { status } = useAppSelector(selectUnitDataResult);
 	const unitData = useAppSelector(selectAllUnits);
 
+	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
+
 	return (
 		<div className='flexGrowOne'>
-			{status === QueryStatus.pending ? (
+			{status === QueryStatus.pending || isRefreshingReadings ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
@@ -62,14 +66,8 @@ export default function UnitsDetailComponent() {
 		</div>
 	);
 }
-
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
-};
-
 const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%',
+	...tooltipBaseStyle,
 	// For now, only an admin can see the unit page.
 	tooltipUnitView: 'help.admin.unitview'
 };

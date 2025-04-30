@@ -19,19 +19,15 @@ class Preferences {
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 * @param {String} defaultAreaUnit - The default area unit to normalize by
 	 * @param {String} defaultMeterReadingFrequency - The default meter reading frequency if none is given
-	 * @param {Number} defaultMeterMinimumValue - Option to set the default meter minimum value
-	 * @param {Number} defaultMeterMaximumValue - Option to set the default meter maximum value
 	 * @param {String} defaultMeterMinimumDate - Option to set the default meter minimum date
-	 * @param {String} defaultMeterMaximumValue - Option to set the default meter maximum value
+	 * @param {String} defaultMeterMaximumDate - Option to set the default meter maximum date
 	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
-	 * @param {Boolean} defaultMeterDisableChecks - Option to set the default meter disable checks
 	 * @param {String} defaultHelpUrl - Option to set the default help page url
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
 		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency,
-		defaultMeterMinimumValue, defaultMeterMaximumValue, defaultMeterMinimumDate,
-		defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultMeterDisableChecks, defaultHelpUrl) {
+		defaultMeterMinimumDate, defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -42,13 +38,10 @@ class Preferences {
 		this.defaultAreaNormalization = defaultAreaNormalization;
 		this.defaultAreaUnit = defaultAreaUnit;
 		this.defaultMeterReadingFrequency = defaultMeterReadingFrequency;
-		this.defaultMeterMinimumValue = defaultMeterMinimumValue;
-		this.defaultMeterMaximumValue = defaultMeterMaximumValue;
 		this.defaultMeterMinimumDate = defaultMeterMinimumDate;
 		this.defaultMeterMaximumDate = defaultMeterMaximumDate;
 		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
-		this.defaultMeterDisableChecks = defaultMeterDisableChecks;
 		this.defaultHelpUrl = defaultHelpUrl;
 	}
 
@@ -82,13 +75,10 @@ class Preferences {
 			row.default_area_normalization,
 			row.default_area_unit,
 			row.default_meter_reading_frequency,
-			row.default_meter_minimum_value,
-			row.default_meter_maximum_value,
 			row.default_meter_minimum_date,
 			row.default_meter_maximum_date,
 			row.default_meter_reading_gap,
 			row.default_meter_maximum_errors,
-			row.default_meter_disable_checks,
 			row.default_help_url
 		);
 	}
@@ -122,13 +112,10 @@ class Preferences {
 				defaultAreaNormalization: preferences.defaultAreaNormalization,
 				defaultAreaUnit: preferences.defaultAreaUnit,
 				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency,
-				defaultMeterMinimumValue: preferences.defaultMeterMinimumValue,
-				defaultMeterMaximumValue: preferences.defaultMeterMaximumValue,
 				defaultMeterMinimumDate: preferences.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
 				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors,
-				defaultMeterDisableChecks: preferences.defaultMeterDisableChecks,
 				defaultHelpUrl: preferences.defaultHelpUrl
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was

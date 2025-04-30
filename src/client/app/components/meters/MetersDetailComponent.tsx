@@ -13,6 +13,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from './CreateMeterModalComponent';
 import MeterViewComponent from './MeterViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the meters page card view
@@ -35,7 +36,7 @@ export default function MetersDetailComponent() {
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='meters' />
-					<div style={tooltipStyle}>
+					<div style={tooltipBaseStyle}>
 						<TooltipMarkerComponent page='meters' helpTextId={getToolTipMessage(isAdmin)} />
 					</div>
 				</h2>
@@ -60,15 +61,6 @@ export default function MetersDetailComponent() {
 		</div >
 	);
 }
-
-const titleStyle: React.CSSProperties = {
-	textAlign: 'center'
-};
-
-const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%'
-};
 
 // Switch help depending if admin or not.
 const getToolTipMessage = (isAdmin: boolean) => isAdmin ? 'help.admin.meterview' : 'help.meters.meterview';

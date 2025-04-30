@@ -21,12 +21,9 @@ export interface AdminState {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
-	defaultMeterMinimumValue: number;
-	defaultMeterMaximumValue: number;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
-	defaultMeterDisableChecks: boolean;
 	defaultHelpUrl: string;
 }

@@ -196,7 +196,73 @@ mocha.describe('readings API', () => {
 				});
 
 
-				// Add C10 here
+				mocha.it('C10: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU', async () => {
+					// Use predefined unit and conversion data
+					const unitData = unitDatakWh.concat([
+						//adding u3, u16
+						{	
+							// u3
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'MJ'
+						},
+						{ 	
+							// u16
+							name: 'BTU',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
+							note: 'OED created standard unit'
+						}
+					]);
+					const conversionData = conversionDatakWh.concat([
+						// adding c2, c3
+						{	
+							// c2
+							sourceName: 'kWh',
+							destinationName: 'MJ',
+							bidirectional: true,
+							slope: 3.6,
+							intercept: 0,
+							note: 'MJ → BTU'
+						},
+						{	
+							// c3
+							sourceName: 'MJ',
+							destinationName: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
+						}
+					]);
+					
+					// load data into database
+					await prepareTest(unitData, conversionData, meterDatakWh);
+
+					// Get the unit ID since the DB could use any value
+					const unitId = await getUnitId('BTU');
+					const expected = [10645752.224022, 11490184.2415072];
+					// for compare, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+							});
+						expectCompareToEqualExpected(res, expected);
+					});
 
 				mocha.it('C11: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([

@@ -354,8 +354,7 @@ export const graphSlice = createSlice({
 								current.queryTimeInterval = TimeInterval.fromString(value);
 								break;
 							case 'sliderRange':
-								// TODO omitted for now re-implement later.
-								// current.rangeSliderInterval = TimeInterval.fromString(value);
+								current.rangeSliderInterval = TimeInterval.fromString(value);
 								break;
 							case 'unitID':
 								current.selectedUnit = parseInt(value);

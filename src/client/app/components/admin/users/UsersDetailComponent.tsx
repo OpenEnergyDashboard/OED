@@ -12,10 +12,10 @@ import CreateUserModalComponent from './CreateUserModalComponent';
 import UserViewComponent from './UserViewComponent';
 import { selectSelectedLanguage } from '../../../redux/slices/appStateSlice';
 import { useAppSelector } from '../../../redux/reduxHooks';
+import { tooltipBaseStyle } from '../../../styles/modalStyle';
 
 const tooltipStyle = {
-	display: 'inline-block',
-	fontSize: '50%',
+	...tooltipBaseStyle,
 	tooltipUsersView: 'help.admin.users'
 };
 

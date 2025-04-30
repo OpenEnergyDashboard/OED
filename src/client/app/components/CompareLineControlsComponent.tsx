@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import {
 	selectQueryTimeInterval, selectShiftAmount, selectShiftTimeInterval, updateShiftAmount, updateShiftTimeInterval
 } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
 import { FormattedMessage } from 'react-intl';
 import { ShiftAmount } from '../types/redux/graph';
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
@@ -18,11 +17,13 @@ import { Value } from '@wojtekmaj/react-daterange-picker/dist/cjs/shared/types';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * @returns compare line control component for compare line graph page
  */
 export default function CompareLineControlsComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const shiftAmount = useAppSelector(selectShiftAmount);
 	const timeInterval = useAppSelector(selectQueryTimeInterval);

@@ -6,6 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppSelector } from '../redux/reduxHooks';
+import { footerStyle } from '../styles/modalStyle';
 
 /**
  *
@@ -30,11 +31,3 @@ export default function FooterComponent() {
 		</div>
 	);
 }
-
-
-const footerStyle: React.CSSProperties = {
-	borderTop: '1px #e1e4e8 solid',
-	padding: '10px 0px',
-	textAlign: 'center',
-	width: '100%'
-};

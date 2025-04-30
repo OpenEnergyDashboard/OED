@@ -4,6 +4,7 @@
 
 const moment = require('moment');
 const Meter = require('../../models/Meter');
+const Unit = require('../../models/Unit');
 const loadArrayInput = require('../pipeline-in-progress/loadArrayInput');
 const { log } = require('../../log');
 const demuxCsvWithSingleColumnTimestamps = require('./csvDemux');
@@ -55,12 +56,12 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				undefined, // default graphic unit
 				undefined, // area unit
 				preferences.defaultMeterReadingFrequency, // reading frequency
-				preferences.defaultMeterMinimumValue, // minVal
-				preferences.defaultMeterMaximumValue, // maxVal
+				Number.MIN_SAFE_INTEGER, // minVal
+				Number.MAX_SAFE_INTEGER, // maxVal
 				preferences.defaultMeterMinimumDate, // minDate
 				preferences.defaultMeterMaximumDate, // maxDate
 				preferences.defaultMeterMaximumErrors, // maxError
-				preferences.defaultMeterDisableChecks  // disableChecks
+				Unit.disableChecksType.REJECT_ALL // disable checks
 			);
 			await meter.insert(conn);
 			log.warn('WARNING: Created a meter (' + `${serialNumber}.${i}` +

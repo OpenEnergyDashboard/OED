@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender } from '../redux/slices/graphSlice';
+import { selectChartToRender, selectQueryTimeInterval } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import '../styles/modal.css';
 import AreaUnitSelectComponent from './AreaUnitSelectComponent';
@@ -24,6 +24,8 @@ import { useTranslate } from '../redux/componentHooks';
 export default function MoreOptionsComponent() {
 	const translate = useTranslate();
 	const chartToRender = useAppSelector(selectChartToRender);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+	const isBounded = queryTimeInterval.getIsBounded();
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);
 	const handleClose = () => {
@@ -44,14 +46,14 @@ export default function MoreOptionsComponent() {
 						<ModalBody>
 							{/* More UI options for line graphic */}
 							{chartToRender == ChartTypes.line && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.line && <DateRangeComponent />}
+							{chartToRender == ChartTypes.line && !isBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.line && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.line && <ErrorBarComponent />}
 							{chartToRender == ChartTypes.line && <ExportComponent />}
 							{chartToRender == ChartTypes.line && <ChartLinkComponent />}
 
 							{/* More UI options for bar graphic */}
-							{chartToRender == ChartTypes.bar && <DateRangeComponent />}
+							{chartToRender == ChartTypes.bar && !isBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.bar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.bar && <ExportComponent />}
 							{chartToRender == ChartTypes.bar && <ChartLinkComponent />}
@@ -61,7 +63,7 @@ export default function MoreOptionsComponent() {
 							{chartToRender == ChartTypes.compare && <ChartLinkComponent />}
 
 							{/* More UI options for map graphic */}
-							{chartToRender == ChartTypes.map && <DateRangeComponent />}
+							{chartToRender == ChartTypes.map && !isBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.map && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.map && <ChartLinkComponent />}
 
@@ -72,7 +74,7 @@ export default function MoreOptionsComponent() {
 
 							{/* More UI options for radar graphic */}
 							{chartToRender == ChartTypes.radar && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.radar && <DateRangeComponent />}
+							{chartToRender == ChartTypes.radar && !isBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
 
