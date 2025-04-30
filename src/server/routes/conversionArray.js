@@ -6,13 +6,14 @@ const express = require('express');
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const { adminAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
 /**
  * Route for redoing Cik and/or refreshing reading views.
  */
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', adminAuthMiddleware('refresh system data'), async (req, res) => {
 	if (req.body.redoCik) {
 		const conn = getConnection();
 		await redoCik(conn);
