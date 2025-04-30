@@ -204,18 +204,11 @@ mocha.describe('readings API', () => {
                     // Get the unit ID since the DB could use any value.
                     const unitId = await getUnitId('kW');
                     const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_ri_15_mu_kW_gu_kW_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
-                    // Create a request API for the 60 days period
-                    const startDate = "2022-08-25";
-                    const endDate = "2022-10-24";
-                    const time = "00:00:00";
-                    const timeInterval = createTimeString(startDate, time, endDate, time);
-
+                   
                     const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-                        .query({ timeInterval, graphicUnitId: unitId });
+                        .query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
                     expectReadingToEqualExpected(res, expected);
                 });
-                
-                // Add L27 here
                 mocha.it('L27: should have raw points for middle readings for 15 minute for a 14 day period and flow units & kW as kW', async () => {
                     const unitData = [
                         {
