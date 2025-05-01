@@ -83,12 +83,11 @@ mocha.describe('readings API', () => {
                         await prepareTest(unitDataDegreesC, conversionDataDegreesC, meterDataDegrees);
                         // Get the graphic unit ID for 'C'
                         const graphicUnitIdC = await getUnitId('C');
-                        // Using filename based on test description (Degrees -> C), not the likely typo in testing.md (kW -> kW)
-                        const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_C_gu_C_st_-inf_et_inf.csv');
 
-						const res = await chai.request(app)
+                        const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
+
+                        const res = await chai.request(app)
                             .get(`/api/unitReadings/line/meters/${METER_ID}?timeInterval=${ETERNITY.toString()}&graphicUnitId=${graphicUnitIdC}`);
-                        
                         // Check result matches expected csv file
                         expectRangeToEqualExpected(res, expected);
                     });
