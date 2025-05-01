@@ -27,18 +27,45 @@ mocha.describe('readings API', () => {
             mocha.describe('for range (min/max)', () => {
                 mocha.describe('for raw meters', () => {
 
-                    // Add LR9 here
                     mocha.it('LR9: line chart, range aggregation, raw data (Degrees -> C), daily, no normalization', async () => {
-                        // Define units u6 (C) and u7 (Degrees)
-                        const unitDataDegreesC = [
-                            { name: 'C', identifier: '', unitRepresent: Unit.unitRepresentType.RAW, secInRate: 3600, typeOfUnit: Unit.unitType.UNIT, suffix: '', displayable: Unit.displayableType.ALL, preferredDisplay: true, note: 'Celsius' },
-                            { name: 'Degrees', identifier: '', unitRepresent: Unit.unitRepresentType.RAW, secInRate: 3600, typeOfUnit: Unit.unitType.METER, suffix: '', displayable: Unit.displayableType.NONE, preferredDisplay: false, note: 'special unit' }
-                        ];
-                        // Define conversion c5 (Degrees -> C)
+                        const unitC = {
+                            // u6
+                            name: 'C',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.RAW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true,
+                            note: 'Celsius'
+                        };
+                        const unitDegrees = {
+                            // u7
+                            name: 'Degrees',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.RAW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        };
+                        const unitDataDegreesC = [unitC, unitDegrees];
+
                         const conversionDataDegreesC = [
-                            { sourceName: 'Degrees', destinationName: 'C', bidirectional: false, slope: 1, intercept: 0, note: 'Degrees → C' }
+                            {
+                                // c5
+                                sourceName: 'Degrees',
+                                destinationName: 'C',
+                                bidirectional: false,
+                                slope: 1,
+                                intercept: 0,
+                                note: 'Degrees → C'
+                            }
                         ];
-                        // Define meter using Degrees unit and standard input file
+
                         const meterDataDegrees = [
                             {
                                 name: 'Temp Fahrenheit in Celsius',
@@ -61,6 +88,7 @@ mocha.describe('readings API', () => {
 
 						const res = await chai.request(app)
                             .get(`/api/unitReadings/line/meters/${METER_ID}?timeInterval=${ETERNITY.toString()}&graphicUnitId=${graphicUnitIdC}`);
+                        
                         // Check result matches expected csv file
                         expectRangeToEqualExpected(res, expected);
                     });
