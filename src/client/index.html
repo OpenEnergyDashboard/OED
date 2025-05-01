@@ -22,7 +22,7 @@
     To test CSP rules change http-equiv=”Content-Security-Policy” to http-equiv=”Content-Security-Policy-Report-Only” this allows us to send reports of 
     what would have been blocked without actually blocking it.
     
-    For sites use OED and are blocked by these CSP rules may add their site to the exception they may list their website link next to the tag that is blocking 
+    For sites using OED and are blocked by these CSP rules may add their site to the exception they may list their website link next to the tag that is blocking 
     the user site. The site link must be added after 'self' but before the semi colon marking the end of that tag. The font-src tag is a great example on how to implement 
     a site to the exception list. Another example for adding a site (https://newException.com) to a tag with multiple sites as an exceptions would be : 
         img-src 'self' http://example.com https://site_example.net; becomes img-src 'self' http://example.com https://site_example.net https://newException.com;
