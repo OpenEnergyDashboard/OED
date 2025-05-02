@@ -27,7 +27,7 @@ mocha.describe('readings API', () => {
             mocha.describe('for range (min/max)', () => {
                 mocha.describe('for raw meters', () => {
 
-                    mocha.it('LR9: line chart, range aggregation, raw data (Degrees -> C), daily, no normalization', async () => {
+                    mocha.it('LR9: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & Celsius as Celsius', async () => {
                         const unitC = {
                             // u6
                             name: 'C',
@@ -86,8 +86,8 @@ mocha.describe('readings API', () => {
 
                         const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kW_gu_kW_st_-inf_et_inf.csv');
 
-                        const res = await chai.request(app)
-                            .get(`/api/unitReadings/line/meters/${METER_ID}?timeInterval=${ETERNITY.toString()}&graphicUnitId=${graphicUnitIdC}`);
+                        const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                            .query({ timeInterval: ETERNITY.toString(), graphicUnitId: graphicUnitIdC });
                         // Check result matches expected csv file
                         expectRangeToEqualExpected(res, expected);
                     });
