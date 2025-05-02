@@ -25,19 +25,17 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: conversion
 			}),
-			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
-				try {
-					await queryFulfilled;
-					dispatch(
-						conversionsApi.endpoints.refresh.initiate({
-							redoCik: true,
-							refreshReadingViews: false
-						})
-					);
-				} catch (err) {
-					console.error('addConversion failed', err);
-				}
+			onQueryStarted: async (_arg, api) => {
+				api.queryFulfilled
+					.then(() => {
+						api.dispatch(
+							conversionsApi.endpoints.refresh.initiate({
+								redoCik: true,
+								refreshReadingViews: false
+							}));
+					});
 			}
+
 		}),
 		deleteConversion: builder.mutation<void, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
 			query: conversion => ({
@@ -88,7 +86,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings', 'Units'],
+			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
 				dispatch(setRefresingReadings(true));
 				try {

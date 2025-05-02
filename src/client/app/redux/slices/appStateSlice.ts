@@ -134,7 +134,7 @@ export const appStateSlice = createThunkSlice({
 		selectOptionsVisibility: state => state.optionsVisibility,
 		selectSelectedLanguage: state => state.selectedLanguage,
 		selectChartLinkHideOptions: state => state.chartLinkHideOptions,
-		selectRefreshingReadings: state => state.refreshingReadings,
+		selectRefreshingReadings: state => state.refreshingReadings
 	}
 });
 
@@ -145,7 +145,7 @@ export const {
 	setOptionsVisibility,
 	updateSelectedLanguage,
 	setChartLinkOptionsVisibility,
-	setRefresingReadings,
+	setRefresingReadings
 } = appStateSlice.actions;
 
 export const {
@@ -153,5 +153,5 @@ export const {
 	selectOptionsVisibility,
 	selectSelectedLanguage,
 	selectChartLinkHideOptions,
-	selectRefreshingReadings,
+	selectRefreshingReadings
 } = appStateSlice.selectors;

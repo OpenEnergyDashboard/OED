@@ -30,7 +30,7 @@ export default function UnitsDetailComponent() {
 	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
 	return (
 		<div className='flexGrowOne'>
-			{status === QueryStatus.pending || isRefreshingReadings ? ( 
+			{status === QueryStatus.pending || isRefreshingReadings ? (
 				<div className='text-center'>
 					<SpinnerComponent loading width={50} height={50} />
 					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
