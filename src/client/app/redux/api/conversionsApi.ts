@@ -86,7 +86,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings'],
+			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings', 'Units'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
 				dispatch(setRefresingReadings(true));
 				try {
