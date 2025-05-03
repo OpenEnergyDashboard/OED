@@ -8,11 +8,18 @@
 
 <head>
     <meta charset="utf-8">
+    <script nonce="__NONCE__">
+        window.__webpack_nonce__ = "__NONCE__";
+        window.__plotly_nonce__ = "__NONCE__";
+        console.log("This script runs because it has the correct nonce.");
+    </script>
     <base id="base" href="SUBDIR" target="_blank">
     <link rel="icon" type="image/png" href="favicon.ico">
     <title>Open Energy Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+        
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" nonce="__NONCE__">
     
     
     <!--
@@ -26,17 +33,22 @@
     For sites using OED and are blocked by these CSP rules may add their site to the exception they may list their website link next to the tag that is blocking 
     the user site. The site link must be added after 'self' but before the semi colon marking the end of that tag. The font-src tag is a great example on how to implement 
     a site to the exception list. Another example for adding a site (https://newException.com) to a tag with multiple sites as an exceptions would be : 
-        img-src 'self' http://example.com https://site_example.net; becomes img-src 'self' http://example.com https://site_example.net https://newException.com;
-     -->
+    img-src 'self' http://example.com https://site_example.net; becomes img-src 'self' http://example.com https://site_example.net https://newException.com;
+    -->
     <!-- <meta http-equiv="Content-Security-Policy" content="
-                                                        default-src 'self';
-                                                        img-src 'self'; 
-                                                        font-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'; 
-                                                        media-src 'self'; 
-                                                        script-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
-                                                        style-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' 'nonce-{{nonce}}'; "> -->
+    default-src 'self';
+    img-src 'self'; 
+    font-src 'self' https://maxcdn.bootstrapcdn.com; 
+    media-src 'self'; 
+    script-src 'self' 'nonce-__NONCE__';
+    style-src 'self' 'nonce-__NONCE__'; "> -->
     
-    
+    <meta "Content-Security-Policy-Report-Only", contents=" 
+    default-src 'self'; 
+    img-src 'self'; 
+    font-src 'self' https://maxcdn.bootstrapcdn.com 'nonce-${nonce}';
+    media-src 'self'; script-src 'self' 'nonce-${nonce}' ;
+    style-src 'self' 'nonce-${nonce}';">
     
     <!-- <link rel="stylesheet" href="styles/card-page.css" nonce="__NONCE__">
     <link rel="stylesheet" href="styles/DateRangeCustom.css" nonce="__NONCE__">
@@ -45,22 +57,15 @@
     <link rel="stylesheet" href="styles/react-select-css.css" nonce="__NONCE__">
     <link rel="stylesheet" href="styles/spinner.css" nonce="__NONCE__">
     <link rel="stylesheet" href="styles/tooltip.css" nonce="__NONCE__">
-     -->
+    -->
 </head>
 
 <body>
     <div id="root"></div>
-    <!-- <script nonce="__NONCE__">
-        window.webpackNonce = "__NONCE__";
-        window.webpackCSSNonce = "__NONCE__";
-        window.webpackTSNonce = "__NONCE__";
 
+    <script src="app/bundle.js" nonce="__NONCE__">
         
-
-        // console.log("This script runs because it has the correct nonce.");
-        </script> -->
-
-    <script src="app/bundle.js"> </script>
+   </script>
     <noscript>
         <h1>OED requires JavaScript to run correctly. Please enable JavaScript.</h1>
     </noscript>

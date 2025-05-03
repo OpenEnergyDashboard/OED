@@ -1,14 +1,18 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-//  if (typeof document !== 'undefined') {
-// 	const script = document.querySelector('script[nonce]');
-// 	if (script && script.nonce) {
-// 	  (window as any).webpackNonce = script.nonce;
-// 	  console.log("webpackNonce set to", script.nonce);
-// 	}
-//   }
+
+ const originalAppendChild = document.head.appendChild;
+
+document.head.appendChild = function(node) {
+  if (node.tagName === 'STYLE' && !node.nonce) {
+    node.setAttribute('nonce', window.__plotly_nonce__ || window.__webpack_nonce__);
+  }
+  return originalAppendChild.call(this, node);
+};
+
 import 'bootstrap/dist/css/bootstrap.css';
+console.log('BootstrapCSS Loaded');
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
