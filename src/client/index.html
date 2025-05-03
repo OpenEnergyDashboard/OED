@@ -14,6 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     
+    
     <!--
     The meta tag with "Content-Security-Policy" below is the Content Security Policy, by having default-src as self all CSP rules that are unspecified will only 
     allow the OED site and resources to be used/displayed. Tags like img-src, media-src, and script-src are also set to self to ensure that only 
@@ -27,17 +28,39 @@
     a site to the exception list. Another example for adding a site (https://newException.com) to a tag with multiple sites as an exceptions would be : 
         img-src 'self' http://example.com https://site_example.net; becomes img-src 'self' http://example.com https://site_example.net https://newException.com;
      -->
-    <meta http-equiv=”Content-Security-Policy” content=”
-                                                        default-src ’self’;
-                                                        img-src ’self’; 
-                                                        font-src ’self’ https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css; 
-                                                        media-src ’self’; 
-                                                        script-src ’self’;”>
+    <!-- <meta http-equiv="Content-Security-Policy" content="
+                                                        default-src 'self';
+                                                        img-src 'self'; 
+                                                        font-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'; 
+                                                        media-src 'self'; 
+                                                        script-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css';
+                                                        style-src 'self' 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' 'nonce-{{nonce}}'; "> -->
+    
+    
+    
+    <!-- <link rel="stylesheet" href="styles/card-page.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/DateRangeCustom.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/index.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/modal.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/react-select-css.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/spinner.css" nonce="__NONCE__">
+    <link rel="stylesheet" href="styles/tooltip.css" nonce="__NONCE__">
+     -->
 </head>
 
 <body>
     <div id="root"></div>
-    <script src="app/bundle.js"></script>
+    <!-- <script nonce="__NONCE__">
+        window.webpackNonce = "__NONCE__";
+        window.webpackCSSNonce = "__NONCE__";
+        window.webpackTSNonce = "__NONCE__";
+
+        
+
+        // console.log("This script runs because it has the correct nonce.");
+        </script> -->
+
+    <script src="app/bundle.js"> </script>
     <noscript>
         <h1>OED requires JavaScript to run correctly. Please enable JavaScript.</h1>
     </noscript>

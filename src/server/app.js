@@ -33,6 +33,8 @@ const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
 
+const crypto = require('node:crypto')
+
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
 // TODO Verify that user see the message returned, see https://express-rate-limit.mintlify.app/reference/configuration#message
@@ -145,6 +147,12 @@ router.get('*', (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
+
+		const nonce = crypto.randomBytes(16).toString('base64url')
+		htmlPlusData = htmlPlusData.replace(/__NONCE__/g, nonce)
+
+		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com; media-src 'self'; script-src 'self' ; style-src 'self' https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css 'unsafe-inline'; style-src-elem 'unsafe-inline' https://maxcdn.bootstrapcdn.com;`)
+
 		res.send(htmlPlusData);
 	});
 });

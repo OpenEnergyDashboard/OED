@@ -38,11 +38,29 @@ const config = {
 	module: {
 		rules: [
 			// All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
-			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
+			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader'
+				// , 
+				// options: {
+				// attributes: {
+				//   nonce: 'webpackTSNonce'
+				// }} 
+			},
 			// CSS stylesheet loader.
 			{ test: /\.css$/, use: [
-				{loader: 'style-loader'},
-				{loader: 'css-loader'}
+				{loader: 'style-loader'
+					// , 
+					// options: {
+					// attributes: {
+					//   nonce: 'webpackNonce'
+					// }}
+				},
+				{loader: 'css-loader'
+					// , 
+					// options: {
+					// attributes: {
+					//   nonce: 'webpackCSSNonce'
+					// }}
+				}
 			] },
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
 			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
