@@ -177,7 +177,7 @@ const LocaleTranslationData = {
 		"edit": "Edit",
 		"edit.a.group": "Edit a Group",
 		"edit.a.meter": "Edit a Meter",
-		"edit.group": "Edit Group",
+		"edit.group": "Details/Edit Group",
 		"edit.meter": "Details/Edit Meter",
 		"edit.unit": "Details/Edit Unit",
 		"edit.user": "Edit User",
