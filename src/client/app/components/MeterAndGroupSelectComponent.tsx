@@ -13,7 +13,7 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
+import { selectChartToRender, updateSelectedMeters, updateThreeDMeterOrGroupInfo, updateSelectedGroups } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
@@ -35,12 +35,26 @@ export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectP
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
 	const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
+	//Combine options array into one with a type property to differentiate between meters and groups
+	const combinedOptions = [
+		...meterGroupedOptions.map(option => ({ ...option, meterOrGroup: MeterOrGroup.meters })),
+		...groupsGroupedOptions.map(option => ({ ...option, meterOrGroup: MeterOrGroup.groups }))
+	];
+
+	//Combine the selected values into one array with a type property to differentiate between meters and groups
+	const combinedValue = [
+		...allSelectedMeterValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.meters })),
+		...allSelectedGroupValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.groups }))
+	];
 	// Set the current component's appropriate meter or group SelectOption
 	const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
-		const newMetersOrGroups = newValues.map(option => option.value);
-		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
+		const newMeters = newValues.filter(option => option.meterOrGroup === MeterOrGroup.meters).map(option => option.value);
+		const newGroups = newValues.filter(option => option.meterOrGroup === MeterOrGroup.groups).map(option => option.value);
+
+		dispatch(updateSelectedMeters(newMeters));
+		dispatch(updateSelectedGroups(newGroups));
 	};
 
 	return (
