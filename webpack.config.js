@@ -45,7 +45,8 @@ const config = {
 					options: {
 						attributes: {
 							nonce: '__webpack_nonce__'
-						}}
+						}
+					}
 				},
 				{loader: 'css-loader'}
 			] },

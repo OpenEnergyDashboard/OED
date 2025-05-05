@@ -8,10 +8,10 @@
 
 <head>
     <meta charset="utf-8">
-    <script nonce="__NONCE__">
-        window.__webpack_nonce__ = "__NONCE__";
-        window.__plotly_nonce__ = "__NONCE__";
-        console.log("This script runs because it has the correct nonce.");
+    <script nonce="{{nonce}}">
+        window.__webpack_nonce__ = "{{nonce}}";
+        window.__plotly_nonce__ = "{{nonce}}";
+        // console.log("This script runs because it has the correct nonce.");
     </script>
     <base id="base" href="SUBDIR" target="_blank">
     <link rel="icon" type="image/png" href="favicon.ico">
@@ -19,7 +19,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
         
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" nonce="__NONCE__">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" nonce="{{nonce}}">
     
     
     <!--
@@ -43,12 +43,6 @@
     script-src 'self' 'nonce-__NONCE__';
     style-src 'self' 'nonce-__NONCE__'; "> -->
     
-    <meta "Content-Security-Policy-Report-Only", contents=" 
-    default-src 'self'; 
-    img-src 'self'; 
-    font-src 'self' https://maxcdn.bootstrapcdn.com 'nonce-${nonce}';
-    media-src 'self'; script-src 'self' 'nonce-${nonce}' ;
-    style-src 'self' 'nonce-${nonce}';">
     
     <!-- <link rel="stylesheet" href="styles/card-page.css" nonce="__NONCE__">
     <link rel="stylesheet" href="styles/DateRangeCustom.css" nonce="__NONCE__">
@@ -63,7 +57,7 @@
 <body>
     <div id="root"></div>
 
-    <script src="app/bundle.js" nonce="__NONCE__">
+    <script src="app/bundle.js" nonce="{{nonce}}">
         
    </script>
     <noscript>

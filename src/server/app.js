@@ -149,9 +149,9 @@ router.get('*', (req, res) => {
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 
 		const nonce = crypto.randomBytes(16).toString('base64url')
-		htmlPlusData = htmlPlusData.replace(/__NONCE__/g, nonce)
+		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce)
 
-		res.setHeader('Content-Security-Policy-Report-Only', `default-src 'self'; img-src 'self'; font-src 'self' https://maxcdn.bootstrapcdn.com 'nonce-${nonce}'; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self'  'nonce-${nonce}';`)
+		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com ; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self' 'nonce-${nonce}' 'unsafe-inline';`)
 
 		res.send(htmlPlusData);
 	});
