@@ -24,13 +24,13 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.use(adminAuthenticator('edit site preferences'));
+// router.use(adminAuthenticator('edit site preferences'));
 
 /**
  * Route for updating the preferences
  * @param user_id
  */
-router.post('/', async (req, res) => {
+router.post('/', adminAuthenticator('edit site preferences'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

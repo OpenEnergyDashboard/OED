@@ -210,5 +210,6 @@ module.exports = {
 	exportAuthMiddleware,
 	obviusUsernameAndPasswordAuthMiddleware,
 	optionalAuthMiddleware,
-	verifyCredentials
+	verifyCredentials,
+	credentialsRequestValidationMiddleware
 };

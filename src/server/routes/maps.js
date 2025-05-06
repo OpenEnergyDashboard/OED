@@ -15,7 +15,7 @@ const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
+// router.use(optionalAuthenticator);
 
 function formatMapForResponse(map) {
 	const formattedMap = {
@@ -34,7 +34,8 @@ function formatMapForResponse(map) {
 	return formattedMap;
 }
 
-router.get('/', async (req, res) => {
+//Applying optionalAuthMiddlewear directly to route
+router.get('/', optionalAuthenticator, async (req, res) => { 
 	try {
 		const conn = getConnection();
 		let query;
@@ -51,7 +52,8 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.get('/:map_id', async (req, res) => {
+//Applying optionalAuthMiddlewear directly to route
+router.get('/:map_id', optionalAuthenticator, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -243,7 +245,7 @@ router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 	const validatorResult = validate(req.body, validMap);
 	if (!validatorResult.valid) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.status(400);
+		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
 		try {

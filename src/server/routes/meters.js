@@ -20,7 +20,7 @@ const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
+// router.use(optionalAuthenticator);
 
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
@@ -103,7 +103,9 @@ function formatMeterForResponse(meter, hasFullAccess) {
 /**
  * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
-router.get('/', async (req, res) => {
+
+//Adding optionalAuthMiddlewear directly to route
+router.get('/', optionalAuthenticator, async (req, res) => {
 	try {
 		const conn = getConnection();
 		let query;
@@ -125,7 +127,9 @@ router.get('/', async (req, res) => {
  * Prohibits access to meters that are not displayable if not logged in
  * @param {int} meter_id
  */
-router.get('/:meter_id', async (req, res) => {
+
+//Adding optionalAuthMiddlewear directly to route
+router.get('/:meter_id', optionalAuthenticator, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -321,7 +325,8 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 /**
  * Route for POST add meter.
  */
-router.post('/addMeter', async (req, res) => {
+//Added adminAuthMiddlewear to addMeter route that had nothing 
+router.post('/addMeter', requiredAdmin('add meter'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
