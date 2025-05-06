@@ -13,7 +13,7 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { selectChartToRender, updateSelectedMeters, updateThreeDMeterOrGroupInfo, updateSelectedGroups } from '../redux/slices/graphSlice';
+import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
@@ -26,48 +26,44 @@ import { labelStyle } from '../styles/modalStyle';
  * @param props - Helps differentiate between meter or group options
  * @returns A React-Select component.
  */
-export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
+export default function MeterAndGroupSelectComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
-	const { meterOrGroup } = props;
+
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
-	const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
+	// const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
 	//Combine options array into one with a type property to differentiate between meters and groups
 	const combinedOptions = [
-		...meterGroupedOptions.map(option => ({ ...option, meterOrGroup: MeterOrGroup.meters })),
-		...groupsGroupedOptions.map(option => ({ ...option, meterOrGroup: MeterOrGroup.groups }))
+		...meterGroupedOptions.map(option => ({ ...option, label: `${option.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
+		...groupsGroupedOptions.map(option => ({ ...option, label: `${option.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
 	];
-
 	//Combine the selected values into one array with a type property to differentiate between meters and groups
 	const combinedValue = [
-		...allSelectedMeterValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.meters })),
-		...allSelectedGroupValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.groups }))
+		...allSelectedMeterValues.map(value => ({ ...value,  label: `${value.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
+		...allSelectedGroupValues.map(value => ({ ...value, label: `${value.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
 	];
 	// Set the current component's appropriate meter or group SelectOption
-	const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
+	//const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
-		const newMeters = newValues.filter(option => option.meterOrGroup === MeterOrGroup.meters).map(option => option.value);
-		const newGroups = newValues.filter(option => option.meterOrGroup === MeterOrGroup.groups).map(option => option.value);
-
-		dispatch(updateSelectedMeters(newMeters));
-		dispatch(updateSelectedGroups(newGroups));
+		const newMetersOrGroups = newValues.map(option => option.value);
+		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
 	};
 
 	return (
 		<>
 			<p style={labelStyle}>
-				{translate(`${meterOrGroup}`)}:
-				<TooltipMarkerComponent page='home' helpTextId={`help.home.select.${meterOrGroup}`} />
+				{translate('meter')}:
+				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.meters'} />
 			</p>
 			<Select<SelectOption, true, GroupedOption>
 				isMulti
-				placeholder={translate(`select.${meterOrGroup}`)}
-				options={options}
-				value={value}
+				placeholder={translate('select.meter.group')}
+				options={combinedOptions}
+				value={combinedValue}
 				onChange={onChange}
 				closeMenuOnSelect={false}
 				// Customize Labeling for Grouped Labels
@@ -96,9 +92,6 @@ const formatGroupLabel = (data: GroupedOption) => {
 	);
 };
 
-interface MeterAndGroupSelectProps {
-	meterOrGroup: MeterOrGroup;
-}
 
 const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, GroupedOption>) => {
 	// Types for makeAnimated are generic, and does not offer completion, so type assert
