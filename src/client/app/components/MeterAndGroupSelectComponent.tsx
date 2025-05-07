@@ -35,16 +35,44 @@ export default function MeterAndGroupSelectComponent() {
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
 	// const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
-	//Combine options array into one with a type property to differentiate between meters and groups
+	// Merge meterGroupedOptions and groupsGroupedOptions into a single list with two categories
 	const combinedOptions = [
-		...meterGroupedOptions.map(option => ({ ...option, label: `${option.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
-		...groupsGroupedOptions.map(option => ({ ...option, label: `${option.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
-	].sort((a, b) => a.label.localeCompare(b.label));
+		{
+			label: 'Options', // Category name
+			options: [
+				// Compatible meters with "ᵐ" added to the label
+				...meterGroupedOptions.find(group => group.label === 'Meters')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᵐ`
+				})) || [],
+				// Compatible groups with "ᶢ" added to the label
+				...groupsGroupedOptions.find(group => group.label === 'Options')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᶢ`
+				})) || []
+			].sort((a, b) => a.label.localeCompare(b.label)) // Sort alphabetically by label
+		},
+		{
+			label: 'Incompatible Options',
+			options: [
+				// Incompatible meters with "ᵐ" added to the label
+				...meterGroupedOptions.find(group => group.label === 'Incompatible Meters')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᵐ`
+				})) || [],
+				// Incompatible groups with "ᶢ" added to the label
+				...groupsGroupedOptions.find(group => group.label === 'Incompatible Options')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᶢ`
+				})) || []
+			].sort((a, b) => a.label.localeCompare(b.label))
+		}
+	];
 	//Combine the selected values into one array with a type property to differentiate between meters and groups
 	const combinedValue = [
-		...allSelectedMeterValues.map(value => ({ ...value,  label: `${value.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
-		...allSelectedGroupValues.map(value => ({ ...value, label: `${value.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
-	].sort((a, b) => a.label.localeCompare(b.label));
+		...allSelectedMeterValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.meters })),
+		...allSelectedGroupValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.groups }))
+	];
 	// Set the current component's appropriate meter or group SelectOption
 	//const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
@@ -59,7 +87,7 @@ export default function MeterAndGroupSelectComponent() {
 				{translate('meter')}:
 				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.meters'} />
 			</p>
-			<Select<SelectOption, true>
+			<Select<SelectOption, true, GroupedOption>
 				isMulti
 				placeholder={translate('select.meter.group')}
 				options={combinedOptions}
@@ -67,7 +95,7 @@ export default function MeterAndGroupSelectComponent() {
 				onChange={onChange}
 				closeMenuOnSelect={false}
 				// Customize Labeling for Grouped Labels
-				//formatGroupLabel={formatGroupLabel}
+				formatGroupLabel={formatGroupLabel}
 				// Included React-Select Animations
 				components={animatedComponents}
 				styles={customStyles}
@@ -148,7 +176,7 @@ const animatedComponents = makeAnimated({
 });
 
 
-const customStyles: StylesConfig<SelectOption, true> = {
+const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 	multiValue: (base, props) => ({
 		...base,
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
