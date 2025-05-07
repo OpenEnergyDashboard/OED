@@ -39,12 +39,12 @@ export default function MeterAndGroupSelectComponent() {
 	const combinedOptions = [
 		...meterGroupedOptions.map(option => ({ ...option, label: `${option.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
 		...groupsGroupedOptions.map(option => ({ ...option, label: `${option.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
-	];
+	].sort((a, b) => a.label.localeCompare(b.label));
 	//Combine the selected values into one array with a type property to differentiate between meters and groups
 	const combinedValue = [
 		...allSelectedMeterValues.map(value => ({ ...value,  label: `${value.label} (m)`, meterOrGroup: MeterOrGroup.meters })),
 		...allSelectedGroupValues.map(value => ({ ...value, label: `${value.label} (g)`, meterOrGroup: MeterOrGroup.groups }))
-	];
+	].sort((a, b) => a.label.localeCompare(b.label));
 	// Set the current component's appropriate meter or group SelectOption
 	//const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
@@ -59,7 +59,7 @@ export default function MeterAndGroupSelectComponent() {
 				{translate('meter')}:
 				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.meters'} />
 			</p>
-			<Select<SelectOption, true, GroupedOption>
+			<Select<SelectOption, true>
 				isMulti
 				placeholder={translate('select.meter.group')}
 				options={combinedOptions}
@@ -67,7 +67,7 @@ export default function MeterAndGroupSelectComponent() {
 				onChange={onChange}
 				closeMenuOnSelect={false}
 				// Customize Labeling for Grouped Labels
-				formatGroupLabel={formatGroupLabel}
+				//formatGroupLabel={formatGroupLabel}
 				// Included React-Select Animations
 				components={animatedComponents}
 				styles={customStyles}
@@ -148,7 +148,7 @@ const animatedComponents = makeAnimated({
 });
 
 
-const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
+const customStyles: StylesConfig<SelectOption, true> = {
 	multiValue: (base, props) => ({
 		...base,
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
