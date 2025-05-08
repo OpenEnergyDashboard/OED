@@ -2,6 +2,7 @@
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*This file implements to the api/units route */
 const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
@@ -74,7 +75,7 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			note: {
 				type: 'string'
@@ -167,7 +168,7 @@ router.post('/addUnit', async (req, res) => {
 				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			note: {
 				oneOf: [
