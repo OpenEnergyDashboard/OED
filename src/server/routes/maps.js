@@ -15,7 +15,7 @@ const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 
 const router = express.Router();
-// router.use(optionalAuthenticator);
+
 
 function formatMapForResponse(map) {
 	const formattedMap = {

@@ -7,15 +7,13 @@
 const express = require('express');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
-const { adminAuthMiddleware } = require('./authenticator'); // clean import
+const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
 const LogMsg = require('../models/LogMsg');
 const { getConnection } = require('../db');
 const { TimeInterval } = require('../../common/TimeInterval');
 
 const router = express.Router();
 
-// Global protection for all routes (good practice)
-// router.use(adminAuthMiddleware('log API'));
 
 const validLog = {
 	type: 'object',
@@ -51,7 +49,7 @@ const validLogMsg = {
 }
 
 // Each route explicitly requires admin again with a specific action
-router.post('/info', adminAuthMiddleware('create info log'), async (req, res) => {
+router.post('/info', adminAuthenticator('create info log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.info(req.body.message);
@@ -62,7 +60,7 @@ router.post('/info', adminAuthMiddleware('create info log'), async (req, res) =>
 	}
 });
 
-router.post('/warn', adminAuthMiddleware('create warn log'), async (req, res) => {
+router.post('/warn', adminAuthenticator('create warn log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.warn(req.body.message);
@@ -73,7 +71,7 @@ router.post('/warn', adminAuthMiddleware('create warn log'), async (req, res) =>
 	}
 });
 
-router.post('/error', adminAuthMiddleware('create error log'), async (req, res) => {
+router.post('/error', adminAuthenticator('create error log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.error(req.body.message);
@@ -84,7 +82,7 @@ router.post('/error', adminAuthMiddleware('create error log'), async (req, res) 
 	}
 });
 
-router.get('/logsmsg/getLogsByDateRangeAndType', adminAuthMiddleware('view logs'), async (req, res) => {
+router.get('/logsmsg/getLogsByDateRangeAndType', adminAuthenticator('view logs'), async (req, res) => {
 	const validationResult = validate(req.query, validLogMsg);
 	if (!validationResult.valid) {
 		log.error('invalid request to getLogsByDateRangeAndType');

@@ -16,7 +16,6 @@ const Point = require('../models/Point');
 const { failure, success } = require('./response');
 
 const router = express.Router();
-// router.use(optionalAuthenticator);
 
 /**
  * Given a meter or group, return id, name, displayable, gps, note, area.
