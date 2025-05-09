@@ -1,10 +1,10 @@
-name: Docker-build
+name: Docker CI
 
 on:
     pull_request:
-        branches: [ development ]
+        branches: [development]
     push:
-        branches: [ development ]
+        branches: [development]
 
 jobs:
     run-docker-checks-tests:
@@ -17,17 +17,33 @@ jobs:
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
 
+            # (Optional) if you need psql client on the runner
             - name: Install PostgreSQL Client
               run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
-            - name: Build and start containers
+            - name: Build & start containers
               run: |
+                  docker compose -f docker-compose.ci.yml build
                   docker compose -f docker-compose.ci.yml up -d
+
+            - name: Wait for DB & Web to be healthy
+              run: docker compose -f docker-compose.ci.yml ps
 
             - name: Install dependencies inside the web container
               run: |
-                  docker compose run web sh -c "npm install"
+                  docker compose -f docker-compose.ci.yml run --rm web \
+                    sh -c "npm ci"
 
-            - name: Run tests inside the web container
+            - name: Run lint & type checks
               run: |
-                  docker compose exec web sh -c "npm run test"
+                  docker compose -f docker-compose.ci.yml run --rm web \
+                    sh -c "npm run check:header && npm run check:typescript && npm run check:types && npm run check:lint"
+
+            - name: Run unit & integration tests
+              run: |
+                  docker compose -f docker-compose.ci.yml run --rm web \
+                    sh -c "npm test"
+
+            - name: Tear down
+              if: always()
+              run: docker compose -f docker-compose.ci.yml down -v
