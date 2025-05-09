@@ -30,4 +30,8 @@ jobs:
 
             - name: Run tests inside the web container
               run: |
+                  docker compose exec web sh -c "npm run check:header"
+                  docker compose exec web sh -c "npm run check:typescript"
+                  docker compose exec web sh -c "npm run check:types"
+                  docker compose exec web sh -c "npm run check:lint"
                   docker compose exec web sh -c "npm run test"
