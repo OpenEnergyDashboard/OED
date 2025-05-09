@@ -1,0 +1,33 @@
+name: Docker-build
+
+on:
+    pull_request:
+        branches: [ development ]
+    push:
+        branches: [ development ]
+
+jobs:
+    run-docker-checks-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out repository code
+              uses: actions/checkout@v3
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v2
+
+            - name: Install PostgreSQL Client
+              run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+            - name: Build and start containers
+              run: |
+                  sudo docker compose -f docker-compose.ci.yml up
+
+            - name: Install dependencies inside the web container
+              run: |
+                  sudo docker compose run web sh -c "npm install"
+
+            - name: Run tests inside the web container
+              run: |
+                  sudo docker compose exec web sh -c "npm run test"
