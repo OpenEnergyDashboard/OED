@@ -23,7 +23,6 @@ import { labelStyle } from '../styles/modalStyle';
 
 /**
  * Creates a React-Select component for the UI Options Panel.
- * @param props - Helps differentiate between meter or group options
  * @returns A React-Select component.
  */
 export default function MeterAndGroupSelectComponent() {
