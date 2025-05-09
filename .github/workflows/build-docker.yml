@@ -22,12 +22,12 @@ jobs:
 
             - name: Build and start containers
               run: |
-                  sudo docker compose -f docker-compose.ci.yml up
+                  docker compose -f docker-compose.ci.yml up -d
 
             - name: Install dependencies inside the web container
               run: |
-                  sudo docker compose run web sh -c "npm install"
+                  docker compose run web sh -c "npm install"
 
             - name: Run tests inside the web container
               run: |
-                  sudo docker compose exec web sh -c "npm run test"
+                  docker compose exec web sh -c "npm run test"
