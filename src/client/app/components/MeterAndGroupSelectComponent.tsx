@@ -42,12 +42,12 @@ export default function MeterAndGroupSelectComponent() {
 				// Compatible meters with "ᵐ" added to the label
 				...meterGroupedOptions.find(group => group.label === 'Meters')?.options.map(option => ({
 					...option,
-					label: `${option.label}ᵐ`
+					label: `${option.label}ᴹ`
 				})) || [],
 				// Compatible groups with "ᶢ" added to the label
 				...groupsGroupedOptions.find(group => group.label === 'Options')?.options.map(option => ({
 					...option,
-					label: `${option.label}ᶢ`
+					label: `${option.label}ᴳ`
 				})) || []
 			].sort((a, b) => a.label.localeCompare(b.label)) // Sort alphabetically by label
 		},
@@ -57,12 +57,12 @@ export default function MeterAndGroupSelectComponent() {
 				// Incompatible meters with "ᵐ" added to the label
 				...meterGroupedOptions.find(group => group.label === 'Incompatible Meters')?.options.map(option => ({
 					...option,
-					label: `${option.label}ᵐ`
+					label: `${option.label}ᴹ`
 				})) || [],
 				// Incompatible groups with "ᶢ" added to the label
 				...groupsGroupedOptions.find(group => group.label === 'Incompatible Options')?.options.map(option => ({
 					...option,
-					label: `${option.label}ᶢ`
+					label: `${option.label}ᴳ`
 				})) || []
 			].sort((a, b) => a.label.localeCompare(b.label))
 		}
