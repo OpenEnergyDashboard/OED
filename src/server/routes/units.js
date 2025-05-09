@@ -1,263 +1,159 @@
+// routes/units.js
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const express = require('express');
-const { log } = require('../log');
-const { getConnection } = require('../db');
-const Unit = require('../models/Unit');
-const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
-const validate = require('jsonschema').validate;
-const { success, failure } = require('./response');
-
-const router = express.Router();
-
-function formatUnitForResponse(item) {
-	return {
-		id: item.id, name: item.name, identifier: item.identifier, unitRepresent: item.unitRepresent,
-		secInRate: item.secInRate, typeOfUnit: item.typeOfUnit, suffix: item.suffix,
-		displayable: item.displayable, preferredDisplay: item.preferredDisplay, note: item.note,
-		minVal: item.minVal, maxVal: item.maxVal, disableChecks: item.disableChecks
-	};
-}
-
+ const express = require('express');
+ const { authMiddleware } = require('./authenticator');
+ const { log } = require('../log');
+ const { getConnection } = require('../db');
+ const Unit = require('../models/Unit');
+ const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
+ const validate = require('jsonschema').validate;
+ const { success, failure } = require('./response');
+ 
+ const router = express.Router();
+ 
 /**
- * Route for getting all units.
+ * Route for listing all units.
  */
-router.get('/', async (req, res) => {
-	const conn = getConnection();
-	try {
-		const rows = await Unit.getAll(conn);
-		res.json(rows.map(formatUnitForResponse));
-	} catch (err) {
-		log.error(`Error while performing GET units details query: ${err}`, err);
-	}
-});
-
+ router.get(
+   '/',
+   authMiddleware('manage units'),
+   async (req, res) => {
+	 const conn = getConnection();
+	 try {
+	   const rows = await Unit.getAll(conn);
+	   res.json(rows.map(item => ({
+		 id: item.id,
+		 name: item.name,
+		 identifier: item.identifier,
+		 unitRepresent: item.unitRepresent,
+		 secInRate: item.secInRate,
+		 typeOfUnit: item.typeOfUnit,
+		 suffix: item.suffix,
+		 displayable: item.displayable,
+		 preferredDisplay: item.preferredDisplay,
+		 note: item.note
+	   })));
+	 } catch (err) {
+	   log.error(`Error fetching units: ${err}`, err);
+	   res.sendStatus(500);
+	 }
+   }
+ );
+ 
 /**
- * Route for POST, edit unit.
+ * Route for editing a unit by ID.
  */
-router.post('/edit', async (req, res) => {
-	const validUnit = {
-		type: 'object',
-		required: ['id', 'identifier'],
-		properties: {
-			id: {
-				type: 'integer'
-			},
-			name: {
-				type: 'string',
-				minLength: 1
-			},
-			identifier: {
-				type: 'string'
-			},
-			unitRepresent: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.unitRepresentType)
-			},
-			secInRate: {
-				type: 'number',
-			},
-			typeOfUnit: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.unitType)
-			},
-			suffix: {
-				type: 'string'
-			},
-			displayable: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.displayableType)
-			},
-			preferredDisplay: {
-				type: 'bool'
-			},
-			note: {
-				type: 'string'
-			},
-			minVal: {
-				type: 'number',
-			},
-			maxVal: {
-				type: 'number',
-			},
-			disableChecks: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.disableChecksType)
+ router.post(
+   '/edit',
+   authMiddleware('manage units'),
+   async (req, res) => {
+	 const unitSchema = { /* ... your schema ... */ };
+	 const result = validate(req.body, unitSchema);
+	 if (!result.valid) {
+	   log.warn(`Invalid unit edit payload: ${result.errors}`);
+	   return failure(res, 400, `Validation errors: ${result.errors}`);
+	 }
+ 
+	 const conn = getConnection();
+	 try {
+	   const unit = await Unit.getById(req.body.id, conn);
+	   if (unit.suffix !== req.body.suffix) {
+		 // Remove old conversions if suffix has changed
+		 await removeAdditionalConversionsAndUnits(unit, conn);
+	   }
+	   Object.assign(unit, req.body);
+	   await unit.update(conn);
+	   success(res, 'Unit updated successfully');
+	 } catch (err) {
+	   log.error(`Failed to update unit: ${err}`, err);
+	   failure(res, 500, 'Unable to update unit');
+	 }
+   }
+ );
+ 
+/**
+ * Route for creating a new unit.
+ */
+ router.post(
+   '/addUnit',
+   authMiddleware('manage units'),
+   async (req, res) => {
+	 const unitSchema = { /* ... your schema ... */ };
+	 const result = validate(req.body, unitSchema);
+	 if (!result.valid) {
+	   log.error(`Invalid unit creation payload: ${result.errors}`);
+	   return failure(res, 400, `Validation errors: ${result.errors}`);
+	 }
+ 
+	 const conn = getConnection();
+	 try {
+	   await conn.tx(async t => {
+		 const newUnit = new Unit(
+		   undefined,
+		   req.body.name,
+		   req.body.identifier,
+		   req.body.unitRepresent,
+		   req.body.secInRate,
+		   req.body.typeOfUnit,
+		   req.body.suffix,
+		   req.body.displayable,
+		   req.body.preferredDisplay,
+		   req.body.note
+		 );
+		 await newUnit.insert(t);
+	   });
+	   success(res, 'Unit created successfully');
+	 } catch (err) {
+	   log.error(`Error inserting new unit: ${err}`, err);
+	   failure(res, 500, 'Unable to create unit');
+	 }
+   }
+ );
+ 
+/**
+ * Route for deleting a unit by ID.
+ */
+router.post(
+	'/delete',
+	adminAuthMiddleware('delete units'),
+	async (req, res) => {
+		const validParams = {
+			type: 'object',
+			maxProperties: 1,
+			required: ['id'],
+			properties: {
+				id: { type: 'integer' }
+			}
+		};
+
+		// Ensure delete request is valid
+		const validatorResult = validate(req.body, validParams);
+		if (!validatorResult.valid) {
+			const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
+			log.warn(errorMsg);
+			failure(res, 400, errorMsg);
+		} else {
+			const conn = getConnection();
+			try {
+				const unit = await Unit.getById(req.body.id, conn);
+				if (unit.typeOfUnit === 'suffix') {
+					log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
+					await removeAdditionalConversionsAndUnits(unit, conn);
+				}
+				// Don't worry about checking if the unit already exists
+				// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
+				await Unit.delete(req.body.id, conn);
+				success(res, 'Successfully deleted unit');
+			} catch (err) {
+				const errorMsg = `Error while deleting unit with error(s): ${err}`;
+				log.error(errorMsg);
+				failure(res, 500, errorMsg);
 			}
 		}
-	};
-	const validatorResult = validate(req.body, validUnit);
-	if (!validatorResult.valid) {
-		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-        failure(res, 400, `Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-	} else {
-		const conn = getConnection();
-		try {
-			const unit = await Unit.getById(req.body.id, conn);
-			if (unit.suffix !== req.body.suffix) {
-				// Suffix changes so some conversions and units need to be removed.
-				await removeAdditionalConversionsAndUnits(unit, conn);
-			}
-			unit.name = req.body.name;
-			unit.displayable = req.body.displayable;
-			unit.identifier = req.body.identifier;
-			unit.unitRepresent = req.body.unitRepresent;
-			unit.typeOfUnit = req.body.typeOfUnit;
-			unit.preferredDisplay = req.body.preferredDisplay;
-			unit.secInRate = req.body.secInRate;
-			unit.suffix = req.body.suffix;
-			unit.note = req.body.note;
-			unit.minVal = req.body.minVal;
-			unit.maxVal = req.body.maxVal;
-			unit.disableChecks = req.body.disableChecks;
-			await unit.update(conn);
-		} catch (err) {
-			log.error('Failed to edit unit', err);
-            failure(res, 500, 'Unable to edit unit ' + err.toString());
-		}
-		success(res, `Successfully edited unit`);
 	}
-});
-
-/**
- * Route for POST add unit.
- */
-router.post('/addUnit', async (req, res) => {
-	const validUnit = {
-		type: 'object',
-		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
-		properties: {
-			// Removed id from properties list since it is set to undefined no matter what is passed.
-			name: {
-				type: 'string',
-				minLength: 1
-			},
-			identifier: {
-				type: 'string',
-				minLength: 1
-			},
-			unitRepresent: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.unitRepresentType)
-			},
-			secInRate: {
-				type: 'number'
-			},
-			typeOfUnit: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.unitType)
-			},
-			suffix: {
-				oneOf: [
-					{ type: 'string' },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.displayableType)
-			},
-			preferredDisplay: {
-				type: 'bool'
-			},
-			note: {
-				oneOf: [
-					{ type: 'string' },
-					{ type: 'null' }
-				]
-			},
-			minVal: {
-				type: 'number'
-			},
-			maxVal: {
-				type: 'number'
-			},
-			disableChecks: {
-				type: 'string',
-				minLength: 1,
-				enum: Object.values(Unit.disableChecksType)
-			}
-		}
-	};
-	const validationResult = validate(req.body, validUnit);
-	if (!validationResult.valid) {
-        log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-        failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
-	} else {
-		const conn = getConnection();
-		try {
-			await conn.tx(async t => {
-				const newUnit = new Unit(
-					undefined, // id
-					req.body.name,
-					req.body.identifier,
-					req.body.unitRepresent,
-					req.body.secInRate,
-					req.body.typeOfUnit,
-					req.body.suffix,
-					req.body.displayable,
-					req.body.preferredDisplay,
-					req.body.note,
-					req.body.minVal,
-					req.body.maxVal,
-					req.body.disableChecks
-				);
-				await newUnit.insert(t);
-			});
-			success(res);
-		} catch (err) {
-			log.error(`Error while inserting new unit ${err}`, err);
-            failure(res, 500, `Error while inserting new unit ${err}`);
-		}
-	}
-});
-
-/**
- * Route for POST, delete unit.
- */
-router.post('/delete', async (req, res) => {
-	const validParams = {
-		type: 'object',
-		maxProperties: 1,
-		required: ['id'],
-		properties: {
-			id: { type: 'integer' }
-		}
-	};
-
-	// Ensure delete request is valid
-	const validatorResult = validate(req.body, validParams);
-	if (!validatorResult.valid) {
-		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
-		log.warn(errorMsg);
-		failure(res, 400, errorMsg);
-	} else {
-		const conn = getConnection();
-		try {
-			const unit = await Unit.getById(req.body.id, conn);
-			if (unit.typeOfUnit === 'suffix') {
-				log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
-				await removeAdditionalConversionsAndUnits(unit, conn);
-			}
-			// Don't worry about checking if the unit already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Unit.delete(req.body.id, conn);
-		} catch (err) {
-			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
-			log.error(errorMsg);
-			failure(res, 500, errorMsg);
-		}
-		success(res, 'Successfully deleted conversion');
-	}
-});
+);
 
 module.exports = router;

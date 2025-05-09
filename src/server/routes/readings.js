@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
+const { authMiddleware } = require('./authenticator');
 const moment = require('moment');
 const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
@@ -13,7 +14,10 @@ const { getConnection } = require('../db');
 
 const router = express.Router();
 
-router.get('/line/count/meters/:meter_ids', async (req, res) => {
+/**
+ * Route for fetching readings count by meter IDs and time interval.
+ */
+router.get('/line/count/meters/:meter_ids', authMiddleware('view readings'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -54,7 +58,10 @@ router.get('/line/count/meters/:meter_ids', async (req, res) => {
 	}
 })
 
-router.get('/line/raw/meter/:meter_id', async (req, res) => {
+/**
+ * Route for fetching raw readings by meter ID and time interval.
+ */
+router.get('/line/raw/meter/:meter_id', authMiddleware('view readings'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
