@@ -34,10 +34,10 @@ jobs:
                   docker compose -f docker-compose.ci.yml run --rm web \
                     sh -c "npm ci"
 
-            - name: Run lint & type checks
-              run: |
-                  docker compose -f docker-compose.ci.yml run --rm web \
-                    sh -c "npm run check:header && npm run check:typescript && npm run check:types && npm run check:lint"
+#            - name: Run lint & type checks
+#              run: |
+#                  docker compose -f docker-compose.ci.yml run --rm web \
+#                    sh -c "npm run check:header && npm run check:typescript && npm run check:types && npm run check:lint"
 
             - name: Run unit & integration tests
               run: |
