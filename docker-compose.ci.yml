@@ -13,7 +13,10 @@ services:
         environment:
             # Custom PGDATA per recommendations from official Docker page
             PGDATA: /var/lib/postgresql/data/pgdata
-            POSTGRES_PASSWORD: ${OED_DB_PASSWORD} # default postgres password that should be changed for security.
+            POSTGRES_USER: ${OED_DB_USER}
+            POSTGRES_PASSWORD: ${OED_DB_PASSWORD}
+            # Create the “test” database that your tests actually target
+            POSTGRES_DB: ${OED_DB_TEST_DATABASE}
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
         healthcheck:

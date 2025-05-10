@@ -20,12 +20,12 @@ jobs:
             - name: Create .env file for Docker Compose
               run: |
                   cat <<EOF > .env
+                  OED_SERVER_PORT=${{ secrets.OED_SERVER_PORT }}
+                  OED_DB_USER=${{ secrets.OED_DB_USER }}
                   OED_DB_DATABASE=${{ secrets.OED_DB_DATABASE }}
+                  OED_DB_TEST_DATABASE=${{ secrets.OED_DB_TEST_DATABASE }}
                   OED_DB_PASSWORD=${{ secrets.OED_DB_PASSWORD }}
                   OED_DB_PORT=${{ secrets.OED_DB_PORT }}
-                  OED_DB_TEST_DATABASE=${{ secrets.OED_DB_TEST_DATABASE }}
-                  OED_DB_USER=${{ secrets.OED_DB_USER }}
-                  OED_SERVER_PORT=${{ secrets.OED_SERVER_PORT }}
                   OED_TOKEN_SECRET=${{ secrets.OED_TOKEN_SECRET }}
                   EOF
 
