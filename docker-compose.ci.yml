@@ -29,7 +29,7 @@ services:
     web:
         # Configuration variables for the app.
         environment:
-            OED_PRODUCTION: "no"
+            OED_PRODUCTION: "yes"
             OED_SERVER_PORT: ${OED_SERVER_PORT}
             OED_DB_USER: ${OED_DB_USER}
             OED_DB_DATABASE: ${OED_DB_DATABASE}
