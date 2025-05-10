@@ -14,9 +14,6 @@ services:
             # Custom PGDATA per recommendations from official Docker page
             PGDATA: /var/lib/postgresql/data/pgdata
             POSTGRES_USER: ${OED_DB_USER}
-            POSTGRES_PASSWORD: ${OED_DB_PASSWORD}
-            # Create the “test” database that your tests actually target
-            POSTGRES_DB: ${OED_DB_TEST_DATABASE}
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
         healthcheck:
@@ -32,7 +29,7 @@ services:
     web:
         # Configuration variables for the app.
         environment:
-            OED_PRODUCTION: "yes"
+            OED_PRODUCTION: "no"
             OED_SERVER_PORT: ${OED_SERVER_PORT}
             OED_DB_USER: ${OED_DB_USER}
             OED_DB_DATABASE: ${OED_DB_DATABASE}
