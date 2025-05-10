@@ -18,7 +18,7 @@ jobs:
       OED_TOKEN_SECRET: ${{ secrets.OED_TOKEN_SECRET }}
       OED_SERVER_PORT: ${{ secrets.OED_SERVER_PORT }}
       OED_TEST_SITE_READING_RATE: ${{ secrets.OED_TEST_SITE_READING_RATE }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
