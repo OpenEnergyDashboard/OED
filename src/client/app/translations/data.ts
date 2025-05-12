@@ -136,6 +136,7 @@ const LocaleTranslationData = {
 		"csvReadings": "CSV Readings",
 		"custom.date.range": "Custom date range",
 		"custom.value": "Custom value",
+		"data.sources": "Data Sources",
 		"date.range": 'Date Range',
 		"day": "Day",
 		"days": "Days",

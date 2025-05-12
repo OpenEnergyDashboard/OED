@@ -13,8 +13,10 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { selectChartToRender, selectSelectedUnit, updateSelectedMeters, updateThreeDMeterOrGroupInfo,
-	updateSelectedGroups, updateSelectedUnit} from '../redux/slices/graphSlice';
+import {
+	selectChartToRender, selectSelectedUnit, updateSelectedMeters, updateThreeDMeterOrGroupInfo,
+	updateSelectedGroups, updateSelectedUnit
+} from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
@@ -94,7 +96,7 @@ export default function MeterAndGroupSelectComponent() {
 	return (
 		<>
 			<p style={labelStyle}>
-				{translate('meter')}:
+				{translate('data.sources')}:
 				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.meters'} />
 			</p>
 			<Select<SelectOption, true, GroupedOption>

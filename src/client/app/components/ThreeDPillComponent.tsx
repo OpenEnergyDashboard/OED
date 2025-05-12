@@ -104,7 +104,7 @@ export default function ThreeDPillComponent() {
 		<div style={pillContainer}>
 			{combinedPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>{translate('meters')}</p>
+					<p style={pillBoxLabel}>{translate('data.sources')}</p>
 					<div style={pills}>
 						{populatePills(combinedPillData)}
 					</div>
