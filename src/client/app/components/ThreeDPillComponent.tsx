@@ -43,10 +43,11 @@ export default function ThreeDPillComponent() {
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
 	});
 
+	// Merge meters and groups into one array
+	const combinedPillData = [...meterPillData, ...groupPillData];
+
 	// when there is only one choice, it must be selected as a default (there is no other option)
 	useEffect(() => {
-		const combinedPillData = [...meterPillData, ...groupPillData];
-
 		if (combinedPillData.length === 1) {
 			const singlePill = combinedPillData[0];
 			dispatch(updateThreeDMeterOrGroupInfo({
@@ -54,7 +55,7 @@ export default function ThreeDPillComponent() {
 				meterOrGroup: singlePill.meterOrGroup
 			}));
 		}
-	}, [meterPillData, groupPillData]);
+	}, [combinedPillData, dispatch]);
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(
@@ -65,13 +66,12 @@ export default function ThreeDPillComponent() {
 	);
 
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
-	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
-		return meterOrGroupPillData.map(pillData => {
+	const populatePills = (pillDataArray: MeterOrGroupPill[]) => {
+		return pillDataArray.map(pillData => {
 			// retrieve data from appropriate state slice .meters or .group
-			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[pillData.meterOrGroupID]?.identifier
-				:
-				groupDataById[pillData.meterOrGroupID]?.name;
+			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters
+				? meterDataById[pillData.meterOrGroupID]?.identifier
+				: groupDataById[pillData.meterOrGroupID]?.name;
 
 			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;
@@ -93,27 +93,20 @@ export default function ThreeDPillComponent() {
 					color={pillData.isDisabled && !isCurrentlySelected ? 'dark' : colorToRender}
 					style={pill}
 					onClick={() => handlePillClick(pillData)}
-				>{meterOrGroupName}</Badge>
+				>
+					{meterOrGroupName}
+				</Badge>
 			);
 		});
 	};
 
 	return (
 		<div style={pillContainer}>
-			{meterPillData.length > 0 &&
+			{combinedPillData.length > 0 &&
 				<div style={pillBox}>
 					<p style={pillBoxLabel}>{translate('meters')}</p>
 					<div style={pills}>
-						{populatePills(meterPillData)}
-					</div>
-				</div>
-			}
-
-			{groupPillData.length > 0 &&
-				<div style={pillBox}>
-					<p style={pillBoxLabel}>{translate('groups')}</p>
-					<div style={pills} >
-						{populatePills(groupPillData)}
+						{populatePills(combinedPillData)}
 					</div>
 				</div>
 			}

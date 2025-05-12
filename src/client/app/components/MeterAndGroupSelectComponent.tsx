@@ -13,7 +13,8 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo, updateSelectedGroups, updateSelectedMeters } from '../redux/slices/graphSlice';
+import { selectChartToRender, selectSelectedUnit, updateSelectedMeters, updateThreeDMeterOrGroupInfo,
+	updateSelectedGroups, updateSelectedUnit} from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
@@ -29,6 +30,7 @@ export default function MeterAndGroupSelectComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
+	const selectedUnit = useAppSelector(selectSelectedUnit);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
 
 	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
@@ -81,9 +83,12 @@ export default function MeterAndGroupSelectComponent() {
 
 		dispatch(updateSelectedMeters(newMeters));
 		dispatch(updateSelectedGroups(newGroups));
-		//const newMetersOrGroups = newValues.map(option => option.value);
-		//console.log(meta);
-		//dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
+		console.log(meta);
+		const lastAdded = newValues[newValues.length - 1];
+		if (lastAdded && selectedUnit === -99 && lastAdded.defaultGraphicUnit) {
+			dispatch(updateSelectedUnit(lastAdded.defaultGraphicUnit));
+		}
+
 	};
 
 	return (
