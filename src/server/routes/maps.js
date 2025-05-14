@@ -245,7 +245,7 @@ router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 	const validatorResult = validate(req.body, validMap);
 	if (!validatorResult.valid) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.sendStatus(400);
+		res.status(400);
 	} else {
 		const conn = getConnection();
 		try {

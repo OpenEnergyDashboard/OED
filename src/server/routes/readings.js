@@ -17,7 +17,7 @@ const router = express.Router();
 /**
  * Route for fetching readings count by meter IDs and time interval.
  */
-router.get('/line/count/meters/:meter_ids', authMiddleware('view readings'), async (req, res) => {
+router.get('/line/count/meters/:meter_ids', authMiddleware('reading count by meter IDs'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -61,7 +61,7 @@ router.get('/line/count/meters/:meter_ids', authMiddleware('view readings'), asy
 /**
  * Route for fetching raw readings by meter ID and time interval.
  */
-router.get('/line/raw/meter/:meter_id', authMiddleware('view readings'), async (req, res) => {
+router.get('/line/raw/meter/:meter_id', authMiddleware('reading raw by meter ID'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

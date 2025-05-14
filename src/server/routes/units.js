@@ -48,7 +48,7 @@
  */
  router.post(
    '/edit',
-   authMiddleware('manage units'),
+   authMiddleware('make changes to a unit'),
    async (req, res) => {
 	 const unitSchema = { /* ... your schema ... */ };
 	 const result = validate(req.body, unitSchema);
@@ -79,7 +79,7 @@
  */
  router.post(
    '/addUnit',
-   authMiddleware('manage units'),
+   authMiddleware('add a new unit'),
    async (req, res) => {
 	 const unitSchema = { /* ... your schema ... */ };
 	 const result = validate(req.body, unitSchema);
@@ -118,40 +118,31 @@
  */
 router.post(
 	'/delete',
-	adminAuthMiddleware('delete units'),
+	authMiddleware('removes a certain unit'),
 	async (req, res) => {
-		const validParams = {
+		const paramsSchema = {
 			type: 'object',
-			maxProperties: 1,
 			required: ['id'],
-			properties: {
-				id: { type: 'integer' }
-			}
+			properties: { id: { type: 'integer' } }
 		};
+		const result = validate(req.body, paramsSchema);
+		if (!result.valid) {
+			log.warn(`Invalid delete-unit payload: ${result.errors}`);
+			return failure(res, 400, `Validation errors: ${result.errors}`);
+		}
 
-		// Ensure delete request is valid
-		const validatorResult = validate(req.body, validParams);
-		if (!validatorResult.valid) {
-			const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
-			log.warn(errorMsg);
-			failure(res, 400, errorMsg);
-		} else {
-			const conn = getConnection();
-			try {
-				const unit = await Unit.getById(req.body.id, conn);
-				if (unit.typeOfUnit === 'suffix') {
-					log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
-					await removeAdditionalConversionsAndUnits(unit, conn);
-				}
-				// Don't worry about checking if the unit already exists
-				// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-				await Unit.delete(req.body.id, conn);
-				success(res, 'Successfully deleted unit');
-			} catch (err) {
-				const errorMsg = `Error while deleting unit with error(s): ${err}`;
-				log.error(errorMsg);
-				failure(res, 500, errorMsg);
+		const conn = getConnection();
+		try {
+			const unit = await Unit.getById(req.body.id, conn);
+			if (unit.typeOfUnit === 'suffix') {
+				log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
+				await removeAdditionalConversionsAndUnits(unit, conn);
 			}
+			await Unit.delete(req.body.id, conn);
+			success(res, 'Unit deleted successfully');
+		} catch (err) {
+			log.error(`Error deleting unit: ${err}`, err);
+			failure(res, 500, 'Unable to delete unit');
 		}
 	}
 );

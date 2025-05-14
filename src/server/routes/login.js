@@ -2,24 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
- const express = require('express');
- const bcrypt = require('bcryptjs');
- const jwt = require('jsonwebtoken');
- const User = require('../models/User');
- const secretToken = require('../config').secretToken;
- const validate = require('jsonschema').validate;
- const { log } = require('../log');
- const { getConnection } = require('../db');
- const { credentialsRequestValidationMiddleware } = require('./authenticator');
- 
- const router = express.Router();
- 
- /**
-  * Authenticate users and return a JSON Web Token with their user ID.
-  * @param {String} username
-  * @param {String} password
-  */
- router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const secretToken = require('../config').secretToken;
+const validate = require('jsonschema').validate;
+const { log } = require('../log');
+const { getConnection } = require('../db');
+const { credentialsRequestValidationMiddleware } = require('./authenticator');
+
+const router = express.Router();
+
+/**
+ * Authenticate users and return a JSON Web Token with their user ID.
+ * @param {String} username
+ * @param {String} Password
+ */
+router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 2,
@@ -67,6 +67,5 @@
 		}
 	}
 });
- 
- module.exports = router;
- 
+
+module.exports = router;
