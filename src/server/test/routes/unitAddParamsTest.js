@@ -1,5 +1,5 @@
 const { chai, mocha, app, testDB, recreateDB } = require('../common');
-const { generateValidationTests } = require('../util/unitTestUtils');
+const { generateUnitValidationTests } = require('../util/unitTestUtils');
 const Unit = require('../../models/Unit');
 const { validateString, validateInt, validateBool } = require('../util/vaidationHelpers')
 const ADD_UNIT = '/api/units/addUnit';
@@ -10,7 +10,7 @@ mocha.describe('Unit Routes - /addUnit Validation', () => {
         await recreateDB(conn);
     });
 
-    generateValidationTests({
+    generateUnitValidationTests({
         app,
         endpoint: ADD_UNIT,
         Unit,
