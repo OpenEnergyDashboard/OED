@@ -140,12 +140,12 @@ export const graphSlice = createSlice({
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
+		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
 			if (state.current.threeD.meterOrGroup !== action.payload) {
 				state.current.threeD.meterOrGroup = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup | undefined }>) => {
 			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
 			updateThreeDMeterOrGroupID(state, graphSlice.actions.updateThreeDMeterOrGroupID(action.payload.meterOrGroupID));
 			updateThreeDMeterOrGroup(state, graphSlice.actions.updateThreeDMeterOrGroup(action.payload.meterOrGroup));

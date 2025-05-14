@@ -46,14 +46,21 @@ export default function ThreeDPillComponent() {
 	// Merge meters and groups into one array
 	const combinedPillData = [...meterPillData, ...groupPillData];
 
-	// when there is only one choice, it must be selected as a default (there is no other option)
 	useEffect(() => {
+		// If only one item is selected, auto-select it
 		if (combinedPillData.length === 1) {
 			const singlePill = combinedPillData[0];
 			dispatch(updateThreeDMeterOrGroupInfo({
 				meterOrGroupID: singlePill.meterOrGroupID,
 				meterOrGroup: singlePill.meterOrGroup
 			}));
+		}
+		// If the current 3D selection is no longer present, clear it
+		const stillExists = combinedPillData.some(
+			pill => pill.meterOrGroupID === threeDState.meterOrGroupID && pill.meterOrGroup === threeDState.meterOrGroup
+		);
+		if (!stillExists && (threeDState.meterOrGroupID !== undefined)) {
+			dispatch(updateThreeDMeterOrGroupInfo({ meterOrGroupID: undefined, meterOrGroup: undefined }));
 		}
 	}, [combinedPillData, dispatch]);
 
