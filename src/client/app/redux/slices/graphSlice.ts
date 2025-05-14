@@ -22,6 +22,7 @@ const defaultState: GraphState = {
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
 	initialXAxisRange: TimeInterval.unbounded(),
+	lastAddedMeterOrGroup: undefined,
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	duration: moment.duration(4, 'weeks'),
@@ -139,6 +140,10 @@ export const graphSlice = createSlice({
 			if (state.current.threeD.meterOrGroupID !== action.payload) {
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
+		},
+		// Added here because it is used to easily track if the last added was meter or group, which then used to select which is active in threeD
+		setLastAddedMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
+			state.current.lastAddedMeterOrGroup = action.payload;
 		},
 		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
 			if (state.current.threeD.meterOrGroup !== action.payload) {
@@ -362,8 +367,9 @@ export const {
 	setAreaNormalization, updateSelectedGroups,
 	resetRangeSliderStack, updateSelectedAreaUnit,
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
-	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
-	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateShiftAmount, updateShiftTimeInterval
+	setLastAddedMeterOrGroup, changeCompareSortingOrder,
+	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
+	updateThreeDMeterOrGroupInfo, updateShiftAmount,
+	updateShiftTimeInterval
 } = graphSlice.actions;
 

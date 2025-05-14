@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import {
 	selectChartToRender, selectSelectedUnit, updateSelectedMeters, updateThreeDMeterOrGroupInfo,
-	updateSelectedGroups, updateSelectedUnit
+	updateSelectedGroups, updateSelectedUnit, setLastAddedMeterOrGroup
 } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
@@ -86,6 +86,10 @@ export default function MeterAndGroupSelectComponent() {
 		dispatch(updateSelectedMeters(newMeters));
 		dispatch(updateSelectedGroups(newGroups));
 		console.log(meta);
+		// Track last added type
+		if (meta.action === 'select-option' && meta.option) {
+			dispatch(setLastAddedMeterOrGroup(meta.option.meterOrGroup));
+		}
 		const lastAdded = newValues[newValues.length - 1];
 		if (lastAdded && selectedUnit === -99 && lastAdded.defaultGraphicUnit) {
 			dispatch(updateSelectedUnit(lastAdded.defaultGraphicUnit));

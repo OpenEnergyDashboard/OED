@@ -72,6 +72,7 @@ export interface GraphState {
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
 	initialXAxisRange: TimeInterval;
+	lastAddedMeterOrGroup: MeterOrGroup | undefined;
 	rangeSliderInterval: TimeInterval;
 	duration: moment.Duration;
 	comparePeriod: ComparePeriod;

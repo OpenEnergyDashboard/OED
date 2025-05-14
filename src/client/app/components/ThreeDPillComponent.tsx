@@ -45,7 +45,10 @@ export default function ThreeDPillComponent() {
 
 	// Merge meters and groups into one array
 	const combinedPillData = [...meterPillData, ...groupPillData];
-
+	// Track length of combinedPillData to determine if a new pill was added
+	const prevLengthRef = React.useRef(combinedPillData.length);
+	// Anonymous selector to get the last added is a meter or group
+	const lastAddedType = useAppSelector(state => state.graph.current.lastAddedMeterOrGroup);
 	useEffect(() => {
 		// If only one item is selected, auto-select it
 		if (combinedPillData.length === 1) {
@@ -62,6 +65,25 @@ export default function ThreeDPillComponent() {
 		if (!stillExists && (threeDState.meterOrGroupID !== undefined)) {
 			dispatch(updateThreeDMeterOrGroupInfo({ meterOrGroupID: undefined, meterOrGroup: undefined }));
 		}
+		// Auto-select new item on 3D chart if a new pill was added
+		if (
+			combinedPillData.length > prevLengthRef.current &&
+			lastAddedType
+		) {
+			let lastAdded;
+			if (lastAddedType === MeterOrGroup.meters && meterPillData.length > 0) {
+				lastAdded = meterPillData[meterPillData.length - 1];
+			} else if (lastAddedType === MeterOrGroup.groups) {
+				lastAdded = groupPillData[groupPillData.length - 1];
+			}
+			if (lastAdded) {
+				dispatch(updateThreeDMeterOrGroupInfo({
+					meterOrGroupID: lastAdded.meterOrGroupID,
+					meterOrGroup: lastAdded.meterOrGroup
+				}));
+			}
+		}
+		prevLengthRef.current = combinedPillData.length;
 	}, [combinedPillData, dispatch]);
 
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
