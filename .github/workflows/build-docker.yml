@@ -2,9 +2,9 @@ name: Build Docker
 
 on:
     pull_request:
-        branches: [development]
+        branches: [ development ]
     push:
-        branches: [development]
+        branches: [ development ]
 
 jobs:
     run-docker-checks-tests:
@@ -34,13 +34,8 @@ jobs:
                   docker compose -f docker-compose.ci.yml build
                   docker compose -f docker-compose.ci.yml up -d
 
-            - name: Wait for DB & Web to be healthy
+            - name: Wait for database to be healthy
               run: docker compose -f docker-compose.ci.yml ps
-
-            - name: Install dependencies inside the web container
-              run: |
-                  docker compose -f docker-compose.ci.yml run --rm web \
-                    sh -c "npm ci"
 
 #            - name: Run lint & type checks
 #              run: |
