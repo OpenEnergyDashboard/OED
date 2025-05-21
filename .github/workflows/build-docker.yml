@@ -45,7 +45,7 @@ jobs:
             - name: Run unit & integration tests
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
-                    sh -c "npm test"
+                    sh -c "npm ci && npm test"
 
             - name: Tear down
               if: always()
