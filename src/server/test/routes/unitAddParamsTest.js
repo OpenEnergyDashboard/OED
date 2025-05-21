@@ -1,7 +1,14 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 const { chai, mocha, app, testDB, recreateDB } = require('../common');
 const { generateUnitValidationTests } = require('../util/unitTestUtils');
+const { validateString, validateInt, validateBool } = require('../util/validationHelpers');
 const Unit = require('../../models/Unit');
-const { validateString, validateInt, validateBool } = require('../util/vaidationHelpers')
+
 const ADD_UNIT = '/api/units/addUnit';
 
 mocha.describe('Unit Routes - /addUnit Validation', () => {
