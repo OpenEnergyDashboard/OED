@@ -37,10 +37,17 @@ jobs:
             - name: Wait for database to be healthy
               run: docker compose -f docker-compose.ci.yml ps
 
-            - name: Run lint & type checks
+            - name: Install deps & run checks
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
-                    sh -c "npm ci && npm run check:header && npm run check:typescript && npm run check:types && npm run check:lint"
+                    sh -c "\
+                      git config --global --add safe.directory /usr/src/app && \
+                      npm ci && \
+                      npm run check:header && \
+                      npm run check:typescript && \
+                      npm run check:types && \
+                      npm run check:lint \
+                    "
 
             - name: Run unit & integration tests
               run: |
