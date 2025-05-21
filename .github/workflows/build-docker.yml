@@ -49,6 +49,7 @@ jobs:
                       npm run check:lint \
                     "
 
+
             - name: Run unit & integration tests
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
