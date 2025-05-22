@@ -9,6 +9,7 @@ on:
 jobs:
   run-checks-tests:
     env:
+      # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
       OED_DB_USER: ${{ secrets.OED_DB_USER }}
       OED_DB_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
       OED_DB_DATABASE: ${{ secrets.OED_DB_DATABASE }}
@@ -28,6 +29,7 @@ jobs:
       postgres:
         image: postgres
         env:
+          # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
           POSTGRES_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
           POSTGRES_DB: ${{ secrets.OED_DB_TEST_DATABASE }}
         options: >-
@@ -72,6 +74,7 @@ jobs:
       - name: Connect to PostgreSQL
         run: node client.js
         env:
+          # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
           POSTGRES_HOST: ${{ secrets.OED_DB_HOST }}
           POSTGRES_PORT: ${{ secrets.OED_DB_PORT }}
 

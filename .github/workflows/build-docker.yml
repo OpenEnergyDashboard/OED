@@ -14,9 +14,12 @@ jobs:
             - name: Check out repository code
               uses: actions/checkout@v3
 
+            # Install Docker in GitHub Actions virtual machine
             - name: Set up Docker Buildx
               uses: docker/setup-buildx-action@v2
 
+            # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
+            # This .env file will be used by docker-compose.ci.yml
             - name: Create .env file for Docker Compose
               run: |
                   cat <<EOF > .env
@@ -29,15 +32,21 @@ jobs:
                   OED_TOKEN_SECRET=${{ secrets.OED_TOKEN_SECRET }}
                   EOF
 
+            # Build Docker images and run the containers -> integration smoke test
             - name: Build & start containers
               run: |
                   docker compose -f docker-compose.ci.yml build
                   docker compose -f docker-compose.ci.yml up -d
 
+            # We need the database container for the further tests
             - name: Wait for database to be healthy
               run: docker compose -f docker-compose.ci.yml ps
 
-            - name: Install deps & run checks
+            # We need git config --global -add safe.directory /usr/src/app because
+            # /usr/src/app is owned by the runner in GitHub Actions virtual machine whereas
+            # it is the root to executes git ls-files in checkHeader.sh.
+            # Git will deny the execution if the mounted volume (/usr/src/app) is owned by a different user.
+            - name: Run checks
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
                     sh -c "\
@@ -49,8 +58,7 @@ jobs:
                       npm run check:lint \
                     "
 
-
-            - name: Run unit & integration tests
+            - name: Run unit and integration tests
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
                     sh -c "npm ci && npm test"
