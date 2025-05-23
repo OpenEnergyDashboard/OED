@@ -45,7 +45,7 @@ jobs:
             # We need git config --global -add safe.directory /usr/src/app because
             # /usr/src/app is owned by the runner in GitHub Actions virtual machine whereas
             # it is the root to executes git ls-files in checkHeader.sh.
-            # Git denies the execution if the mounted volume (/usr/src/app) is owned by a different user.
+            # Git will deny the execution if the mounted volume (/usr/src/app) is owned by a different user.
             - name: Run checks
               run: |
                   docker compose -f docker-compose.ci.yml run --rm web \
