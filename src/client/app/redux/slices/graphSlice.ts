@@ -84,17 +84,22 @@ export const graphSlice = createSlice({
 			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
-			// clearing when already unbounded should be a no-op
-			if (action.payload.getIsBounded() || state.current.queryTimeInterval.getIsBounded()) {
+			// Allow update if any bound is set, or if current is not unbounded
+			if (
+				action.payload.getStartTimestamp() !== undefined ||
+				action.payload.getEndTimestamp() !== undefined ||
+				state.current.queryTimeInterval.getIsBounded()
+			) {
 				state.current.queryTimeInterval = action.payload;
 			}
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			// same as updateTimeInterval, always update if action is bounded,
-			// else only set unbounded if current isn't already unbounded.
-			// clearing when already unbounded should be a no-op
-			if (action.payload.getIsBounded() || state.current.shiftTimeInterval.getIsBounded()) {
+			// Allow update if any bound is set, or if current is not unbounded
+			if (
+				action.payload.getStartTimestamp() !== undefined ||
+				action.payload.getEndTimestamp() !== undefined ||
+				state.current.shiftTimeInterval.getIsBounded()
+			) {
 				state.current.shiftTimeInterval = action.payload;
 			}
 		},
@@ -102,7 +107,11 @@ export const graphSlice = createSlice({
 			state.current.shiftAmount = action.payload;
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			if (action.payload.getIsBounded() || state.current.rangeSliderInterval.getIsBounded()) {
+			if (
+				action.payload.getStartTimestamp() !== undefined ||
+				action.payload.getEndTimestamp() !== undefined ||
+				state.current.rangeSliderInterval.getIsBounded()
+			) {
 				state.current.rangeSliderInterval = action.payload;
 			}
 		},
