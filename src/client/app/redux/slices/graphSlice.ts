@@ -23,6 +23,7 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
+	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	duration: moment.duration(4, 'weeks'),
@@ -255,6 +256,9 @@ export const graphSlice = createSlice({
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
 			state.current = action.payload;
+		},
+		setInitialXAxisRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.initialXAxisRange = action.payload;
 		}
 
 	},
@@ -405,6 +409,7 @@ export const graphSlice = createSlice({
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
 		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectInitialXAxisRange: state => state.current.initialXAxisRange,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
@@ -435,7 +440,7 @@ export const {
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectShiftAmount, selectShiftTimeInterval
+	selectShiftAmount, selectShiftTimeInterval, selectInitialXAxisRange
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -452,7 +457,7 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateShiftAmount,
+	updateSelectedMetersOrGroups, updateShiftAmount, setInitialXAxisRange,
 	updateShiftTimeInterval
 } = graphSlice.actions;
 

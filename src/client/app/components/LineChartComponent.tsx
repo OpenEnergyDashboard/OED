@@ -19,8 +19,8 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
+import { setInitialXAxisRange, selectSliderRangeInterval } from '../redux/slices/graphSlice';
 import { fullSizeContainer } from '../styles/modalStyle';
-import { selectSliderRangeInterval } from '../redux/slices/graphSlice';
 
 /**
  * @returns plotlyLine graphic
@@ -70,7 +70,28 @@ export default function LineChartComponent() {
 	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
+	const allX = React.useMemo(
+		() =>
+			data.flatMap(trace => {
+				if (!trace.x) return [];
+				// If trace.x is an array of arrays, flatten it
+				if (Array.isArray(trace.x[0])) {
+					return (trace.x as any[][]).flat();
+				}
+				// Otherwise, it's a flat array
+				return trace.x as (string | number | Date)[];
+			}),
+		[data]
+	);
 
+	const minX = allX.length ? utc(Math.min(...allX.map(x => +new Date(x)))) : undefined;
+	const maxX = allX.length ? utc(Math.max(...allX.map(x => +new Date(x)))) : undefined;
+
+	React.useEffect(() => {
+		if (minX && maxX) {
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+		}
+	}, [minX, maxX, dispatch]);
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;

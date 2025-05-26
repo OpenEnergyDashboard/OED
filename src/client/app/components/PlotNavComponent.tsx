@@ -10,7 +10,8 @@ import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 import {
 	changeSliderRange, selectChartToRender, selectHistoryIsDirty,
 	selectSelectedGroups, selectSelectedMeters,
-	selectSliderRangeInterval, updateTimeInterval
+	selectSliderRangeInterval, updateTimeInterval, selectInitialXAxisRange,
+	selectQueryTimeInterval
 } from '../redux/slices/graphSlice';
 import HistoryComponent from './HistoryComponent';
 import { ChartTypes } from '../types/redux/graph';
@@ -49,6 +50,8 @@ export const RefreshGraphComponent = () => {
 	const [time, setTime] = React.useState(0);
 	const dispatch = useAppDispatch();
 	const sliderInterval = useAppSelector(selectSliderRangeInterval);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+	const initialXAxisRange = useAppSelector(selectInitialXAxisRange);
 	const somethingFetching = useAppSelector(selectAnythingFetching);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
@@ -66,11 +69,38 @@ export const RefreshGraphComponent = () => {
 		}
 		return () => clearInterval(interval);
 	}, [somethingFetching]);
+
+	function getNextQueryTimeInterval(
+		prevQuery: TimeInterval,
+		slider: TimeInterval,
+		xAxisMin: moment.Moment | undefined,
+		xAxisMax: moment.Moment | undefined
+	): TimeInterval {
+		let start = slider.getStartTimestamp();
+		let end = slider.getEndTimestamp();
+
+		// If previous query was unbounded on the left and slider is at or before min, keep left unbounded
+		if (!prevQuery.getStartTimestamp() && start && xAxisMin && (start.isSameOrBefore(xAxisMin))) {
+			start = undefined;
+		}
+		// If previous query was unbounded on the right and slider is at or after max, keep right unbounded
+		if (!prevQuery.getEndTimestamp() && end && xAxisMax && (end.isSameOrAfter(xAxisMax))) {
+			end = undefined;
+		}
+		return new TimeInterval(start, end);
+	}
 	return (
 		<img
 			src='./refresh.png'
 			style={{ height: '25px', transform: `rotate(${time}deg)`, visibility: iconVisible ? 'visible' : 'hidden' }}
-			onClick={() => { !somethingFetching && dispatch(updateTimeInterval(sliderInterval)); }}
+			onClick={() => {
+				if (!somethingFetching) {
+					const minX = initialXAxisRange?.getStartTimestamp?.();
+					const maxX = initialXAxisRange?.getEndTimestamp?.();
+					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
+					dispatch(updateTimeInterval(nextInterval));
+				}
+			}}
 		/>
 	);
 };
