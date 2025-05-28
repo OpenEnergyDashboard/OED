@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { clearGraphHistory } from '../redux/actions/extraActions';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
@@ -109,6 +110,7 @@ export const RefreshGraphComponent = () => {
 					const maxX = initialXAxisRange?.getEndTimestamp?.();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
 					dispatch(updateTimeInterval(nextInterval));
+					dispatch(changeSliderRange(nextInterval));
 				}
 			}}
 		/>

@@ -26,6 +26,7 @@ export default function MoreOptionsComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const isBounded = queryTimeInterval.getIsBounded();
+	const isHalfBounded = queryTimeInterval.getIsHalfBounded();
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);
 	const handleClose = () => {
@@ -46,14 +47,14 @@ export default function MoreOptionsComponent() {
 						<ModalBody>
 							{/* More UI options for line graphic */}
 							{chartToRender == ChartTypes.line && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.line && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.line && !isHalfBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.line && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.line && <ErrorBarComponent />}
 							{chartToRender == ChartTypes.line && <ExportComponent />}
 							{chartToRender == ChartTypes.line && <ChartLinkComponent />}
 
 							{/* More UI options for bar graphic */}
-							{chartToRender == ChartTypes.bar && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.bar && !isHalfBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.bar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.bar && <ExportComponent />}
 							{chartToRender == ChartTypes.bar && <ChartLinkComponent />}

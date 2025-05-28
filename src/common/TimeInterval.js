@@ -89,12 +89,12 @@ class TimeInterval {
 	getIsBounded() {
 		return this.isBounded;
 	}
-	getIsLeftBounded() {
-		return this.startTimestamp !== undefined && this.endTimestamp === undefined;
-	}
-	getIsRightBounded() {
-		return this.startTimestamp === undefined && this.endTimestamp !== undefined;
-	}
+	getIsHalfBounded() {
+    return (
+        (this.startTimestamp !== undefined && this.endTimestamp === undefined) ||
+        (this.startTimestamp === undefined && this.endTimestamp !== undefined)
+    );
+}
 	/**
 	 * Creates a new unbounded time interval
 	 * @returns {TimeInterval}

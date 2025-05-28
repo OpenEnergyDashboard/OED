@@ -84,8 +84,8 @@ export default function LineChartComponent() {
 		[data]
 	);
 
-	const minX = allX.length ? utc(Math.min(...allX.map(x => +new Date(x)))) : undefined;
-	const maxX = allX.length ? utc(Math.max(...allX.map(x => +new Date(x)))) : undefined;
+	const minX = allX.length ? utc(allX.reduce((a, b) => utc(a).isBefore(utc(b)) ? a : b)) : undefined;
+	const maxX = allX.length ? utc(allX.reduce((a, b) => utc(a).isAfter(utc(b)) ? a : b)) : undefined;
 
 	React.useEffect(() => {
 		if (minX && maxX) {

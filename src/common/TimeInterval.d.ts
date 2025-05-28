@@ -19,4 +19,5 @@ export class TimeInterval {
 	public getStartTimestamp(): moment.Moment;
 	public getEndTimestamp(): moment.Moment;
 	public getIsBounded(): boolean;
+	public getIsHalfBounded(): boolean;
 }
