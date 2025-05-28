@@ -69,15 +69,25 @@ export const RefreshGraphComponent = () => {
 		}
 		return () => clearInterval(interval);
 	}, [somethingFetching]);
-
+	/**
+	 * Computes the next query TimeInterval based on the current slider position and previous query interval.
+	 * - If the previous query interval was unbounded on a side and the slider is at or beyond the min/max x-axis,
+	 *   that side remains unbounded.
+	 * - Otherwise, the slider's value is used for the new interval.
+	 * @param prevQuery - The previous query interval (may be bounded or unbounded).
+	 * @param slider - The current slider interval selected by the user.
+	 * @param xAxisMin - The minimum x value of the data (left bound).
+	 * @param xAxisMax - The maximum x value of the data (right bound).
+	 * @returns  The new query interval to use for the next data fetch.
+	 */
 	function getNextQueryTimeInterval(
 		prevQuery: TimeInterval,
 		slider: TimeInterval,
 		xAxisMin: moment.Moment | undefined,
 		xAxisMax: moment.Moment | undefined
 	): TimeInterval {
-		let start = slider.getStartTimestamp();
-		let end = slider.getEndTimestamp();
+		let start: moment.Moment | undefined = slider.getStartTimestamp();
+		let end: moment.Moment | undefined = slider.getEndTimestamp();
 
 		// If previous query was unbounded on the left and slider is at or before min, keep left unbounded
 		if (!prevQuery.getStartTimestamp() && start && xAxisMin && (start.isSameOrBefore(xAxisMin))) {
