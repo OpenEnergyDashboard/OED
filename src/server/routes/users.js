@@ -139,7 +139,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 /**
  * Route for updating an existing user.
  */
-router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	
 	const validParams = {
 		type: 'object',
