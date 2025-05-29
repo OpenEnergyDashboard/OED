@@ -13,29 +13,37 @@
  const { success, failure } = require('./response');
  
  const router = express.Router();
+
+ function formatUnitForResponse(unit) {
+	return {
+	  id: unit.id,
+	  name: unit.name,
+	  identifier: unit.identifier,
+	  unitRepresent: unit.unitRepresent,
+	  secInRate: unit.secInRate,
+	  typeOfUnit: unit.typeOfUnit,
+	  suffix: unit.suffix,
+	  displayable: unit.displayable,
+	  preferredDisplay: unit.preferredDisplay,
+	  note: unit.note,
+	  minVal: unit.minVal,
+	  maxVal: unit.maxVal,
+	  disableChecks: unit.disableChecks
+	};
+  }
+  
  
 /**
  * Route for listing all units.
  */
  router.get(
    '/',
-   authMiddleware('manage units'),
+   authMiddleware('get units'),
    async (req, res) => {
 	 const conn = getConnection();
 	 try {
 	   const rows = await Unit.getAll(conn);
-	   res.json(rows.map(item => ({
-		 id: item.id,
-		 name: item.name,
-		 identifier: item.identifier,
-		 unitRepresent: item.unitRepresent,
-		 secInRate: item.secInRate,
-		 typeOfUnit: item.typeOfUnit,
-		 suffix: item.suffix,
-		 displayable: item.displayable,
-		 preferredDisplay: item.preferredDisplay,
-		 note: item.note
-	   })));
+	   res.json(rows.map(formatUnitForResponse));
 	 } catch (err) {
 	   log.error(`Error fetching units: ${err}`, err);
 	   res.sendStatus(500);
@@ -48,9 +56,25 @@
  */
  router.post(
    '/edit',
-   authMiddleware('make changes to a unit'),
+   authMiddleware('edit units'),
    async (req, res) => {
-	 const unitSchema = { /* ... your schema ... */ };
+	 const unitSchema = { type: 'object',
+	 required: ['id', 'name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
+	 properties: {
+	   id: { type: 'integer' },
+	   name: { type: 'string' },
+	   identifier: { type: 'string' },
+	   unitRepresent: { type: 'string' },
+	   secInRate: { type: 'number' },
+	   typeOfUnit: { type: 'string' },
+	   suffix: { type: 'string' },
+	   displayable: { type: 'boolean' },
+	   preferredDisplay: { type: 'boolean' },
+	   note: { type: 'string' },
+	   minVal: { type: 'number' },
+	   maxVal: { type: 'number' },
+	   disableChecks: { type: 'boolean' }
+	 }};
 	 const result = validate(req.body, unitSchema);
 	 if (!result.valid) {
 	   log.warn(`Invalid unit edit payload: ${result.errors}`);
@@ -79,9 +103,25 @@
  */
  router.post(
    '/addUnit',
-   authMiddleware('add a new unit'),
+   authMiddleware('add units'),
    async (req, res) => {
-	 const unitSchema = { /* ... your schema ... */ };
+	 const unitSchema = { type: 'object',
+	 required: ['name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
+	 properties: {
+	   id: { type: 'integer' },
+	   name: { type: 'string' },
+	   identifier: { type: 'string' },
+	   unitRepresent: { type: 'string' },
+	   secInRate: { type: 'number' },
+	   typeOfUnit: { type: 'string' },
+	   suffix: { type: 'string' },
+	   displayable: { type: 'boolean' },
+	   preferredDisplay: { type: 'boolean' },
+	   note: { type: 'string' },
+	   minVal: { type: 'number' },
+	   maxVal: { type: 'number' },
+	   disableChecks: { type: 'boolean' }
+	 }};
 	 const result = validate(req.body, unitSchema);
 	 if (!result.valid) {
 	   log.error(`Invalid unit creation payload: ${result.errors}`);
@@ -118,7 +158,7 @@
  */
 router.post(
 	'/delete',
-	authMiddleware('removes a certain unit'),
+	authMiddleware('delete units'),
 	async (req, res) => {
 		const paramsSchema = {
 			type: 'object',
