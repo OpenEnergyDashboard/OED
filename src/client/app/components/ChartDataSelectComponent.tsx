@@ -17,14 +17,14 @@ import DateRangeComponent from './DateRangeComponent';
 export default function ChartDataSelectComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
-	const isBounded = queryTimeInterval.getIsBounded();
+	const isHalfBounded = queryTimeInterval.getIsHalfBounded();
 
 	return (
 		<div>
 			<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.groups} />
 			<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.meters} />
 			<UnitSelectComponent />
-			{(isBounded && chartToRender !== ChartTypes.threeD && chartToRender !== ChartTypes.compareLine) && <DateRangeComponent />}
+			{(isHalfBounded && chartToRender !== ChartTypes.threeD && chartToRender !== ChartTypes.compareLine) && <DateRangeComponent />}
 		</div>
 	);
 }

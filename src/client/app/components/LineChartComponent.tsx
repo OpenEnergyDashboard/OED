@@ -70,6 +70,10 @@ export default function LineChartComponent() {
 	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
+	// Getting the entire x-axis range from all traces
+	// This is used to set the initial x-axis range when the component mounts.
+	// It ensures that the graph starts with a range that covers all data points. That would be used for querying the data.
+	// If there are no data points, minX and maxX will be undefined.
 	const allX = React.useMemo(
 		() =>
 			data.flatMap(trace => {
