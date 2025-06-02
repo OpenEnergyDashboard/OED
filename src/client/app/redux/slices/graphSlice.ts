@@ -85,36 +85,17 @@ export const graphSlice = createSlice({
 			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			// Allow update if any bound is set, or if current is not unbounded
-			if (
-				action.payload.getStartTimestamp() !== undefined ||
-				action.payload.getEndTimestamp() !== undefined ||
-				state.current.queryTimeInterval.getIsBounded()
-			) {
-				state.current.queryTimeInterval = action.payload;
-			}
+			state.current.queryTimeInterval = action.payload;
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			// Allow update if any bound is set, or if current is not unbounded
-			if (
-				action.payload.getStartTimestamp() !== undefined ||
-				action.payload.getEndTimestamp() !== undefined ||
-				state.current.shiftTimeInterval.getIsBounded()
-			) {
-				state.current.shiftTimeInterval = action.payload;
-			}
+			state.current.shiftTimeInterval = action.payload;
 		},
 		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
 			state.current.shiftAmount = action.payload;
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			if (
-				action.payload.getStartTimestamp() !== undefined ||
-				action.payload.getEndTimestamp() !== undefined ||
-				state.current.rangeSliderInterval.getIsBounded()
-			) {
-				state.current.rangeSliderInterval = action.payload;
-			}
+			state.current.rangeSliderInterval = action.payload;
+
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderInterval = TimeInterval.unbounded();
