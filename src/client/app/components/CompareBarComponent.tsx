@@ -18,13 +18,11 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
 import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-
 import { UnitRepresentType } from '../types/redux/units';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { useTranslate } from '../redux/componentHooks';
-
 
 export interface CompareEntity {
 	id: number;
