@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
-    This file tests the readings retrieval API for line chart quantity meters.
-    See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
+  This file tests the readings retrieval API for line chart quantity meters.
+  See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
 const { chai, mocha, app } = require('../common');
@@ -47,40 +47,40 @@ mocha.describe('readings API', () => {
 					// Add LR4 here
 					mocha.it('LR4: range should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 						const unitData = [
-              {
-                // u1
-                name: 'kWh',
-                identifier: '',
-                unitRepresent: Unit.unitRepresentType.QUANTITY,
-                secInRate: 3600,
-                typeOfUnit: Unit.unitType.UNIT,
-                suffix: '',
-                displayable: Unit.displayableType.ALL,
-                preferredDisplay: true,
-                note: 'OED created standard unit'
-              },
-              {
-                // u2
-                name: 'Electric_Utility',
-                identifier: '',
-                unitRepresent: Unit.unitRepresentType.QUANTITY,
-                secInRate: 3600,
-                typeOfUnit: Unit.unitType.METER,
-                suffix: '',
-                displayable: Unit.displayableType.NONE,
-                preferredDisplay: false,
-                note: 'special unit'
-              }
+							{
+								// u1
+								name: 'kWh',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: true,
+								note: 'OED created standard unit'
+							},
+							{
+								// u2
+								name: 'Electric_Utility',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.METER,
+								suffix: '',
+								displayable: Unit.displayableType.NONE,
+								preferredDisplay: false,
+								note: 'special unit'
+							}
 						];
 						const conversionData = [
 							{
 								// c1
 								sourceName: 'Electric_Utility',
-                sourceUnit: 'kWh',
-                bidirectional: false,
-                slope: 1,
-                intercept: 0,
-                note: 'Electric_Utility → kWh'
+								sourceUnit: 'kWh',
+								bidirectional: false,
+								slope: 1,
+								intercept: 0,
+								note: 'Electric_Utility → kWh'
 							}
 						];
 						const meterData = [
@@ -91,7 +91,7 @@ mocha.describe('readings API', () => {
 								displayable: true,
 								gps: undefined,
 								note: 'special meter',
-								file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+								file: './readingsData/readings_ri_15_days_75.csv',
 								deleteFile: false,
 								readingFrequency: '15 minutes',
 								id: METER_ID
@@ -102,11 +102,12 @@ mocha.describe('readings API', () => {
 						const unitId = await getUnitId('kWh');
 						// Load expected response data from the corresponding csv file
 						const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
-            // Create a request to the API for unbounded reading times and save the response
+						// Create a request to the API for unbounded reading times and save the response
 						const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 							.query({ timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-24', '00:00:00'), graphicUnitId: unitId });
 						expectRangeToEqualExpected(res, expected);
 					});
+
 					// Add LR5 here
 
 					// Add LR6 here
