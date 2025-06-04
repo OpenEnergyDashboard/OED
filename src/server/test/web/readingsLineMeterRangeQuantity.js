@@ -41,6 +41,7 @@ mocha.describe('readings API', () => {
 					});
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 					// Add LR2 here
 
 					// Add LR3 here
@@ -84,6 +85,8 @@ mocha.describe('readings API', () => {
 	});
 =======
                     // Add LR2 here
+=======
+>>>>>>> 1c43fb049 (removed comment)
                     mocha.it('LR2: range should have daily points for 15 minute reading intervals and quantity units with explicit start/end time & kWh as kWh', async () => {
                         // Load the data into the database
                         await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
