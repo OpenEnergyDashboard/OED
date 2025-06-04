@@ -10,7 +10,7 @@ import { FormattedMessage } from 'react-intl';
 import EditUnitModalComponent from './EditUnitModalComponent';
 import '../../styles/card-page.css';
 import { UnitData } from 'types/redux/units';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import { LocaleDataKey } from 'translations/data';
 
 interface UnitViewComponentProps {
@@ -24,6 +24,7 @@ interface UnitViewComponentProps {
  */
 export default function UnitViewComponent(props: UnitViewComponentProps) {
 	// Don't check if admin since only an admin is allow to route to this page.
+	const translate = useTranslate();
 
 	// Edit Modal Show
 	const [showEditModal, setShowEditModal] = useState(false);

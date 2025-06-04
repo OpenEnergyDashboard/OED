@@ -18,3 +18,7 @@ select option[value="false"] {
 select option[value="true"] {
 	color: green;
 }
+
+.confirmation-message {
+	white-space: pre-wrap;
+}

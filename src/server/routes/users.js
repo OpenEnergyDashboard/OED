@@ -48,7 +48,7 @@ router.get('/token', async (req, res) => {
 					const userProfile = await User.getByID(decoded.data, conn);
 					res.status(200).json(
 						{
-							email: userProfile.email,
+							username: userProfile.username,
 							role: userProfile.role
 						});
 				} catch (error) {
@@ -94,9 +94,9 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		required: ['email', 'password', 'role'],
+		required: ['username', 'password', 'role', 'note'],
 		properties: {
-			email: {
+			username: {
 				type: 'string'
 			},
 			password: {
@@ -105,6 +105,9 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			role: {
 				type: 'string',
 				enum: Object.values(User.role)
+			},
+			note: {
+				type: 'string'
 			}
 		}
 	};
@@ -112,15 +115,15 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
-			const { email, password, role } = req.body;
+			const { username, password, role, note } = req.body;
 			const conn = getConnection();
 			// Check if user already exists
-			const currentUser = await User.getByEmail(email, conn);
+			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				res.status(400).send({ message: `user ${email} already exists so cannot create` });
+				res.status(400).send({ message: `user ${username} already exists so cannot create` });
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
-				const user = new User(undefined, email, hashedPassword, role);
+				const user = new User(undefined, username, hashedPassword, role, note);
 				await user.insert(conn);
 				res.sendStatus(200);
 			}
@@ -135,47 +138,88 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
  * Route for updating user role
  */
 router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res) => {
+	
 	const validParams = {
 		type: 'object',
-		required: ['users'],
+		required: ['user'],
 		properties: {
-			users: {
-				type: 'array',
-				items: {
-					type: 'object',
-					required: ['email', 'role'],
-					properties: {
-						email: {
-							type: 'string'
-						},
-						role: {
-							type: 'string',
-							enum: Object.values(User.role)
-						}
-
+			user: {
+				type: 'object',
+				required: ['id', 'username', 'role', 'note'],
+				properties: {
+					id: {
+						type: 'integer'
+					},
+					username: {
+						type: 'string',
+						minLength: 3,
+						maxLength: 254
+							},
+					role: {
+						type: 'string',
+						enum: Object.values(User.role)
+					},
+					password: {
+						type: 'string',
+						// TODO Do not have minLength: 8 because this is optional. Nice if could check if present.
+						maxLength: 128
+		
+					},
+					note: {
+						type: 'string'
 					}
 				}
 			}
 		}
 	};
+
 	if (!validate(req.body, validParams).valid) {
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const conn = getConnection();
-			const { users } = req.body;
-			const minimumUser = users.find(user => user.role === User.role.ADMIN);
-			// This protects the database so that there will always be at least one admin during role updates.
-			if (minimumUser === undefined) {
-				res.sendStatus(400);
-			} else {
-				const roleUpdates = users.map(async user => await User.updateUserRole(user.email, user.role, conn));
-				await Promise.all(roleUpdates);
-				res.sendStatus(200);
+			const { user } = req.body;
+			const userBeforeChanges = await User.getByID(user.id,conn);
+			
+			// This protects the database so that there will always be at least one admin
+			if (userBeforeChanges.role === 'admin' && user.role !== 'admin') {
+				const numberOfAdmins = await User.getNumberOfAdmins(conn);
+				if (numberOfAdmins < 2) {
+					const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
+					log.error(errorMessage);
+					return res.status(400).json({
+						message: errorMessage,
+					});
+				}
 			}
+
+			// set up Asynchronous database queries
+			const userUpdates = [];
+
+			// update user
+			userUpdates.push(
+				User.updateUser(user.id, user.username, user.role, user.note, conn)
+			);
+			
+			
+			// update the user's password if needed
+			if (user.password) {
+				const hashedPassword = await bcrypt.hash(user.password, 10);
+				userUpdates.push(
+					User.updateUserPassword(user.id, hashedPassword, conn)
+				);
+			}
+
+			await Promise.all(userUpdates);
+			return res.sendStatus(200);
+
 		} catch (error) {
+			
 			log.error('Error while performing edit user request.', error);
-			res.sendStatus(500);
+			res.status(500).json({
+				message: 'Error while performing edit user request.',
+				error: error.message
+			});
 		}
 	}
 });
@@ -186,9 +230,9 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		required: ['email'],
+		required: ['username'],
 		properties: {
-			email: {
+			username: {
 				type: 'string'
 			}
 		}
@@ -198,13 +242,13 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 	} else {
 		try {
 			const conn = getConnection();
-			const { email } = req.body;
+			const { username } = req.body;
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
-			if (user.email === email) {// Admins cannot delete themselves
+			if (user.username === username) {// Admins cannot delete themselves
 				res.sendStatus(400);
 			} else {
-				await User.deleteUser(email, conn);
+				await User.deleteUser(username, conn);
 				res.sendStatus(200);
 			}
 		} catch (error) {

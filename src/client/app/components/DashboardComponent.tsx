@@ -15,6 +15,7 @@ import RadarChartComponent from './RadarChartComponent';
 import ThreeDComponent from './ThreeDComponent';
 import UIOptionsComponent from './UIOptionsComponent';
 import PlotNavComponent from './PlotNavComponent';
+import CompareLineChartComponent from './CompareLineChartComponent';
 
 /**
  * React component that controls the dashboard
@@ -31,7 +32,7 @@ export default function DashboardComponent() {
 					<UIOptionsComponent />
 				</div>
 				<div className={`${optionsVisibility ? 'col-12 col-lg-10' : 'col-12'} align-self-auto text-center`} style={{ height: '100%' }}>
-					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
 						<PlotNavComponent />
 						{chartToRender === ChartTypes.line && <LineChartComponent />}
 						{chartToRender === ChartTypes.bar && <BarChartComponent />}
@@ -39,11 +40,10 @@ export default function DashboardComponent() {
 						{chartToRender === ChartTypes.map && <MapChartComponent />}
 						{chartToRender === ChartTypes.threeD && <ThreeDComponent />}
 						{chartToRender === ChartTypes.radar && <RadarChartComponent />}
+						{chartToRender === ChartTypes.compareLine && <CompareLineChartComponent />}
 					</div>
 				</div>
 			</div>
 		</div >
 	);
 }
-
-

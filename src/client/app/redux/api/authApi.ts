@@ -13,7 +13,7 @@ type LoginResponse = User & {
 
 export const authApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
-		login: builder.mutation<LoginResponse, { email: string, password: string }>({
+		login: builder.mutation<LoginResponse, { username: string, password: string }>({
 			query: loginArgs => ({
 				url: 'api/login',
 				method: 'POST',

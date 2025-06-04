@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { cloneDeep, isEqual, range } from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -13,20 +13,18 @@ import { metersApi, selectMeterById, selectMeterDataById } from '../../redux/api
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import {
-	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS,
-	MAX_VAL, MIN_DATE, MIN_DATE_MOMENT, MIN_VAL,
-	selectGraphicUnitCompatibility
+	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS, MIN_DATE, MIN_DATE_MOMENT, selectGraphicUnitCompatibility
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meters';
-import { UnitRepresentType } from '../../types/redux/units';
+import { DisableChecksType, UnitRepresentType } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { getGPSString, nullToEmptyString } from '../../utils/input';
-import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { getGPSString, nullToEmptyString, NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -43,12 +41,13 @@ interface EditMeterModalComponentProps {
  * @returns Meter edit element
  */
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
+	const translate = useTranslate();
 	const [editMeter] = metersApi.useEditMeterMutation();
 	// since this selector is shared amongst many other modals, we must use a selector factory in order
 	// to have a single selector per modal instance. Memo ensures that this is a stable reference
 	// The current meter's state of meter being edited. It should always be valid.
 	const meterState = useAppSelector(state => selectMeterById(state, props.meter.id));
-	const [localMeterEdits, setLocalMeterEdits] = useState(_.cloneDeep(meterState));
+	const [localMeterEdits, setLocalMeterEdits] = useState(cloneDeep(meterState));
 	const {
 		compatibleGraphicUnits,
 		incompatibleGraphicUnits,
@@ -59,7 +58,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// TODO should this state be used for the meterState above or would that cause issues?
 	const meterDataByID = useAppSelector(selectMeterDataById);
 
-	useEffect(() => { setLocalMeterEdits(_.cloneDeep(meterState)); }, [meterState]);
+	useEffect(() => { setLocalMeterEdits(cloneDeep(meterState)); }, [meterState]);
 	/* State */
 	// unit state
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -75,6 +74,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 	}, [localMeterEdits.cumulative]);
 
+	const handleUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedUnitId = Number(e.target.value);
+		let selectedUnit;
+		if (selectedUnitId === -99) {
+			// No unit so set specially
+			selectedUnit = NoUnit;
+		} else {
+			selectedUnit = unitDataById[selectedUnitId];
+		}
+
+		setLocalMeterEdits({
+			...localMeterEdits,
+			unitId: selectedUnitId,
+			minVal: selectedUnit.minVal,
+			maxVal: selectedUnit.maxVal,
+			disableChecks: selectedUnit.disableChecks
+		});
+	};
+
 	// Save changes
 	// Currently using the old functionality which is to compare inherited prop values to state values
 	// If there is a difference between props and state, then a change was made
@@ -87,7 +105,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		let inputOk = true;
 
 		// Check for changes by comparing state to props
-		const meterHasChanges = !_.isEqual(meterState, localMeterEdits);
+		const meterHasChanges = !isEqual(meterState, localMeterEdits);
 
 		// Only validate and store if any changes.
 		if (meterHasChanges) {
@@ -155,7 +173,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
-				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews });
+				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
+					.unwrap()
+					.then(() => {
+						showSuccessNotification(translate('meter.successfully.edited.meter'));
+					})
+					.catch(err => {
+						showErrorNotification(
+							translate('meter.failed.to.edit.meter') + '"' + err.data + '"'
+						);
+					});
 			} else if (error_message) {
 				// Display an error message if there are dependent deep meters and checked.
 				// Undo the unit change.
@@ -178,6 +205,34 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setLocalMeterEdits({ ...localMeterEdits, [e.target.name]: JSON.parse(e.target.value) });
+	};
+
+	// Function handles the selection of a new displayable.
+	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// If there is a potential issue then the admin will decide if save happens. Otherwise, the value is put into state.
+		let save = true;
+		if (!JSON.parse(e.target.value)) {
+			// This will hold the overall message for the admin alert.
+			let msg = '';
+			// This will hold the names of groups that are affected.
+			let groups = '';
+			// Tells if the change should be cancelled.
+			// Checks for groups that include the meter being edited.
+			for (const groupId of Object.values(groupDataByID)) {
+				if (groupId.displayable && groupId.deepMeters.includes(meterState.id)) {
+					groups += `${groupId.name}\n`;
+				}
+			}
+			if (groups != '') {
+				// There is a message to display to the user.
+				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.edit.displayable.warning')}\n`;
+				msg += `${groups + '\n' + translate('meter.edit.displayable.verify')}\n`;
+				save = window.confirm(msg);
+			}
+		}
+		if (save) {
+			handleBooleanChange(e);
+		}
 	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,7 +305,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='unitId'
 								type='select'
 								value={localMeterEdits.unitId}
-								onChange={e => handleNumberChange(e)}>
+								onChange={handleUnitChange}>
 								{Array.from(compatibleUnits).map(unit => {
 									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
@@ -306,7 +361,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='displayable'
 								type='select'
 								value={localMeterEdits.displayable?.toString()}
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => handleDisplayableChange(e)}
 								invalid={localMeterEdits.displayable && localMeterEdits.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -535,19 +590,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							<Input
-								id='readingDuplication'
-								name='readingDuplication'
-								type='number'
+							<Input id='readingDuplication' name='readingDuplication' type="select"
 								onChange={e => handleNumberChange(e)}
-								step='1'
-								min='1'
-								max='9'
-								defaultValue={localMeterEdits?.readingDuplication}
-								invalid={localMeterEdits?.readingDuplication < 1 || localMeterEdits?.readingDuplication > 9} />
-							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
-							</FormFeedback>
+								defaultValue={localMeterEdits?.readingDuplication} >
+								{range(1, 10).map(i => (
+									<option key={i} value={`${i}`}> {i} </option>
+								))}
+							</Input>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -576,7 +625,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					<Row xs='1' lg='2'>
 						{/* minVal input */}
 						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Label for='minVal'>{translate('min.value')}</Label>
 							<Input
 								id='minVal'
 								name='minVal'
@@ -592,7 +641,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* maxVal input */}
 						<Col><FormGroup>
-							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Label for='maxVal'>{translate('max.value')}</Label>
 							<Input
 								id='maxVal'
 								name='maxVal'
@@ -664,16 +713,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						</FormGroup></Col>
 						{/* DisableChecks input */}
 						<Col><FormGroup>
-							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
+							<Label for='disableChecks'>{translate('disable.checks')}</Label>
 							<Input
 								id='disableChecks'
 								name='disableChecks'
 								type='select'
-								value={localMeterEdits?.disableChecks?.toString()}
-								onChange={e => handleBooleanChange(e)}
-								invalid={localMeterEdits?.disableChecks && localMeterEdits.unitId === -99}>
-								{Object.keys(TrueFalseType).map(key => {
-									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+								value={localMeterEdits.disableChecks}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(DisableChecksType).map(key => {
+									return (<option value={key} key={key} >
+										{translate(`DisableChecksType.${key}`)}</option>);
 								})}
 							</Input>
 						</FormGroup></Col>

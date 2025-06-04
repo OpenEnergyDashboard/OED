@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import * as _ from 'lodash';
+import { filter } from 'lodash';
 import { selectIsAdmin } from '../slices/currentUserSlice';
 import { selectAllMeters } from '../../redux/api/metersApi';
 import { DisplayableType, UnitType } from '../../types/redux/units';
@@ -42,7 +42,7 @@ export const selectVisibleUnitOrSuffixState = createSelector(
 	selectUnitDataById,
 	selectIsAdmin,
 	(unitDataById, isAdmin) => {
-		const visibleUnitsOrSuffixes = _.filter(unitDataById, data =>
+		const visibleUnitsOrSuffixes = filter(unitDataById, data =>
 			(data.typeOfUnit == UnitType.unit || data.typeOfUnit == UnitType.suffix)
 			&&
 			(isAdmin

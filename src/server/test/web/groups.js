@@ -99,7 +99,7 @@ mocha.describe('groups API', () => {
 		// documented in usersTest.js.
 		mocha.before(async () => {
 			let res = await chai.request(app).post('/api/login')
-				.send({ email: testUser.email, password: testUser.password });
+				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
 		mocha.describe('create endpoint', () => {
@@ -130,7 +130,7 @@ mocha.describe('groups API', () => {
 
 						// login
 						res = await chai.request(app).post('/api/login')
-							.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						currentToken = res.body.token;
 						// create
 						res = await chai.request(app).post('/api/groups/create').set('token', currentToken);
@@ -190,7 +190,7 @@ mocha.describe('groups API', () => {
 
 						// login
 						res = await chai.request(app).post('/api/login')
-							.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						currentToken = res.body.token;
 						// edit
 						res = await chai.request(app).put('/api/groups/edit').set('token', currentToken);

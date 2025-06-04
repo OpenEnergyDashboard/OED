@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import * as _ from 'lodash';
 import * as React from 'react';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -10,8 +10,9 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
-import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectCik } from '../../redux/api/conversionsApi';
+import { groupsApi, selectAllGroups, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectAllMeters, selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
@@ -29,7 +30,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString } from '../../utils/input';
 import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -40,17 +41,22 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
  * @returns Group create element
  */
 export default function CreateGroupModalComponent() {
+	const translate = useTranslate();
 	const [createGroup] = groupsApi.useCreateGroupMutation();
 
+	const globalCikState = useAppSelector(selectCik);
 	// Meters state
 	const metersDataById = useAppSelector(selectMeterDataById);
+	const metersData = useAppSelector(selectAllMeters);
 	// Groups state
 	const groupDataById = useAppSelector(selectGroupDataById);
+	const groupsData = useAppSelector(selectAllGroups);
 	// Units state
 	const unitsDataById = useAppSelector(selectUnitDataById);
 	// Which units are possible for graphing state
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
-
+	// Obtaining language
+	const locale = useAppSelector(selectSelectedLanguage);
 	// Since creating group the initial values are effectively nothing or the desired defaults.
 	const defaultValues: GroupData = {
 		// ID not needed, assigned by DB, add here for TS
@@ -176,9 +182,6 @@ export default function CreateGroupModalComponent() {
 		setGraphicUnitsState(graphicUnitsStateDefaults);
 	};
 
-	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
-	// that create starts from an empty template.
-
 	// Save changes
 	const handleSubmit = () => {
 		// Close modal first to avoid repeat clicks
@@ -230,13 +233,13 @@ export default function CreateGroupModalComponent() {
 		// Can only vary if admin and only used then.
 		// This is the current deep meters of this group including any changes.
 		// The id is not really needed so set to -1 since same function for edit.
-		const groupDeepMeter = metersInChangedGroup(state);
+		const groupDeepMeter = metersInChangedGroup(state, groupDataById);
 		// Get meters that okay for this group in a format the component can display.
-		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
+		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter, globalCikState, metersDataById, metersData, locale);
 		// Get groups okay for this group. Similar to meters.
 		// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
 		// in this case so set to -1 so it never matches in this function.
-		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
+		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter, globalCikState, metersDataById, groupsData, locale);
 		// Update the state
 		setGroupChildrenState(groupChildrenState => ({
 			...groupChildrenState,
@@ -255,7 +258,7 @@ export default function CreateGroupModalComponent() {
 		// First must get a set from the array of deep meter numbers which is all meters currently in this group.
 		const deepMetersSet = new Set(state.deepMeters);
 		// Get the units that are compatible with this set of meters.
-		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
+		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet, metersDataById, globalCikState);
 		// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
 		allowedDefaultGraphicUnit.add(-99);
 		graphicUnitsState.possibleGraphicUnits.forEach(unit => {
@@ -426,13 +429,13 @@ export default function CreateGroupModalComponent() {
 									// Get the currently included/selected meters as an array of the ids.
 									const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
 									// The id is not really needed so set to -1 since same function for edit.
-									const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 });
+									const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 }, groupDataById);
 									// The choice may have invalidated the default graphic unit so it needs
 									// to be reset to no unit.
 									// The selection encodes this information in the color but recalculate
 									// to see if this is the case.
 									// Get the units compatible with the new set of deep meters in group.
-									const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+									const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters), metersDataById, globalCikState);
 									// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
 									newAllowedDGU.add(-99);
 									let dgu = state.defaultGraphicUnit;
@@ -462,13 +465,13 @@ export default function CreateGroupModalComponent() {
 								// Get the currently included/selected meters as an array of the ids.
 								const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
 								// The id is not really needed so set to -1 since same function for edit.
-								const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 });
+								const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 }, groupDataById);
 								// The choice may have invalidated the default graphic unit so it needs
 								// to be reset to no unit.
 								// The selection encodes this information in the color but recalculate
 								// to see if this is the case.
 								// Get the units compatible with the new set of deep meters in group.
-								const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+								const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters), metersDataById, globalCikState);
 								// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
 								newAllowedDGU.add(-99);
 								let dgu = state.defaultGraphicUnit;
@@ -522,7 +525,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -541,7 +545,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**

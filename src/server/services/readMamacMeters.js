@@ -7,8 +7,7 @@ const readCsv = require('./readCsv');
 const parseString = require('xml2js').parseString;
 const Meter = require('../models/Meter');
 const util = require('util');
-const _ = require('lodash');
-const stopDB = require('../models/database').stopDB;
+const zipObject = require('lodash/zipObject');
 const { log } = require('../log');
 const moment = require('moment');
 const Unit = require('../models/Unit');
@@ -21,7 +20,7 @@ async function parseCSV(filename) {
 	// the headers should be in the first line
 	const headers = meterInfo[0];
 	const meterDataRows = meterInfo.slice(1);
-	return meterDataRows.map(row => _.zipObject(headers, row));
+	return meterDataRows.map(row => zipObject(headers, row));
 }
 
 /**
@@ -98,12 +97,12 @@ async function getMeterInfo(url, ip, csvLine) {
 				unitId, // default graphic unit
 				undefined, // area unit
 				preferences.defaultMeterReadingFrequency, // reading frequency
-				preferences.defaultMeterMinimumValue, // minVal
-				preferences.defaultMeterMaximumValue, // maxVal
+				Number.MIN_SAFE_INTEGER, // minVal
+				Number.MAX_SAFE_INTEGER, // maxVal
 				preferences.defaultMeterMinimumDate, // minDate
 				preferences.defaultMeterMaximumDate, // maxDate
 				preferences.defaultMeterMaximumErrors, // maxError
-				preferences.defaultMeterDisableChecks  // disableChecks
+				Unit.disableChecksType.REJECT_ALL // disable checks
 			);
 		});
 }

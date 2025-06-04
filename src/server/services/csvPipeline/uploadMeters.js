@@ -7,7 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
-const { BooleanTypesJS } = require('./validateCsvUploadParams');
+const { normalizeBoolean } = require('./validateCsvUploadParams');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -28,7 +28,7 @@ async function uploadMeters(req, res, filepath, conn) {
 	});
 
 	// If there is a header row, we remove and ignore it for now.
-	const meters = (req.body.headerRow === BooleanTypesJS.true) ? temp.slice(1) : temp;
+	const meters = normalizeBoolean(req.body.headerRow) ? temp.slice(1) : temp;
 	// The original code used a Promise.all to run through the meters. The issue is that the promises are run in parallel.
 	// If the meters are independent as expected then this works fine. However, in the error case where one CSV file has
 	// the same meter name listed twice, the order of the attempts to add to the database was arbitrary. This meant one of them
@@ -37,6 +37,7 @@ async function uploadMeters(req, res, filepath, conn) {
 	// as this makes the most logical sense (no update here) and it is consistent. To make this happen a for loop is used as it
 	// is sequential. A small negative is the database requests do not run in parallel in the usual case without an error.
 	// However, uploading meters is not common so slowing it down slightly seems a reasonable price to get this behavior.
+
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
@@ -75,34 +76,40 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
 
-			if (req.body.update === BooleanTypesJS.true) {
+			if (normalizeBoolean(req.body.update)) {
 				// Updating the new meters.
 				// First get its id.
-				let nameOfMeter = req.body.meterName;
-				if (!nameOfMeter) {
-					// Seems no name provided so use one in CSV file.
-					nameOfMeter = meter[0];
+				let identifierOfMeter = req.body.meterIdentifier;
+				if (!identifierOfMeter) {
+					// Seems no identifier provided so use one in CSV file.
+					if (!meter[7]) {
+						// There is no identifier given for meter in CSV so use name as identifier since would be automatically set.
+						identifierOfMeter = meter[0];
+					} else {
+						identifierOfMeter = meter[7];
+					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter name provided (\"${nameOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
 				}
 				let currentMeter;
-				currentMeter = await Meter.getByName(nameOfMeter, conn)
+				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
 					.catch(error => {
 						// Did not find the meter.
-						let msg = `Meter name of \"${nameOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
+						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
 						throw new CSVPipelineError(msg, undefined, 500);
 					});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
 			} else {
-				// Inserting the new meters.
+				// Inserting the new meter
 				await new Meter(undefined, ...meter).insert(conn)
 					.catch(error => {
 						// Probably duplicate meter.
 						throw new CSVPipelineError(
 							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
-					});
+					}
+				);
 			}
 		}
 	} catch (error) {

@@ -15,23 +15,24 @@ const router = express.Router();
 
 /**
  * Authenticate users and return a JSON Web Token with their user ID.
- * @param {String} email
+ * @param {String} username
  * @param {String} Password
  */
 router.post('/', async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 2,
-		required: ['email', 'password'],
+		required: ['username', 'password'],
 		properties: {
-			email: {
+			username: {
 				type: 'string',
 				minLength: 3,
 				maxLength: 254
 			},
 			password: {
 				type: 'string',
-				minLength: 3
+				minLength: 8,
+				maxLength: 128
 			}
 		}
 	};
@@ -41,7 +42,7 @@ router.post('/', async (req, res) => {
 	} else {
 		const conn = getConnection();
 		try {
-			const user = await User.getByEmail(req.body.email, conn);
+			const user = await User.getByUsername(req.body.username, conn);
 			let isValid;
 			if (user === null) {
 				// User did not exist so return false.
@@ -51,7 +52,7 @@ router.post('/', async (req, res) => {
 			}
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
-				res.json({ token: token, email: user.email, role: user.role });
+				res.json({ token: token, username: user.username, role: user.role });
 			} else {
 				throw new Error('Unauthorized password');
 			}
@@ -59,7 +60,7 @@ router.post('/', async (req, res) => {
 			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
 				res.status(401).send({ text: 'Not authorized' });
 			} else {
-				log.error(`Unable to check user password for ${req.body.email}`, err);
+				log.error(`Unable to check user password for ${req.body.username}`, err);
 				res.status(500).send({ text: 'Internal Server Error' });
 			}
 		}

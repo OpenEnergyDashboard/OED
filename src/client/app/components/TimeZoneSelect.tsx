@@ -5,8 +5,8 @@
 import * as React from 'react';
 import Select from 'react-select';
 import { TimeZoneOption } from 'types/timezone';
-import translate from '../utils/translate';
-import * as moment from 'moment-timezone';
+import { useTranslate } from '../redux/componentHooks';
+import moment from 'moment-timezone';
 
 interface TimeZoneSelectProps {
 	// The timezone is a string and null is stored in DB when there isn't one.
@@ -15,7 +15,7 @@ interface TimeZoneSelectProps {
 }
 
 const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick }) => {
-
+	const translate = useTranslate();
 	const getTimeZones = () => {
 		const zoneNames = moment.tz.names();
 		return zoneNames.map(zoneName => {

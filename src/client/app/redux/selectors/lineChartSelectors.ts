@@ -45,6 +45,7 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 				const yMinData: number[] = [];
 				const yMaxData: number[] = [];
 				const hoverText: string[] = [];
+
 				// The scaling is the factor to change the reading by. It divides by the area while will be 1 if no scaling by area.
 				readings.forEach(reading => {
 					// As usual, we want to interpret the readings in UTC. We lose the timezone as this as the start/endTimestamp

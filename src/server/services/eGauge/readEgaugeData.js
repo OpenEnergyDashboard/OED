@@ -54,7 +54,8 @@ async function readEgaugeData(meter, conn) {
 		conn = conn,
 		// eGauge uses Unix timestamps and deals with DST.
 		honorDst = true,
-		relaxedParsing = false
+		relaxedParsing = false,
+		useMeterZone = false
 	);
 }
 

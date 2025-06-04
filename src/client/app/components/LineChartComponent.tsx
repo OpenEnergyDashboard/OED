@@ -7,6 +7,7 @@ import moment from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
@@ -16,22 +17,26 @@ import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } fro
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
+import { selectSliderRangeInterval } from '../redux/slices/graphSlice';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 const { utc } = moment;
-
 
 /**
  * @returns plotlyLine graphic
  */
 export default function LineChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	// get current data fetching arguments
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
 	// get data needed to derive/ format data from query response
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
+	// initial slider range
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -58,6 +63,14 @@ export default function LineChartComponent() {
 	// Use Query Data to derive plotly datasets memoized selector
 	const unitLabel = useAppSelector(selectLineUnitLabel);
 
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+		'zoomOut2d', 'autoScale2d', 'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+	// Manage button states with useState
+	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
 
 
@@ -78,18 +91,34 @@ export default function LineChartComponent() {
 		return (
 			<Plot
 				data={data}
-				style={{ width: '100%', height: '100%', minHeight: '700px' }}
+				style={fullSizeContainer}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					autosize: true, showlegend: true,
 					legend: { x: 0, y: 1.1, orientation: 'h' },
-					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
-					xaxis: { rangeslider: { visible: true }, showgrid: true, gridcolor: '#ddd' }
+					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
+					xaxis: {
+						rangeslider: { visible: true },
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						showgrid: true,
+						gridcolor: '#ddd'
+					}
 				}}
 				config={{
 					responsive: true,
-					displayModeBar: false,
-					// Current Locale
+					displayModeBar: true,
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+						name: 'toggle-options',
+						title: translate('toggle.options'),
+						icon: Icons.pencil,
+						click: function () {
+							// # of items must differ so the length can tell which list of buttons is being set
+							setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+						}
+					}],
 					locale,
 					// Available Locales
 					locales: Locales

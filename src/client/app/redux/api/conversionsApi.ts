@@ -6,6 +6,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { ConversionData } from '../../types/redux/conversions';
 import { baseApi } from './baseApi';
 import { CikData } from '../../types/redux/ciks';
+import { setRefresingReadings } from '../../redux/slices/appStateSlice';
 
 export const conversionsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -84,7 +85,15 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings']
+			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings'],
+			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
+				dispatch(setRefresingReadings(true));
+				try {
+					await queryFulfilled;
+				} finally {
+					dispatch(setRefresingReadings(false));
+				}
+			}
 		})
 	})
 });

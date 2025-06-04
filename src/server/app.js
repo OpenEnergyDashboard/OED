@@ -21,7 +21,6 @@ const login = require('./routes/login');
 const verification = require('./routes/verification');
 const groups = require('./routes/groups');
 const version = require('./routes/version');
-const timezones = require('./routes/timezones');
 const createRouterForReadings = require('./routes/unitReadings').createRouter;
 const createRouterForCompareReadings = require('./routes/compareReadings').createRouter;
 const baseline = require('./routes/baseline');
@@ -42,17 +41,56 @@ const generalLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
 	limit: 200, // 200 requests
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false // Disable the `X-RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	// If rate limit is 10, OED won't load and bad things will happen
+	message: async (req, res) => {
+		const string = `
+			<h1 style='text-align:center'>
+				You have been rate limited by your OED site.
+			</h1>
+			<h2 style ='text-align:center'>
+				We suggest you try these in this order: 
+			</h2>
+			<h2 
+				style='text-align:center'>
+			</h2>
+			<div> 
+				<ol style = "text-align: center; list-style-position: inside;"> 
+					<li>
+						Click the 'Refresh this page' button below to try again.
+					</li>
+					<li> 
+						If you keep returning to this page wait longer and click 'Refresh this page' button.
+					</li> 
+					<li>
+						Contact your site to find why the rate limit is denying access to the OED site.
+					</li> 
+				</ol>  
+			</div>
+			<h3 style='text-align:center'>
+				<button onClick='window.location.reload();'> 
+					Refresh this page 
+				</button>
+			</h3>
+		`
+		return string
+	}
 });
 // Apply the limit to overall requests
 const app = express().use(generalLimiter);
 
 // This is limiting 3D-Graphic
 const threeDLimiter = rateLimit({
-	// TODO This was causing tests to fail for 3D rejection. This limit seems to be okay
-	// but we should find a better solution than upping values just for tests.
-	windowMs: 10 * 1000, // 10 seconds
-	limit: 15,
+	/* Rationale: Each hour/day returned by 3D will have 365 points if a full year.
+	When returned for each hour in the day that is 365 * 24 = 8760 (max possible). For line graphics,
+	OED limits the number of points to 1440. Thus, a 3D request is 8760 / 1440 = 6 times
+	more data in the worst case of 3D vs. line graphics. Since OED limits to 200 request
+	per 5 seconds in general (that includes line graphics), the limit for 3D will be
+	200 / 6 = 33. Note the limit used to be much less because the database work for 3D
+	could be high. This is now resolved so it is around the same time as line graphics.
+	It is unclear a lower limit is actually needed but done to be safe. */
+	windowMs: 5 * 1000, // 5 seconds
+	limit: 33,
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
@@ -92,7 +130,6 @@ app.use('/api/compareReadings', createRouterForCompareReadings());
 app.use('/api/baselines', baseline);
 app.use('/api/maps', maps);
 app.use('/api/logs', logs);
-app.use('/api/timezones', timezones);
 app.use('/api/obvius', obvius);
 app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);

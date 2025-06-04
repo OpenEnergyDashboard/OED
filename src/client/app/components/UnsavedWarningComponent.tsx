@@ -10,7 +10,7 @@ import { useBlocker } from 'react-router-dom';
 import { Button, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import { LocaleDataKey } from '../translations/data';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 export interface UnsavedWarningProps {
 	changes: any;
@@ -25,20 +25,19 @@ export interface UnsavedWarningProps {
  * @returns Component that prompts before navigating away from current page
  */
 export function UnsavedWarningComponent(props: UnsavedWarningProps) {
+	const translate = useTranslate();
 	const { hasUnsavedChanges, submitChanges, changes } = props;
 	const blocker = useBlocker(hasUnsavedChanges);
 	const handleSubmit = async () => {
 		submitChanges(changes)
 			.unwrap()
 			.then(() => {
-				//TODO translate me
 				showSuccessNotification(translate('unsaved.success'));
 				if (blocker.state === 'blocked') {
 					blocker.proceed();
 				}
 			})
 			.catch(() => {
-				//TODO translate me
 				showErrorNotification(translate('unsaved.failure'));
 				if (blocker.state === 'blocked') {
 					blocker.proceed();

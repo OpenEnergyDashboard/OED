@@ -2,37 +2,48 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { values } from 'lodash';
 import moment from 'moment';
 import { Layout } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectRadarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
 import {
 	selectAreaUnit, selectGraphAreaNormalization, selectLineGraphRate,
 	selectSelectedGroups, selectSelectedMeters, selectSelectedUnit
 } from '../redux/slices/graphSlice';
 import { DataType } from '../types/Datasources';
 import Locales from '../types/locales';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
+
+
+// Display Plotly Buttons Feature
+// The number of items in defaultButtons and advancedButtons must differ as discussed below
+const defaultButtons: Plotly.ModeBarDefaultButtons[] = [
+	'zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+	'zoomOut2d', 'autoScale2d', 'resetScale2d'
+];
+const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
 
 /**
  * @returns radar plotly component
  */
 export default function RadarChartComponent() {
+	const translate = useTranslate();
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectRadarChartQueryArgs);
 	const { data: meterReadings, isLoading: meterIsLoading } = readingsApi.useLineQuery(meterArgs, { skip: meterShouldSkip });
 	const { data: groupData, isLoading: groupIsLoading } = readingsApi.useLineQuery(groupArgs, { skip: groupShouldSkip });
-	const datasets: any[] = [];
 	// graphic unit selected
 	const graphingUnit = useAppSelector(selectSelectedUnit);
 	// The current selected rate
@@ -45,10 +56,12 @@ export default function RadarChartComponent() {
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
+	// Manage button states with useState
+	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+	const datasets: any[] = [];
 
 	if (meterIsLoading || groupIsLoading) {
 		return <SpinnerComponent loading width={50} height={50} />;
-		// return <SpinnerComponent loading width={50} height={50} />
 	}
 
 	let unitLabel = '';
@@ -70,29 +83,20 @@ export default function RadarChartComponent() {
 	// Add all valid data from existing meters to the radar plot
 	for (const meterID of selectedMeters) {
 		if (meterReadings) {
-			const meterArea = meterDataById[meterID].area;
+			const entity = meterDataById[meterID];
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (meterArea > 0 && meterDataById[meterID].areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ?
-					meterArea * getAreaUnitConversion(meterDataById[meterID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = meterReadings[meterID];
 				if (readingsData) {
-					const label = meterDataById[meterID].identifier;
+					const label = entity.identifier;
 					const colorID = meterID;
-					// TODO If we are sure the data is always defined then remove this commented out code.
-					// Be consistent for all graphing and groups below.
-					// if (readingsData.readings === undefined) {
-					// 	throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					// }
 					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
 					// HoverText is the popup value show for each reading.
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
+					const readings = values(readingsData);
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
@@ -131,27 +135,20 @@ export default function RadarChartComponent() {
 	for (const groupID of selectedGroups) {
 		// const byGroupID = state.readings.line.byGroupID[groupID];
 		if (groupData) {
-			const groupArea = groupDataById[groupID].area;
+			const entity = groupDataById[groupID];
 			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!areaNormalization || (groupArea > 0 && groupDataById[groupID].areaUnit != AreaUnitType.none)) {
-				// Convert the group area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = areaNormalization ?
-					groupArea * getAreaUnitConversion(groupDataById[groupID].areaUnit, selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
+				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = groupData[groupID];
 				if (readingsData) {
-					const label = groupDataById[groupID].name;
+					const label = entity.name;
 					const colorID = groupID;
-					// if (readingsData.readings === undefined) {
-					// 	throw new Error('Unacceptable condition: readingsData.readings is undefined.');
-					// }
 					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
 					// HoverText is the popup value show for each reading.
 					const thetaData: string[] = [];
 					const rData: number[] = [];
 					const hoverText: string[] = [];
-					const readings = _.values(readingsData);
+					const readings = values(readingsData);
 					readings.forEach(reading => {
 						// As usual, we want to interpret the readings in UTC. We lose the timezone as these start/endTimestamp
 						// are equivalent to Unix timestamp in milliseconds.
@@ -328,6 +325,16 @@ export default function RadarChartComponent() {
 				useResizeHandler={true}
 				config={{
 					displayModeBar: true,
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+						name: 'toggle-options',
+						title: translate('toggle.options'),
+						icon: Icons.pencil,
+						click: function () {
+							// # of items must differ so the length can tell which list of buttons is being set
+							setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+						}
+					}],
 					responsive: true,
 					locales: Locales // makes locales available for use
 				}}

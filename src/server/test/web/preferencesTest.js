@@ -14,7 +14,7 @@ mocha.describe('preferences API', () => {
 		mocha.describe('edit endpoint', () => {
 			mocha.it('should accept requests from Admin role', async () => {
 				let res = await chai.request(app).post('/api/login')
-					.send({ email: testUser.email, password: testUser.password });
+					.send({ username: testUser.username, password: testUser.password });
 				expect(res).to.have.status(200);
 				const token = res.body.token;
 				const preferences = {
@@ -47,7 +47,7 @@ mocha.describe('preferences API', () => {
 
 							// login
 							let res = await chai.request(app).post('/api/login')
-								.send({ email: unauthorizedUser.email, password: unauthorizedUser.password });
+								.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 							token = res.body.token;
 						});
 						mocha.it(`should reject requests from ${role}`, async () => {

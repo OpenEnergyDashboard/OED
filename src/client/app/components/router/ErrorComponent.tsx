@@ -6,13 +6,18 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from 'reactstrap';
 import AppLayout from '../../components/AppLayout';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 
 /**
  * @returns A error page that then returns to main dashboard page.
  */
 export default function ErrorComponent() {
+	const translate = useTranslate();
 	const nav = useNavigate();
+	const refreshPage = () => {
+		nav('/');
+		window.location.reload();
+	};
 	return (
 		<AppLayout>
 			{/* Pass div as child prop to AppLayout */}
@@ -30,6 +35,15 @@ export default function ErrorComponent() {
 					onClick={() => nav('/')}
 				>
 					{translate('return.dashboard')}
+				</Button>
+				<p>
+					{translate('page.user.refresh.directions')}
+				</p>
+				<Button
+					color='primary'
+					onClick={refreshPage}
+				>
+					{translate('page.restart.button')}
 				</Button>
 			</div>
 		</AppLayout>

@@ -3,9 +3,12 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { GPSPoint } from './calibration';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById, DisableChecksType } from '../types/redux/units';
 import translate from './translate';
-import * as _ from 'lodash';
+import { LanguageTypes } from 'types/redux/i18n';
+
+export const MIN_VAL = Number.MIN_SAFE_INTEGER;
+export const MAX_VAL = Number.MAX_SAFE_INTEGER;
 
 /**
  * get string value from GPSPoint or null.
@@ -48,9 +51,10 @@ export function nullToEmptyString(item: any) {
  * Calculates the set of all possible graphic units for a meter/group.
  * This is any unit that is of type unit or suffix.
  * @param units candidate graphic units
+ * @param locale Current language selected from Redux state
  * @returns The set of all possible graphic units for a meter/group
  */
-export function potentialGraphicUnits(units: UnitDataById) {
+export function potentialGraphicUnits(units: UnitDataById, locale: LanguageTypes) {
 	// Set of possible graphic units
 	let possibleGraphicUnits = new Set<UnitData>();
 
@@ -61,7 +65,10 @@ export function potentialGraphicUnits(units: UnitDataById) {
 		}
 	});
 	// Put in alphabetical order.
-	possibleGraphicUnits = new Set(_.sortBy(Array.from(possibleGraphicUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+	// TODO: change second argument of locale from undefined to current language if needed, but alphabetical ordering works
+	// with accents using undefined locale arg
+	possibleGraphicUnits = new Set(Array.from(possibleGraphicUnits).sort((unitA, unitB) => unitA.identifier.toLowerCase().
+		localeCompare(unitB.identifier.toLowerCase(), String(locale), { sensitivity: 'accent' })));
 	// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 	possibleGraphicUnits.add(noUnitTranslated());
 	return possibleGraphicUnits;
@@ -79,7 +86,10 @@ export const NoUnit: UnitData = {
 	suffix: '',
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
-	note: ''
+	note: '',
+	minVal: MIN_VAL,
+	maxVal: MAX_VAL,
+	disableChecks: DisableChecksType.reject_all
 };
 
 /**

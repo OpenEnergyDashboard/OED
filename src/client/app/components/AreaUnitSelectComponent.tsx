@@ -11,16 +11,17 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { StringSelectOption } from '../types/items';
 import { UnitRepresentType } from '../types/redux/units';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle, bottomSpace, checkboxStyle } from '../styles/modalStyle';
 
 /**
  * React Component that creates the area unit selector dropdown
  * @returns Area unit select element
  */
 export default function AreaUnitSelectComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
-
 	const graphState = useAppSelector(selectGraphState);
 	const unitDataById = useAppSelector(selectUnitDataById);
 
@@ -41,11 +42,6 @@ export default function AreaUnitSelectComponent() {
 		dispatch(graphSlice.actions.toggleAreaNormalization());
 	};
 
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
-
 	if (graphState.selectedUnit != -99 && unitDataById[graphState.selectedUnit]?.unitRepresent === UnitRepresentType.raw) {
 		return null;
 	}
@@ -55,7 +51,7 @@ export default function AreaUnitSelectComponent() {
 			<div className='checkbox'>
 				<input
 					type='checkbox'
-					style={{ marginRight: '10px' }}
+					style={checkboxStyle}
 					onChange={handleToggleAreaNormalization}
 					checked={graphState.areaNormalization}
 					id='areaNormalization'
@@ -65,9 +61,11 @@ export default function AreaUnitSelectComponent() {
 				</label>
 				<TooltipMarkerComponent page='home' helpTextId='help.home.area.normalize' />
 			</div>
-			{/* Will only show up if areaNormalization is enabled */}
+			{/* Will only show up if areaNormalization is enabled.
+				The bottom padding makes sure the drop down area unit menu does not
+				go below the next item so it can be visible/clicked through menu. */}
 			{graphState.areaNormalization &&
-				<div>
+				<div style={bottomSpace}>
 					<p style={labelStyle}>
 						<FormattedMessage id='area.unit' />:
 					</p>

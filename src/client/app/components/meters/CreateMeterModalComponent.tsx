@@ -2,6 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { range } from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import { useState } from 'react';
@@ -10,11 +11,8 @@ import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, M
 import { metersApi } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import {
-	MAX_DATE, MAX_DATE_MOMENT,
-	MAX_ERRORS, MAX_VAL, MIN_DATE,
-	MIN_DATE_MOMENT, MIN_VAL,
-	isValidCreateMeter,
-	selectDefaultCreateMeterValues, selectCreateMeterUnitCompatibility
+	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS, MIN_DATE, MIN_DATE_MOMENT,
+	isValidCreateMeter, selectCreateMeterUnitCompatibility, selectDefaultCreateMeterValues
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -23,16 +21,25 @@ import { MeterData, MeterTimeSortType, MeterType } from '../../types/redux/meter
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { DisableChecksType } from '../../types/redux/units';
+import { NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
+
+interface CreateMeterModalProps {
+	onCreateMeter?: (meterIdentifier: string) => void; // Define the type of the callback function
+}
 
 /**
  * Defines the create meter modal form
+ * @param props for create meter to return the identifier
  * @returns Meter create element
  */
-export default function CreateMeterModalComponent() {
+export default function CreateMeterModalComponent(props: CreateMeterModalProps): React.JSX.Element {
+	const translate = useTranslate();
 	// Tracks whether a unit/ default unit has been selected.
 	// RTKQ Mutation to submit add meter
 	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
@@ -47,6 +54,7 @@ export default function CreateMeterModalComponent() {
 	const [meterDetails, setMeterDetails] = useState(defaultValues);
 	const unitIsSelected = meterDetails.unitId !== -999;
 	const defaultGaphicUnitIsSelected = meterDetails.defaultGraphicUnit !== -999;
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	const { compatibleGraphicUnits, incompatibleGraphicUnits, compatibleUnits } = useAppSelector(state =>
 		// Type assertion due to conflicting GPS Property
@@ -84,6 +92,26 @@ export default function CreateMeterModalComponent() {
 	const handleTimeZoneChange = (timeZone: string) => {
 		setMeterDetails({ ...meterDetails, ['timeZone']: timeZone });
 	};
+
+	const handleUnitChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedUnitId = Number(e.target.value);
+		let selectedUnit;
+		if (selectedUnitId === -99) {
+			// No unit so set specially
+			selectedUnit = NoUnit;
+		} else {
+			selectedUnit = unitDataById[selectedUnitId];
+		}
+
+		setMeterDetails(details => ({
+			...details,
+			unitId: selectedUnitId,
+			minVal: selectedUnit.minVal,
+			maxVal: selectedUnit.maxVal,
+			disableChecks: selectedUnit.disableChecks
+		}));
+	};
+
 	// Reset the state to default values
 	const resetState = () => {
 		setMeterDetails(defaultValues);
@@ -93,9 +121,6 @@ export default function CreateMeterModalComponent() {
 		setShowModal(false);
 		resetState();
 	};
-
-	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
-	// that create starts from an empty template.
 
 	// Submit
 	const handleSubmit = async () => {
@@ -152,6 +177,15 @@ export default function CreateMeterModalComponent() {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(translate('meter.successfully.create.meter'));
 					resetState();
+					// if props exist, then return the identifier
+					//  or return the name if identifier is not set because the identifier will be set from the name
+					if (props.onCreateMeter) {
+						if (meterDetails.identifier === '') {
+							props.onCreateMeter(meterDetails.name);
+						} else {
+							props.onCreateMeter(meterDetails.identifier);
+						}
+					}
 				})
 				.catch(err => {
 					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
@@ -161,7 +195,6 @@ export default function CreateMeterModalComponent() {
 			showErrorNotification(translate('meter.input.error'));
 		}
 	};
-
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -229,15 +262,11 @@ export default function CreateMeterModalComponent() {
 							</Label>
 							<Input id='unitId' name='unitId' type='select'
 								value={meterDetails.unitId}
-								onChange={e => {
-									handleNumberChange(e);
-								}}
+								onChange={handleUnitChange}
 								invalid={!unitIsSelected}>
-								{
-									<option value={-999} key={-999} hidden disabled>
-										{translate('select.unit')}
-									</option>
-								}
+								<option value={-999} key={-999} hidden disabled>
+									{translate('select.unit')}
+								</option>
 								{
 									Array.from(compatibleUnits).map(unit =>
 										<option key={unit.id} value={unit.id}>
@@ -369,11 +398,15 @@ export default function CreateMeterModalComponent() {
 						{/* Area input */}
 						<Col><FormGroup>
 							<Label for='area'>{translate('area')}</Label>
-							<Input id='area' name='area' type='number'
+							<Input
+								id='area'
+								name='area'
+								type='number'
 								min='0'
 								defaultValue={meterDetails.area}
 								onChange={e => handleNumberChange(e)}
-								invalid={meterDetails.area < 0} />
+								invalid={meterDetails.area < 0}
+							/>
 							<FormFeedback>
 								<FormattedMessage id="error.negative" />
 							</FormFeedback>
@@ -495,16 +528,12 @@ export default function CreateMeterModalComponent() {
 						{/* readingDuplication input */}
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
-							<Input id='readingDuplication' name='readingDuplication' type='number'
-								onChange={e => handleNumberChange(e)}
-								step='1'
-								min='1'
-								max='9'
-								defaultValue={meterDetails.readingDuplication}
-								invalid={meterDetails?.readingDuplication < 1 || meterDetails?.readingDuplication > 9} />
-							<FormFeedback>
-								<FormattedMessage id="error.bounds" values={{ min: '1', max: '9' }} />
-							</FormFeedback>
+							<Input id='readingDuplication' name='readingDuplication' type="select"
+								onChange={e => handleNumberChange(e)}>
+								{range(1, 10).map(i => (
+									<option key={i} value={`${i}`}> {i} </option>
+								))}
+							</Input>
 						</FormGroup></Col>
 					</Row>
 					<Row xs='1' lg='2'>
@@ -530,12 +559,12 @@ export default function CreateMeterModalComponent() {
 					<Row xs='1' lg='2'>
 						{/* minVal input */}
 						<Col><FormGroup>
-							<Label for='minVal'>{translate('meter.minVal')}</Label>
+							<Label for='minVal'>{translate('min.value')}</Label>
 							<Input id='minVal' name='minVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={MIN_VAL}
 								max={meterDetails.maxVal}
-								defaultValue={meterDetails.minVal}
+								value={meterDetails.minVal}
 								invalid={meterDetails?.minVal < MIN_VAL || meterDetails?.minVal > meterDetails?.maxVal} />
 							<FormFeedback>
 								<FormattedMessage id="error.bounds" values={{ min: MIN_VAL, max: meterDetails.maxVal }} />
@@ -543,12 +572,12 @@ export default function CreateMeterModalComponent() {
 						</FormGroup></Col>
 						{/* maxVal input */}
 						<Col><FormGroup>
-							<Label for='maxVal'>{translate('meter.maxVal')}</Label>
+							<Label for='maxVal'>{translate('max.value')}</Label>
 							<Input id='maxVal' name='maxVal' type='number'
 								onChange={e => handleNumberChange(e)}
 								min={meterDetails.minVal}
 								max={MAX_VAL}
-								defaultValue={meterDetails.maxVal}
+								value={meterDetails.maxVal}
 								invalid={meterDetails?.maxVal > MAX_VAL || meterDetails?.minVal > meterDetails?.maxVal} />
 							<FormFeedback>
 								<FormattedMessage id="error.bounds" values={{ min: meterDetails.minVal, max: MAX_VAL }} />
@@ -603,17 +632,14 @@ export default function CreateMeterModalComponent() {
 							</FormFeedback>
 						</FormGroup></Col>
 						<Col><FormGroup>
-							<Label for='disableChecks'>{translate('meter.disableChecks')}</Label>
+							<Label for='disableChecks'>{translate('disable.checks')}</Label>
 							<Input id='disableChecks' name='disableChecks' type='select'
-								defaultValue={meterDetails.disableChecks?.toString()}
-								onChange={e => handleBooleanChange(e)}>
-								{
-									Object.keys(TrueFalseType).map(key =>
-										<option value={key} key={key}>
-											{translate(`TrueFalseType.${key}`)}
-										</option>
-									)
-								}
+								value={meterDetails.disableChecks}
+								onChange={e => handleStringChange(e)}>
+								{Object.keys(DisableChecksType).map(key => {
+									return (<option value={key} key={key} >
+										{translate(`DisableChecksType.${key}`)}</option>);
+								})}
 							</Input>
 						</FormGroup></Col>
 					</Row>

@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { omit } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -15,14 +15,17 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import { UnitType } from '../../types/redux/units';
 
 /**
  * Defines the create conversion modal form
  * @returns Conversion create element
  */
 export default function CreateConversionModalComponent() {
+	const translate = useTranslate();
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation();
 	// Want units in sorted order by identifier regardless of case.
 
@@ -31,6 +34,11 @@ export default function CreateConversionModalComponent() {
 	/* State */
 	// Modal show
 	const [showModal, setShowModal] = useState(false);
+
+	// State for the warning modal
+	const [showWarningModal, setShowWarningModal] = useState(false);
+	const [warningMessage, setWarningMessage] = useState('');
+
 	const handleClose = () => {
 		setShowModal(false);
 		resetState();
@@ -71,23 +79,57 @@ export default function CreateConversionModalComponent() {
 	};
 	/* End State */
 
+	// Determines whether the selected source is of type meter
+	const isMeterSource = () => {
+		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.sourceId);
+		return source?.typeOfUnit === UnitType.meter;
+	};
+
+	// Determine whether the selected source or destination is a suffix unit
+	const isSuffixUsed = () => {
+		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.sourceId);
+		const dest = defaultValues.sourceOptions.find(u => u.id === conversionState.destinationId);
+		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
+	};
+
+	/* Warning Modal */
+	const handleWarningConfirm = () => {
+		//Close the warning modal
+		setShowWarningModal(false);
+
+		//Proceed with the creation of the conversion
+		setShowModal(false);
+		addConversionMutation({...omit(conversionState, 'sourceOptions'),
+			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+		resetState();
+	};
+
+	const handleWarningCancel = () => {
+		//Close the warning modal
+		setShowWarningModal(false);
+	};
+
 	// Reset the state to default values
 	const resetState = () => {
 		setConversionState(defaultValues);
 	};
-
-	// Unlike edit, we decided to discard and inputs when you choose to leave the page. The reasoning is
-	// that create starts from an empty template.
+	/* End Warning Modal */
 
 	// Submit
 	const handleSubmit = () => {
-		if (validConversion) {
+		// Show warning modal if slope and intercept are both 0
+		if (conversionState.slope === 0 && conversionState.intercept === 0) {
+			setWarningMessage(translate('conversion.slope.intercept.zero'));
+			setShowWarningModal(true);
+		} else if (validConversion) {
 			// Close modal first to avoid repeat clicks
 			setShowModal(false);
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
-			//
-			addConversionMutation(_.omit(conversionState, 'sourceOptions'));
+			// If source is a meter, make bidirectional false
+			// If source or destination is a suffix unit, make bidirectional false
+			addConversionMutation({...omit(conversionState, 'sourceOptions'),
+				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 			resetState();
 		} else {
 			showErrorNotification(reason);
@@ -101,6 +143,14 @@ export default function CreateConversionModalComponent() {
 
 	return (
 		<>
+			<ConfirmActionModalComponent
+				show={showWarningModal}
+				actionConfirmMessage={warningMessage}
+				handleClose={handleWarningCancel}
+				actionFunction={handleWarningConfirm}
+				actionConfirmText={translate('confirm.action')}
+				actionRejectText={translate('cancel')}
+			/>
 			{/* Show modal button */}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.conversion" />
@@ -180,11 +230,23 @@ export default function CreateConversionModalComponent() {
 								id='bidirectional'
 								name='bidirectional'
 								type='select'
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => handleBooleanChange(e)}
+								value={String(conversionState.bidirectional)}
+								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
+							{isMeterSource() && conversionState.bidirectional === true && (
+								<FormFeedback className='d-block'>
+									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
+								</FormFeedback>
+							)}
+							{isSuffixUsed() && conversionState.bidirectional === true &&  (
+								<FormFeedback className='d=block'>
+									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
+								</FormFeedback>
+							)}
 						</FormGroup>
 						<Row xs='1' lg='2'>
 							<Col>
@@ -235,7 +297,7 @@ export default function CreateConversionModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} >
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

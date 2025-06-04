@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const _ = require('lodash');
+const flatten = require('lodash/flatten');
+const difference = require('lodash/difference');
 const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { getConnection } = require('../db');
@@ -277,7 +278,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 				await newGroup.insert(t);
 				const adoptGroupsQuery = req.body.childGroups.map(gid => newGroup.adoptGroup(gid, t));
 				const adoptMetersQuery = req.body.childMeters.map(mid => newGroup.adoptMeter(mid, t));
-				return t.batch(_.flatten([adoptGroupsQuery, adoptMetersQuery]));
+				return t.batch(flatten([adoptGroupsQuery, adoptMetersQuery]));
 			});
 			success(res);
 		} catch (err) {
@@ -374,20 +375,20 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 
 				await newGroup.update(t);
 
-				const adoptedGroups = _.difference(req.body.childGroups, currentChildGroups);
+				const adoptedGroups = difference(req.body.childGroups, currentChildGroups);
 				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid, t));
 
-				const disownedGroups = _.difference(currentChildGroups, req.body.childGroups);
+				const disownedGroups = difference(currentChildGroups, req.body.childGroups);
 				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid, t));
 
 				// Compute meters differences and adopt/disown to make changes
-				const adoptedMeters = _.difference(req.body.childMeters, currentChildMeters);
+				const adoptedMeters = difference(req.body.childMeters, currentChildMeters);
 				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid, t));
 
-				const disownedMeters = _.difference(currentChildMeters, req.body.childMeters);
+				const disownedMeters = difference(currentChildMeters, req.body.childMeters);
 				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid, t));
 
-				return t.batch(_.flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
+				return t.batch(flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
 			res.sendStatus(200);
 		} catch (err) {

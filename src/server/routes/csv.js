@@ -21,13 +21,11 @@ const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
-const { refreshReadingViews } = require('../services/refreshReadingViews');
-const { refreshHourlyReadingViews } = require('../services/refreshHourlyReadingViews');
+const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
-const { BooleanTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 
 /** Middleware validation */
-const { validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
+const { normalizeBoolean, validateMetersCsvUploadParams, validateReadingsCsvUploadParams } = require('../services/csvPipeline/validateCsvUploadParams');
 const { CSVPipelineError } = require('../services/csvPipeline/CustomErrors');
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 
@@ -67,9 +65,14 @@ router.use(function (req, res, next) {
 					(await isTokenAuthorized(token, csvRole)) ? cb(null, true) : cb(new Error('Invalid token (either unauthorized or logged out'));
 				} else {
 					// If no token is found, then the request is mostly like a curl request. We require an
-					// email and password to be supplied for curl requests.
-					const { email, password } = request.body;
-					const verifiedUser = await verifyCredentials(email, password, true);
+					// username and password to be supplied for curl requests.
+					const { username, email, password } = request.body;
+					// TODO:
+					// Allowing for backwards compatibility if any users are still using the 'email' parameter instead of
+					// the 'username' parameter to login. Developers need to decide in the future if we should deprecate email
+					// or continue to allow this backwards compatibility
+					const user = username || email;
+					const verifiedUser = await verifyCredentials(user, password, true);
 					if (verifiedUser) {
 						isUserAuthorized(verifiedUser, csvRole) ? cb(null, true) : cb(new Error('Invalid credentials'));
 					} else {
@@ -105,7 +108,7 @@ router.use(function (req, res, next) {
 });
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip === BooleanTypesJS.true;
+	const isGzip = normalizeBoolean(req.body.gzip);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	try {
@@ -128,6 +131,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 		success(req, res, 'Successfully inserted the meters.');
 	} catch (error) {
 		failure(req, res, error);
+
 	} finally {
 		// Clean up files
 		fs.unlink(uploadedFilepath) // Delete the uploaded file.
@@ -149,9 +153,8 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 });
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
-	const isGzip = req.body.gzip ===  BooleanTypesJS.true;
-	const isRefreshReadings = req.body.refreshReadings === BooleanTypesJS.true;
-	const isRefreshHourlyReadings = req.body.refreshHourlyReadings === BooleanTypesJS.true;
+	const isGzip = normalizeBoolean(req.body.gzip);
+	const isRefreshReadings = normalizeBoolean(req.body.refreshReadings);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
 	let isAllReadingsOk;
@@ -174,11 +177,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		({ isAllReadingsOk, msgTotal } = await uploadReadings(req, res, csvFilepath, conn));
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
-			await refreshReadingViews();
-		}
-		if (isRefreshHourlyReadings) {
-			// Refresh readings so show when hourly data is used.
-			await refreshHourlyReadingViews();
+			await refreshAllReadingViews();
 		}
 	} catch (error) {
 		failure(req, res, error);

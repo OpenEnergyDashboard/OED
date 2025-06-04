@@ -4,4 +4,4 @@
 
 DELETE 
 FROM users 
-WHERE email = ${email};
+WHERE username = ${username};

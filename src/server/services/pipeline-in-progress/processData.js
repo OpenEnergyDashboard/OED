@@ -9,8 +9,8 @@ const { log } = require('../../log');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
-const { validateReadings } = require('./validateReadings');
-const { TimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
+const { validateReadings, validateSingleReading } = require('./validateReadings');
+const { MeterTimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
 
 // The default start/end timestamps that are set to the first
@@ -48,11 +48,14 @@ const E0 = moment(0).utc()
  * @param {array} conn the connection to the database
  * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
  * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
+ * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
+ *   Should only be true if honorDST is true and reading does not have proper time zone information. This feature is not great and should
+ *   be avoided except in special circumstances.
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
-async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
+async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn, honorDst = false, relaxedParsing = false) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -62,13 +65,13 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 	// If all readings were accepted or not.
 	let isAllReadingsOk = true;
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
-	const result = [];
+	let result = [];
 	// Tell all readings that will not be added to DB.
 	const readingsDropped = [];
 	// Usually holds current message(s) that are yet to be added to msgTotal.
 	let errMsg;
 	// Tells sorted order of readings.
-	const isAscending = (timeSort === TimeSortTypesJS.increasing);
+	const isAscending = (timeSort === MeterTimeSortTypesJS.increasing);
 	// Convert readingGap and readingLengthVariation to milliseconds to stay consistent with moment.diff() which returns the difference in milliseconds
 	const msReadingGap = readingGap * 1000;
 	const msReadingLengthVariation = readingLengthVariation * 1000;
@@ -188,8 +191,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// See else clause for why formatted this way.
 			startTimestamp = prevReading.endTimestamp;
 			startTimestampTz = prevEndTimestampTz;
-			endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
-			if (!endTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				endTimestampTz = moment.tz(rows[index][1], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			}
+			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
@@ -198,8 +208,7 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
 			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
-		}
-		else {
+		} else {
 			// If the start date/time from the reading's timezone. Next, we put it
 			// into a moment reading has a timezone offset associated with it then we want to honor it by using parseZone.
 			// However the database uses UTC and has no timezone offset so we need to get the reading into UTC.
@@ -208,8 +217,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 			// Thus, we want in a timezone aware way so the UTC sticks and there is no shift of time.
 			// This setup should work no matter want the timezone is on the server.
 			// Get the reading into moment in a timezone aware way. Note will assume UTC if no timezone in the string.
-			startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
-			if (!startTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				startTimestampTz = moment.tz(rows[index][1], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
+			}
+			if (!startTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
 				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
@@ -217,8 +233,15 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// If this fails it is caught below.
 				startTimestampTz = moment.parseZone(rows[index][1], undefined);
 			}
-			endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
-			if (!endTimestampTz.isValid() && relaxedParsing) {
+			if (useMeterZone) {
+				// Treat the reading as if it came in the meter time zone.
+				// This keeps the time the same but applies the time zone.
+				endTimestampTz = moment.tz(rows[index][2], meterZone);
+			} else {
+				// Use whatever the reading has (UTC if none)
+				endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
+			}
+			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
@@ -329,19 +352,29 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// for inclusion. Thus, we mark that a split is needed.
 				splitDst = true;
 			} else if (shift > 0) {
-				// These are the examples on the right in the example diagram in the developer docs.
-				// This reading crossed and left DST so went back in time.
-				// The next two lines are similar use to above.
-				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
-				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
-				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
-				// This may take multiple readings so store the time now.
-				prevEndTimestamp = prevReading.endTimestamp;
-				// We note we are in this situation and may need to remove and split readings.
-				inDst = true;
+				// This is a hack where when doing meter time zone you don't do the DST processing when crossing out
+				// of DST. This can give duplicate values and miss if the readings don't align with the DST shift range.
+				// TODO fix this up so better.
+				if (!useMeterZone) {
+					// These are the examples on the right in the example diagram in the developer docs.
+					// This reading crossed and left DST so went back in time.
+					// The next two lines are similar use to above.
+					const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+					zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+					// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
+					// This may take multiple readings so store the time now.
+					prevEndTimestamp = prevReading.endTimestamp;
+					// We note we are in this situation and may need to remove and split readings.
+					inDst = true;
+				}
+			} else {
+				// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
+				// handled next.
+				if (useMeterZone) {
+					// TODO This is a big hack because we we don't do inDst for this case so reset. Similar to issue above.
+					splitDst = false;
+				}
 			}
-			// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
-			// handled next.
 			if (inDst) {
 				if (endTimestamp.isAfter(prevEndTimestamp)) {
 					// This reading has some part of its time past the previous one used so need to use it and stop this process.
@@ -564,22 +597,22 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 				// Remove that in DST split since done processing this reading and don't want for next one.
 				splitDst = false;
 			} else if (inDstStop) {
-					// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
-					// We could not reset before now since it would potentially create a gap and different length.
-					currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
-					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
-					result.push(currentReading.clone());
-					// Reset inDstStop
-					inDstStop = false;
-					// We reset the start timestamp for the same issue with next reading.
-					currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-					// Reset back to default so if store into DB know not in DST shift zone.
-					// clone() may not be needed but being safe.
-					prevEndTimestamp = E0.clone();
+				// This start timestamp from reading in inDst where it is stopping since just accepted a reading.
+				// We could not reset before now since it would potentially create a gap and different length.
+				currentReading = new Reading(meterID, meterReading, startTimestampUse, endTimestamp);
+				// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+				result.push(currentReading.clone());
+				// Reset inDstStop
+				inDstStop = false;
+				// We reset the start timestamp for the same issue with next reading.
+				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
+				// Reset back to default so if store into DB know not in DST shift zone.
+				// clone() may not be needed but being safe.
+				prevEndTimestamp = E0.clone();
 			} else {
 				currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
-					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
-					result.push(currentReading.clone());
+				// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
+				result.push(currentReading.clone());
 			}
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
@@ -626,18 +659,36 @@ async function processData(rows, meterID, timeSort = TimeSortTypesJS.increasing,
 		// Not used in many cases but just set since easier.
 		prevEndTimestampTz = endTimestampTz;
 	}
-	// Validate data if conditions given
-	if (conditionSet !== undefined && !conditionSet['disableChecks']) {
+	// Validate data if conditions are given and disableChecks is not set to 'reject_none'
+	if (conditionSet !== undefined && conditionSet['disableChecks'] !== 'reject_none') {
 		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
 		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
+
 		if (!validReadings) {
-			errMsg = `<h2>For meter ${meterName}: error when validating data so all reading are rejected</h2>`;
+			errMsg = `<h2>For meter ${meterName}: Error when validating data where `;
+			// Handle 'reject_bad' specifically
+			if (conditionSet['disableChecks'] === 'reject_bad') {
+				errMsg += `only bad readings are rejected</h2>`;
+				// This removes invalid readings but keeps the valid ones.
+				result = result.filter(reading => validateSingleReading(reading, conditionSet));
+			} else {
+				// Default behavior: reject all readings
+				errMsg += `all readings are rejected</h2>`;
+				// Empties the result array
+				result.splice(0, result.length);
+			}
 			log.error(errMsg);
 			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
-			// This empties the result array. Should be fast and okay with const.
-			result.splice(0, result.length);
+
+			// Mark readings as not okay since some were dropped
 			isAllReadingsOk = false;
-			return { result, isAllReadingsOk, msgTotal };
+
+			if (result.length === 0) {
+				// If no readings are added then return since don't want to update
+				// readings nor the time stamps in this case.
+				// Note catches case if reject_bad removes them all.
+				return { result, isAllReadingsOk, msgTotal };
+			}
 		}
 	}
 	// Update the meter to contain information for the last reading in the data file.
@@ -751,8 +802,8 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 	if (msgTotal.length < MAX_SIZE) {
 		msgTotal += newMsg;
 	} else if (!msgTotalWarning) {
-		msgTotal = '<h1>WARNING - The total number of messages was stopped due to size.' +
-			' The log file has all the messages.</h1>' + message + '<h1>Message lost starting now.</h1>';
+		msgTotal += '<h1>WARNING - The total number of messages was stopped due to size.' +
+			' The log file has all the messages.</h1>' + newMsg + '<h1>Messages lost starting now.</h1>';
 		// Note that warned so goes from false to true.
 		msgTotalWarning = !msgTotalWarning;
 	}

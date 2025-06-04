@@ -2,8 +2,9 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as _ from 'lodash';
+import { cloneDeep, isEqual, difference, filter } from 'lodash';
 import * as React from 'react';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 // Realize that * is already imported from react
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -11,8 +12,9 @@ import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, InputGroup,
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectCik } from '../../redux/api/conversionsApi';
+import { groupsApi, selectAllGroups, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectAllMeters, selectMeterDataById } from '../../redux/api/metersApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
@@ -35,7 +37,7 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
 import { showErrorNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -57,21 +59,27 @@ interface EditGroupModalComponentProps {
  * @returns Group edit element
  */
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
+	const locale = useAppSelector(selectSelectedLanguage);
+	const translate = useTranslate();
 	const [submitGroupEdits] = groupsApi.useEditGroupMutation();
 	const [deleteGroup] = groupsApi.useDeleteGroupMutation();
+	const globalCikState = useAppSelector(selectCik);
 	// Meter state
 	const meterDataById = useAppSelector(selectMeterDataById);
-	// Group state used on other pages
+	const meterData = useAppSelector(selectAllMeters);
+	// Group state
 	const groupDataById = useAppSelector(selectGroupDataById);
+	const groupsData = useAppSelector(selectAllGroups);
+
 	// Make a local copy of the group data so we can update during the edit process.
 	// When the group is saved the values will be synced again with the global state.
 	// This needs to be a deep clone so the changes are only local.
-	const [editGroupsState, setEditGroupsState] = useState(_.cloneDeep(groupDataById));
+	const [editGroupsState, setEditGroupsState] = useState(cloneDeep(groupDataById));
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
 
 	// Update group state in case changed from create/edit
 	useEffect(() => {
-		setEditGroupsState(_.cloneDeep(groupDataById));
+		setEditGroupsState(cloneDeep(groupDataById));
 	}, [groupDataById]);
 
 	// The current groups state of group being edited of the local copy. It should always be valid.
@@ -228,7 +236,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// Failure to edit groups will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		// Set back to the global group values for this group. As before, need a deep copy.
-		setEditGroupsState(_.cloneDeep(groupDataById));
+		setEditGroupsState(cloneDeep(groupDataById));
 		// Set back to the default values for the menus.
 		setGroupChildrenState(groupChildrenDefaults);
 		setGraphicUnitsState(graphicUnitsStateDefaults);
@@ -261,8 +269,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This is the unedited state of the group being edited to compare to for changes.
 		const originalGroupState = groupDataById[groupState.id];
 		// Check children separately since lists.
-		const childMeterChanges = !_.isEqual(originalGroupState.childMeters, groupState.childMeters);
-		const childGroupChanges = !_.isEqual(originalGroupState.childGroups, groupState.childGroups);
+		const childMeterChanges = !isEqual(originalGroupState.childMeters, groupState.childMeters);
+		const childGroupChanges = !isEqual(originalGroupState.childGroups, groupState.childGroups);
 		const groupHasChanges =
 			(
 				originalGroupState.name != groupState.name ||
@@ -345,9 +353,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// Can only vary if admin and only used then.
 		if (loggedInAsAdmin) {
 			// Get meters that okay for this group in a format the component can display.
-			const possibleMeters = getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters);
+			const possibleMeters =
+				getMeterMenuOptionsForGroup(groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, meterData, locale);
 			// Get groups okay for this group. Similar to meters.
-			const possibleGroups = getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters);
+			const possibleGroups =
+				getGroupMenuOptionsForGroup(groupState.id, groupState.defaultGraphicUnit, groupState.deepMeters, globalCikState, meterDataById, groupsData, locale);
 			// Update the state
 			setGroupChildrenState(groupChildrenState => ({
 				...groupChildrenState,
@@ -370,7 +380,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// First must get a set from the array of deep meter numbers which is all meters currently in this group.
 			const deepMetersSet = new Set(groupState.deepMeters);
 			// Get the units that are compatible with this set of meters.
-			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
+			const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet, meterDataById, globalCikState);
 			// No unit allowed so modify allowed ones. Should not be there but will be fine if is since set.
 			allowedDefaultGraphicUnit.add(-99);
 			graphicUnitsState.possibleGraphicUnits.forEach(unit => {
@@ -600,7 +610,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										}
 									} else {
 										// Could have removed any item so figure out which one it is. Need to convert options to ids.
-										const removedMeter = _.difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
+										const removedMeter = difference(groupState.childMeters, newSelectedMeterOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedMeterId = removedMeter[0];
 										const childRemoved = removeChildFromGroup(removedMeterId, DataType.Meter);
@@ -647,7 +657,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										}
 									} else {
 										// Could have removed any item so figure out which one it is. Need to convert options to ids.
-										const removedGroup = _.difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
+										const removedGroup = difference(groupState.childGroups, newSelectedGroupOptions.map(item => { return item.value; }));
 										// There should only be one removed item.
 										const removedGroupId = removedGroup[0];
 										const childRemoved = removeChildFromGroup(removedGroupId, DataType.Group);
@@ -716,7 +726,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// This copy is directly changed without using the Redux hooks since it is not used by React.
 		// This means that changes to the group do not happen unless the change is accepted and this copy is
 		// put back into the edit state.
-		const tempGroupsState = _.cloneDeep(editGroupsState);
+		const tempGroupsState = cloneDeep(editGroupsState);
 
 		// Add the child to the group being edited in temp so can decide if want change.
 		// This assumes there are no duplicates which is not allowed by menus
@@ -784,10 +794,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			// Use the edit group since want the current values for deepMeters for comparison.
 			const parentGroup = editGroupsState[groupId];
 			// Get parent's compatible units
-			const parentCompatibleUnits = unitsCompatibleWithMeters(new Set(parentGroup.deepMeters));
+			const parentCompatibleUnits = unitsCompatibleWithMeters(new Set(parentGroup.deepMeters), meterDataById, globalCikState);
 			// Get compatibility change case when add this group to its parent.
 			const compatibilityChangeCase = getCompatibilityChangeCase(parentCompatibleUnits, gid, DataType.Group,
-				parentGroup.defaultGraphicUnit, groupsState[groupId].deepMeters);
+				parentGroup.defaultGraphicUnit, groupsState[groupId].deepMeters, globalCikState, meterDataById);
 			switch (compatibilityChangeCase) {
 				case GroupCase.NoCompatibleUnits:
 					// The group has no compatible units so cannot do this.
@@ -843,16 +853,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// until the next render. Second, and more importantly, the updated state was not showing during the render.
 		// Why that is the case was unclear because the set value were correct. Given all of this and to make the
 		// code more similar to add, it is done with a copy.
-		const tempGroupsState = _.cloneDeep(editGroupsState);
+		const tempGroupsState = cloneDeep(editGroupsState);
 
 		// Add the child to the group being edited.
 		if (childType === DataType.Meter) {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[groupState.id].childMeters, value => value != childId);
+			const newChildren = filter(tempGroupsState[groupState.id].childMeters, value => value != childId);
 			tempGroupsState[groupState.id].childMeters = newChildren;
 		} else {
 			// All the children without one being removed.
-			const newChildren = _.filter(tempGroupsState[groupState.id].childGroups, value => value != childId);
+			const newChildren = filter(tempGroupsState[groupState.id].childGroups, value => value != childId);
 			tempGroupsState[groupState.id].childGroups = newChildren;
 		}
 
@@ -927,7 +937,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -948,7 +959,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			);
 		});
 		// Want chosen in sorted order.
-		return _.sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -972,7 +984,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
-		listedMeters.sort();
+		listedMeters.sort((meterA, meterB) => meterA.toLowerCase().localeCompare(meterB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			listedMeters.push(translate('meter.hidden'));
@@ -1003,7 +1015,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display. Before were sorted by id so not okay here.
-		listedGroups.sort();
+		listedGroups.sort((groupA, groupB) => groupA.toLowerCase().localeCompare(
+			groupB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden groups so note at bottom of list.
 			listedGroups.push(translate('group.hidden'));
@@ -1031,7 +1044,8 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			}
 		});
 		// Sort for display.
-		listedDeepMeters.sort();
+		listedDeepMeters.sort((deepMeterA, deepMeterB) => deepMeterA.toLowerCase().localeCompare(
+			deepMeterB.toLowerCase(), locale, { sensitivity: 'accent' }));
 		if (hasHidden) {
 			// There are hidden meters so note at bottom of list.
 			// This should never happen to an admin.

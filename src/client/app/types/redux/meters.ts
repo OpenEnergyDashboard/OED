@@ -4,6 +4,7 @@
 import { GPSPoint } from 'utils/calibration';
 // import { ActionType } from './actions';
 import { AreaUnitType } from 'utils/getAreaUnitConversion';
+import { DisableChecksType } from './units';
 
 // The relates to the JS object Meter.types for the same use in src/server/models/Meter.js.
 // They should be kept in sync.
@@ -15,7 +16,7 @@ export enum MeterType {
 	OTHER = 'other'
 }
 
-// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts but does not have 'meter value or default'.
+// This relates to TimeSortTypes in src/client/app/types/csvUploadForm.ts
 // They should be kept in sync.
 export enum MeterTimeSortType {
 	increasing = 'increasing',
@@ -56,7 +57,7 @@ export interface MeterData {
 	minDate: string;
 	maxDate: string;
 	maxError: number;
-	disableChecks: boolean;
+	disableChecks: DisableChecksType;
 }
 
 export interface MeterDataByID extends Record<number, MeterData> { }

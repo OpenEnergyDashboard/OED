@@ -56,6 +56,7 @@ export const RefreshGraphComponent = () => {
 	const iconVisible = chartType !== ChartTypes.threeD
 		&& chartType !== ChartTypes.map
 		&& chartType !== ChartTypes.compare
+		&& chartType !== ChartTypes.radar
 		&& (selectedMeters.length || selectedGroups.length);
 
 	React.useEffect(() => {

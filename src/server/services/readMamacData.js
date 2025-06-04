@@ -116,7 +116,8 @@ async function readMamacData(meter, conn) {
 		},
 		conn = conn,
 		honorDst = false,
-		relaxedParsing = false
+		relaxedParsing = false,
+		useMeterZone = false
 	);
 }
 

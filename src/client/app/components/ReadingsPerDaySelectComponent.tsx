@@ -10,7 +10,7 @@ import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectReadingsPerDaySelectData } from '../redux/selectors/threeDSelectors';
 import { selectThreeDReadingInterval, updateThreeDReadingInterval } from '../redux/slices/graphSlice';
 import { ReadingInterval } from '../types/redux/graph';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
@@ -18,6 +18,7 @@ import TooltipMarkerComponent from './TooltipMarkerComponent';
  * @returns A Select menu with Readings per day options.
  */
 export default function ReadingsPerDaySelect() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const readingInterval = useAppSelector(selectThreeDReadingInterval);
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);

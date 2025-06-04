@@ -11,14 +11,16 @@ import { graphSlice, selectGraphState } from '../redux/slices/graphSlice';
 import { SelectOption } from '../types/items';
 import { ChartTypes, LineGraphRate, LineGraphRates } from '../types/redux/graph';
 import { UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * React component that controls the line graph rate menu
  * @returns Rate selection element
  */
 export default function GraphicRateMenuComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 
 	// Graph state
@@ -40,7 +42,8 @@ export default function GraphicRateMenuComponent() {
 	const displayOnChartType: ChartTypes[] = [
 		ChartTypes.line,
 		ChartTypes.threeD,
-		ChartTypes.radar
+		ChartTypes.radar,
+		ChartTypes.compareLine
 	];
 
 	if (!displayOnChartType.includes(graphState.chartToRender)) {
@@ -57,11 +60,6 @@ export default function GraphicRateMenuComponent() {
 			labelIdForTranslate: rateKey
 		} as SelectOption);
 	});
-
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
 
 	return (
 		<div>

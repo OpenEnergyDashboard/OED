@@ -3,6 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
  */
 
+-- By indexing both columns together, the database can efficiently handle queries that involve both meter_id and time_interval.
+-- Created to support the usage of the view by 3d.
+CREATE INDEX IF NOT EXISTS idx_hourly_readings_unit_meter_time
+ON hourly_readings_unit (meter_id, lower(time_interval));
+
 /*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for the readings in the supplied meter. This can be an issue, in particular,
@@ -21,7 +26,6 @@ BEGIN
 	RETURN tsrange_to_shrink * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
-
 
 -- Gets meters graphing data for 3D graphic by returning points that span the requested
 -- length of time over the days requested. This function can be slower than line readings
@@ -94,32 +98,11 @@ BEGIN
 		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id
         WHERE m.id = current_meter_id
         ;
-
         -- Get the range of days requested by calling shrink_tsrange_to_meter_readings_by_day.
         -- First make requested range only be full days by dropping any partial days at start/end.
         requested_range := shrink_tsrange_to_meter_readings_by_day(tsrange(date_trunc_up('day', start_stamp), date_trunc('day', end_stamp)), current_meter_id);
 
-        -- This currently does a special case if you want every hour since there is no need to
-        -- do the generate_series since that case aligns with the hourly table.
-        -- The more general code is currently slower than desired so doing this.
-        -- TODO Can we optimize the code so this is not needed or the slowdown is less?
-        IF (reading_length_hours_use = 1) THEN
-            -- If want every hour then can just return the items in the hourly table in the desired range of time.
-            -- Note could do outside the meter loop as is done for line readings and use the DB to do all the
-            -- meters but this makes both cases parallel and is still fast enough.
-            RETURN QUERY
-                SELECT
-                    hr.meter_id as meter_id,
-                    hr.reading_rate * slope + intercept as reading_rate,
-                    lower(hr.time_interval) AS start_timestamp,
-                    upper(hr.time_interval) AS end_timestamp
-                FROM hourly_readings_unit hr
-                -- Only want the desired meter and within the time requested
-                WHERE hr.meter_id = current_meter_id and requested_range @> hr.time_interval
-                 -- Time sort by which meter and the start time for graphing.
-                ORDER BY meter_id, start_timestamp
-            ;
-        ELSIF (reading_length_hours_use <= 12) THEN
+        IF (reading_length_hours_use <= 12) THEN
             -- Need to generate_series to group the desired hours together
             RETURN QUERY
                 -- The readings are rates in the hourly table so want to average not sum so
@@ -151,6 +134,8 @@ BEGIN
                 -- Only want readings that lie within this slice of the desired data
                 AND lower(hr.time_interval) >= hours.hour
                 AND upper(hr.time_interval) <= hours.hour + reading_length_interval
+                -- ensures that the start of the reading time intervals does not exceed the end of the current generated interval
+                AND lower(hr.time_interval) <= hours.hour + reading_length_interval
                 -- Group by the start time of the generated series since all points in
                 -- the desired slice have the same start time for the series.
                 -- Also group by the meter_id since Postgres wants and desired for graphing
@@ -173,8 +158,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-/*Gets group meters graphing data for 3D graphic by returning points that span the requested
+/* Gets group meters graphing data for 3D graphic by returning points that span the requested
   length of time over the days requested. 
 */
 CREATE OR REPLACE FUNCTION group_3d_readings_unit (

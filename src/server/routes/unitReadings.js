@@ -6,7 +6,7 @@
 
 const express = require('express');
 const validate = require('jsonschema').validate;
-const _ = require('lodash');
+const mapValues = require('lodash/mapValues');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
@@ -73,7 +73,7 @@ function formatReadingRow(readingRow) {
 async function meterLineReadings(meterIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterLineReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatReadingRow));
+	return mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatReadingRow));
 }
 
 function validateGroupLineReadingsParams(params) {
@@ -103,7 +103,7 @@ function validateGroupLineReadingsParams(params) {
 async function groupLineReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupLineReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatReadingRow));
+	return mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatReadingRow));
 }
 
 function validateMeterBarReadingsParams(params) {
@@ -167,7 +167,7 @@ async function meterBarReadings(meterIDs, graphicUnitId, barWidthDays, timeInter
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterBarReadings(
 		meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
+	return mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
 function validateGroupBarReadingsParams(params) {
@@ -199,7 +199,7 @@ async function groupBarReadings(groupIDs, graphicUnitId, barWidthDays, timeInter
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupBarReadings(
 		groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, barWidthDays, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
+	return mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatBarReadingRow));
 }
 
 function validateMeterRadarReadingsParams(params) {
@@ -255,7 +255,7 @@ function formatRadarReadingRow(readingRow) {
 async function meterRadarReadings(meterIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getMeterRadarReadings(meterIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatRadarReadingRow));
+	return mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatRadarReadingRow));
 }
 
 function validateGroupRadarReadingsParams(params) {
@@ -284,7 +284,7 @@ function validateGroupRadarReadingsParams(params) {
 async function groupRadarReadings(groupIDs, graphicUnitId, timeInterval) {
 	const conn = getConnection();
 	const rawReadings = await Reading.getGroupRadarReadings(groupIDs, graphicUnitId, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-	return _.mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatRadarReadingRow));
+	return mapValues(rawReadings, readingsForGroup => readingsForGroup.map(formatRadarReadingRow));
 }
 
 /**

@@ -57,13 +57,10 @@ export interface PreferenceRequestItem {
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
 	defaultMeterReadingFrequency: string;
-	defaultMeterMinimumValue: number;
-	defaultMeterMaximumValue: number;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
-	defaultMeterDisableChecks: boolean;
 	defaultHelpUrl: string;
 }
 
@@ -82,17 +79,18 @@ export interface TooltipItems {
  * A user object to be displayed for Administrators.
  */
 export interface User {
-	email: string;
+	id?: number;
+	username: string;
 	role: UserRole;
-}
-export interface NewUser extends User {
-	password: string;
+	password?: string;
+	note: string;
 }
 
 /**
  * The values of this enum that needs to match the keys of User.role in src/server/models/User
  */
 export enum UserRole {
+	INVALID = 'invalid',
 	ADMIN = 'admin',
 	CSV = 'csv',
 	EXPORT = 'export',
@@ -104,3 +102,15 @@ export enum TrueFalseType {
 	true = 'yes',
 	false = 'no'
 }
+
+// user default values
+export const userDefaults = {
+	username: '',
+	password: '',
+	confirmPassword: '',
+	note: '',
+	role: UserRole.INVALID,
+	passwordMatch: true,
+	disableDelete: false,
+	passwordLength: true
+};

@@ -46,6 +46,7 @@ mocha.describe('PIPELINE: Load data from array', () => {
 			undefined,
 			conn,
 			false,
+			false,
 			false);
 		const result = await Reading.getAllByMeterID(meter.id, conn);
 		expect(result.length).to.equal(5);

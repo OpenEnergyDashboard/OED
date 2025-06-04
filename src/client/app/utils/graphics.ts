@@ -4,7 +4,7 @@
 
 import { LineGraphRate } from 'types/redux/graph';
 import { UnitData, UnitRepresentType } from '../types/redux/units';
-import translate from '../utils/translate';
+import translate from './translate';
 import { AreaUnitType } from './getAreaUnitConversion';
 
 // Has functions for use with graphics
@@ -19,7 +19,6 @@ import { AreaUnitType } from './getAreaUnitConversion';
  */
 export function lineUnitLabel(selectUnitState: UnitData, currentSelectedRate: LineGraphRate, areaNormalization: boolean,
 	selectedAreaUnit: AreaUnitType): { unitLabel: string, needsRateScaling: boolean } {
-
 	let unitLabel: string = '';
 	let needsRateScaling = false;
 	// Quantity and flow units have different unit labels.

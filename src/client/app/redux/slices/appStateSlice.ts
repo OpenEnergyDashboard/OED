@@ -23,13 +23,17 @@ export interface AppState {
 	optionsVisibility: boolean;
 	chartLinkHideOptions: boolean;
 	selectedLanguage: LanguageTypes;
+	languageManuallySet: boolean;
+	refreshingReadings: boolean;
 }
 
 const defaultState: AppState = {
 	initComplete: false,
 	optionsVisibility: true,
 	selectedLanguage: LanguageTypes.en,
-	chartLinkHideOptions: false
+	chartLinkHideOptions: false,
+	languageManuallySet: false,
+	refreshingReadings: false
 };
 
 export const appStateSlice = createThunkSlice({
@@ -50,10 +54,14 @@ export const appStateSlice = createThunkSlice({
 		updateSelectedLanguage: create.reducer<LanguageTypes>((state, action) => {
 			state.selectedLanguage = action.payload;
 			moment.locale(action.payload);
+			state.languageManuallySet = true;
 		}),
 		setChartLinkOptionsVisibility: create.reducer<boolean>((state, action) => {
 			state.chartLinkHideOptions = action.payload;
 
+		}),
+		setRefresingReadings: create.reducer<boolean>((state, action) => {
+			state.refreshingReadings = action.payload;
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
@@ -113,15 +121,18 @@ export const appStateSlice = createThunkSlice({
 				}
 			})
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {
-				state.selectedLanguage = action.payload.defaultLanguage;
-				moment.locale(action.payload.defaultLanguage);
+				if (!state.languageManuallySet) {
+					state.selectedLanguage = action.payload.defaultLanguage;
+					moment.locale(action.payload.defaultLanguage);
+				}
 			});
 	},
 	selectors: {
 		selectInitComplete: state => state.initComplete,
 		selectOptionsVisibility: state => state.optionsVisibility,
 		selectSelectedLanguage: state => state.selectedLanguage,
-		selectChartLinkHideOptions: state => state.chartLinkHideOptions
+		selectChartLinkHideOptions: state => state.chartLinkHideOptions,
+		selectRefreshingReadings: state => state.refreshingReadings
 	}
 });
 
@@ -131,12 +142,14 @@ export const {
 	toggleOptionsVisibility,
 	setOptionsVisibility,
 	updateSelectedLanguage,
-	setChartLinkOptionsVisibility
+	setChartLinkOptionsVisibility,
+	setRefresingReadings
 } = appStateSlice.actions;
 
 export const {
 	selectInitComplete,
 	selectOptionsVisibility,
 	selectSelectedLanguage,
-	selectChartLinkHideOptions
+	selectChartLinkHideOptions,
+	selectRefreshingReadings
 } = appStateSlice.selectors;

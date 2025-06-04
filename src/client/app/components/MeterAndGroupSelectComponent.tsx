@@ -16,15 +16,18 @@ import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
 import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
+import { labelStyle } from '../styles/modalStyle';
+
 /**
  * Creates a React-Select component for the UI Options Panel.
  * @param props - Helps differentiate between meter or group options
  * @returns A React-Select component.
  */
 export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
@@ -143,9 +146,4 @@ const customStyles: StylesConfig<SelectOption, true, GroupedOption> = {
 		...base,
 		backgroundColor: props.data.isDisabled ? 'hsl(0, 0%, 70%)' : base.backgroundColor
 	})
-};
-
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
 };

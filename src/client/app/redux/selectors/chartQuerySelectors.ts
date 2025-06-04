@@ -8,12 +8,14 @@ import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
 import {
-	selectBarWidthDays, selectComparePeriod,
-	selectCompareTimeInterval, selectMapBarWidthDays, selectQueryTimeInterval,
+	selectWidthDays, selectComparePeriod,
+	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
-	selectSelectedUnit, selectThreeDState
+	selectSelectedUnit, selectThreeDState,
+	selectShiftAmount
 } from '../slices/graphSlice';
 import { omit } from 'lodash';
+import { selectLineChartDeps } from './lineChartSelectors';
 
 // query args that 'most' graphs share
 export interface commonQueryArgs {
@@ -25,6 +27,7 @@ export interface commonQueryArgs {
 
 // endpoint specific args
 export interface LineReadingApiArgs extends commonQueryArgs { }
+export interface CompareLineReadingApiArgs extends commonQueryArgs { }
 export interface BarReadingApiArgs extends commonQueryArgs { barWidthDays: number }
 
 // ThreeD only queries a single id so extend common, but omit ids array
@@ -81,6 +84,33 @@ export const selectLineChartQueryArgs = createSelector(
 	}
 );
 
+export const selectCompareLineQueryArgs = createSelector(
+	selectQueryTimeInterval,
+	selectSelectedUnit,
+	selectThreeDState,
+	selectLineChartDeps,
+	selectShiftAmount,
+	(queryTimeInterval, selectedUnit, threeD, lineChartDeps, ShiftAmount) => {
+		const args: CompareLineReadingApiArgs =
+			threeD.meterOrGroup === MeterOrGroup.meters
+				? {
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				}
+				: {
+					ids: [threeD.meterOrGroupID!],
+					timeInterval: queryTimeInterval.toString(),
+					graphicUnitId: selectedUnit,
+					meterOrGroup: threeD.meterOrGroup!
+				};
+		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded() || ShiftAmount == 'none';
+		const argsDeps = threeD.meterOrGroup === MeterOrGroup.meters ? lineChartDeps.meterDeps : lineChartDeps.groupDeps;
+		return { args, shouldSkipQuery, argsDeps };
+	}
+);
+
 export const selectRadarChartQueryArgs = createSelector(
 	selectLineChartQueryArgs,
 	lineChartArgs => {
@@ -91,7 +121,7 @@ export const selectRadarChartQueryArgs = createSelector(
 
 export const selectBarChartQueryArgs = createSelector(
 	selectCommonQueryArgs,
-	selectBarWidthDays,
+	selectWidthDays,
 	(common, barWidthDays) => {
 		// QueryArguments to pass into the bar chart component
 		const barWidthAsDays = Math.round(barWidthDays.asDays());
@@ -139,7 +169,7 @@ export const selectCompareChartQueryArgs = createSelector(
 
 export const selectMapChartQueryArgs = createSelector(
 	selectBarChartQueryArgs,
-	selectMapBarWidthDays,
+	selectWidthDays,
 	(state: RootState) => state.maps,
 	(barChartArgs, barWidthDays, maps) => {
 		const durationDays = Math.round(barWidthDays.asDays());
@@ -185,11 +215,13 @@ export const selectAllChartQueryArgs = createSelector(
 	selectCompareChartQueryArgs,
 	selectMapChartQueryArgs,
 	selectThreeDQueryArgs,
-	(line, bar, compare, map, threeD) => ({
+	selectCompareLineQueryArgs,
+	(line, bar, compare, map, threeD, compareLine) => ({
 		line,
 		bar,
 		compare,
 		map,
-		threeD
+		threeD,
+		compareLine
 	})
 );

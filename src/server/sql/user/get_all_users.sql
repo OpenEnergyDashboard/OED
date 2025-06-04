@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- This does not expose password_hash to the client
-SELECT id, email, role FROM users;
+SELECT id, username, role, note FROM users;

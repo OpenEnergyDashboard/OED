@@ -27,16 +27,18 @@ const processData = require('./processData');
  * @param {array} conn connection to database
  * @param {boolean} honorDst true if this meter's times shift when crossing DST, false otherwise (default false)
  * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default is false since this can give bad dates/times.
+ * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
+ *   Should only be true if honorDST is true and reading does not have proper time zone information.
  * @returns {object[]} {whether readings were all process (true) or false, all the messages from processing the readings as a string}
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-	shouldUpdate, conditionSet, conn, honorDst, relaxedParsing) {
+	shouldUpdate, conditionSet, conn, honorDst, relaxedParsing, useMeterZone) {
 	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
 	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
 		isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-		conditionSet, conn, honorDst, relaxedParsing);
+		conditionSet, conn, honorDst, relaxedParsing, useMeterZone);
 	if (shouldUpdate) {
 		// New readings should replace old ones.
 		await Reading.insertOrUpdateAll(readingsToInsert, conn)
