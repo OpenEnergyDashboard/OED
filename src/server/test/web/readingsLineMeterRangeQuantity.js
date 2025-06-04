@@ -44,7 +44,6 @@ mocha.describe('readings API', () => {
 
 					// Add LR3 here
 
-					// Add LR4 here
 					mocha.it('LR4: range should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 						const unitData = [
 							{
