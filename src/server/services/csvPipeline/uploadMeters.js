@@ -8,6 +8,7 @@ const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
+const moment = require('moment-timezone');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -271,11 +272,10 @@ function isValidMeterType(meterTypeString) {
  * @returns true or false
  */
 function isValidTimeZone(zone) {
-	// check against the built in timezones, must use a try catch since it does not return a boolean
-	try {
-		new Intl.DateTimeFormat(undefined, { timeZone: zone });
+	const validZones = moment.tz.names();
+	if (validZones.includes(zone)) {
 		return true;
-	} catch (e) {
+	} else {
 		return false;
 	}
 }
