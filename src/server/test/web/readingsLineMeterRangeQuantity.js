@@ -59,31 +59,20 @@ mocha.describe('readings API', () => {
                     // Add LR4 here
 
                     // Add LR5 here
-mocha.it('LR5: API should return readings only within specified time range (15-min intervals, quantity, kWh)', async () => {
-    // Prepare test data using existing utility
-    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
-
-    // Get Unit ID for kWh
-    const unitId = await getUnitId('kWh');
-
-    // Load the expected data for the LR5 date range and unit configuration
-    const expected = await parseExpectedCsv(
-        'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv'
-    );
-
-
-
-    // Send API request using time range and graphic unit
-    const res = await chai.request(app)
-        .get(`/api/unitReadings/line/meters/${METER_ID}`)
-        .query({
-            timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:00:00'),
-            graphicUnitId: unitId, readingInterval: 15
-        });
-
-    // Assert the response only includes data within that range and format
-    expectRangeToEqualExpected(res, expected);
-});
+																			 mocha.it('LR5: API should return readings only within specified time range (15-min intervals, quantity, kWh', async () => {
+																			 				// Prepare test data using existing utility
+																			 				await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+																								//Get unit ID for kWh
+																								const unitId = await getUnitId('kWh');
+																								//Load the expected data for the LR5 date range and unit configuration
+																								const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kWh_st_2022-09-21%00#00#00_et_2022-10-06%00#00#00.csv');
+																								//Send API request using time range and graphic unit
+																								const res = await chai.request(app)
+																												.get(`/api/unitReadings/line/meters/${METER_ID}`)
+																												.query({ timeInterval: createTimeString('2022-09-21', '00:00:00', '2022-10-06', '00:00:00'), graphicUnitId: unitId, readingInterval: 15 });
+																								//Assert the reponse only includes data within that range and format
+																								expectRangeToEqualExpected(res, expected);
+																			 });
                     // Add LR6 here
 
                     // Add LR7 here
