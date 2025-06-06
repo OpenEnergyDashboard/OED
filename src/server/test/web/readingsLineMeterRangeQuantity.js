@@ -58,7 +58,7 @@ mocha.describe('readings API', () => {
 
                     // Add LR4 here
 
-                    // Add LR5 here
+
 																			 mocha.it('LR5: API should return readings only within specified time range (15-min intervals, quantity, kWh', async () => {
 																			 				// Prepare test data using existing utility
 																			 				await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
