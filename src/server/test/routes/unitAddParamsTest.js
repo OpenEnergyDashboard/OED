@@ -4,11 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+//
 const { chai, mocha, app, testDB, recreateDB } = require('../common');
+//This is the first way to test endpoint
 const { generateUnitValidationTests } = require('../util/unitTestUtils');
-const { validateString, validateInt, validateBool } = require('../util/validationHelpers');
-const Unit = require('../../models/Unit');
+//2nd way
+const { validateString, validateInt, validateBool } = require('../util/vaidationHelpers');
 
+//This is the end point we use to test in this file.
 const ADD_UNIT = '/api/units/addUnit';
 
 mocha.describe('Unit Routes - /addUnit Validation', () => {
@@ -18,9 +21,7 @@ mocha.describe('Unit Routes - /addUnit Validation', () => {
     });
 
     generateUnitValidationTests({
-        app,
         endpoint: ADD_UNIT,
-        Unit,
         getId: async () => undefined,
         options: { skipId: true },
         cases: [
@@ -48,6 +49,8 @@ const basePayload = {
     disableChecks: 'reject_bad'
 };
 
+
+//This is another way to test - we test each route by testing String, Boolean, Integer seperately. 
 mocha.describe('Validation - /addUnit', () => {
     mocha.it('should validate string fields', async () => {
         await validateString({ field: 'name', endpoint: ADD_UNIT, basePayload, maxLength: 255 });
