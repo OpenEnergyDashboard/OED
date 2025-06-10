@@ -51,6 +51,7 @@ const basePayload = {
 
 
 //This is another way to test - we test each route by testing String, Boolean, Integer seperately. 
+//By now this file should run into test fail, because we didn't have any restriction for max lenngth for string and int as an ipunt
 mocha.describe('Validation - /addUnit', () => {
     mocha.it('should validate string fields', async () => {
         await validateString({ field: 'name', endpoint: ADD_UNIT, basePayload, maxLength: 255 });
