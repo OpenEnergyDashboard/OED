@@ -4,8 +4,6 @@
  */
 
 import * as React from 'react';
-import { useState } from 'react';
-import { Icons } from 'plotly.js';
 import Plot from 'react-plotly.js';
 import * as moment from 'moment';
 import { useAppSelector } from '../redux/reduxHooks';
@@ -77,14 +75,16 @@ const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => 
 		}
 	}
 
-
+	// Unlike line, bar, etc., testing found that the only two buttons that can be shown
+	// (outside download plot and plotly info) is box select & lasso select. Neither is
+	// desired so this lists the default ones to remove (those two) but does not use state
+	// to change it dynamically.
+	// Note: Since this is a 2D graphic and the regular bar graphic has more buttons it is
+	// unclear why it only has these two buttons.
+	// This website was consulted: https://plotly.com/javascript/configuration-options/#remove-modebar-buttons
+	// on the expected buttons.
 	// Display Plotly Buttons Feature:
-	// The number of items in defaultButtons and advancedButtons must differ as discussed below */
-	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
-		'resetScale2d'];
-	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
-	// Manage button states with useState
-	const [listOfButtons, setListOfButtons] = useState(defaultButtons);
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d'];
 
 	// Get the time shift for this comparison as a moment duration
 	const compareShift = calculateCompareShift(comparePeriod);
@@ -116,7 +116,6 @@ const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => 
 	// X axis label tells the user what time period they are looking at. Label A & B so easier for user to know which applies to which bar.
 	// The same A/B labels are used below for the x: value in the plot.
 	const xTitle: string = `${lastStartTimeLabel} -<br> ${LastEndTimeLabel} (A) &<br>${thisStartTimeLabel} -<br> ${thisEndTimeLabel} (B)`;
-
 
 	const colorize = (changeForColorization: number) => {
 		if (isNaN(changeForColorization)) {
@@ -164,6 +163,7 @@ const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => 
 			}
 		);
 	}
+
 	let layout: any;
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
@@ -225,23 +225,13 @@ const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => 
 		};
 	}
 
-
-
 	return (
 		<Plot
 			data={datasets}
 			layout={layout}
 			config={{
 				displayModeBar: true,
-				modeBarButtonsToRemove: listOfButtons,
-				modeBarButtonsToAdd: [{
-					name: 'toggle-options',
-					title: translate('toggle.options'),
-					icon: Icons.pencil,
-					click: function () {
-						setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
-					}
-				}],
+				modeBarButtonsToRemove: defaultButtons,
 				locale,
 				locales: Locales
 			}}
