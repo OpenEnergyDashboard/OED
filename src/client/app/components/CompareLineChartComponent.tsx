@@ -5,6 +5,7 @@
 import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectCompareLineQueryArgs } from '../redux/selectors/chartQuerySelectors';
@@ -86,6 +87,14 @@ export default function CompareLineChartComponent() {
 	// Check if there is at least one valid graph for current data and shifted data
 	const enoughData = data.find(data => data.x!.length > 1) && dataNew.find(dataNew => dataNew.x!.length > 1);
 
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d',
+		'zoomOut2d', 'autoScale2d', 'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+	// Manage button states with useState
+	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+
 	// Customize the layout of the plot
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text `not plot.
 	if (!meterOrGroupID) {
@@ -148,7 +157,17 @@ export default function CompareLineChartComponent() {
 					layout={layout}
 					config={{
 						responsive: true,
-						displayModeBar: false,
+						displayModeBar: true,
+						modeBarButtonsToRemove: listOfButtons,
+						modeBarButtonsToAdd: [{
+							name: 'toggle-options',
+							title: translate('toggle.options'),
+							icon: Icons.pencil,
+							click: function () {
+								// # of items must differ so the length can tell which list of buttons is being set
+								setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+							}
+						}],
 						// Current Locale
 						locale,
 						// Available Locales
