@@ -87,7 +87,7 @@ mocha.describe("readings API", () => {
 
 						// Add LR4 here
 
-					//Testing
+
 						mocha.it(
 							"LR5: API should return readings only within specified time range (15-min intervals, quantity, kWh",
 							async () => {
