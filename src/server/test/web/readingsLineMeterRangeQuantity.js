@@ -138,6 +138,6 @@ mocha.describe("readings API", () => {
 					});
 				});
 			});
-		},
-	);
+		});
+	});
 });
