@@ -15,19 +15,22 @@ class TimeInterval {
 	}
 
 	toString() {
+		let str = '';
 		if (this.startTimestamp === undefined && this.endTimestamp === undefined) {
-			return 'all';
+			str = 'all';
+		} else {
+			// If startTimestamp is defined, append it to the string.(Left bound)
+			if (this.startTimestamp !== undefined) {
+				str += this.startTimestamp.format();
+			}
+			// The middle separator is an underscore.
+			str += '_';
+			// If endTimestamp is defined, append it to the string.(Right bound)
+			if (this.endTimestamp !== undefined) {
+				str += this.endTimestamp.format();
+			}
 		}
-		// If only start is defined (bounded left)
-		if (this.startTimestamp !== undefined && this.endTimestamp === undefined) {
-			return `${this.startTimestamp.format()}_`;
-		}
-		// If only end is defined (bounded right)
-		if (this.startTimestamp === undefined && this.endTimestamp !== undefined) {
-			return `_${this.endTimestamp.format()}`;
-		}
-		// Both defined (fully bounded)
-		return `${this.startTimestamp.format()}_${this.endTimestamp.format()}`;
+		return str;
 	}
 
 	equals(other) {
@@ -89,6 +92,10 @@ class TimeInterval {
 	getIsBounded() {
 		return this.isBounded;
 	}
+	/**
+	 * Check if the time interval is half bounded, meaning it has either a start or an end timestamp, but not both or none.
+	 * @returns {boolean}
+	 */
 	getIsHalfBounded() {
     return (
         (this.startTimestamp !== undefined && this.endTimestamp === undefined) ||
