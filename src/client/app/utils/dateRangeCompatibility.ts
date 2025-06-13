@@ -22,24 +22,20 @@ export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
 	 * In the case where the correction is not needed incrementing by a millisecond won't change what users
 	 * see.
 	*/
-	if (startTS && endTS) {
+	let startDate: Date | null = null;
+	let endDate: Date | null = null;
+
+	// If the start or end time is defined, convert it to a Date object.
+	if (startTS) {
 		const startTimeStamp = startTS.toISOString().slice(0, -1);
+		startDate = new Date(startTimeStamp);
+	}
+	if (endTS) {
 		const endTimeStamp = endTS.clone().subtract(1, 'millisecond').toISOString().slice(0, -1);
-		const startDate = new Date(startTimeStamp);
-		const endDate = new Date(endTimeStamp);
-		return [startDate, endDate];
+		endDate = new Date(endTimeStamp);
 	}
-	if (startTS && !endTS) {
-		const startTimeStamp = startTS.toISOString().slice(0, -1);
-		const startDate = new Date(startTimeStamp);
-		return [startDate, null];
-	}
-	if (!startTS && endTS) {
-		const endTimeStamp = endTS.clone().subtract(1, 'millisecond').toISOString().slice(0, -1);
-		const endDate = new Date(endTimeStamp);
-		return [null, endDate];
-	}
-	return null;
+	// If both start and end dates are undefined, return a null pair.
+	return [startDate, endDate];
 }
 
 /**
@@ -58,10 +54,17 @@ export function toUTC(date: Date) {
  * @returns the translated TimeInterval
  */
 export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
-	let start = null;
-	let end = null;
+	let start: moment.Moment | undefined;
+	let end: moment.Moment | undefined;
+
 	if (Array.isArray(dateRange)) {
-		[start, end] = dateRange;
+		const [startDate, endDate] = dateRange as [Date | null, Date | null];
+		if (startDate) {
+			start = moment(toUTC(startDate));
+		}
+		if (endDate) {
+			end = moment(toUTC(endDate)).add(1, 'millisecond');
+		}
 	}
 	/*	Adds a millisecond to the end time.
 		For the case in which the end time is the last moment of the day (date = date.endOf('day)),
@@ -71,20 +74,9 @@ export function dateRangeToTimeInterval(dateRange: Value): TimeInterval {
 		In the case where the end date is not the last time in the day, this should not effect what users
 		should see.
 	*/
-	if (start && end) {
-		start = moment(toUTC(start));
-		end = moment(toUTC(end)).add(1, 'millisecond');
-		return new TimeInterval(start, end);
-	}
-	if (start && !end) {
-		start = moment(toUTC(start));
-		return new TimeInterval(start, undefined);
-	}
-	if (!start && end) {
-		end = moment(toUTC(end)).add(1, 'millisecond');
-		return new TimeInterval(undefined, end);
-	}
-	return TimeInterval.unbounded();
+
+	const toReturn = new TimeInterval(start, end);
+	return toReturn;
 }
 
 /**
