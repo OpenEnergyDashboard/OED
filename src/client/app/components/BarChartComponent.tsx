@@ -94,7 +94,6 @@ export default function BarChartComponent() {
 		}
 	}, [minX, maxX]);
 
-
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;
 	}

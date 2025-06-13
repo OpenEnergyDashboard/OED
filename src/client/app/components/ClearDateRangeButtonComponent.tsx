@@ -9,8 +9,6 @@ import { changeSliderRange, updateTimeInterval } from '../redux/slices/graphSlic
 import { TimeInterval } from '../../../common/TimeInterval';
 import { useTranslate } from '../redux/componentHooks';
 
-
-//TODO: Translate Internationalization
 /**
  * A button component that, when clicked, clears the current date range filter
  * by dispatching an action to set the query TimeInterval to unbounded (no start or end).
@@ -23,7 +21,6 @@ export default function ClearDateRangeButton() {
 		<Button
 			color="secondary"
 			onClick={() => {
-				console.log('Clear Date Range button clicked');
 				dispatch(updateTimeInterval(TimeInterval.unbounded()));
 				dispatch(changeSliderRange(TimeInterval.unbounded()));
 			}}

@@ -15,12 +15,12 @@ import * as moment from 'moment';
 export function timeIntervalToDateRange(timeInterval: TimeInterval): Value {
 	const startTS = timeInterval.getStartTimestamp();
 	const endTS = timeInterval.getEndTimestamp();
-	/*	Clones and rewinds the end time by one millisecond.
-		In the case where the end date has been pushed forward by a millisecond for data fetching purpose in
-		the method dateRangeToTimeInterval (method below) a millisecond is subtracted in order to reverse the
-		operation and to display the correct dates in the Date Range Picker.
-		In the case where the correction is not needed incrementing by a millisecond won't change what users
-		see.
+	/* Clones and rewinds the end time by one millisecond.
+	 * In the case where the end date has been pushed forward by a millisecond for data fetching purpose in
+	 * the method dateRangeToTimeInterval (method below) a millisecond is subtracted in order to reverse the
+	 * operation and to display the correct dates in the Date Range Picker.
+	 * In the case where the correction is not needed incrementing by a millisecond won't change what users
+	 * see.
 	*/
 	if (startTS && endTS) {
 		const startTimeStamp = startTS.toISOString().slice(0, -1);
