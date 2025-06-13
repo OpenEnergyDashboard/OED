@@ -7,6 +7,7 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const { success, failure } = require('./response');
+const { createConversionGraph, createConversionGraphFromArray } = require('../services/graph/createConversionGraph');
 const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
@@ -201,5 +202,68 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		success(res, 'Successfully deleted conversion');
 	}
 });
+router.post('/simulate-delete', async (req, res) => {
+	// 1. Validate input like in /delete
+	// Only require a source and destination id
+	const validConversion = {
+		type: 'object',
+		required: ['sourceId', 'destinationId'],
+		properties: {
+			sourceId: {
+				type: 'number',
+				minimum: 0
+			},
+			destinationId: {
+				type: 'number',
+				minimum: 0
+			}
+		}
+	};
+	const validatorResult = validate(req.body, validConversion);
+	if (!validatorResult.valid) {
+		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+	}
+	// 2. Load all conversions, units, meters, groups
+	try {
+		const [allConversions, allMeters, allGroups, allUnits] = await Promise.all([
+			Conversion.getAll(conn),
+			Meter.getAll(conn),
+			Group.getAll(conn),
+			Unit.getAll(conn)
+		]);
+	// 3. Remove the conversions we are simulating deleting
+	const newConversions = allConversions.filter(c =>
+		!(c.sourceId === req.body.sourceId && c.destinationId === req.body.destinationId)
+	);
+	// 4. Build old and new graphs
+	const oldGraph = await createConversionGraph(conn);
+	// Build a new graph with the remaining conversions
+	const newGraph = createConversionGraphFromArray(allUnits, newConversions);
+	// 5. For each meter/group, compare graphable units before/after deletion
+	const affectedMeters = [];
+		for (const meter of allMeters) {
+			const unitId = meter.unitId;
+			const oldPaths = getAllPaths(oldGraph, unitId);
+			const newPaths = getAllPaths(newGraph, unitId);
 
+			const oldReachable = new Set(oldPaths.map(p => p[p.length - 1]));
+			const newReachable = new Set(newPaths.map(p => p[p.length - 1]));
+
+			const lostUnits = [...oldReachable].filter(u => !newReachable.has(u));
+			if (lostUnits.length > 0) {
+				affectedMeters.push({
+					meterId: meter.id,
+					meterName: meter.name,
+					lostUnits
+				});
+			}
+		}
+	// 6. Return a summary of affected meters/groups and lost units
+		return res.json({affectedMeters});
+	} catch (err) {
+		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
+		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
+	}
+});
 module.exports = router;

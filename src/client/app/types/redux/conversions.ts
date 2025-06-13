@@ -19,3 +19,9 @@ export interface ConversionsState {
 	submitting: ConversionData[];
 	conversions: ConversionData[];
 }
+
+export interface SimulateDeleteResult {
+	affectedMeters: number[];
+	// affectedGroups: number[];
+	// affectedUnits: number[];
+}

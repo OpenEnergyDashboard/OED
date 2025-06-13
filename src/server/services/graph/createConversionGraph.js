@@ -29,6 +29,21 @@ async function createConversionGraph(conn) {
 
 	return graph;
 }
+// Helper to build a graph from arrays (not from Database).
+// This is used in simulate-delete
+function createConversionGraphFromArray(units, conversions) {
+	const graph = createGraph();
+	for (const unit of units) {
+		graph.addNode(unit.id, unit.name);
+	}
+	for (const c of conversions) {
+		graph.addLink(c.sourceId, c.destinationId);
+		if (c.bidirectional) {
+			graph.addLink(c.destinationId, c.sourceId);
+		}
+	}
+	return graph;
+}
 
 /**
  * Returns the list of units on the shortest path from source to destination.
@@ -73,6 +88,7 @@ function getAllPaths(graph, sourceId) {
 
 module.exports = {
 	createConversionGraph,
+	createConversionGraphFromArray,
 	getPath,
 	getAllPaths
 };

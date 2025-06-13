@@ -62,6 +62,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	};
 
+	// 1. Store current state
+	const oldConversions = [...conversionDetails];
+
 	// Set existing conversion values
 	const values = { ...props.conversion };
 
@@ -152,7 +155,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				});
 				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
 			} else if (srcCount === 1) {
-				// No meters use this meter unit so warn that will is ungraphable if used.
+				// No meters use this meter unit so warn that will be ungraphable if used.
 				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
 			} else {
 				// No meters use this meter unit so warn that reduced graphable units if used.

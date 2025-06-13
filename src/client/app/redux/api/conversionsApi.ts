@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import { ConversionData } from '../../types/redux/conversions';
+import { ConversionData, SimulateDeleteResult } from '../../types/redux/conversions';
 import { baseApi } from './baseApi';
 import { CikData } from '../../types/redux/ciks';
 import { setRefresingReadings } from '../../redux/slices/appStateSlice';
@@ -95,6 +95,13 @@ export const conversionsApi = baseApi.injectEndpoints({
 					dispatch(setRefresingReadings(false));
 				}
 			}
+		}),
+		simulateDeleteConversion: builder.mutation<SimulateDeleteResult, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
+			query: conversion => ({
+				url: 'api/conversions/simulate-delete',
+				method: 'POST',
+				body: conversion
+			})
 		})
 	})
 });
