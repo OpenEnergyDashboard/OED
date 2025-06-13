@@ -92,7 +92,7 @@ export default function BarChartComponent() {
 		if (minX && maxX) {
 			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
 		}
-	}, [minX, maxX, dispatch]);
+	}, [minX, maxX]);
 
 
 	if (meterIsFetching || groupIsFetching) {

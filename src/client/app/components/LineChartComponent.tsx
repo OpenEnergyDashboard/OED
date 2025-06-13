@@ -95,7 +95,7 @@ export default function LineChartComponent() {
 		if (minX && maxX) {
 			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
 		}
-	}, [minX, maxX, dispatch]);
+	}, [minX, maxX]);
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;
