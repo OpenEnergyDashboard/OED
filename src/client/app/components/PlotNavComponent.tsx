@@ -11,8 +11,8 @@ import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 import {
 	changeSliderRange, selectChartToRender, selectHistoryIsDirty,
 	selectSelectedGroups, selectSelectedMeters,
-	selectSliderRangeInterval, updateTimeInterval, selectInitialXAxisRange,
-	selectQueryTimeInterval
+	selectSliderRangeInterval, selectInitialXAxisRange,
+	selectQueryTimeInterval, updateTimeIntervalAndSliderRange
 } from '../redux/slices/graphSlice';
 import HistoryComponent from './HistoryComponent';
 import { ChartTypes } from '../types/redux/graph';
@@ -109,8 +109,7 @@ export const RefreshGraphComponent = () => {
 					const minX = initialXAxisRange?.getStartTimestamp?.();
 					const maxX = initialXAxisRange?.getEndTimestamp?.();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
-					dispatch(updateTimeInterval(nextInterval));
-					dispatch(changeSliderRange(nextInterval));
+					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
 				}
 			}}
 		/>

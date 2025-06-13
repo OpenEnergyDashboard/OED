@@ -95,7 +95,10 @@ export const graphSlice = createSlice({
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.rangeSliderInterval = action.payload;
-
+		},
+		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.queryTimeInterval = action.payload;
+			state.current.rangeSliderInterval = action.payload;
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderInterval = TimeInterval.unbounded();
@@ -421,7 +424,8 @@ export const {
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectShiftAmount, selectShiftTimeInterval, selectInitialXAxisRange
+	selectShiftAmount, selectShiftTimeInterval,
+	selectInitialXAxisRange
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -438,7 +442,8 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateShiftAmount, setInitialXAxisRange,
+	updateSelectedMetersOrGroups, updateShiftAmount,
+	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
 	updateShiftTimeInterval
 } = graphSlice.actions;
 

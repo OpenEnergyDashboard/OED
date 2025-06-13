@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { Button } from 'reactstrap';
 import { useAppDispatch } from '../redux/reduxHooks';
-import { changeSliderRange, updateTimeInterval } from '../redux/slices/graphSlice';
+import { updateTimeIntervalAndSliderRange } from '../redux/slices/graphSlice';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { useTranslate } from '../redux/componentHooks';
 
@@ -21,8 +21,7 @@ export default function ClearDateRangeButton() {
 		<Button
 			color="secondary"
 			onClick={() => {
-				dispatch(updateTimeInterval(TimeInterval.unbounded()));
-				dispatch(changeSliderRange(TimeInterval.unbounded()));
+				dispatch(updateTimeIntervalAndSliderRange(TimeInterval.unbounded()));
 			}}
 		>
 			{translate('clear.date.range')}
