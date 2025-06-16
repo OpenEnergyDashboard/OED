@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
+import { SimulateDeleteAffectedMeter } from '../../types/redux/conversions';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
@@ -40,6 +41,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
+	const [simulateDeleteConversion] = conversionsApi.useSimulateDeleteConversionMutation();
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
@@ -64,6 +66,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	// 1. Store current state
 	const oldConversions = [...conversionDetails];
+	const [affectedMeters, setAffectedMeters] = useState<SimulateDeleteAffectedMeter[]>([]);
 
 	// Set existing conversion values
 	const values = { ...props.conversion };
@@ -126,55 +129,30 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	};
 
 	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
-	const checkState = () => {
-		const source = unitDataById[state.sourceId];
-		const dest = unitDataById[state.destinationId];
-		let msg = '';
-		let cancel = false;
-		if (source.typeOfUnit === UnitType.meter) {
-			// How many conversions have this conversion's source so are conversions from a meter.
-			const srcCount = getConversionCount(source, conversionDetails);
-			// How many meters use this conversion, i.e., have the source as its unit.
-			const relatedMeters = Object.values(meterDataById).filter(meter => meter.unitId === source.id);
-			if (srcCount === 1 && relatedMeters.length !== 0) {
-				// This is the only conversion for this meter unit so if it is removed then
-				// you cannot graph any meters using this unit. Not allowed to delete if
-				// any meters use this unit as in this case.
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
-				});
-				cancel = true;
-			} else if (relatedMeters.length !== 0) {
-				// Some meters use this meter unit but there are other ways to graphic it
-				// so warn the admin and tell each meter impacted.
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
-				});
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
-			} else if (srcCount === 1) {
-				// No meters use this meter unit so warn that will be ungraphable if used.
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
-			} else {
-				// No meters use this meter unit so warn that reduced graphable units if used.
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
-			}
-			// TODO The following code did what was originally in issue #905 but there were issues
-			// with the design and usage of suffix units. It is commented out for now and needs
-			// to be revisited when the design for suffix is better.
-			// } else if (source.typeOfUnit === UnitType.suffix) {
-			// 	const srcCount = getConversionCount(source, conversionDetails);
-			// 	if (srcCount === 1) {
-			// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
-			// 	}
-		} else if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
-			const destConversions = conversionDetails.filter(conversion =>
-				(conversion.destinationId === dest.id) ||
-				(conversion.bidirectional && conversion.sourceId === dest.id)
-			);
+	const handleDeleteClick = async () => {
+		try {
+			const result = await simulateDeleteConversion({
+				sourceId: state.sourceId,
+				destinationId: state.destinationId
+			}).unwrap();
 
+			setAffectedMeters(result.affectedMeters);
+
+			let msg = '';
+			if (result.affectedMeters.length > 0) {
+				msg += translate('conversion.delete.meter.related') + ':\n';
+				result.affectedMeters.forEach(meter => {
+					msg += `• ${meter.meterName}\n`;
+					if (meter.lostUnits.length > 0) {
+						msg += '  ' + translate('conversion.delete.lost.units') + ': ';
+						msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
+					}
+				});
+			}
+			msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
+			setDeleteConfirmationMessage(msg);
+
+<<<<<<< HEAD
 			const remainingDestConversions = destConversions.filter(conversion =>
 				!(conversion.sourceId === source.id && conversion.destinationId === dest.id)
 			);
@@ -222,9 +200,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		} else {
 			setDeleteConfirmationMessage(msg + translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?');
 			handleDeleteConfirmationModalOpen();
+		} catch (e) {
+			// handle error
 		}
 	};
-
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
@@ -532,7 +511,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</Container>
 				</ModalBody>
 				<ModalFooter>
-					<Button color='danger' onClick={checkState}>
+					<Button color='danger' onClick={handleDeleteClick}>
 						<FormattedMessage id="conversion.delete.conversion" />
 					</Button>
 					{/* Hides the modal */}

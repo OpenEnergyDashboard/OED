@@ -21,7 +21,13 @@ export interface ConversionsState {
 }
 
 export interface SimulateDeleteResult {
-	affectedMeters: number[];
+	affectedMeters: SimulateDeleteAffectedMeter[];
 	// affectedGroups: number[];
 	// affectedUnits: number[];
+}
+
+export interface SimulateDeleteAffectedMeter {
+	meterId: number;
+	meterName: string;
+	lostUnits: number[];
 }
