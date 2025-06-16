@@ -25,7 +25,7 @@ export default function MoreOptionsComponent() {
 	const translate = useTranslate();
 	const chartToRender = useAppSelector(selectChartToRender);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
-	const isBounded = queryTimeInterval.getIsBounded();
+	// const isBounded = queryTimeInterval.getIsBounded();
 	const isHalfBounded = queryTimeInterval.getIsHalfBounded();
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);
@@ -64,7 +64,7 @@ export default function MoreOptionsComponent() {
 							{chartToRender == ChartTypes.compare && <ChartLinkComponent />}
 
 							{/* More UI options for map graphic */}
-							{chartToRender == ChartTypes.map && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.map && !isHalfBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.map && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.map && <ChartLinkComponent />}
 
@@ -75,7 +75,7 @@ export default function MoreOptionsComponent() {
 
 							{/* More UI options for radar graphic */}
 							{chartToRender == ChartTypes.radar && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.radar && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.radar && !isHalfBounded && <DateRangeComponent />}
 							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
 

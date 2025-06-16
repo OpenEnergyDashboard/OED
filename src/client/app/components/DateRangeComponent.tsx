@@ -13,7 +13,6 @@ import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectC
 import '../styles/DateRangeCustom.css';
 import { Dispatch } from '../types/redux/actions';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
-import ClearDateRangeButton from './ClearDateRangeButtonComponent';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
@@ -56,7 +55,6 @@ export default function DateRangeComponent() {
 							calendarIcon={null}
 						/>
 					</div>
-					<ClearDateRangeButton />
 				</>
 			)}
 		</div>
