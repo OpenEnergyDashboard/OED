@@ -16,10 +16,11 @@ import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/sel
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectBarStacking } from '../redux/slices/graphSlice';
+import { selectSliderRangeInterval ,selectBarStacking, setInitialXAxisRange } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -33,6 +34,7 @@ export default function BarChartComponent() {
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
 	const locale = useAppSelector(selectSelectedLanguage);
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
@@ -65,6 +67,33 @@ export default function BarChartComponent() {
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
 
+	// Getting the entire x-axis range from all traces
+	// This is used to set the initial x-axis range when the component mounts.
+	// It ensures that the graph starts with a range that covers all data points. That would be used for querying the data.
+	// If there are no data points, minX and maxX will be undefined.
+	const allX = React.useMemo(
+		() =>
+			datasets.flatMap(trace => {
+				if (!trace.x) return [];
+				// If trace.x is an array of arrays, flatten it
+				if (Array.isArray(trace.x[0])) {
+					return (trace.x as any[][]).flat();
+				}
+				// Otherwise, it's a flat array
+				return trace.x as (string | number | Date)[];
+			}),
+		[datasets]
+	);
+
+	const minX = allX.length ? utc(allX.reduce((a, b) => utc(a).isBefore(utc(b)) ? a : b)) : undefined;
+	const maxX = allX.length ? utc(allX.reduce((a, b) => utc(a).isAfter(utc(b)) ? a : b)) : undefined;
+
+	React.useEffect(() => {
+		if (minX && maxX) {
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+		}
+	}, [minX, maxX]);
+
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;
 	}
@@ -73,7 +102,7 @@ export default function BarChartComponent() {
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
 
 	if (raw) {
-		return <h1><b>${translate('bar.raw')}</b></h1>;
+		return <h1><b>{translate('bar.raw')}</b></h1>;
 	}
 	// At least one viable dataset.
 	const enoughData = datasets.find(dataset => dataset.x!.length >= 1);
@@ -88,7 +117,7 @@ export default function BarChartComponent() {
 		return (
 			<Plot
 				data={datasets}
-				style={{ width: '100%', height: '100%', minHeight: '700px' }}
+				style={fullSizeContainer}
 				layout={{
 					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					barmode: (barStacking ? 'stack' : 'group'),
@@ -102,6 +131,8 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()],
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,

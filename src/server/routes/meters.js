@@ -246,7 +246,11 @@ function validateMeterParams(params) {
 			minDate: { type: 'string' },
 			maxDate: { type: 'string' },
 			maxError: { type: 'integer' },
-			disableChecks: { type: 'bool' },
+			disableChecks: {
+				type: 'string',
+				minLength: 1,
+				enum: Object.values(Unit.disableChecksType)
+			}
 		}
 	}
 	const paramsValidationResult = validate(params, validParams);

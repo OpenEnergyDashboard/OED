@@ -16,7 +16,6 @@ import { conversionsApi } from '../../utils/api';
 import { updateCikAndDBViewsIfNeeded } from './admin';
 import { conversionsSlice } from '../reducers/conversions';
 
-
 export function fetchConversionsDetails(): Thunk {
 	return async (dispatch: Dispatch, getState: GetState) => {
 		// ensure a fetch is not currently happening
@@ -34,7 +33,6 @@ export function fetchConversionsDetails(): Thunk {
 		}
 	};
 }
-
 
 /**
  * Fetch the conversions details from the database if they have not already been fetched once

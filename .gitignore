@@ -56,3 +56,6 @@ nohup.out
 
 # tmp file
 src/server/tmp/*
+
+#ui-testing screenshots
+src/cypress/screenshots/*

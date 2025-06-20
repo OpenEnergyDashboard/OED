@@ -3,9 +3,13 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { GPSPoint } from './calibration';
-import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById } from '../types/redux/units';
+import { UnitData, DisplayableType, UnitRepresentType, UnitType, UnitDataById, DisableChecksType } from '../types/redux/units';
 import translate from './translate';
 import { LanguageTypes } from 'types/redux/i18n';
+
+export const MIN_VAL = Number.MIN_SAFE_INTEGER;
+export const MAX_VAL = Number.MAX_SAFE_INTEGER;
+
 /**
  * get string value from GPSPoint or null.
  * @param gps GPS point to get value from and can be null
@@ -82,7 +86,10 @@ export const NoUnit: UnitData = {
 	suffix: '',
 	displayable: DisplayableType.none,
 	preferredDisplay: false,
-	note: ''
+	note: '',
+	minVal: MIN_VAL,
+	maxVal: MAX_VAL,
+	disableChecks: DisableChecksType.reject_all
 };
 
 /**

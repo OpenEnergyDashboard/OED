@@ -10,10 +10,11 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
-	compare = 'compare',
+	compare = 'compare.bar',
 	map = 'map',
 	radar = 'radar',
-	threeD = '3D'
+	threeD = '3D',
+	compareLine = 'compare.line'
 }
 
 // Rates that can be graphed, only relevant to line graphs.
@@ -55,12 +56,22 @@ export interface ThreeDState {
 	readingInterval: ReadingInterval;
 }
 
+export enum ShiftAmount {
+	none = 'none',
+	day = 'day',
+	week = 'week',
+	month = 'month',
+	year = 'year',
+	custom = 'custom'
+}
+
 export interface GraphState {
 	areaNormalization: boolean;
 	selectedMeters: number[];
 	selectedGroups: number[];
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
+	initialXAxisRange: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	duration: moment.Duration;
 	comparePeriod: ComparePeriod;
@@ -73,4 +84,6 @@ export interface GraphState {
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;
 	hotlinked: boolean;
+	shiftAmount: ShiftAmount;
+	shiftTimeInterval: TimeInterval;
 }

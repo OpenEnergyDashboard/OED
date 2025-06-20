@@ -13,7 +13,7 @@ import {
 	updateHistory, updateSliderRange
 } from '../../redux/actions/extraActions';
 import { SelectOption } from '../../types/items';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
@@ -23,6 +23,7 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
+	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
 	duration: moment.duration(4, 'weeks'),
@@ -39,7 +40,9 @@ const defaultState: GraphState = {
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
 	},
-	hotlinked: false
+	hotlinked: false,
+	shiftAmount: ShiftAmount.none,
+	shiftTimeInterval: TimeInterval.unbounded()
 };
 
 interface History<T> {
@@ -82,16 +85,20 @@ export const graphSlice = createSlice({
 			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
-			// clearing when already unbounded should be a no-op
-			if (action.payload.getIsBounded() || state.current.queryTimeInterval.getIsBounded()) {
-				state.current.queryTimeInterval = action.payload;
-			}
+			state.current.queryTimeInterval = action.payload;
+		},
+		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.shiftTimeInterval = action.payload;
+		},
+		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
+			state.current.shiftAmount = action.payload;
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			if (action.payload.getIsBounded() || state.current.rangeSliderInterval.getIsBounded()) {
-				state.current.rangeSliderInterval = action.payload;
-			}
+			state.current.rangeSliderInterval = action.payload;
+		},
+		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.queryTimeInterval = action.payload;
+			state.current.rangeSliderInterval = action.payload;
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderInterval = TimeInterval.unbounded();
@@ -233,6 +240,9 @@ export const graphSlice = createSlice({
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
 			state.current = action.payload;
+		},
+		setInitialXAxisRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.initialXAxisRange = action.payload;
 		}
 
 	},
@@ -341,11 +351,16 @@ export const graphSlice = createSlice({
 								current.queryTimeInterval = TimeInterval.fromString(value);
 								break;
 							case 'sliderRange':
-								// TODO omitted for now re-implement later.
-								// current.rangeSliderInterval = TimeInterval.fromString(value);
+								current.rangeSliderInterval = TimeInterval.fromString(value);
 								break;
 							case 'unitID':
 								current.selectedUnit = parseInt(value);
+								break;
+							case 'shiftAmount':
+								current.shiftAmount = value as ShiftAmount;
+								break;
+							case 'shiftTimeInterval':
+								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
 						}
 					});
@@ -378,6 +393,7 @@ export const graphSlice = createSlice({
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
 		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectInitialXAxisRange: state => state.current.initialXAxisRange,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
@@ -387,7 +403,9 @@ export const graphSlice = createSlice({
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
 		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
-		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString()
+		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
+		selectShiftAmount: state => state.current.shiftAmount,
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval
 	}
 });
 
@@ -405,7 +423,9 @@ export const {
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
 	selectGraphAreaNormalization, selectSliderRangeInterval,
 	selectDefaultGraphState, selectHistoryIsDirty,
-	selectPlotlySliderMax, selectPlotlySliderMin
+	selectPlotlySliderMax, selectPlotlySliderMin,
+	selectShiftAmount, selectShiftTimeInterval,
+	selectInitialXAxisRange
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -422,6 +442,8 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups
+	updateSelectedMetersOrGroups, updateShiftAmount,
+	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
+	updateShiftTimeInterval
 } = graphSlice.actions;
 

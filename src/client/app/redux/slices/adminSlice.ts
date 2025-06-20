@@ -28,13 +28,10 @@ export const defaultAdminState: AdminState = {
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
 	defaultMeterReadingFrequency: '00:15:00',
-	defaultMeterMinimumValue: Number.MIN_SAFE_INTEGER,
-	defaultMeterMaximumValue: Number.MAX_SAFE_INTEGER,
 	defaultMeterMinimumDate: moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
-	defaultMeterDisableChecks: false,
 	defaultHelpUrl: ''
 };
 
@@ -103,14 +100,6 @@ export const adminSlice = createSlice({
 			state.defaultMeterReadingFrequency = action.payload;
 			state.submitted = false;
 		},
-		updateDefaultMeterMinimumValue: (state, action: PayloadAction<number>) => {
-			state.defaultMeterMinimumValue = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterMaximumValue: (state, action: PayloadAction<number>) => {
-			state.defaultMeterMaximumValue = action.payload;
-			state.submitted = false;
-		},
 		updateDefaultMeterMinimumDate: (state, action: PayloadAction<string>) => {
 			state.defaultMeterMinimumDate = action.payload;
 			state.submitted = false;
@@ -125,10 +114,6 @@ export const adminSlice = createSlice({
 		},
 		updateDefaultMeterMaximumErrors: (state, action: PayloadAction<number>) => {
 			state.defaultMeterMaximumErrors = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterDisableChecks: (state, action: PayloadAction<boolean>) => {
-			state.defaultMeterDisableChecks = action.payload;
 			state.submitted = false;
 		},
 		updateDefaultHelpUrl: (state, action: PayloadAction<string>) => {
@@ -159,13 +144,10 @@ export const {
 	updateDefaultFileSizeLimit,
 	updateDefaultAreaUnit,
 	updateDefaultMeterReadingFrequency,
-	updateDefaultMeterMinimumValue,
-	updateDefaultMeterMaximumValue,
 	updateDefaultMeterMinimumDate,
 	updateDefaultMeterMaximumDate,
 	updateDefaultMeterReadingGap,
-	updateDefaultMeterMaximumErrors,
-	updateDefaultMeterDisableChecks
+	updateDefaultMeterMaximumErrors
 } = adminSlice.actions;
 
 export const {
@@ -188,13 +170,10 @@ export const selectAdminPreferences = createAppSelector(
 		defaultAreaNormalization: adminState.defaultAreaNormalization,
 		defaultAreaUnit: adminState.defaultAreaUnit,
 		defaultMeterReadingFrequency: adminState.defaultMeterReadingFrequency,
-		defaultMeterMinimumValue: adminState.defaultMeterMinimumValue,
-		defaultMeterMaximumValue: adminState.defaultMeterMaximumValue,
 		defaultMeterMinimumDate: adminState.defaultMeterMinimumDate,
 		defaultMeterMaximumDate: adminState.defaultMeterMaximumDate,
 		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
-		defaultMeterDisableChecks: adminState.defaultMeterDisableChecks,
 		defaultHelpUrl: adminState.defaultHelpUrl
 	})
 );

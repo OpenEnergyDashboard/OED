@@ -12,7 +12,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
 import { authApi, authPollInterval } from '../../redux/api/authApi';
-
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 /**
  * Defines the groups page card view
  * @returns Groups page element
@@ -27,13 +27,8 @@ export default function GroupsDetailComponent() {
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
 
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
-	};
-
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
 		tooltipGroupView: isAdmin ? 'help.admin.groupview' : 'help.groups.groupview'
 	};

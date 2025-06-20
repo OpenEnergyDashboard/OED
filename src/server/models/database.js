@@ -90,6 +90,7 @@ async function createSchema(conn) {
 	await Unit.createUnitTypesEnum(conn);
 	await Unit.createAreaUnitTypesEnum(conn);
 	await Unit.createDisplayableTypesEnum(conn);
+	await Unit.createDisableChecksTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
 	await Conversion.createTable(conn);

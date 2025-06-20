@@ -8,7 +8,7 @@ import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { selectChartLinkHideOptions, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
-import { ChartTypes } from '../../types/redux/graph';
+import { ChartTypes, ShiftAmount } from '../../types/redux/graph';
 import { GroupDataByID } from '../../types/redux/groups';
 import { MeterDataByID } from '../../types/redux/meters';
 import { UnitDataById, UnitRepresentType } from '../../types/redux/units';
@@ -26,15 +26,17 @@ import {
 import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './authVisibilitySelectors';
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
 import { createAppSelector } from './selectors';
+import { selectCik } from '../api/conversionsApi';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
 		selectVisibleMetersAndGroups,
 		selectMeterDataById,
 		selectGroupDataById,
-		selectSelectedUnit
+		selectSelectedUnit,
+		selectCik
 	],
-	(visible, meterDataById, groupDataById, selectedUnitId) => {
+	(visible, meterDataById, groupDataById, selectedUnitId, globalCikState) => {
 		// meters and groups that can graph
 		const compatibleMeters = new Set<number>();
 		const compatibleGroups = new Set<number>();
@@ -59,7 +61,7 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 			else {
 				// A unit is selected
 				// Get all of compatible units for this meter
-				const compatibleUnits = unitsCompatibleWithMeters(new Set<number>([meterId]));
+				const compatibleUnits = unitsCompatibleWithMeters(new Set<number>([meterId]), meterDataById, globalCikState);
 				// Then, check if the selected unit exists in that set of compatible units
 				compatibleUnits.has(selectedUnitId) ? compatibleMeters.add(meterId) : incompatibleMeters.add(meterId);
 			}
@@ -78,7 +80,7 @@ export const selectCurrentUnitCompatibility = createAppSelector(
 				else {
 					// Get the set of units compatible with the current group (through its deepMeters attribute)
 					// TODO If a meter in a group is not visible to this user then it is not in Redux state and this fails.
-					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId));
+					const compatibleUnits = unitsCompatibleWithMeters(metersInGroup(groupId, groupDataById), meterDataById, globalCikState);
 					compatibleUnits.has(selectedUnitId) ? compatibleGroups.add(groupId) : incompatibleGroups.add(groupId);
 				}
 			});
@@ -289,13 +291,24 @@ export const selectMeterGroupSelectData = createAppSelector(
 export const selectUnitSelectData = createAppSelector(
 	[
 		selectUnitDataById,
+		selectMeterDataById,
 		selectVisibleUnitOrSuffixState,
 		selectSelectedMeters,
 		selectSelectedGroups,
 		selectGraphAreaNormalization,
-		selectSelectedLanguage
+		selectSelectedLanguage,
+		selectGroupDataById,
+		selectCik
 	],
-	(unitDataById, visibleUnitsOrSuffixes, selectedMeters, selectedGroups, areaNormalization, selectSelectedLanguage) => {
+	(unitDataById,
+		meterDataById,
+		visibleUnitsOrSuffixes,
+		selectedMeters,
+		selectedGroups,
+		areaNormalization,
+		selectSelectedLanguage,
+		groupDataById,
+		globalCikState) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
 		// Holds all units that are not compatible with selected meters/groups
@@ -311,7 +324,7 @@ export const selectUnitSelectData = createAppSelector(
 		// Get for all groups
 		selectedGroups.forEach(group => {
 			// Get for all deep meters in group
-			metersInGroup(group).forEach(meter => {
+			metersInGroup(group, groupDataById).forEach(meter => {
 				allSelectedMeters.add(meter);
 			});
 		});
@@ -330,7 +343,7 @@ export const selectUnitSelectData = createAppSelector(
 		} else {
 			// Some meter or group is selected
 			// Retrieve set of units compatible with list of selected meters and/or groups
-			const units = unitsCompatibleWithMeters(allSelectedMeters);
+			const units = unitsCompatibleWithMeters(allSelectedMeters, meterDataById, globalCikState);
 
 			// Loop over all units (they must be of type unit or suffix - case 1)
 			visibleUnitsOrSuffixes.forEach(o => {
@@ -469,10 +482,10 @@ export const selectChartLink = createAppSelector(
 			case ChartTypes.bar:
 				linkText += `&duration=${current.duration.asDays()}`;
 				linkText += `&barStacking=${current.barStacking}`;
+				linkText += `&sliderRange=${rangeSliderInterval}`;
 				break;
 			case ChartTypes.line:
-				// TODO Omitted for the time being re-implement slider range later.
-				// linkText += `&sliderRange=${rangeSliderInterval}`;
+				linkText += `&sliderRange=${rangeSliderInterval}`;
 				break;
 			case ChartTypes.compare:
 				linkText += `&comparePeriod=${current.comparePeriod}`;
@@ -485,6 +498,12 @@ export const selectChartLink = createAppSelector(
 				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
 				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
 				linkText += `&readingInterval=${current.threeD.readingInterval}`;
+				break;
+			case ChartTypes.compareLine:
+				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
+				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
+				linkText += `&shiftAmount=${current.shiftAmount}`;
+				current.shiftAmount === ShiftAmount.custom && (linkText += `&shiftTimeInterval=${current.shiftTimeInterval}`);
 				break;
 		}
 		const unitID = current.selectedUnit;

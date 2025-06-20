@@ -9,7 +9,7 @@ const { log } = require('../../log');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const handleCumulativeReset = require('./handleCumulativeReset');
-const { validateReadings } = require('./validateReadings');
+const { validateReadings, validateSingleReading } = require('./validateReadings');
 const { MeterTimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
 
@@ -65,7 +65,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 	// If all readings were accepted or not.
 	let isAllReadingsOk = true;
 	// If processData is successfully finished then return result = [R0, R1, R2...RN]
-	const result = [];
+	let result = [];
 	// Tell all readings that will not be added to DB.
 	const readingsDropped = [];
 	// Usually holds current message(s) that are yet to be added to msgTotal.
@@ -659,18 +659,36 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		// Not used in many cases but just set since easier.
 		prevEndTimestampTz = endTimestampTz;
 	}
-	// Validate data if conditions given
-	if (conditionSet !== undefined && !conditionSet['disableChecks']) {
+	// Validate data if conditions are given and disableChecks is not set to 'reject_none'
+	if (conditionSet !== undefined && conditionSet['disableChecks'] !== 'reject_none') {
 		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
 		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
+
 		if (!validReadings) {
-			errMsg = `<h2>For meter ${meterName}: error when validating data so all reading are rejected</h2>`;
+			errMsg = `<h2>For meter ${meterName}: Error when validating data where `;
+			// Handle 'reject_bad' specifically
+			if (conditionSet['disableChecks'] === 'reject_bad') {
+				errMsg += `only bad readings are rejected</h2>`;
+				// This removes invalid readings but keeps the valid ones.
+				result = result.filter(reading => validateSingleReading(reading, conditionSet));
+			} else {
+				// Default behavior: reject all readings
+				errMsg += `all readings are rejected</h2>`;
+				// Empties the result array
+				result.splice(0, result.length);
+			}
 			log.error(errMsg);
 			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
-			// This empties the result array. Should be fast and okay with const.
-			result.splice(0, result.length);
+
+			// Mark readings as not okay since some were dropped
 			isAllReadingsOk = false;
-			return { result, isAllReadingsOk, msgTotal };
+
+			if (result.length === 0) {
+				// If no readings are added then return since don't want to update
+				// readings nor the time stamps in this case.
+				// Note catches case if reject_bad removes them all.
+				return { result, isAllReadingsOk, msgTotal };
+			}
 		}
 	}
 	// Update the meter to contain information for the last reading in the data file.

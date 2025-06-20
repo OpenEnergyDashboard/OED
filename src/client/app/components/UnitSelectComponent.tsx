@@ -14,6 +14,7 @@ import { graphSlice, selectSelectedUnit } from '../redux/slices/graphSlice';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { selectUnitDataById, unitsApi } from '../redux/api/unitsApi';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * @returns A React-Select component for UI Options Panel
@@ -77,7 +78,4 @@ const formatGroupLabel = (data: GroupedOption) => {
 const divBottomPadding: React.CSSProperties = {
 	paddingBottom: '15px'
 };
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
+

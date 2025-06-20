@@ -25,6 +25,7 @@ interface ConfirmActionModalComponentProps {
 	// Also be aware that react bootstrap does not support nested modals by default
 	// A good solution to this is to hide the parent modal when this modal is opened
 	actionFunction: () => void;
+	forceCancel?: boolean;
 }
 
 // TODO This is a function that deals with confirm/reject that may be useful in other places.
@@ -38,6 +39,7 @@ interface ConfirmActionModalComponentProps {
  * @param props.actionRejectText (Optional) The text of the action rejection button.
  * @param props.handleClose The function that executes when clicking the action rejection button. Usually used for closing the modal.
  * @param props.actionFunction The function that is executed when clicking the action confirmation button.
+ * @param props.forceCancel (Optional) If true, only a single cancel button will display.
  * @returns A modal component that executes the actionFunction on confirmation and handleClose on rejection.
  */
 export default function ConfirmActionModalComponent(props: ConfirmActionModalComponentProps) {
@@ -53,17 +55,26 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 					{props.actionTitle ? props.actionTitle : translate('confirm.action')}
 				</ModalHeader>
 				{/* Passed message is already translated */}
-				<ModalBody>{props.actionConfirmMessage}</ModalBody>
+				<ModalBody><p className="confirmation-message">{props.actionConfirmMessage}</p></ModalBody>
 				<ModalFooter>
-					{/* Do not execute the actionFunction and instead close the action confirm modal */}
-					<Button color='secondary' onClick={handleClose}>
-						{/* Render the action reject text if it was passed, or else 'no' */}
-						{props.actionRejectText ? props.actionRejectText : translate('no')}
-					</Button>
-					{/* Execute the action function and close the action confirm modal */}
-					<Button color='primary' onClick={props.actionFunction}>
-						{props.actionConfirmText ? props.actionConfirmText : translate('yes')}
-					</Button>
+					{props.forceCancel ? (
+						// Render a single cancel button if forceCancel is true
+						<Button color='secondary' onClick={handleClose}>
+							{props.actionRejectText ? props.actionRejectText : translate('no')}
+						</Button>
+					) : (
+						<>
+							{/* Do not execute the actionFunction and instead close the action confirm modal */}
+							<Button color='secondary' onClick={handleClose}>
+								{/* Render the action reject text if it was passed, or else 'no' */}
+								{props.actionRejectText ? props.actionRejectText : translate('no')}
+							</Button>
+							{/* Execute the action function and close the action confirm modal */}
+							<Button color='primary' onClick={props.actionFunction}>
+								{props.actionConfirmText ? props.actionConfirmText : translate('yes')}
+							</Button>
+						</>
+					)}
 				</ModalFooter>
 			</Modal>
 		</>

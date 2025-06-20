@@ -7,6 +7,7 @@
 	See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 const { chai, mocha, app } = require('../common');
+const Unit = require('../../models/Unit');
 const { prepareTest,
 	expectCompareToEqualExpected,
 	getUnitId,
@@ -106,17 +107,55 @@ mocha.describe('readings API', () => {
 					// for compare, need the unitID, currentStart, currentEnd, shift
 					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
 						.query({
-							curr_start: '2022-10-09 00:00:00', 
-							curr_end: '2022-10-31 17:12:34',  
+							curr_start: '2022-10-09 00:00:00',
+							curr_end: '2022-10-31 17:12:34',
 							shift: 'P28D',                    // 28-day shift
 							graphicUnitId: unitId             // Unit ID for kWh
 						});
-				
+
 					expectCompareToEqualExpected(res, expected, GROUP_ID); // confirm the results match with expected results
 				});
 
-
-				// Add CG8 here
+				mocha.it('CG8: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as MJ', async () => {
+					// Define unit u3 for MJ (megajoules)
+					const u3 = {
+						name: 'MJ',
+						identifier: 'megaJoules',
+						unitRepresent: Unit.unitRepresentType.QUANTITY,
+						secInRate: 3600,
+						typeOfUnit: Unit.unitType.UNIT, suffix: '',
+						displayable: Unit.displayableType.ALL,
+						preferredDisplay: false,
+						note: 'MJ'
+					}
+					// Define conversion c2 for kWh to MJ
+					const c2 = {
+						sourceName: 'kWh',
+						destinationName: 'MJ',
+						bidirectional: true,
+						slope: 3.6,
+						intercept: 0,
+						note: 'kWh → MJ'
+					}
+					await prepareTest(
+						unitDatakWh.concat(u3), // Use units [u1, u2] + u3
+						conversionDatakWh.concat(c2), // Use conversion [c1] + c2
+						meterDatakWhGroups,
+						groupDatakWh
+					);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('MJ');
+					const expected = [20398.8705799196, 21140.7089140044];
+					// for comparison, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				});
 
 				// Add CG9 here
 
