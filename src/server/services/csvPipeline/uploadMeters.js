@@ -7,18 +7,19 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
-const { normalizeBoolean } = require('./validateCsvUploadParams');
+const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
+const moment = require('moment-timezone');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {express.Request} req
+ * @param {express.Response} res
  * @param {filepath} filepath Path to meters csv file.
  * @param conn Connection to the database.
  */
 async function uploadMeters(req, res, filepath, conn) {
 	const temp = (await readCsv(filepath)).map(row => {
-		// The Canonical structure of each row in the Meters CSV file is the order of the fields 
+		// The Canonical structure of each row in the Meters CSV file is the order of the fields
 		// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
 		// then we assume that the uploaded CSV file follows this Canonical structure.
 
@@ -41,6 +42,12 @@ async function uploadMeters(req, res, filepath, conn) {
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
+			//validation for boolean values
+			validateBooleanFields(meter, i);
+
+			// Validate min and max values
+			validateMinMaxValues(meter, i);
+
 			// First verify GPS is okay
 			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
 			const gpsInput = meter[6];
@@ -48,12 +55,56 @@ async function uploadMeters(req, res, filepath, conn) {
 			if (gpsInput) {
 				// Verify GPS is okay values
 				if (!isValidGPSInput(gpsInput)) {
-					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
+					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
 				// DB is longitude, latitude.
 				meter[6] = switchGPS(gpsInput);
+			}
+
+			// verify the area input
+			const areaInput = meter[9];
+			if (areaInput) {
+				if (!isValidArea(areaInput)) {
+					let msg = `For meter ${meter[0]} the area entry of ${areaInput} is invalid. Area must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			const timeSortValue = meter[17];
+			if (timeSortValue) {
+				if (!isValidTimeSort(timeSortValue)) {
+					let msg = `For meter ${meter[0]} the time sort ${timeSortValue} is invalid. Valid options are increasing or decreasing.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			const timezone = meter[5];
+			if (timezone) {
+				if (!isValidTimeZone(timezone)) {
+					let msg = `For meter ${meter[0]}, ${timezone} is not a valid time zone.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// Verify area unit provided
+			const areaUnitString = meter[25];
+			if (areaUnitString) {
+				if (!isValidAreaUnit(areaUnitString)) {
+					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid. Unit must be feet, meters, or none.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// Verify meter type
+			const meterTypeString = meter[4];
+			if (meterTypeString) {
+				if (!isValidMeterType(meterTypeString)) {
+					let msg = `For meter ${meter[0]} the meter type of ${meterTypeString} is invalid. Valid types include:
+								egauge, mamac, metasys, obvius, and other. `;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
 			}
 
 			// Process unit.
@@ -109,7 +160,7 @@ async function uploadMeters(req, res, filepath, conn) {
 						throw new CSVPipelineError(
 							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
 					}
-				);
+					);
 			}
 		}
 	} catch (error) {
@@ -153,6 +204,83 @@ function switchGPS(gpsString) {
 }
 
 /**
+ * Checks if the area provided is a number and if it is larger than zero.
+ * @param areaInput the provided area for the meter
+ * @returns true or false
+ */
+function isValidArea(areaInput) {
+	// check for non-number input, which is not allowed
+	if (Number.isNaN(areaInput)){
+		return false;
+	}
+
+	// must be a number and must be non-negative
+	if (areaInput > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks if the area unit provided is an option
+ * @param areaUnit the provided area for the meter
+ * @returns true or false
+ */
+function isValidAreaUnit(areaUnit) { 
+    const validTypes = Object.values(Unit.areaUnitType); 
+    // must be one of the three values 
+    if (validTypes.includes(areaUnit)) { 
+        return true; 
+    } else { 
+        return false; 
+    } 
+}
+
+/**
+ * Checks if the time sort value provided is accurate (should be increasing or decreasing)
+ * @param timeSortValue the provided time sort
+ * @returns true or false
+ */
+function isValidTimeSort(timeSortValue) {
+	const validTimes = Object.values(MeterTimeSortTypesJS);
+	// must be one of the three values
+	if (validTimes.includes(timeSortValue)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks if the meter type provided is one of the 5 options allowed when creating a meter.
+ * @param meterTypeString the string for the meter type
+ * @returns true or false
+ */
+function isValidMeterType(meterTypeString) {
+	const validTypes = Object.values(Meter.type);
+	if (validTypes.includes(meterTypeString)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks the provided time zone and if it is a real time zone.
+ * @param zone the provided time zone from the csv
+ * @returns true or false
+ */
+function isValidTimeZone(zone) {
+	const validZones = moment.tz.names();
+	if (validZones.includes(zone)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
  * Return the id associated with the given unit's name.
  * If the unit's name is invalid or its type is different from expected type, return null.
  * @param {string} unitName The given unit's name.
@@ -168,6 +296,80 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+
+/**
+ * Validates all boolean-like fields for a given meter row.
+ * @param {Array} meter - A single row from the CSV file.
+ * @param {number} rowIndex - The current row index for error reporting.
+ */
+function validateBooleanFields(meter, rowIndex) {
+	// all inputs that involve a true or false all being validated together.
+	const booleanFields = {
+		2: 'enabled',
+		3: 'displayable',
+		10: 'cumulative',
+		11: 'reset',
+		18: 'end only',
+		32: 'disableChecks'
+	};
+
+	// this array has values which may be left empty
+	const booleanUndefinedAcceptable = [
+		'cumulative', 'reset', 'end only', 'disableChecks'
+	];
+
+	for (const [index, name] of Object.entries(booleanFields)) {
+		let value = meter[index];
+
+		// allows upper/lower case.
+		if ((value === '' || value === undefined) && booleanUndefinedAcceptable.includes(name)) {
+			// skip if the value is undefined
+			continue;
+		} else {
+			if (typeof value === 'string') {
+				value = value.toLowerCase();
+			}
+		}
+
+		// Validates read values to either false or true
+		if (value !== 'true' && value !== 'false' && value !== true && value !== false
+			&& value !== 'yes' && value !== 'no') {
+			throw new CSVPipelineError(
+				`Invalid input for '${name}' in row ${rowIndex + 1}: "${meter[index]}". Expected 'true' or 'false'.`,
+				undefined,
+				500
+			);
+		}
+	}
+}
+
+function validateMinMaxValues(meter, rowIndex) {
+	const minValue = Number(meter[27]);
+	const maxValue = Number(meter[28]);
+
+	if (isNaN(minValue) && isNaN(maxValue)) {
+		// do nothing, pass it through
+	} else if (isNaN(minValue) || minValue < -9007199254740991 || minValue > maxValue) {
+		throw new CSVPipelineError(
+			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			undefined,
+			500
+		);
+	}
+
+	if (isNaN(maxValue)) {
+		// do nothing, pass it through
+	} else if (isNaN(maxValue) || maxValue > 9007199254740991 || minValue > maxValue) {
+		throw new CSVPipelineError(
+			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			undefined,
+			500
+		);
+	}
 }
 
 module.exports = uploadMeters;
