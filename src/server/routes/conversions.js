@@ -247,13 +247,17 @@ router.post('/simulate-delete', async (req, res) => {
 	const affectedMeters = [];
 		for (const meter of allMeters) {
 			const unitId = meter.unitId;
+			if (unitId == -99) continue; // Skip meters with no unit
 			const oldPaths = getAllPaths(oldGraph, unitId);
 			const newPaths = getAllPaths(newGraph, unitId);
 
 			const oldReachable = new Set(oldPaths.map(p => p[p.length - 1]));
 			const newReachable = new Set(newPaths.map(p => p[p.length - 1]));
 
-			const lostUnits = [...oldReachable].filter(u => !newReachable.has(u));
+			const oldReachableIds = [...oldReachable].map(u => typeof u === 'object' ? u.id : u);
+			const newReachableIds = [...newReachable].map(u => typeof u === 'object' ? u.id : u);
+			const lostUnits = oldReachableIds.filter(u => !newReachableIds.includes(u));
+
 			if (lostUnits.length > 0) {
 				affectedMeters.push({
 					meterId: meter.id,

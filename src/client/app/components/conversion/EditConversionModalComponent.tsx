@@ -146,6 +146,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					if (meter.lostUnits.length > 0) {
 						msg += '  ' + translate('conversion.delete.lost.units') + ': ';
 						msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
+						console.log(meter.lostUnits);
 					}
 				});
 			}

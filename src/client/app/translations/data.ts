@@ -75,6 +75,7 @@ const LocaleTranslationData = {
 		"conversion.create.source.destination.same": "The source and destination cannot be the same for a conversion",
 		"conversion.delete.conversion": "Delete Conversion",
 		"conversion.delete.meter.orphan": "Deleting this meter conversion will orphan (make ungraphable) meter unit",
+		"conversion.delete.lost.units": "Units this meter will lose access to after deletion",
 		"conversion.delete.meter.related": "The following meters use meter unit",
 		"conversion.delete.meter.reduce.graphable": "Deleting this meter conversion will reduce the number of graphable units for meters using meter unit",
 		"conversion.delete.restricted": "This conversion cannot be deleted until the significant consequences of doing this are addressed.",
