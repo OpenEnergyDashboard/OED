@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
-import { SimulateDeleteAffectedMeter } from '../../types/redux/conversions';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
@@ -179,7 +178,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					destinationId: state.destinationId
 				}).unwrap();
 
-				setAffectedMeters(result.affectedMeters);
 
 				if (result.affectedMeters.length > 0) {
 					msg += translate('conversion.delete.meter.affected') + ':\n';
