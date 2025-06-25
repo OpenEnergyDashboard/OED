@@ -127,46 +127,78 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 		return count;
 	};
+	const checkState = async () => {
+		const source = unitDataById[state.sourceId];
+		const dest = unitDataById[state.destinationId];
+		let msg = '';
+		let cancel = false;
 
-	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
-	const handleDeleteClick = async () => {
-		try {
-			const result = await simulateDeleteConversion({
-				sourceId: state.sourceId,
-				destinationId: state.destinationId
-			}).unwrap();
-
-			setAffectedMeters(result.affectedMeters);
-
-			let msg = '';
-			if (result.affectedMeters.length > 0) {
-				msg += translate('conversion.delete.meter.related') + ':\n';
-				result.affectedMeters.forEach(meter => {
-					msg += `• ${meter.meterName}\n`;
-					if (meter.lostUnits.length > 0) {
-						msg += '  ' + translate('conversion.delete.lost.units') + ': ';
-						msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
-						console.log(meter.lostUnits);
-					}
+		if (source.typeOfUnit === UnitType.meter) {
+			// How many conversions have this conversion's source so are conversions from a meter.
+			const srcCount = getConversionCount(source, conversionDetails);
+			// How many meters use this conversion, i.e., have the source as its unit.
+			const relatedMeters = Object.values(meterDataById).filter(meter => meter.unitId === source.id);
+			if (srcCount === 1 && relatedMeters.length !== 0) {
+				// This is the only conversion for this meter unit so if it is removed then
+				// you cannot graph any meters using this unit. Not allowed to delete if
+				// any meters use this unit as in this case.
+				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
+				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
+				relatedMeters.forEach(meter => {
+					msg += `"${meter.name}"\n`;
 				});
-			}
-			msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
-			setDeleteConfirmationMessage(msg);
-
-<<<<<<< HEAD
-			const remainingDestConversions = destConversions.filter(conversion =>
-				!(conversion.sourceId === source.id && conversion.destinationId === dest.id)
-			);
-
-			if (remainingDestConversions.length === 0) {
-				msg += `${translate('conversion.delete.unit.orphan')} "${dest.name}".\n`;
 				cancel = true;
+			} else if (relatedMeters.length !== 0) {
+				// Some meters use this meter unit but there are other ways to graph it
+				// so warn the admin and tell each meter impacted.
+				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
+				relatedMeters.forEach(meter => {
+					msg += `"${meter.name}"\n`;
+				});
+				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
+			} else if (srcCount === 1) {
+				// No meters use this meter unit so warn that it will be ungraphable if used.
+				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
+			} else {
+				// No meters use this meter unit so warn that reduced graphable units if used.
+				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
 			}
+			// TODO The following code did what was originally in issue #905 but there were issues
+			// with the design and usage of suffix units. It is commented out for now and needs
+			// to be revisited when the design for suffix is better.
+			// } else if (source.typeOfUnit === UnitType.suffix) {
+			// 	const srcCount = getConversionCount(source, conversionDetails);
+			// 	if (srcCount === 1) {
+			// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
+			// 	}
+		} else if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
+			// Use server simulation for unit-to-unit conversions
+			try {
+				const result = await simulateDeleteConversion({
+					sourceId: state.sourceId,
+					destinationId: state.destinationId
+				}).unwrap();
 
-			if (msg === '') {
-				msg += `${translate('conversion.delete.unit')}\n`;
-				// TODO: Check after deleting the conversion to see if a change happens.
-				// 		 Notify the admin of any consequences caused by deleting the conversion.
+				setAffectedMeters(result.affectedMeters);
+
+				if (result.affectedMeters.length > 0) {
+					msg += translate('conversion.delete.meter.affected') + ':\n';
+					result.affectedMeters.forEach(meter => {
+						msg += `• ${meter.meterName}\n`;
+						if (meter.lostUnits.length > 0) {
+							msg += '  ' + translate('conversion.delete.lost.units') + ': ';
+							msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
+						}
+					});
+				}
+				msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
+				setDeleteConfirmationMessage(msg);
+				setShowDeleteConfirmationModal(true);
+				return; // Prevents further execution for this case
+			} catch (e) {
+				setDeleteConfirmationMessage(translate('conversion.delete.simulation.error'));
+				setShowDeleteConfirmationModal(true);
+				return;
 			}
 		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
 			const unit = source.typeOfUnit === UnitType.suffix ? source : dest;
@@ -193,6 +225,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			}
 		}
 
+		// This code only runs for non-unit-to-unit cases
 		if (msg === '') {
 			handleDeleteConfirmationModalOpen();
 		} else if (cancel) {
@@ -201,8 +234,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		} else {
 			setDeleteConfirmationMessage(msg + translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?');
 			handleDeleteConfirmationModalOpen();
-		} catch (e) {
-			// handle error
 		}
 	};
 	/* Confirm Delete Modal */
@@ -512,7 +543,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</Container>
 				</ModalBody>
 				<ModalFooter>
-					<Button color='danger' onClick={handleDeleteClick}>
+					<Button color='danger' onClick={checkState}>
 						<FormattedMessage id="conversion.delete.conversion" />
 					</Button>
 					{/* Hides the modal */}
