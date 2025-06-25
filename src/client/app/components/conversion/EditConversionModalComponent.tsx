@@ -171,32 +171,49 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
 			// 	}
 		} else if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
-			// Use server simulation for unit-to-unit conversions
-			try {
-				const result = await simulateDeleteConversion({
-					sourceId: state.sourceId,
-					destinationId: state.destinationId
-				}).unwrap();
+			// Check if deleting this conversion would orphan the destination unit
+			const destConversions = conversionDetails.filter(conversion =>
+				(conversion.destinationId === dest.id) ||
+				(conversion.bidirectional && conversion.sourceId === dest.id)
+			);
+
+			const remainingDestConversions = destConversions.filter(conversion =>
+				!(conversion.sourceId === source.id && conversion.destinationId === dest.id)
+			);
+
+			if (remainingDestConversions.length === 0) {
+				msg += `${translate('conversion.delete.unit.orphan')} "${dest.name}".\n`;
+				cancel = true;
+			}
+
+			// Only run the simulation if not canceling for orphan
+			if (!cancel) {
+				try {
+					const result = await simulateDeleteConversion({
+						sourceId: state.sourceId,
+						destinationId: state.destinationId
+					}).unwrap();
 
 
-				if (result.affectedMeters.length > 0) {
-					msg += translate('conversion.delete.meter.affected') + ':\n';
-					result.affectedMeters.forEach(meter => {
-						msg += `• ${meter.meterName}\n`;
-						if (meter.lostUnits.length > 0) {
-							msg += '  ' + translate('conversion.delete.lost.units') + ': ';
-							msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
-						}
-					});
+					if (result.affectedMeters.length > 0) {
+						msg += translate('conversion.delete.meter.affected') + ':\n';
+						result.affectedMeters.forEach(meter => {
+							msg += `• ${meter.meterName}\n`;
+							if (meter.lostUnits.length > 0) {
+								msg += '  ' + translate('conversion.delete.lost.units') + ': ';
+								msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
+							}
+						});
+					}
+					msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
+					setDeleteConfirmationMessage(msg);
+					setShowDeleteConfirmationModal(true);
+					return;
+				} catch (e) {
+					setDeleteConfirmationMessage(translate('conversion.delete.simulation.error'));
+					setShowDeleteConfirmationModal(true);
+					return;
 				}
-				msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
-				setDeleteConfirmationMessage(msg);
-				setShowDeleteConfirmationModal(true);
-				return; // Prevents further execution for this case
-			} catch (e) {
-				setDeleteConfirmationMessage(translate('conversion.delete.simulation.error'));
-				setShowDeleteConfirmationModal(true);
-				return;
 			}
 		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
 			const unit = source.typeOfUnit === UnitType.suffix ? source : dest;
