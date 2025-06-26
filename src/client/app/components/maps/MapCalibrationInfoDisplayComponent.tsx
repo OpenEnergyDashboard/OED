@@ -88,7 +88,7 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 		const longitudeIndex = 1;
 		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') { return; }
 		const input = this.state.value;
-		const { validGps } = isValidGPSInput(input);
+		const { validGps, message } = isValidGPSInput(input);
 		if (validGps) {
 			const array = input.split(',').map((value: string) => parseFloat(value));
 			const gps: GPSPoint = {
@@ -98,7 +98,7 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 			this.props.updateGPSCoordinates(gps);
 			this.resetInputField();
 		} else {
-			this.props.log('info', `refused data point with invalid input: ${input}`);
+			this.props.log('info', `refused data point with invalid input: ${input} and error of "${message}"`);
 		}
 	};
 

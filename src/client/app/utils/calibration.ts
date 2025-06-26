@@ -105,7 +105,7 @@ export function itemDisplayableOnMap(size: Dimensions, point: CartesianPoint): b
  * separated by a comma and the GPS values to be within allowed values.
  * Note it causes a popup if the GPS values are not valid.
  * @param input The string to check for GPS values
- * @returns true if string is GPS and false otherwise.
+ * @returns true if string is GPS and false otherwise. Also returns message: empty if okay and error if not.
  */
 export function isValidGPSInput(input: string) {
 	let message = '';
