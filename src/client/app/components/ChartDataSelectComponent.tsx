@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { ChartTypes} from '../types/redux/graph';
+import { ChartTypes } from '../types/redux/graph';
 import MeterAndGroupSelectComponent from './MeterAndGroupSelectComponent';
 import UnitSelectComponent from './UnitSelectComponent';
 import { useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender, selectQueryTimeInterval} from '../redux/slices/graphSlice';
+import { selectChartToRender, selectQueryTimeInterval } from '../redux/slices/graphSlice';
 import DateRangeComponent from './DateRangeComponent';
 
 /**

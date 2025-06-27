@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { Badge } from 'reactstrap';
-import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
+import { selectGraphState, selectLastMeterOrGroup, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
@@ -47,8 +47,8 @@ export default function ThreeDPillComponent() {
 	const combinedPillData = [...meterPillData, ...groupPillData];
 	// Track length of combinedPillData to determine if a new pill was added
 	const prevLengthRef = React.useRef(combinedPillData.length);
-	// Anonymous selector to get the last added is a meter or group
-	const lastAddedType = useAppSelector(state => state.graph.current.lastAddedMeterOrGroup);
+	// selector to get if the last added thing is a meter or group (Returns MeterOrGroup type, not boolean)
+	const lastAddedType = useAppSelector(selectLastMeterOrGroup);
 	useEffect(() => {
 		// If only one item is selected, auto-select it
 		if (combinedPillData.length === 1) {
@@ -66,12 +66,14 @@ export default function ThreeDPillComponent() {
 			dispatch(updateThreeDMeterOrGroupInfo({ meterOrGroupID: undefined, meterOrGroup: undefined }));
 		}
 		// Auto-select new item on 3D chart if a new pill was added
-		if (
-			combinedPillData.length > prevLengthRef.current &&
-			lastAddedType
-		) {
+		// If the number of pills increased, and the last added type is defined we can assume a new meter or group was added
+		// If the last added type is undefined, it means something messed up, and we have no clue what to select, so we do nothing
+		// If the last added type is defined, we select the last meter or group from the respective array
+		if (combinedPillData.length > prevLengthRef.current && lastAddedType) {
 			let lastAdded;
 			if (lastAddedType === MeterOrGroup.meters && meterPillData.length > 0) {
+				// Because meters and groups can share IDs, we need to check the last added type
+				// and select the last meter or group from the respective array, so we rely on the array to be sorted by chronological order
 				lastAdded = meterPillData[meterPillData.length - 1];
 			} else if (lastAddedType === MeterOrGroup.groups) {
 				lastAdded = groupPillData[groupPillData.length - 1];
@@ -83,6 +85,7 @@ export default function ThreeDPillComponent() {
 				}));
 			}
 		}
+		// Update the previous length reference to the current length
 		prevLengthRef.current = combinedPillData.length;
 	}, [combinedPillData, dispatch]);
 
@@ -99,8 +102,8 @@ export default function ThreeDPillComponent() {
 		return pillDataArray.map(pillData => {
 			// retrieve data from appropriate state slice .meters or .group
 			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters
-				? meterDataById[pillData.meterOrGroupID]?.identifier
-				: groupDataById[pillData.meterOrGroupID]?.name;
+				? `${meterDataById[pillData.meterOrGroupID]?.identifier ?? ''}ᴹ`
+				: `${groupDataById[pillData.meterOrGroupID]?.name ?? ''}ᴳ`;
 
 			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;

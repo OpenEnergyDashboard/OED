@@ -35,9 +35,6 @@ export default function MeterAndGroupSelectComponent() {
 	const selectedUnit = useAppSelector(selectSelectedUnit);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
 
-	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
-	// const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
-
 	// Merge meterGroupedOptions and groupsGroupedOptions into a single list with two categories
 	const combinedOptions = [
 		{
@@ -76,8 +73,6 @@ export default function MeterAndGroupSelectComponent() {
 		...allSelectedMeterValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.meters })),
 		...allSelectedGroupValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.groups }))
 	];
-	// Set the current component's appropriate meter or group SelectOption
-	//const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
 		const newMeters = newValues.filter(option => option.meterOrGroup === MeterOrGroup.meters).map(option => option.value);
@@ -85,7 +80,6 @@ export default function MeterAndGroupSelectComponent() {
 
 		dispatch(updateSelectedMeters(newMeters));
 		dispatch(updateSelectedGroups(newGroups));
-		console.log(meta);
 		// Track last added type
 		if (meta.action === 'select-option' && meta.option) {
 			dispatch(setLastAddedMeterOrGroup(meta.option.meterOrGroup));
@@ -101,7 +95,7 @@ export default function MeterAndGroupSelectComponent() {
 		<>
 			<p style={labelStyle}>
 				{translate('data.sources')}:
-				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.meters'} />
+				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.datasources'} />
 			</p>
 			<Select<SelectOption, true, GroupedOption>
 				isMulti
@@ -180,7 +174,10 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				ref.current && ReactTooltip.hide(ref.current);
 			}}
 		>
-			<components.MultiValueLabel {...props} />
+			<span>
+				{props.data.label}
+				{props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}
+			</span>
 		</div >
 	);
 
