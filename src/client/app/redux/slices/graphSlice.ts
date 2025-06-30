@@ -371,6 +371,7 @@ export const {
 	setLastAddedMeterOrGroup, changeCompareSortingOrder,
 	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
 	updateThreeDMeterOrGroupInfo, updateShiftAmount,
+	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
 	updateShiftTimeInterval
 } = graphSlice.actions;
 
