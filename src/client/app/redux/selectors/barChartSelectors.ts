@@ -43,7 +43,7 @@ export const selectPlotlyBarDataFromResult = createSelector.withTypes<BarReading
 				const entityId = Number(id);
 				const entity = meterOrGroup === MeterOrGroup.meters ? meterDataById[entityId] : groupDataById[entityId];
 				const entityArea = selectAreaScalingFromEntity(entity, areaUnit, areaNormalization);
-				const label = selectNameFromEntity(entity);
+				const label = selectNameFromEntity(entity) + (meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : '');
 				const colorID = entity.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data.

@@ -174,8 +174,8 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				ref.current && ReactTooltip.hide(ref.current);
 			}}
 		>
+			<components.MultiValueLabel {...props} />
 			<span>
-				{props.data.label}
 				{props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}
 			</span>
 		</div >
