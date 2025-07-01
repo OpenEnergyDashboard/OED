@@ -6,11 +6,24 @@
 			"type": "node",
 			"request": "attach",
 			"port": 9229,
-			"address": "localhost",
-			"localRoot": "${workspaceFolder}",
 			"remoteRoot": "/usr/src/app",
-			"protocol": "inspector",
-			"restart": true
+			"sourceMaps": true
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome against localhost",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}"
+		}
+	],
+	"compounds": [
+		{
+			"name": "Debug Server and Client",
+			"configurations": [
+				"Attach to Node in Docker",
+				"Launch Chrome against localhost"
+			]
 		}
 	]
 }
