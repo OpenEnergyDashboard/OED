@@ -19,6 +19,11 @@ import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelec
 import SpinnerComponent from '../SpinnerComponent';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { useState } from 'react';
+import { useBlocker } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
+
 /**
  * Defines the CSV Meters page
  * @returns CSV Meters page element
@@ -102,126 +107,217 @@ export default function MetersCSVUploadComponent() {
 		display: 'flex'
 	};
 
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	const blocker = useBlocker(hasUnsavedChanges);
+
+	// Stores the path that the user tries to go before being blocked
+	// by the Unsaved Warning. Once the user tries to 'leave,' the
+	// user will be redirected to the stored path.
+	// NOTE: Not working, have not figured out why it is unable to navigate
+	// to the stored path. Instead, the user has to reattempt to leave the
+	// page again.
+	//const navigate = useNavigate();
+	//const [attemptedPath, setAttemptedPath] = useState<string | null>(null);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges && blocker.state === 'blocked') {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClear(); // Proceed to close the modal
+			/*
+			if (attemptedPath) {
+				navigate(attemptedPath);
+			}
+			*/
+		}
+	};
+
+	// logic borrowed from UnsavedWarningComponent.tsx
+	// since there is no Modal used here, instead uses useEffect()
+	// to prevent the user from navigating to a different page if
+	// there are unsaved changes
+	React.useEffect(() => {
+		if (blocker.state === 'blocked') {
+			handleToggle();
+		}
+	}, [blocker.state, hasUnsavedChanges]);
+
 	return (
-		<Container className="min-vh-100">
-			{showSpinner ? (
-				<div style={spinContainerStyle}>
-					<SpinnerComponent loading width={50} height={50} />
-				</div>
-			) : (<>
-				<TooltipHelpComponent page='help.csv.meters' />
-				<Form onSubmit={handleSubmit}>
-					<Row className="justify-content-md-center">
-						<Col md='auto'>
-							<div className="text-center">
-								<h2>
-									{translate('csv.upload.meters')}
-									<div style={tooltipStyle}>
-										<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
-									</div>
-								</h2>
-							</div>
-							<FormFileUploaderComponent
-								onFileChange={handleFileChange}
-								isInvalid={!!selectedFile}
-							/>
-							<FormGroup>
-								<Row>
-									<Col>
-										<Label for='gzip'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='gzip'
-													name='gzip'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.gzip')}
-												</div>
-											</div>
-										</Label>
-									</Col>
-								</Row>
-								<Row>
-									<Col>
-										<Label for='headerRow'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='headerRow'
-													name='headerRow'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.header.row')}
-												</div>
-											</div>
-										</Label>
-									</Col>
-								</Row>
-								<Row>
-									<Col>
-										<Label for='update'>
-											<div style={checkBox}>
-												<Input
-													type='checkbox'
-													id='update'
-													name='update'
-													onChange={handleCheckboxChange}
-												/>
-												<div className='ps-2'>
-													{translate('csv.common.param.update')}
-												</div>
-											</div>
-										</Label>
-									</Col>
-								</Row>
-							</FormGroup>
-							{meterData.update && (
-								<FormGroup>
-									<Label for='meterIdentifier'>
-										<div className='pb-1'>
-											{translate('csv.readings.param.meter.identifier')}
+		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						//blocker.reset?.();
+						// Note: This does not work cleanly, instead of immediately
+						// leaving after pressing "Leave", it instead clears the boolean
+						// values that display the warning, and the user just has to
+						// leave the page again.
+						handleClear();
+						//blocker.state = 'unblocked';
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit;
+						handleClear();
+						//setMeterData(MetersCSVUploadDefaults);
+						//setSelectedFile(null);
+						//setIsValidFileType(false);
+						//blocker.state = 'unblocked';
+
+					}}
+					onCancel={() => {
+						setShowUnsavedWarning(false);
+						//blocker.state = 'unblocked';
+					}}
+				/>
+			)}
+			<Container className="min-vh-100">
+				{showSpinner ? (
+					<div style={spinContainerStyle}>
+						<SpinnerComponent loading width={50} height={50} />
+					</div>
+				) : (<>
+					<TooltipHelpComponent page='help.csv.meters' />
+					<Form onSubmit={handleSubmit}>
+						<Row className="justify-content-md-center">
+							<Col md='auto'>
+								<div className="text-center">
+									<h2>
+										{translate('csv.upload.meters')}
+										<div style={tooltipStyle}>
+											<TooltipMarkerComponent page='help.csv.meters' helpTextId={tooltipStyle.tooltipReadings} />
 										</div>
-									</Label>
-									<Input
-										id='meterIdentifier'
-										name='meterIdentifier'
-										type='select'
-										value={meterData.meterIdentifier || ''}
-										onChange={handleSelectedMeterChange}
-										invalid={!meterIsSelected}
-									>
-										{
-											<option value={''} key={-999} hidden disabled>
-												{translate('select.meter')}
-											</option>
-										}
-										{
-											Array.from(visibleMeters).map(meter => {
-												return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
-											})
-										}
-									</Input>
+									</h2>
+								</div>
+								<FormFileUploaderComponent
+									onFileChange={handleFileChange}
+									isInvalid={!!selectedFile}
+								/>
+								<FormGroup>
+									<Row>
+										<Col>
+											<Label for='gzip'>
+												<div style={checkBox}>
+													<Input
+														type='checkbox'
+														id='gzip'
+														name='gzip'
+														onChange={e => {
+															handleCheckboxChange(e);
+															setHasUnsavedChanges(true); // Mark as unsaved
+															handleToggle();
+														}}
+													/>
+													<div className='ps-2'>
+														{translate('csv.common.param.gzip')}
+													</div>
+												</div>
+											</Label>
+										</Col>
+									</Row>
+									<Row>
+										<Col>
+											<Label for='headerRow'>
+												<div style={checkBox}>
+													<Input
+														type='checkbox'
+														id='headerRow'
+														name='headerRow'
+														onChange={e => {
+															handleCheckboxChange(e);
+															setHasUnsavedChanges(true); // Mark as unsaved
+															handleToggle();
+														}}
+													/>
+													<div className='ps-2'>
+														{translate('csv.common.param.header.row')}
+													</div>
+												</div>
+											</Label>
+										</Col>
+									</Row>
+									<Row>
+										<Col>
+											<Label for='update'>
+												<div style={checkBox}>
+													<Input
+														type='checkbox'
+														id='update'
+														name='update'
+														onChange={e => {
+															handleCheckboxChange(e);
+															setHasUnsavedChanges(true); // Mark as unsaved
+															handleToggle();
+														}}
+													/>
+													<div className='ps-2'>
+														{translate('csv.common.param.update')}
+													</div>
+												</div>
+											</Label>
+										</Col>
+									</Row>
 								</FormGroup>
-							)}
-							<div className='d-flex flex-row-reverse'>
-								<div className='p-3'>
-									<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
-										{translate('csv.submit.button')}
-									</Button>
+								{meterData.update && (
+									<FormGroup>
+										<Label for='meterIdentifier'>
+											<div className='pb-1'>
+												{translate('csv.readings.param.meter.identifier')}
+											</div>
+										</Label>
+										<Input
+											id='meterIdentifier'
+											name='meterIdentifier'
+											type='select'
+											value={meterData.meterIdentifier || ''}
+											onChange={e => {
+												handleSelectedMeterChange(e);
+												setHasUnsavedChanges(true); // Mark as unsaved
+												//handleToggle();
+											}}
+											invalid={!meterIsSelected}
+										>
+											{
+												<option value={''} key={-999} hidden disabled>
+													{translate('select.meter')}
+												</option>
+											}
+											{
+												Array.from(visibleMeters).map(meter => {
+													return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
+												})
+											}
+										</Input>
+									</FormGroup>
+								)}
+								<div className='d-flex flex-row-reverse'>
+									<div className='p-3'>
+										<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
+											{translate('csv.submit.button')}
+										</Button>
+									</div>
+									<div className='p-3'>
+										<Button color='secondary' type='reset' onClick={handleClear}>
+											{translate('csv.clear.button')}
+										</Button>
+									</div>
 								</div>
-								<div className='p-3'>
-									<Button color='secondary' type='reset' onClick={handleClear}>
-										{translate('csv.clear.button')}
-									</Button>
-								</div>
-							</div>
-						</Col>
-					</Row>
-				</Form>
-			</>)}
-		</Container>
+							</Col>
+						</Row>
+					</Form>
+				</>)}
+			</Container>
+		</>
 	);
 }

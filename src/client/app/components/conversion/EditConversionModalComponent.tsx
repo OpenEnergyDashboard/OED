@@ -20,6 +20,8 @@ import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+
 interface EditConversionModalComponentProps {
 	show: boolean;
 	conversion: ConversionData;
@@ -42,6 +44,21 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			props.handleClose(); // Proceed to close the modal
+		}
+	};
 
 	// Set existing conversion values
 	const values = { ...props.conversion };
@@ -339,6 +356,25 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+				/>
+			)}
 			{/* Warning Modal */}
 			<ConfirmActionModalComponent
 				show={showWarningModal}
@@ -362,7 +398,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				actionConfirmText={deleteRejectText}
 				actionRejectText={deleteRejectText}
 				forceCancel={true} />
-			<Modal isOpen={props.show} toggle={props.handleClose}>
+			<Modal isOpen={props.show} toggle={handleToggle}>
 				<ModalHeader>
 					<FormattedMessage id="conversion.edit.conversion" />
 					<TooltipHelpComponent page='conversions-edit' />
@@ -411,7 +447,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								name='bidirectional'
 								type='select'
 								defaultValue={state.bidirectional.toString()}
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => {
+									handleBooleanChange(e);
+									setHasUnsavedChanges(true); // Mark as unsaved
+								}}
 								invalid={(isMeterSource() || isSuffixUsed()) && state.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -438,7 +477,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='slope'
 										type='number'
 										value={state.slope}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {
+											handleNumberChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}} />
 								</FormGroup>
 							</Col>
 							<Col>
@@ -450,7 +492,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='intercept'
 										type='number'
 										value={state.intercept}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {
+											handleNumberChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}} />
 								</FormGroup>
 							</Col>
 						</Row>
@@ -463,7 +508,10 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								type='textarea'
 								defaultValue={state.note}
 								placeholder='Note'
-								onChange={e => handleStringChange(e)} />
+								onChange={e => {
+									handleStringChange(e);
+									setHasUnsavedChanges(true); // Mark as unsaved
+								}} />
 						</FormGroup>
 					</Container>
 				</ModalBody>

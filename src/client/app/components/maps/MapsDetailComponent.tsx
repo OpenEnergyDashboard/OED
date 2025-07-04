@@ -12,6 +12,10 @@ import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { useState } from 'react';
+import { useBlocker } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 interface MapsDetailProps {
 	maps: number[];
 	unsavedChanges: boolean;
@@ -20,30 +24,124 @@ interface MapsDetailProps {
 	createNewMap(): any;
 }
 
-export default class MapsDetailComponent extends React.Component<MapsDetailProps> {
-	constructor(props: MapsDetailProps) {
-		super(props);
-		this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
-	}
+/**
+ * Defines the Maps page
+ * @param props for the maps component
+ * @returns Maps page element
+ */
+export default function MapsDetailComponent(props: MapsDetailProps) {
+	// constructor(props: MapsDetailProps) {
+	// 	super(props);
+	// 	this.handleSubmitClicked = this.handleSubmitClicked.bind(this);
+	// }
 
-	public componentDidMount() {
-		this.props.fetchMapsDetails();
-	}
 
-	public render() {
-		const tableStyle: React.CSSProperties = {
-			marginLeft: '5%',
-			marginRight: '5%'
-		};
+	// public componentDidMount() {
+	// 	this.props.fetchMapsDetails();
+	// }
 
-		const buttonContainerStyle: React.CSSProperties = {
-			minWidth: '150px',
-			width: '10%',
-			marginLeft: '40%',
-			marginRight: '40%'
-		};
+	React.useEffect(() => {
+		props.fetchMapsDetails();
+	}, []);
 
-		return (
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	const blocker = useBlocker(hasUnsavedChanges);
+
+	// Stores the path that the user tries to go before being blocked
+	// by the Unsaved Warning. Once the user tries to 'leave,' the
+	// user will be redirected to the stored path.
+	// NOTE: Not working, have not figured out why it is unable to navigate
+	// to the stored path. Instead, the user has to reattempt to leave the
+	// page again.
+	//const navigate = useNavigate();
+	//const [attemptedPath, setAttemptedPath] = useState<string | null>(null);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges && blocker.state === 'blocked') {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClear(); // Proceed to close the modal
+			/*
+			if (attemptedPath) {
+				navigate(attemptedPath);
+			}
+			*/
+		}
+	};
+
+	// logic borrowed from UnsavedWarningComponent.tsx
+	// since there is no Modal used here, instead uses useEffect()
+	// to prevent the user from navigating to a different page if
+	// there are unsaved changes
+	React.useEffect(() => {
+		if (blocker.state === 'blocked') {
+			handleToggle();
+		}
+	}, [blocker.state, hasUnsavedChanges]);
+
+	const tableStyle: React.CSSProperties = {
+		marginLeft: '5%',
+		marginRight: '5%'
+	};
+
+	const buttonContainerStyle: React.CSSProperties = {
+		minWidth: '150px',
+		width: '10%',
+		marginLeft: '40%',
+		marginRight: '40%'
+	};
+
+	const handleSubmitClicked = () => {
+		props.submitEditedMaps();
+		// Notify that the unsaved changes have been submitted
+		//this.removeUnsavedChanges();
+	};
+
+	const handleClear = () => {
+		setShowUnsavedWarning(false);
+		setHasUnsavedChanges(false);
+	};
+
+	return (
+		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						//blocker.reset?.();
+						// Note: This does not work cleanly, instead of immediately
+						// leaving after pressing "Leave", it instead clears the boolean
+						// values that display the warning, and the user just has to
+						// leave the page again.
+						handleClear();
+						//blocker.state = 'unblocked';
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmitClicked;
+						handleClear();
+						//setMeterData(MetersCSVUploadDefaults);
+						//setSelectedFile(null);
+						//setIsValidFileType(false);
+						//blocker.state = 'unblocked';
+
+					}}
+					onCancel={() => {
+						setShowUnsavedWarning(false);
+						//blocker.state = 'unblocked';
+					}}
+				/>
+			)}
 			<div className='flexGrowOne'>
 				{/* <UnsavedWarningContainer /> */}
 				<TooltipHelpComponent page='maps' />
@@ -70,11 +168,18 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 								</tr>
 							</thead>
 							<tbody>
-								{this.props.maps.map(mapID =>
-									(<MapViewContainer key={mapID} id={mapID} />))}
+								{props.maps.map(mapID =>
+									(<MapViewContainer
+										key={mapID}
+										id={mapID}
+										onMapChange={() => setHasUnsavedChanges(true)} />))
+								}
 								<tr>
 									<td colSpan={8}>
-										<Link to='/calibration' onClick={() => this.props.createNewMap()}>
+										<Link to='/calibration' onClick={() => {
+											props.createNewMap();
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}>
 											<Button style={buttonContainerStyle} color='primary'>
 												<FormattedMessage id='create.map' />
 											</Button>
@@ -87,23 +192,36 @@ export default class MapsDetailComponent extends React.Component<MapsDetailProps
 					{hasToken() && <Button
 						color='success'
 						style={buttonContainerStyle}
-						disabled={!this.props.unsavedChanges}
-						onClick={this.handleSubmitClicked}
+						// disabled={!this.props.unsavedChanges}
+						onClick={handleSubmitClicked}
 					>
 						<FormattedMessage id='save.map.edits' />
 					</Button>}
 				</div>
 			</div>
-		);
-	}
+		</>
+	);
+	// public render() {
+	// 	const tableStyle: React.CSSProperties = {
+	// 		marginLeft: '5%',
+	// 		marginRight: '5%'
+	// 	};
 
-	private removeUnsavedChanges() {
-		// store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
-	}
+	// 	const buttonContainerStyle: React.CSSProperties = {
+	// 		minWidth: '150px',
+	// 		width: '10%',
+	// 		marginLeft: '40%',
+	// 		marginRight: '40%'
+	// 	};
+	// }
 
-	private handleSubmitClicked() {
-		this.props.submitEditedMaps();
-		// Notify that the unsaved changes have been submitted
-		this.removeUnsavedChanges();
-	}
+	// private removeUnsavedChanges() {
+	// 	// store.dispatch(unsavedWarningSlice.actions.removeUnsavedChanges());
+	// }
+
+	// private handleSubmitClicked() {
+	// 	this.props.submitEditedMaps();
+	// 	// Notify that the unsaved changes have been submitted
+	// 	//this.removeUnsavedChanges();
+	// }
 }

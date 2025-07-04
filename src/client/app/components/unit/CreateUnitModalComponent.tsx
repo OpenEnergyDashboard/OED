@@ -19,12 +19,30 @@ import { MIN_VAL, MAX_VAL } from '../../utils/input';
 import { LineGraphRates } from '../../types/redux/graph';
 import { customRateValid, isCustomRate } from '../../utils/unitInput';
 
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+
 /**
  * Defines the create unit modal form
  * @returns Unit create element
  */
 export default function CreateUnitModalComponent() {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClose(); // Proceed to close the modal
+		}
+	};
+
 	const [submitCreateUnit] = unitsApi.useAddUnitMutation();
 	const CUSTOM_INPUT = '-77';
 
@@ -195,11 +213,30 @@ export default function CreateUnitModalComponent() {
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+				/>
+			)}
 			{/* Show modal button */}
 			<Button color="secondary" onClick={handleShow}>
 				<FormattedMessage id="create.unit" />
 			</Button>
-			<Modal isOpen={showModal} toggle={handleClose} size="lg">
+			<Modal isOpen={showModal} toggle={handleToggle} size="lg">
 				<ModalHeader>
 					<FormattedMessage id="create.unit" />
 					<TooltipHelpComponent page="units-create" />
@@ -223,7 +260,10 @@ export default function CreateUnitModalComponent() {
 										name="identifier"
 										type="text"
 										autoComplete="on"
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										value={state.identifier}
 									/>
 								</FormGroup>
@@ -237,7 +277,10 @@ export default function CreateUnitModalComponent() {
 										name="name"
 										type="text"
 										autoComplete="on"
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										value={state.name}
 										invalid={state.name === ''}
 									/>
@@ -258,7 +301,10 @@ export default function CreateUnitModalComponent() {
 										id="typeOfUnit"
 										name="typeOfUnit"
 										type="select"
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										value={state.typeOfUnit}
 										invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}
 									>
@@ -289,7 +335,10 @@ export default function CreateUnitModalComponent() {
 										id="unitRepresent"
 										name="unitRepresent"
 										type="select"
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										value={state.unitRepresent}
 									>
 										{Object.keys(UnitRepresentType).map(key => {
@@ -312,7 +361,10 @@ export default function CreateUnitModalComponent() {
 										id="displayable"
 										name="displayable"
 										type="select"
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										value={state.displayable}
 										invalid={
 											state.displayable != DisplayableType.none &&
@@ -353,7 +405,10 @@ export default function CreateUnitModalComponent() {
 										id="preferredDisplay"
 										name="preferredDisplay"
 										type="select"
-										onChange={e => handleBooleanChange(e)}
+										onChange={e => {
+											handleBooleanChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (
@@ -376,7 +431,10 @@ export default function CreateUnitModalComponent() {
 										name="secInRate"
 										type="select"
 										value={rate}
-										onChange={e => handleRateChange(e)}
+										onChange={e => {
+											handleRateChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 									>
 										{Object.entries(LineGraphRates).map(
 											([rateKey, rateValue]) => (
@@ -401,7 +459,10 @@ export default function CreateUnitModalComponent() {
 												value={customRate}
 												min={1}
 												invalid={!customRateValid(customRate)}
-												onChange={e => handleCustomRateChange(e)}
+												onChange={e => {
+													handleCustomRateChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
 												// This grabs each key hit and then finishes input when hit enter.
 												onKeyDown={e => { handleEnter(e.key); }}
 											/>
@@ -422,7 +483,10 @@ export default function CreateUnitModalComponent() {
 										name="suffix"
 										type="text"
 										value={state.suffix}
-										onChange={e => handleStringChange(e)}
+										onChange={e => {
+											handleStringChange(e);
+											setHasUnsavedChanges(true); // Mark as unsaved
+										}}
 										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''
 										}
 									/>
@@ -437,7 +501,10 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='minVal'>{translate('min.value')}</Label>
 								<Input id='minVal' name='minVal' type='number'
-									onChange={e => handleNumberChange(e)}
+									onChange={e => {
+										handleNumberChange(e);
+										setHasUnsavedChanges(true); // Mark as unsaved
+									}}
 									min={MIN_VAL}
 									max={state.maxVal}
 									value={state.minVal}
@@ -450,7 +517,10 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='maxVal'>{translate('max.value')}</Label>
 								<Input id='maxVal' name='maxVal' type='number'
-									onChange={e => handleNumberChange(e)}
+									onChange={e => {
+										handleNumberChange(e);
+										setHasUnsavedChanges(true); // Mark as unsaved
+									}}
 									min={state.minVal}
 									max={MAX_VAL}
 									value={state.maxVal}
@@ -465,7 +535,10 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='disableChecks'>{translate('disable.checks')}</Label>
 								<Input id='disableChecks' name='disableChecks' type='select'
-									onChange={e => handleStringChange(e)}
+									onChange={e => {
+										handleStringChange(e);
+										setHasUnsavedChanges(true); // Mark as unsaved
+									}}
 									value={state.disableChecks}>
 									{Object.keys(DisableChecksType).map(key => {
 										return (<option value={key} key={key} >
@@ -482,7 +555,10 @@ export default function CreateUnitModalComponent() {
 								name='note'
 								type='textarea'
 								value={state.note}
-								onChange={e => handleStringChange(e)} />
+								onChange={e => {
+									handleStringChange(e);
+									setHasUnsavedChanges(true); // Mark as unsaved
+								}} />
 						</FormGroup>
 					</Container>
 				</ModalBody>

@@ -45,23 +45,18 @@ interface EditMeterModalComponentProps {
 export default function EditMeterModalComponent(props: EditMeterModalComponentProps) {
 	const translate = useTranslate();
 
+	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
 	const handleToggle = () => {
 		if (hasUnsavedChanges) {
-			/*
-			const confirmClose = window.confirm(
-			  'You have unsaved changes. Are you sure you want to close the modal?'
-			);
-			if (!confirmClose) {
-				return;
-			}
-			*/
 			setShowUnsavedWarning(true);
 		}
 		else {
-			props.handleClose(); // Proceed to close the modal
+			handleClose(); // Proceed to close the modal
 		}
 	};
 
@@ -280,22 +275,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
 			{showUnsavedWarning && (
 				<SimpleUnsavedWarningComponent
 					isOpen={showUnsavedWarning}
 					onDiscard={() => {
 						setShowUnsavedWarning(false);
-						props.handleClose();
+						setHasUnsavedChanges(false);
+						handleClose();
 						resetState();
 					}}
 					onConfirm={() => {
 						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
 						handleSaveChanges();
-						props.handleClose();
+						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
 				/>
-			)}		
+			)}
 			<Modal isOpen={props.show} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.meter" />
@@ -315,7 +313,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='identifier'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -329,7 +327,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='name'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -349,7 +347,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='unitId'
 								type='select'
 								value={localMeterEdits.unitId}
-								onChange={handleUnitChange}>
+								onChange={e => {
+									handleUnitChange(e);
+									setHasUnsavedChanges(true); // Mark as unsaved
+								}}>
 								{Array.from(compatibleUnits).map(unit => {
 									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
 								})}
@@ -366,7 +367,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='defaultGraphicUnit'
 								type='select'
 								value={localMeterEdits.defaultGraphicUnit}
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -394,7 +395,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								// the ? to avoid access. This only applies to items where you dereference
 								// the state value such as .toString() here.
 								value={localMeterEdits.enabled?.toString()}
-								onChange={(e) => {
+								onChange={e => {
 									handleBooleanChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -411,7 +412,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='displayable'
 								type='select'
 								value={localMeterEdits.displayable?.toString()}
-								onChange={(e) => {
+								onChange={e => {
 									handleDisplayableChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -434,7 +435,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='meterType'
 								type='select'
 								value={localMeterEdits.meterType}
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -452,7 +453,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='readingFrequency'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -472,7 +473,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='url'
 								type='text'
 								autoComplete='off'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -486,7 +487,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='gps'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -503,7 +504,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								type='number'
 								min='0'
 								defaultValue={localMeterEdits.area}
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -520,7 +521,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='areaUnit'
 								type='select'
 								value={localMeterEdits.areaUnit}
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -541,7 +542,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							id='note'
 							name='note'
 							type='textarea'
-							onChange={(e) => {
+							onChange={e => {
 								handleStringChange(e);
 								setHasUnsavedChanges(true); // Mark as unsaved
 							}}
@@ -557,7 +558,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='cumulative'
 								type='select'
 								value={localMeterEdits.cumulative?.toString()}
-								onChange={(e) => {
+								onChange={e => {
 									handleBooleanChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -575,7 +576,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 									name='cumulativeReset'
 									type='select'
 									value={localMeterEdits.cumulativeReset?.toString()}
-									onChange={(e) => {
+									onChange={e => {
 										handleBooleanChange(e);
 										setHasUnsavedChanges(true); // Mark as unsaved
 									}}>
@@ -599,7 +600,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='cumulativeResetStart'
 								type='text'
 								autoComplete='off'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -616,7 +617,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='cumulativeResetEnd'
 								type='text'
 								autoComplete='off'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -635,7 +636,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='endOnlyTime'
 								type='select'
 								value={localMeterEdits.endOnlyTime?.toString()}
-								onChange={(e) => {
+								onChange={e => {
 									handleBooleanChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -651,7 +652,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='readingGap'
 								name='readingGap'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -671,7 +672,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='readingVariation'
 								name='readingVariation'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -686,7 +687,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 							<Input id='readingDuplication' name='readingDuplication' type="select"
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -706,7 +707,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='timeSort'
 								type='select'
 								value={localMeterEdits?.timeSort}
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -731,7 +732,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='minVal'
 								name='minVal'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -750,7 +751,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='maxVal'
 								name='maxVal'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -772,7 +773,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='minDate'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -793,7 +794,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='maxDate'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -815,7 +816,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='maxError'
 								name='maxError'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -835,7 +836,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='disableChecks'
 								type='select'
 								value={localMeterEdits.disableChecks}
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}>
@@ -854,7 +855,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								id='reading'
 								name='reading'
 								type='number'
-								onChange={(e) => {
+								onChange={e => {
 									handleNumberChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -868,7 +869,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='startTimestamp'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -885,7 +886,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='endTimestamp'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
 									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
@@ -900,9 +901,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 								name='previousEnd'
 								type='text'
 								autoComplete='on'
-								onChange={(e) => {
+								onChange={e => {
 									handleStringChange(e);
-								setHasUnsavedChanges(true); // Mark as unsaved
+									setHasUnsavedChanges(true); // Mark as unsaved
 								}}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={localMeterEdits?.previousEnd} />

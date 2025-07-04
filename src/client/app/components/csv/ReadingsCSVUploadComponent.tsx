@@ -24,6 +24,9 @@ import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
 import SpinnerComponent from '../SpinnerComponent';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { useBlocker } from 'react-router-dom';
+
 /**
  * Defines the CSV Readings page
  * @returns CSV Readings page element
@@ -189,386 +192,509 @@ export default function ReadingsCSVUploadComponent() {
 		display: 'flex'
 	};
 
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	const blocker = useBlocker(hasUnsavedChanges);
+
+	// Stores the path that the user tries to go before being blocked
+	// by the Unsaved Warning. Once the user tries to 'leave,' the
+	// user will be redirected to the stored path.
+	// NOTE: Not working, have not figured out why it is unable to navigate
+	// to the stored path. Instead, the user has to reattempt to leave the
+	// page again.
+	//const navigate = useNavigate();
+	//const [attemptedPath, setAttemptedPath] = useState<string | null>(null);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges && blocker.state === 'blocked') {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClear(); // Proceed to close the modal
+			/*
+			if (attemptedPath) {
+				navigate(attemptedPath);
+			}
+			*/
+		}
+	};
+
+	// logic borrowed from UnsavedWarningComponent.tsx
+	// since there is no Modal used here, instead uses useEffect()
+	// to prevent the user from navigating to a different page if
+	// there are unsaved changes
+	React.useEffect(() => {
+		if (blocker.state === 'blocked') {
+			handleToggle();
+		}
+	}, [blocker.state, hasUnsavedChanges]);
+
 	return (
-		<Container>
-			{showSpinner ? (
-				<div style={spinContainerStyle}>
-					<SpinnerComponent loading width={50} height={50} />
-				</div>
-			) : (<>
-				<TooltipHelpComponent page='help.csv.readings' />
-				<Form onSubmit={handleSubmit}>
-					<Row className="justify-content-md-center">
-						<Col md='auto'>
-							<div className="text-center">
-								<h2>
-									{translate('csv.upload.readings')}
-									<div style={tooltipStyle}>
-										<TooltipMarkerComponent page='help.csv.readings' helpTextId={tooltipStyle.tooltipReadings} />
-									</div>
-								</h2>
-							</div>
-							<Label for='meterIdentifier'>
-								<div className='pb-1'>
-									{translate('csv.readings.param.meter.identifier')}
+		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						//blocker.reset?.();
+						// Note: This does not work cleanly, instead of immediately
+						// leaving after pressing "Leave", it instead clears the boolean
+						// values that display the warning, and the user just has to
+						// leave the page again.
+						handleClear();
+						//blocker.state = 'unblocked';
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit;
+						handleClear();
+						//setMeterData(MetersCSVUploadDefaults);
+						//setSelectedFile(null);
+						//setIsValidFileType(false);
+						//blocker.state = 'unblocked';
+
+					}}
+					onCancel={() => {
+						setShowUnsavedWarning(false);
+						//blocker.state = 'unblocked';
+					}}
+				/>
+			)}
+			<Container>
+				{showSpinner ? (
+					<div style={spinContainerStyle}>
+						<SpinnerComponent loading width={50} height={50} />
+					</div>
+				) : (<>
+					<TooltipHelpComponent page='help.csv.readings' />
+					<Form onSubmit={handleSubmit}>
+						<Row className="justify-content-md-center">
+							<Col md='auto'>
+								<div className="text-center">
+									<h2>
+										{translate('csv.upload.readings')}
+										<div style={tooltipStyle}>
+											<TooltipMarkerComponent page='help.csv.readings' helpTextId={tooltipStyle.tooltipReadings} />
+										</div>
+									</h2>
 								</div>
-							</Label>
-							<Input
-								id='meterIdentifier'
-								name='meterIdentifier'
-								type='select'
-								value={readingsData.meterIdentifier || ''}
-								onChange={handleSelectedMeterChange}
-								invalid={!meterIsSelected}
-							>
-								{
-									<option value={''} key={-999} hidden disabled>
-										{translate('select.meter')}
-									</option>
-								}
-								{
-									Array.from(visibleMeters).map(meter => {
-										return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
-									})
-								}
-							</Input>
-							<div className='py-3'>
-								{isAdmin && <><CreateMeterModalComponent onCreateMeter={handleCreateMeter} /></>}
-							</div>
-							<FormGroup className='py-2'>
-								<FormFileUploaderComponent
-									onFileChange={handleFileChange}
-									isInvalid={!!selectedFile}
-								/>
-							</FormGroup>
-							<Row xs='1' lg='2'>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='gzip'
-											name='gzip'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='gzip'>
-											<div className='ps-2'>
-												{translate('csv.common.param.gzip')}
-											</div>
-										</Label>
+								<Label for='meterIdentifier'>
+									<div className='pb-1'>
+										{translate('csv.readings.param.meter.identifier')}
 									</div>
-								</Col>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='headerRow'
-											name='headerRow'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='headerRow'>
-											<div className='ps-2'>
-												{translate('csv.common.param.header.row')}
-											</div>
-										</Label>
-									</div>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='update'
-											name='update'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='update'>
-											<div className='ps-2'>
-												{translate('csv.common.param.update')}
-											</div>
-										</Label>
-									</div>
-								</Col>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='relaxedParsing'
-											name='relaxedParsing'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='relaxedParsing'>
-											<div className='ps-2'>
-												{translate('csv.readings.param.relaxed.parsing')}
-											</div>
-										</Label>
-									</div>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='honorDst'
-											name='honorDst'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='honorDst'>
-											<div className='ps-2'>
-												{translate('csv.readings.param.honor.dst')}
-											</div>
-										</Label>
-									</div>
-								</Col>
-								<Col>
-									<div style={checkBox}>
-										<Input
-											type='checkbox'
-											id='refreshReadings'
-											name='refreshReadings'
-											onChange={handleCheckboxChange}
-										/>
-										<Label for='refreshReadings'>
-											<div className='ps-2'>
-												{translate('csv.readings.param.refresh.readings')}
-											</div>
-										</Label>
-									</div>
-								</Col>
-							</Row>
-							<div className='pb-3'></div>
-							<Row xs='1' lg='2'>
-								<Col>
-									<FormGroup>
-										<Label for='cumulative'>
-											<div className='pb-1'>
-												{translate('meter.cumulative')}
-											</div>
-										</Label>
-										<Input
-											id='cumulative'
-											name='cumulative'
-											type='select'
-											value={readingsData.cumulative ? 'true' : 'false'}
-											onChange={handleTrueFalseSelectChange}
-										>
-											{Object.keys(TrueFalseType).map(key => {
-												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-											})}
-										</Input>
-									</FormGroup>
-								</Col>
-								<Col>
-									<FormGroup>
-										<Label for='cumulativeReset'>
-											<div className='pb-1'>
-												{translate('meter.cumulativeReset')}
-											</div>
-										</Label>
-										{readingsData.cumulative === true ? (
+								</Label>
+								<Input
+									id='meterIdentifier'
+									name='meterIdentifier'
+									type='select'
+									value={readingsData.meterIdentifier || ''}
+									onChange={e => {
+										handleSelectedMeterChange(e);
+										setHasUnsavedChanges(true); // Mark as unsaved
+									}}
+									invalid={!meterIsSelected}
+								>
+									{
+										<option value={''} key={-999} hidden disabled>
+											{translate('select.meter')}
+										</option>
+									}
+									{
+										Array.from(visibleMeters).map(meter => {
+											return (<option value={meter.identifier} key={meter.id}>{meter.identifier}</option>);
+										})
+									}
+								</Input>
+								<div className='py-3'>
+									{isAdmin && <><CreateMeterModalComponent onCreateMeter={handleCreateMeter} /></>}
+								</div>
+								<FormGroup className='py-2'>
+									<FormFileUploaderComponent
+										onFileChange={handleFileChange}
+										isInvalid={!!selectedFile}
+									/>
+								</FormGroup>
+								<Row xs='1' lg='2'>
+									<Col>
+										<div style={checkBox}>
 											<Input
+												type='checkbox'
+												id='gzip'
+												name='gzip'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='gzip'>
+												<div className='ps-2'>
+													{translate('csv.common.param.gzip')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+									<Col>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='headerRow'
+												name='headerRow'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='headerRow'>
+												<div className='ps-2'>
+													{translate('csv.common.param.header.row')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='update'
+												name='update'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='update'>
+												<div className='ps-2'>
+													{translate('csv.common.param.update')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+									<Col>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='relaxedParsing'
+												name='relaxedParsing'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='relaxedParsing'>
+												<div className='ps-2'>
+													{translate('csv.readings.param.relaxed.parsing')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='honorDst'
+												name='honorDst'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='honorDst'>
+												<div className='ps-2'>
+													{translate('csv.readings.param.honor.dst')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+									<Col>
+										<div style={checkBox}>
+											<Input
+												type='checkbox'
+												id='refreshReadings'
+												name='refreshReadings'
+												onChange={e => {
+													handleCheckboxChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											/>
+											<Label for='refreshReadings'>
+												<div className='ps-2'>
+													{translate('csv.readings.param.refresh.readings')}
+												</div>
+											</Label>
+										</div>
+									</Col>
+								</Row>
+								<div className='pb-3'></div>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='cumulative'>
+												<div className='pb-1'>
+													{translate('meter.cumulative')}
+												</div>
+											</Label>
+											<Input
+												id='cumulative'
+												name='cumulative'
 												type='select'
-												id='cumulativeReset'
-												name='cumulativeReset'
-												value={readingsData.cumulativeReset ? 'true' : 'false'}
-												onChange={handleTrueFalseSelectChange}
+												value={readingsData.cumulative ? 'true' : 'false'}
+												onChange={e => {
+													handleTrueFalseSelectChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
 											>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 												})}
 											</Input>
-										) : (
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='cumulativeReset'>
+												<div className='pb-1'>
+													{translate('meter.cumulativeReset')}
+												</div>
+											</Label>
+											{readingsData.cumulative === true ? (
+												<Input
+													type='select'
+													id='cumulativeReset'
+													name='cumulativeReset'
+													value={readingsData.cumulativeReset ? 'true' : 'false'}
+													onChange={e => {
+														handleTrueFalseSelectChange(e);
+														setHasUnsavedChanges(true); // Mark as unsaved
+													}}
+												>
+													{Object.keys(TrueFalseType).map(key => {
+														return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+													})}
+												</Input>
+											) : (
+												<Input
+													id='cumulativeReset'
+													name='cumulativeReset'
+													type='select'
+													disabled
+												>
+													<option value='no'>Unavailable</option>
+												</Input>
+											)}
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='cumulativeResetStart'>
+												<div className='pb-1'>
+													{translate('meter.cumulativeResetStart')}
+												</div>
+											</Label>
 											<Input
-												id='cumulativeReset'
-												name='cumulativeReset'
+												type="text"
+												id='cumulativeResetStart'
+												name='cumulativeResetStart'
+												onChange={e => {
+													handleChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+												value={readingsData.cumulativeResetStart}
+												placeholder='HH:MM:SS'
+												disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
+											/>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='cumulativeResetEnd'>
+												<div className='pb-1'>
+													{translate('meter.cumulativeResetEnd')}
+												</div>
+											</Label>
+											<Input
+												type="text"
+												id='cumulativeResetEnd'
+												name='cumulativeResetEnd'
+												onChange={e => {
+													handleChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+												value={readingsData.cumulativeResetEnd}
+												placeholder='HH:MM:SS'
+												disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
+											/>
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='endOnly'>
+												<div className='pb-1'>
+													{translate('meter.endOnlyTime')}
+												</div>
+											</Label>
+											<Input
 												type='select'
-												disabled
+												id='endOnly'
+												name='endOnly'
+												value={readingsData.endOnly ? 'true' : 'false'}
+												onChange={e => {
+													handleTrueFalseSelectChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
 											>
-												<option value='no'>Unavailable</option>
+												{Object.keys(TrueFalseType).map(key => {
+													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
+												})}
 											</Input>
-										)}
-									</FormGroup>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<FormGroup>
-										<Label for='cumulativeResetStart'>
-											<div className='pb-1'>
-												{translate('meter.cumulativeResetStart')}
-											</div>
-										</Label>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='lengthGap'>
+												<div className='pb-1'>
+													{translate('meter.readingGap')}
+												</div>
+											</Label>
+											<Input
+												type="number"
+												id='lengthGap'
+												name='lengthGap'
+												min='0'
+												value={readingsData.lengthGap}
+												onChange={e => {
+													handleNumberChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+												invalid={readingsData.lengthGap < 0}
+											/>
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='lengthVariation'>
+												<div className='pb-1'>
+													{translate('meter.readingVariation')}
+												</div>
+											</Label>
+											<Input
+												type="number"
+												id='lengthVariation'
+												name='lengthVariation'
+												min='0'
+												value={readingsData.lengthVariation}
+												onChange={e => {
+													handleNumberChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+												invalid={readingsData.lengthVariation < 0}
+											/>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='duplications'>
+												<div className='pb-1'>
+													{translate('meter.readingDuplication')}
+												</div>
+											</Label>
+											<Input
+												type='select'
+												id='duplications'
+												name='duplications'
+												value={readingsData.duplications || ''}
+												onChange={e => {
+													handleChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											>
+												{range(1, 10).map(i => (
+													<option key={i} value={i}> {i} </option>
+												))}
+											</Input>
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='timeSort'>
+												<div className='pb-1'>
+													{translate('meter.timeSort')}
+												</div>
+											</Label>
+											<Input
+												type='select'
+												id='timeSort'
+												name='timeSort'
+												value={readingsData.timeSort}
+												onChange={e => {
+													handleTimeSortChange(e);
+													setHasUnsavedChanges(true); // Mark as unsaved
+												}}
+											>
+												{Object.keys(MeterTimeSortType).map(key => {
+													return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
+												})}
+											</Input>
+										</FormGroup>
+									</Col>
+								</Row>
+								{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl.
+									Rest of changes left so easy to add back in.
+									This feature was added to help a site import data. It works but can have issues.
+									Thus, it is only allowed for script uploading since that was the need. It was
+									originally added to the web page input of import but decided to not allow
+									it at this time. Thus, the code was commented out. As of now
+									there is no plan to make this generally available due to its limitations.*/}
+								{/*
+									<Label check>
 										<Input
-											type="text"
-											id='cumulativeResetStart'
-											name='cumulativeResetStart'
-											onChange={handleChange}
-											value={readingsData.cumulativeResetStart}
-											placeholder='HH:MM:SS'
-											disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
+											checked={useMeterZone}
+											type='checkbox'
+											name='useMeterZone'
+											onChange={handleCheckboxChange}
 										/>
-									</FormGroup>
-								</Col>
-								<Col>
-									<FormGroup>
-										<Label for='cumulativeResetEnd'>
-											<div className='pb-1'>
-												{translate('meter.cumulativeResetEnd')}
-											</div>
-										</Label>
-										<Input
-											type="text"
-											id='cumulativeResetEnd'
-											name='cumulativeResetEnd'
-											onChange={handleChange}
-											value={readingsData.cumulativeResetEnd}
-											placeholder='HH:MM:SS'
-											disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
-										/>
-									</FormGroup>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<FormGroup>
-										<Label for='endOnly'>
-											<div className='pb-1'>
-												{translate('meter.endOnlyTime')}
-											</div>
-										</Label>
-										<Input
-											type='select'
-											id='endOnly'
-											name='endOnly'
-											value={readingsData.endOnly ? 'true' : 'false'}
-											onChange={handleTrueFalseSelectChange}
-										>
-											{Object.keys(TrueFalseType).map(key => {
-												return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-											})}
-										</Input>
-									</FormGroup>
-								</Col>
-								<Col>
-									<FormGroup>
-										<Label for='lengthGap'>
-											<div className='pb-1'>
-												{translate('meter.readingGap')}
-											</div>
-										</Label>
-										<Input
-											type="number"
-											id='lengthGap'
-											name='lengthGap'
-											min='0'
-											value={readingsData.lengthGap}
-											onChange={handleNumberChange}
-											invalid={readingsData.lengthGap < 0}
-										/>
-									</FormGroup>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<FormGroup>
-										<Label for='lengthVariation'>
-											<div className='pb-1'>
-												{translate('meter.readingVariation')}
-											</div>
-										</Label>
-										<Input
-											type="number"
-											id='lengthVariation'
-											name='lengthVariation'
-											min='0'
-											value={readingsData.lengthVariation}
-											onChange={handleNumberChange}
-											invalid={readingsData.lengthVariation < 0}
-										/>
-									</FormGroup>
-								</Col>
-								<Col>
-									<FormGroup>
-										<Label for='duplications'>
-											<div className='pb-1'>
-												{translate('meter.readingDuplication')}
-											</div>
-										</Label>
-										<Input
-											type='select'
-											id='duplications'
-											name='duplications'
-											value={readingsData.duplications || ''}
-											onChange={handleChange}
-										>
-											{range(1, 10).map(i => (
-												<option key={i} value={i}> {i} </option>
-											))}
-										</Input>
-									</FormGroup>
-								</Col>
-							</Row>
-							<Row xs='1' lg='2'>
-								<Col>
-									<FormGroup>
-										<Label for='timeSort'>
-											<div className='pb-1'>
-												{translate('meter.timeSort')}
-											</div>
-										</Label>
-										<Input
-											type='select'
-											id='timeSort'
-											name='timeSort'
-											value={readingsData.timeSort}
-											onChange={handleTimeSortChange}
-										>
-											{Object.keys(MeterTimeSortType).map(key => {
-												return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
-											})}
-										</Input>
-									</FormGroup>
-								</Col>
-							</Row>
-							{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl.
-								Rest of changes left so easy to add back in.
-								This feature was added to help a site import data. It works but can have issues.
-								Thus, it is only allowed for script uploading since that was the need. It was
-								originally added to the web page input of import but decided to not allow
-								it at this time. Thus, the code was commented out. As of now
-								there is no plan to make this generally available due to its limitations.*/}
-							{/*
-								<Label check>
-									<Input
-										checked={useMeterZone}
-										type='checkbox'
-										name='useMeterZone'
-										onChange={handleCheckboxChange}
-									/>
-									<div className='ps-2'>
-										{translate('csv.readings.param.use.meter.zone' />
+										<div className='ps-2'>
+											{translate('csv.readings.param.use.meter.zone' />
+										</div>
+									</Label>
+								*/}
+								<div className='d-flex flex-row-reverse'>
+									<div className='p-3'>
+										<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected}>
+											{translate('csv.submit.button')}
+										</Button>
 									</div>
-								</Label>
-							*/}
-							<div className='d-flex flex-row-reverse'>
-								<div className='p-3'>
-									<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected}>
-										{translate('csv.submit.button')}
-									</Button>
+									<div className='p-3'>
+										<Button color='secondary' type='reset' onClick={handleClear}>
+											{translate('csv.clear.button')}
+										</Button>
+									</div>
 								</div>
-								<div className='p-3'>
-									<Button color='secondary' type='reset' onClick={handleClear}>
-										{translate('csv.clear.button')}
-									</Button>
+								<div className='pb-5'>
 								</div>
-							</div>
-							<div className='pb-5'>
-							</div>
-						</Col>
-					</Row>
-				</Form>
-			</>)}
-		</Container>
+							</Col>
+						</Row>
+					</Form>
+				</>)}
+			</Container>
+		</>
 	);
 }
