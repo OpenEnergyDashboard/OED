@@ -178,6 +178,7 @@ export default function MetersCSVUploadComponent() {
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
 						//blocker.state = 'unblocked';
 					}}
 				/>

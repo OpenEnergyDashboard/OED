@@ -263,6 +263,7 @@ export default function ReadingsCSVUploadComponent() {
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
 						//blocker.state = 'unblocked';
 					}}
 				/>
