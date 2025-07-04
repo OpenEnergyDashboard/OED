@@ -7,7 +7,7 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const Meter = require('../models/Meter');
-const User = require('../models/User');
+const Group = require('../models/Group');
 const Unit = require('../models/Unit');
 const { success, failure } = require('./response');
 const { getAllPaths, createConversionGraph, createConversionGraphFromArray } = require('../services/graph/createConversionGraph');
@@ -230,21 +230,22 @@ router.post('/simulate-delete', async (req, res) => {
 	}
 	// 2. Load all conversions, units, meters, groups
 	try {
-		const [allConversions, allMeters, allUnits] = await Promise.all([
+		const [allConversions, allMeters, allUnits, allGroups] = await Promise.all([
 			Conversion.getAll(conn),
 			Meter.getAll(conn),
-			Unit.getAll(conn)
+			Unit.getAll(conn),
+			Group.getAll(conn)
 		]);
 	// 3. Remove the conversions we are simulating deleting
-	const newConversions = allConversions.filter(c =>
-		!(c.sourceId === req.body.sourceId && c.destinationId === req.body.destinationId)
-	);
+		const newConversions = allConversions.filter(c =>
+			!(c.sourceId === req.body.sourceId && c.destinationId === req.body.destinationId)
+		);
 	// 4. Build old and new graphs
-	const oldGraph = await createConversionGraph(conn);
+		const oldGraph = await createConversionGraph(conn);
 	// Build a new graph with the remaining conversions
-	const newGraph = createConversionGraphFromArray(allUnits, newConversions);
+		const newGraph = createConversionGraphFromArray(allUnits, newConversions);
 	// 5. For each meter/group, compare graphable units before/after deletion
-	const affectedMeters = [];
+		const affectedMeters = [];
 		for (const meter of allMeters) {
 			const unitId = meter.unitId;
 			if (unitId == -99) continue; // Skip meters with no unit
@@ -266,8 +267,43 @@ router.post('/simulate-delete', async (req, res) => {
 				});
 			}
 		}
+		const affectedGroups = [];
+		for (const group of allGroups) {
+			// get all meters in the group
+			const metersIds = await Group.getDeepMetersByGroupID(group.id, conn);
+			if (!metersIds || metersIds.length === 0) continue; // Skip empty groups
+
+			// For each meter, get old and new reachable units
+			const oldSets = metersIds.map(meterId => {
+				const meter = allMeters.find(m => m.id === meterId);
+				if (!meter || meter.unitId == -99){
+					return new Set();
+				}
+				const oldPaths = getAllPaths(oldGraph, meter.unitId);
+				return new Set(oldPaths.map(p => typeof p[p.length - 1] === 'object' ? p[p.length - 1].id : p[p.length - 1]));
+			});
+			const newSets = metersIds.map(meterId => {
+				const meter = allMeters.find(m => m.id === meterId);
+				if (!meter || meter.unitId == -99) return new Set();
+				const newPaths = getAllPaths(newGraph, meter.unitId);
+				return new Set(newPaths.map(p => typeof p[p.length - 1] === 'object' ? p[p.length - 1].id : p[p.length - 1]));
+			});
+			// Intersection helper
+			const intersect = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
+			const oldIntersection = oldSets.length ? intersect(oldSets) : new Set();
+			const newIntersection = newSets.length ? intersect(newSets) : new Set();
+
+			// If group loses all graphable units
+			if (oldIntersection.size > 0 && newIntersection.size === 0) {
+				affectedGroups.push({
+					groupId: group.id,
+					groupName: group.name,
+					lostUnits: Array.from(oldIntersection)
+				});
+			}
+		}
 	// 6. Return a summary of affected meters/groups and lost units
-		return res.json({affectedMeters});
+		return res.json({affectedMeters, affectedGroups});
 	} catch (err) {
 		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
 		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);

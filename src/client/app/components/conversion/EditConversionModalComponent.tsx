@@ -205,6 +205,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							}
 						});
 					}
+					if (result.affectedGroups && result.affectedGroups.length > 0) {
+						msg += translate('conversion.delete.group.affected') + ':\n';
+						result.affectedGroups.forEach(group => {
+							msg += `• ${group.groupName}\n`;
+							if (group.lostUnits.length > 0) {
+								msg += '  ' + translate('conversion.delete.lost.units') + ': ';
+								msg += group.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
+							}
+						});
+					}
 					msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
 					setDeleteConfirmationMessage(msg);
 					setShowDeleteConfirmationModal(true);
