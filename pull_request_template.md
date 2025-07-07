@@ -1,12 +1,10 @@
 # Description
 
-Implemented DOMPurify to sanitize HTML responses from response.js and success.js. Created sanitizer.js as a centralized, pre-configured instance of DOMPurify on the server. This also allows for implementation of sanitization elsewhere if needed in the future. These changes remediate a cross-site scripting vulnerability when users upload meter data.
+(Please include a summary of the change and which issue is touched on. Please also include relevant motivation and context.)
 
-Fixes problem report 3 from the penetration test report.
+Fixes #[issue]
 
-Developed and implemented by:
-Thomas Nigro - https://github.com/tnigro45
-Landon Wivell - https://github.com/Landon-Wivell
+(In general, OED likes to have at least one issue associated with each pull request. Replace [issue] with the OED GitHub issue number. In the preview you will see an issue description if you hover over that number. You can create one yourself before doing this pull request. This is where details are normally given on what is being addressed. Note you should not use the word "Fixes" if it does not completely address the issue since the issue would automatically be closed on merging the pull request. In that case use "Partly Addresses #[issue].)
 
 ## Type of change
 
@@ -19,10 +17,10 @@ Landon Wivell - https://github.com/Landon-Wivell
 
 (Note what you have done by placing an "x" instead of the space in the [ ] so it becomes [x]. It is hoped you do all of them.)
 
-- [x] I have followed the [OED pull request](https://openenergydashboard.org/developer/pr/) ideas
+- [ ] I have followed the [OED pull request](https://openenergydashboard.org/developer/pr/) ideas
 - [ ] I have removed text in ( ) from the issue request
-- [x] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](https://openenergydashboard.org/developer/cla/) and each author is listed in the Description section.
+- [ ] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](https://openenergydashboard.org/developer/cla/) and each author is listed in the Description section.
 
 ## Limitations
 
-N/A
+(Describe any issues that remain or work that should still be done.)

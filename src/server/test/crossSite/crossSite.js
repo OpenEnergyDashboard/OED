@@ -3,14 +3,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /* This file tests the functionality of the DOMPurify library. It tests for XSS 
-vulnerabilties in HTML of user uploaded data.*/
+vulnerabilities in HTML of user uploaded data.*/
 
 /* Run in OED Docker web container terminal/shell: 
  npm run testsome src/server/test/crossSite/crossSite.js */
 const { chai, mocha, expect, app, testUser } = require('../common');
 
 mocha.describe('Cross site', () => {
-	mocha.it('test 1', async () => {
+	mocha.it('test 1: tests for sanitization of HTML', async () => {
 		const filePath = 'src/server/test/crossSite/readings.csv';
 
 		const res = await chai.request(app).post('/api/csv/readings')
@@ -22,7 +22,7 @@ mocha.describe('Cross site', () => {
 			.field('meterName','<img src=x onerror="alert(document.domain)">')
 			.field('gzip', "no")
 			.attach('csvfile', 'src/server/test/crossSite/something.csv');
-		console.log('res.text: ', res.text);
+        expect(res.text).to.include('<img src="x">');
 		expect(res).to.have.status(400); 
 	});
 });
