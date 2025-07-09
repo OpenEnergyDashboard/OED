@@ -238,24 +238,33 @@ router.post('/simulate-delete', async (req, res) => {
 
 		// 3. Build simulated graph and Cik array
 		const simulatedGraph = createConversionGraphFromArray(allUnits, newConversions);
-		// If you need to handle suffix units, call your in-memory version here
-		// await handleSuffixUnits(simulatedGraph, conn); // (need a different version to not write to DB)
 		const simulatedCik = await createCikArray(simulatedGraph, conn);
 
 		// 4. Get the current Cik array
 		const currentGraph = await createConversionGraph(conn);
 		const currentCik = await createCikArray(currentGraph, conn);
 
-		// 5. For each meter, compare compatible units before/after
+		// 5. Precompute compatible units for each meter (current and simulated)
+		const meterIdToUnits_current = {};
+		const meterIdToUnits_sim = {};
+		for (const meter of allMeters) {
+			if (meter.unitId == -99) continue;
+			meterIdToUnits_current[meter.id] = new Set(currentCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
+			meterIdToUnits_sim[meter.id] = new Set(simulatedCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
+		}
+
+		// 6. Batch load all group-to-meter relationships
+		const groupIdToMeterIds = {};
+		await Promise.all(allGroups.map(async group => {
+			groupIdToMeterIds[group.id] = await Group.getDeepMetersByGroupID(group.id, conn);
+		}));
+
+		// 7. For each meter, compare compatible units before/after
 		const affectedMeters = [];
 		for (const meter of allMeters) {
 			if (meter.unitId == -99) continue;
-			const before = new Set(currentCik
-				.filter(cik => cik.source === meter.unitId)
-				.map(cik => cik.destination));
-			const after = new Set(simulatedCik
-				.filter(cik => cik.source === meter.unitId)
-				.map(cik => cik.destination));
+			const before = meterIdToUnits_current[meter.id] || new Set();
+			const after = meterIdToUnits_sim[meter.id] || new Set();
 			const lostUnits = [...before].filter(u => !after.has(u));
 			if (lostUnits.length > 0) {
 				affectedMeters.push({
@@ -266,23 +275,17 @@ router.post('/simulate-delete', async (req, res) => {
 			}
 		}
 
-		// 6. For each group, compare compatible units before/after
+		// 8. For each group, intersect the sets (using cached meter compatible units)
 		const affectedGroups = [];
 		for (const group of allGroups) {
-			const meterIds = await Group.getDeepMetersByGroupID(group.id, conn);
+			const meterIds = groupIdToMeterIds[group.id];
 			if (!meterIds || meterIds.length === 0) continue;
 
-			// Helper to get compatible units for a set of meters from a Cik array
-			const compatibleUnits = (cikArr) => {
-				const sets = meterIds.map(meterId =>
-					new Set(cikArr.filter(cik => cik.source === allMeters.find(m => m.id === meterId)?.unitId)
-						.map(cik => cik.destination))
-				);
-				return sets.length ? sets.reduce((a, b) => new Set([...a].filter(x => b.has(x)))) : new Set();
-			};
-
-			const before = compatibleUnits(currentCik);
-			const after = compatibleUnits(simulatedCik);
+			const intersectSets = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
+			const sets_current = meterIds.map(id => meterIdToUnits_current[id] || new Set());
+			const sets_sim = meterIds.map(id => meterIdToUnits_sim[id] || new Set());
+			const before = sets_current.length ? intersectSets(sets_current) : new Set();
+			const after = sets_sim.length ? intersectSets(sets_sim) : new Set();
 
 			if (before.size > 0 && after.size === 0) {
 				affectedGroups.push({
