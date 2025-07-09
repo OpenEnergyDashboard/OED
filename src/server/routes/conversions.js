@@ -5,6 +5,7 @@
 const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
+const { createCikArray } = require('../services/graph/createConversionArrays');
 const Conversion = require('../models/Conversion');
 const Meter = require('../models/Meter');
 const Group = require('../models/Group');
@@ -207,58 +208,55 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 });
 router.post('/simulate-delete', async (req, res) => {
 	const conn = getConnection();
-	// 1. Validate input like in /delete
-	// Only require a source and destination id
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId'],
 		properties: {
-			sourceId: {
-				type: 'number',
-				minimum: 0
-			},
-			destinationId: {
-				type: 'number',
-				minimum: 0
-			}
+			sourceId: { type: 'number', minimum: 0 },
+			destinationId: { type: 'number', minimum: 0 }
 		}
 	};
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		return;
 	}
-	// 2. Load all conversions, units, meters, groups
 	try {
+		// 1. Load all data
 		const [allConversions, allMeters, allUnits, allGroups] = await Promise.all([
 			Conversion.getAll(conn),
 			Meter.getAll(conn),
 			Unit.getAll(conn),
 			Group.getAll(conn)
 		]);
-	// 3. Remove the conversions we are simulating deleting
+
+		// 2. Remove the conversion to be deleted
 		const newConversions = allConversions.filter(c =>
 			!(c.sourceId === req.body.sourceId && c.destinationId === req.body.destinationId)
 		);
-	// 4. Build old and new graphs
-		const oldGraph = await createConversionGraph(conn);
-	// Build a new graph with the remaining conversions
-		const newGraph = createConversionGraphFromArray(allUnits, newConversions);
-	// 5. For each meter/group, compare graphable units before/after deletion
+
+		// 3. Build simulated graph and Cik array
+		const simulatedGraph = createConversionGraphFromArray(allUnits, newConversions);
+		// If you need to handle suffix units, call your in-memory version here
+		// await handleSuffixUnits(simulatedGraph, conn); // (need a different version to not write to DB)
+		const simulatedCik = await createCikArray(simulatedGraph, conn);
+
+		// 4. Get the current Cik array
+		const currentGraph = await createConversionGraph(conn);
+		const currentCik = await createCikArray(currentGraph, conn);
+
+		// 5. For each meter, compare compatible units before/after
 		const affectedMeters = [];
 		for (const meter of allMeters) {
-			const unitId = meter.unitId;
-			if (unitId == -99) continue; // Skip meters with no unit
-			const oldPaths = getAllPaths(oldGraph, unitId);
-			const newPaths = getAllPaths(newGraph, unitId);
-
-			const oldReachable = new Set(oldPaths.map(p => p[p.length - 1]));
-			const newReachable = new Set(newPaths.map(p => p[p.length - 1]));
-
-			const oldReachableIds = [...oldReachable].map(u => typeof u === 'object' ? u.id : u);
-			const newReachableIds = [...newReachable].map(u => typeof u === 'object' ? u.id : u);
-			const lostUnits = oldReachableIds.filter(u => !newReachableIds.includes(u));
-
+			if (meter.unitId == -99) continue;
+			const before = new Set(currentCik
+				.filter(cik => cik.source === meter.unitId)
+				.map(cik => cik.destination));
+			const after = new Set(simulatedCik
+				.filter(cik => cik.source === meter.unitId)
+				.map(cik => cik.destination));
+			const lostUnits = [...before].filter(u => !after.has(u));
 			if (lostUnits.length > 0) {
 				affectedMeters.push({
 					meterId: meter.id,
@@ -267,43 +265,35 @@ router.post('/simulate-delete', async (req, res) => {
 				});
 			}
 		}
+
+		// 6. For each group, compare compatible units before/after
 		const affectedGroups = [];
 		for (const group of allGroups) {
-			// get all meters in the group
-			const metersIds = await Group.getDeepMetersByGroupID(group.id, conn);
-			if (!metersIds || metersIds.length === 0) continue; // Skip empty groups
+			const meterIds = await Group.getDeepMetersByGroupID(group.id, conn);
+			if (!meterIds || meterIds.length === 0) continue;
 
-			// For each meter, get old and new reachable units
-			const oldSets = metersIds.map(meterId => {
-				const meter = allMeters.find(m => m.id === meterId);
-				if (!meter || meter.unitId == -99){
-					return new Set();
-				}
-				const oldPaths = getAllPaths(oldGraph, meter.unitId);
-				return new Set(oldPaths.map(p => typeof p[p.length - 1] === 'object' ? p[p.length - 1].id : p[p.length - 1]));
-			});
-			const newSets = metersIds.map(meterId => {
-				const meter = allMeters.find(m => m.id === meterId);
-				if (!meter || meter.unitId == -99) return new Set();
-				const newPaths = getAllPaths(newGraph, meter.unitId);
-				return new Set(newPaths.map(p => typeof p[p.length - 1] === 'object' ? p[p.length - 1].id : p[p.length - 1]));
-			});
-			// Intersection helper
-			const intersect = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
-			const oldIntersection = oldSets.length ? intersect(oldSets) : new Set();
-			const newIntersection = newSets.length ? intersect(newSets) : new Set();
+			// Helper to get compatible units for a set of meters from a Cik array
+			const compatibleUnits = (cikArr) => {
+				const sets = meterIds.map(meterId =>
+					new Set(cikArr.filter(cik => cik.source === allMeters.find(m => m.id === meterId)?.unitId)
+						.map(cik => cik.destination))
+				);
+				return sets.length ? sets.reduce((a, b) => new Set([...a].filter(x => b.has(x)))) : new Set();
+			};
 
-			// If group loses all graphable units
-			if (oldIntersection.size > 0 && newIntersection.size === 0) {
+			const before = compatibleUnits(currentCik);
+			const after = compatibleUnits(simulatedCik);
+
+			if (before.size > 0 && after.size === 0) {
 				affectedGroups.push({
 					groupId: group.id,
 					groupName: group.name,
-					lostUnits: Array.from(oldIntersection)
+					lostUnits: Array.from(before)
 				});
 			}
 		}
-	// 6. Return a summary of affected meters/groups and lost units
-		return res.json({affectedMeters, affectedGroups});
+
+		return res.json({ affectedMeters, affectedGroups });
 	} catch (err) {
 		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
 		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
