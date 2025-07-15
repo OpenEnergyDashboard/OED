@@ -30,7 +30,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 	// SHL: I put a lot of comment in unitParamsTest.js which probably is now obsolete but some apply here.
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
-		await recreateDB(conn);
 
 		await insertUnits([INSERT_UNIT], true, conn);
 	});

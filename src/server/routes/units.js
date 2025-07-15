@@ -48,10 +48,13 @@ router.post('/edit', async (req, res) => {
 			},
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 50
 			},
 			identifier: {
-				type: 'string'
+				type: 'string',
+				minLength: 1,
+				maxLength: 50
 			},
 			unitRepresent: {
 				type: 'string',
@@ -67,7 +70,9 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
-				type: 'string'
+				type: 'string',
+				minLength: 1,
+				maxLength: 50
 			},
 			displayable: {
 				type: 'string',
@@ -92,7 +97,7 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
-	};
+	}; 
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
@@ -137,11 +142,13 @@ router.post('/addUnit', async (req, res) => {
 			// Removed id from properties list since it is set to undefined no matter what is passed.
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 50
 			},
 			identifier: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: 50
 			},
 			unitRepresent: {
 				type: 'string',
@@ -149,8 +156,10 @@ router.post('/addUnit', async (req, res) => {
 				enum: Object.values(Unit.unitRepresentType)
 			},
 			secInRate: {
-				type: 'number'
+				type: 'integer',
+				minimum: 0
 			},
+			
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
@@ -189,7 +198,19 @@ router.post('/addUnit', async (req, res) => {
 			}
 		}
 	};
+	console.log('secInRate:', req.body.secInRate, 'typeof:', typeof req.body.secInRate);
+
 	const validationResult = validate(req.body, validUnit);
+
+	if (validationResult.valid && req.body.minVal > req.body.maxVal) {
+		validationResult.valid = false;
+		validationResult.errors = [
+			...(validationResult.errors || []),
+			{ message: "'maxVal' must be greater than or equal to 'minVal'" }
+		];
+	}
+
+
 	if (!validationResult.valid) {
         log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
         failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);

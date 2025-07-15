@@ -20,6 +20,26 @@ async function testInvalidField({ field, invalidValue, endpoint, basePayload, ex
 }
 
 /**
+ * Tests that the API rejects when maxVal is less than minVal
+ * @param {Object} params
+ * @param {string} params.endpoint - API endpoint to test
+ * @param {Object} params.basePayload - Base payload with valid values
+ */
+ async function validateMinMaxRelation({ endpoint, basePayload }) {
+    // Create invalid payload where minVal > maxVal
+    const invalidPayload = {
+        ...basePayload,
+        minVal: (basePayload.minVal || 10) + 1,  
+        maxVal: basePayload.minVal || 10 
+    };
+    const res = await chai.request(app)
+        .post(endpoint)
+        .send(invalidPayload);
+    
+    expect(res).to.have.status(400);
+}
+
+/**
  * Validates string field behavior for required, length, and enum constraints.
  * @param {Object} options - Validation options.
  * @param {string} options.field - The name of the field to validate.
@@ -58,15 +78,19 @@ async function validateString({ field, endpoint, basePayload, required = true, m
  * @param {number} [options.min=0] - Minimum valid integer.
  * @param {number} [options.max=999999] - Maximum valid integer.
  */
-async function validateInt({ field, endpoint, basePayload, required = true, min = 0, max = 999999 }) {
-	console.log(`Validating integer field: ${field}`);
-
+ async function validateInt({ field, endpoint, basePayload, required = true, min = null, max = null }) {
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
-	await testInvalidField({ field, invalidValue: min - 1, endpoint, basePayload });
-	await testInvalidField({ field, invalidValue: max + 1, endpoint, basePayload });
+	if (typeof min === 'number') {
+		await testInvalidField({ field, invalidValue: min - 1, endpoint, basePayload });
+	}
+
+	if (typeof max === 'number') {
+		await testInvalidField({ field, invalidValue: max + 1, endpoint, basePayload });
+	}
+
 	await testInvalidField({ field, invalidValue: 'notAnInteger', endpoint, basePayload });
 }
 
@@ -91,5 +115,6 @@ async function validateBool({ field, endpoint, basePayload, required = true }) {
 module.exports = {
 	validateString,
 	validateInt,
-	validateBool
+	validateBool,
+	validateMinMaxRelation
 };
