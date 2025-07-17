@@ -7,6 +7,7 @@
 const { chai, mocha, app, testDB, recreateDB } = require('../common');
 const { generateUnitValidationTests } = require('../util/unitTestUtils');
 const { insertUnits } = require('../../util/insertData');
+// SHL: This does not seem to be used.
 const { getUnitId } = require('../../util/readingsUtils');
 const Unit = require('../../models/Unit');
 
@@ -40,10 +41,12 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 		options: { skipId: false },
 		cases: [
 			{ name: 'valid default unit', expectedStatus: 200 },
+// SHL: This seems to assume that the id of 2 does not exist. To be safe it should get the current id and then modify (say add 1) to test.
 			{ name: 'nonexistent id', expectedStatus: 500, mutation: { type: 'change', field: 'id', value: 2 } },
 			{ name: 'missing id', expectedStatus: 400, mutation: { type: 'remove', field: 'id' } },
 			{ name: 'missing identifier', expectedStatus: 400, mutation: { type: 'remove', field: 'identifier' } },
 			{ name: 'empty name', expectedStatus: 400, mutation: { type: 'change', field: 'name', value: '' } },
+// SHL: Curious why the value is INVALID and sometimes in different tests.
 			{ name: 'invalid unitRepresent', expectedStatus: 400, mutation: { type: 'change', field: 'unitRepresent', value: 'INVALID' } },
 			{ name: 'invalid displayable', expectedStatus: 400, mutation: { type: 'change', field: 'displayable', value: 'sometimes' } },
 			{ name: 'missing all fields', expectedStatus: 400, mutation: { type: 'custom', body: {} } }

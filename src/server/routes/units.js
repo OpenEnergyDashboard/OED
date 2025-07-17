@@ -1,3 +1,4 @@
+// SHL: Not your doing but could the * be aligned (only one space before) as in other files?
 /* This Source Code Form is subject to the terms of the Mozilla Public
   * License, v. 2.0. If a copy of the MPL was not distributed with this
   * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -42,6 +43,9 @@ router.post('/edit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['id', 'identifier'],
+// SHL: Some routes use the maxProperties test to make sure there are not extra ones. I think it would be good
+// to do that in these routes (all with params) and also create a test to see if an extra value is sent that it is rejected.
+// delete below does have this value.
 		properties: {
 			id: {
 				type: 'integer'
@@ -63,6 +67,7 @@ router.post('/edit', async (req, res) => {
 			},
 			secInRate: {
 				type: 'number',
+// SHL: No min as in add.
 			},
 			typeOfUnit: {
 				type: 'string',
@@ -97,6 +102,7 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
+// SHL: Extra space at end of line. Maybe use VSC Format File.
 	}; 
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
@@ -125,7 +131,8 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-            failure(res, 500, 'Unable to edit unit ' + err.toString());
+ // SHL: Need tab indenting - not your doing but nice if fixed.
+           failure(res, 500, 'Unable to edit unit ' + err.toString());
 		}
 		success(res, `Successfully edited unit`);
 	}
@@ -167,6 +174,7 @@ router.post('/addUnit', async (req, res) => {
 			},
 			suffix: {
 				oneOf: [
+// SHL: Can the min/max be added if a string?
 					{ type: 'string' },
 					{ type: 'null' }
 				]
@@ -198,6 +206,7 @@ router.post('/addUnit', async (req, res) => {
 			}
 		}
 	};
+// SHL: Remove debug statement?
 	console.log('secInRate:', req.body.secInRate, 'typeof:', typeof req.body.secInRate);
 
 	const validationResult = validate(req.body, validUnit);

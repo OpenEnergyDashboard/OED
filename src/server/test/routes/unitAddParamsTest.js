@@ -6,7 +6,9 @@
 
 //
 const { expect } = require('chai');
+// SHL: recreateDB does not seem to be used.
 const { chai, mocha, app, testDB, recreateDB } = require('../common');
+// SHL: This does not seem to be used.
 //This is the first way to test endpoint
 const { generateUnitValidationTests } = require('../util/unitTestUtils');
 //2nd way
@@ -15,6 +17,7 @@ const { validateString, validateInt, validateBool, validateMinMaxRelation } = re
 //This is the end point we use to test in this file.
 const ADD_UNIT = '/api/units/addUnit';
 
+// SHL: I'm unsure what this commented out code is for.
 // mocha.describe('Unit Routes - /addUnit Validation', () => {
 //     mocha.beforeEach(async () => {
 //         const conn = testDB.getConnection();
@@ -50,6 +53,7 @@ const basePayload = {
 	disableChecks: 'reject_bad'
 };
 
+// SHL: I'm curious why these tests are so different than the edit verify and seem to cover different tests.
 mocha.describe('Validation - /addUnit', () => {
 	mocha.it('should validate string fields', async () => {
 		// Based on schema: name VARCHAR(50), NOT NULL
@@ -57,6 +61,7 @@ mocha.describe('Validation - /addUnit', () => {
 			field: 'name',
 			endpoint: ADD_UNIT,
 			basePayload,
+// SHL: name also has a min of 1 similar to identifier.
 			maxLength: 50
 		});
 
@@ -74,6 +79,7 @@ mocha.describe('Validation - /addUnit', () => {
 			field: 'unitRepresent',
 			endpoint: ADD_UNIT,
 			basePayload,
+// SHL: It is raw not pressure. More generally, could the values be gotten from the Object so it always matches the intended "enum" values?
 			enumValues: ['flow', 'quantity', 'pressure'] // Update with actual enum values in Unit.unitRepresentType
 		});
 
@@ -81,8 +87,10 @@ mocha.describe('Validation - /addUnit', () => {
 			field: 'typeOfUnit',
 			endpoint: ADD_UNIT,
 			basePayload,
+// SHL: The enum values are wrong.
 			enumValues: ['unit', 'conversion'] // Update based on Unit.unitType
 		});
+// SHL: Remove extra blank line.
 
 
 		await validateString({
@@ -98,6 +106,8 @@ mocha.describe('Validation - /addUnit', () => {
 			basePayload,
 			enumValues: ['reject_bad', 'reject_all', 'reject_none']
 		});
+// SHL: I don't see a test on suffix which is limited to 50.
+// SHL: While there is no limit on note in the DB, I think the route should limit to some upper limit of say 1000 and this should test that.
 	});
 
 	mocha.it('should validate numeric and integer fields', async () => {
@@ -106,6 +116,7 @@ mocha.describe('Validation - /addUnit', () => {
             endpoint: ADD_UNIT,
             basePayload,
             required: false,
+// SHL: Zero is not allowed. It must be positive. Test should check 0 does not work.
             min: 0,
         });
         

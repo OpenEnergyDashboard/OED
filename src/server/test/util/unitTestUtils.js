@@ -2,6 +2,7 @@ const { chai, mocha, expect, app} = require('../common');
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const chaiRequest = require('chai').request;
+// SHL: Please remove blank line between imports.
 
 const Unit = require('../../models/Unit')
 const { getUnitId } = require('../../util/readingsUtils');
@@ -38,6 +39,7 @@ function applyMutation(base, mutation = {}) {
 			mutated[mutation.field] = mutation.value;
 			break;
 		case 'custom':
+// SHL: I'm curious why some cases return the value and some set the value. Could they all set the value so one return at end?
 			return mutation.body;
 		case undefined:
 			// No mutation provided, return original
@@ -51,6 +53,7 @@ function applyMutation(base, mutation = {}) {
 
 /**
  * Generates and runs validation test cases for a unit-related API endpoint.
+// SHL: See other comments on params.
  * @param {Object} params - Parameters for generating the tests.
  * @param {string} [params.method='post'] - HTTP method to use (e.g., 'post', 'put').
  * @param {string} params.endpoint - API endpoint to test.
