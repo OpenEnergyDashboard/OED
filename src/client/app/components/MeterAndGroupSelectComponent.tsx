@@ -142,10 +142,12 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	const onThreeD = useAppSelector(state => selectChartToRender(state) === ChartTypes.threeD);
 	// TODO Verify behavior, and set proper message/ translate
 	return (
-		< div ref={ref}
+		<div ref={ref}
 			key={`${typedProps.data.value}:${typedProps.data.label}:${typedProps.data.isDisabled}`}
 			data-for={isDisabled ? 'home' : 'select-tooltips'}
-			data-tip={isDisabled ? 'help.home.area.normalize' : `${props.data.label}`}
+			data-tip={isDisabled
+				? 'help.home.area.normalize'
+				: `${props.data.label}${props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}`}
 			onMouseDown={e => {
 				e.stopPropagation();
 				ReactTooltip.rebuild();
@@ -174,8 +176,17 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				ref.current && ReactTooltip.hide(ref.current);
 			}}
 		>
-			<components.MultiValueLabel {...props} />
-			<span>
+			<span
+				style={{
+					display: 'inline-block',
+					maxWidth: '120px', // adjust as needed
+					whiteSpace: 'nowrap',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					verticalAlign: 'middle'
+				}}
+			>
+				{props.data.label}
 				{props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}
 			</span>
 		</div >
