@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
 import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
-import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
+import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -26,7 +26,18 @@ export default function ChartLinkComponent() {
 	const linkHideOptions = useAppSelector(selectChartLinkHideOptions);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval)
 	const ref = React.useRef<HTMLDivElement>(null);
+
+	const shouldShowKeepCurrentCheckbox = React.useMemo(() => {
+		if (!queryTimeInterval) return false
+		const end = queryTimeInterval.getEndTimestamp?.()
+		const isRightUnBounded = !end
+		return isRightUnBounded
+	}, [queryTimeInterval])
+
+
+
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard.writeText(linkText)
@@ -66,6 +77,12 @@ export default function ChartLinkComponent() {
 						<Button outline onClick={() => setLinkTextVisible(visible => !visible)}>
 							{linkTextVisible ? 'x' : 'v'}
 						</Button>
+							{shouldShowKeepCurrentCheckbox && (
+								<label htmlFor="keepCurrentCheckbox" style = {{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+								<Input type="checkbox" id = "keepCurrentCheckbox"/>
+								 Keep Current </label>
+							)}
+						
 					</ButtonGroup>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link' />
 				</div>
