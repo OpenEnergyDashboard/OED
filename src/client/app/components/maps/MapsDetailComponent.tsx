@@ -11,7 +11,6 @@ import MapViewContainer from '../../containers/maps/MapViewContainer';
 import { hasToken } from '../../utils/token';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 import { useState } from 'react';
 import { useBlocker } from 'react-router-dom';

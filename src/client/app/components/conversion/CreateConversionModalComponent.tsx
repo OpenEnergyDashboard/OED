@@ -4,7 +4,7 @@
 
 import { omit } from 'lodash';
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -19,7 +19,6 @@ import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import { UnitType } from '../../types/redux/units';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 /**
@@ -32,6 +31,8 @@ export default function CreateConversionModalComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -154,6 +155,38 @@ export default function CreateConversionModalComponent() {
 		}
 	};
 
+	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks:
+		// - Source ID has to be a number
+		// - Destination ID has to be a number
+		// - Bidirectional has to be a boolean
+		// - Slope has to be a number
+		// - Intercept has to be a number
+		// - Note cannot be blank
+		const validConversion = !isNaN(conversionState.sourceId)
+			&& !isNaN(conversionState.destinationId)
+			&& typeof conversionState.bidirectional === 'boolean'
+			&& !isNaN(conversionState.slope)
+			&& !isNaN(conversionState.intercept)
+			&& conversionState.note !== '';
+
+		// Compare the local changes to the default values
+		const editMade =
+			conversionState.sourceId !== defaultValues.sourceId
+			|| conversionState.destinationId !== defaultValues.destinationId
+			|| conversionState.bidirectional !== defaultValues.bidirectional
+			|| conversionState.slope !== defaultValues.slope
+			|| conversionState.intercept !== defaultValues.intercept
+			|| conversionState.note !== defaultValues.note;
+		setCanSave(validConversion && editMade);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [conversionState]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipCreateConversionView: 'help.admin.conversioncreate'
@@ -214,10 +247,7 @@ export default function CreateConversionModalComponent() {
 										name='sourceId'
 										type='select'
 										value={conversionState.sourceId}
-										onChange={e => {
-											handleNumberChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleNumberChange(e);}}
 										invalid={conversionState.sourceId === -999}>
 										{<option
 											value={-999}
@@ -244,10 +274,7 @@ export default function CreateConversionModalComponent() {
 										name='destinationId'
 										type='select'
 										value={conversionState.destinationId}
-										onChange={e => {
-											handleNumberChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleNumberChange(e);}}
 										invalid={conversionState.destinationId === -999}>
 										{<option
 											value={-999}
@@ -273,10 +300,7 @@ export default function CreateConversionModalComponent() {
 								id='bidirectional'
 								name='bidirectional'
 								type='select'
-								onChange={e => {
-									handleBooleanChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}
+								onChange={e => {handleBooleanChange(e);}}
 								value={String(conversionState.bidirectional)}
 								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -304,10 +328,8 @@ export default function CreateConversionModalComponent() {
 										name='slope'
 										type='number'
 										value={conversionState.slope}
-										onChange={e => {
-											handleNumberChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -319,10 +341,8 @@ export default function CreateConversionModalComponent() {
 										name='intercept'
 										type='number'
 										value={conversionState.intercept}
-										onChange={e => {
-											handleNumberChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -333,11 +353,9 @@ export default function CreateConversionModalComponent() {
 								id='note'
 								name='note'
 								type='textarea'
-								onChange={e => {
-									handleStringChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}
-								value={conversionState.note} />
+								onChange={e => {handleStringChange(e);}}
+								value={conversionState.note}
+							/>
 						</FormGroup>
 					</Container>
 				</ModalBody>
@@ -352,7 +370,7 @@ export default function CreateConversionModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validConversion} >
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion || !canSave} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

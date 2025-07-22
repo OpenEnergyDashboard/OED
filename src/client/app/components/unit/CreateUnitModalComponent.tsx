@@ -18,7 +18,6 @@ import { showSuccessNotification, showErrorNotification } from '../../utils/noti
 import { MIN_VAL, MAX_VAL } from '../../utils/input';
 import { LineGraphRates } from '../../types/redux/graph';
 import { customRateValid, isCustomRate } from '../../utils/unitInput';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 /**
@@ -160,7 +159,27 @@ export default function CreateUnitModalComponent() {
 			(state.typeOfUnit !== UnitType.suffix || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
 			&& state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal
 			&& customRateValid(Number(state.secInRate));
-		setCanSave(validUnit);
+
+		// Compare the local changes to the default values
+		const editMade =
+			state.name !== defaultValues.name
+			|| state.identifier !== defaultValues.identifier
+			|| state.typeOfUnit !== defaultValues.typeOfUnit
+			|| state.unitRepresent !== defaultValues.unitRepresent
+			|| state.displayable !== defaultValues.displayable
+			|| state.preferredDisplay !== defaultValues.preferredDisplay
+			|| state.secInRate !== defaultValues.secInRate
+			|| state.suffix !== defaultValues.suffix
+			|| state.note !== defaultValues.note
+			|| state.minVal !== defaultValues.minVal
+			|| state.maxVal !== defaultValues.maxVal
+			|| state.disableChecks !== defaultValues.disableChecks;
+		setCanSave(validUnit && editMade);
+
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
 	}, [state]);
 
 	/* End State */
@@ -260,10 +279,7 @@ export default function CreateUnitModalComponent() {
 										name="identifier"
 										type="text"
 										autoComplete="on"
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										value={state.identifier}
 									/>
 								</FormGroup>
@@ -277,10 +293,7 @@ export default function CreateUnitModalComponent() {
 										name="name"
 										type="text"
 										autoComplete="on"
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										value={state.name}
 										invalid={state.name === ''}
 									/>
@@ -301,10 +314,7 @@ export default function CreateUnitModalComponent() {
 										id="typeOfUnit"
 										name="typeOfUnit"
 										type="select"
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										value={state.typeOfUnit}
 										invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}
 									>
@@ -335,10 +345,7 @@ export default function CreateUnitModalComponent() {
 										id="unitRepresent"
 										name="unitRepresent"
 										type="select"
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										value={state.unitRepresent}
 									>
 										{Object.keys(UnitRepresentType).map(key => {
@@ -361,10 +368,7 @@ export default function CreateUnitModalComponent() {
 										id="displayable"
 										name="displayable"
 										type="select"
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										value={state.displayable}
 										invalid={
 											state.displayable != DisplayableType.none &&
@@ -405,10 +409,7 @@ export default function CreateUnitModalComponent() {
 										id="preferredDisplay"
 										name="preferredDisplay"
 										type="select"
-										onChange={e => {
-											handleBooleanChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleBooleanChange(e);}}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (
@@ -431,10 +432,7 @@ export default function CreateUnitModalComponent() {
 										name="secInRate"
 										type="select"
 										value={rate}
-										onChange={e => {
-											handleRateChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleRateChange(e);}}
 									>
 										{Object.entries(LineGraphRates).map(
 											([rateKey, rateValue]) => (
@@ -459,10 +457,7 @@ export default function CreateUnitModalComponent() {
 												value={customRate}
 												min={1}
 												invalid={!customRateValid(customRate)}
-												onChange={e => {
-													handleCustomRateChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCustomRateChange(e);}}
 												// This grabs each key hit and then finishes input when hit enter.
 												onKeyDown={e => { handleEnter(e.key); }}
 											/>
@@ -483,10 +478,7 @@ export default function CreateUnitModalComponent() {
 										name="suffix"
 										type="text"
 										value={state.suffix}
-										onChange={e => {
-											handleStringChange(e);
-											setHasUnsavedChanges(true); // Mark as unsaved
-										}}
+										onChange={e => {handleStringChange(e);}}
 										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''
 										}
 									/>
@@ -501,10 +493,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='minVal'>{translate('min.value')}</Label>
 								<Input id='minVal' name='minVal' type='number'
-									onChange={e => {
-										handleNumberChange(e);
-										setHasUnsavedChanges(true); // Mark as unsaved
-									}}
+									onChange={e => {handleNumberChange(e);}}
 									min={MIN_VAL}
 									max={state.maxVal}
 									value={state.minVal}
@@ -517,10 +506,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='maxVal'>{translate('max.value')}</Label>
 								<Input id='maxVal' name='maxVal' type='number'
-									onChange={e => {
-										handleNumberChange(e);
-										setHasUnsavedChanges(true); // Mark as unsaved
-									}}
+									onChange={e => {handleNumberChange(e);}}
 									min={state.minVal}
 									max={MAX_VAL}
 									value={state.maxVal}
@@ -535,10 +521,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='disableChecks'>{translate('disable.checks')}</Label>
 								<Input id='disableChecks' name='disableChecks' type='select'
-									onChange={e => {
-										handleStringChange(e);
-										setHasUnsavedChanges(true); // Mark as unsaved
-									}}
+									onChange={e => {handleStringChange(e);}}
 									value={state.disableChecks}>
 									{Object.keys(DisableChecksType).map(key => {
 										return (<option value={key} key={key} >
@@ -555,10 +538,7 @@ export default function CreateUnitModalComponent() {
 								name='note'
 								type='textarea'
 								value={state.note}
-								onChange={e => {
-									handleStringChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}} />
+								onChange={e => {handleStringChange(e);}} />
 						</FormGroup>
 					</Container>
 				</ModalBody>

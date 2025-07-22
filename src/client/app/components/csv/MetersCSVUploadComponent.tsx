@@ -18,9 +18,8 @@ import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
 import SpinnerComponent from '../SpinnerComponent';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useBlocker } from 'react-router-dom';
 //import { useNavigate } from 'react-router-dom';
 
@@ -110,6 +109,8 @@ export default function MetersCSVUploadComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
 
 	const blocker = useBlocker(hasUnsavedChanges);
 
@@ -148,6 +149,28 @@ export default function MetersCSVUploadComponent() {
 		}
 	}, [blocker.state, hasUnsavedChanges]);
 
+	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if the inputs for each field is of their appropriate types.
+		const validMeter = typeof meterData.gzip === 'boolean'
+			&& typeof meterData.headerRow === 'boolean'
+			&& meterData.meterIdentifier !== ''
+			&& typeof meterData.update === 'boolean';
+
+		// Compare the local changes to the default values
+		const editMade =
+			meterData.gzip !== MetersCSVUploadDefaults.gzip
+			|| meterData.headerRow !== MetersCSVUploadDefaults.headerRow
+			|| meterData.meterIdentifier !== MetersCSVUploadDefaults.meterIdentifier
+			|| meterData.update !== MetersCSVUploadDefaults.update;
+		setCanSave(validMeter && editMade);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [meterData]);
+
 	return (
 		<>
 			{/* Unsaved Warning Component */}
@@ -163,23 +186,12 @@ export default function MetersCSVUploadComponent() {
 						// values that display the warning, and the user just has to
 						// leave the page again.
 						handleClear();
-						//blocker.state = 'unblocked';
-					}}
-					onConfirm={() => {
-						setShowUnsavedWarning(false);
-						setHasUnsavedChanges(false);
-						handleSubmit;
-						handleClear();
-						//setMeterData(MetersCSVUploadDefaults);
-						//setSelectedFile(null);
-						//setIsValidFileType(false);
-						//blocker.state = 'unblocked';
-
+						blocker.state = 'unblocked';
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
-						//blocker.state = 'unblocked';
+						blocker.state = 'unblocked';
 					}}
 				/>
 			)}
@@ -214,11 +226,7 @@ export default function MetersCSVUploadComponent() {
 														type='checkbox'
 														id='gzip'
 														name='gzip'
-														onChange={e => {
-															handleCheckboxChange(e);
-															setHasUnsavedChanges(true); // Mark as unsaved
-															handleToggle();
-														}}
+														onChange={e => {handleCheckboxChange(e);}}
 													/>
 													<div className='ps-2'>
 														{translate('csv.common.param.gzip')}
@@ -235,11 +243,7 @@ export default function MetersCSVUploadComponent() {
 														type='checkbox'
 														id='headerRow'
 														name='headerRow'
-														onChange={e => {
-															handleCheckboxChange(e);
-															setHasUnsavedChanges(true); // Mark as unsaved
-															handleToggle();
-														}}
+														onChange={e => {handleCheckboxChange(e);}}
 													/>
 													<div className='ps-2'>
 														{translate('csv.common.param.header.row')}
@@ -256,11 +260,7 @@ export default function MetersCSVUploadComponent() {
 														type='checkbox'
 														id='update'
 														name='update'
-														onChange={e => {
-															handleCheckboxChange(e);
-															setHasUnsavedChanges(true); // Mark as unsaved
-															handleToggle();
-														}}
+														onChange={e => {handleCheckboxChange(e);}}
 													/>
 													<div className='ps-2'>
 														{translate('csv.common.param.update')}
@@ -282,11 +282,7 @@ export default function MetersCSVUploadComponent() {
 											name='meterIdentifier'
 											type='select'
 											value={meterData.meterIdentifier || ''}
-											onChange={e => {
-												handleSelectedMeterChange(e);
-												setHasUnsavedChanges(true); // Mark as unsaved
-												//handleToggle();
-											}}
+											onChange={e => {handleSelectedMeterChange(e);}}
 											invalid={!meterIsSelected}
 										>
 											{
@@ -304,7 +300,7 @@ export default function MetersCSVUploadComponent() {
 								)}
 								<div className='d-flex flex-row-reverse'>
 									<div className='p-3'>
-										<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
+										<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier) || !canSave}>
 											{translate('csv.submit.button')}
 										</Button>
 									</div>

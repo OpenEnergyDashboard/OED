@@ -35,7 +35,6 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 /**
@@ -48,6 +47,8 @@ export default function CreateGroupModalComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -297,6 +298,48 @@ export default function CreateGroupModalComponent() {
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [graphicUnitsState.possibleGraphicUnits, state.deepMeters]);
 
+	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if the inputs for each field is of their appropriate types.
+		const validGroup = !isNaN(state.id)
+			&& state.name !== ''
+			&& Array.isArray(state.childMeters)
+			&& Array.isArray(state.childGroups)
+			&& Array.isArray(state.deepMeters)
+			&& state.gps !== null
+			&& typeof state.displayable === 'boolean'
+			&& state.note !== ''
+			&& !isNaN(state.area)
+			&& !isNaN(state.defaultGraphicUnit)
+			&& state.areaUnit !== null;
+
+		//Compare the local changes to the default values
+		const editMade =
+			state.id !== defaultValues.id
+			|| state.name !== defaultValues.name
+			// These three always return true, which causes the unsaved
+			// warning to always appear despite having no changes made.
+			// For now, these have been commented out, but need to be addressed
+			// later on.
+			// These problems exist as there are more than one state that needs
+			// to be accounted for.
+			//|| state.childMeters !== groupChildrenState.childMeters
+			//|| state.childGroups !== defaultValues.childGroups
+			//|| state.deepMeters !== defaultValues.deepMeters
+			|| state.gps !== defaultValues.gps
+			|| state.displayable !== defaultValues.displayable
+			|| state.note !== defaultValues.note
+			|| state.area !== defaultValues.area
+			|| state.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
+			|| state.areaUnit !== defaultValues.areaUnit;
+		setCanSave(validGroup && editMade);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [state]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipCreateGroupView: 'help.admin.groupcreate'
@@ -346,10 +389,7 @@ export default function CreateGroupModalComponent() {
 								name='name'
 								type='text'
 								autoComplete='on'
-								onChange={e => {
-									handleStringChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}
+								onChange={e => {handleStringChange(e);}}
 								required value={state.name}
 								invalid={state.name === ''} />
 							<FormFeedback>
@@ -364,10 +404,7 @@ export default function CreateGroupModalComponent() {
 								name='defaultGraphicUnit'
 								type='select'
 								value={state.defaultGraphicUnit}
-								onChange={e => {
-									handleNumberChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}>
+								onChange={e => {handleNumberChange(e);}}>
 								{/* First list the selectable ones and then the rest as disabled. */}
 								{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
@@ -386,10 +423,7 @@ export default function CreateGroupModalComponent() {
 								name='displayable'
 								type='select'
 								value={state.displayable.toString()}
-								onChange={e => {
-									handleBooleanChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}>
+								onChange={e => {handleBooleanChange(e);}}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -403,10 +437,7 @@ export default function CreateGroupModalComponent() {
 								name='gps'
 								type='text'
 								autoComplete='on'
-								onChange={e => {
-									handleStringChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}
+								onChange={e => {handleStringChange(e);}}
 								value={getGPSString(state.gps)} />
 						</FormGroup></Col>
 					</Row><Row xs='1' lg='2'>
@@ -422,10 +453,7 @@ export default function CreateGroupModalComponent() {
 									// cannot use defaultValue because it won't update when area is auto calculated
 									// this makes the validation redundant but still a good idea
 									value={state.area}
-									onChange={e => {
-										handleNumberChange(e);
-										setHasUnsavedChanges(true); // Mark as unsaved
-									}}
+									onChange={e => {handleNumberChange(e);}}
 									invalid={state.area < 0} />
 								{/* Calculate sum of meter areas */}
 								<Button color='secondary' onClick={handleAutoCalculateArea}>
@@ -445,10 +473,7 @@ export default function CreateGroupModalComponent() {
 								name='areaUnit'
 								type='select'
 								value={state.areaUnit}
-								onChange={e => {
-									handleStringChange(e);
-									setHasUnsavedChanges(true); // Mark as unsaved
-								}}
+								onChange={e => {handleStringChange(e);}}
 								invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
 									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
@@ -466,10 +491,7 @@ export default function CreateGroupModalComponent() {
 							id='note'
 							name='note'
 							type='textarea'
-							onChange={e => {
-								handleStringChange(e);
-								setHasUnsavedChanges(true); // Mark as unsaved
-							}}
+							onChange={e => {handleStringChange(e);}}
 							value={state.note} />
 					</FormGroup>
 					{/* The child meters in this group */}
@@ -557,7 +579,7 @@ export default function CreateGroupModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

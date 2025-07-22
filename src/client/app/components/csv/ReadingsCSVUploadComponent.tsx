@@ -23,7 +23,6 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
 import SpinnerComponent from '../SpinnerComponent';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 import { useBlocker } from 'react-router-dom';
 
@@ -195,6 +194,8 @@ export default function ReadingsCSVUploadComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
 
 	const blocker = useBlocker(hasUnsavedChanges);
 
@@ -233,6 +234,54 @@ export default function ReadingsCSVUploadComponent() {
 		}
 	}, [blocker.state, hasUnsavedChanges]);
 
+	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if the inputs for each field is of their appropriate types.
+		const validReading = typeof readingsData.cumulative	=== 'boolean'
+			&& typeof readingsData.cumulativeReset === 'boolean'
+			&& readingsData.cumulativeResetStart !== ''
+			&& readingsData.cumulativeResetEnd !== ''
+			&& !isNaN(readingsData.duplications)
+			&& typeof readingsData.endOnly === 'boolean'
+			&& typeof readingsData.gzip === 'boolean'
+			&& typeof readingsData.headerRow === 'boolean'
+			&& typeof readingsData.honorDst === 'boolean'
+			&& !isNaN(readingsData.lengthGap)
+			&& !isNaN(readingsData.lengthVariation)
+			&& readingsData.meterIdentifier !== ''
+			&& typeof readingsData.refreshReadings === 'boolean'
+			&& typeof readingsData.relaxedParsing === 'boolean'
+			&& readingsData.timeSort !== null
+			&& typeof readingsData.update === 'boolean'
+			&& typeof readingsData.useMeterZone === 'boolean';
+
+		//Compare the local changes to the default values
+		const editMade =
+			readingsData.cumulative !== ReadingsCSVUploadDefaults.cumulative
+			|| readingsData.cumulativeReset !== ReadingsCSVUploadDefaults.cumulativeReset
+			|| readingsData.cumulativeResetStart !== ReadingsCSVUploadDefaults.cumulativeResetStart
+			|| readingsData.cumulativeResetEnd !== ReadingsCSVUploadDefaults.cumulativeResetEnd
+			|| readingsData.duplications !== ReadingsCSVUploadDefaults.duplications
+			|| readingsData.endOnly !== ReadingsCSVUploadDefaults.endOnly
+			|| readingsData.gzip !== ReadingsCSVUploadDefaults.gzip
+			|| readingsData.headerRow !== ReadingsCSVUploadDefaults.headerRow
+			|| readingsData.honorDst !== ReadingsCSVUploadDefaults.honorDst
+			|| readingsData.lengthGap !== ReadingsCSVUploadDefaults.lengthGap
+			|| readingsData.lengthVariation !== ReadingsCSVUploadDefaults.lengthVariation
+			|| readingsData.meterIdentifier !== ReadingsCSVUploadDefaults.meterIdentifier
+			|| readingsData.refreshReadings !== ReadingsCSVUploadDefaults.refreshReadings
+			|| readingsData.relaxedParsing !== ReadingsCSVUploadDefaults.relaxedParsing
+			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
+			|| readingsData.update !== ReadingsCSVUploadDefaults.update
+			|| readingsData.useMeterZone !== readingsData.useMeterZone;
+		setCanSave(validReading && editMade);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [readingsData]);
+
 	return (
 		<>
 			{/* Unsaved Warning Component */}
@@ -248,23 +297,12 @@ export default function ReadingsCSVUploadComponent() {
 						// values that display the warning, and the user just has to
 						// leave the page again.
 						handleClear();
-						//blocker.state = 'unblocked';
-					}}
-					onConfirm={() => {
-						setShowUnsavedWarning(false);
-						setHasUnsavedChanges(false);
-						handleSubmit;
-						handleClear();
-						//setMeterData(MetersCSVUploadDefaults);
-						//setSelectedFile(null);
-						//setIsValidFileType(false);
-						//blocker.state = 'unblocked';
-
+						blocker.state = 'unblocked';
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
-						//blocker.state = 'unblocked';
+						blocker.state = 'unblocked';
 					}}
 				/>
 			)}
@@ -296,10 +334,7 @@ export default function ReadingsCSVUploadComponent() {
 									name='meterIdentifier'
 									type='select'
 									value={readingsData.meterIdentifier || ''}
-									onChange={e => {
-										handleSelectedMeterChange(e);
-										setHasUnsavedChanges(true); // Mark as unsaved
-									}}
+									onChange={e => {handleSelectedMeterChange(e);}}
 									invalid={!meterIsSelected}
 								>
 									{
@@ -329,10 +364,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='gzip'
 												name='gzip'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='gzip'>
 												<div className='ps-2'>
@@ -347,10 +379,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='headerRow'
 												name='headerRow'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='headerRow'>
 												<div className='ps-2'>
@@ -367,10 +396,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='update'
 												name='update'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='update'>
 												<div className='ps-2'>
@@ -385,10 +411,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='relaxedParsing'
 												name='relaxedParsing'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='relaxedParsing'>
 												<div className='ps-2'>
@@ -405,10 +428,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='honorDst'
 												name='honorDst'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='honorDst'>
 												<div className='ps-2'>
@@ -423,10 +443,7 @@ export default function ReadingsCSVUploadComponent() {
 												type='checkbox'
 												id='refreshReadings'
 												name='refreshReadings'
-												onChange={e => {
-													handleCheckboxChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleCheckboxChange(e);}}
 											/>
 											<Label for='refreshReadings'>
 												<div className='ps-2'>
@@ -450,10 +467,7 @@ export default function ReadingsCSVUploadComponent() {
 												name='cumulative'
 												type='select'
 												value={readingsData.cumulative ? 'true' : 'false'}
-												onChange={e => {
-													handleTrueFalseSelectChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleTrueFalseSelectChange(e);}}
 											>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -474,10 +488,7 @@ export default function ReadingsCSVUploadComponent() {
 													id='cumulativeReset'
 													name='cumulativeReset'
 													value={readingsData.cumulativeReset ? 'true' : 'false'}
-													onChange={e => {
-														handleTrueFalseSelectChange(e);
-														setHasUnsavedChanges(true); // Mark as unsaved
-													}}
+													onChange={e => {handleTrueFalseSelectChange(e);}}
 												>
 													{Object.keys(TrueFalseType).map(key => {
 														return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -508,10 +519,7 @@ export default function ReadingsCSVUploadComponent() {
 												type="text"
 												id='cumulativeResetStart'
 												name='cumulativeResetStart'
-												onChange={e => {
-													handleChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleChange(e);}}
 												value={readingsData.cumulativeResetStart}
 												placeholder='HH:MM:SS'
 												disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
@@ -529,10 +537,7 @@ export default function ReadingsCSVUploadComponent() {
 												type="text"
 												id='cumulativeResetEnd'
 												name='cumulativeResetEnd'
-												onChange={e => {
-													handleChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleChange(e);}}
 												value={readingsData.cumulativeResetEnd}
 												placeholder='HH:MM:SS'
 												disabled={readingsData.cumulativeReset === false || readingsData.cumulative === false}
@@ -553,10 +558,7 @@ export default function ReadingsCSVUploadComponent() {
 												id='endOnly'
 												name='endOnly'
 												value={readingsData.endOnly ? 'true' : 'false'}
-												onChange={e => {
-													handleTrueFalseSelectChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleTrueFalseSelectChange(e);}}
 											>
 												{Object.keys(TrueFalseType).map(key => {
 													return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -577,10 +579,7 @@ export default function ReadingsCSVUploadComponent() {
 												name='lengthGap'
 												min='0'
 												value={readingsData.lengthGap}
-												onChange={e => {
-													handleNumberChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleNumberChange(e);}}
 												invalid={readingsData.lengthGap < 0}
 											/>
 										</FormGroup>
@@ -600,10 +599,7 @@ export default function ReadingsCSVUploadComponent() {
 												name='lengthVariation'
 												min='0'
 												value={readingsData.lengthVariation}
-												onChange={e => {
-													handleNumberChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleNumberChange(e);}}
 												invalid={readingsData.lengthVariation < 0}
 											/>
 										</FormGroup>
@@ -620,10 +616,7 @@ export default function ReadingsCSVUploadComponent() {
 												id='duplications'
 												name='duplications'
 												value={readingsData.duplications || ''}
-												onChange={e => {
-													handleChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleChange(e);}}
 											>
 												{range(1, 10).map(i => (
 													<option key={i} value={i}> {i} </option>
@@ -645,10 +638,7 @@ export default function ReadingsCSVUploadComponent() {
 												id='timeSort'
 												name='timeSort'
 												value={readingsData.timeSort}
-												onChange={e => {
-													handleTimeSortChange(e);
-													setHasUnsavedChanges(true); // Mark as unsaved
-												}}
+												onChange={e => {handleTimeSortChange(e);}}
 											>
 												{Object.keys(MeterTimeSortType).map(key => {
 													return (<option value={key} key={key}>{translate(`TimeSortTypes.${key}`)}</option>);
@@ -679,7 +669,7 @@ export default function ReadingsCSVUploadComponent() {
 								*/}
 								<div className='d-flex flex-row-reverse'>
 									<div className='p-3'>
-										<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected}>
+										<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected || !canSave}>
 											{translate('csv.submit.button')}
 										</Button>
 									</div>

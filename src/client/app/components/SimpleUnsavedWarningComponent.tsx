@@ -8,7 +8,7 @@ import { Button, Modal, ModalBody, ModalFooter } from 'reactstrap';
 
 interface SimpleUnsavedWarningProps {
 	isOpen: boolean;
-	onConfirm: () => void;
+	onConfirm?: () => void;
 	onCancel: () => void;
 	onDiscard: () => void;
 }
@@ -31,9 +31,11 @@ export function SimpleUnsavedWarningComponent(props: SimpleUnsavedWarningProps) 
 				<Button color='danger' onClick={props.onDiscard}>
 					<FormattedMessage id='leave' />
 				</Button>
-				<Button color='success' onClick={props.onConfirm}>
-					<FormattedMessage id='save.all' />
-				</Button>
+				{props.onConfirm && (
+					<Button color='success' onClick={props.onConfirm}>
+						<FormattedMessage id='save.all' />
+					</Button>
+				)}
 			</ModalFooter>
 		</Modal>
 	);
