@@ -21,7 +21,6 @@ import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 import { useEffect, useState } from 'react';
 import { useBlocker } from 'react-router-dom';
-//import { useNavigate } from 'react-router-dom';
 
 /**
  * Defines the CSV Meters page
@@ -114,15 +113,6 @@ export default function MetersCSVUploadComponent() {
 
 	const blocker = useBlocker(hasUnsavedChanges);
 
-	// Stores the path that the user tries to go before being blocked
-	// by the Unsaved Warning. Once the user tries to 'leave,' the
-	// user will be redirected to the stored path.
-	// NOTE: Not working, have not figured out why it is unable to navigate
-	// to the stored path. Instead, the user has to reattempt to leave the
-	// page again.
-	//const navigate = useNavigate();
-	//const [attemptedPath, setAttemptedPath] = useState<string | null>(null);
-
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
 	const handleToggle = () => {
@@ -131,11 +121,6 @@ export default function MetersCSVUploadComponent() {
 		}
 		else {
 			handleClear(); // Proceed to close the modal
-			/*
-			if (attemptedPath) {
-				navigate(attemptedPath);
-			}
-			*/
 		}
 	};
 
@@ -180,7 +165,6 @@ export default function MetersCSVUploadComponent() {
 					onDiscard={() => {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
-						//blocker.reset?.();
 						// Note: This does not work cleanly, instead of immediately
 						// leaving after pressing "Leave", it instead clears the boolean
 						// values that display the warning, and the user just has to
