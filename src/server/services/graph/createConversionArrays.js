@@ -6,6 +6,8 @@ const { SemicolonPreference } = require('typescript');
 const Unit = require('../../models/Unit');
 const { getPath } = require('./createConversionGraph');
 const { pathConversion } = require('./pathConversion');
+const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
+const CikVary = require('../../models/CikVary');
 
 /**
  * Returns the Cik which gives the slope, intercept and suffix name between each meter and unit 
@@ -65,6 +67,46 @@ async function createCikArray(graph, conn) {
 	return c;
 }
 
+/**
+ * Returns the CikVary array: all time-varying conversions between each meter and unit.
+ * Each entry is { source, destination, start_time, end_time, slope, intercept }
+ * @param {*} graph The conversion graph.
+ * @param {*} conn The connection to use.
+ * @returns Array of time-varying conversion segments.
+ */
+async function createCikVaryArray(graph, conn) {
+	const sources = await Unit.getTypeMeter(conn);
+	const destinations = (await Unit.getTypeUnit(conn)).concat(await Unit.getTypeSuffix(conn));
+	const c = [];
+	// Helper to fetch all segments for an edge
+	async function getEdgeConversions(sourceId, destinationId, conn) {
+			// Returns array of {start_time, end_time, slope, intercept}
+			return await CikVary.getAllForEdge(conn, sourceId, destinationId);
+	}
+	for (const source of sources) {
+			for (const destination of destinations) {
+					const sourceId = source.id;
+					const destinationId = destination.id;
+					const path = getPath(graph, sourceId, destinationId);
+					if (path !== null) {
+							const segments = await timeVaryingPathConversion(path, conn, getEdgeConversions);
+							segments.forEach(seg => {
+									c.push({
+											source: sourceId,
+											destination: destinationId,
+											start_time: seg.start_time,
+											end_time: seg.end_time,
+											slope: seg.slope,
+											intercept: seg.intercept
+									});
+							});
+					}
+			}
+	}
+	return c;
+}
+
 module.exports = {
-	createCikArray
+	   createCikArray,
+	   createCikVaryArray
 }

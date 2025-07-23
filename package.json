@@ -45,7 +45,8 @@
 		"generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
 		"testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
 		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
-		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'"
+		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'",
+		"testCikVary": "node ./src/server/tmp/uploads/createCikVaryTest.js"
 	},
 	"nodemonConfig": {
 		"watch": [
