@@ -7,11 +7,23 @@ const chaiHttp = require('chai-http');
 const { expect } = require('chai');
 const mocha = require('mocha');
 const app = require('../../app');
-const { prepareTest, getUnitId, parseExpectedCsv, createTimeString, expectRangeToEqualExpected, METER_ID } = require('./testUtilities');
+const { prepareTest, getUnitId, parseExpectedCsv, createTimeString, expectRangeToEqualExpected, METER_ID, ETERNITY } = require('./testUtilities');
 
 chai.use(chaiHttp);
 
-describe('Readings Line Meter Range Quantity', () => {
+const unitDatakWh = [
+	{ name: 'kWh', identifier: 'kWh', unitRepresent: 'quantity', secInRate: 3600, typeOfUnit: 'unit', suffix: '', displayable: 'all', preferredDisplay: true, note: 'kWh test unit' }
+];
+const conversionDatakWh = [];
+const meterDatakWh = [
+	{ name: 'Electric Meter kWh', unit: 'kWh', defaultGraphicUnit: 'kWh', displayable: true, note: 'test meter', area: 1, areaUnit: 'none', readingFrequency: '15 minutes', meterType: 'other', enabled: true, cumulative: false, cumulativeReset: false, reading: 0, startTimestamp: '2022-08-18 00:00:00', endTimestamp: '2022-11-01 00:00:00' }
+];
+
+mocha.describe('readings API', () => {
+	mocha.describe('readings test, test if data returned by API is as expected', () => {
+		mocha.describe('for line charts', () => {
+			mocha.describe('for range (min/max)', () => {
+				mocha.describe('for quantity meters', () => {
 	describe('Given kWh units and conversions', () => {
 		describe('Given 15 minute reading intervals', () => {
 			describe('Given quantity meter units', () => {
@@ -112,6 +124,11 @@ describe('Readings Line Meter Range Quantity', () => {
 				// Add LR20 here
 
 				// Add LR21 here
+				});
+			});
+		});
+	});
+});
 			});
 		});
 	});
