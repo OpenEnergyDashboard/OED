@@ -46,7 +46,7 @@ router.get('/line/count/meters/:meter_ids', async (req, res) => {
 				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 				count += curr
 			}
-			res.send(JSON.stringify(count));
+			res.json({ count: count }); // Use res.json to safely send JSON data
 		} catch (err) {
 			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
@@ -87,7 +87,7 @@ router.get('/line/raw/meter/:meter_id', async (req, res) => {
 			// Note this returns unusual identifiers to save space and does not return the meter id.
 			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			// They are ready to go back.
-			res.send(rawReadings);
+			res.json(rawReadings); // Use res.json to safely send JSON data
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
@@ -97,4 +97,3 @@ router.get('/line/raw/meter/:meter_id', async (req, res) => {
 
 
 module.exports = router;
-
