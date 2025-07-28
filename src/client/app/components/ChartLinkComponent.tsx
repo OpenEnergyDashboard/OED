@@ -19,6 +19,7 @@ import { wellStyle, rowFlexStart } from '../styles/modalStyle';
  * @returns chartLinkComponent
  */
 export default function ChartLinkComponent() {
+
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const [linkTextVisible, setLinkTextVisible] = React.useState<boolean>(false);
@@ -42,6 +43,15 @@ export default function ChartLinkComponent() {
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
 			<div>
+				<div>
+					<strong style={{ fontSize: '1rem' }}>Chart Link Options: </strong>
+					<div style={{ fontSize: '0.85rem', color: 'black' }}>
+						Hide Options When Using This Link
+					</div>
+					<div style={{ fontSize: '0.85rem', color: 'black' }}>
+						Keep Chart Current
+					</div>
+				</div>
 				<div style={rowFlexStart}>
 					<ButtonGroup >
 						<Button outline onClick={handleButtonClick} >
