@@ -5,61 +5,6 @@
 const Unit = require('../../models/Unit');
 const { pathConversion } = require('./pathConversion');
 const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
-const CikVary = require('../../models/CikVary');
-
-/**
- * Adds new suffix units and time-varying conversions to the database and the conversion graph (for CikVary).
- * @param {*} graph The conversion graph.
- * @param {*} conn The connection to use.
- */
-async function handleSuffixUnitsVary(graph, conn) {
-	const suffixUnits = await Unit.getSuffix(conn);
-	for (const unit of suffixUnits) {
-		const paths = getAllPaths(graph, unit.id);
-		for (const p of paths) {
-			const sourceId = p[0].id;
-			const destinationId = p[p.length - 1].id;
-			const destinationUnit = await Unit.getById(destinationId, conn);
-			if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX || destinationUnit.displayable === Unit.displayableType.NONE) {
-				continue;
-			}
-			// Find the time-varying conversions from the start to end of path.
-			// Helper to fetch all segments for an edge
-			async function getEdgeConversions(sourceId, destinationId, conn) {
-				return await CikVary.getAllForEdge(conn, sourceId, destinationId);
-			}
-			const segments = await timeVaryingPathConversion(p, conn, getEdgeConversions);
-			// The name of the needed unit is the last unit name on the path + " of " and the suffix of the path.
-			const unitName = destinationUnit.name + ' of ' + unit.suffix;
-			const unitIdentifier = destinationUnit.identifier + ' of ' + unit.suffix;
-			let neededSuffixUnit = await Unit.getByName(unitName, conn);
-			if (neededSuffixUnit === null) {
-				// Add the new unit (type suffix) and conversion for each segment.
-				const newUnit = new Unit(undefined, unitName, unitIdentifier, destinationUnit.unitRepresent, unit.secInRate,
-					Unit.unitType.SUFFIX, '', destinationUnit.displayable, destinationUnit.preferredDisplay, 'suffix unit created by OED');
-				await newUnit.insert(conn);
-				neededSuffixUnit = newUnit;
-			}
-			// Insert time-varying conversions from sourceId to new suffix unit for each segment.
-			for (const seg of segments) {
-				const newConversion = {
-					source: sourceId,
-					destination: neededSuffixUnit.id,
-					start_time: seg.start_time,
-					end_time: seg.end_time,
-					slope: seg.slope,
-					intercept: seg.intercept
-				};
-				// Insert into cik_vary (do not clear table, just add)
-				await conn.none('INSERT INTO cik_vary (source_id, destination_id, start_time, end_time, slope, intercept) VALUES ($1, $2, $3, $4, $5, $6)',
-					[newConversion.source, newConversion.destination, newConversion.start_time, newConversion.end_time, newConversion.slope, newConversion.intercept]);
-			}
-		}
-		// Hide the original suffix unit and remove unnecessary conversions.
-		await hideSuffixUnit(unit, paths, graph, conn);
-	}
-}
-
 const Conversion = require('../../models/Conversion');
 const { getAllPaths } = require('./createConversionGraph');
 
@@ -262,6 +207,5 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn) {
 
 module.exports = {
 	handleSuffixUnits,
-	removeAdditionalConversionsAndUnits,
-	handleSuffixUnitsVary
+	removeAdditionalConversionsAndUnits
 };

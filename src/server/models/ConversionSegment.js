@@ -139,6 +139,21 @@ class ConversionSegment {
 			endTime: endTime
 		});
 	}
+
+	/**
+	 * Get all conversion segments for a specific edge (sourceId, destinationId).
+	 * @param {*} conn The database connection to use.
+	 * @param {*} sourceId Source unit id.
+	 * @param {*} destinationId Destination unit id.
+	 * @returns {Promise.<Array.<ConversionSegment>>}
+	 */
+	static async getAllForEdge(conn, sourceId, destinationId) {
+		const rows = await conn.any(sqlFile('conversionSegment/get_by_source_destination.sql'), {
+			sourceId: sourceId,
+			destinationId: destinationId
+		});
+		return rows.map(ConversionSegment.mapRow);
+	}
 }
 
 module.exports = ConversionSegment;

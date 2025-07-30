@@ -7,7 +7,7 @@ const Unit = require('../../models/Unit');
 const { getPath } = require('./createConversionGraph');
 const { pathConversion } = require('./pathConversion');
 const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
-const CikVary = require('../../models/CikVary');
+const ConversionSegment = require('../../models/ConversionSegment');
 
 /**
  * Returns the Cik which gives the slope, intercept and suffix name between each meter and unit 
@@ -81,7 +81,7 @@ async function createCikVaryArray(graph, conn) {
 	// Helper to fetch all segments for an edge
 	async function getEdgeConversions(sourceId, destinationId, conn) {
 			// Returns array of {start_time, end_time, slope, intercept}
-			return await CikVary.getAllForEdge(conn, sourceId, destinationId);
+			return await ConversionSegment.getAllForEdge(conn, sourceId, destinationId);
 	}
 	for (const source of sources) {
 			for (const destination of destinations) {

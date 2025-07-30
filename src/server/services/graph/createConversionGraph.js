@@ -5,6 +5,7 @@
 const createGraph = require('ngraph.graph');
 const Unit = require('../../models/Unit');
 const Conversion = require('../../models/Conversion');
+const ConversionSegment = require('../../models/ConversionSegment');
 const path = require('ngraph.path');
 
 /**
@@ -28,6 +29,34 @@ async function createConversionGraph(conn) {
 	}
 
 	return graph;
+}
+
+/**
+ * Creates a graph with vertices as units and edges as possible conversions (ignoring segment differences).
+ * Only one edge per unique (sourceId, destinationId) pair is added, regardless of how many segments exist.
+ * @param {*} conn 
+ * @returns {Object}
+ */
+async function createConversionSegmentGraph(conn) {
+    const graph = createGraph();
+    const units = await Unit.getAll(conn);
+    for (const unit of units) {
+        graph.addNode(unit.id, unit.name);
+    }
+
+    // Get all conversion segments (may be multiple per edge, but we only care about existence)
+    const segments = await ConversionSegment.getAll(conn);
+    const addedEdges = new Set();
+
+    for (const seg of segments) {
+        const key = `${seg.sourceId}->${seg.destinationId}`;
+        if (!addedEdges.has(key)) {
+            graph.addLink(seg.sourceId, seg.destinationId);
+            addedEdges.add(key);
+        }
+    }
+
+    return graph;
 }
 
 /**
@@ -73,6 +102,7 @@ function getAllPaths(graph, sourceId) {
 
 module.exports = {
 	createConversionGraph,
+	createConversionSegmentGraph,
 	getPath,
 	getAllPaths
 };
