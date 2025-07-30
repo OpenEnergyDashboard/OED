@@ -1,0 +1,8 @@
+global enum FilePreviewFormat {
+JPG,
+PDF,
+SVG,
+THUMBNAIL,
+THUMBNAILBIG,
+THUMBNAILTINY
+}

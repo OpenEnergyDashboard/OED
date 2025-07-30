@@ -11,10 +11,26 @@ const { redoCik } = require('../services/graph/redoCik');
 (async function createSchemaWrapper() {
 	const conn = getConnection();
 	try {
-		await createSchema(conn);
-		await insertStandardUnits(conn);
-		await insertStandardConversions(conn);
+		try {
+			await createSchema(conn);
+		} catch(err) {
+			log.error('create schema error', err);
+		}
+		try {
+			await insertStandardUnits(conn);
+		} catch(err) {
+			log.error('insert standart units failed', err);
+		}
+		try {
+			await insertStandardConversions(conn);
+		} catch (err) {
+			log.error('insertconversions failed', err);
+		}
+		try {
 		await redoCik(conn);
+		} catch(err) {
+			log.error('error redo cik', err);
+		}
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {

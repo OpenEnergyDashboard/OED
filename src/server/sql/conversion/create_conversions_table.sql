@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS conversions (
     source_id INTEGER NOT NULL REFERENCES units(id),
     destination_id INTEGER NOT NULL REFERENCES units(id),
     bidirectional BOOLEAN NOT NULL,
-    slope FLOAT,
-    intercept FLOAT,
+    -- slope FLOAT,
+    -- intercept FLOAT,
     note TEXT,
     CHECK (source_id != destination_id),
     PRIMARY KEY (source_id, destination_id)

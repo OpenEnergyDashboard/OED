@@ -1,0 +1,7 @@
+global enum MlRetrieverSortByEnum {
+CREATEDDATE,
+LABEL,
+LASTMODIFIEDBY,
+LASTMODIFIEDDATE,
+STATUS
+}

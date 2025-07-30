@@ -1,0 +1,6 @@
+global enum CommerceSearchFacetDisplayType {
+CATEGORYTREE,
+DATEPICKER,
+MULTISELECT,
+SINGLESELECT
+}
