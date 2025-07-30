@@ -6,11 +6,44 @@
 			"type": "node",
 			"request": "attach",
 			"port": 9229,
-			"address": "localhost",
-			"localRoot": "${workspaceFolder}",
 			"remoteRoot": "/usr/src/app",
-			"protocol": "inspector",
-			"restart": true
+			"sourceMaps": true
+		},
+		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "Launch Chrome against localhost",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"type": "firefox",
+			"request": "launch",
+			"name": "Launch Firefox against localhost",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}",
+			"pathMappings": [
+				{
+					"url": "webpack://open-energy-dashboard/src",
+					"path": "${workspaceFolder}/src"
+				}
+			]
+		}
+	],
+	"compounds": [
+		{
+			"name": "Debug Server and Client (Chrome)",
+			"configurations": [
+				"Attach to Node in Docker",
+				"Launch Chrome against localhost"
+			]
+		},
+		{
+			"name": "Debug Server and Client (Firefox)",
+			"configurations": [
+				"Attach to Node in Docker",
+				"Launch Firefox against localhost"
+			]
 		}
 	]
 }
