@@ -13,7 +13,8 @@ import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/grap
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { wellStyle, rowFlexStart } from '../styles/modalStyle';
+import { wellStyle, rowFlexStart, labelStyle } from '../styles/modalStyle';
+import { checkboxStyle } from '../styles/modalStyle';
 
 /**
  * @returns chartLinkComponent
@@ -43,41 +44,61 @@ export default function ChartLinkComponent() {
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
 			<div>
-				<div>
-					<strong style={{ fontSize: '1rem' }}>Chart Link Options: </strong>
-					<div style={{ fontSize: '0.85rem', color: 'black' }}>
-						Hide Options When Using This Link
-					</div>
-					<div style={{ fontSize: '0.85rem', color: 'black' }}>
-						Keep Chart Current
-					</div>
+				{/* inputting new "keep chart current" feature */}
+				<div style={labelStyle}>
+					{translate('chart.link.options.title')}
+				</div>
+				{/* hide options checkbox */}
+				<div className='checkbox'>
+					<input
+						type='checkbox'
+						style={checkboxStyle}
+						defaultChecked={linkHideOptions}
+						onClickCapture={e => {
+							e.stopPropagation();
+							dispatch(setChartLinkOptionsVisibility(!linkHideOptions));
+						}}
+						onMouseOver={() => {
+							ref.current && ReactTooltip.show(ref.current);
+						}}
+						onMouseLeave={() => {
+							ref.current && ReactTooltip.hide(ref.current);
+						}}
+					/>
+					<label>
+						{translate('hide.options.when.using.this.label')}
+					</label>
+					<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link' />
+				</div>
+				{/* keep current checkbox */}
+				<div className='checkbox'>
+					<input
+						type='checkbox'
+						style={checkboxStyle}
+						onMouseOver={() => {
+							ref.current && ReactTooltip.show(ref.current);
+						}}
+						onMouseLeave={() => {
+							ref.current && ReactTooltip.hide(ref.current);
+						}}
+					/>
+					<label>
+						{translate('keep.chart.current.label')}
+					</label>
+					{/* we need to create a tool tip for "keep chart current" checkbox */}
+					<TooltipMarkerComponent page='' helpTextId='' />
 				</div>
 				<div style={rowFlexStart}>
 					<ButtonGroup >
 						<Button outline onClick={handleButtonClick} >
 							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', gap: '1em', alignItems: 'center' }}>
 								{translate('chart.link')}
-								<div ref={ref} data-for={'home'} data-tip={'help.home.toggle.chart.link'}								>
-									<Input type='checkbox' defaultChecked={linkHideOptions}
-										onClickCapture={e => {
-											e.stopPropagation();
-											dispatch(setChartLinkOptionsVisibility(!linkHideOptions));
-										}}
-										onMouseOver={() => {
-											ref.current && ReactTooltip.show(ref.current);
-										}}
-										onMouseLeave={() => {
-											ref.current && ReactTooltip.hide(ref.current);
-										}}
-									/>
-								</div>
 							</div>
 						</Button>
 						<Button outline onClick={() => setLinkTextVisible(visible => !visible)}>
 							{linkTextVisible ? 'x' : 'v'}
 						</Button>
 					</ButtonGroup>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link' />
 				</div>
 				{
 					linkTextVisible &&
