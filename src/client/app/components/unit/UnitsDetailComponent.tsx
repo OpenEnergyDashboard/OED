@@ -15,7 +15,6 @@ import CreateUnitModalComponent from './CreateUnitModalComponent';
 import UnitViewComponent from './UnitViewComponent';
 import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
-
 /**
  * Defines the units page card view
  * @returns Units page element
@@ -28,6 +27,7 @@ export default function UnitsDetailComponent() {
 	const unitData = useAppSelector(selectAllUnits);
 
 	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
+
 	return (
 		<div className='flexGrowOne'>
 			{status === QueryStatus.pending || isRefreshingReadings ? (

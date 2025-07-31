@@ -64,7 +64,6 @@ export const appStateSlice = createThunkSlice({
 		setRefresingReadings: create.reducer<boolean>((state, action) => {
 			state.refreshingReadings = action.payload;
 		}),
-
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
 			async (_: void, { dispatch }) => {
