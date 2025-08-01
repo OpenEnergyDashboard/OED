@@ -36,4 +36,5 @@ export interface SimulateDeleteAffectedGroup {
 	groupId: number;
 	groupName: string;
 	lostUnits: number[];
+	orphaned: boolean;
 }

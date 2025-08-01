@@ -193,34 +193,48 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					destinationId: state.destinationId
 				}).unwrap();
 
-				if (result.affectedMeters.length > 0) {
-					msg += translate('conversion.delete.meter.affected') + ':\n';
-					result.affectedMeters.forEach(meter => {
-						msg += `• ${meter.meterName}\n`;
-						if (meter.lostUnits.length > 0) {
-							msg += '  ' + translate('conversion.delete.lost.units') + ': ';
-							msg += meter.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
-						}
-					});
-				}
-
-				if (result.affectedMeters.length > 0 && result.affectedGroups && result.affectedGroups.length > 0) {
-					msg += '\n';
-				}
-
-				if (result.affectedGroups && result.affectedGroups.length > 0) {
-					msg += translate('conversion.delete.group.affected') + ':\n';
-					result.affectedGroups.forEach(group => {
+				// Orphaned groups check
+				const orphanedGroups = result.affectedGroups?.filter(group => group.orphaned) || [];
+				if (orphanedGroups.length > 0) {
+					msg = translate('conversion.delete.group.orphan') + ':\n';
+					orphanedGroups.forEach(group => {
 						msg += `• ${group.groupName}\n`;
-						if (group.lostUnits.length > 0) {
-							msg += '  ' + translate('conversion.delete.lost.units') + ': ';
-							msg += group.lostUnits.map(id => unitDataById[id]?.name || id).join(', ') + '\n';
-						}
 					});
 					cancel = true;
+				} else {
+					// Group meters by lostUnits
+					const meterLossMap = new Map<string, string[]>();
+					result.affectedMeters.forEach(meter => {
+						if (!meter.lostUnits || meter.lostUnits.length === 0) return;
+						const key = JSON.stringify([...meter.lostUnits].sort());
+						if (!meterLossMap.has(key)) meterLossMap.set(key, []);
+						meterLossMap.get(key)!.push(meter.meterName);
+					});
+					meterLossMap.forEach((meterNames, lostUnitsKey) => {
+						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+						msg += '• ' + meterNames.join(', \n') + ' ';
+						msg += translate('conversion.delete.lost.units') + ': ';
+						msg += lostUnits.map((id: number) => unitDataById[id]?.name || id).join(', ') + '\n';
+					});
+
+					// Group non-orphaned groups by lostUnits
+					const groupLossMap = new Map<string, string[]>();
+					const nonOrphanedGroups = result.affectedGroups?.filter(group => !group.orphaned) || [];
+					nonOrphanedGroups.forEach(group => {
+						if (!group.lostUnits || group.lostUnits.length === 0) return;
+						const key = JSON.stringify([...group.lostUnits].sort());
+						if (!groupLossMap.has(key)) groupLossMap.set(key, []);
+						groupLossMap.get(key)!.push(group.groupName);
+					});
+					groupLossMap.forEach((groupNames, lostUnitsKey) => {
+						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+						msg += '• ' + groupNames.join(', \n') + ' ';
+						msg += translate('conversion.delete.lost.units') + ': ';
+						msg += lostUnits.map((id: number) => unitDataById[id]?.name || id).join(', ') + '\n';
+					});
 				}
 			} catch (e) {
-				msg += translate('conversion.delete.simulation.error');
+				msg = translate('conversion.delete.simulation.error');
 				cancel = true;
 			}
 		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {

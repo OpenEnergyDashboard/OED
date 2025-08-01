@@ -287,11 +287,13 @@ router.post('/simulate-delete', async (req, res) => {
 			const before = sets_current.length ? intersectSets(sets_current) : new Set();
 			const after = sets_sim.length ? intersectSets(sets_sim) : new Set();
 
-			if (before.size > 0 && after.size === 0) {
+			const lostUnits = [...before].filter(u => !after.has(u));
+			if (lostUnits.length > 0) {
 				affectedGroups.push({
 					groupId: group.id,
 					groupName: group.name,
-					lostUnits: Array.from(before)
+					lostUnits,
+					orphaned: after.size === 0
 				});
 			}
 		}
