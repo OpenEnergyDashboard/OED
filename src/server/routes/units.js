@@ -43,6 +43,7 @@ router.post('/edit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['id', 'identifier'],
+		maxProperties: 13,
 // SHL: Some routes use the maxProperties test to make sure there are not extra ones. I think it would be good
 // to do that in these routes (all with params) and also create a test to see if an extra value is sent that it is rejected.
 // delete below does have this value.
@@ -102,7 +103,6 @@ router.post('/edit', async (req, res) => {
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
-// SHL: Extra space at end of line. Maybe use VSC Format File.
 	}; 
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
@@ -131,8 +131,7 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
- // SHL: Need tab indenting - not your doing but nice if fixed.
-           failure(res, 500, 'Unable to edit unit ' + err.toString());
+           	failure(res, 500, 'Unable to edit unit ' + err.toString());
 		}
 		success(res, `Successfully edited unit`);
 	}
@@ -145,6 +144,9 @@ router.post('/addUnit', async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
+		additionalProperties: false, //Instead of using maxProperties, 
+		//I use additionalProperties here since add unit can have 12 legal 
+		//properties and 1 bad property, which add up to 13 but still bad.
 		properties: {
 			// Removed id from properties list since it is set to undefined no matter what is passed.
 			name: {
@@ -164,7 +166,7 @@ router.post('/addUnit', async (req, res) => {
 			},
 			secInRate: {
 				type: 'integer',
-				minimum: 0
+				minimum: 1
 			},
 			
 			typeOfUnit: {
@@ -174,8 +176,11 @@ router.post('/addUnit', async (req, res) => {
 			},
 			suffix: {
 				oneOf: [
-// SHL: Can the min/max be added if a string?
-					{ type: 'string' },
+					{
+						type: 'string',
+						minLength: 1,
+						maxLength: 50
+					},
 					{ type: 'null' }
 				]
 			},
@@ -206,8 +211,6 @@ router.post('/addUnit', async (req, res) => {
 			}
 		}
 	};
-// SHL: Remove debug statement?
-	console.log('secInRate:', req.body.secInRate, 'typeof:', typeof req.body.secInRate);
 
 	const validationResult = validate(req.body, validUnit);
 

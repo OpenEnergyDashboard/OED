@@ -5,31 +5,34 @@ const { chai, app } = require('../common');
 chai.use(chaiHttp);
 
 /**
- * Sends a POST request with a modified payload to test a specific invalid field.
-// SHL: I don't see options as a parameter.
- * @param {Object} options - Test options.
- * @param {string} options.field - The field name to test.
- * @param {*} options.invalidValue - The invalid value to test with.
- * @param {string} options.endpoint - The API endpoint to test against.
- * @param {Object} options.basePayload - The base valid payload.
-// SHL: Unsure why this is in [ ]. Is it to show the default? If so, maybe give default in the description as JSDoc does not seem to support default values directly.
- * @param {number} [options.expectedStatus=400] - Expected HTTP response status.
+ * Sends a POST request to the specified API endpoint with a test payload,
+ * setting the given field to an invalid value or removing it entirely
+ * if undefined, to test validation errors.
+ *
+ * @param field the field name in the payload to invalidate
+ * @param invalidValue the value to assign to the field for testing; if undefined, the field is removed
+ * @param endpoint the API endpoint URL to test (e.g., /api/units/addUnit)
+ * @param basePayload the base valid payload object to clone and modify
+ * @param expectedStatus the expected HTTP status code (default 400 for validation errors)
  */
 async function testInvalidField({ field, invalidValue, endpoint, basePayload, expectedStatus = 400 }) {
 	const payload = { ...basePayload, [field]: invalidValue };
+	if (invalidValue === undefined) {
+		delete payload[field]; // remove field to simulate required check
+	} else {
+		payload[field] = invalidValue;
+	}	
 	const res = await chai.request(app).post(endpoint).send(payload);
-	expect(res).to.have.status(expectedStatus);
+  	expect(res).to.have.status(expectedStatus);
 }
 
 /**
- * Tests that the API rejects when maxVal is less than minVal
-  // SHL: See above on param comments.
-* @param {Object} params
- * @param {string} params.endpoint - API endpoint to test
- * @param {Object} params.basePayload - Base payload with valid values
+ * Validates that the API rejects payloads where minVal is greater than maxVal.
+ *
+ * @param endpoint the API endpoint URL to test (e.g., /api/units/addUnit)
+ * @param basePayload a valid payload object to use as the base for testing
  */
-// SHL: I'm stopping commenting on formatting and non-tab indenting but all files should be checked.
- async function validateMinMaxRelation({ endpoint, basePayload }) {
+async function validateMinMaxRelation({ endpoint, basePayload }) {
     // Create invalid payload where minVal > maxVal
     const invalidPayload = {
         ...basePayload,
@@ -44,28 +47,26 @@ async function testInvalidField({ field, invalidValue, endpoint, basePayload, ex
 }
 
 /**
- * Validates string field behavior for required, length, and enum constraints.
- // SHL: See above on param comments.
-* @param {Object} options - Validation options.
- * @param {string} options.field - The name of the field to validate.
- * @param {string} options.endpoint - The endpoint to send the test request to.
- * @param {Object} options.basePayload - The base valid payload.
- * @param {boolean} [options.required=true] - Whether the field is required.
- * @param {number} [options.minLength=1] - Minimum allowed string length.
- * @param {number} [options.maxLength=255] - Maximum allowed string length.
- * @param {string[]|null} [options.enumValues=null] - Valid enum values for the field.
+ * Validates a string field by testing required presence, min/max length, and enum constraints.
+ *
+ * @param field the name of the string field to validate
+ * @param endpoint the API endpoint to test (e.g., /api/units/addUnit)
+ * @param basePayload a valid payload object to start from
+ * @param required whether the field is required (default: true)
+ * @param minLength the minimum length allowed for the string (default: 1)
+ * @param maxLength the maximum length allowed for the string (default: 255)
+ * @param enumValues optional array of valid enum values to test against
  */
 async function validateString({ field, endpoint, basePayload, required = true, minLength = 1, maxLength = 255, enumValues = null }) {
-// SHL: Is this a debug statement?
-	console.log(`Validating string field: ${field}`);
 
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
 // SHL: Would it be better to create a string one less than min as value similar to max?
+// Fixed
 	if (minLength > 0) {
-		await testInvalidField({ field, invalidValue: '', endpoint, basePayload });
+		await testInvalidField({ field, invalidValue: 'x'.repeat(minLength - 1), endpoint, basePayload });
 	}
 
 	await testInvalidField({ field, invalidValue: 'x'.repeat(maxLength + 1), endpoint, basePayload });
@@ -76,18 +77,19 @@ async function validateString({ field, endpoint, basePayload, required = true, m
 }
 
 /**
- * Validates integer field behavior including range and type constraints.
- * @param {Object} options - Validation options.
- * @param {string} options.field - The field to test.
- * @param {string} options.endpoint - API endpoint to test.
- * @param {Object} options.basePayload - The base valid request payload.
- * @param {boolean} [options.required=true] - Whether the field is required.
- * @param {number} [options.min=0] - Minimum valid integer.
- * @param {number} [options.max=999999] - Maximum valid integer.
+ * Validates an integer field by testing for presence (if required), 
+ * numeric bounds (min and max), and type correctness.
+ *
+ * @param field the name of the integer field to validate
+ * @param endpoint the API endpoint to test (e.g., /api/units/addUnit)
+ * @param basePayload a valid base object used to construct requests
+ * @param required whether the field is required (default: true)
+ * @param min the minimum allowed integer value (optional)
+ * @param max the maximum allowed integer value (optional)
  */
-// SHL: Extra space at start of line. Probably should use format document in VSC on all files.
-// SHL: Would null or undefined be better?
- async function validateInt({ field, endpoint, basePayload, required = true, min = null, max = null }) {
+async function validateInt({ field, endpoint, basePayload, required = true, min = null, max = null }) {
+
+	// Should remove the field for actual missing
 	if (required) {
 // SHL: If I understand the code, the test is sending the field in the route with undefined.
 // This seems different than it being absent when required.
@@ -106,17 +108,15 @@ async function validateString({ field, endpoint, basePayload, required = true, m
 }
 
 /**
- * Validates boolean field by checking undefined and non-boolean inputs.
- * @param {Object} options - Validation options.
- * @param {string} options.field - The field to validate.
- * @param {string} options.endpoint - The API endpoint.
- * @param {Object} options.basePayload - The base valid request payload.
- * @param {boolean} [options.required=true] - Whether the field is required.
+ * Validates a boolean field by checking for presence (if required)
+ * and ensuring the value is a valid boolean.
+ *
+ * @param field the name of the boolean field to validate
+ * @param endpoint the API endpoint to test (e.g., /api/units/addUnit)
+ * @param basePayload a valid base object used to construct requests
+ * @param required whether the field is required (default: true)
  */
 async function validateBool({ field, endpoint, basePayload, required = true }) {
-// SHL: Is this a debug statement?
-	console.log(`Validating boolean field: ${field}`);
-
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}

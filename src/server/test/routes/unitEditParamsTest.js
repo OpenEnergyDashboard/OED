@@ -4,14 +4,35 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, app, testDB, recreateDB } = require('../common');
-const { generateUnitValidationTests } = require('../util/unitTestUtils');
-const { insertUnits } = require('../../util/insertData');
-// SHL: This does not seem to be used.
-const { getUnitId } = require('../../util/readingsUtils');
+const { expect } = require('chai');
+const { chai, mocha, app, testDB } = require('../common');
 const Unit = require('../../models/Unit');
+const { insertUnits } = require('../../util/insertData');
+const { getUnitIdByName } = require('../../util/readingsUtils');
+const {
+	validateString,
+	validateInt,
+	validateBool,
+	validateMinMaxRelation
+} = require('../util/vaidationHelpers');
 
 const EDIT_UNIT = '/api/units/edit';
+
+const basePayload = {
+	name: 'Valid Name',
+	identifier: 'valid_id',
+	unitRepresent: 'flow',
+	secInRate: 60,
+	typeOfUnit: 'unit',
+	suffix: 'L/s',
+	displayable: 'all',
+	preferredDisplay: true,
+	note: 'Note text',
+	minVal: 0,
+	maxVal: 100,
+	disableChecks: 'reject_bad'
+};
+
 
 const INSERT_UNIT = {
 	name: 'kWh',
@@ -35,21 +56,117 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 		await insertUnits([INSERT_UNIT], true, conn);
 	});
 
-	generateUnitValidationTests({
-		endpoint: EDIT_UNIT,
-		unitName: INSERT_UNIT.name,
-		options: { skipId: false },
-		cases: [
-			{ name: 'valid default unit', expectedStatus: 200 },
-// SHL: This seems to assume that the id of 2 does not exist. To be safe it should get the current id and then modify (say add 1) to test.
-			{ name: 'nonexistent id', expectedStatus: 500, mutation: { type: 'change', field: 'id', value: 2 } },
-			{ name: 'missing id', expectedStatus: 400, mutation: { type: 'remove', field: 'id' } },
-			{ name: 'missing identifier', expectedStatus: 400, mutation: { type: 'remove', field: 'identifier' } },
-			{ name: 'empty name', expectedStatus: 400, mutation: { type: 'change', field: 'name', value: '' } },
-// SHL: Curious why the value is INVALID and sometimes in different tests.
-			{ name: 'invalid unitRepresent', expectedStatus: 400, mutation: { type: 'change', field: 'unitRepresent', value: 'INVALID' } },
-			{ name: 'invalid displayable', expectedStatus: 400, mutation: { type: 'change', field: 'displayable', value: 'sometimes' } },
-			{ name: 'missing all fields', expectedStatus: 400, mutation: { type: 'custom', body: {} } }
-		]
+	mocha.it('should validate string fields', async () => {
+		await validateString({
+			field: 'name',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			minLength: 1,
+			maxLength: 50
+		});
+
+		await validateString({
+			field: 'identifier',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			minLength: 1,
+			maxLength: 50,
+			required: true
+		});
+
+		await validateString({
+			field: 'unitRepresent',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			enumValues: Object.values(Unit.unitRepresentType),
+			minLength: 1
+		});
+
+		await validateString({
+			field: 'typeOfUnit',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			enumValues: Object.values(Unit.unitType),
+			minLength: 1
+		});
+
+		await validateString({
+			field: 'suffix',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			minLength: 1,
+			maxLength: 50,
+			required: false
+		});
+
+		await validateString({
+			field: 'displayable',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			enumValues: Object.values(Unit.displayableType),
+			minLength: 1
+		});
+
+		await validateString({
+			field: 'disableChecks',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			enumValues: Object.values(Unit.disableChecksType),
+			minLength: 1
+		});
+
+		await validateString({
+			field: 'note',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			maxLength: 1000
+		});
+	});
+
+	mocha.it('should validate numeric and integer fields', async () => {
+		await validateInt({
+			field: 'secInRate',
+			endpoint: EDIT_UNIT,
+			basePayload,
+			required: false
+		});
+
+		await validateInt({
+			field: 'minVal',
+			endpoint: EDIT_UNIT,
+			basePayload
+		});
+
+		await validateInt({
+			field: 'maxVal',
+			endpoint: EDIT_UNIT,
+			basePayload
+		});
+
+		await validateMinMaxRelation({
+			endpoint: EDIT_UNIT,
+			basePayload
+		});
+	});
+
+	mocha.it('should validate boolean fields', async () => {
+		await validateBool({
+			field: 'preferredDisplay',
+			endpoint: EDIT_UNIT,
+			basePayload
+		});
+	});
+
+	mocha.it('should reject payloads with extra fields', async () => {
+		const payloadWithExtra = {
+			...basePayload,
+			extra: 'not allowed'
+		};
+
+		const res = await chai.request(app)
+			.post(EDIT_UNIT)
+			.send(payloadWithExtra);
+
+		expect(res).to.have.status(400);
 	});
 });
