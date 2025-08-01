@@ -7,8 +7,7 @@ import { defineConfig } from 'cypress';
 export default defineConfig({
 	e2e: {
 		setupNodeEvents(on, config) {
-
-			// This directs the output of cy.log() to the terminal for debug purposes
+			// implement node event listeners here
 			on("task", {
 				log(args) {
 					console.log(...args);
