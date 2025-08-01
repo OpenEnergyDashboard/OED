@@ -7,13 +7,14 @@ import { defineConfig } from 'cypress';
 export default defineConfig({
 	e2e: {
 		setupNodeEvents(on, config) {
-			// implement node event listeners here
+
+			// This directs the output of cy.log() to the terminal for debug purposes
 			on("task", {
 				log(args) {
 					console.log(...args);
-					return null
+					return null;
 				}
-			})
+			});
 		},
 		specPattern: 'src/cypress/e2e/*.cy.ts',
 		supportFile: 'src/cypress/support/e2e.ts',
