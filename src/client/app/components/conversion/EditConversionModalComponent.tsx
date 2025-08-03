@@ -167,6 +167,29 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				// TODO: Check after deleting the conversion to see if a change happens.
 				// 		 Notify the admin of any consequences caused by deleting the conversion.
 			}
+		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
+			const unit = source.typeOfUnit === UnitType.suffix ? source : dest;
+			// Get the units that use this suffix
+			const affectedUnits = Object.values(unitDataById).filter(u => u.suffix === unit.identifier);
+			// Get the conversions that use these units
+			const affectedConversions = conversionDetails.filter(c =>
+				affectedUnits.some(u => u.id === c.sourceId || u.id === c.destinationId)
+			);
+			// Send user a warning before deletion
+			if (affectedUnits.length > 0) {
+				msg += `${translate('conversion.delete.suffix.units.to.delete')}:\n`;
+				affectedUnits.forEach(u => {
+					msg += `- ${u.name} (${u.identifier})\n`;
+				});
+			}
+			if (affectedConversions.length > 0) {
+				msg += `${translate('conversion.delete.suffix.conversions.to.delete')}:\n`;
+				affectedConversions.forEach(c => {
+					const s = unitDataById[c.sourceId]?.identifier || c.sourceId;
+					const d = unitDataById[c.destinationId]?.identifier || c.destinationId;
+					msg += `- ${s} -> ${d}\n`;
+				});
+			}
 		}
 
 		if (msg === '') {
