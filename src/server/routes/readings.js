@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const { authMiddleware } = require('./authenticator');
-const moment = require('moment');
-const Meter = require('../models/Meter');
+const { optionalAuthMiddleware } = require('./authenticator');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
@@ -14,10 +12,13 @@ const { getConnection } = require('../db');
 
 const router = express.Router();
 
+// TODO This route should be limiting access to large file responses to the appropriate users.
+// Currently it is done in the component but also needs to be here.
+// For now it only gets the user information and validates it but does not use it.
 /**
  * Route for fetching readings count by meter IDs and time interval.
  */
-router.get('/line/count/meters/:meter_ids', authMiddleware('reading count by meter IDs'), async (req, res) => {
+router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -61,7 +62,7 @@ router.get('/line/count/meters/:meter_ids', authMiddleware('reading count by met
 /**
  * Route for fetching raw readings by meter ID and time interval.
  */
-router.get('/line/raw/meter/:meter_id', authMiddleware('reading raw by meter ID'), async (req, res) => {
+router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

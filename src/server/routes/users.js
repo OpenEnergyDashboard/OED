@@ -3,13 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const bcrypt = require('bcryptjs');
-const { authMiddleware } = require('./authenticator'); 
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const express = require('express');
 const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const { adminAuthMiddleware } = require('./authenticator');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
 
@@ -31,7 +30,7 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 /**
  * Route for fetching own user profile.
  */
-router.get('/token', authMiddleware('get own user'), async (req, res) => {
+router.get('/token', optionalAuthMiddleware, async (req, res) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
 		type: 'string'

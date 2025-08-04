@@ -13,7 +13,7 @@ const router = express.Router();
 /**
  * Route for redoing Cik and/or refreshing reading views.
  */
-router.post('/refresh conversions array', adminAuthMiddleware('refresh system data'), async (req, res) => {
+router.post('/refresh conversions array', adminAuthMiddleware('conversion refresh system data'), async (req, res) => {
 	if (req.body.redoCik) {
 		const conn = getConnection();
 		await redoCik(conn);

@@ -10,7 +10,8 @@ const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
-const { optionalAuthMiddleware, adminAuthMiddleware } = require('./authenticator');
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
+>>>>>>> 326292140 (This changes several items in routes:)
 
 const router = express.Router();
 

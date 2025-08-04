@@ -5,8 +5,7 @@
 const express = require('express');
 const Preferences = require('../models/Preferences');
 const { log } = require('../log');
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 
@@ -15,7 +14,7 @@ const router = express.Router();
 /**
  * Route for getting the preferences
  */
-router.get('/', optionalAuthenticator, async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Preferences.get(conn);
@@ -30,7 +29,7 @@ router.get('/', optionalAuthenticator, async (req, res) => {
  * Route for updating the preferences
  * @param user_id
  */
-router.post('/', adminAuthenticator('edit site preferences'), async (req, res) => {
+router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
