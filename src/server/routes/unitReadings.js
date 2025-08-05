@@ -13,9 +13,6 @@ const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
 
-/**
- * Validate comma-separated integer list for meter IDs.
- */
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
 		type: 'object',
@@ -33,9 +30,6 @@ function validateMeterLineReadingsParams(params) {
 	return paramsValidationResult.valid;
 }
 
-/**
- * Validate timeInterval & graphicUnitId in query.
- */
 function validateLineReadingsQueryParams(queryParams) {
 	const validQuery = {
 		type: 'object',
@@ -86,9 +80,6 @@ async function meterLineReadings(meterIDs, graphicUnitId, timeInterval) {
 	return mapValues(rawReadings, readingsForMeter => readingsForMeter.map(formatReadingRow));
 }
 
-/**
- * Validate comma-separated integer list for group IDs.
- */
 function validateGroupLineReadingsParams(params) {
 	const validParams = {
 		type: 'object',
@@ -390,9 +381,7 @@ function validateThreeDQueryParams(queryParams) {
 
 function createRouter() {
 	const router = express.Router();
-  /**
-   * Route for fetching line readings by meter IDs
-   */
+	// Route for fetching line readings by meter IDs
 	router.get('/line/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -405,9 +394,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching line readings by group IDs
-   */
+	// Route for fetching line readings by group IDs
 	router.get('/line/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -420,9 +407,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching bar readings by meter IDs
-   */
+	// Route for fetching bar readings by meter IDs
 	router.get('/bar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -436,9 +421,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching bar readings by group IDs
-   */
+	// Route for fetching bar readings by group IDs
 	router.get('/bar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -452,9 +435,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching radar readings by meter IDs
-   */
+	// Route for fetching radar readings by meter IDs
 	router.get('/radar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -467,9 +448,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching radar readings by group IDs
-   */
+	// Route for fetching radar readings by group IDs
 	router.get('/radar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -482,9 +461,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching 3D readings by meter IDs
-   */
+	// Route for fetching 3D readings by meter IDs
 	router.get('/threeD/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
@@ -512,9 +489,7 @@ function createRouter() {
 		}
 	});
 
-  /**
-   * Route for fetching 3D readings by group ID
-   */
+	// Route for fetching 3D readings by group ID
 	router.get('/threeD/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);

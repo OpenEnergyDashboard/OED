@@ -27,9 +27,7 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 	}
 });
 
-/**
- * Route for fetching own user profile.
- */
+// Route for obtaining the requestor's user info
 router.get('/token', optionalAuthMiddleware, async (req, res) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
@@ -60,9 +58,7 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 	}
 });
 
-/**
- * Route for fetching a user by ID.
- */
+// Route for fetching a user by ID.
 router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -89,9 +85,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 	}
 });
 
-/**
- * Route for creating a new user.
- */
+// Route for creating a new user.
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -135,9 +129,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 	}
 });
 
-/**
- * Route for updating an existing user.
- */
+// Route for updating an existing user.
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	
 	const validParams = {
@@ -225,9 +217,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	}
 });
 
-/**
- * Route for deleting a user.
- */
+// Route for deleting a user.
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',

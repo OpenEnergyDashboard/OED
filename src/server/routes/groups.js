@@ -64,6 +64,9 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 	}
 });
 
+// TODO It is unclear if all these routes can be used by non-admins.
+// This should be checked an updated as needed.
+
 router.get('/idname', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {

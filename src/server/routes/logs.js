@@ -14,7 +14,6 @@ const { TimeInterval } = require('../../common/TimeInterval');
 
 const router = express.Router();
 
-
 const validLog = {
 	type: 'object',
 	required: ['message'],
@@ -48,7 +47,6 @@ const validLogMsg = {
 	}
 }
 
-// Each route explicitly requires admin again with a specific action
 router.post('/info', adminAuthMiddleware('create info log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {

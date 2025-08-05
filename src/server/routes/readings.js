@@ -12,9 +12,6 @@ const { getConnection } = require('../db');
 
 const router = express.Router();
 
-// TODO This route should be limiting access to large file responses to the appropriate users.
-// Currently it is done in the component but also needs to be here.
-// For now it only gets the user information and validates it but does not use it.
 /**
  * Route for fetching readings count by meter IDs and time interval.
  */
@@ -58,6 +55,10 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 		}
 	}
 })
+
+// TODO This route should be limiting access to large file responses to the appropriate users.
+// Currently it is done in the component but also needs to be here.
+// For now it only gets the user information and validates it but does not use it.
 
 /**
  * Route for fetching raw readings by meter ID and time interval.

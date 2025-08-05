@@ -15,7 +15,6 @@ const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 
 const router = express.Router();
 
-
 function formatMapForResponse(map) {
 	const formattedMap = {
 		id: map.id,
@@ -33,7 +32,6 @@ function formatMapForResponse(map) {
 	return formattedMap;
 }
 
-//Applying optionalAuthMiddlewear directly to route
 router.get('/', optionalAuthMiddleware, async (req, res) => { 
 	try {
 		const conn = getConnection();
@@ -51,7 +49,6 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 	}
 });
 
-//Applying optionalAuthMiddlewear directly to route
 router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
