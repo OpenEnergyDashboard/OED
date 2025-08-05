@@ -31,18 +31,18 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 Cypress.Commands.overwrite("log", function(log, ...args) {
-  const indent = "\t"; // You can adjust the number of tabs or spaces here
-  const formattedArgs = args.map((arg) =>
-        typeof arg === "string" ? indent + arg : indent + JSON.stringify(arg)
-  );
-  if (Cypress.browser.isHeadless) {
-    return cy.task("log", formattedArgs, { log: false }).then(() => {
-      return log(...args);
-    });
-  } else {
-    console.log(...formattedArgs);
-    return log(...args);
-  }
+	const indent = "\t"; // You can adjust the number of tabs or spaces here
+	const formattedArgs = args.map((arg) =>
+				typeof arg === "string" ? indent + arg : indent + JSON.stringify(arg)
+	);
+	if (Cypress.browser.isHeadless) {
+		return cy.task("log", formattedArgs, { log: false }).then(() => {
+			return log(...args);
+		});
+	} else {
+		console.log(...formattedArgs);
+		return log(...args);
+	}
 });
 
 //
