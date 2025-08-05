@@ -101,8 +101,6 @@ function formatMeterForResponse(meter, hasFullAccess) {
 /**
  * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
-
-//Adding optionalAuthMiddlewear directly to route
 router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
 		const conn = getConnection();
@@ -125,8 +123,6 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
  * Prohibits access to meters that are not displayable if not logged in
  * @param {int} meter_id
  */
-
-//Adding optionalAuthMiddlewear directly to route
 router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -323,7 +319,6 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 /**
  * Route for POST add meter.
  */
-//Added adminAuthMiddlewear to addMeter route that had nothing 
 router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
