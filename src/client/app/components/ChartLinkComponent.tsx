@@ -15,6 +15,7 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { wellStyle, rowFlexStart } from '../styles/modalStyle';
 
+
 /**
  * @returns chartLinkComponent
  */
@@ -33,11 +34,11 @@ export default function ChartLinkComponent() {
 	const ref = React.useRef<HTMLDivElement>(null);
 	const shouldShowcurrentTimeCheckbox = React.useMemo(() => {
 		if (!queryTimeInterval) return false
-		const end = queryTimeInterval.getEndTimestamp?.()
-		const isRightUnBounded = !end
-		return isRightUnBounded
+		if(queryTimeInterval.getIsBounded()) return false
+		if(queryTimeInterval.getStartTimestamp() == null && !queryTimeInterval.getIsBounded()) return false
+		return true
 	}, [queryTimeInterval])
-
+	
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard.writeText(linkText)
@@ -71,6 +72,7 @@ export default function ChartLinkComponent() {
 											ref.current && ReactTooltip.hide(ref.current);
 										}}
 									/>
+									
 								</div>
 							</div>
 						</Button>
