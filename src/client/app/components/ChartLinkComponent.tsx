@@ -30,12 +30,11 @@ export default function ChartLinkComponent() {
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval)
 	const ref = React.useRef<HTMLDivElement>(null);
-	
 	const shouldShowKeepCurrentCheckbox = React.useMemo(() => {
 		if (!queryTimeInterval) return false
-		const end = queryTimeInterval.getEndTimestamp?.()
-		const isRightUnBounded = !end
-		return isRightUnBounded
+		if(queryTimeInterval.getIsBounded()) return false
+		if(queryTimeInterval.getStartTimestamp() == null && !queryTimeInterval.getIsBounded()) return false
+		return true
 	}, [queryTimeInterval])
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
@@ -80,23 +79,23 @@ export default function ChartLinkComponent() {
 				</div>
 				{/* keep current checkbox */}
 				{shouldShowKeepCurrentCheckbox && (
-				<div className='checkbox'>
-					<input
-						type='checkbox'
-						style={checkboxStyle}
-						onMouseOver={() => {
-							ref.current && ReactTooltip.show(ref.current);
-						}}
-						onMouseLeave={() => {
-							ref.current && ReactTooltip.hide(ref.current);
-						}}
-					/>
-					<label>
-						{translate('keep.chart.current.label')}
-					</label>
-					{/* we need to create a tool tip for "keep chart current" checkbox */}
-					<TooltipMarkerComponent page='' helpTextId='' />
-				</div>
+					<div className='checkbox'>
+						<input
+							type='checkbox'
+							style={checkboxStyle}
+							onMouseOver={() => {
+								ref.current && ReactTooltip.show(ref.current);
+							}}
+							onMouseLeave={() => {
+								ref.current && ReactTooltip.hide(ref.current);
+							}}
+						/>
+						<label>
+							{translate('keep.chart.current.label')}
+						</label>
+						{/* we need to create a tool tip for "keep chart current" checkbox */}
+						<TooltipMarkerComponent page='' helpTextId='' />
+					</div>
 				)}
 				<div style={rowFlexStart}>
 					<ButtonGroup >
