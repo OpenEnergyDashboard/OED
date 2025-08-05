@@ -11,6 +11,7 @@ interface SimpleUnsavedWarningProps {
 	onConfirm?: () => void;
 	onCancel: () => void;
 	onDiscard: () => void;
+	disabled?: boolean;
 }
 
 /**
@@ -32,7 +33,7 @@ export function SimpleUnsavedWarningComponent(props: SimpleUnsavedWarningProps) 
 					<FormattedMessage id='leave' />
 				</Button>
 				{props.onConfirm && (
-					<Button color='success' onClick={props.onConfirm}>
+					<Button color='success' onClick={props.onConfirm} disabled={props.disabled}>
 						<FormattedMessage id='save.all' />
 					</Button>
 				)}

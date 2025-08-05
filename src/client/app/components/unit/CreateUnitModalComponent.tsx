@@ -249,6 +249,7 @@ export default function CreateUnitModalComponent() {
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
 				/>
 			)}
 			{/* Show modal button */}

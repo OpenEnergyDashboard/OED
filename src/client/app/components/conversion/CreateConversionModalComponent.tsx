@@ -31,6 +31,8 @@ export default function CreateConversionModalComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -156,10 +158,15 @@ export default function CreateConversionModalComponent() {
 	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
+		// This checks if all of the required fields have been filled out.
+		const validChange =
+			conversionState.sourceId !== defaultValues.sourceId
+			&& conversionState.destinationId !== defaultValues.destinationId;
 		// Compare the local changes to the default values
 		const editMade =
 			conversionState.sourceId !== defaultValues.sourceId
 			|| conversionState.destinationId !== defaultValues.destinationId;
+		setCanSave(validChange && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -190,6 +197,7 @@ export default function CreateConversionModalComponent() {
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
 				/>
 			)}
 			<ConfirmActionModalComponent
