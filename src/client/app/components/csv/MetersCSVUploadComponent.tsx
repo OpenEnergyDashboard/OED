@@ -108,8 +108,6 @@ export default function MetersCSVUploadComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	const blocker = useBlocker(hasUnsavedChanges);
 
@@ -134,22 +132,15 @@ export default function MetersCSVUploadComponent() {
 		}
 	}, [blocker.state, hasUnsavedChanges]);
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks if the inputs for each field is of their appropriate types.
-		const validMeter = typeof meterData.gzip === 'boolean'
-			&& typeof meterData.headerRow === 'boolean'
-			&& meterData.meterIdentifier !== ''
-			&& typeof meterData.update === 'boolean';
-
 		// Compare the local changes to the default values
 		const editMade =
 			meterData.gzip !== MetersCSVUploadDefaults.gzip
 			|| meterData.headerRow !== MetersCSVUploadDefaults.headerRow
 			|| meterData.meterIdentifier !== MetersCSVUploadDefaults.meterIdentifier
 			|| meterData.update !== MetersCSVUploadDefaults.update;
-		setCanSave(validMeter && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -174,7 +165,6 @@ export default function MetersCSVUploadComponent() {
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
-						setHasUnsavedChanges(false);
 						blocker.state = 'unblocked';
 					}}
 				/>
@@ -284,7 +274,7 @@ export default function MetersCSVUploadComponent() {
 								)}
 								<div className='d-flex flex-row-reverse'>
 									<div className='p-3'>
-										<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier) || !canSave}>
+										<Button color='primary' type='submit' disabled={!isValidFileType || (meterData.update && !meterData.meterIdentifier)}>
 											{translate('csv.submit.button')}
 										</Button>
 									</div>

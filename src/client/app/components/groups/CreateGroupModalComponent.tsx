@@ -36,6 +36,7 @@ import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { isEqual } from 'lodash';
 
 /**
  * Defines the create group modal form
@@ -47,8 +48,6 @@ export default function CreateGroupModalComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -298,22 +297,13 @@ export default function CreateGroupModalComponent() {
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [graphicUnitsState.possibleGraphicUnits, state.deepMeters]);
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks if the inputs for each field is of their appropriate types.
-		const validGroup = !isNaN(state.id)
-			&& state.name !== ''
-			&& Array.isArray(state.childMeters)
-			&& Array.isArray(state.childGroups)
-			&& Array.isArray(state.deepMeters)
-			&& state.gps !== null
-			&& typeof state.displayable === 'boolean'
-			&& state.note !== ''
-			&& !isNaN(state.area)
-			&& !isNaN(state.defaultGraphicUnit)
-			&& state.areaUnit !== null;
-
+		// Check children separately since lists.
+		const childMeterChanges = !isEqual(state.childMeters, defaultValues.childMeters);
+		const childGroupChanges = !isEqual(state.childGroups, defaultValues.childGroups);
+		const deepMeterChanges = !isEqual(state.deepMeters, defaultValues.deepMeters);
 		//Compare the local changes to the default values
 		const editMade =
 			state.id !== defaultValues.id
@@ -332,8 +322,10 @@ export default function CreateGroupModalComponent() {
 			|| state.note !== defaultValues.note
 			|| state.area !== defaultValues.area
 			|| state.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
-			|| state.areaUnit !== defaultValues.areaUnit;
-		setCanSave(validGroup && editMade);
+			|| state.areaUnit !== defaultValues.areaUnit
+			|| childMeterChanges
+			|| childGroupChanges
+			|| deepMeterChanges;
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -579,7 +571,7 @@ export default function CreateGroupModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

@@ -31,8 +31,6 @@ export default function CreateConversionModalComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -155,32 +153,13 @@ export default function CreateConversionModalComponent() {
 		}
 	};
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks:
-		// - Source ID has to be a number
-		// - Destination ID has to be a number
-		// - Bidirectional has to be a boolean
-		// - Slope has to be a number
-		// - Intercept has to be a number
-		// - Note cannot be blank
-		const validConversion = !isNaN(conversionState.sourceId)
-			&& !isNaN(conversionState.destinationId)
-			&& typeof conversionState.bidirectional === 'boolean'
-			&& !isNaN(conversionState.slope)
-			&& !isNaN(conversionState.intercept)
-			&& conversionState.note !== '';
-
 		// Compare the local changes to the default values
 		const editMade =
 			conversionState.sourceId !== defaultValues.sourceId
-			|| conversionState.destinationId !== defaultValues.destinationId
-			|| conversionState.bidirectional !== defaultValues.bidirectional
-			|| conversionState.slope !== defaultValues.slope
-			|| conversionState.intercept !== defaultValues.intercept
-			|| conversionState.note !== defaultValues.note;
-		setCanSave(validConversion && editMade);
+			|| conversionState.destinationId !== defaultValues.destinationId;
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -370,7 +349,7 @@ export default function CreateConversionModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validConversion || !canSave} >
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

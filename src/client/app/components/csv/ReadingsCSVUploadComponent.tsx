@@ -194,8 +194,6 @@ export default function ReadingsCSVUploadComponent() {
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	const blocker = useBlocker(hasUnsavedChanges);
 
@@ -220,28 +218,9 @@ export default function ReadingsCSVUploadComponent() {
 		}
 	}, [blocker.state, hasUnsavedChanges]);
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks if the inputs for each field is of their appropriate types.
-		const validReading = typeof readingsData.cumulative	=== 'boolean'
-			&& typeof readingsData.cumulativeReset === 'boolean'
-			&& readingsData.cumulativeResetStart !== ''
-			&& readingsData.cumulativeResetEnd !== ''
-			&& !isNaN(readingsData.duplications)
-			&& typeof readingsData.endOnly === 'boolean'
-			&& typeof readingsData.gzip === 'boolean'
-			&& typeof readingsData.headerRow === 'boolean'
-			&& typeof readingsData.honorDst === 'boolean'
-			&& !isNaN(readingsData.lengthGap)
-			&& !isNaN(readingsData.lengthVariation)
-			&& readingsData.meterIdentifier !== ''
-			&& typeof readingsData.refreshReadings === 'boolean'
-			&& typeof readingsData.relaxedParsing === 'boolean'
-			&& readingsData.timeSort !== null
-			&& typeof readingsData.update === 'boolean'
-			&& typeof readingsData.useMeterZone === 'boolean';
-
 		//Compare the local changes to the default values
 		const editMade =
 			readingsData.cumulative !== ReadingsCSVUploadDefaults.cumulative
@@ -261,7 +240,6 @@ export default function ReadingsCSVUploadComponent() {
 			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
 			|| readingsData.update !== ReadingsCSVUploadDefaults.update
 			|| readingsData.useMeterZone !== readingsData.useMeterZone;
-		setCanSave(validReading && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -286,7 +264,6 @@ export default function ReadingsCSVUploadComponent() {
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
-						setHasUnsavedChanges(false);
 						blocker.state = 'unblocked';
 					}}
 				/>
@@ -654,7 +631,7 @@ export default function ReadingsCSVUploadComponent() {
 								*/}
 								<div className='d-flex flex-row-reverse'>
 									<div className='p-3'>
-										<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected || !canSave}>
+										<Button color='primary' type='submit' disabled={!isValidFileType || !meterIsSelected}>
 											{translate('csv.submit.button')}
 										</Button>
 									</div>

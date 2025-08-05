@@ -47,8 +47,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -350,23 +348,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	};
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks:
-		// - Source ID has to be a number
-		// - Destination ID has to be a number
-		// - Bidirectional has to be a boolean
-		// - Slope has to be a number
-		// - Intercept has to be a number
-		// - Note cannot be blank
-		const validConversion = !isNaN(state.sourceId)
-			&& !isNaN(state.destinationId)
-			&& typeof state.bidirectional === 'boolean'
-			&& !isNaN(state.slope)
-			&& !isNaN(state.intercept)
-			&& state.note !== '';
-
 		// Compare the local changes to the default values
 		const editMade =
 			props.conversion.sourceId !== state.sourceId
@@ -375,7 +359,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			|| props.conversion.slope !== state.slope
 			|| props.conversion.intercept !== state.intercept
 			|| props.conversion.note !== state.note;
-		setCanSave(validConversion && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -548,7 +531,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges} disabled={!canSave}>
+					<Button color='primary' onClick={handleSaveChanges}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

@@ -47,8 +47,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -86,46 +84,9 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// This checks if the inputs for each field is of their appropriate types.
-		// (maxError is left out because it is of type 'any')
-		const validMeter =
-			!isNaN(meterState.id)
-			&& localMeterEdits.identifier !== ''
-			&& localMeterEdits.name !== ''
-			&& !isNaN(localMeterEdits.area)
-			&& typeof localMeterEdits.enabled === 'boolean'
-			&& typeof localMeterEdits.displayable === 'boolean'
-			&& localMeterEdits.meterType !== ''
-			&& localMeterEdits.url !== ''
-			&& localMeterEdits.timeZone !== ''
-			&& localMeterEdits.gps !== null
-			&& !isNaN(localMeterEdits.unitId)
-			&& !isNaN(localMeterEdits.defaultGraphicUnit)
-			&& localMeterEdits.note !== ''
-			&& typeof localMeterEdits.cumulative === 'boolean'
-			&& typeof localMeterEdits.cumulativeReset === 'boolean'
-			&& localMeterEdits.cumulativeResetStart !== ''
-			&& localMeterEdits.cumulativeResetEnd !== ''
-			&& typeof localMeterEdits.endOnlyTime === 'boolean'
-			&& !isNaN(localMeterEdits.readingGap)
-			&& !isNaN(localMeterEdits.readingVariation)
-			&& !isNaN(localMeterEdits.readingDuplication)
-			&& localMeterEdits.timeSort !== null
-			&& !isNaN(localMeterEdits.reading)
-			&& localMeterEdits.startTimestamp !== ''
-			&& localMeterEdits.endTimestamp !== ''
-			&& localMeterEdits.previousEnd !== ''
-			&& localMeterEdits.areaUnit !== null
-			&& localMeterEdits.readingFrequency !== ''
-			&& localMeterEdits.minDate !== ''
-			&& localMeterEdits.maxDate !== ''
-			&& !isNaN(localMeterEdits.minVal)
-			&& !isNaN(localMeterEdits.maxVal)
-			&& localMeterEdits.disableChecks !== null;
-
 		// Compare the local changes to the default values
 		const editMade =
 			props.meter.id !== localMeterEdits.id
@@ -161,7 +122,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			|| props.meter.minVal !== localMeterEdits.minVal
 			|| props.meter.maxVal !== localMeterEdits.maxVal
 			|| props.meter.disableChecks !== localMeterEdits.disableChecks;
-		setCanSave(validMeter && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -906,7 +866,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges} disabled={!validMeter || !canSave}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!validMeter}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

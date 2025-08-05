@@ -66,8 +66,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-	// If user can save
-	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -422,7 +420,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// the deep meters of this group are properly updated.
 	}, [graphicUnitsState.possibleGraphicUnits, groupState.deepMeters, loggedInAsAdmin]);
 
-	// Keeps canSave state up to date. Checks if valid and if edit made.
+	// Checks if valid and if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	// Reuses code from this file's handleSubmit()
 	useEffect(() => {
@@ -433,19 +431,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		const childMeterChanges = !isEqual(originalGroupState.childMeters, groupState.childMeters);
 		const childGroupChanges = !isEqual(originalGroupState.childGroups, groupState.childGroups);
 		const deepMeterChanges = !isEqual(originalGroupState.deepMeters, groupState.deepMeters);
-
-		// This checks if the inputs for each field is of their appropriate types.
-		const validGroup = !isNaN(originalGroupState.id)
-			&& originalGroupState.name !== ''
-			&& Array.isArray(originalGroupState.childMeters)
-			&& Array.isArray(originalGroupState.childGroups)
-			&& Array.isArray(originalGroupState.deepMeters)
-			&& originalGroupState.gps !== null
-			&& typeof originalGroupState.displayable === 'boolean'
-			&& originalGroupState.note !== ''
-			&& !isNaN(originalGroupState.area)
-			&& !isNaN(originalGroupState.defaultGraphicUnit)
-			&& originalGroupState.areaUnit !== null;
 
 		//Compare the local changes to the default values
 		const editMade =
@@ -463,7 +448,6 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			|| childMeterChanges
 			|| childGroupChanges
 			|| deepMeterChanges;
-		setCanSave(validGroup && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
@@ -782,7 +766,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								<FormattedMessage id="discard.changes" />
 							</Button>
 							{/* On click calls the function handleSaveChanges in this component */}
-							<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
+							<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
 								<FormattedMessage id="save.all" />
 							</Button>
 						</div>
