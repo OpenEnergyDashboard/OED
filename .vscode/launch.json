@@ -1,16 +1,15 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+	
 		{
-			"name": "Attach to Node in Docker",
-			"type": "node",
-			"request": "attach",
-			"port": 9229,
-			"address": "localhost",
-			"localRoot": "${workspaceFolder}",
-			"remoteRoot": "/usr/src/app",
-			"protocol": "inspector",
-			"restart": true
+
+			"type": "chrome",
+			"request": "launch",
+			"name": "launch chrome against local host",
+			"url": "http://localhost:3000",
+			"webRoot": "${workspaceFolder}"
+			
 		}
 	]
 }

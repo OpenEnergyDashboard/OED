@@ -8,8 +8,8 @@ import ReactTooltip from 'react-tooltip';
 import { Button, ButtonGroup, Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
-import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
-import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
+import { selectChartLinkHideOptions, selectCurrentTime, setChartLinkOptionsVisibility, setCurrentTime } from '../redux/slices/appStateSlice';
+import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters, selectSliderRangeInterval } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -27,16 +27,16 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval)
+	const currentTime = useAppSelector(selectCurrentTime)
+	const range = useAppSelector(selectSliderRangeInterval)
+	
 	const ref = React.useRef<HTMLDivElement>(null);
-
-	const shouldShowKeepCurrentCheckbox = React.useMemo(() => {
+	const shouldShowcurrentTimeCheckbox = React.useMemo(() => {
 		if (!queryTimeInterval) return false
 		const end = queryTimeInterval.getEndTimestamp?.()
 		const isRightUnBounded = !end
 		return isRightUnBounded
 	}, [queryTimeInterval])
-
-
 
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
@@ -77,10 +77,18 @@ export default function ChartLinkComponent() {
 						<Button outline onClick={() => setLinkTextVisible(visible => !visible)}>
 							{linkTextVisible ? 'x' : 'v'}
 						</Button>
-							{shouldShowKeepCurrentCheckbox && (
-								<label htmlFor="keepCurrentCheckbox" style = {{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-								<Input type="checkbox" id = "keepCurrentCheckbox"/>
+					
+							{shouldShowcurrentTimeCheckbox && (
+								
+								<label htmlFor="currentTimeCheckbox" style = {{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+								<Input
+  									type="checkbox"
+ 									id="currentTimeCheckbox"
+ 									checked={currentTime}
+  									onChange={e => dispatch(setCurrentTime(e.target.checked))}
+									/>
 								 Keep Current </label>
+								 
 							)}
 						
 					</ButtonGroup>

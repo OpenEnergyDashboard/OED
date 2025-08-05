@@ -12,7 +12,7 @@ import {
 	changeSliderRange, selectChartToRender, selectHistoryIsDirty,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSliderRangeInterval, selectInitialXAxisRange,
-	selectQueryTimeInterval, updateTimeIntervalAndSliderRange
+	selectQueryTimeInterval, updateTimeIntervalAndSliderRange,updateTimeCreated
 } from '../redux/slices/graphSlice';
 import HistoryComponent from './HistoryComponent';
 import { ChartTypes } from '../types/redux/graph';
@@ -110,6 +110,7 @@ export const RefreshGraphComponent = () => {
 					const maxX = initialXAxisRange?.getEndTimestamp?.();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
 					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
+					dispatch(updateTimeCreated())
 				}
 			}}
 		/>

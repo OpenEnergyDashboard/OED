@@ -26,6 +26,7 @@ const defaultState: GraphState = {
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
+	timeCreated: new TimeInterval(moment(),moment()),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
@@ -141,6 +142,9 @@ export const graphSlice = createSlice({
 			if (state.current.threeD.meterOrGroupID !== action.payload) {
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
+		},
+		updateTimeCreated: (state) => {
+			state.current.timeCreated = new TimeInterval(moment(), moment());
 		},
 		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
 			if (state.current.threeD.meterOrGroup !== action.payload) {
@@ -362,6 +366,11 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
+							case 'timeCreated':
+								const now = moment()
+								const timeCreated = current.timeCreated.getEndTimestamp()
+								const diffDays = now.diff(timeCreated,'days', true)
+								
 						}
 					});
 				}
@@ -405,7 +414,8 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
-		selectShiftTimeInterval: state => state.current.shiftTimeInterval
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
+		selectTimeCreated : state => state.current.timeCreated
 	}
 });
 
@@ -425,7 +435,7 @@ export const {
 	selectDefaultGraphState, selectHistoryIsDirty,
 	selectPlotlySliderMax, selectPlotlySliderMin,
 	selectShiftAmount, selectShiftTimeInterval,
-	selectInitialXAxisRange
+	selectInitialXAxisRange,selectTimeCreated
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -444,6 +454,6 @@ export const {
 	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
 	updateSelectedMetersOrGroups, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
-	updateShiftTimeInterval
+	updateShiftTimeInterval,updateTimeCreated
 } = graphSlice.actions;
 
