@@ -285,7 +285,7 @@ router.post('/simulate-delete', async (req, res) => {
 			if (!meterIds || meterIds.length === 0) {
 				continue;
 			}
-			const intersectSets = sets => sets.reduce((a, b) => a.intersection(b));
+			const intersectSets = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
 			const setsCurrent = meterIds.map(id => meterIdToUnitsCurrent[id] || new Set());
 			const setsSim = meterIds.map(id => meterIdToUnitsSim[id] || new Set());
 			const before = setsCurrent.length ? intersectSets(setsCurrent) : new Set();
