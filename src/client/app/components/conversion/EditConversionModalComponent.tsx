@@ -130,7 +130,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const checkState = async () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
-		let msg = '';
+		const msgElements:React.ReactNode[] = [];
 		let cancel = false;
 
 		// Meter source orphan check
@@ -141,22 +141,56 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			const relatedMeters = Object.values(meterDataById).filter(meter => meter.unitId === source.id);
 
 			if (srcCount === 1 && relatedMeters.length !== 0) {
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `  "${meter.name}"\n`;
-				});
+				// This is the only conversion for this meter unit so if it is removed then
+				// you cannot graph any meters using this unit. Not allowed to delete if
+				// any meters use this unit as in this case.
+				msgElements.push(
+					<div key="meter-orphan">
+						<span className="bold">{translate('conversion.delete.meter.orphan')} </span>
+						&quot;{source.name}&quot;.
+						<br />
+						<span className="bold">{translate('conversion.delete.meter.related')} </span>
+						&quot;{source.name}&quot;:
+						<ul>
+							{relatedMeters.map(meter => (
+								<li key={meter.id}>&quot;{meter.name}&quot;</li>
+							))}
+						</ul>
+					</div>
+				);
 				cancel = true;
 			} else if (relatedMeters.length !== 0) {
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `  "${meter.name}"\n`;
-				});
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
+				// Some meters use this meter unit but there are other ways to graph it,
+				// so warn the admin and tell each meter impacted.
+				msgElements.push(
+					<div key="meter-related">
+						<span className="bold">{translate('conversion.delete.meter.related')} </span>
+						&quot;{source.name}&quot;:
+						<ul>
+							{relatedMeters.map(meter => (
+								<li key={meter.id}>&quot;{meter.name}&quot;</li>
+							))}
+						</ul>
+						<span className="bold">{translate('conversion.delete.meter.reduce.graphable')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			} else if (srcCount === 1) {
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
+				// No meters use this meter unit so warn that will is ungraphable if used.
+				msgElements.push(
+					<div key="meter-orphan-alone">
+						<span className="bold">{translate('conversion.delete.meter.orphan')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			} else {
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
+				// No meters use this meter unit so warn that reduced graphable units if used.
+				msgElements.push(
+					<div key="meter-reduce-graphable">
+						<span className="bold">{translate('conversion.delete.meter.reduce.graphable')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			}
 			//	TODO The following code did what was originally in issue #905 but there were issues
 			//	with the design and usage of suffix units. It is commented out for now and needs
@@ -180,7 +214,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			);
 
 			if (remainingDestConversions.length === 0) {
-				msg += `${translate('conversion.delete.unit.orphan')} "${dest.name}".\n`;
+				msgElements.push(
+					<div key="unit-orphan">
+						<span className="bold">{translate('conversion.delete.unit.orphan')} </span>
+						"{dest.name}".
+					</div>
+				);
 			}
 		}
 
@@ -199,10 +238,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				// Orphaned groups check
 				const orphanedGroups = result.affectedGroups?.filter(group => group.orphaned) || [];
 				if (orphanedGroups.length > 0) {
-					msg = translate('conversion.delete.group.orphan') + ':\n';
-					orphanedGroups.forEach(group => {
-						msg += `"${group.groupName}"\n`;
-					});
+					msgElements.push(
+						<div key="orphaned-groups">
+							<span className="bold">{translate('conversion.delete.group.orphan')}:</span>
+							<ul>
+								{orphanedGroups.map(group => (
+									<li key={group.groupName}>"{group.groupName}"</li>
+								))}
+							</ul>
+						</div>
+					);
 					cancel = true;
 				} else {
 					// Group meters by lostUnits
@@ -212,19 +257,28 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							return;
 						}
 						const key = JSON.stringify([...meter.lostUnits].sort());
-						if (!meterLossMap.has(key)){
+						if (!meterLossMap.has(key)) {
 							meterLossMap.set(key, []);
 						}
 						meterLossMap.get(key)!.push(meter.meterName);
 					});
 					meterLossMap.forEach((meterNames, lostUnitsKey) => {
 						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
-						// TODO: CSS For breaks in paragraph
-						msg += translate('conversion.delete.meter.affected') + ':\n';
-						msg += meterNames.map(name => `"${name}"`).join(', \n') + ' ';
-						msg += '\n';
-						msg += translate('conversion.delete.lost.units') + ': ';
-						msg += lostUnits.map((id: number) => `"${unitDataById[id]?.name || id}"`).join(', ') + '\n';
+						msgElements.push(
+							<div key={`meters-${lostUnitsKey}`}>
+								<span className="bold">{translate('conversion.delete.meter.affected')}: </span>
+								<div style={{ marginLeft: 16 }}>
+									{meterNames.map(name => (
+										<div key={name}>"{name}"</div>
+									))}
+								</div>
+								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+								{lostUnits.map((id: number, i: number) => (
+									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
+								))}
+								<br /><br />
+							</div>
+						);
 					});
 
 					// Group non-orphaned groups by lostUnits
@@ -242,15 +296,29 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					});
 					groupLossMap.forEach((groupNames, lostUnitsKey) => {
 						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
-						msg += translate('conversion.delete.group.affected') + ':\n';
-						msg += groupNames.map(name => `"${name}"`).join(', \n') + ' ';
-						msg += '\n';
-						msg += translate('conversion.delete.lost.units') + ': ';
-						msg += lostUnits.map((id: number) => `"${unitDataById[id]?.name || id}"`).join(', ') + '\n';
+						msgElements.push(
+							<div key={`groups-${lostUnitsKey}`}>
+								<span className="bold">{translate('conversion.delete.group.affected')}: </span>
+								<div style={{ marginLeft: 16 }}>
+									{groupNames.map(name => (
+										<div key={name}>"{name}"</div>
+									))}
+								</div>
+								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+								{lostUnits.map((id: number, i: number) => (
+									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
+								))}
+								<br /><br />
+							</div>
+						);
 					});
 				}
 			} catch (e) {
-				msg = translate('conversion.delete.simulation.error');
+				msgElements.push(
+					<div key="simulation-error">
+						{translate('conversion.delete.simulation.error')}
+					</div>
+				);
 				cancel = true;
 			}
 		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
@@ -280,11 +348,21 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 
 		if (cancel) {
-			setDeleteConfirmationMessage(msg + '\n' + translate('conversion.delete.restricted'));
+			msgElements.push(
+				<div key="restricted">
+					<br />
+					{translate('conversion.delete.restricted')}
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
 			handleCancelModalOpen();
 		} else {
-			msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
-			setDeleteConfirmationMessage(msg);
+			msgElements.push(
+				<div key="final-confirm">
+					{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
 			handleDeleteConfirmationModalOpen();
 		}
 	};
@@ -292,7 +370,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 	const [showCancelModal, setShowCancelModal] = useState(false);
-	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState(
+	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
 		translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?');
 	const deleteConfirmText = translate('conversion.delete.conversion');
 	const deleteRejectText = translate('cancel');

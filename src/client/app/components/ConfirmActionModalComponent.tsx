@@ -12,7 +12,7 @@ interface ConfirmActionModalComponentProps {
 	show: boolean;
 	actionTitle?: string;
 	// Message to display when action button is rendered
-	actionConfirmMessage: string;
+	actionConfirmMessage: React.ReactNode;
 	// Overrides the default action confirmation text 'yes'
 	actionConfirmText?: string;
 	// Overrides the default action confirmation text 'no'
