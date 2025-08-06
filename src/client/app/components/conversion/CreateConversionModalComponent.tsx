@@ -33,6 +33,12 @@ export default function CreateConversionModalComponent() {
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If user can save
 	const [canSave, setCanSave] = useState(false);
+	// If user has an invalid save (slope intercept is 0) with unsaved warning.
+	// Stores the conversion data so that it can be used in either
+	// handleSubmit() or handleWarningConfirm().
+	// This addresses an issue of where the conversionState does not carry over
+	// when going from unsaved warning to the invalid save modal.
+	const [pendingConversion, setPendingConversion] = useState<any>(null);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -118,8 +124,7 @@ export default function CreateConversionModalComponent() {
 
 		//Proceed with the creation of the conversion
 		setShowModal(false);
-		addConversionMutation({...omit(conversionState, 'sourceOptions'),
-			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+		addConversionMutation(pendingConversion);
 		resetState();
 	};
 
@@ -131,6 +136,7 @@ export default function CreateConversionModalComponent() {
 	// Reset the state to default values
 	const resetState = () => {
 		setConversionState(defaultValues);
+		setPendingConversion(null);
 	};
 	/* End Warning Modal */
 
@@ -138,6 +144,8 @@ export default function CreateConversionModalComponent() {
 	const handleSubmit = () => {
 		// Show warning modal if slope and intercept are both 0
 		if (conversionState.slope === 0 && conversionState.intercept === 0) {
+			setPendingConversion({...omit(conversionState, 'sourceOptions'),
+				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 			setWarningMessage(translate('conversion.slope.intercept.zero'));
 			setShowWarningModal(true);
 		} else if (validConversion) {
@@ -165,7 +173,11 @@ export default function CreateConversionModalComponent() {
 		// Compare the local changes to the default values
 		const editMade =
 			conversionState.sourceId !== defaultValues.sourceId
-			|| conversionState.destinationId !== defaultValues.destinationId;
+			|| conversionState.destinationId !== defaultValues.destinationId
+			|| conversionState.bidirectional !== defaultValues.bidirectional
+			|| conversionState.slope !== defaultValues.slope
+			|| conversionState.intercept !== defaultValues.intercept
+			|| conversionState.note !== defaultValues.note;
 		setCanSave(validChange && editMade);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
@@ -193,8 +205,21 @@ export default function CreateConversionModalComponent() {
 					onConfirm={() => {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
-						handleSubmit();
-						handleClose();
+						if (conversionState.slope === 0 && conversionState.intercept === 0) {
+							setPendingConversion({...omit(conversionState, 'sourceOptions'),
+								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+							setWarningMessage(translate('conversion.slope.intercept.zero'));
+							setShowWarningModal(true);
+						}
+						else if (validConversion) {
+							setShowModal(false);
+							addConversionMutation({...omit(conversionState, 'sourceOptions'),
+								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+							resetState();
+						}
+						else {
+							handleClose();
+						}
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
 					disabled={!canSave}
