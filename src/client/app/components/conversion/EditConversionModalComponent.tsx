@@ -126,6 +126,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 		return count;
 	};
+	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
 	const checkState = async () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
@@ -134,19 +135,22 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 		// Meter source orphan check
 		if (source.typeOfUnit === UnitType.meter) {
+			// How many conversions have this conversion's source so are conversions from a meter.
 			const srcCount = getConversionCount(source, conversionDetails);
+			// How many meters use this conversion, i.e., have the source as its unit.
 			const relatedMeters = Object.values(meterDataById).filter(meter => meter.unitId === source.id);
+
 			if (srcCount === 1 && relatedMeters.length !== 0) {
 				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
 				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
 				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
+					msg += `  "${meter.name}"\n`;
 				});
 				cancel = true;
 			} else if (relatedMeters.length !== 0) {
 				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
 				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
+					msg += `  "${meter.name}"\n`;
 				});
 				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
 			} else if (srcCount === 1) {
@@ -164,7 +168,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			//  }
 		}
 
-		// Unit-to-unit orphan check ---
+		// Unit-to-unit orphan check
 		if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
 			const destConversions = conversionDetails.filter(conversion =>
 				(conversion.destinationId === dest.id) ||
@@ -177,7 +181,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 			if (remainingDestConversions.length === 0) {
 				msg += `${translate('conversion.delete.unit.orphan')} "${dest.name}".\n`;
-				cancel = true;
 			}
 		}
 
@@ -198,39 +201,52 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				if (orphanedGroups.length > 0) {
 					msg = translate('conversion.delete.group.orphan') + ':\n';
 					orphanedGroups.forEach(group => {
-						msg += `• ${group.groupName}\n`;
+						msg += `"${group.groupName}"\n`;
 					});
 					cancel = true;
 				} else {
 					// Group meters by lostUnits
 					const meterLossMap = new Map<string, string[]>();
 					result.affectedMeters.forEach(meter => {
-						if (!meter.lostUnits || meter.lostUnits.length === 0) return;
+						if (!meter.lostUnits || meter.lostUnits.length === 0){
+							return;
+						}
 						const key = JSON.stringify([...meter.lostUnits].sort());
-						if (!meterLossMap.has(key)) meterLossMap.set(key, []);
+						if (!meterLossMap.has(key)){
+							meterLossMap.set(key, []);
+						}
 						meterLossMap.get(key)!.push(meter.meterName);
 					});
 					meterLossMap.forEach((meterNames, lostUnitsKey) => {
 						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
-						msg += '• ' + meterNames.join(', \n') + ' ';
+						// TODO: CSS For breaks in paragraph
+						msg += translate('conversion.delete.meter.affected') + ':\n';
+						msg += meterNames.map(name => `"${name}"`).join(', \n') + ' ';
+						msg += '\n';
 						msg += translate('conversion.delete.lost.units') + ': ';
-						msg += lostUnits.map((id: number) => unitDataById[id]?.name || id).join(', ') + '\n';
+						msg += lostUnits.map((id: number) => `"${unitDataById[id]?.name || id}"`).join(', ') + '\n';
 					});
 
 					// Group non-orphaned groups by lostUnits
 					const groupLossMap = new Map<string, string[]>();
 					const nonOrphanedGroups = result.affectedGroups?.filter(group => !group.orphaned) || [];
 					nonOrphanedGroups.forEach(group => {
-						if (!group.lostUnits || group.lostUnits.length === 0) return;
+						if (!group.lostUnits || group.lostUnits.length === 0){
+							return;
+						}
 						const key = JSON.stringify([...group.lostUnits].sort());
-						if (!groupLossMap.has(key)) groupLossMap.set(key, []);
+						if (!groupLossMap.has(key)){
+							groupLossMap.set(key, []);
+						}
 						groupLossMap.get(key)!.push(group.groupName);
 					});
 					groupLossMap.forEach((groupNames, lostUnitsKey) => {
 						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
-						msg += '• ' + groupNames.join(', \n') + ' ';
+						msg += translate('conversion.delete.group.affected') + ':\n';
+						msg += groupNames.map(name => `"${name}"`).join(', \n') + ' ';
+						msg += '\n';
 						msg += translate('conversion.delete.lost.units') + ': ';
-						msg += lostUnits.map((id: number) => unitDataById[id]?.name || id).join(', ') + '\n';
+						msg += lostUnits.map((id: number) => `"${unitDataById[id]?.name || id}"`).join(', ') + '\n';
 					});
 				}
 			} catch (e) {
@@ -262,12 +278,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			}
 		}
 
-		msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
 
 		if (cancel) {
 			setDeleteConfirmationMessage(msg + '\n' + translate('conversion.delete.restricted'));
 			handleCancelModalOpen();
 		} else {
+			msg += translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?';
 			setDeleteConfirmationMessage(msg);
 			handleDeleteConfirmationModalOpen();
 		}
