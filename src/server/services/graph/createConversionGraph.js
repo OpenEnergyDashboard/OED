@@ -29,8 +29,16 @@ async function createConversionGraph(conn) {
 
 	return graph;
 }
-// Helper to build a graph from arrays (not from Database).
-// This is used in simulate-delete
+
+/**
+ * Creates a conversion graph from arrays of units and conversions.
+ * Each unit becomes a node, and each conversion becomes a directed edge.
+ * Bidirectional conversions are represented as two edges (in both directions).
+ *
+ * @param {Array<{id: number, name: string}>} units - Array of unit objects with `id` and `name`.
+ * @param {Array<{sourceId: number, destinationId: number, bidirectional?: boolean}>} conversions - Array of conversion objects, each with `sourceId`, `destinationId`, and optional `bidirectional` flag.
+ * @returns {Object} The constructed graph instance (from ngraph.graph).
+ */
 function createConversionGraphFromArray(units, conversions) {
 	const graph = createGraph();
 	for (const unit of units) {

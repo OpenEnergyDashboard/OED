@@ -23,7 +23,6 @@ export interface ConversionsState {
 export interface SimulateDeleteResult {
 	affectedMeters: SimulateDeleteAffectedMeter[];
 	affectedGroups: SimulateDeleteAffectedGroup[];
-	// affectedUnits: number[];
 }
 
 export interface SimulateDeleteAffectedMeter {

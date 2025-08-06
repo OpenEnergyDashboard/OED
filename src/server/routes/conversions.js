@@ -11,7 +11,7 @@ const Meter = require('../models/Meter');
 const Group = require('../models/Group');
 const Unit = require('../models/Unit');
 const { success, failure } = require('./response');
-const { getAllPaths, createConversionGraph, createConversionGraphFromArray } = require('../services/graph/createConversionGraph');
+const { createConversionGraph, createConversionGraphFromArray } = require('../services/graph/createConversionGraph');
 const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
@@ -245,12 +245,16 @@ router.post('/simulate-delete', async (req, res) => {
 		const currentCik = await createCikArray(currentGraph, conn);
 
 		// 5. Precompute compatible units for each meter (current and simulated)
-		const meterIdToUnits_current = {};
-		const meterIdToUnits_sim = {};
+		const meterIdToUnitsCurrent = {};
+		const meterIdToUnitsSim = {};
 		for (const meter of allMeters) {
-			if (meter.unitId == -99) continue;
-			meterIdToUnits_current[meter.id] = new Set(currentCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
-			meterIdToUnits_sim[meter.id] = new Set(simulatedCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
+			if (meter.unitId == -99){
+				meterIdToUnitsCurrent[meter.id] = new Set();
+				meterIdToUnitsSim[meter.id] = new Set();
+				continue;
+			}
+			meterIdToUnitsCurrent[meter.id] = new Set(currentCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
+			meterIdToUnitsSim[meter.id] = new Set(simulatedCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
 		}
 
 		// 6. Batch load all group-to-meter relationships
@@ -262,9 +266,8 @@ router.post('/simulate-delete', async (req, res) => {
 		// 7. For each meter, compare compatible units before/after
 		const affectedMeters = [];
 		for (const meter of allMeters) {
-			if (meter.unitId == -99) continue;
-			const before = meterIdToUnits_current[meter.id] || new Set();
-			const after = meterIdToUnits_sim[meter.id] || new Set();
+			const before = meterIdToUnitsCurrent[meter.id] || new Set();
+			const after = meterIdToUnitsSim[meter.id] || new Set();
 			const lostUnits = [...before].filter(u => !after.has(u));
 			if (lostUnits.length > 0) {
 				affectedMeters.push({
@@ -279,13 +282,14 @@ router.post('/simulate-delete', async (req, res) => {
 		const affectedGroups = [];
 		for (const group of allGroups) {
 			const meterIds = groupIdToMeterIds[group.id];
-			if (!meterIds || meterIds.length === 0) continue;
-
-			const intersectSets = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
-			const sets_current = meterIds.map(id => meterIdToUnits_current[id] || new Set());
-			const sets_sim = meterIds.map(id => meterIdToUnits_sim[id] || new Set());
-			const before = sets_current.length ? intersectSets(sets_current) : new Set();
-			const after = sets_sim.length ? intersectSets(sets_sim) : new Set();
+			if (!meterIds || meterIds.length === 0) {
+				continue;
+			}
+			const intersectSets = sets => sets.reduce((a, b) => a.intersection(b));
+			const setsCurrent = meterIds.map(id => meterIdToUnitsCurrent[id] || new Set());
+			const setsSim = meterIds.map(id => meterIdToUnitsSim[id] || new Set());
+			const before = setsCurrent.length ? intersectSets(setsCurrent) : new Set();
+			const after = setsSim.length ? intersectSets(setsSim) : new Set();
 
 			const lostUnits = [...before].filter(u => !after.has(u));
 			if (lostUnits.length > 0) {

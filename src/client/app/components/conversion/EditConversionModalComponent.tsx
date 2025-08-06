@@ -66,7 +66,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// 1. Store current state
 	const oldConversions = [...conversionDetails];
 	const [affectedMeters, setAffectedMeters] = useState<SimulateDeleteAffectedMeter[]>([]);
-
 	// Set existing conversion values
 	const values = { ...props.conversion };
 
@@ -224,11 +223,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 
 		// Only run simulation if the previous orphan check passed and it's unit-to-unit
-		if (
-			source.typeOfUnit === UnitType.unit &&
-			dest.typeOfUnit === UnitType.unit &&
-			!cancel
-		) {
+		if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit && !cancel) {
 			try {
 				const result = await simulateDeleteConversion({
 					sourceId: state.sourceId,
@@ -253,9 +248,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					// Group meters by lostUnits
 					const meterLossMap = new Map<string, string[]>();
 					result.affectedMeters.forEach(meter => {
-						if (!meter.lostUnits || meter.lostUnits.length === 0){
-							return;
-						}
 						const key = JSON.stringify([...meter.lostUnits].sort());
 						if (!meterLossMap.has(key)) {
 							meterLossMap.set(key, []);
@@ -285,9 +277,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					const groupLossMap = new Map<string, string[]>();
 					const nonOrphanedGroups = result.affectedGroups?.filter(group => !group.orphaned) || [];
 					nonOrphanedGroups.forEach(group => {
-						if (!group.lostUnits || group.lostUnits.length === 0){
-							return;
-						}
 						const key = JSON.stringify([...group.lostUnits].sort());
 						if (!groupLossMap.has(key)){
 							groupLossMap.set(key, []);
