@@ -55,7 +55,7 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 		properties: {
 			username: {
 				type: 'string',
-				minLength: 5,
+				minLength: 3,
 				maxLength: 254
 			},
 			password: {
