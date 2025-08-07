@@ -17,17 +17,16 @@ mocha.describe('Log Routes', () => {
        token = res.body.token;
    });
 
-   // Original status code tests
    mocha.describe('Basic API validation', () => {
-       mocha.it('should return 200 for valid message', async () => {
+       mocha.it('should return 200 for valid info message', async () => {
            const response = await chai.request(app)
                .post('/api/logs/info')
                .set('token', token)
-               .send({ message: 'Valid log message' });
+               .send({ message: 'Valid info message' });
            expect(response.status).to.equal(200);
        });
 
-       mocha.it('should return 400 for invalid message', async () => {
+       mocha.it('should return 400 for invalid info message', async () => {
            const response = await chai.request(app)
                .post('/api/logs/info')
                .set('token', token)
@@ -35,15 +34,15 @@ mocha.describe('Log Routes', () => {
            expect(response.status).to.equal(400);
        }); 
 
-       mocha.it('should return 200 for valid warning message', async () => {
+       mocha.it('should return 200 for valid warn message', async () => {
            const response = await chai.request(app)
                .post('/api/logs/warn')
                .set('token', token)
-               .send({ message: 'Valid warning message' });
+               .send({ message: 'Valid warn message' });
            expect(response.status).to.equal(200);
        });
 
-       mocha.it('should return 400 for invalid warning message', async () => {
+       mocha.it('should return 400 for invalid warn message', async () => {
            const response = await chai.request(app)
                .post('/api/logs/warn')
                .set('token', token)
