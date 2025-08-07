@@ -8,341 +8,352 @@ const { chai, mocha, expect, app, testUser } = require('../common');
 const moment = require('moment');
 
 mocha.describe('Log Routes', () => {
-   let token;
+    let token;
 
-   mocha.before(async () => {
-       // Login to get authentication token
-       const res = await chai.request(app).post('/api/login')
-           .send({ username: testUser.username, password: testUser.password });
-       token = res.body.token;
-   });
+    mocha.before(async () => {
+        // Login to get authentication token
+        const res = await chai.request(app).post('/api/login')
+            .send({ username: testUser.username, password: testUser.password });
+        token = res.body.token;
+    });
 
-   mocha.describe('Basic API validation', () => {
-       mocha.it('should return 200 for valid info message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: 'Valid info message' });
-           expect(response.status).to.equal(200);
-       });
+    mocha.describe('Basic API validation', () => {
+        mocha.it('should return 200 for valid info message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: 'Valid info message' });
+            expect(response.status).to.equal(200);
+        });
 
-       mocha.it('should return 400 for invalid info message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: '' }); // Invalid empty message
-           expect(response.status).to.equal(400);
-       }); 
+        mocha.it('should return 400 for invalid info message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: '' }); // Invalid empty message
+            expect(response.status).to.equal(400);
+        });
 
-       mocha.it('should return 200 for valid warn message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/warn')
-               .set('token', token)
-               .send({ message: 'Valid warn message' });
-           expect(response.status).to.equal(200);
-       });
+        mocha.it('should return 200 for valid warn message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/warn')
+                .set('token', token)
+                .send({ message: 'Valid warn message' });
+            expect(response.status).to.equal(200);
+        });
 
-       mocha.it('should return 400 for invalid warn message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/warn')
-               .set('token', token)
-               .send({ message: '' }); // Invalid empty message
-           expect(response.status).to.equal(400);
-       });
+        mocha.it('should return 400 for invalid warn message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/warn')
+                .set('token', token)
+                .send({ message: '' }); // Invalid empty message
+            expect(response.status).to.equal(400);
+        });
 
-       mocha.it('should return 200 for valid error message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/error')
-               .set('token', token)
-               .send({ message: 'Valid error message' });
-           expect(response.status).to.equal(200);
-       });
+        mocha.it('should return 200 for valid error message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/error')
+                .set('token', token)
+                .send({ message: 'Valid error message' });
+            expect(response.status).to.equal(200);
+        });
 
-       mocha.it('should return 400 for invalid error message', async () => {
-           const response = await chai.request(app)
-               .post('/api/logs/error')
-               .set('token', token)
-               .send({ message: '' }); // Invalid empty message
-           expect(response.status).to.equal(400);
-       });
+        mocha.it('should return 400 for invalid error message', async () => {
+            const response = await chai.request(app)
+                .post('/api/logs/error')
+                .set('token', token)
+                .send({ message: '' }); // Invalid empty message
+            expect(response.status).to.equal(400);
+        });
 
-       mocha.it('should return logs for valid date range and type', async () => {
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ timeInterval: '2023-01-01T00:00:00Z_2023-12-31T23:59:59Z', logTypes: 'INFO', logLimit: '10' });
-           expect(response.status).to.equal(200);
-           expect(response.body).to.be.an('array');
-       });
+        mocha.it('should return logs for valid date range and type', async () => {
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({ timeInterval: '2023-01-01T00:00:00Z_2023-12-31T23:59:59Z', logTypes: 'INFO', logLimit: '10' });
+            expect(response.status).to.equal(200);
+            expect(response.body).to.be.an('array');
+        });
 
-       mocha.it('should return 400 for invalid date range and type', async () => {
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ timeInterval: 'invalid', logTypes: 'INVALID', logLimit: 'invalid' });
-           expect(response.status).to.equal(400);
-       });
-   });
+        mocha.it('should return 400 for invalid date range and type', async () => {
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({ timeInterval: 'invalid', logTypes: 'INVALID', logLimit: 'invalid' });
+            expect(response.status).to.equal(400);
+        });
+    });
 
-   // Enhanced insert-and-verify tests
-   mocha.describe('Insert and verify log functionality', () => {
-       mocha.it('should insert INFO log and retrieve it correctly', async () => {
-           const testMessage = 'Test INFO message for retrieval';
-           
-           // Insert log via API
-           const insertResponse = await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: testMessage });
-           expect(insertResponse.status).to.equal(200);
+    // Enhanced insert-and-verify tests
+    mocha.describe('Insert and verify log functionality', () => {
+        mocha.it('should insert INFO log and retrieve it correctly', async () => {
+            const testMessage = 'Test INFO message for retrieval';
 
-           // Retrieve and verify the log appears in results
-           const retrieveResponse = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'INFO',
-                   logLimit: '100'
-               });
-           
-           expect(retrieveResponse.status).to.equal(200);
-           expect(retrieveResponse.body).to.be.an('array');
-           
-           // Find our test message in the results
-           const testLog = retrieveResponse.body.find(log => log.logMessage === testMessage);
-           expect(testLog).to.not.be.undefined;
-           expect(testLog.logType).to.equal('INFO');
-           expect(testLog.logMessage).to.equal(testMessage);
-       });
+            // Insert log via API
+            const insertResponse = await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: testMessage });
+            expect(insertResponse.status).to.equal(200);
 
-       mocha.it('should filter logs by type correctly', async () => {
-           const infoMessage = 'Test INFO for filtering';
-           const warnMessage = 'Test WARN for filtering';
-           const errorMessage = 'Test ERROR for filtering';
+            // Retrieve and verify the log appears in results
+            const retrieveResponse = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'INFO',
+                    logLimit: '100'
+                });
 
-           // Insert different types of logs
-           await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: infoMessage });
+            expect(retrieveResponse.status).to.equal(200);
+            expect(retrieveResponse.body).to.be.an('array');
 
-           await chai.request(app)
-               .post('/api/logs/warn')
-               .set('token', token)
-               .send({ message: warnMessage });
+            // Find our test message in the results
+            const testLog = retrieveResponse.body.find(log => log.logMessage === testMessage);
+            expect(testLog).to.not.be.undefined;
+            expect(testLog.logType).to.equal('INFO');
+            expect(testLog.logMessage).to.equal(testMessage);
+        });
 
-           await chai.request(app)
-               .post('/api/logs/error')
-               .set('token', token)
-               .send({ message: errorMessage });
+        mocha.it('should filter logs by type correctly', async () => {
+            const infoMessage = 'Test INFO for filtering';
+            const warnMessage = 'Test WARN for filtering';
+            const errorMessage = 'Test ERROR for filtering';
 
-           // Query for only INFO logs
-           const infoResponse = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'INFO',
-                   logLimit: '100'
-               });
+            // Insert different types of logs
+            await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: infoMessage });
 
-           expect(infoResponse.status).to.equal(200);
-           
-           // Should only contain INFO logs
-           const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
-           expect(testLog).to.not.be.undefined;
-           expect(testLog.logType).to.equal('INFO');
-           expect(testLog.logMessage).to.equal(infoMessage);
+            await chai.request(app)
+                .post('/api/logs/warn')
+                .set('token', token)
+                .send({ message: warnMessage });
 
-           // Verify no WARN or ERROR logs are returned
-           const nonInfoLogs = infoResponse.body.filter(log =>
-               log.logMessage === warnMessage || log.logMessage === errorMessage
-           );
-           expect(nonInfoLogs).to.have.lengthOf(0);
+            await chai.request(app)
+                .post('/api/logs/error')
+                .set('token', token)
+                .send({ message: errorMessage });
 
-           // Query for only WARN logs
-           const warnResponse = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'WARN',
-                   logLimit: '100'
-               });
+            // Query for only INFO logs
+            const infoResponse = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'INFO',
+                    logLimit: '100'
+                });
 
-           expect(warnResponse.status).to.equal(200);
-           
-           // Should only contain WARN logs
-           const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
-           expect(warnTestLog).to.not.be.undefined;
-           expect(warnTestLog.logType).to.equal('WARN');
-           expect(warnTestLog.logMessage).to.equal(warnMessage);
-           
-           // Verify no INFO or ERROR logs are returned
-           const nonWarnLogs = warnResponse.body.filter(log => 
-               log.logMessage === infoMessage || log.logMessage === errorMessage
-           );
-           expect(nonWarnLogs).to.have.lengthOf(0);
+            expect(infoResponse.status).to.equal(200);
 
-           // Query for only ERROR logs
-           const errorResponse = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'ERROR',
-                   logLimit: '100'
-               });
+            // Should only contain INFO logs
+            const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
+            expect(testLog).to.not.be.undefined;
+            expect(testLog.logType).to.equal('INFO');
+            expect(testLog.logMessage).to.equal(infoMessage);
 
-           expect(errorResponse.status).to.equal(200);
-           
-           // Should only contain ERROR logs
-           const errorTestLog = errorResponse.body.find(log => log.logMessage === errorMessage);
-           expect(errorTestLog).to.not.be.undefined;
-           expect(errorTestLog.logType).to.equal('ERROR');
-           expect(errorTestLog.logMessage).to.equal(errorMessage);
-           
-           // Verify no INFO or WARN logs are returned
-           const nonErrorLogs = errorResponse.body.filter(log => 
-               log.logMessage === infoMessage || log.logMessage === warnMessage
-           );
-           expect(nonErrorLogs).to.have.lengthOf(0);
+            // Verify no WARN or ERROR logs are returned
+            const nonInfoLogs = infoResponse.body.filter(log =>
+                log.logMessage === warnMessage || log.logMessage === errorMessage
+            );
+            expect(nonInfoLogs).to.have.lengthOf(0);
 
-       });
+            // Query for only WARN logs
+            const warnResponse = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'WARN',
+                    logLimit: '100'
+                });
 
-       mocha.it('should filter logs by multiple types', async () => {
-           const infoMessage = 'Test INFO multi-type';
-           const warnMessage = 'Test WARN multi-type';
-           const errorMessage = 'Test ERROR multi-type';
+            expect(warnResponse.status).to.equal(200);
 
-           // Insert different types of logs
-           await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: infoMessage });
+            // Should only contain WARN logs
+            const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
+            expect(warnTestLog).to.not.be.undefined;
+            expect(warnTestLog.logType).to.equal('WARN');
+            expect(warnTestLog.logMessage).to.equal(warnMessage);
 
-           await chai.request(app)
-               .post('/api/logs/warn')
-               .set('token', token)
-               .send({ message: warnMessage });
+            // Verify no INFO or ERROR logs are returned
+            const nonWarnLogs = warnResponse.body.filter(log =>
+                log.logMessage === infoMessage || log.logMessage === errorMessage
+            );
+            expect(nonWarnLogs).to.have.lengthOf(0);
 
-           await chai.request(app)
-               .post('/api/logs/error')
-               .set('token', token)
-               .send({ message: errorMessage });
+            // Query for only ERROR logs
+            const errorResponse = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'ERROR',
+                    logLimit: '100'
+                });
 
-           // Query for INFO and WARN logs
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'INFO,WARN',
-                   logLimit: '100'
-               });
+            expect(errorResponse.status).to.equal(200);
 
-           expect(response.status).to.equal(200);
-           
-           // Should contain INFO and WARN logs, but not ERROR
-           const infoLog = response.body.find(log => log.logMessage === infoMessage);
-           const warnLog = response.body.find(log => log.logMessage === warnMessage);
-           const errorLog = response.body.find(log => log.logMessage === errorMessage);
-           
-           expect(infoLog).to.not.be.undefined;
-           expect(infoLog.logType).to.equal('INFO');
-           expect(infoLog.logMessage).to.equal(infoMessage);
-           
-           expect(warnLog).to.not.be.undefined;
-           expect(warnLog.logType).to.equal('WARN');
-           expect(warnLog.logMessage).to.equal(warnMessage);
-           
-           expect(errorLog).to.be.undefined; // Should not be returned
-       });
+            // Should only contain ERROR logs
+            const errorTestLog = errorResponse.body.find(log => log.logMessage === errorMessage);
+            expect(errorTestLog).to.not.be.undefined;
+            expect(errorTestLog.logType).to.equal('ERROR');
+            expect(errorTestLog.logMessage).to.equal(errorMessage);
 
-       mocha.it('should respect log limit parameter', async () => {
-           const messagePrefix = 'Limit test message';
+            // Verify no INFO or WARN logs are returned
+            const nonErrorLogs = errorResponse.body.filter(log =>
+                log.logMessage === infoMessage || log.logMessage === warnMessage
+            );
+            expect(nonErrorLogs).to.have.lengthOf(0);
 
-           // Insert multiple logs
-           for (let i = 0; i < 5; i++) {
-               await chai.request(app)
-                   .post('/api/logs/info')
-                   .set('token', token)
-                   .send({ message: `${messagePrefix} ${i}` });
-           }
+        });
 
-           // Query with limit of 2
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().subtract(1, 'minute').toISOString(),
-                   logTypes: 'INFO',
-                   logLimit: '2'
-               });
+        mocha.it('should filter logs by multiple types', async () => {
+            const infoMessage = 'Test INFO multi-type';
+            const warnMessage = 'Test WARN multi-type';
+            const errorMessage = 'Test ERROR multi-type';
 
-           expect(response.status).to.equal(200);
-           expect(response.body).to.be.an('array');
-           
-           // Should not return more than the limit
-           expect(response.body.length).to.be.at.most(2);
-       });
+            // Insert different types of logs
+            await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: infoMessage });
 
-       mocha.it('should handle date range filtering', async () => {
-           const oldMessage = 'Old test message';
-           const recentMessage = 'Recent test message';
+            await chai.request(app)
+                .post('/api/logs/warn')
+                .set('token', token)
+                .send({ message: warnMessage });
 
-           // Insert a log
-           await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: oldMessage });
+            await chai.request(app)
+                .post('/api/logs/error')
+                .set('token', token)
+                .send({ message: errorMessage });
 
-           // Wait a moment, then insert another
-           await new Promise(resolve => setTimeout(resolve, 1000));
-           const cutoffTime = moment();
-           await new Promise(resolve => setTimeout(resolve, 1000));
+            // Query for INFO and WARN logs
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'INFO,WARN',
+                    logLimit: '100'
+                });
 
-           await chai.request(app)
-               .post('/api/logs/info')
-               .set('token', token)
-               .send({ message: recentMessage });
+            expect(response.status).to.equal(200);
 
-           // Query for logs after the cutoff time
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: cutoffTime.toISOString(),
-                   logTypes: 'INFO',
-                   logLimit: '100'
-               });
+            // Should contain INFO and WARN logs, but not ERROR
+            const infoLog = response.body.find(log => log.logMessage === infoMessage);
+            const warnLog = response.body.find(log => log.logMessage === warnMessage);
+            const errorLog = response.body.find(log => log.logMessage === errorMessage);
 
-           expect(response.status).to.equal(200);
-           
-           // Should only contain the recent message
-           const recentLog = response.body.find(log => log.logMessage === recentMessage);
-           const oldLog = response.body.find(log => log.logMessage === oldMessage);
-           
-           expect(recentLog).to.not.be.undefined;
-           expect(recentLog.logMessage).to.equal(recentMessage);
-           expect(oldLog).to.be.undefined; // Should not be returned due to date filter
-       });
+            expect(infoLog).to.not.be.undefined;
+            expect(infoLog.logType).to.equal('INFO');
+            expect(infoLog.logMessage).to.equal(infoMessage);
 
-       mocha.it('should return empty array when no logs match filters', async () => {
-           // Query for logs with a very specific type that doesn't exist
-           const response = await chai.request(app)
-               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
-               .set('token', token)
-               .query({ 
-                   timeInterval: moment().add(1, 'day').toISOString(), // Future date
-                   logTypes: 'INFO',
-                   logLimit: '100'
-               });
+            expect(warnLog).to.not.be.undefined;
+            expect(warnLog.logType).to.equal('WARN');
+            expect(warnLog.logMessage).to.equal(warnMessage);
 
-           expect(response.status).to.equal(200);
-           expect(response.body).to.be.an('array');
-           expect(response.body).to.have.lengthOf(0);
-       });
-   });
+            expect(errorLog).to.be.undefined; // Should not be returned
+        });
+
+        mocha.it('should respect log limit parameter', async () => {
+            const messagePrefix = 'Limit test message';
+
+            // Insert multiple logs
+            for (let i = 0; i < 5; i++) {
+                await chai.request(app)
+                    .post('/api/logs/info')
+                    .set('token', token)
+                    .send({ message: `${messagePrefix} ${i}` });
+            }
+
+            // Query with limit of 2
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    logTypes: 'INFO',
+                    logLimit: '2'
+                });
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.be.an('array');
+
+            // Should return exactly the limit
+            expect(response.body.length).to.equal(2);
+        });
+
+        mocha.it('should handle date range filtering', async () => {
+            const oldMessage = 'Old test message';
+            const recentMessage = 'Recent test message';
+
+            // Insert a log
+            await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: oldMessage });
+
+            // Wait a moment, then insert another
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const cutoffTime = moment();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: recentMessage });
+
+            // Query for logs after the cutoff time
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: cutoffTime.toISOString(),
+                    logTypes: 'INFO',
+                    logLimit: '100'
+                });
+
+            expect(response.status).to.equal(200);
+
+            // Should only contain the recent message
+            const recentLog = response.body.find(log => log.logMessage === recentMessage);
+            const oldLog = response.body.find(log => log.logMessage === oldMessage);
+
+            expect(recentLog).to.not.be.undefined;
+            expect(recentLog.logMessage).to.equal(recentMessage);
+            expect(oldLog).to.be.undefined; // Should not be returned due to date filter
+        });
+
+        mocha.it('should return empty array when no logs match filters', async () => {
+            // Insert some logs that should NOT be returned
+            await chai.request(app)
+                .post('/api/logs/info')
+                .set('token', token)
+                .send({ message: 'Info log that should not match' });
+
+            await chai.request(app)
+                .post('/api/logs/warn')
+                .set('token', token)
+                .send({ message: 'Warn log that should not match' });
+
+            // Query for logs with a future date - should exclude all existing logs
+            const response = await chai.request(app)
+                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+                .set('token', token)
+                .query({
+                    timeInterval: moment().add(1, 'day').toISOString(), // Future date
+                    logTypes: 'INFO',
+                    logLimit: '100'
+                });
+
+            expect(response.status).to.equal(200);
+            expect(response.body).to.be.an('array');
+            expect(response.body).to.have.lengthOf(0); // Should be empty despite logs existing
+        });
+    });
 });
