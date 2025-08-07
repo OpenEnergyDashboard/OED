@@ -422,7 +422,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// the deep meters of this group are properly updated.
 	}, [graphicUnitsState.possibleGraphicUnits, groupState.deepMeters, loggedInAsAdmin]);
 
-	// Checks if valid and if edit made.
+	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	// Reuses code from this file's handleSubmit()
 	useEffect(() => {
@@ -478,6 +478,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || !validGroup}
 				/>
 			)}
 			{/* This is for the modal for delete. */}

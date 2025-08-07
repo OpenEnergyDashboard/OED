@@ -350,7 +350,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	};
 
-	// Checks if valid and if edit made.
+	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
 		// Compare the local changes to the default values
@@ -393,6 +393,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
 				/>
 			)}
 			{/* Warning Modal */}

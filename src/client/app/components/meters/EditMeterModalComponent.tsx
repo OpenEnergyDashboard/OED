@@ -86,7 +86,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	useEffect(() => { setValidMeter(isValidMeter(localMeterEdits)); }, [localMeterEdits]);
 
-	// Checks if valid and if edit made.
+	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
 		// Compare the local changes to the default values
@@ -342,6 +342,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || !validMeter}
 				/>
 			)}
 			<Modal isOpen={props.show} toggle={handleToggle} size='lg'>

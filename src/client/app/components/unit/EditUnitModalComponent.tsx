@@ -378,6 +378,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
 				/>
 			)}
 			<ConfirmActionModalComponent
