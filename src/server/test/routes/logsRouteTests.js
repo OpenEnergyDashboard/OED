@@ -70,7 +70,7 @@ mocha.describe('Log Routes', () => {
            const response = await chai.request(app)
                .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                .set('token', token)
-               .query({ timeInterval: '2023-01-01T00:00:00Z', logTypes: 'INFO', logLimit: '10' });
+               .query({ timeInterval: '2023-01-01T00:00:00Z_2023-12-31T23:59:59Z', logTypes: 'INFO', logLimit: '10' });
            expect(response.status).to.equal(200);
            expect(response.body).to.be.an('array');
        });
@@ -148,14 +148,18 @@ mocha.describe('Log Routes', () => {
                });
 
            expect(infoResponse.status).to.equal(200);
-           const infoLogs = infoResponse.body.filter(log => 
-               log.logMessage === infoMessage || log.logMessage === warnMessage || log.logMessage === errorMessage
-           );
            
-           // Should only contain INFO log
-           expect(infoLogs).to.have.lengthOf(1);
-           expect(infoLogs[0].logType).to.equal('INFO');
-           expect(infoLogs[0].logMessage).to.equal(infoMessage);
+           // Should only contain INFO logs
+           const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
+           expect(testLog).to.not.be.undefined;
+           expect(testLog.logType).to.equal('INFO');
+           expect(testLog.logMessage).to.equal(infoMessage);
+
+           // Verify no WARN or ERROR logs are returned
+           const nonInfoLogs = infoResponse.body.filter(log =>
+               log.logMessage === warnMessage || log.logMessage === errorMessage
+           );
+           expect(nonInfoLogs).to.have.lengthOf(0);
 
            // Query for only WARN logs
            const warnResponse = await chai.request(app)
@@ -168,14 +172,43 @@ mocha.describe('Log Routes', () => {
                });
 
            expect(warnResponse.status).to.equal(200);
-           const warnLogs = warnResponse.body.filter(log => 
-               log.logMessage === infoMessage || log.logMessage === warnMessage || log.logMessage === errorMessage
-           );
            
-           // Should only contain WARN log
-           expect(warnLogs).to.have.lengthOf(1);
-           expect(warnLogs[0].logType).to.equal('WARN');
-           expect(warnLogs[0].logMessage).to.equal(warnMessage);
+           // Should only contain WARN logs
+           const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
+           expect(warnTestLog).to.not.be.undefined;
+           expect(warnTestLog.logType).to.equal('WARN');
+           expect(warnTestLog.logMessage).to.equal(warnMessage);
+           
+           // Verify no INFO or ERROR logs are returned
+           const nonWarnLogs = warnResponse.body.filter(log => 
+               log.logMessage === infoMessage || log.logMessage === errorMessage
+           );
+           expect(nonWarnLogs).to.have.lengthOf(0);
+
+           // Query for only ERROR logs
+           const errorResponse = await chai.request(app)
+               .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+               .set('token', token)
+               .query({ 
+                   timeInterval: moment().subtract(1, 'minute').toISOString(),
+                   logTypes: 'ERROR',
+                   logLimit: '100'
+               });
+
+           expect(errorResponse.status).to.equal(200);
+           
+           // Should only contain ERROR logs
+           const errorTestLog = errorResponse.body.find(log => log.logMessage === errorMessage);
+           expect(errorTestLog).to.not.be.undefined;
+           expect(errorTestLog.logType).to.equal('ERROR');
+           expect(errorTestLog.logMessage).to.equal(errorMessage);
+           
+           // Verify no INFO or WARN logs are returned
+           const nonErrorLogs = errorResponse.body.filter(log => 
+               log.logMessage === infoMessage || log.logMessage === warnMessage
+           );
+           expect(nonErrorLogs).to.have.lengthOf(0);
+
        });
 
        mocha.it('should filter logs by multiple types', async () => {
@@ -210,14 +243,21 @@ mocha.describe('Log Routes', () => {
                });
 
            expect(response.status).to.equal(200);
-           const testLogs = response.body.filter(log => 
-               log.logMessage === infoMessage || log.logMessage === warnMessage || log.logMessage === errorMessage
-           );
            
            // Should contain INFO and WARN logs, but not ERROR
-           expect(testLogs).to.have.lengthOf(2);
-           const logTypes = testLogs.map(log => log.logType).sort();
-           expect(logTypes).to.deep.equal(['INFO', 'WARN']);
+           const infoLog = response.body.find(log => log.logMessage === infoMessage);
+           const warnLog = response.body.find(log => log.logMessage === warnMessage);
+           const errorLog = response.body.find(log => log.logMessage === errorMessage);
+           
+           expect(infoLog).to.not.be.undefined;
+           expect(infoLog.logType).to.equal('INFO');
+           expect(infoLog.logMessage).to.equal(infoMessage);
+           
+           expect(warnLog).to.not.be.undefined;
+           expect(warnLog.logType).to.equal('WARN');
+           expect(warnLog.logMessage).to.equal(warnMessage);
+           
+           expect(errorLog).to.be.undefined; // Should not be returned
        });
 
        mocha.it('should respect log limit parameter', async () => {
@@ -279,13 +319,14 @@ mocha.describe('Log Routes', () => {
                });
 
            expect(response.status).to.equal(200);
-           const testLogs = response.body.filter(log => 
-               log.logMessage === oldMessage || log.logMessage === recentMessage
-           );
-
+           
            // Should only contain the recent message
-           expect(testLogs).to.have.lengthOf(1);
-           expect(testLogs[0].logMessage).to.equal(recentMessage);
+           const recentLog = response.body.find(log => log.logMessage === recentMessage);
+           const oldLog = response.body.find(log => log.logMessage === oldMessage);
+           
+           expect(recentLog).to.not.be.undefined;
+           expect(recentLog.logMessage).to.equal(recentMessage);
+           expect(oldLog).to.be.undefined; // Should not be returned due to date filter
        });
 
        mocha.it('should return empty array when no logs match filters', async () => {
