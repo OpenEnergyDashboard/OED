@@ -775,7 +775,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid}>
+					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

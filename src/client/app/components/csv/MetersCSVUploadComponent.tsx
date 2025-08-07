@@ -31,6 +31,9 @@ export default function MetersCSVUploadComponent() {
 	const [meterData, setMeterData] = React.useState<MetersCSVUploadPreferences>(MetersCSVUploadDefaults);
 	const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
 	const [isValidFileType, setIsValidFileType] = React.useState<boolean>(false);
+	// For the case of invalid file type is submitted and a unsaved warning
+	// is necessary.
+	const [invalidFileEntry, setInvalidFileEntry] = React.useState<boolean>(false);
 	// tracks if should show spinner (true while loading data, false otherwise)
 	const [showSpinner, setShowSpinner] = React.useState<boolean>(false);
 	const dispatch = useAppDispatch();
@@ -64,16 +67,21 @@ export default function MetersCSVUploadComponent() {
 		setSelectedFile(file);
 		if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
 			setIsValidFileType(true);
+			setInvalidFileEntry(false);
 		} else {
 			setIsValidFileType(false);
 			setSelectedFile(null);
 			showErrorNotification(translate('csv.file.error') + file.name);
+			// Since the invalid file will still be visible after clearing
+			// selectedFile, it should count as an editMade.
+			setInvalidFileEntry(true);
 		}
 	};
 
 	const handleClear = () => {
 		setMeterData(MetersCSVUploadDefaults);
 		setIsValidFileType(false);
+		setInvalidFileEntry(false);
 	};
 
 	const handleSubmit = async (e: React.MouseEvent<HTMLFormElement>) => {
@@ -89,6 +97,7 @@ export default function MetersCSVUploadComponent() {
 				showErrorNotification(message);
 			}
 		}
+		setInvalidFileEntry(false);
 	};
 
 	const spinContainerStyle = {
@@ -132,7 +141,7 @@ export default function MetersCSVUploadComponent() {
 		}
 	}, [blocker.state, hasUnsavedChanges]);
 
-	// Checks if valid and if edit made.
+	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
 		// Compare the local changes to the default values
@@ -140,12 +149,15 @@ export default function MetersCSVUploadComponent() {
 			meterData.gzip !== MetersCSVUploadDefaults.gzip
 			|| meterData.headerRow !== MetersCSVUploadDefaults.headerRow
 			|| meterData.meterIdentifier !== MetersCSVUploadDefaults.meterIdentifier
-			|| meterData.update !== MetersCSVUploadDefaults.update;
+			|| meterData.update !== MetersCSVUploadDefaults.update
+			// If any file is added, it will count as edit made.
+			|| selectedFile !== null
+			|| invalidFileEntry === true;
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
 		setHasUnsavedChanges(editMade);
-	}, [meterData]);
+	}, [meterData, selectedFile, invalidFileEntry]);
 
 	return (
 		<>

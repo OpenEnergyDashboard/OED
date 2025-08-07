@@ -307,20 +307,10 @@ export default function CreateGroupModalComponent() {
 		// Check children separately since lists.
 		const childMeterChanges = !isEqual(state.childMeters, defaultValues.childMeters);
 		const childGroupChanges = !isEqual(state.childGroups, defaultValues.childGroups);
-		const deepMeterChanges = !isEqual(state.deepMeters, defaultValues.deepMeters);
 		//Compare the local changes to the default values
 		const editMade =
 			state.id !== defaultValues.id
 			|| state.name !== defaultValues.name
-			// These three always return true, which causes the unsaved
-			// warning to always appear despite having no changes made.
-			// For now, these have been commented out, but need to be addressed
-			// later on.
-			// These problems exist as there are more than one state that needs
-			// to be accounted for.
-			//|| state.childMeters !== groupChildrenState.childMeters
-			//|| state.childGroups !== defaultValues.childGroups
-			//|| state.deepMeters !== defaultValues.deepMeters
 			|| state.gps !== defaultValues.gps
 			|| state.displayable !== defaultValues.displayable
 			|| state.note !== defaultValues.note
@@ -328,14 +318,13 @@ export default function CreateGroupModalComponent() {
 			|| state.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
 			|| state.areaUnit !== defaultValues.areaUnit
 			|| childMeterChanges
-			|| childGroupChanges
-			|| deepMeterChanges;
-		setCanSave(validChange && editMade);
+			|| childGroupChanges;
+		setCanSave(validChange && editMade && validGroup);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
 		setHasUnsavedChanges(editMade);
-	}, [state]);
+	}, [state, validGroup]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -577,7 +566,7 @@ export default function CreateGroupModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

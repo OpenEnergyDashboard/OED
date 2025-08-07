@@ -47,6 +47,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -126,6 +128,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
 		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade);
 	}, [localMeterEdits]);
 
 	/* End State */
@@ -866,7 +870,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges} disabled={!validMeter}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!validMeter || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

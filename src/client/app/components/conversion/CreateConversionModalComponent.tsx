@@ -178,12 +178,12 @@ export default function CreateConversionModalComponent() {
 			|| conversionState.slope !== defaultValues.slope
 			|| conversionState.intercept !== defaultValues.intercept
 			|| conversionState.note !== defaultValues.note;
-		setCanSave(validChange && editMade);
+		setCanSave(validChange && editMade && validConversion);
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
 		// If editMade is true, then hasUnsavedChanges will be set to true.
 		setHasUnsavedChanges(editMade);
-	}, [conversionState]);
+	}, [conversionState, validConversion]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -382,7 +382,7 @@ export default function CreateConversionModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validConversion} >
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion || !canSave} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
