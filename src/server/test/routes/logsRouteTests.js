@@ -101,7 +101,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'INFO',
                     logLimit: '100'
                 });
@@ -142,7 +142,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'INFO',
                     logLimit: '100'
                 });
@@ -166,7 +166,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'WARN',
                     logLimit: '100'
                 });
@@ -190,7 +190,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'ERROR',
                     logLimit: '100'
                 });
@@ -237,7 +237,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'INFO,WARN',
                     logLimit: '100'
                 });
@@ -276,7 +276,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().subtract(1, 'minute').toISOString(),
+                    timeInterval: `${moment().subtract(1, 'minute').toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'INFO',
                     logLimit: '2'
                 });
@@ -313,7 +313,7 @@ mocha.describe('Log Routes', () => {
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: cutoffTime.toISOString(),
+                    timeInterval: `${cutoffTime.toISOString()}_${moment().add(1, 'minute').toISOString()}`,
                     logTypes: 'INFO',
                     logLimit: '100'
                 });
@@ -341,12 +341,12 @@ mocha.describe('Log Routes', () => {
                 .set('token', token)
                 .send({ message: 'Warn log that should not match' });
 
-            // Query for logs with a future date - should exclude all existing logs
+            // Query for logs with a future date range - should exclude all existing logs
             const response = await chai.request(app)
                 .get('/api/logs/logsmsg/getLogsByDateRangeAndType')
                 .set('token', token)
                 .query({
-                    timeInterval: moment().add(1, 'day').toISOString(), // Future date
+                    timeInterval: `${moment().add(1, 'day').toISOString()}_${moment().add(2, 'days').toISOString()}`, // Future date range
                     logTypes: 'INFO',
                     logLimit: '100'
                 });
