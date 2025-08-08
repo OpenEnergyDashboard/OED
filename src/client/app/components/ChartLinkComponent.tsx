@@ -9,7 +9,7 @@ import { Button, ButtonGroup, Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
 import { selectChartLinkHideOptions, selectCurrentTime, setChartLinkOptionsVisibility, setCurrentTime } from '../redux/slices/appStateSlice';
-import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters, selectSliderRangeInterval } from '../redux/slices/graphSlice';
+import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
@@ -29,7 +29,6 @@ export default function ChartLinkComponent() {
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval)
 	const currentTime = useAppSelector(selectCurrentTime)
-	const range = useAppSelector(selectSliderRangeInterval)
 	
 	const ref = React.useRef<HTMLDivElement>(null);
 	const shouldShowcurrentTimeCheckbox = React.useMemo(() => {

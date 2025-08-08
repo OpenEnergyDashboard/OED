@@ -366,11 +366,11 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
-							case 'timeCreated':
+							case 'timeSpan':
+								const days = parseFloat(value)
 								const now = moment()
-								const timeCreated = current.timeCreated.getEndTimestamp()
-								const diffDays = now.diff(timeCreated,'days', true)
-								
+								const leftBound = now.clone().subtract(days, 'days')
+								current.rangeSliderInterval = new TimeInterval(leftBound,undefined)
 						}
 					});
 				}

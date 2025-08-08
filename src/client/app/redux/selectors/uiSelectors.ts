@@ -518,7 +518,10 @@ export const selectChartLink = createAppSelector(
 		}
 
 		if(currentTime){
-   		 linkText += `&timeCreated=${current.timeCreated.getEndTimestamp().format('YYYY-MM-DDTHH:00:00[Z]')}`;
+		const timeCreatedEnd = current.timeCreated.getEndTimestamp()
+		const sliderStart = current.rangeSliderInterval.getStartTimestamp()
+		const diffDays = timeCreatedEnd.diff(sliderStart,'days',true)
+   		 linkText += `&timeSpan=${diffDays.toFixed(2)}`;
 		}
 		
 		return linkText;
