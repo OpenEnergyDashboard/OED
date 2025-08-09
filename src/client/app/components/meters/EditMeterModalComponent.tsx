@@ -23,7 +23,7 @@ import { DisableChecksType, UnitRepresentType } from '../../types/redux/units';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString, NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
-import { showErrorNotification } from '../../utils/notifications';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -122,7 +122,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			// If the user input a value then gpsInput should be a string.
 			// null came from the DB and it is okay to just leave it - Not a string.
 			if (typeof gpsInput === 'string') {
-				if (isValidGPSInput(gpsInput)) {
+				const {validGps, message} = isValidGPSInput(gpsInput);
+				if (validGps) {
 					// Clearly gpsInput is a string but TS complains about the split so cast.
 					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
 					// It is valid and needs to be in this format for routing.
@@ -133,9 +134,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					// gpsInput must be of type string but TS does not think so so cast.
 				} else if ((gpsInput as string).length !== 0) {
 					// GPS not okay.
-					// TODO isValidGPSInput currently tops up an alert so not doing it here, may change
-					// so leaving code commented out.
-					// showErrorNotification(translate('input.gps.range') + state.gps + '.');
+					showErrorNotification(message);
 					inputOk = false;
 				}
 			}
@@ -173,7 +172,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 				// Submit new meter if checks where ok.
-				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews });
+				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
+					.unwrap()
+					.then(() => {
+						showSuccessNotification(translate('meter.successfully.edited.meter'));
+					})
+					.catch(err => {
+						showErrorNotification(
+							translate('meter.failed.to.edit.meter') + '"' + err.data + '"'
+						);
+					});
 			} else if (error_message) {
 				// Display an error message if there are dependent deep meters and checked.
 				// Undo the unit change.

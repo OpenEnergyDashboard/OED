@@ -1,32 +1,26 @@
-/*
- * This Source Code Form is subject to the terms of the Mozilla Public
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { connect } from 'react-redux';
-import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
-// import { useTranslate } from 'redux/componentHooks';
-// import * as React from 'react'; Convert from containers to components
-// import { useState } from 'react';
-// When this container gets converted to component,migrate to useTranslate() from componentHooks.ts
-import translate from '../utils/translate';
+import * as React from 'react';
 import Plot from 'react-plotly.js';
-// import { Icons } from 'plotly.js';
-import Locales from '../types/locales';
 import * as moment from 'moment';
-import { UnitRepresentType } from '../types/redux/units';
-import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
-import { selectUnitDataById } from '../redux/api/unitsApi';
-import { RootState } from '../store';
-import { selectGroupDataById } from '../redux/api/groupsApi';
-import { selectMeterDataById } from '../redux/api/metersApi';
+import { useAppSelector } from '../redux/reduxHooks';
 import {
 	selectAreaUnit, selectComparePeriod,
 	selectCompareTimeInterval, selectGraphAreaNormalization,
 	selectSelectedUnit
 } from '../redux/slices/graphSlice';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import Locales from '../types/locales';
+import { getComparePeriodLabels, getCompareChangeSummary, calculateCompareShift } from '../utils/calculateCompare';
+import { getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { UnitRepresentType } from '../types/redux/units';
+import { selectUnitDataById } from '../redux/api/unitsApi';
+import { selectMeterDataById } from '../redux/api/metersApi';
+import { selectGroupDataById } from '../redux/api/groupsApi';
+import { useTranslate } from '../redux/componentHooks';
 
 export interface CompareEntity {
 	id: number;
@@ -39,32 +33,24 @@ export interface CompareEntity {
 	prevTotalUsage?: number;
 }
 
-interface CompareChartContainerProps {
+interface CompareBarComponentProps {
 	entity: CompareEntity;
 }
 
-/**
- * Passes the current redux state of the of the chart container and it's props, and turns it into props for the React
- * component, which is what will be visible on the page. Makes it possible to access
- * your reducer state objects from within your React components.
- * @param state The redux state
- * @param ownProps Chart container props
- * @returns The props object
- */
-function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps): any {
-	const comparePeriod = selectComparePeriod(state);
-	const compareTimeInterval = selectCompareTimeInterval(state);
-	const datasets: any[] = [];
+const CompareBarComponent: React.FC<CompareBarComponentProps> = ({ entity }) => {
+	const comparePeriod = useAppSelector(selectComparePeriod);
+	const compareTimeInterval = useAppSelector(selectCompareTimeInterval);
 	const periodLabels = getComparePeriodLabels(comparePeriod);
-	// The unit label depends on the unit which is in selectUnit state.
-	// Also need to determine if raw.
-	const graphingUnit = selectSelectedUnit(state);
-	// This container is not called if there is no data of there are not units so this is safe.
-	const unitDataById = selectUnitDataById(state);
-	const meterDataById = selectMeterDataById(state);
-	const groupDataById = selectGroupDataById(state);
+
+	const datasets: any[] = [];
+	const graphingUnit = useAppSelector(selectSelectedUnit);
+	const unitDataById = useAppSelector(selectUnitDataById);
+	const meterDataById = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	const selectUnitState = unitDataById[graphingUnit];
-	const locale = selectSelectedLanguage(state);
+	const locale = useAppSelector(selectSelectedLanguage);
+
+	const translate = useTranslate();
 	let unitLabel: string = '';
 	// If graphingUnit is -99 then none selected and nothing to graph so label is empty.
 	// This will probably happen when the page is first loaded.
@@ -89,17 +75,16 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		}
 	}
 
-	/* TODO When I click this icon it crashes OED. The error relates to using a Hook (useState, I think)
-	outside a component. This does not use a component as the other graphics do as it is
-	a container. It either needs a modified solution or the component needs to be converted.
-	Only after the component has been converted uncomment the code below and in plotly config
+	// Unlike line, bar, etc., testing found that the only two buttons that can be shown
+	// (outside download plot and plotly info) is box select & lasso select. Neither is
+	// desired so this lists the default ones to remove (those two) but does not use state
+	// to change it dynamically.
+	// Note: Since this is a 2D graphic and the regular bar graphic has more buttons it is
+	// unclear why it only has these two buttons.
+	// This website was consulted: https://plotly.com/javascript/configuration-options/#remove-modebar-buttons
+	// on the expected buttons.
 	// Display Plotly Buttons Feature:
-	// The number of items in defaultButtons and advancedButtons must differ as discussed below */
-	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
-		'resetScale2d'];
-	/* const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
-	// Manage button states with useState
-	const [listOfButtons, setListOfButtons] = useState(defaultButtons); */
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d'];
 
 	// Get the time shift for this comparison as a moment duration
 	const compareShift = calculateCompareShift(comparePeriod);
@@ -142,20 +127,19 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 	};
 
 	// Compose the text to display to the user.
-	const entity = ownProps.entity;
 	const changeSummary = getCompareChangeSummary(entity.change, entity.identifier, periodLabels);
 
 	const barColor = 'rgba(218, 165, 32, 1)';
 
 	let previousPeriod = entity.prevUsage;
 	let currentPeriod = entity.currUsage;
-	const areaNormalization = selectGraphAreaNormalization(state);
+	const areaNormalization = useAppSelector(selectGraphAreaNormalization);
 	// Check if there is data to graph.
 	if (previousPeriod !== null && currentPeriod !== null) {
 		if (areaNormalization) {
 			const area = entity.isGroup ? groupDataById[entity.id].area : meterDataById[entity.id].area;
 			const areaUnit = entity.isGroup ? groupDataById[entity.id].areaUnit : meterDataById[entity.id].areaUnit;
-			const normalization = area * getAreaUnitConversion(areaUnit, selectAreaUnit(state));
+			const normalization = area * getAreaUnitConversion(areaUnit, useAppSelector(selectAreaUnit));
 			previousPeriod /= normalization;
 			currentPeriod /= normalization;
 		}
@@ -241,31 +225,18 @@ function mapStateToProps(state: RootState, ownProps: CompareChartContainerProps)
 		};
 	}
 
-	// Assign all the parameters required to create the Plotly object (data, layout, config) to the variable props, returned by mapStateToProps
-	// The Plotly toolbar is displayed if displayModeBar is set to true
-	const props: any = {
-		data: datasets,
-		layout,
-		config: {
-			displayModeBar: true,
-			modeBarButtonsToRemove: defaultButtons,
-			// TODO: Removes line above and uncomment below. Read above for more info
-			// modeBarButtonsToRemove: listOfButtons,
-			// modeBarButtonsToAdd: [{
-			// 	name: 'toggle-options',
-			// 	title: translate('toggle.options'),
-			// 	icon: Icons.pencil,
-			// 	click: function () {
-			// 		// # of items must differ so the length can tell which list of buttons is being set
-			// 		setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
-			// 	}
-			// }],
-			locale,
-			locales: Locales // makes locales available for use
-		}
-	};
-	props.config.locale = state.appState.selectedLanguage;
-	return props;
-}
+	return (
+		<Plot
+			data={datasets}
+			layout={layout}
+			config={{
+				displayModeBar: true,
+				modeBarButtonsToRemove: defaultButtons,
+				locale,
+				locales: Locales
+			}}
+		/>
+	);
+};
 
-export default connect(mapStateToProps)(Plot);
+export default CompareBarComponent;

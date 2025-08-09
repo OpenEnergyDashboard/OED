@@ -11,18 +11,26 @@ class TimeInterval {
 		// utc keeps the moments from changing timezone.
 		this.startTimestamp = startTimestamp && moment.utc(startTimestamp);
 		this.endTimestamp = endTimestamp && moment.utc(endTimestamp);
-		this.isBounded = (this.startTimestamp !== null) && (this.endTimestamp !== null);
+		this.isBounded = (this.startTimestamp !== undefined) && (this.endTimestamp !== undefined);
 	}
 
 	toString() {
-		if (this.isBounded) {
-			// Using '_' as a separator character since it doesn't appear in ISO dates
-			if (this.startTimestamp === undefined || this.endTimestamp === undefined) {
-				throw Error('startTimestamp or endTimestamp was undefined in a bounded TimeInterval');
+		let str = '';
+		if (this.startTimestamp === undefined && this.endTimestamp === undefined) {
+			str = 'all';
+		} else {
+			// If startTimestamp is defined, append it to the string.(Left bound)
+			if (this.startTimestamp !== undefined) {
+				str += this.startTimestamp.format();
 			}
-			return `${this.startTimestamp.format()}_${this.endTimestamp.format()}`;
+			// The middle separator is an underscore.
+			str += '_';
+			// If endTimestamp is defined, append it to the string.(Right bound)
+			if (this.endTimestamp !== undefined) {
+				str += this.endTimestamp.format();
+			}
 		}
-		return 'all';
+		return str;
 	}
 
 	equals(other) {
@@ -58,9 +66,9 @@ class TimeInterval {
 		 * THIS ends at +∞ OR not before OTHER
 		 */
 		return (
-			((this.startTimestamp === null) || (this.startTimestamp <= other.startTimestamp))
+			((this.startTimestamp === undefined) || (this.startTimestamp <= other.startTimestamp))
 			&&
-			((this.endTimestamp === null) || (this.endTimestamp >= other.endTimestamp))
+			((this.endTimestamp === undefined) || (this.endTimestamp >= other.endTimestamp))
 		);
 	}
 
@@ -84,13 +92,22 @@ class TimeInterval {
 	getIsBounded() {
 		return this.isBounded;
 	}
-
+	/**
+	 * Check if the time interval is half bounded, meaning it has either a start or an end timestamp, but not both or none.
+	 * @returns {boolean}
+	 */
+	getIsHalfBounded() {
+    return (
+        (this.startTimestamp !== undefined && this.endTimestamp === undefined) ||
+        (this.startTimestamp === undefined && this.endTimestamp !== undefined)
+    );
+}
 	/**
 	 * Creates a new unbounded time interval
 	 * @returns {TimeInterval}
 	 */
 	static unbounded() {
-		return new TimeInterval(null, null);
+		return new TimeInterval(undefined, undefined);
 	}
 
 	/**
@@ -102,8 +119,9 @@ class TimeInterval {
 		if (stringified === 'all') {
 			return TimeInterval.unbounded();
 		}
-		// Using '_' as a separator character since it doesn't appear in ISO dates
-		const [startTimestamp, endTimestamp] = stringified.split('_').map(timestamp => moment(timestamp));
+		const [start, end] = stringified.split('_');
+		const startTimestamp = start ? moment(start) : undefined;
+		const endTimestamp = end ? moment(end) : undefined;
 		return new TimeInterval(startTimestamp, endTimestamp);
 	}
 }

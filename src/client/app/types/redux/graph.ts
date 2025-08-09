@@ -71,6 +71,7 @@ export interface GraphState {
 	selectedGroups: number[];
 	selectedUnit: number;
 	selectedAreaUnit: AreaUnitType;
+	initialXAxisRange: TimeInterval;
 	rangeSliderInterval: TimeInterval;
 	duration: moment.Duration;
 	comparePeriod: ComparePeriod;

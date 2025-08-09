@@ -81,10 +81,16 @@ const app = express().use(generalLimiter);
 
 // This is limiting 3D-Graphic
 const threeDLimiter = rateLimit({
-	// TODO This was causing tests to fail for 3D rejection. This limit seems to be okay
-	// but we should find a better solution than upping values just for tests.
-	windowMs: 10 * 1000, // 10 seconds
-	limit: 15,
+	/* Rationale: Each hour/day returned by 3D will have 365 points if a full year.
+	When returned for each hour in the day that is 365 * 24 = 8760 (max possible). For line graphics,
+	OED limits the number of points to 1440. Thus, a 3D request is 8760 / 1440 = 6 times
+	more data in the worst case of 3D vs. line graphics. Since OED limits to 200 request
+	per 5 seconds in general (that includes line graphics), the limit for 3D will be
+	200 / 6 = 33. Note the limit used to be much less because the database work for 3D
+	could be high. This is now resolved so it is around the same time as line graphics.
+	It is unclear a lower limit is actually needed but done to be safe. */
+	windowMs: 5 * 1000, // 5 seconds
+	limit: 33,
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });

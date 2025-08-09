@@ -8,6 +8,7 @@ const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ function formatConversionForResponse(item) {
 /**
  * Route for getting all conversions.
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Conversion.getAll(conn);
@@ -33,7 +34,7 @@ router.get('/', async (req, res) => {
 /**
  * Route for POST, edit conversion.
  */
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
@@ -87,7 +88,7 @@ router.post('/edit', async (req, res) => {
 /**
  * Route for POST add conversion.
  */
-router.post('/addConversion', async (req, res) => {
+router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
@@ -148,7 +149,7 @@ router.post('/addConversion', async (req, res) => {
 /**
  * Route for POST, delete conversion.
  */
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, res) => {
 	// Only require a source and destination id
 	const validConversion = {
 		type: 'object',

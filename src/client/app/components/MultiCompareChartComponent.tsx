@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { UncontrolledAlert } from 'reactstrap';
-import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
+import CompareBarComponent, { CompareEntity } from './CompareBarComponent';
 import { selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSortingOrder } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
@@ -111,7 +111,7 @@ export default function MultiCompareChartComponent() {
 						issues, this TS error is being suppressed for now.
 						eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						@ts-ignore */}
-						<CompareChartContainer
+						<CompareBarComponent
 							key={compareEntity.id + compareEntity.name}
 							entity={compareEntity}
 						/>
@@ -131,13 +131,16 @@ export default function MultiCompareChartComponent() {
  *
  * @param currentPeriodUsage The current usage in the compare period
  * @param usedToThisPointLastTimePeriod The previous usage in the compare period
- * @returns The fraction change in usage where negative means less usage
+ * @returns The fraction change in usage where negative means less usage, or NaN if either is 0
  */
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number): number {
+	// Assuming the usage is 0, then nothing to compare
+	// we do a !usedToThisPointLastTimePeriod check to avoid Null and Undefined values, which are falsy values not catched by an equal 0 check and isNaN
+	if (!usedToThisPointLastTimePeriod || !currentPeriodUsage || isNaN(usedToThisPointLastTimePeriod) || isNaN(currentPeriodUsage)) {
+		return NaN;
+	}
 	return -1 + (currentPeriodUsage / usedToThisPointLastTimePeriod);
 }
-
-
 
 /**
  * @param ids An array of items being compared that contain but are more than the id

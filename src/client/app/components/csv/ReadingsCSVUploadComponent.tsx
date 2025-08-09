@@ -22,6 +22,7 @@ import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
 import SpinnerComponent from '../SpinnerComponent';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the CSV Readings page
@@ -180,8 +181,7 @@ export default function ReadingsCSVUploadComponent() {
 	};
 
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		tooltipReadings: 'help.csv.readings'
 	};
 

@@ -10,14 +10,17 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartToRender, graphSlice, selectWidthDays, selectComparePeriod } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
 import { ComparePeriod } from '../utils/calculateCompare';
-import translate from '../utils/translate';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle } from '../styles/modalStyle';
+import { divTopBottomPadding } from '../styles/modalStyle';
+import { useTranslate } from '../redux/componentHooks';
 
 /**
  * @returns Interval controls for the bar, map, and compare pages
  */
 export default function IntervalControlsComponent() {
 	const dispatch = useAppDispatch();
+	const translate = useTranslate();
 	const chartType = useAppSelector(selectChartToRender);
 
 	// The min/max days allowed for user selection
@@ -170,13 +173,3 @@ export default function IntervalControlsComponent() {
 		</div>
 	);
 }
-
-const divTopBottomPadding: React.CSSProperties = {
-	paddingTop: '0px',
-	paddingBottom: '15px'
-};
-
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};

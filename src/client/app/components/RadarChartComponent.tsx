@@ -4,7 +4,6 @@
 
 import { values } from 'lodash';
 import * as moment from 'moment';
-import { Layout } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
@@ -26,6 +25,7 @@ import getGraphColor from '../utils/getGraphColor';
 import { lineUnitLabel } from '../utils/graphics';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
+import {setHelpLayout} from '../utils/setLayout';
 
 
 // Display Plotly Buttons Feature
@@ -183,31 +183,13 @@ export default function RadarChartComponent() {
 		}
 	}
 
-	let layout: Partial<Layout>;
+	let layout = {};
 	// TODO See 3D code for functions that can be used for layout and notices.
 	if (datasets.length === 0) {
 		// There are no meters so tell user.
 		// Customize the layout of the plot
 		// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
-		layout = {
-			'xaxis': {
-				'visible': false
-			},
-			'yaxis': {
-				'visible': false
-			},
-			'annotations': [
-				{
-					'text': `${translate('select.meter.group')}`,
-					'xref': 'paper',
-					'yref': 'paper',
-					'showarrow': false,
-					'font': {
-						'size': 28
-					}
-				}
-			]
-		};
+		layout = setHelpLayout(translate('select.meter.group'), 28);
 	} else {
 		// Plotly scatterpolar plots have the unfortunate attribute that if a smaller number of plotting
 		// points is done first then that impacts the labeling of the polar coordinate where you can get
@@ -224,25 +206,7 @@ export default function RadarChartComponent() {
 			// There is no data so tell user - likely due to date range outside where readings.
 			// Remove plotting data even though none there is an empty r & theta that gives empty graphic.
 			datasets.splice(0, datasets.length);
-			layout = {
-				'xaxis': {
-					'visible': false
-				},
-				'yaxis': {
-					'visible': false
-				},
-				'annotations': [
-					{
-						'text': `${translate('radar.no.data')}`,
-						'xref': 'paper',
-						'yref': 'paper',
-						'showarrow': false,
-						'font': {
-							'size': 28
-						}
-					}
-				]
-			};
+			layout = setHelpLayout(translate('radar.no.data'),28);
 		} else {
 			// Check if all the values for the dates are compatible. Plotly does not like having different dates in different
 			// scatterpolar lines. Lots of attempts to get this to work failed so not going to allow since not that common.
@@ -259,25 +223,9 @@ export default function RadarChartComponent() {
 				// Remove plotting data.
 				datasets.splice(0, datasets.length);
 				// The lines are not compatible so tell user.
-				layout = {
-					'xaxis': {
-						'visible': false
-					},
-					'yaxis': {
-						'visible': false
-					},
-					'annotations': [
-						{
-							'text': `${translate('radar.lines.incompatible')}`,
-							'xref': 'paper',
-							'yref': 'paper',
-							'showarrow': false,
-							'font': {
-								'size': 28
-							}
-						}
-					]
-				};
+				//Change layout to use function from utils
+				//Then look at other chart components and do it similar way
+				layout = setHelpLayout(translate('radar.lines.incompatible'),28);
 			} else {
 				// Data available and okay so plot.
 				// Maximum number of ticks, represents 12 months. Too many is cluttered so this seems good value.

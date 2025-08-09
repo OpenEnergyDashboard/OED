@@ -7,13 +7,12 @@
 const express = require('express');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
+const { adminAuthMiddleware } = require('./authenticator');
 const LogMsg = require('../models/LogMsg');
 const { getConnection } = require('../db');
 const { TimeInterval } = require('../../common/TimeInterval');
 
 const router = express.Router();
-router.use(adminAuthenticator('log API'));
 
 const validLog = {
 	type: 'object',
@@ -24,7 +23,7 @@ const validLog = {
 			minLength: 1
 		}
 	}
-}
+};
 
 const validLogMsg = {
 	type: 'object',
@@ -47,7 +46,8 @@ const validLogMsg = {
 		},
 	}
 }
-router.post('/info', async (req, res) => {
+
+router.post('/info', adminAuthMiddleware('create info log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.info(req.body.message);
@@ -58,7 +58,7 @@ router.post('/info', async (req, res) => {
 	}
 });
 
-router.post('/warn', async (req, res) => {
+router.post('/warn', adminAuthMiddleware('create warn log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.warn(req.body.message);
@@ -69,7 +69,7 @@ router.post('/warn', async (req, res) => {
 	}
 });
 
-router.post('/error', async (req, res) => {
+router.post('/error', adminAuthMiddleware('create error log'), async (req, res) => {
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.error(req.body.message);
@@ -80,7 +80,7 @@ router.post('/error', async (req, res) => {
 	}
 });
 
-router.get('/logsmsg/getLogsByDateRangeAndType', async (req, res) => {
+router.get('/logsmsg/getLogsByDateRangeAndType', adminAuthMiddleware('view logs'), async (req, res) => {
 	const validationResult = validate(req.query, validLogMsg);
 	if (!validationResult.valid) {
 		log.error('invalid request to getLogsByDateRangeAndType');
@@ -92,10 +92,11 @@ router.get('/logsmsg/getLogsByDateRangeAndType', async (req, res) => {
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			const logTypes = req.query.logTypes.split(',');
 			const rows = await LogMsg.getLogsByDateRangeAndType(
-				timeInterval.startTimestamp, timeInterval.endTimestamp, logTypes, logLimit, conn);
+				timeInterval.startTimestamp, timeInterval.endTimestamp, logTypes, logLimit, conn
+			);
 			res.json(rows);
 		} catch (err) {
-			log.error(`Failed to fetch logs filter by date range and type: ${err}`);
+			log.error(`Failed to fetch logs filtered by date range and type: ${err}`);
 			res.sendStatus(500);
 		}
 	}

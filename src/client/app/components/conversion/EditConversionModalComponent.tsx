@@ -5,7 +5,7 @@ import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
@@ -55,13 +55,26 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
+		setState({...state, [e.target.name]: JSON.parse(e.target.value) });
 	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: Number(e.target.value) });
 	};
 	/* End State */
+
+	// Determines whether the selected source is of type meter
+	const isMeterSource = () => {
+		const source = unitDataById[state.sourceId];
+		return source?.typeOfUnit === UnitType.meter;
+	};
+
+	// Determine whether the selected source or destination is a suffix unit
+	const isSuffixUsed = () => {
+		const source = unitDataById[state.sourceId];
+		const dest = unitDataById[state.destinationId];
+		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
+	};
 
 	/**
 	 * Calculates the number of conversions that use a given unit as a source or destination (not both).
@@ -129,11 +142,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			// TODO The following code did what was originally in issue #905 but there were issues
 			// with the design and usage of suffix units. It is commented out for now and needs
 			// to be revisited when the design for suffix is better.
-		// } else if (source.typeOfUnit === UnitType.suffix) {
-		// 	const srcCount = getConversionCount(source, conversionDetails);
-		// 	if (srcCount === 1) {
-		// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
-		// 	}
+			// } else if (source.typeOfUnit === UnitType.suffix) {
+			// 	const srcCount = getConversionCount(source, conversionDetails);
+			// 	if (srcCount === 1) {
+			// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
+			// 	}
 		} else if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
 			const destConversions = conversionDetails.filter(conversion =>
 				(conversion.destinationId === dest.id) ||
@@ -233,13 +246,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		props.handleClose();
 		resetState();
 	};
+	/* Warning Modal State */
+	const [showWarningModal, setShowWarningModal] = useState(false);
+	const [warningMessage, setWarningMessage] = useState('');
 
-	// Save changes
-	// Currently using the old functionality which is to compare inherited prop values to state values
-	// If there is a difference between props and state, then a change was made
-	// Side note, we could probably just set a boolean when any input i
-	// Edit Conversion Validation: is not needed as no breaking edits can be made
-	const handleSaveChanges = () => {
+	const handleWarningConfirm = () => {
+		// Close the warning modal
+		setShowWarningModal(false);
+
+		// Proceed with saving changes
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
@@ -252,7 +267,45 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Only do work if there are changes
 		if (conversionHasChanges) {
 			// Save our changes
-			editConversion({ conversionData: state, shouldRedoCik });
+			editConversion({
+				conversionData: {
+					...state,
+					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
+		}
+	};
+	const handleWarningCancel = () => {
+		// Close the warning modal
+		setShowWarningModal(false);
+	};
+
+	// Save changes
+	// Currently using the old functionality which is to compare inherited prop values to state values
+	// If there is a difference between props and state, then a change was made
+	// Side note, we could probably just set a boolean when any input i
+	// Edit Conversion Validation: is not needed as no breaking edits can be made
+	const handleSaveChanges = () => {
+		// Check if slope and intercept are both 0
+		if (state.slope === 0 && state.intercept === 0) {
+			setWarningMessage(translate('conversion.slope.intercept.zero'));
+			setShowWarningModal(true);
+		} else {
+			// Close the modal first to avoid repeat clicks
+			props.handleClose();
+
+			// Need to redo Cik if slope, intercept, or bidirectional changes.
+			const shouldRedoCik = props.conversion.slope !== state.slope
+				|| props.conversion.intercept !== state.intercept
+				|| props.conversion.bidirectional !== state.bidirectional;
+			// Check for changes by comparing state to props
+			const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
+			// Only do work if there are changes
+			if (conversionHasChanges) {
+				// Save our changes
+				editConversion({
+					conversionData: {
+						...state,
+						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
+			}
 		}
 	};
 
@@ -263,6 +316,14 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	return (
 		<>
+			{/* Warning Modal */}
+			<ConfirmActionModalComponent
+				show={showWarningModal}
+				actionConfirmMessage={warningMessage}
+				handleClose={handleWarningCancel}
+				actionFunction={handleWarningConfirm}
+				actionConfirmText={translate('confirm.action')}
+				actionRejectText={translate('cancel')} />
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
@@ -327,11 +388,22 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								name='bidirectional'
 								type='select'
 								defaultValue={state.bidirectional.toString()}
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => handleBooleanChange(e)}
+								invalid={(isMeterSource() || isSuffixUsed()) && state.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
+							{isMeterSource() && state.bidirectional === true && (
+								<FormFeedback className='d-block'>
+									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
+								</FormFeedback>
+							)}
+							{isSuffixUsed() && state.bidirectional === true && (
+								<FormFeedback className='d-block'>
+									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
+								</FormFeedback>
+							)}
 						</FormGroup>
 						<Row xs='1' lg='2'>
 							<Col>

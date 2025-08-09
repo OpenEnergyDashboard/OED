@@ -10,8 +10,7 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { isTokenAuthorized } = require('../util/userRoles');
-const requiredAdmin = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
@@ -20,7 +19,6 @@ const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
 
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
@@ -103,7 +101,7 @@ function formatMeterForResponse(meter, hasFullAccess) {
 /**
  * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
 		const conn = getConnection();
 		let query;
@@ -125,7 +123,7 @@ router.get('/', async (req, res) => {
  * Prohibits access to meters that are not displayable if not logged in
  * @param {int} meter_id
  */
-router.get('/:meter_id', async (req, res) => {
+router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -257,7 +255,7 @@ function validateMeterParams(params) {
 	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
 }
 
-router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
@@ -321,7 +319,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 /**
  * Route for POST add meter.
  */
-router.post('/addMeter', async (req, res) => {
+router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);

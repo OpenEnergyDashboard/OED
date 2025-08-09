@@ -9,14 +9,12 @@ const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { log } = require('../log');
 const Point = require('../models/Point');
 const { failure, success } = require('./response');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
 
 /**
  * Given a meter or group, return id, name, displayable, gps, note, area.
@@ -49,7 +47,7 @@ function formatToOnlyNameID(item) {
 /**
  * GET info of all groups
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
@@ -66,7 +64,10 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.get('/idname', async (req, res) => {
+// TODO It is unclear if all these routes can be used by non-admins.
+// This should be checked an updated as needed.
+
+router.get('/idname', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
@@ -83,7 +84,7 @@ router.get('/idname', async (req, res) => {
  * @param int group_id
  * @returns {[int], [int]}  child meter IDs and child group IDs
  */
-router.get('/children/:group_id', async (req, res) => {
+router.get('/children/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const [meters, groups, deepMeters] = await Promise.all([
@@ -103,7 +104,7 @@ router.get('/children/:group_id', async (req, res) => {
  * only the IDs of the children.
  * @return {[int, [int], [int]]}  array where each entry has the group id, array of child meter IDs and array of child group IDs
  */
-router.get('/allChildren/', async (req, res) => {
+router.get('/allChildren/', optionalAuthMiddleware, async (req, res) => {
 	// There are not parameters so nothing to verify.
 	const conn = getConnection();
 	try {
@@ -114,7 +115,7 @@ router.get('/allChildren/', async (req, res) => {
 	}
 });
 
-router.get('/deep/groups/:group_id', async (req, res) => {
+router.get('/deep/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -142,7 +143,7 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 	}
 });
 
-router.get('/deep/meters/:group_id', async (req, res) => {
+router.get('/deep/meters/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -170,7 +171,7 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
-router.get('/parents/:group_id', async (req, res) => {
+router.get('/parents/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -198,7 +199,7 @@ router.get('/parents/:group_id', async (req, res) => {
 	}
 });
 
-router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
+router.post('/create', adminAuthMiddleware('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 10,
@@ -292,7 +293,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 	}
 });
 
-router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
+router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 10,
@@ -402,7 +403,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	}
 });
 
-router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,

@@ -141,7 +141,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		// If the user input a value then gpsInput should be a string.
 		// null came from the DB and it is okay to just leave it - Not a string.
 		if (typeof gpsInput === 'string') {
-			if (isValidGPSInput(gpsInput)) {
+			const { validGps, message } = isValidGPSInput(gpsInput);
+			if (validGps) {
 				const gpsValues = gpsInput.split(',').map(value => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
 				gps = {
@@ -150,9 +151,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				};
 			} else if (gpsInput.length !== 0) {
 				// GPS not okay. Only true if some input.
-				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
-				// so leaving code commented out.
-				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
+				showErrorNotification(message);
 				inputOk = false;
 			}
 		}

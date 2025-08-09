@@ -26,6 +26,8 @@ export default function MoreOptionsComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const isBounded = queryTimeInterval.getIsBounded();
+	const isHalfBounded = queryTimeInterval.getIsHalfBounded();
+	const isBoundedAnywhere = isBounded || isHalfBounded;
 	const [showModal, setShowModal] = useState(false);
 	const handleShow = () => setShowModal(true);
 	const handleClose = () => {
@@ -46,14 +48,14 @@ export default function MoreOptionsComponent() {
 						<ModalBody>
 							{/* More UI options for line graphic */}
 							{chartToRender == ChartTypes.line && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.line && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.line && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.line && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.line && <ErrorBarComponent />}
 							{chartToRender == ChartTypes.line && <ExportComponent />}
 							{chartToRender == ChartTypes.line && <ChartLinkComponent />}
 
 							{/* More UI options for bar graphic */}
-							{chartToRender == ChartTypes.bar && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.bar && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.bar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.bar && <ExportComponent />}
 							{chartToRender == ChartTypes.bar && <ChartLinkComponent />}
@@ -63,7 +65,7 @@ export default function MoreOptionsComponent() {
 							{chartToRender == ChartTypes.compare && <ChartLinkComponent />}
 
 							{/* More UI options for map graphic */}
-							{chartToRender == ChartTypes.map && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.map && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.map && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.map && <ChartLinkComponent />}
 
@@ -74,7 +76,7 @@ export default function MoreOptionsComponent() {
 
 							{/* More UI options for radar graphic */}
 							{chartToRender == ChartTypes.radar && <GraphicRateMenuComponent />}
-							{chartToRender == ChartTypes.radar && !isBounded && <DateRangeComponent />}
+							{chartToRender == ChartTypes.radar && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
 
