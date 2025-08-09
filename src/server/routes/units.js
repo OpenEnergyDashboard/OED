@@ -1,7 +1,6 @@
-// SHL: Not your doing but could the * be aligned (only one space before) as in other files?
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*This file implements to the api/units route */
 const express = require('express');
@@ -44,9 +43,6 @@ router.post('/edit', async (req, res) => {
 		type: 'object',
 		required: ['id', 'identifier'],
 		maxProperties: 13,
-// SHL: Some routes use the maxProperties test to make sure there are not extra ones. I think it would be good
-// to do that in these routes (all with params) and also create a test to see if an extra value is sent that it is rejected.
-// delete below does have this value.
 		properties: {
 			id: {
 				type: 'integer'
@@ -68,7 +64,7 @@ router.post('/edit', async (req, res) => {
 			},
 			secInRate: {
 				type: 'number',
-// SHL: No min as in add.
+				minimum: 1,
 			},
 			typeOfUnit: {
 				type: 'string',
@@ -131,7 +127,7 @@ router.post('/edit', async (req, res) => {
 			await unit.update(conn);
 		} catch (err) {
 			log.error('Failed to edit unit', err);
-           	failure(res, 500, 'Unable to edit unit ' + err.toString());
+        	failure(res, 500, 'Unable to edit unit ' + err.toString());
 		}
 		success(res, `Successfully edited unit`);
 	}
