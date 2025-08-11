@@ -16,7 +16,7 @@ const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
->>>>>>> 326292140 (This changes several items in routes:)
+const { simulateDeleteConversion } = require('../services/conversionSimulation');
 
 const router = express.Router();
 
@@ -207,7 +207,6 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 	}
 });
 router.post('/simulate-delete', async (req, res) => {
-	const conn = getConnection();
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId'],
@@ -223,86 +222,9 @@ router.post('/simulate-delete', async (req, res) => {
 		return;
 	}
 	try {
-		// 1. Load all data
-		const [allConversions, allMeters, allUnits, allGroups] = await Promise.all([
-			Conversion.getAll(conn),
-			Meter.getAll(conn),
-			Unit.getAll(conn),
-			Group.getAll(conn)
-		]);
-
-		// 2. Remove the conversion to be deleted
-		const newConversions = allConversions.filter(c =>
-			!(c.sourceId === req.body.sourceId && c.destinationId === req.body.destinationId)
-		);
-
-		// 3. Build simulated graph and Cik array
-		const simulatedGraph = createConversionGraphFromArray(allUnits, newConversions);
-		const simulatedCik = await createCikArray(simulatedGraph, conn);
-
-		// 4. Get the current Cik array
-		const currentGraph = await createConversionGraph(conn);
-		const currentCik = await createCikArray(currentGraph, conn);
-
-		// 5. Precompute compatible units for each meter (current and simulated)
-		const meterIdToUnitsCurrent = {};
-		const meterIdToUnitsSim = {};
-		for (const meter of allMeters) {
-			if (meter.unitId == -99){
-				meterIdToUnitsCurrent[meter.id] = new Set();
-				meterIdToUnitsSim[meter.id] = new Set();
-				continue;
-			}
-			meterIdToUnitsCurrent[meter.id] = new Set(currentCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
-			meterIdToUnitsSim[meter.id] = new Set(simulatedCik.filter(cik => cik.source === meter.unitId).map(cik => cik.destination));
-		}
-
-		// 6. Batch load all group-to-meter relationships
-		const groupIdToMeterIds = {};
-		await Promise.all(allGroups.map(async group => {
-			groupIdToMeterIds[group.id] = await Group.getDeepMetersByGroupID(group.id, conn);
-		}));
-
-		// 7. For each meter, compare compatible units before/after
-		const affectedMeters = [];
-		for (const meter of allMeters) {
-			const before = meterIdToUnitsCurrent[meter.id] || new Set();
-			const after = meterIdToUnitsSim[meter.id] || new Set();
-			const lostUnits = [...before].filter(u => !after.has(u));
-			if (lostUnits.length > 0) {
-				affectedMeters.push({
-					meterId: meter.id,
-					meterName: meter.name,
-					lostUnits
-				});
-			}
-		}
-
-		// 8. For each group, intersect the sets (using cached meter compatible units)
-		const affectedGroups = [];
-		for (const group of allGroups) {
-			const meterIds = groupIdToMeterIds[group.id];
-			if (!meterIds || meterIds.length === 0) {
-				continue;
-			}
-			const intersectSets = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
-			const setsCurrent = meterIds.map(id => meterIdToUnitsCurrent[id] || new Set());
-			const setsSim = meterIds.map(id => meterIdToUnitsSim[id] || new Set());
-			const before = setsCurrent.length ? intersectSets(setsCurrent) : new Set();
-			const after = setsSim.length ? intersectSets(setsSim) : new Set();
-
-			const lostUnits = [...before].filter(u => !after.has(u));
-			if (lostUnits.length > 0) {
-				affectedGroups.push({
-					groupId: group.id,
-					groupName: group.name,
-					lostUnits,
-					orphaned: after.size === 0
-				});
-			}
-		}
-
-		return res.json({ affectedMeters, affectedGroups });
+		const conn = getConnection();
+		const result = await simulateDeleteConversion(req.body, conn);
+		return res.json(result);
 	} catch (err) {
 		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
 		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
