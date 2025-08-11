@@ -137,7 +137,7 @@ mocha.describe('Log Routes', () => {
 				.set('token', token)
 				.send({ message: errorMessage });
 
-			// Query for only INFO logs
+			// // Query for only INFO logs
 			const infoResponse = await chai.request(app)
 				.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
 				.set('token', token)
@@ -147,19 +147,27 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(infoResponse.status).to.equal(200);
+			// expect(infoResponse.status).to.equal(200);
 
-			// Should only contain INFO logs
-			const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
-			expect(testLog).to.not.be.undefined;
+			// // Should only contain INFO logs
+			// const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
+			// expect(testLog).to.not.be.undefined;
+			// expect(testLog.logType).to.equal('INFO');
+			// expect(testLog.logMessage).to.equal(infoMessage);
+
+			// // Verify no WARN or ERROR logs are returned
+			// const nonInfoLogs = infoResponse.body.filter(log =>
+			// 	log.logMessage === warnMessage || log.logMessage === errorMessage
+			// );
+			// expect(nonInfoLogs).to.have.lengthOf(0);
+
+			expect(infoResponse.status).to.equal(200);
+			// Should only contain one INFO log
+			const infoBody = infoResponse.body;
+			expect(infoBody.length).to.equal(1);
+			const testLog = infoBody[0];
 			expect(testLog.logType).to.equal('INFO');
 			expect(testLog.logMessage).to.equal(infoMessage);
-
-			// Verify no WARN or ERROR logs are returned
-			const nonInfoLogs = infoResponse.body.filter(log =>
-				log.logMessage === warnMessage || log.logMessage === errorMessage
-			);
-			expect(nonInfoLogs).to.have.lengthOf(0);
 
 			// Query for only WARN logs
 			const warnResponse = await chai.request(app)
@@ -172,6 +180,9 @@ mocha.describe('Log Routes', () => {
 				});
 
 			expect(warnResponse.status).to.equal(200);
+
+			
+
 
 			// Should only contain WARN logs
 			const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
