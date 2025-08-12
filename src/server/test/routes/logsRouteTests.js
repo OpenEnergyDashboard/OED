@@ -30,7 +30,7 @@ mocha.describe('Log Routes', () => {
 			const response = await chai.request(app)
 				.post('/api/logs/info')
 				.set('token', token)
-				.send({ message: '' }); // Invalid empty message
+				.send({ message: '' }); 
 			expect(response.status).to.equal(400);
 		});
 
@@ -46,7 +46,7 @@ mocha.describe('Log Routes', () => {
 			const response = await chai.request(app)
 				.post('/api/logs/warn')
 				.set('token', token)
-				.send({ message: '' }); // Invalid empty message
+				.send({ message: '' });
 			expect(response.status).to.equal(400);
 		});
 
@@ -62,7 +62,7 @@ mocha.describe('Log Routes', () => {
 			const response = await chai.request(app)
 				.post('/api/logs/error')
 				.set('token', token)
-				.send({ message: '' }); // Invalid empty message
+				.send({ message: '' });
 			expect(response.status).to.equal(400);
 		});
 
@@ -137,7 +137,7 @@ mocha.describe('Log Routes', () => {
 				.set('token', token)
 				.send({ message: errorMessage });
 
-			// // Query for only INFO logs
+			// Query for only INFO logs
 			const infoResponse = await chai.request(app)
 				.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
 				.set('token', token)
@@ -146,20 +146,6 @@ mocha.describe('Log Routes', () => {
 					logTypes: 'INFO',
 					logLimit: '100'
 				});
-
-			// expect(infoResponse.status).to.equal(200);
-
-			// // Should only contain INFO logs
-			// const testLog = infoResponse.body.find(log => log.logMessage === infoMessage);
-			// expect(testLog).to.not.be.undefined;
-			// expect(testLog.logType).to.equal('INFO');
-			// expect(testLog.logMessage).to.equal(infoMessage);
-
-			// // Verify no WARN or ERROR logs are returned
-			// const nonInfoLogs = infoResponse.body.filter(log =>
-			// 	log.logMessage === warnMessage || log.logMessage === errorMessage
-			// );
-			// expect(nonInfoLogs).to.have.lengthOf(0);
 
 			expect(infoResponse.status).to.equal(200);
 			// Should only contain one INFO log
@@ -180,9 +166,6 @@ mocha.describe('Log Routes', () => {
 				});
 
 			expect(warnResponse.status).to.equal(200);
-
-			
-
 
 			// Should only contain WARN logs
 			const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
@@ -268,7 +251,8 @@ mocha.describe('Log Routes', () => {
 			expect(warnLog.logType).to.equal('WARN');
 			expect(warnLog.logMessage).to.equal(warnMessage);
 
-			expect(errorLog).to.be.undefined; // Should not be returned
+			// Should not be returned
+			expect(errorLog).to.be.undefined; 
 		});
 
 		mocha.it('should respect log limit parameter', async () => {
@@ -337,7 +321,8 @@ mocha.describe('Log Routes', () => {
 
 			expect(recentLog).to.not.be.undefined;
 			expect(recentLog.logMessage).to.equal(recentMessage);
-			expect(oldLog).to.be.undefined; // Should not be returned due to date filter
+			// Should not be returned due to date filter
+			expect(oldLog).to.be.undefined; 
 		});
 
 		mocha.it('should return empty array when no logs match filters', async () => {
@@ -357,14 +342,15 @@ mocha.describe('Log Routes', () => {
 				.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
 				.set('token', token)
 				.query({
-					timeInterval: `${moment().add(1, 'day').toISOString()}_${moment().add(2, 'days').toISOString()}`, // Future date range
+					timeInterval: `${moment().add(1, 'day').toISOString()}_${moment().add(2, 'days').toISOString()}`,
 					logTypes: 'INFO',
 					logLimit: '100'
 				});
 
 			expect(response.status).to.equal(200);
 			expect(response.body).to.be.an('array');
-			expect(response.body).to.have.lengthOf(0); // Should be empty despite logs existing
+			// Should be empty despite logs existing
+			expect(response.body).to.have.lengthOf(0);
 		});
 	});
 });
