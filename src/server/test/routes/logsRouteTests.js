@@ -151,9 +151,9 @@ mocha.describe('Log Routes', () => {
 			// Should only contain one INFO log
 			const infoBody = infoResponse.body;
 			expect(infoBody.length).to.equal(1);
-			const testLog = infoBody[0];
-			expect(testLog.logType).to.equal('INFO');
-			expect(testLog.logMessage).to.equal(infoMessage);
+			const testInfoLog = infoBody[0];
+			expect(testInfoLog.logType).to.equal('INFO');
+			expect(testInfoLog.logMessage).to.equal(infoMessage);
 
 			// Query for only WARN logs
 			const warnResponse = await chai.request(app)
@@ -166,18 +166,12 @@ mocha.describe('Log Routes', () => {
 				});
 
 			expect(warnResponse.status).to.equal(200);
-
-			// Should only contain WARN logs
-			const warnTestLog = warnResponse.body.find(log => log.logMessage === warnMessage);
-			expect(warnTestLog).to.not.be.undefined;
-			expect(warnTestLog.logType).to.equal('WARN');
-			expect(warnTestLog.logMessage).to.equal(warnMessage);
-
-			// Verify no INFO or ERROR logs are returned
-			const nonWarnLogs = warnResponse.body.filter(log =>
-				log.logMessage === infoMessage || log.logMessage === errorMessage
-			);
-			expect(nonWarnLogs).to.have.lengthOf(0);
+			// Should only contain one WARN log
+			const warnBody = warnResponse.body;
+			expect(warnBody.length).to.equal(1);
+			const testWarnLog = warnBody[0];
+			expect(testWarnLog.logType).to.equal('WARN');
+			expect(testWarnLog.logMessage).to.equal(warnMessage);
 
 			// Query for only ERROR logs
 			const errorResponse = await chai.request(app)
@@ -190,19 +184,12 @@ mocha.describe('Log Routes', () => {
 				});
 
 			expect(errorResponse.status).to.equal(200);
-
-			// Should only contain ERROR logs
-			const errorTestLog = errorResponse.body.find(log => log.logMessage === errorMessage);
-			expect(errorTestLog).to.not.be.undefined;
-			expect(errorTestLog.logType).to.equal('ERROR');
-			expect(errorTestLog.logMessage).to.equal(errorMessage);
-
-			// Verify no INFO or WARN logs are returned
-			const nonErrorLogs = errorResponse.body.filter(log =>
-				log.logMessage === infoMessage || log.logMessage === warnMessage
-			);
-			expect(nonErrorLogs).to.have.lengthOf(0);
-
+			// Should only contain one ERROR log
+			const errorBody = errorResponse.body;
+			expect(errorBody.length).to.equal(1);
+			const testErrorLog = errorBody[0];
+			expect(testErrorLog.logType).to.equal('ERROR');
+			expect(testErrorLog.logMessage).to.equal(errorMessage);
 		});
 
 		mocha.it('should filter logs by multiple types', async () => {
