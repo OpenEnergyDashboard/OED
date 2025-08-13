@@ -268,17 +268,13 @@ router.post('/splitEarlier', adminAuthMiddleware('split earlier conversion segme
 	} else {
 		const conn = getConnection();
 		try {
-			const earlierSegment = new ConversionSegment(
-				req.body.sourceId, 
+			await ConversionSegment.splitEarlier(
+				req.body.sourceId,
 				req.body.destinationId,
 				req.body.newWeekPatternsId,
 				req.body.newSlope,
 				req.body.newIntercept,
-				momentToIsoOrInfinity(req.body.startTime),
-				momentToIsoOrInfinity(req.body.splitTime),
-				req.body.newNote
-			);
-			await earlierSegment.splitEarlier(
+				req.body.newNote,
 				momentToIsoOrInfinity(req.body.startTime),
 				momentToIsoOrInfinity(req.body.endTime),
 				momentToIsoOrInfinity(req.body.splitTime),
@@ -357,17 +353,13 @@ router.post('/splitLater', adminAuthMiddleware('split later conversion segment')
 	} else {
 		const conn = getConnection();
 		try {
-			const laterSegment = new ConversionSegment(
-				req.body.sourceId, 
+			await ConversionSegment.splitLater(
+				req.body.sourceId,
 				req.body.destinationId,
 				req.body.newWeekPatternsId,
 				req.body.newSlope,
 				req.body.newIntercept,
-				momentToIsoOrInfinity(req.body.splitTime),
-				momentToIsoOrInfinity(req.body.endTime),
-				req.body.newNote
-			);
-			await laterSegment.splitLater(
+				req.body.newNote,
 				momentToIsoOrInfinity(req.body.startTime),
 				momentToIsoOrInfinity(req.body.endTime),
 				momentToIsoOrInfinity(req.body.splitTime),

@@ -458,7 +458,7 @@ router.post('/deleteEarlier', adminAuthMiddleware('delete earlier day segment'),
 			startHour: {
 				type: 'number',
 				// if it was 0, there would be no previous segment
-				minimum: 1,		
+				minimum: 1,	
 				maximum: 23
 			},
 			endHour: {
@@ -519,7 +519,7 @@ router.post('/deleteLater', adminAuthMiddleware('delete later day segment'), asy
 				type: 'number',
 				minimum: 1,
 				// if it was 24, there would be no following segment
-				maximum: 23	
+				maximum: 23
 			}
 		}
 	};
