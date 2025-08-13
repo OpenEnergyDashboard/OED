@@ -256,24 +256,7 @@ class ConversionSegment {
 			// Update the current segment
 			await t.none(sqlFile('conversionSegment/update_conversion_segment.sql'), conversionSegment);
 		});
-}
-
-	/**
-	 * Deletes the conversion associated with the source, destination, start time, and end time from the database.
-	 * @param {*} sourceId The source meter's id.
-	 * @param {*} destinationId The destination meter's id.
-	 * @param {*} startTime The start time of the conversion segment.
-	 * @param {*} endTime The end time of the conversion segment.
-	 * @param {*} conn The connection to use.
-	 */
-	static async delete(sourceId, destinationId, startTime, endTime, conn) {
-		await conn.none(sqlFile('conversionSegment/delete_conversion_segment.sql'), {
-			sourceId: sourceId,
-			destinationId: destinationId,
-			startTime: startTime,
-			endTime: endTime
-		});
-	}
+	}	
 
 	/**
 	 * Delete conversion segment after updating the end time of the previous segment to the end time of the deleted segment.

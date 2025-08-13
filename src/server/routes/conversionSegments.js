@@ -467,62 +467,6 @@ router.post('/edit', adminAuthMiddleware('edit conversion segment'), async (req,
 });
 
 /**
- * POST delete conversion segment.
- * @param {int} sourceId The source meter's id.
- * @param {int} destinationId The destination meter's id.
- * @param {string} startTime The new start time of the conversion segment.
- * @param {string} endTime The new end time of the conversion segment.
- */
-router.post('/delete', adminAuthMiddleware('delete conversion segment'), async (req, res) => {
-	const validConversionSegment = {
-		type: 'object',
-		maxProperties: 4,
-		required: ['sourceId', 'destinationId', 'startTime', 'endTime'],
-		properties: {
-			sourceId: {
-				type: 'integer',
-				minimum: 0
-			},
-			destinationId: {
-				type: 'integer',
-				minimum: 0
-			},
-			startTime: {
-				type: 'string'
-			},
-			endTime: {
-				type: 'string'
-			}
-		}
-	};
-	// Ensure conversion segment object is valid
-	const validatorResult = validate(req.body, validConversionSegment);
-	if (!validatorResult.valid) {
-		const errMsg = `Got request to delete a conversion segment with invalid conversion segment data, error(s): ${validatorResult.errors}`
-		log.warn(errMsg);
-		failure(res, 400, errMsg);
-	} else {
-		const conn = getConnection();
-		try {
-			// Don't worry about checking if the conversion segment already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await ConversionSegment.delete(
-				req.body.sourceId, 
-				req.body.destinationId, 
-				momentToIsoOrInfinity(req.body.startTime),
-				momentToIsoOrInfinity(req.body.endTime),
-				conn
-			);
-			success(res, 'Successfully deleted conversion segment');
-		} catch (err) {
-			const errMsg = `Error while deleting conversion segment with error(s): ${err}`
-			log.error(errMsg);
-			failure(res, 500, errMsg);
-		}
-	}
-});
-
-/**
  * POST delete conversion segment after updating the end time of the previous segment to the end time of the deleted segment.
  * @param {int} sourceId The source meter's id.
  * @param {int} destinationId The destination meter's id.
