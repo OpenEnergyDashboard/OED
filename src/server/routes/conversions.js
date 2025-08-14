@@ -5,13 +5,8 @@
 const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const { createCikArray } = require('../services/graph/createConversionArrays');
 const Conversion = require('../models/Conversion');
-const Meter = require('../models/Meter');
-const Group = require('../models/Group');
-const Unit = require('../models/Unit');
 const { success, failure } = require('./response');
-const { createConversionGraph, createConversionGraphFromArray } = require('../services/graph/createConversionGraph');
 const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');

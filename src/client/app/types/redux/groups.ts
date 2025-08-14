@@ -47,3 +47,4 @@ export interface GroupsState {
 	byGroupID: GroupDataByID
 	selectedGroups: number[];
 }
+export type GroupPayloadForGroupAPI= Omit<GroupData, 'deepMeters'>;

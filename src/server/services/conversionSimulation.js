@@ -47,7 +47,7 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 
 	// 6. Batch load all group-to-meter relationships
 	const groupIdToMeterIds = {};
-    await Promise.all(allGroups.map(async group => {
+	await Promise.all(allGroups.map(async group => {
 		groupIdToMeterIds[group.id] = await Group.getDeepMetersByGroupID(group.id, conn);
 	}));
 
@@ -70,7 +70,7 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	const affectedGroups = [];
 	for (const group of allGroups) {
 		const meterIds = groupIdToMeterIds[group.id];
-        if (!meterIds || meterIds.length === 0) {
+		if (!meterIds || meterIds.length === 0) {
 			continue;
 		}
 		const intersectSets = sets => sets.reduce((a, b) => new Set([...a].filter(x => b.has(x))));
