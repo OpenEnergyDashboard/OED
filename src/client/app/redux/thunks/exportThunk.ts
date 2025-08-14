@@ -183,30 +183,16 @@ export const exportRawReadings = createAppThunk(
 				let unitIdentifier;
 				// A complication is that a unit associated with a meter is not the one the user
 				// sees when graphing. Now try to find the graphing unit.
-				// Try to find expected conversion from meter with slope = 1 and intercept = 0
+				// Find the first conversion for this meter unit
 				const conversion = find(conversionState, function (c: ConversionData) {
-					return c.sourceId === meterUnitId && c.slope === 1 && c.intercept === 0;
+					return c.sourceId === meterUnitId;
 				});
 				if (!conversion) {
-					// This is the unusual case where the conversion is not 1, 0.
-					// We find the first conversion and use it.
-					const anyConversion = find(conversionState, function (c: ConversionData) {
-						// Conversion has source that is the meter unit.
-						return c.sourceId === meterUnitId;
-					});
-					if (!anyConversion) {
-						// Could not find a conversion with this meter. This should never happen.
-						// Use the identifier of currentMeter unit and extra info.
-						unitIdentifier = unitsDataById[meterUnitId].identifier +
-							' (this is the meter unit which is unusual)';
-						// Nice if logged warning but no easy way so don't.
-					} else {
-						// Use this conversion but give slope/destination since changes values.
-						unitIdentifier = unitsDataById[anyConversion.destinationId].identifier +
-							` (but conversion from meter values of slope = ${anyConversion.slope} and intercept = ${anyConversion.intercept}`;
-					}
+					// Could not find a conversion with this meter. This should never happen.
+					unitIdentifier = unitsDataById[meterUnitId].identifier +
+        ' (this is the meter unit which is unusual)';
 				} else {
-					// This is the typical case where there was a conversion from the meter of 1, 0.
+					// Use the destination unit identifier for the conversion
 					unitIdentifier = unitsDataById[conversion.destinationId].identifier;
 				}
 

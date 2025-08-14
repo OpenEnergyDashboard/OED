@@ -200,10 +200,21 @@ async function insertConversions(conversionsToInsert, conn) {
 				}
 			})
 			if (ok) {
-				const sourceName = (await Unit.getByName(conversionData.sourceName, conn)).id;
-				const destinationName = (await Unit.getByName(conversionData.destinationName, conn)).id;
-				if (await Conversion.getBySourceDestination(sourceName, destinationName, conn) === null) {
-					await new Conversion(sourceName, destinationName, conversionData.bidirectional, conversionData.slope, conversionData.intercept, conversionData.note).insert(conn);
+				const sourceId = (await Unit.getByName(conversionData.sourceName, conn)).id;
+				const destinationId = (await Unit.getByName(conversionData.destinationName, conn)).id;
+				if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
+					await new Conversion(
+						sourceId, 
+						destinationId, 
+						conversionData.bidirectional,  
+						conversionData.note
+					).insert(
+						null,
+						conversionData.slope,
+						conversionData.intercept,
+						null,
+						conn
+					);
 				}
 			}
 		}

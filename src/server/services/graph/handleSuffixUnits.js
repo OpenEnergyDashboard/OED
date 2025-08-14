@@ -30,9 +30,18 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 	await newUnit.insert(conn);
 
 	// Create the conversion from the prefix unit to this new unit.
-	const newConversion = new Conversion(sourceId, newUnit.id, false, slope, intercept,
+	const newConversion = new Conversion(
+		sourceId,
+		newUnit.id,
+		false,
 		`${sourceUnit.name} → ${newUnit.name} (created by OED for unit with suffix)`);
-	await newConversion.insert(conn);
+	await newConversion.insert(
+		null,
+		slope,
+		intercept,
+		null,
+		conn
+	);
 
 	// Add the new node and conversion to the graph.
 	graph.addNode(newUnit.id, newUnit.name);
@@ -51,21 +60,36 @@ async function addNewUnitAndConversion(sourceId, destinationId, slope, intercept
 async function verifyConversion(expectedSlope, expectedIntercept, source, destination, graph, conn) {
 	const sourceId = source.id;
 	const destinationId = destination.id;
+
+	// check if the conversion exists
 	const currentConversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
+
 	if (!currentConversion) {
 		// The destination suffix unit exists but the conversion doesn't.
 		// Create a new conversion with desired values.
-		const newConversion = new Conversion(sourceId, destinationId, false, expectedSlope, expectedIntercept,
+		const newConversion = new Conversion(
+			sourceId,
+			destinationId,
+			false,
 			`${source.name} → ${destination.name} (created by OED for unit with suffix)`);
-		// Insert the new conversion to database and graph.
-		await newConversion.insert(conn);
+		// Insert the new conversion and segment to database
+		await newConversion.insert(
+			null,
+			expectedSlope,
+			expectedIntercept,
+			null,
+			conn
+		);
+		// Insert the new conversion to the graph
 		graph.addLink(sourceId, destinationId);
-	} else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
-		// While unlikely, the conversion changed so update
-		currentConversion.slope = expectedSlope;
-		currentConversion.intercept = expectedIntercept;
-		await currentConversion.update(conn);
-	}
+	} 
+// TODO: This check needs to be finalized soon to reflect the updated Conversion table
+// else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
+// 		// While unlikely, the conversion changed so update
+// 		currentConversion.slope = expectedSlope;
+// 		currentConversion.intercept = expectedIntercept;
+// 		await currentConversion.update(conn);
+// 	}
 }
 
 /**

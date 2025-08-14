@@ -22,4 +22,3 @@ const { redoCik } = require('../services/graph/redoCik');
 		process.exitCode = 1;
 	}
 }());
-

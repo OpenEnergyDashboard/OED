@@ -11,15 +11,15 @@ import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { clearGraphHistory } from '../redux/actions/extraActions';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
+import { useTranslate } from '../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectHelpUrl } from '../redux/slices/adminSlice';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
 import LoginComponent from './LoginComponent';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -64,6 +64,8 @@ export default function HeaderButtonsComponent() {
 		shouldCSVReadingsButtonDisabled: true,
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
+		shouldDaysButtonDisabled: true,
+		shouldWeeksButtonDisabled: true,
 		shouldLogMsgButtonDisabled: true,
 		shouldVisualUnitMapButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
@@ -102,6 +104,8 @@ export default function HeaderButtonsComponent() {
 			shouldCSVReadingsButtonDisabled: pathname === '/csvReadings',
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions',
+			shouldDaysButtonDisabled: pathname === '/days',
+			shouldWeeksButtonDisabled: pathname === '/weeks',
 			shouldLogMsgButtonDisabled: pathname === '/logmsg',
 			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
 		}));
@@ -223,6 +227,20 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/meters">
 								<FormattedMessage id='meters' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldDaysButtonDisabled}
+								tag={Link}
+								to="/days">
+								<FormattedMessage id='patterns.daily' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldWeeksButtonDisabled}
+								tag={Link}
+								to="/weeks">
+								<FormattedMessage id='patterns.weekly' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}

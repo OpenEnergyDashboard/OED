@@ -1,24 +1,40 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import * as moment from 'moment-timezone';
 import * as React from 'react';
 // Realize that * is already imported from react
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import TooltipHelpComponent from '../TooltipHelpComponent';
+import {
+	Button, Col, Container,
+	FormFeedback,
+	FormGroup,
+	Input, Label, Modal, ModalBody, ModalFooter, ModalHeader,
+	Pagination,
+	PaginationItem, PaginationLink,
+	Row, Table
+} from 'reactstrap';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { conversionSegmentsApi } from '../../redux/api/conversionSegmentsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
+import { weeksApi } from '../../redux/api/weeksApi';
+import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
-import { tooltipBaseStyle } from '../../styles/modalStyle';
+import { tooltipBaseStyle, modalSectionDividerStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { ConversionData } from '../../types/redux/conversions';
+import { ConversionSegmentData, UpdateConversionSegmentPayload } from '../../types/redux/conversionSegments';
 import { UnitData, UnitType } from '../../types/redux/units';
-import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import EditConversionSegmentModalComponent from './EditConversionSegmentModalComponent';
+import SplitConversionSegmentModalComponent from './SplitConversionSegmentModalComponent';
+import DeleteConversionSegmentModalComponent from './DeleteConversionSegmentModalComponent';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -39,6 +55,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
+	const getSegments = conversionSegmentsApi.useGetConversionSegmentByConversionQuery({
+		sourceId: props.conversion.sourceId,
+		destinationId: props.conversion.destinationId
+	});
+	const getWeeks = weeksApi.useGetWeeksQuery();
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
@@ -49,17 +70,36 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
+	// Tracks the active segment being edited, with original start/end times used to match and update the correct entry in the backend
+	const [editingSegment, setEditingSegment] = useState<UpdateConversionSegmentPayload | null>(null);
+	const [showSegmentNoteModal, setShowSegmentNoteModal] = React.useState(false);
+	const [showEditSegmentModal, setShowEditSegmentModal] = React.useState(false);
+	const [showSplitSegmentModal, setShowSplitSegmentModal] = React.useState(false);
+	const [showSegmentDeleteModal, setShowSegmentDeleteModal] = useState(false);
+	const [actionDirection, setActionDirection] = useState<'earlier' | 'later' | null>(null);
+	const [selectedSegment, setSelectedSegment] = useState<ConversionSegmentData | null>(null);
+	const [currentPage, setCurrentPage] = React.useState(1);
+	const [showAllSegments, setShowAllSegments] = React.useState(false);
+
+	// Extract data and utilities from query hooks for easier usage
+	const segments = getSegments.data ?? [];
+	const weekPatterns = getWeeks.data ?? [];
+
+	const PER_TABLE = 10;
+	const totalPages = Math.ceil(segments.length / PER_TABLE);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
 	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({...state, [e.target.name]: JSON.parse(e.target.value) });
+		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
 	};
 
-	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [e.target.name]: Number(e.target.value) });
+	// Opens a modal showing the full segment note
+	const handleNoteModal = (segment: ConversionSegmentData) => {
+		setSelectedSegment(segment);
+		setShowSegmentNoteModal(true);
 	};
 	/* End State */
 
@@ -250,7 +290,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const [showWarningModal, setShowWarningModal] = useState(false);
 	const [warningMessage, setWarningMessage] = useState('');
 
-	const handleWarningConfirm = () => {
+	const handleWarningConfirm = async () => {
 		// Close the warning modal
 		setShowWarningModal(false);
 
@@ -258,10 +298,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Close the modal first to avoid repeat clicks
 		props.handleClose();
 
-		// Need to redo Cik if slope, intercept, or bidirectional changes.
-		const shouldRedoCik = props.conversion.slope !== state.slope
-			|| props.conversion.intercept !== state.intercept
-			|| props.conversion.bidirectional !== state.bidirectional;
+		// Need to redo Cik if bidirectional changes.
+		const shouldRedoCik = props.conversion.bidirectional !== state.bidirectional;
 		// Check for changes by comparing state to props
 		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 		// Only do work if there are changes
@@ -270,7 +308,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			editConversion({
 				conversionData: {
 					...state,
-					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
+					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+				}, shouldRedoCik
+			});
 		}
 	};
 	const handleWarningCancel = () => {
@@ -284,28 +324,19 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Side note, we could probably just set a boolean when any input i
 	// Edit Conversion Validation: is not needed as no breaking edits can be made
 	const handleSaveChanges = () => {
-		// Check if slope and intercept are both 0
-		if (state.slope === 0 && state.intercept === 0) {
-			setWarningMessage(translate('conversion.slope.intercept.zero'));
-			setShowWarningModal(true);
-		} else {
-			// Close the modal first to avoid repeat clicks
-			props.handleClose();
-
-			// Need to redo Cik if slope, intercept, or bidirectional changes.
-			const shouldRedoCik = props.conversion.slope !== state.slope
-				|| props.conversion.intercept !== state.intercept
-				|| props.conversion.bidirectional !== state.bidirectional;
-			// Check for changes by comparing state to props
-			const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
-			// Only do work if there are changes
-			if (conversionHasChanges) {
-				// Save our changes
-				editConversion({
-					conversionData: {
-						...state,
-						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
-			}
+		// Need to redo Cik if bidirectional changes.
+		const shouldRedoCik = props.conversion.bidirectional !== state.bidirectional;
+		// Check for changes by comparing state to props
+		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
+		// Only do work if there are changes
+		if (conversionHasChanges) {
+			// Save our changes
+			editConversion({
+				conversionData: {
+					...state,
+					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+				}, shouldRedoCik
+			});
 		}
 	};
 
@@ -339,13 +370,65 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				actionConfirmText={deleteRejectText}
 				actionRejectText={deleteRejectText}
 				forceCancel={true} />
-			<Modal isOpen={props.show} toggle={props.handleClose}>
+			<Modal isOpen={showSegmentNoteModal} toggle={() => setShowSegmentNoteModal(false)} centered>
+				<ModalHeader toggle={() => setShowSegmentNoteModal(false)}>
+					{selectedSegment?.startTime} to {selectedSegment?.endTime}
+				</ModalHeader>
+				<ModalBody>
+					{selectedSegment?.note}
+				</ModalBody>
+			</Modal>
+			{/* Segment Edit Modal */}
+			{showEditSegmentModal &&
+				<EditConversionSegmentModalComponent
+					show={showEditSegmentModal}
+					segment={editingSegment!}
+					weekPatterns={weekPatterns}
+					segments={segments}
+					handleClose={() =>  {
+						setShowEditSegmentModal(false);
+						setEditingSegment(null);
+					}}
+				/>
+			}
+			{/* Segment Split Modal */}
+			{selectedSegment && actionDirection && (
+				<SplitConversionSegmentModalComponent
+					show={showSplitSegmentModal}
+					direction={actionDirection}
+					segment={selectedSegment}
+					weekPatterns={weekPatterns}
+					handleClose={() => {
+						setShowSplitSegmentModal(false);
+						setSelectedSegment(null);
+						setActionDirection(null);
+					}}
+				/>
+			)}
+			{/* Segment Delete Modal */}
+			{selectedSegment && actionDirection && (
+				<DeleteConversionSegmentModalComponent
+					show={showSegmentDeleteModal}
+					direction={actionDirection}
+					segment={selectedSegment}
+					message={warningMessage}
+					handleClose={() => {
+						setShowWarningModal(false);
+						setSelectedSegment(null);
+						setActionDirection(null);
+					}}
+				/>
+			)}
+			<Modal isOpen={props.show} toggle={props.handleClose} size='xl'>
 				<ModalHeader>
-					<FormattedMessage id="conversion.edit.conversion" />
+					<FormattedMessage id='conversion.overall' />
 					<TooltipHelpComponent page='conversions-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='conversions-edit' helpTextId={tooltipStyle.tooltipEditConversionView} />
 					</div>
+					<p style={{ marginBottom: '0', fontSize: '1rem', color: 'gray' }}>
+						<FormattedMessage id="conversion.overall.subtitle" />
+					</p>
 				</ModalHeader>
 				{/* when any of the conversion are changed call one of the functions. */}
 				<ModalBody>
@@ -396,41 +479,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							</Input>
 							{isMeterSource() && state.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
+									<FormattedMessage id='conversion.bidirectional.disabled.meter' />
 								</FormFeedback>
 							)}
 							{isSuffixUsed() && state.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
+									<FormattedMessage id='conversion.bidirectional.disabled.suffix' />
 								</FormFeedback>
 							)}
 						</FormGroup>
-						<Row xs='1' lg='2'>
-							<Col>
-								{/* Slope input */}
-								<FormGroup>
-									<Label for='slope'>{translate('conversion.slope')}</Label>
-									<Input
-										id='slope'
-										name='slope'
-										type='number'
-										value={state.slope}
-										onChange={e => handleNumberChange(e)} />
-								</FormGroup>
-							</Col>
-							<Col>
-								{/* Intercept input */}
-								<FormGroup>
-									<Label for='intercept'>{translate('conversion.intercept')}</Label>
-									<Input
-										id='intercept'
-										name='intercept'
-										type='number'
-										value={state.intercept}
-										onChange={e => handleNumberChange(e)} />
-								</FormGroup>
-							</Col>
-						</Row>
 						{/* Note input */}
 						<FormGroup>
 							<Label for='note'>{translate('note')}</Label>
@@ -442,19 +499,161 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								placeholder='Note'
 								onChange={e => handleStringChange(e)} />
 						</FormGroup>
+						<hr style={modalSectionDividerStyle} />
+						<h5 className='mt-4'><FormattedMessage id='conversion.segments.table' /></h5>
+						<p style={{ fontSize: '1rem', color: 'gray', fontWeight: '500' }}>
+							<FormattedMessage id="conversion.segments.table.subtitle" />
+						</p>
+						<Table striped bordered>
+							<thead>
+								<tr>
+									<th><FormattedMessage id='date.range' /></th>
+									<th><FormattedMessage id='slope' /></th>
+									<th><FormattedMessage id='intercept' /></th>
+									<th><FormattedMessage id='conversion.pattern' /></th>
+									<th><FormattedMessage id='conversion.note' /></th>
+									<th><FormattedMessage id='edit' /></th>
+									<th><FormattedMessage id='conversion.table.split.earlier' /></th>
+									<th><FormattedMessage id='conversion.table.split.later' /></th>
+									<th><FormattedMessage id='conversion.table.delete.earlier' /></th>
+									<th><FormattedMessage id='conversion.table.delete.later' /></th>
+								</tr>
+							</thead>
+							<tbody>
+								{(showAllSegments ? segments : segments.slice((currentPage - 1) * PER_TABLE, currentPage * PER_TABLE))
+									.map(segment => (
+										<tr key={`${segment.sourceId}-${segment.destinationId}-${segment.startTime}`}>
+											<td>{segment.startTime} to {segment.endTime}</td>
+											<td>{(segment.weekPatternsId ?? -99) === -99 ? segment.slope : ''}</td>
+											<td>{(segment.weekPatternsId ?? -99) === -99 ? segment.intercept : ''}</td>
+											<td>{weekPatterns.find(wp => wp.id === segment.weekPatternsId)?.name ?? 'No Pattern'}</td>
+											<td
+												style={{ cursor: 'pointer' }}
+												onClick={() => handleNoteModal(segment)}
+												aria-label={segment.note}
+											>
+												{(segment.note ?? '').length > 30 ? `${segment.note.slice(0, 30)} ...` : segment.note || ''}
+											</td>
+											<td>
+												<Button color='secondary' onClick={() => {
+													setEditingSegment({
+														...segment,
+														weekPatternsId: segment.weekPatternsId ?? -99,
+														startTime: (segment.startTime === '-infinity')
+															? segment.startTime
+															: moment.utc(segment.startTime).format('YYYY-MM-DD HH:mm:ss'),
+														endTime: (segment.endTime === 'infinity')
+															? segment.endTime
+															: moment.utc(segment.endTime).format('YYYY-MM-DD HH:mm:ss'),
+														originalStartTime: segment.startTime,
+														originalEndTime: segment.endTime
+													});
+													setShowEditSegmentModal(true);
+												}}>
+													<FormattedMessage id='edit' />
+												</Button>
+											</td>
+											<td><Button
+												color='secondary'
+												onClick={() => {
+													setActionDirection('earlier');
+													setSelectedSegment(segment);
+													setShowSplitSegmentModal(true);
+												}}
+											>
+												<FormattedMessage id='split.earlier' /></Button></td>
+											<td><Button
+												color='secondary'
+												onClick={() => {
+													setActionDirection('later');
+													setSelectedSegment(segment);
+													setShowSplitSegmentModal(true);
+												}}
+											>
+												<FormattedMessage id='split.later' /></Button></td>
+											<td>
+												{segments.length !== 1 && segment.startTime !== '-infinity' && (
+													<Button
+														color='danger'
+														size='sm'
+														onClick={() => {
+															setActionDirection('earlier');
+															setSelectedSegment(segment);
+															setShowSegmentDeleteModal(true);
+														}}
+													>
+														<FormattedMessage id='delete.earlier' />
+													</Button>
+												)}
+											</td>
+											<td>
+												{segments.length !== 1 && segment.endTime !== 'infinity' && (
+													<Button
+														color='danger'
+														size='sm'
+														onClick={() => {
+															setActionDirection('later');
+															setSelectedSegment(segment);
+															setShowSegmentDeleteModal(true);
+														}}
+													>
+														<FormattedMessage id='delete.later' />
+													</Button>
+												)}
+											</td>
+										</tr>
+									))}
+							</tbody>
+						</Table>
+						{!showAllSegments && segments.length !== 0 && (
+							<Pagination aria-label='Segments Pagination' style={{ justifyContent: 'center', margin: '1% auto' }}>
+								<>
+									<PaginationItem disabled={currentPage === 1}>
+										<PaginationLink first onClick={() => setCurrentPage(1)} />
+									</PaginationItem>
+									<PaginationItem disabled={currentPage === 1}>
+										<PaginationLink previous onClick={() => setCurrentPage(currentPage - 1)} />
+									</PaginationItem>
+
+									{Array.from({ length: totalPages }, (_, index) => (
+										<PaginationItem key={index + 1} active={currentPage === index + 1}>
+											<PaginationLink onClick={() => setCurrentPage(index + 1)}>
+												{index + 1}
+											</PaginationLink>
+										</PaginationItem>
+									))}
+									<PaginationItem disabled={currentPage === totalPages}>
+										<PaginationLink next onClick={() => setCurrentPage(currentPage + 1)} />
+									</PaginationItem>
+									<PaginationItem disabled={currentPage === totalPages}>
+										<PaginationLink last onClick={() => setCurrentPage(totalPages)} />
+									</PaginationItem>
+								</>
+							</Pagination>
+						)}
+						<div style={{ display: 'flex', justifyContent: 'center', marginTop: '1% auto' }}>
+							{/* Show all logs or in pages button */}
+							{segments.length > 0 &&
+								<Button color='primary' onClick={() => setShowAllSegments(!showAllSegments)}>
+									{!showAllSegments ? `${translate('show.all.segments')} (${segments.length})` : translate('show.in.pages')}
+								</Button>}
+						</div>
 					</Container>
 				</ModalBody>
 				<ModalFooter>
 					<Button color='danger' onClick={checkState}>
-						<FormattedMessage id="conversion.delete.conversion" />
+						<FormattedMessage id='conversion.overall.delete' />
 					</Button>
 					{/* Hides the modal */}
 					<Button color='secondary' onClick={handleClose}>
-						<FormattedMessage id="discard.changes" />
+						<FormattedMessage id='conversion.overall.discard' />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges}>
-						<FormattedMessage id="save.all" />
+					<Button
+						color='primary'
+						onClick={handleSaveChanges}
+						disabled={props.conversion.bidirectional === state.bidirectional && props.conversion.note === state.note}>
+						<FormattedMessage id='conversion.overall.save' />
 					</Button>
 				</ModalFooter>
 			</Modal>
