@@ -295,6 +295,7 @@ router.post('/splitLater', adminAuthMiddleware('split later day segment'), async
 
 /**
  * POST edit day segment.
+	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
  * @param {integer} dayId The id for the day.
  * @param {number} startHour The new hour the day segment starts.
  * @param {number} endHour The new hour the day segment ends.

@@ -376,6 +376,7 @@ router.post('/splitLater', adminAuthMiddleware('split later conversion segment')
 
 /**
  * POST edit conversion segment.
+ * Note: This function only supports updates where the new start and/or end time extends into the immediately adjacent segments.
  * @param {int} sourceId The source meter's id.
  * @param {int} destinationId The destination meter's id.
  * @param {int} weekPatternsId The id of the weekly pattern.

@@ -203,6 +203,7 @@ class DaySegment {
 	
 	/**
 	 * Returns a promise to update a daySegment in the database.
+	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
 	 * @param {*} originalStartHour The original start hour of the segment being updated
 	 * @param {*} originalEndHour The original end hour of the segment being updated
 	 * @param {*} conn the connection to use.

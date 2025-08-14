@@ -222,6 +222,7 @@ class ConversionSegment {
 
 	/**
 	 * Updates an existed conversion segment in the database.
+	 * Note: This function only supports updates where the new start and/or end time extends into the immediately adjacent segments.
 	 * @param {*} originalStartTime The original start time of the segment being updated.
 	 * @param {*} originalEndTime The original end time of the segment being updated.
 	 * @param {*} conn The connection to use.
