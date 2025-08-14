@@ -89,7 +89,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings', 'Units'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
 				dispatch(setRefresingReadings(true));
-				try {
+				try { 
 					await queryFulfilled;
 				} finally {
 					dispatch(setRefresingReadings(false));
