@@ -15,6 +15,7 @@ import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import { tooltipBaseStyle } from '../../../styles/modalStyle';
+import { SimpleUnsavedWarningComponent } from '../../SimpleUnsavedWarningComponent';
 
 /**
  * Defines the create user modal form
@@ -22,6 +23,24 @@ import { tooltipBaseStyle } from '../../../styles/modalStyle';
  */
 export default function CreateUserModal() {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleCloseModal(); // Proceed to close the modal
+		}
+	};
+
 	// create user form state and use the defaults
 	const [userDetails, setUserDetails] = useState(userDefaults);
 
@@ -102,6 +121,23 @@ export default function CreateUserModal() {
 			});
 	};
 
+	// Checks if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// Compare the local changes to the default values
+		const editMade =
+			userDetails.username !== userDefaults.username
+			|| userDetails.password !== userDefaults.password
+			|| userDetails.note !== userDefaults.note
+			|| userDetails.role !== userDefaults.role;
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade);
+	}, [userDetails]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Only an admin can create a meter.
@@ -110,10 +146,30 @@ export default function CreateUserModal() {
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleCloseModal();
+						resetForm();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit();
+						handleCloseModal();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || userDetails.disableDelete || !isFormValid()}
+				/>
+			)}
 			<Button color='secondary' onClick={handleShowModal}>
 				{translate('create.user')}
 			</Button>
-			<Modal isOpen={showModal} toggle={handleCloseModal} size='lg'>
+			<Modal isOpen={showModal} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					{translate('create.user')}
 					<TooltipHelpComponent page='users-create' />
@@ -233,7 +289,7 @@ export default function CreateUserModal() {
 					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color='primary' onClick={handleSubmit} disabled={!isFormValid()}>
+					<Button color='primary' onClick={handleSubmit} disabled={!isFormValid() || !canSave || userDetails.disableDelete}>
 						{translate('create.user')}
 					</Button>
 				</ModalFooter>

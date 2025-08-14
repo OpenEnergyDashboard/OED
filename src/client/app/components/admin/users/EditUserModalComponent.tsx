@@ -15,6 +15,7 @@ import ConfirmActionModalComponent from '../../ConfirmActionModalComponent';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
 import TooltipMarkerComponent from '../../TooltipMarkerComponent';
 import { tooltipBaseStyle } from '../../../styles/modalStyle';
+import { SimpleUnsavedWarningComponent } from '../../SimpleUnsavedWarningComponent';
 
 interface EditUserModalComponentProps {
 	show: boolean;
@@ -30,6 +31,28 @@ interface EditUserModalComponentProps {
  */
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
+	// When opening the edit page, the password is not filled in for security reasons.
+	// Therefore, this boolean value is used to keep track if there are any changes
+	// made to either the password field or the confirm password field.
+	const [passwordModified, setPasswordModified] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			props.handleClose(); // Proceed to close the modal
+		}
+	};
+
 	// get current logged in user
 	const currentLoggedInUser = useAppSelector(selectCurrentUserProfile) as User;
 
@@ -41,12 +64,31 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		disableDelete: props.user.username === currentLoggedInUser.username
 	});
 
+	// Store the details of the currently selected user
+	// This variable is used to reset back to the initial user details.
+	// Otherwise, the unsaved changes will remain when reopening the
+	// edit page.
+	const initialUserDetails = {
+		...userDefaults,
+		...props.user
+	};
+
 	// user apis
 	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 
 	// check if passwords match and if password length is at least 8
 	useEffect(() => {
+		// If any character is added in either field, it will count as password
+		// being modified. This will actively update the passwordModified
+		// boolean value when any change is made.
+		const passwordFieldChanged = userDetails.password.length > 0 || userDetails.confirmPassword.length > 0;
+		if (!passwordModified && passwordFieldChanged) {
+			setPasswordModified(true);
+		}
+		else {
+			setPasswordModified(false);
+		}
 		setUserDetails(prevDetails => ({
 			...prevDetails,
 			passwordMatch: (userDetails.password === userDetails.confirmPassword),
@@ -119,6 +161,16 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 	/* End Confirm Delete Modal */
 
+	// Reset the state to default values
+	// To be used for the discard changes button
+	// Different use case from CreateConversionModalComponent's resetState
+	// This allows us to reset our state to match the store in the event of an edit failure
+	// Failure to edit conversions will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
+	const resetState = () => {
+		setUserDetails(initialUserDetails);
+	};
+
+
 	// Modal show/close
 	const handleShowModal = () => {
 		props.handleShow();
@@ -160,6 +212,24 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			});
 	};
 
+	// Checks if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// Compare the local changes to the default values
+		const editMade =
+			props.user.id !== userDetails.id
+			|| props.user.username !== userDetails.username
+			|| props.user.note !== userDetails.note
+			|| props.user.role !== userDetails.role
+			|| passwordModified;
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade);
+	}, [userDetails]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipUsersView: 'help.admin.users'
@@ -167,6 +237,26 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleCloseModal();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+						handleCloseModal();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || userDetails.disableDelete || !isFormValid()}
+				/>
+			)}
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
@@ -174,7 +264,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				actionFunction={handleDeleteUser}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal isOpen={props.show} toggle={handleCloseModal} size='lg'>
+			<Modal isOpen={props.show} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					{translate('edit.user')}
 					<TooltipHelpComponent page='users-edit' />
@@ -298,7 +388,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid()}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid() || !canSave || userDetails.disableDelete}>
 						{translate('save.all')}
 					</Button>
 				</ModalFooter>
