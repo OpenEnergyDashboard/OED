@@ -25,5 +25,11 @@ module.exports = {
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/meter/alter_meter_disable_checks.sql'));
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/preferences/alter_preferences_table.sql'));
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/readings/create_function_get_3d_readings.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/days/create_day_patterns_table.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/weeks/create_week_patterns_table.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/conversionSegments/create_conversion_segments_table.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/daySegments/create_day_segments_table.sql'));
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/conversions/insert_slope_intercept_into_conversion_segments.sql'))
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/conversions/alter_conversions_table.sql'));
     }
 };

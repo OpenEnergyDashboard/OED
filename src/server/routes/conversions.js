@@ -14,7 +14,7 @@ const router = express.Router();
 
 function formatConversionForResponse(item) {
 	return {
-		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, slope: item.slope, intercept: item.intercept, note: item.note
+		sourceId: item.sourceId, destinationId: item.destinationId, bidirectional: item.bidirectional, note: item.note
 	};
 }
 
@@ -37,26 +37,20 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
+		required: ['sourceId', 'destinationId', 'bidirectional'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			bidirectional: {
 				type: 'boolean'
-			},
-			slope: {
-				type: 'float'
-			},
-			intercept: {
-				type: 'float'
 			},
 			note: {
 				oneOf: [
@@ -75,44 +69,58 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 		const conn = getConnection();
 		try {
 			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
-				req.body.slope, req.body.intercept, req.body.note);
+			req.body.note);
 			await updatedConversion.update(conn);
+			success(res);
 		} catch (err) {
 			log.error(`Error while editing conversion with error(s): ${err}`);
 			failure(res, 500, `Error while editing conversion with error(s): ${err}`);
 		}
-		success(res);
 	}
 });
 
 /**
  * Route for POST add conversion.
+ * The slope, intercept, week pattern id, and note are included to create a new conversion segment spanning from -infinity to infinity.
  */
 router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
+		maxProperties: 8,
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			bidirectional: {
 				type: 'boolean'
 			},
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			weekPatternsId: {
+				oneOf: [
+					{ type: 'integer' },
+					{ type: 'null' }
+				]
+			},
 			slope: {
-				type: 'float'
+				type: 'number'
 			},
 			intercept: {
-				type: 'float'
+				type: 'number'
 			},
-			note: {
+			segmentNote: {
 				oneOf: [
 					{ type: 'string' },
 					{ type: 'null' }
@@ -126,17 +134,22 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 		failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
+
 		try {
 			await conn.tx(async t => {
 				const newConversion = new Conversion(
 					req.body.sourceId,
 					req.body.destinationId,
 					req.body.bidirectional,
-					req.body.slope,
-					req.body.intercept,
 					req.body.note
 				);
-				await newConversion.insert(t);
+				await newConversion.insert(
+					req.body.weekPatternsId,
+					req.body.slope,
+					req.body.intercept,
+					req.body.segmentNote,
+					t
+				);
 			});
 			res.sendStatus(200);
 		} catch (err) {
@@ -156,12 +169,12 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			}
