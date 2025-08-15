@@ -163,7 +163,7 @@ export default function CreateUserModal() {
 						handleCloseModal();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
-					disabled={!canSave || userDetails.disableDelete || !isFormValid()}
+					disabled={!canSave || !isFormValid()}
 				/>
 			)}
 			<Button color='secondary' onClick={handleShowModal}>
@@ -289,7 +289,7 @@ export default function CreateUserModal() {
 					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color='primary' onClick={handleSubmit} disabled={!isFormValid() || !canSave || userDetails.disableDelete}>
+					<Button color='primary' onClick={handleSubmit} disabled={!isFormValid() || !canSave}>
 						{translate('create.user')}
 					</Button>
 				</ModalFooter>

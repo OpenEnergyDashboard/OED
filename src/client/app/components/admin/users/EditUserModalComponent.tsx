@@ -41,6 +41,10 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// Therefore, this boolean value is used to keep track if there are any changes
 	// made to either the password field or the confirm password field.
 	const [passwordModified, setPasswordModified] = useState(false);
+	// Compare the local changes made to the password fields.
+	// Determine if the password entered matches the password of the
+	// current user.
+	// const [samePassword, setSamePassword] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -83,7 +87,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// being modified. This will actively update the passwordModified
 		// boolean value when any change is made.
 		const passwordFieldChanged = userDetails.password.length > 0 || userDetails.confirmPassword.length > 0;
-		if (!passwordModified && passwordFieldChanged) {
+		if (passwordFieldChanged) {
 			setPasswordModified(true);
 		}
 		else {
@@ -103,6 +107,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			userDetails.passwordLength &&
 			userDetails.role &&
 			userDetails.username.length > 2;
+	// 		!samePassword;
 	};
 
 	// Handlers for each type of input change
@@ -215,12 +220,25 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
+		// Call isFormValid()
+		isFormValid();
+		// Compare the local changes made to the password fields.
+		// Determine if the password entered matches the password of the
+		// current user.
+		// if (initialUserDetails.password === userDetails.password
+		// && initialUserDetails.confirmPassword === userDetails.confirmPassword
+		// && passwordModified) {
+		// 	setSamePassword(true);
+		// }
+		// else {
+		// 	setSamePassword(false);
+		// }
 		// Compare the local changes to the default values
 		const editMade =
-			props.user.id !== userDetails.id
-			|| props.user.username !== userDetails.username
-			|| props.user.note !== userDetails.note
-			|| props.user.role !== userDetails.role
+			initialUserDetails.id !== userDetails.id
+			|| initialUserDetails.username !== userDetails.username
+			|| initialUserDetails.note !== userDetails.note
+			|| initialUserDetails.role !== userDetails.role
 			|| passwordModified;
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
@@ -228,7 +246,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setHasUnsavedChanges(editMade);
 		// If editsMade, then canSave is true (saving is enabled)
 		setCanSave(editMade);
-	}, [userDetails]);
+	}, [userDetails, passwordModified, initialUserDetails /*samePassword*/]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
@@ -254,7 +272,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						handleCloseModal();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
-					disabled={!canSave || userDetails.disableDelete || !isFormValid()}
+					disabled={!canSave || !isFormValid()}
 				/>
 			)}
 			<ConfirmActionModalComponent
@@ -388,7 +406,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 					<Button color='secondary' onClick={handleCloseModal}>
 						{translate('cancel')}
 					</Button>
-					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid() || !canSave || userDetails.disableDelete}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid() || !canSave}>
 						{translate('save.all')}
 					</Button>
 				</ModalFooter>
