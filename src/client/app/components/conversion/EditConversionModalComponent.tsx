@@ -229,7 +229,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 
 		// Only run simulation if the previous orphan check passed and it's unit-to-unit
-		if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit && !cancel) {
+		if (source.typeOfUnit !== UnitType.suffix && dest.typeOfUnit === UnitType.unit && !cancel) {
 			try {
 				const result = await simulateDeleteConversion({
 					sourceId: state.sourceId,
