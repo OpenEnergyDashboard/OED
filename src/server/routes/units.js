@@ -145,9 +145,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
-		additionalProperties: false, //Instead of using maxProperties, 
-		//I use additionalProperties here since add unit can have 12 legal 
-		//properties and 1 bad property, which add up to 13 but still bad.
+		additionalProperties: false, 
 		properties: {
 			// TODO Probably should not be passed
 			// id: { type: 'integer' },
@@ -169,8 +167,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			secInRate: {
 				type: 'integer',
 				minimum: 1
-			},
-			
+			},	
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
@@ -217,7 +214,6 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			{ message: "'maxVal' must be greater than or equal to 'minVal'" }
 		];
 	}
-
 
 	if (!validationResult.valid) {
 		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);

@@ -8,13 +8,7 @@ const { expect } = require('chai');
 const { chai, mocha, app, testDB } = require('../common');
 const Unit = require('../../models/Unit');
 const { insertUnits } = require('../../util/insertData');
-const { getUnitIdByName } = require('../../util/readingsUtils');
-const {
-	validateString,
-	validateInt,
-	validateBool,
-	validateMinMaxRelation
-} = require('../util/vaidationHelpers');
+const {validateString, validateInt, validateBool, validateMinMaxRelation, getToken} = require('../util/vaidationHelpers');
 
 const EDIT_UNIT = '/api/units/edit';
 
@@ -33,7 +27,6 @@ const basePayload = {
 	disableChecks: 'reject_bad'
 };
 
-
 const INSERT_UNIT = {
 	name: 'kWh',
 	identifier: '',
@@ -46,16 +39,12 @@ const INSERT_UNIT = {
 	note: 'OED created standard unit'
 };
 
-
 mocha.describe('Unit Routes - /edit Validation', () => {
-
-	// SHL: I put a lot of comment in unitParamsTest.js which probably is now obsolete but some apply here.
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
 
 		await insertUnits([INSERT_UNIT], true, conn);
 	});
-
 	mocha.it('should validate string fields', async () => {
 		await validateString({
 			field: 'name',
@@ -64,7 +53,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			minLength: 1,
 			maxLength: 50
 		});
-
 		await validateString({
 			field: 'identifier',
 			endpoint: EDIT_UNIT,
@@ -73,7 +61,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			maxLength: 50,
 			required: true
 		});
-
 		await validateString({
 			field: 'unitRepresent',
 			endpoint: EDIT_UNIT,
@@ -81,7 +68,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			enumValues: Object.values(Unit.unitRepresentType),
 			minLength: 1
 		});
-
 		await validateString({
 			field: 'typeOfUnit',
 			endpoint: EDIT_UNIT,
@@ -89,7 +75,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			enumValues: Object.values(Unit.unitType),
 			minLength: 1
 		});
-
 		await validateString({
 			field: 'suffix',
 			endpoint: EDIT_UNIT,
@@ -98,7 +83,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			maxLength: 50,
 			required: false
 		});
-
 		await validateString({
 			field: 'displayable',
 			endpoint: EDIT_UNIT,
@@ -106,7 +90,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			enumValues: Object.values(Unit.displayableType),
 			minLength: 1
 		});
-
 		await validateString({
 			field: 'disableChecks',
 			endpoint: EDIT_UNIT,
@@ -114,7 +97,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			enumValues: Object.values(Unit.disableChecksType),
 			minLength: 1
 		});
-
 		await validateString({
 			field: 'note',
 			endpoint: EDIT_UNIT,
@@ -122,7 +104,6 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			maxLength: 1000
 		});
 	});
-
 	mocha.it('should validate numeric and integer fields', async () => {
 		await validateInt({
 			field: 'secInRate',
@@ -130,25 +111,21 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			basePayload,
 			required: false
 		});
-
 		await validateInt({
 			field: 'minVal',
 			endpoint: EDIT_UNIT,
 			basePayload
 		});
-
 		await validateInt({
 			field: 'maxVal',
 			endpoint: EDIT_UNIT,
 			basePayload
 		});
-
 		await validateMinMaxRelation({
 			endpoint: EDIT_UNIT,
 			basePayload
 		});
 	});
-
 	mocha.it('should validate boolean fields', async () => {
 		await validateBool({
 			field: 'preferredDisplay',
@@ -156,17 +133,16 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			basePayload
 		});
 	});
-
 	mocha.it('should reject payloads with extra fields', async () => {
+		const token = await getToken();
 		const payloadWithExtra = {
 			...basePayload,
 			extra: 'not allowed'
 		};
-
 		const res = await chai.request(app)
 			.post(EDIT_UNIT)
+			.set('token', token)
 			.send(payloadWithExtra);
-
 		expect(res).to.have.status(400);
 	});
 });

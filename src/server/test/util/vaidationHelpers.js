@@ -6,9 +6,15 @@
 
 const { expect } = require('chai');
 const chaiHttp = require('chai-http');
-const { chai, app } = require('../common');
-
+const { chai, app, testDB, testUser } = require('../common');
 chai.use(chaiHttp);
+
+
+async function getToken() {
+	let res = await chai.request(app).post('/api/login').send({ username: testUser.username, password: testUser.password });
+	token = res.body.token;
+	return token;
+}
 
 /**
  * Sends a POST request to the specified API endpoint with a test payload,
@@ -21,15 +27,20 @@ chai.use(chaiHttp);
  * @param basePayload the base valid payload object to clone and modify
  * @param expectedStatus the expected HTTP status code (default 400 for validation errors)
  */
-async function testInvalidField({ field, invalidValue, endpoint, basePayload, expectedStatus = 400 }) {
-	const payload = { ...basePayload, [field]: invalidValue };
+ async function testInvalidField({ field, invalidValue, endpoint, basePayload }) {
+	const token = await getToken(); 
+	const payload = { ...basePayload };
 	if (invalidValue === undefined) {
-		delete payload[field]; // remove field to simulate required check
+		delete payload[field];
 	} else {
 		payload[field] = invalidValue;
-	}	
-	const res = await chai.request(app).post(endpoint).send(payload);
-  	expect(res).to.have.status(expectedStatus);
+	}
+	const res = await chai.request(app)
+		.post(endpoint)
+		.set('token', token) 
+		.send(payload);
+
+	expect(res).to.have.status(400);
 }
 
 /**
@@ -39,7 +50,7 @@ async function testInvalidField({ field, invalidValue, endpoint, basePayload, ex
  * @param basePayload a valid payload object to use as the base for testing
  */
 async function validateMinMaxRelation({ endpoint, basePayload }) {
-    // Create invalid payload where minVal > maxVal
+	const token = await getToken(); 
     const invalidPayload = {
         ...basePayload,
         minVal: (basePayload.minVal || 10) + 1,  
@@ -47,6 +58,7 @@ async function validateMinMaxRelation({ endpoint, basePayload }) {
     };
     const res = await chai.request(app)
         .post(endpoint)
+		.set('token', token) 
         .send(invalidPayload);
     
     expect(res).to.have.status(400);
@@ -69,8 +81,6 @@ async function validateString({ field, endpoint, basePayload, required = true, m
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
-// SHL: Would it be better to create a string one less than min as value similar to max?
-// Fixed
 	if (minLength > 0) {
 		await testInvalidField({ field, invalidValue: 'x'.repeat(minLength - 1), endpoint, basePayload });
 	}
@@ -94,11 +104,7 @@ async function validateString({ field, endpoint, basePayload, required = true, m
  * @param max the maximum allowed integer value (optional)
  */
 async function validateInt({ field, endpoint, basePayload, required = true, min = null, max = null }) {
-
-	// Should remove the field for actual missing
 	if (required) {
-// SHL: If I understand the code, the test is sending the field in the route with undefined.
-// This seems different than it being absent when required.
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
@@ -134,5 +140,6 @@ module.exports = {
 	validateString,
 	validateInt,
 	validateBool,
-	validateMinMaxRelation
+	validateMinMaxRelation,
+	getToken
 };
