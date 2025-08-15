@@ -28,7 +28,7 @@ import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent'
 export default function CreateConversionModalComponent() {
 	const translate = useTranslate();
 
-	// boolean that updates if any change is made to any meter modal
+	// boolean that updates if any change is made to any conversion modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If user can save
@@ -47,7 +47,8 @@ export default function CreateConversionModalComponent() {
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleClose();
 		}
 	};
 

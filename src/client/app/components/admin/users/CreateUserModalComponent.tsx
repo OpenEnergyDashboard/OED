@@ -24,7 +24,7 @@ import { SimpleUnsavedWarningComponent } from '../../SimpleUnsavedWarningCompone
 export default function CreateUserModal() {
 	const translate = useTranslate();
 
-	// boolean that updates if any change is made to any meter modal
+	// boolean that updates if any change is made to any user modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
@@ -37,7 +37,8 @@ export default function CreateUserModal() {
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleCloseModal(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleCloseModal();
 		}
 	};
 

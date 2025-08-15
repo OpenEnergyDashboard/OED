@@ -32,7 +32,7 @@ interface EditUserModalComponentProps {
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
 	const translate = useTranslate();
 
-	// boolean that updates if any change is made to any meter modal
+	// boolean that updates if any change is made to user meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
@@ -41,10 +41,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// Therefore, this boolean value is used to keep track if there are any changes
 	// made to either the password field or the confirm password field.
 	const [passwordModified, setPasswordModified] = useState(false);
-	// Compare the local changes made to the password fields.
-	// Determine if the password entered matches the password of the
-	// current user.
-	// const [samePassword, setSamePassword] = useState(false);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -53,7 +49,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			setShowUnsavedWarning(true);
 		}
 		else {
-			props.handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			props.handleClose();
 		}
 	};
 
@@ -87,12 +84,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// being modified. This will actively update the passwordModified
 		// boolean value when any change is made.
 		const passwordFieldChanged = userDetails.password.length > 0 || userDetails.confirmPassword.length > 0;
-		if (passwordFieldChanged) {
-			setPasswordModified(true);
-		}
-		else {
-			setPasswordModified(false);
-		}
+		setPasswordModified(passwordFieldChanged);
+
 		setUserDetails(prevDetails => ({
 			...prevDetails,
 			passwordMatch: (userDetails.password === userDetails.confirmPassword),
@@ -107,7 +100,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			userDetails.passwordLength &&
 			userDetails.role &&
 			userDetails.username.length > 2;
-	// 		!samePassword;
 	};
 
 	// Handlers for each type of input change
@@ -182,14 +174,14 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	const handleCloseModal = () => {
+		// Clear all unsaved changes
+		resetState();
 		resetPasswordFields();
 		props.handleClose();
 	};
 	// End Modal show/close
 
 	const handleSaveChanges = async () => {
-		// close modal
-		props.handleClose();
 		// set needed user details into a user and send to backend
 		const editedUser: User = {
 			id: userDetails.id, username: userDetails.username, role: userDetails.role,
@@ -220,23 +212,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// Checks if edit made.
 	// References the original implementation in EditUnitModalComponent.tsx
 	useEffect(() => {
-		// Call isFormValid()
-		isFormValid();
-		// Compare the local changes made to the password fields.
-		// Determine if the password entered matches the password of the
-		// current user.
-		// if (initialUserDetails.password === userDetails.password
-		// && initialUserDetails.confirmPassword === userDetails.confirmPassword
-		// && passwordModified) {
-		// 	setSamePassword(true);
-		// }
-		// else {
-		// 	setSamePassword(false);
-		// }
 		// Compare the local changes to the default values
 		const editMade =
-			initialUserDetails.id !== userDetails.id
-			|| initialUserDetails.username !== userDetails.username
+			initialUserDetails.username !== userDetails.username
 			|| initialUserDetails.note !== userDetails.note
 			|| initialUserDetails.role !== userDetails.role
 			|| passwordModified;
@@ -246,7 +224,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setHasUnsavedChanges(editMade);
 		// If editsMade, then canSave is true (saving is enabled)
 		setCanSave(editMade);
-	}, [userDetails, passwordModified, initialUserDetails /*samePassword*/]);
+	}, [userDetails, passwordModified, initialUserDetails]);
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,

@@ -57,7 +57,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleClose();
 		}
 	};
 

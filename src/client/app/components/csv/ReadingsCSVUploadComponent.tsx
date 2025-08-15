@@ -32,6 +32,24 @@ import { useBlocker, useNavigate } from 'react-router-dom';
  */
 export default function ReadingsCSVUploadComponent() {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any readings modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	// If there are unsaved changes, useBlocker() is true.
+	// If useBlocker() is true, the user is unable to navigate to other pages
+	// unless the blocker state is changed.
+	// This line of code is called on every time hasUnsavedChanges is updated.
+	const blocker = useBlocker(hasUnsavedChanges);
+
+	// Stores the URL of the page that the user tries to go to before
+	// being blocked by the unsaved warning.
+	const [attemptedDestinationURL, setAttemptedDestinationURL] = useState<string | null>(null);
+	// When blocker.state is unblocked, useNavigate() is used to navigate
+	// to the attempted destination URL.
+	const navigate = useNavigate();
+
 	const dispatch = useAppDispatch();
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
@@ -200,23 +218,6 @@ export default function ReadingsCSVUploadComponent() {
 		display: 'flex'
 	};
 
-	// boolean that updates if any change is made to any meter modal
-	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
-
-	// If there are unsaved changes, useBlocker() is true.
-	// If useBlocker() is true, the user is unable to navigate to other pages
-	// unless the blocker state is changed.
-	// This line of code is called on every time hasUnsavedChanges is updated.
-	const blocker = useBlocker(hasUnsavedChanges);
-
-	// Stores the URL of the page that the user tries to go to before
-	// being blocked by the unsaved warning.
-	const [attemptedDestinationURL, setAttemptedDestinationURL] = useState<string | null>(null);
-	// When blocker.state is unblocked, useNavigate() is used to navigate
-	// to the attempted destination URL.
-	const navigate = useNavigate();
-
 	const handleNavigationAttempt = (path: string) => {
 		// If there are unsaved changes, store the URL of the attempted destination
 		// and display the unsaved warning.
@@ -246,7 +247,8 @@ export default function ReadingsCSVUploadComponent() {
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleClear(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleClear();
 		}
 	};
 

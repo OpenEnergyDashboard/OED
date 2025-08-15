@@ -44,7 +44,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
 
-	// boolean that updates if any change is made to any meter modal
+	// boolean that updates if any change is made to any conversion modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
@@ -57,7 +57,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			setShowUnsavedWarning(true);
 		}
 		else {
-			props.handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			props.handleClose();
 		}
 	};
 
