@@ -182,6 +182,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	// End Modal show/close
 
 	const handleSaveChanges = async () => {
+		// close modal
+		props.handleClose();
 		// set needed user details into a user and send to backend
 		const editedUser: User = {
 			id: userDetails.id, username: userDetails.username, role: userDetails.role,
