@@ -249,7 +249,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
 						handleSaveChanges();
-						handleCloseModal();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
 					disabled={!canSave || !isFormValid()}
