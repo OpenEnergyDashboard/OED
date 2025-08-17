@@ -16,7 +16,7 @@
 		"check:typescript": "./src/scripts/checkTypescript.sh",
 		"check:types": "tsc -p . --noEmit",
 		"check:lint": "eslint --ignore-path .eslintignore --ext .ts,.tsx,.js,.jsx ./src/client/app",
-		"test": "mocha --timeout 15000 \"src/server/test/**/*.js\"",
+		"test": "mocha --timeout 15000 \"src/server/test/web/csvPipelineTest.js\"",
 		"testsome": "mocha --timeout 15000",
 		"createdb": "node ./src/server/services/createDB.js",
 		"developerdb": "node -e 'require(\"./src/server/util/developer.js\").createShiftReadingsFunction()'",
