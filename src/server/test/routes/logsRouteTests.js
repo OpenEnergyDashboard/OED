@@ -6,15 +6,27 @@
 
 const { chai, mocha, expect, app, testUser } = require('../common');
 const moment = require('moment');
+const { log } = require('../../log');
 
 mocha.describe('Log Routes', () => {
-	let token;
+	let token, currentLogToDb;
 
 	mocha.before(async () => {
 		// Login to get authentication token
 		const res = await chai.request(app).post('/api/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
+
+		// These tests insert and check for items in the DB. Normally the test setup in common.js
+		// stops all messages  to the DB but this allows them to happen.
+		// Grab the current value so can put it back. Unclear if absolutely needed but it is safer.
+		currentLogToDb = log.logToDb;
+		log.logToDb = true;
+	});
+
+	mocha.after(async () => {
+		// Reset after tests done.
+		log.logToDb = currentLogToDb;
 	});
 
 	mocha.describe('Basic API validation', () => {
@@ -30,7 +42,7 @@ mocha.describe('Log Routes', () => {
 			const response = await chai.request(app)
 				.post('/api/logs/info')
 				.set('token', token)
-				.send({ message: '' }); 
+				.send({ message: '' });
 			expect(response.status).to.equal(400);
 		});
 
@@ -239,7 +251,7 @@ mocha.describe('Log Routes', () => {
 			expect(warnLog.logMessage).to.equal(warnMessage);
 
 			// Should not be returned
-			expect(errorLog).to.be.undefined; 
+			expect(errorLog).to.be.undefined;
 		});
 
 		mocha.it('should respect log limit parameter', async () => {
@@ -309,7 +321,7 @@ mocha.describe('Log Routes', () => {
 			expect(recentLog).to.not.be.undefined;
 			expect(recentLog.logMessage).to.equal(recentMessage);
 			// Should not be returned due to date filter
-			expect(oldLog).to.be.undefined; 
+			expect(oldLog).to.be.undefined;
 		});
 
 		mocha.it('should return empty array when no logs match filters', async () => {
