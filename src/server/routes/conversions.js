@@ -201,7 +201,7 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		success(res, 'Successfully deleted conversion');
 	}
 });
-router.post('/simulate-delete', async (req, res) => {
+router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId'],
