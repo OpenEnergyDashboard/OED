@@ -53,7 +53,7 @@ nohup.out
 
 # Visual Studio Code settings file
 .vscode/settings.json
-
+.vscode/launch.json
 # tmp file
 src/server/tmp/*
 
