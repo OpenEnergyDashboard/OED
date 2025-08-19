@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip';
 import { Button, ButtonGroup, Input } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
-import { selectChartLinkHideOptions, selectCurrentTime, setChartLinkOptionsVisibility, setCurrentTime } from '../redux/slices/appStateSlice';
+import { selectChartLinkHideOptions, selectGraphCreationTime, setChartLinkOptionsVisibility, setGraphCreationTime } from '../redux/slices/appStateSlice';
 import {selectQueryTimeInterval, selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
 import { showErrorNotification, showInfoNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
@@ -28,7 +28,7 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval)
-	const currentTime = useAppSelector(selectCurrentTime)
+	const graphCreationTime = useAppSelector(selectGraphCreationTime)
 	
 	const ref = React.useRef<HTMLDivElement>(null);
 	const shouldShowcurrentTimeCheckbox = React.useMemo(() => {
@@ -85,8 +85,8 @@ export default function ChartLinkComponent() {
 								<Input
   									type="checkbox"
  									id="currentTimeCheckbox"
- 									checked={currentTime}
-  									onChange={e => dispatch(setCurrentTime(e.target.checked))}
+ 									checked={graphCreationTime}
+  									onChange={e => dispatch(setGraphCreationTime(e.target.checked))}
 									/>
 								 Keep Current </label>
 								 
