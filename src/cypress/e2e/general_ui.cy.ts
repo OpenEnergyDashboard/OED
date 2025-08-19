@@ -16,7 +16,7 @@ describe('UI Functionality Tests for Open Energy Dashboard', () => {
 	viewports.forEach(({ name, width, height }) => {
 		context(`${name} viewport`, () => {
 
-			before(() => {
+			beforeEach(() => {
 				cy.viewport(width, height);
 			});
 

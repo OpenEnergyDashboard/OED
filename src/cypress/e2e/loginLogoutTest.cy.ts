@@ -3,11 +3,17 @@ const viewports = [
 	{ name: 'mobile',  width: 375,  height: 667 }
 ];
 
-// before(() => {
-// 	cy.visit('/');
-// });
+function getOptionsButton() {
+	return cy.get('a.dropdown-toggle:contains("Options")').last();
+}
 
+function getVisibleDropdown() {
+  return cy.get('.dropdown-menu:visible');
+}
 
+function nextTopModal(){
+	return cy.get('.modal.show').last().should('be.visible');
+}
 
 describe('Login/Logout UI Tests for Open Energy Dashboard', () => {
 	viewports.forEach(({ name, width, height }) => {
@@ -18,101 +24,71 @@ describe('Login/Logout UI Tests for Open Energy Dashboard', () => {
 				cy.viewport(width, height);
 			});
 
-			// beforeEach(()=>{
-			// 	cy.visit('/');
-			//	cy.viewport(width, height);
-			// });
-
-			function openOptions(){
-				if(name == 'mobile'){
-					cy.contains('button', 'Menu')
-						.click();
-					cy.get('.modal.show')
-						.should('be.visible')
-						.find('a.dropdown-toggle')
-						.contains('Options')
-						.click();
-
-					return cy.get('.modal.show .dropdown-menu').should('be.visible');
-				} else {
-					cy.contains('a.dropdown-toggle', 'Options')
-						.scrollIntoView()
-						.click();
-					return cy.get('.dropdown-menu').should('be.visible');
-				}
-			}
-
 			it('should allow a user to login and logout successfully',()=>{
 
+				// On mobile, we have to click the menu button first
+				if(name == 'mobile'){
+					cy.contains('button', 'Menu').click();
+				};
+
+				getOptionsButton().click();
+
 				//login test
-				openOptions().contains('button','Log in')
+				getVisibleDropdown().contains('button','Log in')
 					.should('be.visible')
 					.click();
 
-					//div class="modal fade show" style="display: block;" aria-modal="true" role="dialog" tabindex="-1"
+				nextTopModal().find('h5.modal-title').should('contain','Log in');
 
-				cy.get('.modal.fade.show')
-					.last()
+				// Close button
+				nextTopModal().contains('button', 'Close')
+					.should('be.visible');
+
+				// Submit button (disabled initially)
+				nextTopModal().contains('button', 'Submit')
+					.should('exist')
+					.and('be.disabled');
+
+				// Username input
+				nextTopModal().get('input#username')
 					.should('be.visible')
-					.within(()=>{
-						cy.contains('h5.modal-title','Log in')
-							.should('exist');
+					.and('have.attr','type','text')
+					.type('test');
 
-						cy.get('input#username')
-							.should('be.visible')
-							.and('have.attr','type','text');
+				// password input
+				nextTopModal().get('input#password')
+					.should('be.visible')
+					.and('have.attr', 'type', 'password')
+					.type('password');
 
-						cy.get('input#password')
-							.should('be.visible')
-							.and('have.attr', 'type', 'password');
+				// submit button should work now
+				nextTopModal().contains('button','Submit')
+					.should('not.be.disabled')
+					.click();
 
-						// Submit button (disabled initially)
-						cy.contains('button', 'Submit')
-							.should('exist')
-							.and('be.disabled');
-
-						// Close button
-						cy.contains('button', 'Close')
-							.should('be.visible');
-					});
-
-				cy.get('.modal.show')
-					.last()
-					.within(() => {
-						cy.get('#username').type('test');
-						cy.get('#password').type('password');
-						cy.contains('button','Submit')
-							.should('not.be.disabled')
-							.click();
-					});
-
+				// we should get a success popup and close it.
 				cy.get('.Toastify__toast--success')
 					.should('contain','Login Successful')
 					.find('.Toastify__close-button')
 					.click();
 
-
-
 				// logout test
-				cy.contains('a.dropdown-toggle', 'Options')
-					.should('be.visible')
-					.click();
+				getOptionsButton().click();
 
-				cy.contains('button','Log in')
+				getVisibleDropdown().contains('button','Log in')
 					.should('not.be.visible');
 
-				cy.contains('button','Log out')
+				getVisibleDropdown().contains('button','Log out')
 					.should('be.visible')
 					.click();
 
-				cy.contains('a.dropdown-toggle', 'Options')
-					.should('be.visible')
-					.click();
 
-				cy.contains('button','Log in')
+				getOptionsButton().click();
+
+				getVisibleDropdown().contains('button','Log in')
 					.should('be.visible');
 
-				cy.contains('button','Log out')
+				getVisibleDropdown().contains('button','Log out')
 					.should('not.be.visible');
 			});
 		});
