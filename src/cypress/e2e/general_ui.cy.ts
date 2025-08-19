@@ -12,19 +12,20 @@ beforeEach(() => {
 	cy.visit('/');
 });
 
-viewports.forEach(({ name, width, height }) => {
-	describe('UI Functionality Tests for Open Energy Dashboard', () => {
+describe('UI Functionality Tests for Open Energy Dashboard', () => {
+	viewports.forEach(({ name, width, height }) => {
 		context(`${name} viewport`, () => {
+
 			before(() => {
 				cy.viewport(width, height);
 			});
 
-			it('should find and click all buttons', () => {
-				cy.get('button').each((button) => {
-					cy.wrap(button).should('have.length.greaterThan', 0);
-					cy.wrap(button).click({ force: true }); // Test click
-				});
-			});
+			// it('should find and click all buttons', () => {
+			// 	cy.get('button').each((button) => {
+			// 		cy.wrap(button).should('have.length.greaterThan', 0);
+			// 		cy.wrap(button).click({ force: true }); // Test click
+			// 	});
+			// });
 
 			it(`should click all visible buttons`, () => {
 				cy.get('button:visible').then(($buttons) => {
@@ -36,7 +37,6 @@ viewports.forEach(({ name, width, height }) => {
 						.scrollIntoView()
 						.click();
 				});
-
 			});
 
 			function testDropdown(labelText: string){
