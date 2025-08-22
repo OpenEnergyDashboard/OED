@@ -1,7 +1,9 @@
 {
 	"version": "0.2.0",
 	"configurations": [
+	
 		{
+
 			"name": "Attach to Node in Docker",
 			"type": "node",
 			"request": "attach",
@@ -44,6 +46,7 @@
 				"Attach to Node in Docker",
 				"Launch Firefox against localhost"
 			]
+
 		}
 	]
 }

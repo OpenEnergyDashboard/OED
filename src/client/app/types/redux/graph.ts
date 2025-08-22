@@ -87,4 +87,5 @@ export interface GraphState {
 	hotlinked: boolean;
 	shiftAmount: ShiftAmount;
 	shiftTimeInterval: TimeInterval;
+	timeCreated: TimeInterval;
 }

@@ -25,6 +25,7 @@ const defaultState: GraphState = {
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
+	timeCreated: new TimeInterval(moment(),moment()),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
@@ -140,7 +141,10 @@ export const graphSlice = createSlice({
 			if (state.current.threeD.meterOrGroupID !== action.payload) {
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
+		},updateTimeCreated: (state) => {
+			state.current.timeCreated = new TimeInterval(moment(), moment());
 		},
+
 		// Added here because it is used to easily track if the last added was meter or group, which then used to select which is active in threeD
 		setLastAddedMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
 			state.current.lastAddedMeterOrGroup = action.payload;
@@ -289,6 +293,11 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
+							case 'timeSpan':
+								const days = parseFloat(value)
+								const now = moment()
+								const leftBound = now.clone().subtract(days, 'days')
+								current.rangeSliderInterval = new TimeInterval(leftBound,undefined)
 						}
 					});
 				}
@@ -333,7 +342,8 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
-		selectShiftTimeInterval: state => state.current.shiftTimeInterval
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
+		selectTimeCreated : state => state.current.timeCreated
 	}
 });
 
@@ -349,11 +359,12 @@ export const {
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectLastMeterOrGroup,
 	selectSliderRangeInterval, selectDefaultGraphState,
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,
-	selectShiftTimeInterval, selectInitialXAxisRange
+	selectShiftTimeInterval, selectInitialXAxisRange,selectGraphAreaNormalization,selectTimeCreated
+
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -372,6 +383,6 @@ export const {
 	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
 	updateThreeDMeterOrGroupInfo, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
-	updateShiftTimeInterval
+	updateShiftTimeInterval,updateTimeCreated
 } = graphSlice.actions;
 
