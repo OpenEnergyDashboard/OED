@@ -359,7 +359,7 @@ export const {
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectLastMeterOrGroup,
 	selectSliderRangeInterval, selectDefaultGraphState,
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,

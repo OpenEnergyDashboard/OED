@@ -5,11 +5,12 @@
 import * as React from "react";
 import { toast } from "react-toastify";
 import ReactTooltip from "react-tooltip";
-import { Button, ButtonGroup } from "reactstrap";
+import { Button, ButtonGroup,Input} from "reactstrap";
 import { useAppDispatch, useAppSelector } from "../redux/reduxHooks";
 import { selectChartLink } from "../redux/selectors/uiSelectors";
 import {
-selectChartLinkHideOptions, selectGraphCreationTime, setChartLinkOptionsVisibility, setGraphCreationTime
+selectChartLinkHideOptions, selectIsKeepCurrent, setChartLinkOptionsVisibility,
+setIsKeepCurrent
 } from "../redux/slices/appStateSlice";
 import {
 	selectSelectedGroups,
@@ -24,7 +25,7 @@ import { useTranslate } from "../redux/componentHooks";
 import TooltipMarkerComponent from "./TooltipMarkerComponent";
 import { wellStyle, rowFlexStart, labelStyle } from "../styles/modalStyle";
 import { checkboxStyle } from "../styles/modalStyle";
-import { color } from "d3";
+
 
 
 /**
@@ -39,7 +40,7 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
-  const graphCreationTime = useAppSelector(selectGraphCreationTime)
+  const isKeepCurrent = useAppSelector(selectIsKeepCurrent)
 	const ref = React.useRef<HTMLDivElement>(null);
 
 	// THIS react.UseMemo ONLY RETURNS TRUE WHEN THE CONDITIONS ARE MET FOR USING KEEP CURRENT (left is is bounded and right is unbounded)
@@ -82,7 +83,7 @@ export default function ChartLinkComponent() {
 				<div style={labelStyle}>{translate("chart.link.options.title")}</div>
 				{/* hide options checkbox */}
 				<div className="checkbox">
-					<input
+					<Input
 						type="checkbox"
 						style={checkboxStyle}
 						defaultChecked={linkHideOptions}
@@ -106,7 +107,7 @@ export default function ChartLinkComponent() {
 				{/* keep current checkbox ----> */}
 				{/* USE shouldShowKeepCurrentCheckbox AS THE CONDITIONAL BOOLEAN */}
 				<div className="checkbox">
-					<input
+					<Input
 						type="checkbox"
 						style={checkboxStyle}
 						onMouseOver={() => {
@@ -115,6 +116,8 @@ export default function ChartLinkComponent() {
 						onMouseLeave={() => {
 							ref.current && ReactTooltip.hide(ref.current);
 						}}
+						checked={isKeepCurrent}
+						onChange={e => dispatch(setIsKeepCurrent(e.target.checked))}
 						disabled={!shouldShowKeepCurrentCheckbox}
 						// shouldShow is the value we use to tell if it should be disabled or not
 						//when disabled = true, you CANNOT click the checkbox
@@ -157,19 +160,6 @@ export default function ChartLinkComponent() {
 						>
 							{linkTextVisible ? "x" : "v"}
 						</Button>
-					
-							{shouldShowcurrentTimeCheckbox && (
-								
-								<label htmlFor="currentTimeCheckbox" style = {{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-								<Input
-  									type="checkbox"
- 									id="currentTimeCheckbox"
- 									checked={graphCreationTime}
-  									onChange={e => dispatch(setGraphCreationTime(e.target.checked))}
-									/>
-								 Keep Current </label>
-								 
-							)}
 						
 					</ButtonGroup>
 				</div>
