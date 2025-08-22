@@ -9,8 +9,7 @@ import { Button, ButtonGroup } from "reactstrap";
 import { useAppDispatch, useAppSelector } from "../redux/reduxHooks";
 import { selectChartLink } from "../redux/selectors/uiSelectors";
 import {
-	selectChartLinkHideOptions,
-	setChartLinkOptionsVisibility,
+selectChartLinkHideOptions, selectGraphCreationTime, setChartLinkOptionsVisibility, setGraphCreationTime
 } from "../redux/slices/appStateSlice";
 import {
 	selectSelectedGroups,
@@ -27,6 +26,7 @@ import { wellStyle, rowFlexStart, labelStyle } from "../styles/modalStyle";
 import { checkboxStyle } from "../styles/modalStyle";
 import { color } from "d3";
 
+
 /**
  * @returns chartLinkComponent
  */
@@ -39,6 +39,7 @@ export default function ChartLinkComponent() {
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+  const graphCreationTime = useAppSelector(selectGraphCreationTime)
 	const ref = React.useRef<HTMLDivElement>(null);
 
 	// THIS react.UseMemo ONLY RETURNS TRUE WHEN THE CONDITIONS ARE MET FOR USING KEEP CURRENT (left is is bounded and right is unbounded)
@@ -52,6 +53,7 @@ export default function ChartLinkComponent() {
 			return false;
 		return true;
 	}, [queryTimeInterval]);
+
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
 		navigator.clipboard
@@ -133,6 +135,7 @@ export default function ChartLinkComponent() {
 				</div>
 
 				<div style={rowFlexStart}>
+
 					<ButtonGroup>
 						<Button outline onClick={handleButtonClick}>
 							<div
@@ -145,6 +148,7 @@ export default function ChartLinkComponent() {
 								}}
 							>
 								{translate("chart.link")}
+
 							</div>
 						</Button>
 						<Button
@@ -153,6 +157,20 @@ export default function ChartLinkComponent() {
 						>
 							{linkTextVisible ? "x" : "v"}
 						</Button>
+					
+							{shouldShowcurrentTimeCheckbox && (
+								
+								<label htmlFor="currentTimeCheckbox" style = {{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+								<Input
+  									type="checkbox"
+ 									id="currentTimeCheckbox"
+ 									checked={graphCreationTime}
+  									onChange={e => dispatch(setGraphCreationTime(e.target.checked))}
+									/>
+								 Keep Current </label>
+								 
+							)}
+						
 					</ButtonGroup>
 				</div>
 				{linkTextVisible && <div style={wellStyle}>{linkText}</div>}

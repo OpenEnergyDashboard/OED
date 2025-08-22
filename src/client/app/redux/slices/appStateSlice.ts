@@ -25,6 +25,7 @@ export interface AppState {
 	selectedLanguage: LanguageTypes;
 	languageManuallySet: boolean;
 	refreshingReadings: boolean;
+	graphCreationTime: boolean;
 }
 
 const defaultState: AppState = {
@@ -33,7 +34,8 @@ const defaultState: AppState = {
 	selectedLanguage: LanguageTypes.en,
 	chartLinkHideOptions: false,
 	languageManuallySet: false,
-	refreshingReadings: false
+	refreshingReadings: false,
+	graphCreationTime: false,
 };
 
 export const appStateSlice = createThunkSlice({
@@ -62,6 +64,9 @@ export const appStateSlice = createThunkSlice({
 		}),
 		setRefresingReadings: create.reducer<boolean>((state, action) => {
 			state.refreshingReadings = action.payload;
+		}),
+		setGraphCreationTime: create.reducer<boolean>((state, action) => {
+			state.graphCreationTime = action.payload;
 		}),
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
@@ -132,7 +137,9 @@ export const appStateSlice = createThunkSlice({
 		selectOptionsVisibility: state => state.optionsVisibility,
 		selectSelectedLanguage: state => state.selectedLanguage,
 		selectChartLinkHideOptions: state => state.chartLinkHideOptions,
-		selectRefreshingReadings: state => state.refreshingReadings
+		selectRefreshingReadings: state => state.refreshingReadings,
+		selectGraphCreationTime: state => state.graphCreationTime,
+
 	}
 });
 
@@ -143,7 +150,8 @@ export const {
 	setOptionsVisibility,
 	updateSelectedLanguage,
 	setChartLinkOptionsVisibility,
-	setRefresingReadings
+	setRefresingReadings,
+	setGraphCreationTime
 } = appStateSlice.actions;
 
 export const {
@@ -151,5 +159,6 @@ export const {
 	selectOptionsVisibility,
 	selectSelectedLanguage,
 	selectChartLinkHideOptions,
-	selectRefreshingReadings
+	selectRefreshingReadings,
+	selectGraphCreationTime
 } = appStateSlice.selectors;
