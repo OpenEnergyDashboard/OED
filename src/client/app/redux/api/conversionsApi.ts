@@ -8,6 +8,7 @@ import { baseApi } from './baseApi';
 import { CikData } from '../../types/redux/ciks';
 import { setRefresingReadings } from '../../redux/slices/appStateSlice';
 
+
 export const conversionsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		getConversionsDetails: builder.query<ConversionData[], void>({
@@ -85,7 +86,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { redoCik, refreshReadingViews }
 			}),
-			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings'],
+			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings', 'Units'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
 				dispatch(setRefresingReadings(true));
 				try {

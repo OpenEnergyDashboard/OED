@@ -3,7 +3,7 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 import * as React from 'react';
 // Realize that * is already imported from react
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -19,6 +19,7 @@ import { UnitData, UnitType } from '../../types/redux/units';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -42,6 +43,23 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			props.handleClose(); // Proceed to close the modal
+		}
+	};
 
 	// Set existing conversion values
 	const values = { ...props.conversion };
@@ -309,6 +327,25 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	};
 
+	// Checks if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// Compare the local changes to the default values
+		const editMade =
+			props.conversion.sourceId !== state.sourceId
+			|| props.conversion.destinationId !== state.destinationId
+			|| props.conversion.bidirectional !== state.bidirectional
+			|| props.conversion.slope !== state.slope
+			|| props.conversion.intercept !== state.intercept
+			|| props.conversion.note !== state.note;
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade);
+	}, [state]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipEditConversionView: 'help.admin.conversionedit'
@@ -316,6 +353,26 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
 			{/* Warning Modal */}
 			<ConfirmActionModalComponent
 				show={showWarningModal}
@@ -339,7 +396,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				actionConfirmText={deleteRejectText}
 				actionRejectText={deleteRejectText}
 				forceCancel={true} />
-			<Modal isOpen={props.show} toggle={props.handleClose}>
+			<Modal isOpen={props.show} toggle={handleToggle}>
 				<ModalHeader>
 					<FormattedMessage id="conversion.edit.conversion" />
 					<TooltipHelpComponent page='conversions-edit' />
@@ -388,7 +445,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								name='bidirectional'
 								type='select'
 								defaultValue={state.bidirectional.toString()}
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => {handleBooleanChange(e);}}
 								invalid={(isMeterSource() || isSuffixUsed()) && state.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -415,7 +472,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='slope'
 										type='number'
 										value={state.slope}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -427,7 +485,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='intercept'
 										type='number'
 										value={state.intercept}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -440,7 +499,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								type='textarea'
 								defaultValue={state.note}
 								placeholder='Note'
-								onChange={e => handleStringChange(e)} />
+								onChange={e => {handleStringChange(e);}}
+							/>
 						</FormGroup>
 					</Container>
 				</ModalBody>
@@ -453,7 +513,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

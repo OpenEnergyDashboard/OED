@@ -170,7 +170,7 @@ export default function MapChartComponent() {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData !== undefined && !meterIsFetching) {
 								// Meter name to include in hover on graph.
-								const label = entity.identifier;
+								const label = entity.identifier + 'ᴹ';
 								// The usual color for this meter.
 								colors.push(getGraphColor(meterID, DataType.Meter));
 								if (!readingsData) {
@@ -240,7 +240,7 @@ export default function MapChartComponent() {
 							// This protects against there being no readings or that the data is being updated.
 							if (readingsData && !groupIsFetching) {
 								// Group name to include in hover on graph.
-								const label = entity.name;
+								const label = entity.name + 'ᴳ';
 								// The usual color for this group.
 								colors.push(getGraphColor(groupID, DataType.Group));
 								if (!readingsData) {

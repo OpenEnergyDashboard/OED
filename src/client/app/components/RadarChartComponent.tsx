@@ -89,7 +89,7 @@ export default function RadarChartComponent() {
 				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = meterReadings[meterID];
 				if (readingsData) {
-					const label = entity.identifier;
+					const label = entity.identifier + 'ᴹ';
 					const colorID = meterID;
 					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
 					// HoverText is the popup value show for each reading.
@@ -141,7 +141,7 @@ export default function RadarChartComponent() {
 				const scaling = selectScalingFromEntity(entity, selectedAreaUnit, areaNormalization, rateScaling);
 				const readingsData = groupData[groupID];
 				if (readingsData) {
-					const label = entity.name;
+					const label = entity.name + 'ᴳ';
 					const colorID = groupID;
 					// Create two arrays for the distance (rData) and angle (thetaData) values. Fill the array with the data from the line readings.
 					// HoverText is the popup value show for each reading.

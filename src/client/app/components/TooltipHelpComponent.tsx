@@ -63,7 +63,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.select.dateRange': { link: `${helpUrl}/dateRange/` },
 		'help.home.select.groups': { link: `${helpUrl}/graphingGroups/` },
 		'help.home.select.maps': { link: `${helpUrl}/mapGraphic/` },
-		'help.home.select.meters': { link: `${helpUrl}/graphingMeters/` },
+		'help.home.select.datasources': { link: `${helpUrl}/graphingDataSources/` },
 		'help.home.select.rates': { link: `${helpUrl}/graphingRates/` },
 		'help.home.select.units': { link: `${helpUrl}/graphingUnits/` },
 		'help.home.readings.per.day': { link: `${helpUrl}/readingsPerDay/` },

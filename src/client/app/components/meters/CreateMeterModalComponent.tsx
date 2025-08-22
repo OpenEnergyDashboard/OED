@@ -5,7 +5,7 @@
 import { range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { metersApi } from '../../redux/api/metersApi';
@@ -28,6 +28,7 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { DisableChecksType } from '../../types/redux/units';
 import { NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 interface CreateMeterModalProps {
 	onCreateMeter?: (meterIdentifier: string) => void; // Define the type of the callback function
@@ -40,6 +41,24 @@ interface CreateMeterModalProps {
  */
 export default function CreateMeterModalComponent(props: CreateMeterModalProps): React.JSX.Element {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClose(); // Proceed to close the modal
+		}
+	};
+
 	// Tracks whether a unit/ default unit has been selected.
 	// RTKQ Mutation to submit add meter
 	const [submitAddMeter] = metersApi.endpoints.addMeter.useMutation();
@@ -195,6 +214,57 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		}
 	};
 
+	// Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if all of the required fields have been filled out.
+		const validChange =
+			meterDetails.name !== defaultValues.name
+			&& meterDetails.unitId !== defaultValues.unitId
+			&& meterDetails.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
+			&& meterDetails.meterType !== defaultValues.meterType;
+		// Compare the local changes to the default values
+		const editMade =
+			meterDetails.id !== defaultValues.id
+			|| meterDetails.identifier !== defaultValues.identifier
+			|| meterDetails.name !== defaultValues.name
+			|| meterDetails.area !== defaultValues.area
+			|| meterDetails.enabled !== defaultValues.enabled
+			|| meterDetails.displayable !== defaultValues.displayable
+			|| meterDetails.meterType !== defaultValues.meterType
+			|| meterDetails.url !== defaultValues.url
+			|| meterDetails.timeZone !== defaultValues.timeZone
+			|| meterDetails.gps !== defaultValues.gps
+			|| meterDetails.unitId !== defaultValues.unitId
+			|| meterDetails.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
+			|| meterDetails.note !== defaultValues.note
+			|| meterDetails.cumulative !== defaultValues.cumulative
+			|| meterDetails.cumulativeReset !== defaultValues.cumulativeReset
+			|| meterDetails.cumulativeResetStart !== defaultValues.cumulativeResetStart
+			|| meterDetails.cumulativeResetEnd !== defaultValues.cumulativeResetEnd
+			|| meterDetails.endOnlyTime !== defaultValues.endOnlyTime
+			|| meterDetails.readingGap !== defaultValues.readingGap
+			|| meterDetails.readingVariation !== defaultValues.readingVariation
+			|| meterDetails.readingDuplication !== defaultValues.readingDuplication
+			|| meterDetails.timeSort !== defaultValues.timeSort
+			|| meterDetails.reading !== defaultValues.reading
+			|| meterDetails.startTimestamp !== defaultValues.startTimestamp
+			|| meterDetails.endTimestamp !== defaultValues.endTimestamp
+			|| meterDetails.previousEnd !== defaultValues.previousEnd
+			|| meterDetails.areaUnit !== defaultValues.areaUnit
+			|| meterDetails.readingFrequency !== defaultValues.readingFrequency
+			|| meterDetails.minDate !== defaultValues.minDate
+			|| meterDetails.maxDate !== defaultValues.maxDate
+			|| meterDetails.minVal !== defaultValues.minVal
+			|| meterDetails.maxVal !== defaultValues.maxVal
+			|| meterDetails.disableChecks !== defaultValues.disableChecks;
+		setCanSave(validChange && editMade);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [meterDetails]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Only an admin can create a meter.
@@ -210,11 +280,31 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
 			{/* Show modal button */}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="meter.create" />
 			</Button>
-			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
+			<Modal isOpen={showModal} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="meter.create" />
 					<TooltipHelpComponent page='meters-create' />
@@ -234,7 +324,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							</Label>
 							<Input id='identifier' name='identifier' type='text' autoComplete='on'
 								value={meterDetails.identifier}
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 							/>
 						</FormGroup></Col>
 						{/* Name input */}
@@ -244,7 +334,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							</Label>
 							<Input id='name' name='name' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								required value={meterDetails.name}
 								invalid={meterDetails.name === ''}
 							/>
@@ -261,7 +351,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							</Label>
 							<Input id='unitId' name='unitId' type='select'
 								value={meterDetails.unitId}
-								onChange={handleUnitChange}
+								onChange={e => {handleUnitChange(e);}}
 								invalid={!unitIsSelected}>
 								<option value={-999} key={-999} hidden disabled>
 									{translate('select.unit')}
@@ -286,9 +376,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 								// Invalid when unitId is selected and no graphic selected or invalid choice.
 								invalid={unitIsSelected && (!defaultGaphicUnitIsSelected || !defaultGraphicUnitIsValid)}
 								disabled={!unitIsSelected}
-								onChange={e => {
-									handleNumberChange(e);
-								}}
+								onChange={e => {handleNumberChange(e);}}
 							>
 								<option value={-999} key={-999} hidden disabled>
 									{translate('select.unit')}
@@ -318,7 +406,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='enabled'>{translate('meter.enabled')}</Label>
 							<Input id='enabled' name='enabled' type='select'
 								value={meterDetails.enabled.toString()}
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => {handleBooleanChange(e);}}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -329,7 +417,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='displayable'>{translate('displayable')}</Label>
 							<Input id='displayable' name='displayable' type='select'
 								value={meterDetails.displayable.toString()}
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => {handleBooleanChange(e);}}
 								invalid={meterDetails.displayable && meterDetails.unitId === -99}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -346,7 +434,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='meterType'>{translate('meter.type')}</Label>
 							<Input id='meterType' name='meterType' type='select'
 								value={meterDetails.meterType}
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								invalid={meterDetails.meterType === ''}>
 								{/* The default value is a blank string so then tell user to select one. */}
 								{<option
@@ -368,7 +456,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='readingFrequency'>{translate('meter.readingFrequency')}</Label>
 							<Input id='readingFrequency' name='readingFrequency' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={meterDetails.readingFrequency}
 								invalid={meterDetails.readingFrequency === ''} />
 							<FormFeedback>
@@ -382,14 +470,14 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='url'>{translate('meter.url')}</Label>
 							<Input id='url' name='url' type='text'
 								autoComplete='off'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={meterDetails.url} />
 						</FormGroup></Col>
 						{/* GPS input */}
 						<Col><FormGroup>
 							<Label for='gps'>{translate('gps')}</Label>
 							<Input id='gps' name='gps' type='text'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={meterDetails.gps} />
 						</FormGroup></Col>
 					</Row>
@@ -403,7 +491,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 								type='number'
 								min='0'
 								defaultValue={meterDetails.area}
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								invalid={meterDetails.area < 0}
 							/>
 							<FormFeedback>
@@ -415,7 +503,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='areaUnit'>{translate('area.unit')}</Label>
 							<Input id='areaUnit' name='areaUnit' type='select'
 								value={meterDetails.areaUnit}
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								invalid={meterDetails.area > 0 && meterDetails.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
 									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
@@ -430,7 +518,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					<FormGroup>
 						<Label for='note'>{translate('note')}</Label>
 						<Input id='note' name='note' type='textarea'
-							onChange={e => handleStringChange(e)}
+							onChange={e => {handleStringChange(e);}}
 							value={meterDetails.note}
 							placeholder='Note' />
 					</FormGroup>
@@ -440,7 +528,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='cumulative'>{translate('meter.cumulative')}</Label>
 							<Input id='cumulative' name='cumulative' type='select'
 								value={meterDetails.cumulative.toString()}
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => {handleBooleanChange(e);}}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -452,7 +540,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							{meterDetails.cumulative === true ? (
 								<Input id='cumulativeReset' name='cumulativeReset' type='select'
 									value={meterDetails.cumulativeReset.toString()}
-									onChange={e => handleBooleanChange(e)}>
+									onChange={e => {handleBooleanChange(e);}}>
 									{Object.keys(TrueFalseType).map(key => {
 										return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 									})}
@@ -469,7 +557,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='cumulativeResetStart'>{translate('meter.cumulativeResetStart')}</Label>
 							<Input id='cumulativeResetStart' name='cumulativeResetStart' type='text' autoComplete='off'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={meterDetails.cumulativeResetStart}
 								placeholder='HH:MM:SS'
 								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false}
@@ -480,7 +568,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='cumulativeResetEnd'>{translate('meter.cumulativeResetEnd')}</Label>
 							<Input id='cumulativeResetEnd' name='cumulativeResetEnd' type='text'
 								autoComplete='off'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={meterDetails.cumulativeResetEnd}
 								placeholder='HH:MM:SS'
 								disabled={meterDetails.cumulativeReset === false || meterDetails.cumulative === false}
@@ -492,7 +580,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='endOnlyTime'>{translate('meter.endOnlyTime')}</Label>
 							<Input id='endOnlyTime' name='endOnlyTime' type='select' value={meterDetails.endOnlyTime.toString()}
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => {handleBooleanChange(e);}}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -502,7 +590,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='readingGap'>{translate('meter.readingGap')}</Label>
 							<Input id='readingGap' name='readingGap' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								min='0'
 								defaultValue={meterDetails.readingGap}
 								invalid={meterDetails?.readingGap < 0} />
@@ -516,7 +604,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='readingVariation'>{translate('meter.readingVariation')}</Label>
 							<Input id='readingVariation' name='readingVariation' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								min='0'
 								defaultValue={meterDetails.readingVariation}
 								invalid={meterDetails?.readingVariation < 0} />
@@ -528,7 +616,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='readingDuplication'>{translate('meter.readingDuplication')}</Label>
 							<Input id='readingDuplication' name='readingDuplication' type="select"
-								onChange={e => handleNumberChange(e)}>
+								onChange={e => {handleNumberChange(e);}}>
 								{range(1, 10).map(i => (
 									<option key={i} value={`${i}`}> {i} </option>
 								))}
@@ -541,7 +629,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='timeSort'>{translate('meter.timeSort')}</Label>
 							<Input id='timeSort' name='timeSort' type='select'
 								value={meterDetails.timeSort}
-								onChange={e => handleStringChange(e)}>
+								onChange={e => {handleStringChange(e);}}>
 								{Object.keys(MeterTimeSortType).map(key => {
 									// This is a bit of a hack but it should work fine. The TypeSortTypes and MeterTimeSortType should be in sync.
 									// The translation is on the former so we use that enum name there but loop on the other to get the value desired.
@@ -560,7 +648,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='minVal'>{translate('min.value')}</Label>
 							<Input id='minVal' name='minVal' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								min={MIN_VAL}
 								max={meterDetails.maxVal}
 								value={meterDetails.minVal}
@@ -573,7 +661,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='maxVal'>{translate('max.value')}</Label>
 							<Input id='maxVal' name='maxVal' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								min={meterDetails.minVal}
 								max={MAX_VAL}
 								value={meterDetails.maxVal}
@@ -589,7 +677,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='minDate'>{translate('meter.minDate')}</Label>
 							<Input id='minDate' name='minDate' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								required value={meterDetails.minDate}
 								invalid={!moment(meterDetails.minDate).isValid()
@@ -605,7 +693,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Input id='maxDate' name='maxDate' type='text'
 								autoComplete='on'
 								placeholder='YYYY-MM-DD HH:MM:SS'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								required value={meterDetails.maxDate}
 								invalid={!moment(meterDetails.maxDate).isValid()
 									|| !moment(meterDetails.maxDate).isSameOrBefore(MAX_DATE_MOMENT)
@@ -621,7 +709,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='maxError'>{translate('meter.maxError')}</Label>
 							<Input id='maxError' name='maxError' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								min='0'
 								max={MAX_ERRORS}
 								defaultValue={meterDetails.maxError}
@@ -634,7 +722,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='disableChecks'>{translate('disable.checks')}</Label>
 							<Input id='disableChecks' name='disableChecks' type='select'
 								value={meterDetails.disableChecks}
-								onChange={e => handleStringChange(e)}>
+								onChange={e => {handleStringChange(e);}}>
 								{Object.keys(DisableChecksType).map(key => {
 									return (<option value={key} key={key} >
 										{translate(`DisableChecksType.${key}`)}</option>);
@@ -647,7 +735,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<Col><FormGroup>
 							<Label for='reading'>{translate('meter.reading')}</Label>
 							<Input id='reading' name='reading' type='number'
-								onChange={e => handleNumberChange(e)}
+								onChange={e => {handleNumberChange(e);}}
 								defaultValue={meterDetails.reading} />
 						</FormGroup></Col>
 						{/* startTimestamp input */}
@@ -655,7 +743,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='startTimestamp'>{translate('meter.startTimeStamp')}</Label>
 							<Input id='startTimestamp' name='startTimestamp' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={meterDetails.startTimestamp} />
 						</FormGroup></Col>
@@ -666,7 +754,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='endTimestamp'>{translate('meter.endTimeStamp')}</Label>
 							<Input id='endTimestamp' name='endTimestamp' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={meterDetails.endTimestamp} />
 						</FormGroup></Col>
@@ -675,7 +763,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 							<Label for='previousEnd'>{translate('meter.previousEnd')}</Label>
 							<Input id='previousEnd' name='previousEnd' type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								placeholder='YYYY-MM-DD HH:MM:SS'
 								value={meterDetails.previousEnd} />
 						</FormGroup></Col>
@@ -687,7 +775,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid}>
+					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
