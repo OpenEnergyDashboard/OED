@@ -486,7 +486,7 @@ DECLARE
 					upper(hourly.time_interval) AS end_timestamp
 				FROM ((hourly_readings_unit hourly
 				INNER JOIN meters m ON m.id = current_meter_id)
-				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id AND tsrange(c.start_time, c.end_time, '()') && hourly.time_interval)
+				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 				WHERE requested_range @> time_interval AND hourly.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;
@@ -510,7 +510,7 @@ DECLARE
 				INNER JOIN meters m ON m.id = current_meter_id)
 				-- This is getting the conversion for the meter and unit to graph.
 				-- The slope and intercept are used above the transform the reading to the desired unit.
-				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id AND tsrange(c.start_time, c.end_time, '()') && daily.time_interval)
+				INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
 				WHERE requested_range @> time_interval AND daily.meter_id = current_meter_id
 				-- This ensures the data is sorted
 				ORDER BY start_timestamp ASC;

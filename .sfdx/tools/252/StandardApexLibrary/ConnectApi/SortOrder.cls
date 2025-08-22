@@ -1,5 +1,0 @@
-global enum SortOrder {
-ASCENDING,
-DESCENDING,
-MOSTRECENTLYVIEWED
-}

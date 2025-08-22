@@ -1,5 +1,0 @@
-global enum DecisionTableSourceType {
-CSVUPLOAD,
-MULTIPLESOBJECTS,
-SINGLESOBJECT
-}

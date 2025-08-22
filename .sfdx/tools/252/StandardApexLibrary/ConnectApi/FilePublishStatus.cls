@@ -1,5 +1,0 @@
-global enum FilePublishStatus {
-PENDINGACCESS,
-PRIVATEACCESS,
-PUBLICACCESS
-}

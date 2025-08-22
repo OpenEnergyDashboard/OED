@@ -1,9 +1,0 @@
-global enum AudienceCriteriaType {
-AUDIENCE,
-DEFAULT,
-DOMAIN,
-FIELDBASED,
-GEOLOCATION,
-PERMISSION,
-PROFILE
-}

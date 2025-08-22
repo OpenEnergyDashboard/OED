@@ -1,5 +1,0 @@
-global enum ServiceEinsteinModelManagement {
-STARTDATAGENERATION,
-STARTDATAINGESTION,
-STARTTRAINING
-}

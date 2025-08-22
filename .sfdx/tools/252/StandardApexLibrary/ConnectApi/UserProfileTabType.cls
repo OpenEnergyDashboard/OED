@@ -1,7 +1,0 @@
-global enum UserProfileTabType {
-CUSTOMVISUALFORCE,
-CUSTOMWEB,
-ELEMENT,
-FEED,
-OVERVIEW
-}

@@ -1,6 +1,0 @@
-global enum BotLLMProviderType {
-COHERE,
-EINSTEINCODE,
-EINSTEINTEXT,
-OPENAI
-}

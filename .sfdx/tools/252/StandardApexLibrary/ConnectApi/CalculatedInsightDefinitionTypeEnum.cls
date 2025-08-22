@@ -1,6 +1,0 @@
-global enum CalculatedInsightDefinitionTypeEnum {
-CALCULATEDMETRIC,
-EXTERNALMETRIC,
-GRAPHMETRIC,
-STREAMINGMETRIC
-}

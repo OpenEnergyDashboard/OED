@@ -1,5 +1,0 @@
-global enum MemberVouchersSortField {
-CREATEDDATE,
-EFFECTIVEDATE,
-EXPIRATIONDATE
-}

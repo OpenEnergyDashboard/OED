@@ -1,7 +1,0 @@
-global enum BookingStatus {
-CANCELED,
-NOSHOW,
-PROPOSED,
-REJECTED,
-SCHEDULED
-}

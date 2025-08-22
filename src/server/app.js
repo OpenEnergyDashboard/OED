@@ -139,10 +139,10 @@ app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);
 app.use('/api/units', units);
 app.use('/api/conversions', conversions);
-app.use('/api/conversionSegments', conversionSegments);
 app.use('/api/days', days);
-app.use('/api/daySegments', daySegments);
 app.use('/api/weeks', weeks);
+app.use('/api/conversionSegments', conversionSegments);
+app.use('/api/daySegments', daySegments);
 app.use('/api/ciks', ciks);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 

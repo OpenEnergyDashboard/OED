@@ -1,7 +1,0 @@
-global enum GroupEmailFrequency {
-DAILYDIGEST,
-EACHPOST,
-NEVER,
-USEDEFAULT,
-WEEKLYDIGEST
-}

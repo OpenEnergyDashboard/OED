@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- 
+
 const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
@@ -14,89 +14,91 @@ const router = express.Router();
 
 function formatDaySegmentForResponse(item) {
 	return {
-		id: item.id, 
+		id: item.id,
 		dayId: item.dayId,
 		startHour: item.startHour,
 		endHour: item.endHour,
 		slope: item.slope,
 		intercept: item.intercept,
-		note: item.note, 
+		note: item.note,
 	};
 }
 
 /**
- * Route for getting all day segments.
+ * GET day segment by id
  */
-router.get('/', adminAuthMiddleware('get all day segments'), async (req, res) => {
-	const conn = getConnection();
-	try {
-		const rows = await DaySegment.getAll(conn);
-		res.json(rows.map(formatDaySegmentForResponse));
-	} catch (err) {
-		log.error(`Error while performing GET day segment details query: ${err}`);
-	}
-});
-
-/**
- * Route for getting a day segment by id
- */
-router.get('/:id', adminAuthMiddleware('get day segment by id'), async(req, res) => {
+router.get('/:id', adminAuthMiddleware('get day segment by id'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
 		required: ['id'],
 		properties: {
 			id: {
-				type: 'integer', 
-				minimum: 0
+				type: 'string',
+				pattern: '^\\d+$'
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
-		return res.status(400).json({error: 'Invalid id'});
+	const validatorResult = validate(req.params, validParams);
+	if (!validatorResult.valid) {
+		const errMsg = `Got request to retrieve a day segment by id with invalid data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
 	} else {
 		const conn = getConnection();
 		try {
-			const rows = await DaySegment.getById(req.params.id, conn);
-			res.json(rows);
+			const row = await DaySegment.getById(req.params.id, conn);
+			res.json(formatDaySegmentForResponse(row));
 		} catch (err) {
-			log.error(`Error while performing GET day segment by id: ${err}`);
+			log.error(`Error while performing GET day segment by id query: ${err}`);
+			res.sendStatus(500);
 		}
 	}
 });
 
 /**
- * Route for getting all day segments with the same day id
+ * POST get all day segments by dayId
+ * @param {integer} dayId The id for the day.
  */
-router.post('/segments', adminAuthMiddleware('get day segments by day id'), async(req, res) => {
+router.post('/dayId', adminAuthMiddleware('get day segments by day id'), async (req, res) => {
 	const validDaySegment = {
 		type: 'object',
 		maxProperties: 1,
 		required: ['dayId'],
 		properties: {
 			dayId: {
-				type: 'integer', 
+				type: 'integer',
 				minimum: 0
 			}
 		}
 	};
-	if (!validate(req.body, validDaySegment).valid) {
-		return res.status(400).json({error: 'Invalid dayId'});
+	const validatorResult = validate(req.body, validDaySegment);
+	if (!validatorResult.valid) {
+		const errMsg = `Got request to retrieve day segments by dayId with invalid data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
 	} else {
 		const conn = getConnection();
 		try {
 			const rows = await DaySegment.getByDayId(req.body.dayId, conn);
 			res.json(rows.map(formatDaySegmentForResponse));
 		} catch (err) {
-			log.error(`Error while performing GET day segments by dayId: ${err}`);
+			const errMsg = `Error while performing GET day segments by dayId: ${err}`;
+			log.error(errMsg);
 		}
 	}
 });
 
 /**
- * Route for POST add day segment.
+ * POST add day segment.
+ * @param {integer} dayId The id for the day.
+ * @param {number} startHour The hour the day segment starts.
+ * @param {number} endHour The hour the day segment ends.
+ * @param {number} slope The slope of the day segment.
+ * @param {number} intercept The intercept of the day segment.
+ * @param {string} note The notes for the day segment.
  */
-router.post('/add', adminAuthMiddleware('add day segment'), async (req, res) => {
+router.post('/addDaySegment', adminAuthMiddleware('add day segment'), async (req, res) => {
 	const validDaySegment = {
 		type: 'object',
 		maxProperties: 6,
@@ -104,7 +106,7 @@ router.post('/add', adminAuthMiddleware('add day segment'), async (req, res) => 
 		additionalProperties: false,
 		properties: {
 			dayId: {
-				type: 'integer', 
+				type: 'integer',
 				minimum: 0
 			},
 			startHour: {
@@ -134,51 +136,187 @@ router.post('/add', adminAuthMiddleware('add day segment'), async (req, res) => 
 
 	const validatorResult = validate(req.body, validDaySegment);
 	if (!validatorResult.valid) {
-		log.error(`Got request to insert day segment with invalid day segment data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to insert day segment with invalid day segment data. Error(s): ${validatorResult.errors}`);
+		const errMsg = `Got request to add a day segment with invalid day segment data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
 	} else {
-
 		if (req.body.startHour >= req.body.endHour) {
 			return failure(res, 400, `start hour must be less than end hour`);
 		} else {
 			const conn = getConnection();
 			try {
-				await conn.tx(async t => {
-					const newDaySegment = new DaySegment(
-						undefined,
-						req.body.dayId,
-						req.body.startHour,
-						req.body.endHour,
-						req.body.slope,
-						req.body.intercept,
-						req.body.note
-					);
-					await newDaySegment.insert(t);
-				});
-				success(res, `Successfully inserted day segment`);
+				const newDaySegment = new DaySegment(
+					undefined,
+					req.body.dayId,
+					req.body.startHour,
+					req.body.endHour,
+					req.body.slope,
+					req.body.intercept,
+					req.body.note
+				);
+				await newDaySegment.insert(conn);
+				success(res, `Successfully added day segment`);
 			} catch (err) {
-				log.error(`Error while inserting new day segment with error(s): ${err}`);
-				failure(res, 500, `Error while inserting new day segment with errors(s): ${err}`);
+				const errMsg = `Error while adding new day segment with error(s): ${err}`;
+				log.error(errMsg);
+				failure(res, 500, errMsg);
 			}
 		}
 	}
 });
 
 /**
- * Route for POST, edit day segment.
+ * POST split day segment, the earlier segment uses the new slope/intercept/note
+ * @param {integer} id The id of the day segment
+ * @param {number} newSlope The slope of the new day segment.
+ * @param {number} newIntercept The intercept of the new day segment.
+ * @param {string} newNote The notes for the new day segment.
+ * @param {string} splitTime The time to split the segment at.
+ */
+router.post('/splitEarlier', adminAuthMiddleware('split earlier day segment'), async (req, res) => {
+	const validDaySegment = {
+		type: 'object',
+		maxProperties: 5,
+		required: ['id', 'newSlope', 'newIntercept', 'splitTime'],
+		additionalProperties: false,
+		properties: {
+			id: {
+				type: 'integer',
+				minimum: 0
+			},
+			newSlope: {
+				type: 'number'
+			},
+			newIntercept: {
+				type: 'number'
+			},
+			newNote: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			splitTime: {
+				type: 'number',
+				minimum: 1,
+				maximum: 23
+			}
+		}
+	};
+
+	const validatorResult = validate(req.body, validDaySegment);
+	if (!validatorResult.valid) {
+		const errMsg = `Got request to split a day segment earlier with invalid day segment data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
+	} else {
+		const conn = getConnection();
+		try {
+			await DaySegment.splitEarlier(
+				req.body.id,
+				req.body.newSlope,
+				req.body.newIntercept,
+				req.body.newNote,
+				req.body.splitTime,
+				conn
+			);
+			success(res, `Successfully split day segment earlier`);
+		} catch (err) {
+			const errMsg = `Error while splitting day segment earlier with error(s): ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
+		}
+	}
+});
+
+/**
+ * POST split day segment, the later segment uses the new slope/intercept/note
+ * @param {integer} newDayId The day id for the new day segment.
+ * @param {number} newSlope The slope of the new day segment.
+ * @param {number} newIntercept The intercept of the new day segment.
+ * @param {string} newNote The notes for the new day segment.
+ * @param {string} splitTime The time to split the segment at.
+ */
+router.post('/splitLater', adminAuthMiddleware('split later day segment'), async (req, res) => {
+	const validDaySegment = {
+		type: 'object',
+		maxProperties: 5,
+		required: ['id', 'newSlope', 'newIntercept', 'splitTime'],
+		additionalProperties: false,
+		properties: {
+			id: {
+				type: 'integer',
+				minimum: 0
+			},
+			newSlope: {
+				type: 'number'
+			},
+			newIntercept: {
+				type: 'number'
+			},
+			newNote: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			splitTime: {
+				type: 'number',
+				minimum: 1,
+				maximum: 23
+			}
+		}
+	};
+
+	const validatorResult = validate(req.body, validDaySegment);
+	if (!validatorResult.valid) {
+		const errMsg = `Got request to split a day segment later with invalid day segment data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
+	} else {
+		const conn = getConnection();
+		try {
+			await DaySegment.splitLater(
+				req.body.id,
+				req.body.newSlope,
+				req.body.newIntercept,
+				req.body.newNote,
+				req.body.splitTime,
+				conn
+			);
+			success(res, `Successfully split day segment later`);
+		} catch (err) {
+			const errMsg = `Error while splitting day segment later with error(s): ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
+		}
+	}
+});
+
+/**
+ * POST edit day segment.
+	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
+ * @param {integer} dayId The id for the day.
+ * @param {number} startHour The new hour the day segment starts.
+ * @param {number} endHour The new hour the day segment ends.
+ * @param {number} slope The new slope of the day segment.
+ * @param {number} intercept The new intercept of the day segment.
+ * @param {string} note The new notes for the day segment.
+ * @param {number} originalStartHour The start hour of the day segment before it is edited.
+ * @param {number} originalEndHour The end hour of the day segment before it is edited.
  */
 router.post('/edit', adminAuthMiddleware('edit day segment'), async (req, res) => {
 	const validDaySegment = {
 		type: 'object',
-		maxProperties: 7,
-		required: ['id', 'dayId', 'startHour', 'endHour', 'slope', 'intercept'],
+		maxProperties: 9,
+		required: ['id', 'dayId', 'startHour', 'endHour', 'slope', 'intercept', 'originalStartHour', 'originalEndHour'],
 		properties: {
 			id: {
-				type: 'integer', 
+				type: 'integer',
 				minimum: 0
 			},
 			dayId: {
-				type: 'integer', 
+				type: 'integer',
 				minimum: 0
 			},
 			startHour: {
@@ -202,47 +340,77 @@ router.post('/edit', adminAuthMiddleware('edit day segment'), async (req, res) =
 					{ type: 'string' },
 					{ type: 'null' }
 				]
+			},
+			originalStartHour: {
+				type: 'number',
+				minimum: 0,
+				maximum: 23
+			},
+			originalEndHour: {
+				type: 'number',
+				minimum: 1,
+				maximum: 24
 			}
 		}
 	};
 
 	const validatorResult = validate(req.body, validDaySegment);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit day segments with invalid day segment data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit day segments with invalid day segment data, errors: ${validatorResult.errors}`);
+		const errMsg = `Got request to edit a day segment with invalid data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
 	} else {
 		const conn = getConnection();
 		try {
 			const updatedDaySegment = new DaySegment(
-				req.body.id, 
+				req.body.id,
 				req.body.dayId,
 				req.body.startHour,
 				req.body.endHour,
 				req.body.slope,
-				req.body.intercept, 
+				req.body.intercept,
 				req.body.note
 			);
-			await updatedDaySegment.update(conn);
-			success(res, `Successfully updated day segment`);
+			await updatedDaySegment.update(
+				req.body.originalStartHour,
+				req.body.originalEndHour,
+				conn
+			);
+			success(res, `Successfully edited day segment`);
 		} catch (err) {
-			log.error(`Error while updating day segment with error(s): ${err}`);
-			failure(res, 500, `Error while updating day segment with error(s): ${err}`);
+			const errMsg = `Error while editing day segment with error(s): ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
 		}
 	}
 });
 
 /**
- * Route for POST, delete day segment.
+ * POST delete day segment after updating the end time of the previous segment to the end time of the deleted segment.
+ * @param {integer} dayId The day id for the day segment to be deleted.
+ * @param {number} startHour The start hour of the segment to delete.
+ * @param {number} endHour The end hour of the segment to delete.
  */
-router.post('/delete', adminAuthMiddleware('delete day segment'), async (req, res) => {
+router.post('/deleteEarlier', adminAuthMiddleware('delete earlier day segment'), async (req, res) => {
 	const validDaySegment = {
 		type: 'object',
-		maxProperties: 1,
-		required: ['id'],
+		maxProperties: 3,
+		required: ['dayId', 'startHour', 'endHour'],
 		properties: {
-			id: {
-				type: 'integer', 
+			dayId: {
+				type: 'integer',
 				minimum: 0
+			},
+			startHour: {
+				type: 'number',
+				// if it was 0, there would be no previous segment
+				minimum: 1,
+				maximum: 23
+			},
+			endHour: {
+				type: 'number',
+				minimum: 1,
+				maximum: 24
 			}
 		}
 	};
@@ -250,18 +418,78 @@ router.post('/delete', adminAuthMiddleware('delete day segment'), async (req, re
 	// Ensure day segment object is valid
 	const validatorResult = validate(req.body, validDaySegment);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to delete day segments with invalid day segment data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to delete day segments with invalid day segment data. Error(s): ${validatorResult.errors}`);
+		const errMsg = `Got request to delete earlier day segment with invalid data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
 	} else {
 		const conn = getConnection();
 		try {
-			// Don't worry about checking if the day segment already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await DaySegment.delete(req.body.id, conn);
-			success(res, 'Successfully deleted day segment');
+			await DaySegment.deleteEarlier(
+				req.body.dayId,
+				req.body.startHour,
+				req.body.endHour,
+				conn
+			);
+			success(res, 'Successfully deleted earlier day segment.');
 		} catch (err) {
-			log.error(`Error while deleting day segment with error(s): ${err}`);
-			failure(res, 500, `Error while deleting day segment with errors(s): ${err}`);
+			const errMsg = `Error while deleting earlier day segment with error(s): ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
+		}
+	}
+});
+
+
+/**
+ * POST delete day segment after updating the start time of the following segment to the start time of the deleted segment.
+ * @param {integer} dayId The day id for the day segment to be deleted.
+ * @param {number} startHour The start hour of the segment to delete.
+ * @param {number} endHour The end hour of the segment to delete.
+ */
+router.post('/deleteLater', adminAuthMiddleware('delete later day segment'), async (req, res) => {
+	const validDaySegment = {
+		type: 'object',
+		maxProperties: 3,
+		required: ['dayId', 'startHour', 'endHour'],
+		properties: {
+			dayId: {
+				type: 'integer',
+				minimum: 0
+			},
+			startHour: {
+				type: 'number',
+				minimum: 0,
+				maximum: 23
+			},
+			endHour: {
+				type: 'number',
+				minimum: 1,
+				// if it was 24, there would be no following segment
+				maximum: 23
+			}
+		}
+	};
+
+	// Ensure day segment object is valid
+	const validatorResult = validate(req.body, validDaySegment);
+	if (!validatorResult.valid) {
+		const errMsg = `Got request to delete later day segment with invalid data, error(s): ${validatorResult.errors}`;
+		log.warn(errMsg);
+		failure(res, 400, errMsg);
+	} else {
+		const conn = getConnection();
+		try {
+			await DaySegment.deleteLater(
+				req.body.dayId,
+				req.body.startHour,
+				req.body.endHour,
+				conn
+			);
+			success(res, 'Successfully deleted later day segment.');
+		} catch (err) {
+			const errMsg = `Error while deleting later day segment with error(s): ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
 		}
 	}
 });

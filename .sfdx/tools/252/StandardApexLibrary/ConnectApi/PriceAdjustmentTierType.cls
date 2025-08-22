@@ -1,4 +1,0 @@
-global enum PriceAdjustmentTierType {
-AMOUNTBASEDADJUSTMENT,
-PERCENTAGEBASEDADJUSTMENT
-}

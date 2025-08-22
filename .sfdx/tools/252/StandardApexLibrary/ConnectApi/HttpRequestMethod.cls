@@ -1,8 +1,0 @@
-global enum HttpRequestMethod {
-HTTPDELETE,
-HTTPGET,
-HTTPHEAD,
-HTTPPATCH,
-HTTPPOST,
-HTTPPUT
-}

@@ -1,6 +1,0 @@
-global enum SmartDataDiscoveryPredictionTypeEnum {
-CLASSIFICATION,
-MULTICLASSCLASSIFICATION,
-REGRESSION,
-UNKNOWN
-}

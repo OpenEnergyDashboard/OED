@@ -8,6 +8,7 @@ const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const { success, failure } = require('./response');
 const validate = require('jsonschema').validate;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ function formatConversionForResponse(item) {
 /**
  * Route for getting all conversions.
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Conversion.getAll(conn);
@@ -33,18 +34,18 @@ router.get('/', async (req, res) => {
 /**
  * Route for POST, edit conversion.
  */
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'bidirectional'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
@@ -82,19 +83,19 @@ router.post('/edit', async (req, res) => {
  * Route for POST add conversion.
  * The slope, intercept, week pattern id, and note are included to create a new conversion segment spanning from -infinity to infinity.
  */
-router.post('/add', async (req, res) => {
+router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
 		maxProperties: 8,
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
@@ -108,7 +109,10 @@ router.post('/add', async (req, res) => {
 				]
 			},
 			weekPatternsId: {
-				type: 'number'
+				oneOf: [
+					{ type: 'integer' },
+					{ type: 'null' }
+				]
 			},
 			slope: {
 				type: 'number'
@@ -125,7 +129,6 @@ router.post('/add', async (req, res) => {
 		}
 	};
 	const validatorResult = validate(req.body, validConversion);
-
 	if (!validatorResult.valid) {
 		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
@@ -159,19 +162,19 @@ router.post('/add', async (req, res) => {
 /**
  * Route for POST, delete conversion.
  */
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, res) => {
 	// Only require a source and destination id
 	const validConversion = {
 		type: 'object',
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			}

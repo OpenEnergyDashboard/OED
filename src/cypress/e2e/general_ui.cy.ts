@@ -11,6 +11,32 @@ describe('UI Functionality Tests for Open Energy Dashboard', () => {
 		cy.visit('/');
 	});
 
+	const viewports = [
+		{ name: 'desktop', width: 1280, height: 800 },
+		{ name: 'mobile',  width: 375,  height: 667 }
+	];
+
+	viewports.forEach(({ name, width, height }) => {
+		context(`@${name} viewport`, () => {
+			before(() => {
+				cy.viewport(width, height);
+			});
+
+			it(`should click all visible buttons on ${name}`, () => {
+				cy.get('button:visible').then(($buttons) => {
+					const count = $buttons.length;
+					cy.log(`Found ${count} visible buttons on ${name}`)
+				});
+				cy.get('button:visible').each(($btn) => {
+					cy.wrap($btn)
+						.scrollIntoView()
+						.click();
+				});
+
+			});
+		});
+	});
+
 	// it('Tests all buttons functionality', () => {
 	// 	// Ensure buttons are visible and clickable
 	// 	cy.get('button').should('have.length.greaterThan', 0); // Ensure buttons exist

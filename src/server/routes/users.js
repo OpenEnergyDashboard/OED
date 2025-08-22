@@ -3,19 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const bcrypt = require('bcryptjs');
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const express = require('express');
 const User = require('../models/User');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const { adminAuthMiddleware } = require('./authenticator');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
 
 const router = express.Router();
 
 /**
- * Route for getting all users
+ * Route for listing all users.
  */
 router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 	const conn = getConnection();
@@ -27,11 +27,8 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 	}
 });
 
-
-/**
- * Route for obtaining the requestor's user info
- */
-router.get('/token', async (req, res) => {
+// Route for obtaining the requestor's user info
+router.get('/token', optionalAuthMiddleware, async (req, res) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
 		type: 'string'
@@ -61,10 +58,7 @@ router.get('/token', async (req, res) => {
 	}
 });
 
-/**
- * Route for getting a specific user by ID
- * @param user_id
- */
+// Route for fetching a user by ID.
 router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -91,6 +85,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 	}
 });
 
+// Route for creating a new user.
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
@@ -134,10 +129,8 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 	}
 });
 
-/**
- * Route for updating user role
- */
-router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res) => {
+// Route for updating an existing user.
+router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	
 	const validParams = {
 		type: 'object',
@@ -224,9 +217,7 @@ router.post('/edit', adminAuthMiddleware('update a user role'), async (req, res)
 	}
 });
 
-/**
- * Route for deleting a user
- */
+// Route for deleting a user.
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',

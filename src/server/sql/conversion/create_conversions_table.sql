@@ -3,12 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 CREATE TABLE IF NOT EXISTS conversions (
-    source_id INTEGER NOT NULL REFERENCES units(id),
-    destination_id INTEGER NOT NULL REFERENCES units(id),
-    bidirectional BOOLEAN NOT NULL,
-    -- slope FLOAT,
-    -- intercept FLOAT,
-    note TEXT,
-    CHECK (source_id != destination_id),
-    PRIMARY KEY (source_id, destination_id)
+	source_id INTEGER NOT NULL REFERENCES units(id),
+	destination_id INTEGER NOT NULL REFERENCES units(id),
+	bidirectional BOOLEAN NOT NULL,
+	note TEXT,
+	CHECK (source_id != destination_id),
+	PRIMARY KEY (source_id, destination_id)
 );

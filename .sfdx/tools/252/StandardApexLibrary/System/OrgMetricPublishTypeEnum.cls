@@ -1,6 +1,0 @@
-global enum OrgMetricPublishTypeEnum {
-DURATION,
-NONE,
-REQUEST_COUNT,
-REQUEST_COUNT_AND_DURATION
-}

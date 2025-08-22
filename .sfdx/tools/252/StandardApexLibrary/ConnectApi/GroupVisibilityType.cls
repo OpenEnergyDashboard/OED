@@ -1,5 +1,0 @@
-global enum GroupVisibilityType {
-PRIVATEACCESS,
-PUBLICACCESS,
-UNLISTEDACCESS
-}

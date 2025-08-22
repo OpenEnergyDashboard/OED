@@ -1,5 +1,0 @@
-global enum AchievementMappingTypeEnum {
-CONCRETEACHIEVEMENT,
-SHAREDACHIEVEMENT,
-SKILLACHIEVEMENT
-}

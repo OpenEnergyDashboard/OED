@@ -1,7 +1,0 @@
-global enum DataKitStatusEnum {
-ACTIVE,
-DELETING,
-ERROR,
-INACTIVE,
-PROCESSING
-}

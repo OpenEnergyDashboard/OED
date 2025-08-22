@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-UPDATE conversions
-	SET
-		bidirectional = ${bidirectional},
-		note = ${note}
-	WHERE source_id = ${sourceId} AND destination_id = ${destinationId};
+ALTER TABLE conversions
+	DROP COLUMN IF EXISTS slope,
+	DROP COLUMN IF EXISTS intercept
+;

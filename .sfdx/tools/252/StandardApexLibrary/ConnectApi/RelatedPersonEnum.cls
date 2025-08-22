@@ -1,6 +1,0 @@
-global enum RelatedPersonEnum {
-ACCOUNT,
-APPLICANT,
-CONTACT,
-PARTYPROFILE
-}

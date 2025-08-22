@@ -4,24 +4,23 @@
 -- Insert a new week pattern into the week table
 
 INSERT INTO week_patterns (
-	week_name, 
-	note, 
-	sunday, 
-	monday, 
-	tuesday, 
-	wednesday, 
-	thursday, 
-	friday, 
+	name,
+	note,
+	sunday,
+	monday,
+	tuesday,
+	wednesday,
+	thursday,
+	friday,
 	saturday
 ) VALUES (
-	${weekName}, 
-	${note}, 
-	${sunday}, 
-	${monday}, 
-	${tuesday}, 
-	${wednesday}, 
+	${name},
+	${note},
+	${sunday},
+	${monday},
+	${tuesday},
+	${wednesday},
 	${thursday}, 
-	${friday}, 
+	${friday},
 	${saturday}
-)
-RETURNING id;
+);

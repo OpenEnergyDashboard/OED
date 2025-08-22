@@ -1,5 +1,0 @@
-global enum RecordAlertSourceType {
-BUSINESSRULESENGINE,
-EXTERNAL,
-INTERNAL
-}

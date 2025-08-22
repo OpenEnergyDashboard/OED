@@ -1,9 +1,0 @@
-global enum SocialPostMessageType {
-COMMENT,
-DIRECT,
-POST,
-PRIVATEMESSAGE,
-REPLY,
-RETWEET,
-TWEET
-}

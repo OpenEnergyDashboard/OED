@@ -1,9 +1,0 @@
-global enum StoryChartValueTypeEnum {
-AVERAGE,
-BASELINE,
-IMPACT,
-PREDICTION,
-SMALLTERMS,
-UNEXPLAINED,
-VALUE
-}

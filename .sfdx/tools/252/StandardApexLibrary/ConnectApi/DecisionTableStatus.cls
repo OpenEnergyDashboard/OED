@@ -1,6 +1,0 @@
-global enum DecisionTableStatus {
-ACTIVATIONINPROGRESS,
-ACTIVE,
-DRAFT,
-INACTIVE
-}

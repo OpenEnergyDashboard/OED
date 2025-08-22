@@ -1,6 +1,0 @@
-global enum FeedEntityStatus {
-DRAFT,
-ISOLATED,
-PENDINGREVIEW,
-PUBLISHED
-}

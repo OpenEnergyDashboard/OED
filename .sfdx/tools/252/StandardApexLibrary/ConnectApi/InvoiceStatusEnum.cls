@@ -1,7 +1,0 @@
-global enum InvoiceStatusEnum {
-DRAFT,
-DRAFTINPROGRESS,
-ERROR,
-POSTED,
-POSTINGINPROGRESS
-}

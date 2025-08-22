@@ -1,6 +1,0 @@
-global enum RelatedFeedPostType {
-ANSWERED,
-BESTANSWER,
-GENERIC,
-UNANSWERED
-}

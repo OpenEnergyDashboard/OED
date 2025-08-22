@@ -1,5 +1,0 @@
-global enum DeploymentActionEnum {
-FRESHDEPLOYMENT,
-REDEPLOYMENT,
-UPDATEDEPLOYMENT
-}
