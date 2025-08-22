@@ -22,6 +22,7 @@ interface MapViewProps {
 	editMapDetails(map: MapMetadata): any;
 	setCalibration(mode: CalibrationModeTypes, mapID: number): any;
 	removeMap(id: number): any;
+	onMapChange?: () => void;
 }
 
 interface MapViewState {
@@ -135,6 +136,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 						circleSize: parseFloat(this.state.circleInput)
 					};
 					this.props.editMapDetails(editedMap);
+					this.props.onMapChange?.(); // Mark as unsaved
 				}
 			}
 		}
@@ -227,6 +229,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			displayable: !this.props.map.displayable
 		};
 		this.props.editMapDetails(editedMap);
+		this.props.onMapChange?.(); // Mark as unsaved
 	}
 
 	private formatDisplayable() {
@@ -284,6 +287,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				name: this.state.nameInput
 			};
 			this.props.editMapDetails(editedMap);
+			this.props.onMapChange?.(); // Mark as unsaved
 		}
 		this.setState({ nameFocus: !this.state.nameFocus });
 	}
@@ -337,6 +341,7 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 				note: this.state.noteInput
 			};
 			this.props.editMapDetails(editedMap);
+			this.props.onMapChange?.(); // Mark as unsaved
 		}
 		this.setState({ noteFocus: !this.state.noteFocus });
 	}

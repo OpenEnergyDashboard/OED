@@ -43,6 +43,7 @@ import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 interface EditGroupModalComponentProps {
 	show: boolean;
@@ -61,6 +62,24 @@ interface EditGroupModalComponentProps {
 export default function EditGroupModalComponent(props: EditGroupModalComponentProps) {
 	const locale = useAppSelector(selectSelectedLanguage);
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any meter modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			handleClose(); // Proceed to close the modal
+		}
+	};
+
 	const [submitGroupEdits] = groupsApi.useEditGroupMutation();
 	const [deleteGroup] = groupsApi.useDeleteGroupMutation();
 	const globalCikState = useAppSelector(selectCik);
@@ -403,6 +422,37 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		// the deep meters of this group are properly updated.
 	}, [graphicUnitsState.possibleGraphicUnits, groupState.deepMeters, loggedInAsAdmin]);
 
+	// Checks if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	// Reuses code from this file's handleSubmit()
+	useEffect(() => {
+		// Check for changes by comparing the original, global state to edited state.
+		// This is the unedited state of the group being edited to compare to for changes.
+		const originalGroupState = groupDataById[groupState.id];
+		// Check children separately since lists.
+		const childMeterChanges = !isEqual(originalGroupState.childMeters, groupState.childMeters);
+		const childGroupChanges = !isEqual(originalGroupState.childGroups, groupState.childGroups);
+
+		//Compare the local changes to the default values
+		const editMade =
+			originalGroupState.id !== groupState.id
+			|| originalGroupState.name !== groupState.name
+			|| originalGroupState.gps !== groupState.gps
+			|| originalGroupState.displayable !== groupState.displayable
+			|| originalGroupState.note !== groupState.note
+			|| originalGroupState.area !== groupState.area
+			|| originalGroupState.defaultGraphicUnit !== groupState.defaultGraphicUnit
+			|| originalGroupState.areaUnit !== groupState.areaUnit
+			|| childMeterChanges
+			|| childGroupChanges;
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade);
+	}, [groupState, groupDataById]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
@@ -411,6 +461,26 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || !validGroup}
+				/>
+			)}
 			{/* This is for the modal for delete. */}
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
@@ -419,7 +489,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 				actionFunction={handleDeleteGroup}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal isOpen={props.show} toggle={props.handleClose} size={loggedInAsAdmin ? 'lg' : 'md'}>
+			<Modal isOpen={props.show} toggle={handleToggle} size={loggedInAsAdmin ? 'lg' : 'md'}>
 				{/* In a number of the items that follow, what is shown varies on whether you are an admin. */}
 				<ModalHeader>
 					<FormattedMessage id={loggedInAsAdmin ? 'edit.group' : 'group.details'} />
@@ -439,7 +509,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									name='name'
 									type='text'
 									autoComplete='on'
-									onChange={e => handleStringChange(e)}
+									onChange={e => {handleStringChange(e);}}
 									required value={groupState.name}
 									invalid={groupState.name === ''} />
 								<FormFeedback>
@@ -454,7 +524,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 									name='defaultGraphicUnit'
 									type='select'
 									value={groupState.defaultGraphicUnit}
-									onChange={e => handleNumberChange(e)}>
+									onChange={e => {handleNumberChange(e);}}>
 									{/* First list the selectable ones and then the rest as disabled. */}
 									{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 										return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
@@ -504,7 +574,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										name='displayable'
 										type='select'
 										value={groupState.displayable.toString()}
-										onChange={e => handleBooleanChange(e)}>
+										onChange={e => {handleBooleanChange(e);}}>
 										{Object.keys(TrueFalseType).map(key => {
 											return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 										})}
@@ -520,7 +590,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										name='gps'
 										type='text'
 										autoComplete='on'
-										onChange={e => handleStringChange(e)}
+										onChange={e => {handleStringChange(e);}}
 										value={getGPSString(groupState.gps)} />
 								</FormGroup>
 							</Col>
@@ -539,7 +609,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 											// cannot use defaultValue because it won't update when area is auto calculated
 											// this makes the validation redundant but still a good idea
 											value={groupState.area}
-											onChange={e => handleNumberChange(e)}
+											onChange={e => {handleNumberChange(e);}}
 											invalid={groupState.area < 0} />
 										{/* Calculate sum of meter areas */}
 										<Button color='secondary' onClick={handleAutoCalculateArea}>
@@ -561,7 +631,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 										name='areaUnit'
 										type='select'
 										value={groupState.areaUnit}
-										onChange={e => handleStringChange(e)}
+										onChange={e => {handleStringChange(e);}}
 										invalid={groupState.area > 0 && groupState.areaUnit === AreaUnitType.none}>
 										{Object.keys(AreaUnitType).map(key => {
 											return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
@@ -580,7 +650,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								id='note'
 								name='note'
 								type='textarea'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={nullToEmptyString(groupState.note)} />
 						</FormGroup>
 					</>}
@@ -696,7 +766,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 								<FormattedMessage id="discard.changes" />
 							</Button>
 							{/* On click calls the function handleSaveChanges in this component */}
-							<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
+							<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
 								<FormattedMessage id="save.all" />
 							</Button>
 						</div>
