@@ -3,10 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 const { expect } = require('chai');
-const { chai, mocha, app, testDB } = require('../common');
+const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
-const { validateString, validateInt, validateBool, validateMinMaxRelation, getToken } = require('../util/vaidationHelpers');
+const { validateString, validateInt, validateBool, validateMinMaxRelation, getToken } = require('../util/validationHelpers');
 
 //This is the end point we use to test in this file.
 const ADD_UNIT = '/api/units/addUnit';
@@ -57,16 +58,16 @@ mocha.describe('Validation - /addUnit', () => {
 			enumValues: Object.values(Unit.unitType)
 		});
 		await validateString({
-            field: 'displayable',
-            endpoint: ADD_UNIT,
-            basePayload,
-            enumValues: Object.values(Unit.displayableType)
-        });        
+			field: 'displayable',
+			endpoint: ADD_UNIT,
+			basePayload,
+			enumValues: Object.values(Unit.displayableType)
+		});
 		await validateString({
 			field: 'disableChecks',
 			endpoint: ADD_UNIT,
 			basePayload,
-			enumValues:  Object.values(Unit.disableChecksType)
+			enumValues: Object.values(Unit.disableChecksType)
 		});
 		await validateString({
 			field: 'suffix',
@@ -74,34 +75,34 @@ mocha.describe('Validation - /addUnit', () => {
 			basePayload,
 			minLength: 1,
 			maxLength: 50,
-			required : false
+			required: false
 		});
 	});
 	mocha.it('should validate numeric and integer fields', async () => {
-        await validateInt({
-            field: 'secInRate',
-            endpoint: ADD_UNIT,
-            basePayload,
-            required: false,
-            min: 1,
-        });
-        await validateInt({
-            field: 'minVal',
-            endpoint: ADD_UNIT,
-            basePayload,
-            required: true
-        });
-        await validateInt({
-            field: 'maxVal',
-            endpoint: ADD_UNIT,
-            basePayload,
-            required: true
-        });
+		await validateInt({
+			field: 'secInRate',
+			endpoint: ADD_UNIT,
+			basePayload,
+			required: false,
+			min: 1,
+		});
+		await validateInt({
+			field: 'minVal',
+			endpoint: ADD_UNIT,
+			basePayload,
+			required: true
+		});
+		await validateInt({
+			field: 'maxVal',
+			endpoint: ADD_UNIT,
+			basePayload,
+			required: true
+		});
 		await validateMinMaxRelation({
 			endpoint: ADD_UNIT,
 			basePayload
 		});
-    });
+	});
 	mocha.it('should validate boolean fields', async () => {
 		await validateBool({
 			field: 'preferredDisplay',

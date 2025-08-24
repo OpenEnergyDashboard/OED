@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*This file implements to the api/units route */
+/* This file implements to the api/units route */
 const express = require('express');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { log } = require('../log');
@@ -101,7 +101,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
-	}; 
+	};
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
@@ -133,7 +133,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 		} catch (err) {
 			const msg = `Failed to edit unit: ${err}`;
 			log.error(msg);
-        	failure(res, 500, msg);
+			failure(res, 500, msg);
 		}
 	}
 });
@@ -145,7 +145,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
-		additionalProperties: false, 
+		additionalProperties: false,
 		properties: {
 			// TODO Probably should not be passed
 			// id: { type: 'integer' },
@@ -167,7 +167,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			secInRate: {
 				type: 'integer',
 				minimum: 1
-			},	
+			},
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
@@ -210,6 +210,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	if (validationResult.valid && req.body.minVal > req.body.maxVal) {
 		validationResult.valid = false;
 		validationResult.errors = [
+			// Given the result is valid it is unlikely there are any errors but this was used to be careful.
 			...(validationResult.errors || []),
 			{ message: "'maxVal' must be greater than or equal to 'minVal'" }
 		];

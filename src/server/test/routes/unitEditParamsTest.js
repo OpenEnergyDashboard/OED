@@ -8,7 +8,7 @@ const { expect } = require('chai');
 const { chai, mocha, app, testDB } = require('../common');
 const Unit = require('../../models/Unit');
 const { insertUnits } = require('../../util/insertData');
-const {validateString, validateInt, validateBool, validateMinMaxRelation, getToken} = require('../util/vaidationHelpers');
+const { validateString, validateInt, validateBool, validateMinMaxRelation, getToken } = require('../util/validationHelpers');
 
 const EDIT_UNIT = '/api/units/edit';
 

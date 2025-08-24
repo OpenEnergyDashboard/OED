@@ -9,7 +9,9 @@ const chaiHttp = require('chai-http');
 const { chai, app, testDB, testUser } = require('../common');
 chai.use(chaiHttp);
 
-
+/**
+ * @returns The token to use the testUser.
+ */
 async function getToken() {
 	let res = await chai.request(app).post('/api/login').send({ username: testUser.username, password: testUser.password });
 	token = res.body.token;
@@ -27,8 +29,8 @@ async function getToken() {
  * @param basePayload the base valid payload object to clone and modify
  * @param expectedStatus the expected HTTP status code (default 400 for validation errors)
  */
-async function testInvalidField({ field, invalidValue, endpoint, basePayload }) {
-	const token = await getToken();
+ async function testInvalidField({ field, invalidValue, endpoint, basePayload }) {
+	const token = await getToken(); 
 	const payload = { ...basePayload };
 	if (invalidValue === undefined) {
 		delete payload[field];
@@ -37,7 +39,7 @@ async function testInvalidField({ field, invalidValue, endpoint, basePayload }) 
 	}
 	const res = await chai.request(app)
 		.post(endpoint)
-		.set('token', token)
+		.set('token', token) 
 		.send(payload);
 
 	expect(res).to.have.status(400);
@@ -50,18 +52,18 @@ async function testInvalidField({ field, invalidValue, endpoint, basePayload }) 
  * @param basePayload a valid payload object to use as the base for testing
  */
 async function validateMinMaxRelation({ endpoint, basePayload }) {
-	const token = await getToken();
-	const invalidPayload = {
-		...basePayload,
-		minVal: (basePayload.minVal || 10) + 1,
-		maxVal: basePayload.minVal || 10
-	};
-	const res = await chai.request(app)
-		.post(endpoint)
-		.set('token', token)
-		.send(invalidPayload);
-
-	expect(res).to.have.status(400);
+	const token = await getToken(); 
+    const invalidPayload = {
+        ...basePayload,
+        minVal: (basePayload.minVal || 10) + 1,  
+        maxVal: basePayload.minVal || 10 
+    };
+    const res = await chai.request(app)
+        .post(endpoint)
+		.set('token', token) 
+        .send(invalidPayload);
+    
+    expect(res).to.have.status(400);
 }
 
 /**
