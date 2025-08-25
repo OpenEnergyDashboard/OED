@@ -110,7 +110,7 @@ export const RefreshGraphComponent = () => {
 					const maxX = initialXAxisRange?.getEndTimestamp?.();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
 					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
-					dispatch(updateTimeCreated())
+					dispatch(updateTimeCreated());
 				}
 			}}
 		/>

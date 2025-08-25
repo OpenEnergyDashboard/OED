@@ -141,7 +141,7 @@ export const graphSlice = createSlice({
 			if (state.current.threeD.meterOrGroupID !== action.payload) {
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
-		},updateTimeCreated: (state) => {
+		},updateTimeCreated: state => {
 			state.current.timeCreated = new TimeInterval(moment(), moment());
 		},
 
@@ -293,11 +293,12 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
-							case 'timeSpan':
-								const days = parseFloat(value)
-								const now = moment()
-								const leftBound = now.clone().subtract(days, 'days')
-								current.rangeSliderInterval = new TimeInterval(leftBound,undefined)
+							case 'timeSpan':{
+								const days = parseFloat(value);
+								const now = moment();
+								const leftBound = now.clone().subtract(days, 'days');
+								current.rangeSliderInterval = new TimeInterval(leftBound,undefined);
+								break;}
 						}
 					});
 				}

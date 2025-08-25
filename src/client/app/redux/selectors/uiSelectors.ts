@@ -454,7 +454,6 @@ export const selectChartLink = createAppSelector(
 		selectChartLinkHideOptions,
 		selectSliderRangeInterval,
 		selectIsKeepCurrent,
-		
 		state => state.maps.selectedMap
 	],
 	(current, chartLinkHideOptions, rangeSliderInterval, isKeepCurrent,selectedMap) => {
@@ -516,16 +515,13 @@ export const selectChartLink = createAppSelector(
 		if (chartLinkHideOptions) {
 			linkText += '&optionsVisibility=false';
 		}
-
-		if(isKeepCurrent){
-		const timeCreatedEnd = current.timeCreated.getEndTimestamp()
-		const sliderStart = current.rangeSliderInterval.getStartTimestamp()
-		const diffDays = timeCreatedEnd.diff(sliderStart,'days',true)
-   		 linkText += `&timeSpan=${diffDays.toFixed(2)}`;
+		if (isKeepCurrent) {
+			const timeCreatedEnd = current.timeCreated.getEndTimestamp();
+			const sliderStart = current.rangeSliderInterval.getStartTimestamp();
+			const diffDays = timeCreatedEnd.diff(sliderStart, 'days', true);
+			linkText += `&timeSpan=${diffDays.toFixed(2)}`;
 		}
-		
 		return linkText;
-		
 	}
 );
 

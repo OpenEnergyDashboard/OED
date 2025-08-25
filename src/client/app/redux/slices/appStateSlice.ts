@@ -35,7 +35,7 @@ const defaultState: AppState = {
 	chartLinkHideOptions: false,
 	languageManuallySet: false,
 	refreshingReadings: false,
-	isKeepCurrent: false,
+	isKeepCurrent: false
 };
 
 export const appStateSlice = createThunkSlice({
@@ -138,7 +138,7 @@ export const appStateSlice = createThunkSlice({
 		selectSelectedLanguage: state => state.selectedLanguage,
 		selectChartLinkHideOptions: state => state.chartLinkHideOptions,
 		selectRefreshingReadings: state => state.refreshingReadings,
-		selectIsKeepCurrent: state => state.isKeepCurrent,
+		selectIsKeepCurrent: state => state.isKeepCurrent
 
 	}
 });
