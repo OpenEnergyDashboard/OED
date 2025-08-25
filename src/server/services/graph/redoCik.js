@@ -40,29 +40,31 @@ async function updateCikAndViews() {
  * in the cik_vary table in the database.
  */
 async function redoCikVary(conn) {
-    // Create graph based on units and conversion segments.
-    const graph = await createConversionSegmentGraph(conn);
-    // Processes suffix units to update graph and database (not used for now).
-    // await handleSuffixUnits(graph, conn);
-    // Uses final graph to create cik_vary array.
-    const cikVary = await createCikVaryArray(graph, conn);
-    // Inserts cik_vary array into database where old values are deleted.
-    await CikVary.insert(cikVary, conn);
+	// Create graph based on units and conversion segments.
+	const graph = await createConversionGraph(conn);
+	console.log('Graph created with nodes:', graph.getNodesCount(), 'and links:', graph.getLinksCount());
+	// Processes suffix units to update graph and database (not used for now).
+	// await handleSuffixUnits(graph, conn);
+	// Uses final graph to create cik_vary array.
+	const cikVary = await createCikVaryArray(graph, conn);
+	console.log('cikVary array to insert:', cikVary);
+	// Inserts cik_vary array into database where old values are deleted.
+	await CikVary.insert(cikVary, conn);
 }
 
 /**
  * Needed to call from npm run for CikVary. Give new name so hopefully won't use in regular code.
 */
 async function updateCikVaryAndViews() {
-    const conn = getConnection();
-    await redoCikVary(conn);
-    // We need to update views if CikVary changes.
-    await refreshAllReadingViews();
+	const conn = getConnection();
+	await redoCikVary(conn);
+	// We need to update views if CikVary changes.
+	await refreshAllReadingViews();
 }
 
 module.exports = {
 	redoCik,
 	updateCikAndViews,
-    redoCikVary,
-    updateCikVaryAndViews
+	redoCikVary,
+	updateCikVaryAndViews
 };

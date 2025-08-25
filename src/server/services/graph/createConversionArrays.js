@@ -76,37 +76,43 @@ async function createCikArray(graph, conn) {
  */
 async function createCikVaryArray(graph, conn) {
 	const sources = await Unit.getTypeMeter(conn);
+	//console.log('Sources:', sources.map(u => ({ id: u.id, name: u.name, type: u.type })));
 	const destinations = (await Unit.getTypeUnit(conn)).concat(await Unit.getTypeSuffix(conn));
+	//console.log('Destinations:', destinations.map(u => ({ id: u.id, name: u.name, type: u.type })));
 	const c = [];
 	// Helper to fetch all segments for an edge
 	async function getEdgeConversions(sourceId, destinationId, conn) {
-			// Returns array of {start_time, end_time, slope, intercept}
-			return await ConversionSegment.getAllForEdge(conn, sourceId, destinationId);
+		// Returns array of {start_time, end_time, slope, intercept}
+		const toReturn = await ConversionSegment.getAllForEdge(conn, sourceId, destinationId);
+		//console.log(`Edge conversions from ${sourceId} to ${destinationId}:`, toReturn);
+		return toReturn;
 	}
 	for (const source of sources) {
-			for (const destination of destinations) {
-					const sourceId = source.id;
-					const destinationId = destination.id;
-					const path = getPath(graph, sourceId, destinationId);
-					if (path !== null) {
-							const segments = await timeVaryingPathConversion(path, conn, getEdgeConversions);
-							segments.forEach(seg => {
-									c.push({
-											source: sourceId,
-											destination: destinationId,
-											start_time: seg.start_time,
-											end_time: seg.end_time,
-											slope: seg.slope,
-											intercept: seg.intercept
-									});
-							});
-					}
+		for (const destination of destinations) {
+			const sourceId = source.id;
+			const destinationId = destination.id;
+			const path = getPath(graph, sourceId, destinationId);
+			//console.log(`Path from ${sourceId} to ${destinationId}:`, path);
+			if (path !== null) {
+				const segments = await timeVaryingPathConversion(path, conn, getEdgeConversions);
+				//console.log(`Segments for path ${sourceId} -> ${destinationId}:`, segments);
+				segments.forEach(seg => {
+					c.push({
+						source: sourceId,
+						destination: destinationId,
+						start_time: seg.start_time,
+						end_time: seg.end_time,
+						slope: seg.slope,
+						intercept: seg.intercept
+					});
+				});
 			}
+		}
 	}
 	return c;
 }
 
 module.exports = {
-	   createCikArray,
-	   createCikVaryArray
+	createCikArray,
+	createCikVaryArray
 }

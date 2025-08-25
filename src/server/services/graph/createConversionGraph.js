@@ -38,25 +38,25 @@ async function createConversionGraph(conn) {
  * @returns {Object}
  */
 async function createConversionSegmentGraph(conn) {
-    const graph = createGraph();
-    const units = await Unit.getAll(conn);
-    for (const unit of units) {
-        graph.addNode(unit.id, unit.name);
-    }
+	const graph = createGraph();
+	const units = await Unit.getAll(conn);
+	for (const unit of units) {
+		graph.addNode(unit.id, unit.name);
+	}
 
-    // Get all conversion segments (may be multiple per edge, but we only care about existence)
-    const segments = await ConversionSegment.getAll(conn);
-    const addedEdges = new Set();
+	// Get all conversion segments (may be multiple per edge, but we only care about existence)
+	const segments = await ConversionSegment.getAllForEdge(conn);
+	const addedEdges = new Set();
 
-    for (const seg of segments) {
-        const key = `${seg.sourceId}->${seg.destinationId}`;
-        if (!addedEdges.has(key)) {
-            graph.addLink(seg.sourceId, seg.destinationId);
-            addedEdges.add(key);
-        }
-    }
+	for (const seg of segments) {
+		const key = `${seg.sourceId}->${seg.destinationId}`;
+		if (!addedEdges.has(key)) {
+			graph.addLink(seg.sourceId, seg.destinationId);
+			addedEdges.add(key);
+		}
+	}
 
-    return graph;
+	return graph;
 }
 
 /**
