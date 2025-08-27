@@ -96,7 +96,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				}
 			}
 		}),
-		simulateDeleteConversion: builder.mutation<SimulateDeleteResult, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
+		simulateDeleteConversion: builder.query<SimulateDeleteResult, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
 			query: conversion => ({
 				url: 'api/conversions/simulate-delete',
 				method: 'POST',
