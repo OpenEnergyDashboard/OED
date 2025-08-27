@@ -8,7 +8,7 @@ const Meter = require('../models/Meter');
 const Group = require('../models/Group');
 const Unit = require('../models/Unit');
 const { createConversionGraph, createConversionGraphFromArray } = require('./graph/createConversionGraph');
-const { intersectSets, compatibleUnitsForMeter } = require('./compatibleUnits');
+const { intersectSets, compatibleUnitsForMeter } = require('../util/compatibleUnits');
 
 async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 
