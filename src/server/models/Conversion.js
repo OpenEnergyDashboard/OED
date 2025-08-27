@@ -72,29 +72,29 @@ class Conversion {
 	 * @param {*} conn The connection to use.
 	 */
 	async insert(weekPatternsId, slope, intercept, segmentNote, conn) {
-		// insert new conversion
-		const conversionData = {
-			sourceId: this.sourceId,
-			destinationId: this.destinationId,
-			bidirectional: this.bidirectional,
-			note: this.note
-		};
+		return conn.tx(async t => { 
+			// insert new conversion
+			const conversionData = {
+				sourceId: this.sourceId,
+				destinationId: this.destinationId,
+				bidirectional: this.bidirectional,
+				note: this.note
+			};
+			await t.none(sqlFile('conversion/insert_new_conversion.sql'), conversionData);
 
-		await conn.none(sqlFile('conversion/insert_new_conversion.sql'), conversionData);
-
-		// insert new conversion segment
-		const conversionSegment = {
-			sourceId: this.sourceId,
-			destinationId: this.destinationId,
-			weekPatternsId: weekPatternsId,
-			slope: slope,
-			intercept: intercept,
-			startTime: '-infinity',
-			endTime: 'infinity',
-			note: segmentNote
-		};
-
-		await conn.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), conversionSegment);
+			// insert new conversion segment
+			const conversionSegment = {
+				sourceId: this.sourceId,
+				destinationId: this.destinationId,
+				weekPatternsId: weekPatternsId,
+				slope: slope,
+				intercept: intercept,
+				startTime: '-infinity',
+				endTime: 'infinity',
+				note: segmentNote
+			};
+			await t.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), conversionSegment);
+		});
 	}
 
 	/**
