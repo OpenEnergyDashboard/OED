@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { createSelector } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { selectCik, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectAllGroups } from '../../redux/api/groupsApi';
-import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi';
+import { selectAllMeters, selectMeterById, selectMeterDataById } from '../../redux/api/metersApi';
 import { selectAdminPreferences } from '../../redux/slices/adminSlice';
 import { ConversionData } from '../../types/redux/conversions';
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
@@ -20,6 +21,8 @@ import { createAppSelector } from './selectors';
 import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { DisableChecksType } from '../../types/redux/units';
 import { MAX_VAL, MIN_VAL } from '../../utils/input';
+import { Baseline, BaselineSegment, SplitBaselineSegmentPayload } from 'types/redux/baselines';
+import { selectBaselinesDetails } from '../api/baselineApi';
 
 export const MIN_DATE_MOMENT = moment(0).utc();
 export const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
@@ -336,6 +339,46 @@ export const selectDefaultCreateConversionValues = createAppSelector(
 			note: ''
 		};
 		return defaultValues;
+	}
+);
+
+const selectBaselineSegmentById = (baselineSegment: BaselineSegment) => baselineSegment.id;
+export const selectDefaultSplitBaselineSegmentValues = createSelector(
+	[selectBaselineSegmentById],
+	(id: number) => ({
+		id,
+		newBaselineValue: 0,
+		newNote: '',
+		splitTime: -999
+	} as SplitBaselineSegmentPayload)
+);
+
+// Baseline selector to be reviewed
+export const selectBaselineExists = createAppSelector(
+	[
+		selectMeterDataById,
+		selectBaselinesDetails,
+		(_state, baselineState) => baselineState
+	],
+	(meterDataById, baselines, baselineState): [boolean, string] => {
+		// Create Baseline Validation:
+		const baselineValue = baselineState.overallBaseline.baselineValue;
+		// const isActive = baselineState.overallBaseline.isActive;
+
+		// Baseline value not set or valid
+		if (baselineValue < 0) {
+			return [false, translate('baseline.create.baseline.value.not')];
+		}
+
+		// Baseline already exists 
+		// TO-DO: compare meter state ID with the baseline's meterID
+		if ((baselineState.findIndex((baseline: Baseline) => (
+			baseline.meterId === meterDataById[baseline.meterId].id
+		)) !== -1)) {
+			console.log("Baseline exists");
+			return [true, 'Baseline exists'];
+		}
+		return [false, 'Baseline does not exist'];
 	}
 );
 

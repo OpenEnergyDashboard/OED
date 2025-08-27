@@ -2,8 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { createSelector, EntityState, createEntityAdapter } from '@reduxjs/toolkit';
-import { Baseline } from '../../types/redux/baselines';
+import { createSelector } from '@reduxjs/toolkit';
+import { 
+    Baseline, 
+    BaselineSegment,
+    SplitBaselineSegmentPayload,
+    UpdateBaselineSegmentPayload
+} from '../../types/redux/baselines';
 import { baseApi } from './baseApi';
 // export const unitsAdapter = createEntityAdapter<Baseline>({
 //     selectId
@@ -18,6 +23,10 @@ export const baselineApi = baseApi.injectEndpoints({
             query: () => 'api/baseline',
             providesTags: ['Baselines']
         }),
+        getBaselineByMeterId: builder.query<Baseline, number>({
+			query: meterId => `api/baseline/${meterId}`,
+			providesTags: (result, error, id) => [{ type: 'Baselines', id }]
+		}),
         addBaseline: builder.mutation<void, Baseline>({
             query: baseline => ({
                 url: 'api/baseline/new',
@@ -32,19 +41,94 @@ export const baselineApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: baseline 
             }),
-            invalidatesTags: ['Baselines']
+            // invalidatesTags: ['Baselines']            
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'Baselines', id: arg.meterId }]
         }),
         deleteBaseline: builder.mutation<void, number>({
-            query: unitId => ({
+            query: meterId => ({
                 url: 'api/baseline/delete',
                 method: 'POST',
-                body: { id: unitId }
+                body: { id: meterId }
             }),
-            // You should not be able to delete a unit that is used in a meter or conversion
-            // so no invalidation for those.
             invalidatesTags: ['Baselines']
         })
     })
+});
+
+export const baselineSegmentsApi = baseApi.injectEndpoints({
+	endpoints: builder => ({
+		getBaselineSegmentsByMeterId: builder.query<BaselineSegment[], number>({
+			query: meterId => `api/baselineSegments/${meterId}`,
+			providesTags: (result, error, id) => [{ type: 'BaselineSegments', id }]
+		}),
+		addBaselineSegment: builder.mutation<void, Omit<BaselineSegment, 'id'>>({
+			query: baselineSegment => ({
+				url: 'api/baselineSegments/addBaselineSegment',
+				method: 'POST',
+				body: baselineSegment
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: ['BaselineSegments']
+		}),
+        // TO-DO: split functions
+		splitEarlier: builder.mutation<void, SplitBaselineSegmentPayload & Pick<BaselineSegment, 'meterId'>>({
+			query: ({ id, newBaselineValue, newNote, splitTime }) => ({
+				url: 'api/baselineSegments/splitEarlier',
+				method: 'POST',
+				body: { id, newBaselineValue, newNote, splitTime }
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		}),
+		splitLater: builder.mutation<void, SplitBaselineSegmentPayload & Pick<BaselineSegment, 'meterId'>>({
+			query: ({ id, newBaselineValue, newNote, splitTime }) => ({
+				url: 'api/baselineSegments/splitLater',
+				method: 'POST',
+				body: { id, newBaselineValue, newNote, splitTime }
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		}),
+		editBaselineSegment: builder.mutation<void, UpdateBaselineSegmentPayload>({
+			query: baselineSegment => ({
+				url: 'api/baselineSegments/edit',
+				method: 'POST',
+				body: baselineSegment
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		}),
+		deleteBaselineSegment: builder.mutation<void, BaselineSegment>({
+			query: ({ meterId, startHour, endHour }) => ({
+				url: 'api/baselineSegments/delete',
+				method: 'POST',
+				body: { meterId, startHour, endHour }
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		}),
+		// Deletes the provided day segment and updates the end hour of the previous segment
+		deleteBaselineSegmentEarlier: builder.mutation<void, BaselineSegment>({
+			query: ({ meterId, startHour, endHour }) => ({
+				url: 'api/baselineSegments/deleteEarlier',
+				method: 'POST',
+				body: { meterId, startHour, endHour }
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		}),
+		// Deletes the provided day segment and updates the start hour of the next segment
+		deleteBaselineSegmentLater: builder.mutation<void, BaselineSegment>({
+			query: ({ meterId, startHour, endHour }) => ({
+				url: 'api/baselineSegments/deleteLater',
+				method: 'POST',
+				body: { meterId, startHour, endHour }
+			}),
+			transformErrorResponse: res => res.data,
+			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
+		})
+	})
 });
 
 export const selectBaselinesQueryState = baselineApi.endpoints.getBaselinesDetails.select();
@@ -55,4 +139,17 @@ export const selectBaselinesDetails= createSelector(
     }
 );
 
-export const { selectEntities: selectBaselineById } = 
+export const {
+	useGetBaselinesDetailsQuery,
+	useGetBaselineByMeterIdQuery,
+	useAddBaselineMutation,
+	useEditBaselineMutation,
+	useDeleteBaselineMutation
+} = baselineApi;
+
+export const {
+	useGetBaselineSegmentsByMeterIdQuery,
+	useAddBaselineSegmentMutation,
+	useEditBaselineSegmentMutation,
+	useDeleteBaselineSegmentMutation
+} = baselineSegmentsApi;

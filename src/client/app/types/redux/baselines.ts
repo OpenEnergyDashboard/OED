@@ -10,3 +10,25 @@ export interface Baseline {
     isActive: boolean;  // whether there's a baseline applied or not
 	note: string;
 }
+
+export interface BaselineSegment {
+	id: number;
+	meterId: number;
+	startHour: number;
+	endHour: number;
+	baselineValue: number;
+	note?: string;
+}
+
+export interface UpdateBaselineSegmentPayload extends BaselineSegment {
+	originalStartHour: number;
+	originalEndHour: number;
+}
+
+export interface SplitBaselineSegmentPayload {
+	id: number;
+	meterId: number;
+	newBaselineValue: number;
+	newNote?: string;
+	splitTime: number;
+}

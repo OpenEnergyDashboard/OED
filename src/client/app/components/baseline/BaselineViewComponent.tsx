@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
 import { Baseline } from '../../types/redux/baselines';
-import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
 import { useTranslate } from '../../redux/componentHooks';
 import EditBaselineModalComponent from './EditBaselineModalComponent';
@@ -66,9 +65,9 @@ export default function BaselineViewComponent(props: BaselineViewComponentProps)
 				<EditBaselineModalComponent
 					show={showEditModal}
 					baseline={props.baseline}
-					baselineIdentifier={baselineIdentifier}
-					handleShow={handleShow}
-					handleClose={handleClose} />
+					handleClose={handleClose}
+					baselineIdentifier={props.baseline.meterId.toString()}
+					handleShow={handleShow} />
 			</div>
 		</div>
 	);
