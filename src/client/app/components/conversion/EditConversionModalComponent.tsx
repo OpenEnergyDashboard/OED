@@ -426,22 +426,22 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 
-		// Update meters
-		for (const meterId of metersWithLostDefault) {
+		//Edit the meters that lost default graphic units
+		const meterEdits = metersWithLostDefault.map(meterId => {
 			const meterData = meterDataById[meterId];
-			await editMeter({ meterData: { ...meterData, defaultGraphicUnit: -99 }, shouldRefreshViews: false });
-		}
-
-		// Update groups
-		for (const groupId of groupsWithLostDefault) {
-			// The GroupsAPI expects only 10 properties, so omit deepMeters
+			return editMeter({ meterData: { ...meterData, defaultGraphicUnit: -99 }, shouldRefreshViews: false });
+		});
+		//Edit the groups that lost default graphic units
+		const groupEdits = groupsWithLostDefault.map(groupId => {
 			const groupData = groupDataById[groupId];
 			const groupPayload = omit(groupData, ['deepMeters']);
-			await editGroup(groupPayload);
-		}
+			return editGroup(groupPayload);
+		});
 
-		// Delete the conversion
-		deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId });
+		// Add deleteConversion to the batch
+		const deletePromise = deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId });
+
+		await Promise.all([...meterEdits, ...groupEdits, deletePromise]);
 	};
 
 	const handleCancelModalClose = () => {
