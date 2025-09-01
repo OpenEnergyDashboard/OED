@@ -5,16 +5,16 @@
 -- Allows us to use gist in this database
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- create baseline table
--- SHL: As discussed, these changes should go. Also, tab indenting needed.
+
 CREATE TABLE IF NOT EXISTS baseline (
     meter_id INT NOT NULL REFERENCES meters (id),
     apply_range tsrange NOT NULL,
-    calc_range tsrange, 
-    baseline_value DOUBLE PRECISION NOT NULL,
-    note TEXT,
-    PRIMARY KEY (meter_id, apply_range),
-    EXCLUDE USING GIST (
-        meter_id WITH =,
-        apply_range WITH &&
-    )
+	calc_range tsrange NOT NULL,
+	baseline_value DOUBLE PRECISION NOT NULL,
+	note TEXT,
+	PRIMARY KEY (meter_id, apply_range),
+	EXCLUDE USING GIST (
+		meter_id WITH =,
+		apply_range WITH &&
+)
 );
