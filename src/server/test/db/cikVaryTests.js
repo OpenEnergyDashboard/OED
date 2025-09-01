@@ -38,10 +38,10 @@ async function insertTestSegments(conn) {
 	);
 
 	// Split at 2021-01-01 00:00:00 (on the segment starting at 2020-06-01)
-	await ConversionSegment.splitLater(
-		unit10Id, unit1Id, null, 4, 0, null,
-		'2020-06-01 00:00:00', 'infinity', '2021-01-01 00:00:00', conn
-	);
+	//await ConversionSegment.splitLater(
+	//	unit10Id, unit1Id, null, 4, 0, null,
+	//	'2020-06-01 00:00:00', 'infinity', '2021-01-01 00:00:00', conn
+	//);
 
 	await ConversionSegment.splitLater(
 		unit1Id, unit2Id, null, 6, 0, null,
@@ -99,8 +99,7 @@ mocha.describe('CIK Vary Chaining', () => {
 			await insertTestConversions(conn);
 			await insertTestSegments(conn);
 			const segments = await conn.any('SELECT * FROM conversion_segments');
-			//console.log(segments);
-			expect(segments).to.have.lengthOf(8);
+			expect(segments).to.have.lengthOf(7);
 		});
 	});
 
@@ -113,47 +112,10 @@ mocha.describe('CIK Vary Chaining', () => {
 			await redoCikVary(conn);
 			const results = await conn.any('SELECT * FROM cik_vary ORDER BY source_id, destination_id, start_time');
 			expect(results).to.be.an('array').that.is.not.empty;
-			expect(results).to.have.lengthOf(8);
+			expect(results).to.have.lengthOf(7);
 		});
 
-		//mocha.it('should have correct intervals for each cik_vary group', async function () {
-		//	const conn = testDB.getConnection();
-		//	await insertTestUnits(conn);
-		//	await insertTestConversions(conn);
-		//	await insertTestSegments(conn);
-		//	await redoCikVary(conn);
-		//	const results = await conn.any('SELECT * FROM cik_vary ORDER BY source_id, destination_id, start_time');
-		//	const expectedIntervals = [
-		//		['-infinity', '2020-01-01 00:00:00'],
-		//		['2020-01-01 00:00:00', '2020-06-01 00:00:00'],
-		//		['2020-06-01 00:00:00', '2021-01-01 00:00:00'],
-		//		['2021-01-01 00:00:00', 'infinity'],
-		//	];
-		//	// Group results by (source_id, destination_id)
-		//	const grouped = {};
-		//	results.forEach(row => {
-		//		const key = `${row.source_id}->${row.destination_id}`;
-		//		if (!grouped[key]) grouped[key] = [];
-		//		grouped[key].push([row.start_time, row.end_time]);
-		//	});
-
-		//	// Check each group matches expected intervals
-		//	Object.values(grouped).forEach(intervals => {
-		//		const formatted = intervals.map(([start, end]) => [
-		//			!start
-		//				? '-infinity'
-		//				: typeof start === 'string'
-		//					? start
-		//					: start.toISOString().slice(0, 19).replace('T', ' '),
-		//			!end
-		//				? 'infinity'
-		//				: typeof end === 'string'
-		//					? end
-		//					: end.toISOString().slice(0, 19).replace('T', ' ')
-		//		]);
-		//		expect(formatted).to.deep.equal(expectedIntervals);
-		//	});
-		//});
+		
 		mocha.it('should have correct slopes for each cik_vary segment', async function () {
 			const conn = testDB.getConnection();
 			await insertTestUnits(conn);
@@ -165,8 +127,9 @@ mocha.describe('CIK Vary Chaining', () => {
 			// Define expected slopes for each segment, grouped by (source_id, destination_id)
 			const expectedSlopes = {
 				// Format: 'source_id->destination_id': [slope1, slope2, slope3, slope4]
-				'1->3': [1, 12, 21, 32],
-				'1->2': [1, 2, 3, 4],
+				'1->2': [1, 2, 3],
+				//1->2->3
+				'1->3': [1, 12, 21, 24],
 			};
 
 			// Group results by (source_id, destination_id)

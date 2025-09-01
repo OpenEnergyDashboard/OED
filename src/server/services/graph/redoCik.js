@@ -42,12 +42,12 @@ async function updateCikAndViews() {
 async function redoCikVary(conn) {
 	// Create graph based on units and conversion segments.
 	const graph = await createConversionGraph(conn);
-	//console.log('Graph created with nodes:', graph.getNodesCount(), 'and links:', graph.getLinksCount());
+	
 	// Processes suffix units to update graph and database (not used for now).
 	// await handleSuffixUnits(graph, conn);
 	// Uses final graph to create cik_vary array.
 	const cikVary = await createCikVaryArray(graph, conn);
-	//console.log('cikVary array to insert:', cikVary);
+	
 	// Inserts cik_vary array into database where old values are deleted.
 	await CikVary.insert(cikVary, conn);
 }

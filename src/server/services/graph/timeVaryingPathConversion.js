@@ -21,7 +21,7 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         const segments = await getEdgeConversions(sourceId, destinationId, conn);
         edgeSegments.push(segments);
     }
-    //console.log('edgeSegments:', edgeSegments);
+    
     // Collect all unique time boundaries
     const boundaries = new Set();
     edgeSegments.forEach(segments => {
@@ -31,7 +31,7 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         });
     });
     const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-    //console.log(sortedBoundaries);
+    
     // Build combined segments
     const results = [];
     for (let i = 0; i < sortedBoundaries.length - 1; ++i) {
@@ -40,11 +40,11 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         let valid = true;
         let slope = 1;
         let intercept = 0;
-        //console.log(startTime);
+        
         // For each edge, find the segment covering this time range
         for (const segments of edgeSegments) {
             const seg = segments.find(s => parsePostgresDate(s.startTime) <= startTime && parsePostgresDate(s.endTime) >= endTime);
-            //console.log(seg);
+            
             if (!seg) {
                 valid = false;
                 break;
@@ -63,7 +63,7 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
             });
         }
     }
-    //console.log(`timeVaryingPathConversion for path ${path.map(n => n.id).join('->')}:`, results);
+
     return results;
 }
 
@@ -78,7 +78,7 @@ function updatedConversion(origSlope, origIntercept, newSlope, newIntercept) {
 }
 
 function parsePostgresDate(val) {
-    //console.log(val);
+    
     if (val === 'infinity') {
         return Number.POSITIVE_INFINITY;
     }
