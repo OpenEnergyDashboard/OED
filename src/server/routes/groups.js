@@ -211,7 +211,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 				minLength: 1
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			gps: {
 				oneOf: [
@@ -305,7 +305,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 				minLength: 1
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			gps: {
 				oneOf: [

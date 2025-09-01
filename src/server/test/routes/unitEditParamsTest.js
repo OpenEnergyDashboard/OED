@@ -8,7 +8,8 @@ const { expect } = require('chai');
 const { chai, mocha, app, testDB } = require('../common');
 const Unit = require('../../models/Unit');
 const { insertUnits } = require('../../util/insertData');
-const { validateString, validateInt, validateBool, validateMinMaxRelation, getToken } = require('../util/validationHelpers');
+const { getUnitId } = require('../../util/readingsUtils');
+const { validateString, validateInt, validateBool, validateMinMaxRelation, validateExtraFields, getToken } = require('../util/validationHelpers');
 
 const EDIT_UNIT = '/api/units/edit';
 
@@ -29,7 +30,7 @@ const basePayload = {
 
 const INSERT_UNIT = {
 	name: 'kWh',
-	identifier: '',
+	identifier: 'kWh',
 	unitRepresent: Unit.unitRepresentType.QUANTITY,
 	secInRate: 3600,
 	typeOfUnit: Unit.unitType.UNIT,
@@ -37,13 +38,33 @@ const INSERT_UNIT = {
 	displayable: Unit.displayableType.ALL,
 	preferredDisplay: true,
 	note: 'OED created standard unit'
-};
+  };  
 
 mocha.describe('Unit Routes - /edit Validation', () => {
+	let unitId;
+
 	mocha.beforeEach(async () => {
 		const conn = testDB.getConnection();
-
 		await insertUnits([INSERT_UNIT], true, conn);
+		unitId = await getUnitId('kWh');
+	});
+	mocha.it('should accept a valid payload and update the unit', async () => {
+		const token = await getToken();
+	
+		const validUpdate = {
+		  ...basePayload,
+		  id: unitId,
+		  identifier: INSERT_UNIT.identifier,
+		  name: 'Updated Name',
+		  note: 'Updated note'
+		};
+	
+		const res = await chai.request(app)
+		  .post(EDIT_UNIT)
+		  .set('token', token)
+		  .send(validUpdate);
+	
+		expect(res).to.have.status(200);
 	});
 	mocha.it('should validate string fields', async () => {
 		await validateString({
@@ -101,7 +122,7 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			field: 'note',
 			endpoint: EDIT_UNIT,
 			basePayload,
-			maxLength: 1000
+			required: false
 		});
 	});
 	mocha.it('should validate numeric and integer fields', async () => {
@@ -109,7 +130,8 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			field: 'secInRate',
 			endpoint: EDIT_UNIT,
 			basePayload,
-			required: false
+			required: false,
+			min: 1
 		});
 		await validateInt({
 			field: 'minVal',
@@ -135,14 +157,10 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 	});
 	mocha.it('should reject payloads with extra fields', async () => {
 		const token = await getToken();
-		const payloadWithExtra = {
-			...basePayload,
-			extra: 'not allowed'
-		};
-		const res = await chai.request(app)
-			.post(EDIT_UNIT)
-			.set('token', token)
-			.send(payloadWithExtra);
-		expect(res).to.have.status(400);
-	});
+		await validateExtraFields({
+			endpoint: EDIT_UNIT,
+			basePayload,
+			token
+		});
+	});	
 });

@@ -172,8 +172,8 @@ function validateMeterParams(params) {
 					{ type: 'null' }
 				]
 			},
-			enabled: { type: 'bool' },
-			displayable: { type: 'bool' },
+			enabled: { type: 'boolean' },
+			displayable: { type: 'boolean' },
 			meterType: {
 				type: 'string',
 				enum: Object.values(Meter.type)
@@ -210,8 +210,8 @@ function validateMeterParams(params) {
 				]
 			},
 			area: { type: 'number', minimum: 0 },
-			cumulative: { type: 'bool' },
-			cumulativeReset: { type: 'bool' },
+			cumulative: { type: 'boolean' },
+			cumulativeReset: { type: 'boolean' },
 			cumulativeResetStart: { type: 'string' },
 			cumulativeResetEnd: { type: 'string' },
 			readingGap: { type: 'number' },
@@ -221,7 +221,7 @@ function validateMeterParams(params) {
 				type: 'string',
 				enum: Object.values(MeterTimeSortTypesJS)
 			},
-			endOnlyTime: { type: 'bool' },
+			endOnlyTime: { type: 'boolean' },
 			reading: { type: 'number' },
 			startTimestamp: { type: 'string' },
 			endTimestamp: { type: 'string' },

@@ -7,7 +7,7 @@
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
-const { validateString, validateInt, validateBool, validateMinMaxRelation, getToken } = require('../util/validationHelpers');
+const { validateString, validateInt, validateBool, validateMinMaxRelation, validateExtraFields, getToken } = require('../util/validationHelpers');
 
 //This is the end point we use to test in this file.
 const ADD_UNIT = '/api/units/addUnit';
@@ -26,8 +26,17 @@ const basePayload = {
 	maxVal: 100,
 	disableChecks: 'reject_bad'
 };
-
+// Schema source: src/server/migrations/0.8.0-1.0.0/sql/unit/create_units_table.sql
 mocha.describe('Validation - /addUnit', () => {
+	mocha.it('should accept a valid payload', async () => {
+		const token = await getToken();
+		const res = await chai.request(app)
+			.post(ADD_UNIT)
+			.set('token', token)
+			.send(basePayload);
+
+		expect(res).to.have.status(200);
+	});
 	mocha.it('should validate string fields', async () => {
 		await validateString({
 			field: 'name',
@@ -36,27 +45,44 @@ mocha.describe('Validation - /addUnit', () => {
 			minLength: 1,
 			maxLength: 50,
 			required: true,
-		});
-		// identifier VARCHAR(50), NOT NULL, with check char_length >= 1
+		});	
 		await validateString({
 			field: 'identifier',
 			endpoint: ADD_UNIT,
 			basePayload,
 			minLength: 1,
-			maxLength: 50
+			maxLength: 50,
+			required:true
 		});
 		await validateString({
 			field: 'unitRepresent',
 			endpoint: ADD_UNIT,
 			basePayload,
-			enumValues: Object.values(Unit.unitRepresentType)
+			enumValues: Object.values(Unit.unitRepresentType),
+			minLength: 1,
+			required: true,
 		});
 		await validateString({
 			field: 'typeOfUnit',
 			endpoint: ADD_UNIT,
 			basePayload,
-			enumValues: Object.values(Unit.unitType)
+			enumValues: Object.values(Unit.unitType),
+			required: true,
 		});
+		await validateString({
+			field: 'suffix',
+			endpoint: ADD_UNIT,
+			basePayload,
+			minLength: 1,
+			maxLength: 50,
+			required: false
+		});
+		await validateString({
+			field: 'note',
+			endpoint: ADD_UNIT,
+			basePayload,
+			required: false
+		});		  
 		await validateString({
 			field: 'displayable',
 			endpoint: ADD_UNIT,
@@ -68,14 +94,6 @@ mocha.describe('Validation - /addUnit', () => {
 			endpoint: ADD_UNIT,
 			basePayload,
 			enumValues: Object.values(Unit.disableChecksType)
-		});
-		await validateString({
-			field: 'suffix',
-			endpoint: ADD_UNIT,
-			basePayload,
-			minLength: 1,
-			maxLength: 50,
-			required: false
 		});
 	});
 	mocha.it('should validate numeric and integer fields', async () => {
@@ -112,15 +130,10 @@ mocha.describe('Validation - /addUnit', () => {
 	});
 	mocha.it('should reject payloads with extra fields', async () => {
 		const token = await getToken();
-		const payloadWithExtra = {
-			...basePayload,
-			extra: 'not allowed'
-		};
-		const res = await chai.request(app)
-			.post(ADD_UNIT)
-			.set('token', token)
-			.send(payloadWithExtra);
-
-		expect(res).to.have.status(400);
-	});
+		await validateExtraFields({
+			endpoint: ADD_UNIT,
+			basePayload,
+			token
+		});
+	});	
 });

@@ -73,21 +73,23 @@ async function validateMinMaxRelation({ endpoint, basePayload }) {
  * @param endpoint the API endpoint to test (e.g., /api/units/addUnit)
  * @param basePayload a valid payload object to start from
  * @param required whether the field is required (default: true)
- * @param minLength the minimum length allowed for the string (default: 1)
- * @param maxLength the maximum length allowed for the string (default: 255)
+ * @param minLength the minimum length allowed for the string (default: null)
+ * @param maxLength the maximum length allowed for the string (default: null)
  * @param enumValues optional array of valid enum values to test against
  */
-async function validateString({ field, endpoint, basePayload, required = true, minLength = 1, maxLength = 255, enumValues = null }) {
+async function validateString({ field, endpoint, basePayload, required = true, minLength = null, maxLength = null, enumValues = null }) {
 
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
-	if (minLength > 0) {
+	if (minLength && minLength > 0) {
 		await testInvalidField({ field, invalidValue: 'x'.repeat(minLength - 1), endpoint, basePayload });
 	}
 
-	await testInvalidField({ field, invalidValue: 'x'.repeat(maxLength + 1), endpoint, basePayload });
+	if (maxLength) {
+		await testInvalidField({ field, invalidValue: 'x'.repeat(maxLength + 1), endpoint, basePayload });
+	}
 
 	if (enumValues) {
 		await testInvalidField({ field, invalidValue: 'INVALID_ENUM', endpoint, basePayload });
@@ -110,11 +112,11 @@ async function validateInt({ field, endpoint, basePayload, required = true, min 
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
 
-	if (typeof min === 'number') {
+	if (Number.isFinite(min)) {
 		await testInvalidField({ field, invalidValue: min - 1, endpoint, basePayload });
 	}
 
-	if (typeof max === 'number') {
+	if (Number.isFinite(max)) {
 		await testInvalidField({ field, invalidValue: max + 1, endpoint, basePayload });
 	}
 
@@ -138,10 +140,25 @@ async function validateBool({ field, endpoint, basePayload, required = true }) {
 	await testInvalidField({ field, invalidValue: 'notABool', endpoint, basePayload });
 }
 
+async function validateExtraFields({ endpoint, basePayload, token }) {
+	const payloadWithExtra = {
+		...basePayload,
+		extra: 'not allowed'
+	};
+
+	const res = await chai.request(app)
+		.post(endpoint)
+		.set('token', token)
+		.send(payloadWithExtra);
+
+	expect(res).to.have.status(400);
+}
+
 module.exports = {
 	validateString,
 	validateInt,
 	validateBool,
 	validateMinMaxRelation,
-	getToken
+	getToken,
+	validateExtraFields
 };

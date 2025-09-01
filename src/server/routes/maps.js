@@ -102,7 +102,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 				]
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			if: {
 				properties: {
@@ -205,7 +205,7 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 				]
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			if: {
 				properties: {
