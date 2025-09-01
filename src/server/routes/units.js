@@ -29,6 +29,25 @@ function formatUnitForResponse(unit) {
 		maxVal: unit.maxVal,
 		disableChecks: unit.disableChecks
 	};
+};
+
+/**
+ * Validates that minVal is less than or equal to maxVal.
+ * @param {number} minVal
+ * @param {number} maxVal
+ * @param {Array} [existingErrors] - Optional array of existing validation errors
+ * @returns {{ valid: boolean, errors: Array }}
+ */
+function validateMinMax(minVal, maxVal, existingErrors = []) {
+    const errors = [...existingErrors];
+    let valid = true;
+
+    if (typeof minVal === 'number' && typeof maxVal === 'number' && minVal > maxVal) {
+        valid = false;
+        errors.push({ message: "'maxVal' must be greater than or equal to 'minVal'" });
+    }
+
+    return { valid, errors };
 }
 
 /**
@@ -103,6 +122,11 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 		}
 	};
 	const validatorResult = validate(req.body, validUnit);
+
+	const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validationResult.errors);
+	validationResult.valid = validationResult.valid && minMaxCheck.valid;
+	validationResult.errors = minMaxCheck.errors;
+
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
@@ -206,15 +230,9 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	};
 
 	const validationResult = validate(req.body, validUnit);
-
-	if (validationResult.valid && req.body.minVal > req.body.maxVal) {
-		validationResult.valid = false;
-		validationResult.errors = [
-			// Given the result is valid it is unlikely there are any errors but this was used to be careful.
-			...(validationResult.errors || []),
-			{ message: "'maxVal' must be greater than or equal to 'minVal'" }
-		];
-	}
+    const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validationResult.errors);
+	validationResult.valid = validationResult.valid && minMaxCheck.valid;
+	validationResult.errors = minMaxCheck.errors;
 
 	if (!validationResult.valid) {
 		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
