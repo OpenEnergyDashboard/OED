@@ -80,18 +80,17 @@ export const groupsApi = baseApi.injectEndpoints({
 				await queryFulfilled;
 
 				if (shouldRefreshGroupsDeepMetersView) {
-					dispatch(groupsApi.endpoints.refreshGroups.initiate(null));
+					dispatch(groupsApi.endpoints.refreshGroups.initiate());
+				} else {
+					dispatch(groupsApi.util.invalidateTags(['GroupData']));
 				}
-			},
-			invalidatesTags: ['GroupData', 'GroupChildrenData']
+			}
 		}),
-		refreshGroups: builder.mutation<void, unknown>({
-			query: unknown => ({
+		refreshGroups: builder.mutation<void, void>({
+			query: () => ({
 				url: 'api/groups/refresh',
-				method: 'POST',
-				body: unknown
+				method: 'POST'
 			}),
-
 			// Only the group readings really need invalidation
 			invalidatesTags: ['GroupData', 'GroupChildrenData', 'Readings'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
@@ -132,5 +131,3 @@ export const selectGroupNameWithID = (state: RootState, groupId: number) => {
 	const groupInfo = selectGroupById(state, groupId);
 	return groupInfo ? groupInfo.name : '';
 };
-
-export const stableEmptyGroups: GroupData[] = [];

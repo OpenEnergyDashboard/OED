@@ -33,7 +33,6 @@ export default function GroupsDetailComponent() {
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
-	selectGroupDataResult;
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Switch help depending if admin or not.

@@ -15,14 +15,10 @@ const Reading = require('../models/Reading');
 */
 async function refreshAllReadingViews() {
 	const conn = getConnection();
-	// Refresh hourly readings view
-	log.info('Refreshing Materialized Hourly Reading View');
-	await Reading.refreshHourlyReadings(conn);
-	log.info('Materialized Hourly View Refreshed');
-	// Refresh daily readings view
-	log.info('Refreshing Materialized Daily Reading View');
-	await Reading.refreshDailyReadings(conn);
-	log.info('Materialized Daily View Refreshed');
+	// Refresh meter readings views
+	log.info('Refreshing Materialized Hourly and Daily Readings Views');
+	await Reading.refreshMeterReadingsViews(conn);
+	log.info('Materialized Hourly and Daily Readings Views Refreshed');
 	// Refresh group views
 	log.info('Refreshing Group Reading Views');
 	await Promise.all([Reading.refreshGroupDailyReadings(conn), Reading.refreshGroupHourlyReadings(conn)]);

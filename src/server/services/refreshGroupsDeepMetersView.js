@@ -5,7 +5,6 @@
  */
 
 const { log } = require('../log');
-
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const Reading = require('../models/Reading');

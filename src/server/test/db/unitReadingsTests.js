@@ -51,8 +51,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			// Refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			// Refresh meter views but only hourly view needs the change
+			await Reading.refreshMeterReadingsViews(conn);
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings_unit WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
@@ -67,8 +67,7 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
 
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const { meter_id, reading_rate } = await conn.one(
 				'SELECT * FROM daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
@@ -85,8 +84,7 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 100, halfHourBefore, halfHourAfter)
 			], conn);
 
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const rows = await conn.many('SELECT * FROM daily_readings_unit;');
 			expect(rows).to.have.length(2);
@@ -111,9 +109,8 @@ mocha.describe('Line & bar Readings', () => {
 
 			// Expected compressed reading:
 			// ((50 kW * 1 hr) + (100 kW * 2 hr)) / (1 hr + 2 hr)
-			
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM daily_readings_unit WHERE lower(time_interval) = ${start_timestamp};',
 				{ start_timestamp: day1Start });
@@ -196,8 +193,7 @@ mocha.describe('Line & bar Readings', () => {
 				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
@@ -266,8 +262,7 @@ mocha.describe('Line & bar Readings', () => {
 				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
@@ -342,8 +337,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const meterReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, dayStart, dayEnd, conn);
 
@@ -383,10 +377,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 100, dayStart, dayEnd)
 			], conn);
 
-			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
-
-			await Reading.refreshDailyReadings(conn);
+			// We need to refresh the hourly and daily readings view because they are materialized.
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const meterReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
 			expect(meterReadings[meter.id].length).to.equal(1);
@@ -402,7 +394,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
@@ -419,7 +411,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, yearStart, yearStart.clone().add(60, 'days'), conn);
 
@@ -570,11 +562,9 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
 
-			// Refresh hourly readings before daily readings view because of dependency
-			await Reading.refreshHourlyReadings(conn);
 			
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const barReadings = await Reading.getMeterBarReadings([meter.id], graphicUnitId, timestamp1, timestamp5, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -601,11 +591,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
 
-			// Refresh hourly readings before daily readings view because of dependency
-			await Reading.refreshHourlyReadings(conn);
-
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const barReadings = await Reading.getMeterBarReadings([meter.id], graphicUnitId, timestamp1, timestamp5, 2, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -631,11 +618,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter2.id, 1, timestamp1, timestamp2)
 			], conn);
 
-			// Refresh hourly readings before daily readings view because of dependency
-			await Reading.refreshHourlyReadings(conn);
-
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 			const barReadings = await Reading.getMeterBarReadings([meter.id, meter2.id], graphicUnitId, timestamp1, timestamp2, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString(), meter2.id.toString()]);
 

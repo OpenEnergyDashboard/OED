@@ -95,6 +95,17 @@ class Reading {
 		// This can't be a function because you can't call REFRESH inside a function
 		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
 	}
+	
+	/**
+	 * Refreshes meter readings views.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @returns {Promise<void>}
+	 */
+	static async refreshMeterReadingsViews(conn) {
+		await conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+	}
 
 	/**
 	 * Refreshes the group daily readings view.
