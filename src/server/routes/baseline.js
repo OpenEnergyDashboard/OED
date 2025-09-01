@@ -7,6 +7,7 @@ const { getConnection } = require('../db');
 const express = require('express');
 const Baseline = require('../models/Baseline');
 const log = require('../log');
+const { adminAuthMiddleware } = require('./authenticator');
 const router = express.Router();
 router.get('/', async (req, res) => {
 	const conn = getConnection();
