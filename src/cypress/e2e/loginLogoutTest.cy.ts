@@ -1,21 +1,22 @@
-const viewports = [
-	{ name: 'desktop', width: 1280, height: 800 },
-	{ name: 'mobile',  width: 375,  height: 667 }
-];
-
 function getOptionsButton() {
 	return cy.get('a.dropdown-toggle:contains("Options")').last();
-}
+};
 
 function getVisibleDropdown() {
   return cy.get('.dropdown-menu:visible');
-}
+};
 
 function nextTopModal(){
 	return cy.get('.modal.show').last().should('be.visible');
-}
+};
 
 describe('Login/Logout UI Tests for Open Energy Dashboard', () => {
+
+	const viewports = [
+		{ name: 'desktop', width: 1280, height: 800 },
+		{ name: 'mobile',  width: 375,  height: 667 }
+	];
+
 	viewports.forEach(({ name, width, height }) => {
 		context(`${name} viewport`, () => {
 
@@ -81,7 +82,6 @@ describe('Login/Logout UI Tests for Open Energy Dashboard', () => {
 				getVisibleDropdown().contains('button','Log out')
 					.should('be.visible')
 					.click();
-
 
 				getOptionsButton().click();
 
