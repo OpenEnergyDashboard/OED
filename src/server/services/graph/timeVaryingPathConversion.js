@@ -21,7 +21,7 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         const segments = await getEdgeConversions(sourceId, destinationId, conn);
         edgeSegments.push(segments);
     }
-    
+
     // Collect all unique time boundaries
     const boundaries = new Set();
     edgeSegments.forEach(segments => {
@@ -31,7 +31,7 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         });
     });
     const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
-    
+
     // Build combined segments
     const results = [];
     for (let i = 0; i < sortedBoundaries.length - 1; ++i) {
@@ -40,17 +40,43 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
         let valid = true;
         let slope = 1;
         let intercept = 0;
-        
+
         // For each edge, find the segment covering this time range
-        for (const segments of edgeSegments) {
-            const seg = segments.find(s => parsePostgresDate(s.startTime) <= startTime && parsePostgresDate(s.endTime) >= endTime);
-            
+        for (const [edgeIndex, segments] of edgeSegments.entries()) {
+            // Try to find segment in forward direction
+            let seg = segments.find(s =>
+                parsePostgresDate(s.startTime) <= startTime &&
+                parsePostgresDate(s.endTime) >= endTime &&
+                s.sourceId === path[edgeIndex].id &&
+                s.destinationId === path[edgeIndex + 1].id
+            );
+
+            let invert = false;
+
+            if (!seg) {
+                // Try to find segment in reverse direction
+                seg = segments.find(s =>
+                    parsePostgresDate(s.startTime) <= startTime &&
+                    parsePostgresDate(s.endTime) >= endTime &&
+                    s.sourceId === path[edgeIndex + 1].id &&
+                    s.destinationId === path[edgeIndex].id &&
+                    s.bidirectional
+                );
+                if (seg) invert = true;
+            }
+
             if (!seg) {
                 valid = false;
                 break;
             }
-            // Chain the conversion
-            [slope, intercept] = updatedConversion(slope, intercept, seg.slope, seg.intercept);
+
+            let segSlope = seg.slope;
+            let segIntercept = seg.intercept;
+            if (invert) {
+                [segSlope, segIntercept] = invertConversion(segSlope, segIntercept);
+            }
+
+            [slope, intercept] = updatedConversion(slope, intercept, segSlope, segIntercept);
         }
         if (valid) {
             results.push({
@@ -78,7 +104,7 @@ function updatedConversion(origSlope, origIntercept, newSlope, newIntercept) {
 }
 
 function parsePostgresDate(val) {
-    
+
     if (val === 'infinity') {
         return Number.POSITIVE_INFINITY;
     }
@@ -97,6 +123,10 @@ function toPostgresTimestamp(val) {
         return '-infinity';
     }
     return new Date(val);
+}
+
+function invertConversion(slope, intercept) {
+    return [1.0 / slope, -(intercept / slope)];
 }
 
 module.exports = { timeVaryingPathConversion };
