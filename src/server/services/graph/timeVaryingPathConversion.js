@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Conversion = require('../../models/Conversion');
+
 /**
  * Chains time-varying conversions along a path, producing combined segments for cik_vary.
  * Each edge in the path may have multiple time segments (start_time, end_time, slope, intercept).
@@ -59,10 +61,14 @@ async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
                     parsePostgresDate(s.startTime) <= startTime &&
                     parsePostgresDate(s.endTime) >= endTime &&
                     s.sourceId === path[edgeIndex + 1].id &&
-                    s.destinationId === path[edgeIndex].id &&
-                    s.bidirectional
+                    s.destinationId === path[edgeIndex].id
                 );
-                if (seg) invert = true;
+                if (seg) {
+                    // Check bidirectional in conversions table
+                    const bidirectional = await isBidirectional(s.sourceId, s.destinationId, conn);
+                    if (bidirectional) invert = true;
+                    else seg = null; // Not bidirectional, can't use
+                }
             }
 
             if (!seg) {
@@ -127,6 +133,12 @@ function toPostgresTimestamp(val) {
 
 function invertConversion(slope, intercept) {
     return [1.0 / slope, -(intercept / slope)];
+}
+
+
+async function isBidirectional(sourceId, destinationId, conn) {
+    const conversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
+    return conversion && conversion.bidirectional;
 }
 
 module.exports = { timeVaryingPathConversion };
