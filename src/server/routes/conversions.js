@@ -232,11 +232,11 @@ router.post('/deleteWithDefaults', adminAuthMiddleware('delete conversions and u
 		await conn.tx(async t => {
 			// Update meters
 			for (const meterId of meterIds) {
-				await t.none('UPDATE meters SET default_graphic_unit = -99 WHERE id = $1', [meterId]);
+				await t.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meterId]);
 			}
 			// Update groups
 			for (const groupId of groupIds) {
-				await t.none('UPDATE groups SET default_graphic_unit = -99 WHERE id = $1', [groupId]);
+				await t.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [groupId]);
 			}
 			// Delete conversion
 			await Conversion.delete(sourceId, destinationId, t);
