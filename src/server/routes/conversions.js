@@ -225,4 +225,26 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
 	}
 });
+router.post('/deleteWithDefaults', adminAuthMiddleware('delete conversions and update default graphic unit'), async (req, res) => {
+	const { sourceId, destinationId, meterIds, groupIds } = req.body;
+	const conn = getConnection();
+	try {
+		await conn.tx(async t => {
+			// Update meters
+			for (const meterId of meterIds) {
+				await t.none('UPDATE meters SET default_graphic_unit = -99 WHERE id = $1', [meterId]);
+			}
+			// Update groups
+			for (const groupId of groupIds) {
+				await t.none('UPDATE groups SET default_graphic_unit = -99 WHERE id = $1', [groupId]);
+			}
+			// Delete conversion
+			await Conversion.delete(sourceId, destinationId, t);
+		});
+		success(res, 'Successfully deleted conversion and updated meters/groups');
+	} catch (err) {
+		log.error(`Error in deleteWithDefaults transaction: ${err}`);
+		failure(res, 500, `Failed to delete conversion and update meters/groups: ${err}`);
+	}
+});
 module.exports = router;

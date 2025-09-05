@@ -102,6 +102,31 @@ export const conversionsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: conversion
 			})
+		}),
+		deleteWithDefaults: builder.mutation<void, {
+			sourceId: number;
+			destinationId: number;
+			meterIds: number[];
+			groupIds: number[];
+		}>({
+			query: ({ sourceId, destinationId, meterIds, groupIds }) => ({
+				url: 'api/conversions/deleteWithDefaults',
+				method: 'POST',
+				body: { sourceId, destinationId, meterIds, groupIds }
+			}),
+			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
+				// TODO write more robust logic for error handling, and manually invalidate tags instead?
+				// TODO Verify Behavior w/ Maintainers
+				queryFulfilled
+					.then(() => {
+						dispatch(conversionsApi.endpoints.refresh.initiate(
+							{
+								redoCik: true,
+								refreshReadingViews: false
+							}));
+					});
+
+			}
 		})
 	})
 });

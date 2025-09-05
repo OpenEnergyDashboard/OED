@@ -8,8 +8,8 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
-import { metersApi, selectMeterDataById } from '../../redux/api/metersApi';
-import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
@@ -19,6 +19,7 @@ import { ConversionData } from '../../types/redux/conversions';
 import { UnitData, UnitType } from '../../types/redux/units';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
@@ -40,10 +41,9 @@ interface EditConversionModalComponentProps {
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
-	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
 	const [triggerSimulate] = conversionsApi.useLazySimulateDeleteConversionQuery();
-	const [editMeter] = metersApi.useEditMeterMutation();
-	const [editGroup] = groupsApi.useEditGroupMutation();
+	const [deleteWithDefaults] = conversionsApi.useDeleteWithDefaultsMutation();
+	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -426,22 +426,22 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 
-		//Edit the meters that lost default graphic units
-		const meterEdits = metersWithLostDefault.map(meterId => {
-			const meterData = meterDataById[meterId];
-			return editMeter({ meterData: { ...meterData, defaultGraphicUnit: -99 }, shouldRefreshViews: false });
-		});
-		//Edit the groups that lost default graphic units
-		const groupEdits = groupsWithLostDefault.map(groupId => {
-			const groupData = groupDataById[groupId];
-			const groupPayload = omit(groupData, ['deepMeters']);
-			return editGroup(groupPayload);
-		});
-
-		// Add deleteConversion to the batch
-		const deletePromise = deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId });
-
-		await Promise.all([...meterEdits, ...groupEdits, deletePromise]);
+		const payload = {
+			sourceId: state.sourceId,
+			destinationId: state.destinationId,
+			meterIds: metersWithLostDefault,
+			groupIds: groupsWithLostDefault
+		};
+		try {
+			if (metersWithLostDefault.length > 0 || groupsWithLostDefault.length > 0) {
+				await deleteWithDefaults(payload).unwrap();
+			} else {
+				await deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId }).unwrap();
+			}
+			showSuccessNotification(translate('conversion.delete.success'));
+		} catch (error) {
+			showErrorNotification(translate('conversion.delete.failure'));
+		}
 	};
 
 	const handleCancelModalClose = () => {
