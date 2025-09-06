@@ -6,6 +6,7 @@ import { createSelector } from '@reduxjs/toolkit';
 import { 
     Baseline, 
     BaselineSegment,
+    CreateBaselinePayload,
     SplitBaselineSegmentPayload,
     UpdateBaselineSegmentPayload
 } from '../../types/redux/baselines';
@@ -27,12 +28,13 @@ export const baselineApi = baseApi.injectEndpoints({
 			query: meterId => `api/baseline/${meterId}`,
 			providesTags: (result, error, id) => [{ type: 'Baselines', id }]
 		}),
-        addBaseline: builder.mutation<void, Baseline>({
+        addBaseline: builder.mutation<void, CreateBaselinePayload>({
             query: baseline => ({
                 url: 'api/baseline/new',
                 method: 'POST',
                 body: baseline
             }),
+			transformErrorResponse: res => res.data,
             invalidatesTags: ['Baselines']
         }),
         editBaseline: builder.mutation<void, Baseline>({
@@ -100,30 +102,30 @@ export const baselineSegmentsApi = baseApi.injectEndpoints({
 			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
 		}),
 		deleteBaselineSegment: builder.mutation<void, BaselineSegment>({
-			query: ({ meterId, startHour, endHour }) => ({
+			query: ({ meterId, startTime, endTime }) => ({
 				url: 'api/baselineSegments/delete',
 				method: 'POST',
-				body: { meterId, startHour, endHour }
+				body: { meterId, startTime, endTime }
 			}),
 			transformErrorResponse: res => res.data,
 			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
 		}),
-		// Deletes the provided day segment and updates the end hour of the previous segment
+		// Deletes the provided day segment and updates the end time of the previous segment
 		deleteBaselineSegmentEarlier: builder.mutation<void, BaselineSegment>({
-			query: ({ meterId, startHour, endHour }) => ({
+			query: ({ meterId, startTime, endTime }) => ({
 				url: 'api/baselineSegments/deleteEarlier',
 				method: 'POST',
-				body: { meterId, startHour, endHour }
+				body: { meterId, startTime, endTime }
 			}),
 			transformErrorResponse: res => res.data,
 			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
 		}),
-		// Deletes the provided day segment and updates the start hour of the next segment
+		// Deletes the provided day segment and updates the start time of the next segment
 		deleteBaselineSegmentLater: builder.mutation<void, BaselineSegment>({
-			query: ({ meterId, startHour, endHour }) => ({
+			query: ({ meterId, startTime, endTime }) => ({
 				url: 'api/baselineSegments/deleteLater',
 				method: 'POST',
-				body: { meterId, startHour, endHour }
+				body: { meterId, startTime, endTime }
 			}),
 			transformErrorResponse: res => res.data,
 			invalidatesTags: (result, error, arg) => [{ type: 'BaselineSegments', meterId: arg.meterId }]
@@ -146,6 +148,7 @@ export const {
 	useEditBaselineMutation,
 	useDeleteBaselineMutation
 } = baselineApi;
+
 
 export const {
 	useGetBaselineSegmentsByMeterIdQuery,

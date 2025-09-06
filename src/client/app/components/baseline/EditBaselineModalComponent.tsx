@@ -37,7 +37,7 @@ import '../../styles/modal.css';
 interface EditBaselineModalComponentProps {
     show: boolean;
     baseline: Baseline;
-    baselineIdentifier: string;
+    baselineIdentifier: string;  // think about whether to get rid of this
     // passed in to handle opening the modalq2
     handleShow: () => void;
     // passed in to handle closing the modal
@@ -75,9 +75,10 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
     /* End State */
 
     // Performs checks to warn the admin if the baseline is inactive
+	// TODO: Call in submit
     const checkState = () => {
         if (!state.isActive) {
-            alert(translate('baseline.inactiveWarning'));
+            alert(translate('baseline.inactiveWarning'));	// make a notification
         }
     };
 
@@ -147,6 +148,7 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
 
     return (
 		<>
+			<p className='baseline-btn' onClick={props.handleShow}>Edit baseline</p>
 			<Modal isOpen={props.show} toggle={props.handleClose} size="xl">
 				<ModalHeader>
 					<FormattedMessage id="baseline.edit" />
@@ -191,7 +193,7 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
 							<tbody>
 								{paged?.map(seg => (
 									<tr key={seg.id}>
-										<td>{seg.startHour} - {seg.endHour}</td>
+										<td>{seg.startTime} - {seg.endTime}</td>
 										<td>{seg.baselineValue}</td>
 										<td
 											style={{ cursor: 'pointer' }}
@@ -205,22 +207,23 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
 												<FormattedMessage id="edit" />
 											</Button>
 										</td>
+										// This needs to have the same logic as conversions
 										<td>
 											{/* only show split buttons if segment is longer than 1 hour */}
-											{seg.endHour - seg.startHour > 1 && <SplitBaselineSegmentComponent baselineSegment={seg} direction="earlier" />}
+											{seg.endTime - seg.startTime > 1 && <SplitBaselineSegmentComponent baselineSegment={seg} direction="earlier" />}
 										</td>
 										<td>
-											{seg.endHour - seg.startHour > 1 && <SplitBaselineSegmentComponent baselineSegment={seg} direction="later" />}
+											{seg.endTime - seg.startTime > 1 && <SplitBaselineSegmentComponent baselineSegment={seg} direction="later" />}
 										</td>
 										<td>
 											{/* first segment cannot delete earlier */}
-											{seg.startHour > 0 &&
+											{seg.startTime > 0 &&
 												<DeleteBaselineSegmentComponent baselineSegment={seg} direction="earlier" />
 											}
 										</td>
 										<td>
 											{/* last segment cannot delete later */}
-											{seg.endHour < 24 &&
+											{seg.endTime < 24 &&
 												<DeleteBaselineSegmentComponent baselineSegment={seg} direction="later" />
 											}
 										</td>
@@ -262,7 +265,7 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
 					<Button color="secondary" onClick={props.handleClose}>
 						<FormattedMessage id="baseline.edit.discard" />
 					</Button>
-					<Button color="primary" onClick={() => { handleSubmit(); checkState(); }} disabled={isUnchanged || isSaving || isDeleting}>
+					<Button color="primary" onClick={() => { handleSubmit(); }} disabled={isUnchanged || isSaving || isDeleting}>
 						<FormattedMessage id="baseline.edit.save" />
 					</Button>
 				</ModalFooter>
@@ -280,7 +283,7 @@ export default function EditBaselineModalComponent(props: EditBaselineModalCompo
 				{/* Segment note modal */}
 				<Modal isOpen={showNoteModal} toggle={handleCloseNoteModal} centered>
 					<ModalHeader>
-						{noteSegment?.startHour} - {noteSegment?.endHour}
+						{noteSegment?.startTime} - {noteSegment?.endTime}
 					</ModalHeader>
 					<ModalBody>
 						{noteSegment?.note}

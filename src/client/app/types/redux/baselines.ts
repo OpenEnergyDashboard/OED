@@ -2,20 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// export interface BaselineDataById extends Record<number, Baseline> { }  <-- don't know yet if needed
-
 export interface Baseline {
-	baselineValue: number;
 	meterId: number;
-    isActive: boolean;  // whether there's a baseline applied or not
-	note: string;
+	// Whether there's a baseline applied or not
+    isActive: boolean;
+	note?: string;
 }
 
 export interface BaselineSegment {
 	id: number;
 	meterId: number;
-	startHour: number;
-	endHour: number;
+	startTime: number;
+	endTime: number;
 	baselineValue: number;
 	note?: string;
 }
@@ -23,6 +21,16 @@ export interface BaselineSegment {
 export interface UpdateBaselineSegmentPayload extends BaselineSegment {
 	originalStartHour: number;
 	originalEndHour: number;
+}
+
+export interface CreateBaselinePayload {
+	meterId: number;
+	isActive: boolean;
+	// Baseline note
+	note?: string;
+	baselineValue: number;
+	// First segment note
+	segmentNote?: string;
 }
 
 export interface SplitBaselineSegmentPayload {

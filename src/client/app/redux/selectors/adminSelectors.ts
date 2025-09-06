@@ -23,6 +23,7 @@ import { DisableChecksType } from '../../types/redux/units';
 import { MAX_VAL, MIN_VAL } from '../../utils/input';
 import { Baseline, BaselineSegment, SplitBaselineSegmentPayload } from 'types/redux/baselines';
 import { selectBaselinesDetails } from '../api/baselineApi';
+import { create } from 'lodash';
 
 export const MIN_DATE_MOMENT = moment(0).utc();
 export const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
@@ -353,32 +354,46 @@ export const selectDefaultSplitBaselineSegmentValues = createSelector(
 	} as SplitBaselineSegmentPayload)
 );
 
-// Baseline selector to be reviewed
+export const selectDefaultCreateBaselineValues = createAppSelector(
+	[ selectMeterById ],
+	(meter) => {
+		const defaultValues = {
+			isActive: true,
+			// Baseline note
+			note: '',
+			baselineValue: 0,
+			// First segment note
+			segmentNote: '',
+			startTime: -Infinity,
+			endTime: Infinity
+		};
+		return defaultValues;
+	}
+);
+
 export const selectBaselineExists = createAppSelector(
 	[
 		selectMeterDataById,
 		selectBaselinesDetails,
-		(_state, baselineState) => baselineState
+		(_state, meterId: number) => meterId
+		// (_state, baselineState: Baseline) => baselineState.baselineValue,
+		// (_state, baselineState: Baseline) => baselineState.isActive
 	],
-	(meterDataById, baselines, baselineState): [boolean, string] => {
-		// Create Baseline Validation:
-		const baselineValue = baselineState.overallBaseline.baselineValue;
-		// const isActive = baselineState.overallBaseline.isActive;
+	(meterDataById, baselines): [boolean, string, Baseline] => {
+		// Find baseline with the matching meter ID
+		const baselineIndex = baselines.findIndex((baseline: Baseline) => (baseline.meterId === meterDataById[baseline.meterId].id));
+		if (baselineIndex !== -1) {
+			const baseline = baselines[baselineIndex];
 
-		// Baseline value not set or valid
-		if (baselineValue < 0) {
-			return [false, translate('baseline.create.baseline.value.not')];
+			// TODO: internationalize
+			if (baseline.isActive) {
+				return [true, 'Baseline exists and is active', baseline];
+			} else {
+				return [true, 'Baseline exists but is not active', baseline];
+			}
 		}
-
-		// Baseline already exists 
-		// TO-DO: compare meter state ID with the baseline's meterID
-		if ((baselineState.findIndex((baseline: Baseline) => (
-			baseline.meterId === meterDataById[baseline.meterId].id
-		)) !== -1)) {
-			console.log("Baseline exists");
-			return [true, 'Baseline exists'];
-		}
-		return [false, 'Baseline does not exist'];
+		// Return empty baseline if not exists
+		return [false, 'Baseline does not exist', {} as Baseline];
 	}
 );
 
