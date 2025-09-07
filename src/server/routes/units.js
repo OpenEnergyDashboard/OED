@@ -123,14 +123,15 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	};
 	const validatorResult = validate(req.body, validUnit);
 
-	const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validationResult.errors);
-	validationResult.valid = validationResult.valid && minMaxCheck.valid;
-	validationResult.errors = minMaxCheck.errors;
+	const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validatorResult.errors);
+	validatorResult.valid = validatorResult.valid && minMaxCheck.valid;
+	validatorResult.errors = minMaxCheck.errors;
 
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
+		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors.map(e => e.message).join(', ')}`);
 	} else {
+
 		const conn = getConnection();
 		try {
 			const unit = await Unit.getById(req.body.id, conn);
