@@ -9,6 +9,9 @@ const Baseline = require('../models/Baseline');
 const log = require('../log');
 const { adminAuthMiddleware } = require('./authenticator');
 const router = express.Router();
+
+const mockBaselines = require("../data/mockBaselines")
+
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
@@ -35,6 +38,17 @@ router.post('/new', async (req, res) => {
 		log(`Error while adding baseline: ${err}`, 'error');
 	}
 });
+
+router.get("/", (req, res) => {
+	res.json(mockBaselines);
+});
+
+router.get("/:meterId", (req, res) => {
+	const { meterId } = req.params;
+	const segments = mockBaselines.filter(s => s.meterId == meterId);
+	res.json(segments);
+});
+
 router.post('/edit', adminAuthMiddleware('edit baselines'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
