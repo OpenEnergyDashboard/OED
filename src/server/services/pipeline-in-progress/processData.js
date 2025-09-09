@@ -12,6 +12,7 @@ const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings, validateSingleReading } = require('./validateReadings');
 const { MeterTimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
+const { disableChecksType } = require('../../models/Unit');
 
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
@@ -699,20 +700,22 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		// Not used in many cases but just set since easier.
 		prevEndTimestampTz = endTimestampTz;
 	}
-	// Validate data if conditions are given and disableChecks is not set to 'reject_none'
-	if (conditionSet !== undefined && conditionSet['disableChecks'] !== 'reject_none') {
+	// Validate data if conditions are given and disableChecks is not set to 'reject_disabled'
+	if (conditionSet !== undefined && conditionSet['disableChecks'] !== disableChecksType.REJECT_DISABLED) {
 		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
 		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
 
 		if (!validReadings) {
 			errMsg = `<h2>For meter ${meterName}: Error when validating data where `;
 			// Handle 'reject_bad' specifically
-			if (conditionSet['disableChecks'] === 'reject_bad') {
+			if (conditionSet['disableChecks'] === disableChecksType.REJECT_BAD) {
 				errMsg += `only bad readings are rejected</h2>`;
 				// This removes invalid readings but keeps the valid ones.
 				result = result.filter(reading => validateSingleReading(reading, conditionSet));
+			} else if (conditionSet['disableChecks'] === disableChecksType.REJECT_NONE) {
+				errMsg += `all readings are accepted even though there were check errors</h2>`;
 			} else {
-				// Default behavior: reject all readings
+				// Make this the default to be careful in accepting readings.
 				errMsg += `all readings are rejected</h2>`;
 				// Empties the result array
 				result.splice(0, result.length);
