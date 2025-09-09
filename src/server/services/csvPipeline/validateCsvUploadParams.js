@@ -180,7 +180,7 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	
 	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
-		relaxedParsing, useMeterZone } = req.body; // extract query parameters
+		refreshReadings, relaxedParsing, useMeterZone } = req.body; // extract query parameters
 
 	// Set default values of not supplied parameters.
 	if (cumulative === undefined) {
@@ -206,6 +206,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (honorDst === undefined) {
 		req.body.honorDst = DEFAULTS.readings.honorDst;
+	}
+	if (refreshReadings === undefined) {
+		req.body.refreshReadings = DEFAULTS.readings.refreshReadings;
 	}
 	if (relaxedParsing === undefined) {
 		req.body.relaxedParsing = DEFAULTS.readings.relaxedParsing;
