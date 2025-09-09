@@ -178,7 +178,8 @@ export default function ReadingsCSVUploadComponent() {
 			lengthVariation: selectedMeter.readingVariation,
 			endOnly: selectedMeter.endOnlyTime,
 			timeSort: MeterTimeSortType[selectedMeter.timeSort as keyof typeof MeterTimeSortType],
-			useMeterZone: false
+			useMeterZone: false,
+			warnOnCumulativeReset: false
 		}));
 	};
 
@@ -284,6 +285,7 @@ export default function ReadingsCSVUploadComponent() {
 			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
 			|| readingsData.update !== ReadingsCSVUploadDefaults.update
 			|| readingsData.useMeterZone !== readingsData.useMeterZone
+			|| readingsData.warnOnCumulativeReset !== readingsData.warnOnCumulativeReset
 			// If any file is added, it will count as edit made.
 			|| selectedFile !== null
 			|| invalidFileEntry === true;
@@ -684,6 +686,19 @@ export default function ReadingsCSVUploadComponent() {
 											checked={useMeterZone}
 											type='checkbox'
 											name='useMeterZone'
+											onChange={handleCheckboxChange}
+										/>
+										<div className='ps-2'>
+											{translate('csv.readings.param.use.meter.zone' />
+										</div>
+									</Label>
+								*/}
+								{/*
+									<Label check>
+										<Input
+											checked={warnOnCumulativeReset}
+											type='checkbox'
+											name='warnOnCumulativeReset'
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>

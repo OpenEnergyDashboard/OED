@@ -76,7 +76,8 @@ const DEFAULTS = {
 		refreshReadings: false,
 		relaxedParsing: false,
 		timeSort: undefined,
-		useMeterZone: false
+		useMeterZone: false,
+		warnOnCumulativeReset: false
 	}
 }
 
@@ -127,6 +128,7 @@ const VALIDATION = {
 			relaxedParsing: new EnumParam('relaxedParsing', BooleanCheckArray),
 			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
 			useMeterZone: new EnumParam('useMeterZone', BooleanCheckArray),
+			warnOnCumulativeReset: new EnumParam('warnOnCumulativeReset', BooleanCheckArray),
 		},
 		anyOf: [
 			{ required: ['meterIdentifier'] },
@@ -178,9 +180,10 @@ function validateReadingsCsvUploadParams(req, res, next) {
 		failure(req, res, new CSVPipelineError(responseMessage));
 		return;
 	}
-	
+
+	// extract query parameters
 	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
-		refreshReadings, relaxedParsing, useMeterZone } = req.body; // extract query parameters
+		refreshReadings, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
 
 	// Set default values of not supplied parameters.
 	if (cumulative === undefined) {
@@ -215,6 +218,9 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (useMeterZone === undefined) {
 		req.body.useMeterZone = DEFAULTS.readings.useMeterZone;
+	}
+	if (warnOnCumulativeReset === undefined) {
+		req.body.warnOnCumulativeReset = DEFAULTS.readings.warnOnCumulativeReset;
 	}
 	next();
 }
