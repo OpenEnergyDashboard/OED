@@ -42,7 +42,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
 	const [triggerSimulate] = conversionsApi.useLazySimulateDeleteConversionQuery();
-	const [deleteWithDefaults] = conversionsApi.useDeleteWithDefaultsMutation();
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
@@ -433,11 +432,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			groupIds: groupsWithLostDefault
 		};
 		try {
-			if (metersWithLostDefault.length > 0 || groupsWithLostDefault.length > 0) {
-				await deleteWithDefaults(payload).unwrap();
-			} else {
-				await deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId }).unwrap();
-			}
+			await deleteConversion(payload).unwrap();
 			showSuccessNotification(translate('conversion.delete.success'));
 		} catch (error) {
 			showErrorNotification(translate('conversion.delete.failure'));

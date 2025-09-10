@@ -153,52 +153,67 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
  * Route for POST, delete conversion.
  */
 router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, res) => {
-	// Only require a source and destination id
+	// Accept sourceId, destinationId, meterIds, groupIds
 	const validConversion = {
 		type: 'object',
-		required: ['sourceId', 'destinationId'],
+		required: ['sourceId', 'destinationId', 'meterIds', 'groupIds'],
 		properties: {
-			sourceId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+			sourceId: { 
+				type: 'number', 
+				minimum: 0 
 			},
-			destinationId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+			destinationId: { 
+				type: 'number', 
+				minimum: 0 
+			},
+			meterIds: { 
+				type: 'array', 
+				items: { type: 'number' } 
+			},
+			groupIds: { 
+				type: 'array', 
+				items: { type: 'number' } 
 			}
 		}
 	};
 
-	// Ensure conversion object is valid
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		log.error(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
-	} else {
-		const conn = getConnection();
-		try {
-			// Get the source and destination units for the conversion
-			const source = await Unit.getById(req.body.sourceId, conn);
-			const dest = await Unit.getById(req.body.destinationId, conn);
-			// Check if the source or the destination is a suffix unit
-			if (source.typeOfUnit === 'suffix') {
-				log.info('Suffix unit is used in conversion deletion as source.');
-				await removeAdditionalConversionsAndUnits(source, conn);
-			}
-			if (dest.typeOfUnit === 'suffix') {
-				log.info('Suffix unit is used in conversion deletion as destination.');
-				await removeAdditionalConversionsAndUnits(dest, conn);
-			}
-			// Don't worry about checking if the conversion already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Conversion.delete(req.body.sourceId, req.body.destinationId, conn);
-		} catch (err) {
-			log.error(`Error while deleting conversion with error(s): ${err}`);
-			failure(res, 500, `Error while deleting conversion with errors(s): ${err}`);
+		return;
+	}
+	const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
+	const conn = getConnection();
+	try {
+		// Get the source and destination units for the conversion
+		const source = await Unit.getById(sourceId, conn);
+		const dest = await Unit.getById(destinationId, conn);
+		// Check if the source or the destination is a suffix unit
+		if (source.typeOfUnit === 'suffix') {
+			log.info('Suffix unit is used in conversion deletion as source.');
+			await removeAdditionalConversionsAndUnits(source, conn);
 		}
-		success(res, 'Successfully deleted conversion');
+		if (dest.typeOfUnit === 'suffix') {
+			log.info('Suffix unit is used in conversion deletion as destination.');
+			await removeAdditionalConversionsAndUnits(dest, conn);
+		}
+		await conn.tx(async t => {
+			// Update meters if any
+			for (const meterId of meterIds) {
+				await t.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meterId]);
+			}
+			// Update groups if any
+			for (const groupId of groupIds) {
+				await t.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [groupId]);
+			}
+			// Delete conversion
+			await Conversion.delete(sourceId, destinationId, t);
+		});
+		success(res, 'Successfully deleted conversion and updated meters/groups');
+	} catch (err) {
+		log.error(`Error while deleting conversion transaction: ${err}`);
+		failure(res, 500, `Error while deleting conversion and updating meters/groups: ${err}`);
 	}
 });
 router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversions'), async (req, res) => {
@@ -223,28 +238,6 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 	} catch (err) {
 		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
 		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
-	}
-});
-router.post('/deleteWithDefaults', adminAuthMiddleware('delete conversions and update default graphic unit'), async (req, res) => {
-	const { sourceId, destinationId, meterIds, groupIds } = req.body;
-	const conn = getConnection();
-	try {
-		await conn.tx(async t => {
-			// Update meters
-			for (const meterId of meterIds) {
-				await t.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meterId]);
-			}
-			// Update groups
-			for (const groupId of groupIds) {
-				await t.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [groupId]);
-			}
-			// Delete conversion
-			await Conversion.delete(sourceId, destinationId, t);
-		});
-		success(res, 'Successfully deleted conversion and updated meters/groups');
-	} catch (err) {
-		log.error(`Error in deleteWithDefaults transaction: ${err}`);
-		failure(res, 500, `Failed to delete conversion and update meters/groups: ${err}`);
 	}
 });
 module.exports = router;
