@@ -10,8 +10,6 @@ const log = require('../log');
 const { adminAuthMiddleware } = require('./authenticator');
 const router = express.Router();
 
-const mockBaselines = require("../data/mockBaselines")
-
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
@@ -38,44 +36,31 @@ router.post('/new', async (req, res) => {
 		log(`Error while adding baseline: ${err}`, 'error');
 	}
 });
-
-router.get("/", (req, res) => {
-	res.json(mockBaselines);
-});
-
-router.get("/:meterId", (req, res) => {
-	const { meterId } = req.params;
-	const segments = mockBaselines.filter(s => s.meterId == meterId);
-	res.json(segments);
-});
-
 router.post('/edit', adminAuthMiddleware('edit baselines'), async (req, res) => {
-	const validConversion = {
+	const validBaseline = {
 		type: 'object',
-		required: ['baselineValue', 'isActive'],
+		required: ['meterId', 'isActive', 'note'],
 		properties: {
-			baselineValue: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
-			},
-			isActive: {
-				type: 'boolean'
+			meterId: { type: 'number' },
+			isActive: { type: 'boolean' },
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
 			}
 		}
 	};
-
 	// not edited
-	const validatorResult = validate(req.body, validConversion);
+	const validatorResult = validate(req.body, validBaseline);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		log.warn(`Got request to edit baselines with invalid baseline data, errors: ${validatorResult.errors}`);
+		failure(res, 400, `Got request to edit baselines with invalid baseline data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
-			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
-				req.body.slope, req.body.intercept, req.body.note);
-			await updatedConversion.update(conn);
+			const updatedBaseline = new Baseline(req.body.meterId, req.body.isActive, req.body.note);
+			await updatedBaseline.update(conn);
 		} catch (err) {
 			log.error(`Error while editing conversion with error(s): ${err}`);
 			failure(res, 500, `Error while editing conversion with error(s): ${err}`);

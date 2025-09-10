@@ -70,6 +70,15 @@ class Baseline {
 		const rows = await conn.any(sqlFile('baseline/get_all_baselines.sql'));
 		return rows.map(row => Baseline.mapRow(row));
 	}
+
+	/**
+	 * Updates an existed baseline in the database.
+	 * @param {*} conn The connection to use.
+	 */
+	async update(conn) {
+		const baseline = this;
+		await conn.none(sqlFile('baseline/update_baseline.sql'), baseline);
+	}
 }
 
 module.exports = Baseline;

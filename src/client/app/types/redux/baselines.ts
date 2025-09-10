@@ -5,13 +5,15 @@
 export interface Baseline {
 	meterId: number;
 	// Whether there's a baseline applied or not
-    isActive: boolean;
+	isActive: boolean;
 	note?: string;
 }
 
 export interface BaselineSegment {
-	id: number;
 	meterId: number;
+	// Calc range can be null if the value is manually enter
+	calcStart?: number;
+	calcEnd?: number;
 	startTime: number;
 	endTime: number;
 	baselineValue: number;
