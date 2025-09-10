@@ -12,9 +12,9 @@ const ConversionSegment = require('../../models/ConversionSegment');
 
 // Insert test units for IDs 10, 1, 2
 async function insertTestUnits(conn) {
-	await new Unit(undefined, 'Unit 10', 'Unit 10', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.METER, 'Suffix 10', Unit.displayableType.ADMIN, true, 'Note 10').insert(conn);
-	await new Unit(undefined, 'Unit 1', 'Unit 1', Unit.unitRepresentType.QUANTITY, 1001, Unit.unitType.UNIT, 'Suffix 1', Unit.displayableType.ADMIN, true, 'Note 1').insert(conn);
-	await new Unit(undefined, 'Unit 2', 'Unit 2', Unit.unitRepresentType.QUANTITY, 1002, Unit.unitType.UNIT, 'Suffix 2', Unit.displayableType.ADMIN, true, 'Note 2').insert(conn);
+	await new Unit(undefined, 'Unit 10', 'Unit 10', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.METER, '', Unit.displayableType.ADMIN, true, 'Note 10').insert(conn);
+	await new Unit(undefined, 'Unit 1', 'Unit 1', Unit.unitRepresentType.QUANTITY, 1001, Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, true, 'Note 1').insert(conn);
+	await new Unit(undefined, 'Unit 2', 'Unit 2', Unit.unitRepresentType.QUANTITY, 1002, Unit.unitType.UNIT, '', Unit.displayableType.ADMIN, true, 'Note 2').insert(conn);
 }
 
 // Insert multiple segments for 10->1 and 1->2 into conversion_segments
