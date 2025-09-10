@@ -10,59 +10,6 @@ mix case and if statements.
 */
 
 /*
-Rounds a timestamp up to the next interval
- */
-CREATE OR REPLACE FUNCTION date_trunc_up(interval_precision TEXT, ts TIMESTAMP)
-	RETURNS TIMESTAMP LANGUAGE SQL
-IMMUTABLE
-AS $$
-SELECT CASE
-	 WHEN ts = date_trunc(interval_precision, ts) THEN ts
-	 ELSE date_trunc(interval_precision, ts + ('1 ' || interval_precision)::INTERVAL)
-	 END
-$$;
-
-/*
-This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
-not exceed the start/end times for the readings for the supplied meters. This can be an issue, in particular,
-because infinity is used to indicate to graph all readings.
- */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
-	RETURNS TSRANGE
-AS $$
-DECLARE
-	readings_max_tsrange TSRANGE;
-BEGIN
-	SELECT tsrange(min(start_timestamp), max(end_timestamp)) INTO readings_max_tsrange
-	FROM (readings r
-		INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id);
-	RETURN tsrange_to_shrink * readings_max_tsrange;
-END;
-$$ LANGUAGE 'plpgsql';
-
-/*
-This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
-not exceed the start/end times for all the readings. This can be an issue, in particular,
-because infinity is used to indicate to graph all readings. This version does it to the nearest
-day by using the day reading view since bars use to the nearest day and this should be faster.
-This should be fine since bar uses the same view to get data.
- */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_meters_by_day(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
-	RETURNS TSRANGE
-AS $$
-DECLARE
-	readings_max_tsrange TSRANGE;
-BEGIN
-	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM daily_readings_unit dr
-	-- Get all the meter_ids in the passed array of meters.
-	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id;
-	-- Make the original range be to the day by dropping parts of days at start/end.
-	RETURN tsrange(date_trunc_up('day', lower(tsrange_to_shrink)), date_trunc('day', upper(tsrange_to_shrink))) * readings_max_tsrange;
-END;
-$$ LANGUAGE 'plpgsql';
-
-/*
 	The following views are all generated in src/server/models/Reading.js in createReadingsMaterializedViews.
 	This is necessary because they can't be wrapped in a function (otherwise predicates would not be pushed down).
 */
@@ -94,8 +41,7 @@ so they are just averaged. The one table contains both types of readings but are
 so the line reading functions can use them both in the same way.
  */
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS
-hourly_readings_unit
+CREATE MATERIALIZED VIEW hourly_readings_unit
 	AS SELECT
 		-- This gives the weighted average of the reading rates, defined as
 		-- sum(reading_rate * overlap_duration) / sum(overlap_duration)
@@ -218,8 +164,7 @@ hourly_readings_unit
 	-- The order by ensures that the materialized view will be clustered in this way.
 	ORDER BY gen.interval_start, r.meter_id;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS
-daily_readings_unit
+CREATE MATERIALIZED VIEW daily_readings_unit
 	AS SELECT
 		h.meter_id AS meter_id,
         avg(h.reading_rate) AS reading_rate,
@@ -294,8 +239,7 @@ END;
 $$ LANGUAGE 'plpgsql';
 
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS
-group_daily_readings_unit
+CREATE MATERIALIZED VIEW group_daily_readings_unit
 	AS SELECT
 		gdm.group_id,
 		sum(dr.reading_rate  * c.slope + c.intercept) AS reading_rate,
@@ -315,8 +259,7 @@ group_daily_readings_unit
 -- Index on interval, graphic_unit_id, group_id
 CREATE INDEX if not exists idx_group_daily_readings_unit ON group_daily_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS
-group_hourly_readings_unit
+CREATE MATERIALIZED VIEW group_hourly_readings_unit
 	AS SELECT
 		gdm.group_id,
 		sum(hr.reading_rate  * c.slope + c.intercept) AS reading_rate,

@@ -11,13 +11,11 @@ import { selectIsAdmin } from '../slices/currentUserSlice';
 import { baseApi } from './baseApi';
 import { setRefreshingReadings } from '../../redux/slices/appStateSlice';
 
-
 export const groupsAdapter = createEntityAdapter<GroupData>({
 	sortComparer: (groupA, groupB) => groupA.name?.localeCompare(groupB.name, undefined, { sensitivity: 'accent' })
 });
 export const groupsInitialState = groupsAdapter.getInitialState();
 export type GroupDataState = EntityState<GroupData, number>;
-
 
 export const groupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({

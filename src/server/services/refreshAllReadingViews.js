@@ -25,5 +25,4 @@ async function refreshAllReadingViews() {
 	log.info('Group Views Refreshed');
 }
 
-
 module.exports = { refreshAllReadingViews };

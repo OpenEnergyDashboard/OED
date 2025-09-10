@@ -227,7 +227,7 @@ class Group {
 
 	/**
 	 * Refreshes the groups deep meters view.
-	 * Should be called whenever a group's child meters are edited.
+	 * Should be called whenever a group's child meters or groups are edited.
 	 * @param conn The connection to use
 	 * @returns {Promise<void>}
 	 */
