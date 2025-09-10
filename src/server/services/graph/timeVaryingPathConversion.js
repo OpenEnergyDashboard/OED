@@ -14,88 +14,68 @@ const Conversion = require('../../models/Conversion');
  * @returns Array of {source, destination, startTime, endTime, slope, intercept}
  */
 async function timeVaryingPathConversion(path, conn, getEdgeConversions) {
-    // Fetch all time-varying conversions for each edge in the path
+    //console.log('Computing time-varying path conversion for path:', path);
+    // 1. Fetch and sort segments for each edge
     const edgeSegments = [];
     for (let i = 0; i < path.length - 1; ++i) {
         const sourceId = path[i].id;
         const destinationId = path[i + 1].id;
-        // getEdgeConversions should return sorted array of {start_time, end_time, slope, intercept}
-        const segments = await getEdgeConversions(sourceId, destinationId, conn);
+        let segments = await getEdgeConversions(sourceId, destinationId, conn);
+        segments = segments.sort((a, b) => parsePostgresDate(a.startTime) - parsePostgresDate(b.startTime));
         edgeSegments.push(segments);
+        //console.log(`Edge ${i}: source ${sourceId} -> dest ${destinationId}, segments:`, segments);
     }
 
-    // Collect all unique time boundaries
-    const boundaries = new Set();
-    edgeSegments.forEach(segments => {
-        segments.forEach(seg => {
-            boundaries.add(parsePostgresDate(seg.startTime));
-            boundaries.add(parsePostgresDate(seg.endTime));
-        });
-    });
-    const sortedBoundaries = Array.from(boundaries).sort((a, b) => a - b);
+    // 2. Initialize pointers for each edge
+    const pointers = Array(path.length - 1).fill(0);
 
-    // Build combined segments
+    // 3. Main loop
+    let currentStart = Number.NEGATIVE_INFINITY;
     const results = [];
-    for (let i = 0; i < sortedBoundaries.length - 1; ++i) {
-        const startTime = sortedBoundaries[i];
-        const endTime = sortedBoundaries[i + 1];
-        let valid = true;
-        let slope = 1;
-        let intercept = 0;
+    let loopCount = 0;
+    while (true) {
+        loopCount++;
+        //console.log(`\n--- Loop iteration ${loopCount} ---`);
+        // Find current segments for each edge
+        const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
+        //console.log('Current pointers:', pointers);
+        //console.log('Current segments:', currentSegments);
+        // Find minimum end time among current segments
+        let currentEnd = Math.min(...currentSegments.map(seg => parsePostgresDate(seg.endTime)));
+        //console.log('Current start:', currentStart, 'Current end:', currentEnd);
 
-        // For each edge, find the segment covering this time range
-        for (const [edgeIndex, segments] of edgeSegments.entries()) {
-            // Try to find segment in forward direction
-            let seg = segments.find(s =>
-                parsePostgresDate(s.startTime) <= startTime &&
-                parsePostgresDate(s.endTime) >= endTime &&
-                s.sourceId === path[edgeIndex].id &&
-                s.destinationId === path[edgeIndex + 1].id
-            );
-
-            let invert = false;
-
-            if (!seg) {
-                // Try to find segment in reverse direction
-                seg = segments.find(s =>
-                    parsePostgresDate(s.startTime) <= startTime &&
-                    parsePostgresDate(s.endTime) >= endTime &&
-                    s.sourceId === path[edgeIndex + 1].id &&
-                    s.destinationId === path[edgeIndex].id
-                );
-                if (seg) {
-                    // Check bidirectional in conversions table
-                    const bidirectional = await isBidirectional(s.sourceId, s.destinationId, conn);
-                    if (bidirectional) invert = true;
-                    else seg = null; // Not bidirectional, can't use
-                }
-            }
-
-            if (!seg) {
-                valid = false;
-                break;
-            }
-
-            let segSlope = seg.slope;
-            let segIntercept = seg.intercept;
-            if (invert) {
-                [segSlope, segIntercept] = invertConversion(segSlope, segIntercept);
-            }
-
-            [slope, intercept] = updatedConversion(slope, intercept, segSlope, segIntercept);
+        // Combine conversions for the path
+        let slope = 1, intercept = 0;
+        for (const seg of currentSegments) {
+            [slope, intercept] = updatedConversion(slope, intercept, seg.slope, seg.intercept);
         }
-        if (valid) {
-            results.push({
-                source: path[0].id,
-                destination: path[path.length - 1].id,
-                start_time: toPostgresTimestamp(startTime),
-                end_time: toPostgresTimestamp(endTime),
-                slope,
-                intercept
-            });
+        //console.log('Combined slope:', slope, 'Combined intercept:', intercept);
+        results.push({
+            source: path[0].id,
+            destination: path[path.length - 1].id,
+            start_time: toPostgresTimestamp(currentStart),
+            end_time: toPostgresTimestamp(currentEnd),
+            slope,
+            intercept
+        });
+
+        // Advance pointers for segments ending at currentEnd
+        let done = false;
+        for (let i = 0; i < pointers.length; ++i) {
+            if (parsePostgresDate(currentSegments[i].endTime) === currentEnd) {
+                pointers[i]++;
+                //console.log(`Advancing pointer for edge ${i} to ${pointers[i]}`);
+                if (pointers[i] >= edgeSegments[i].length) done = true;
+            }
         }
+        if (done || currentEnd === Number.POSITIVE_INFINITY) {
+            //console.log('Exiting main loop. Done:', done, 'Current end is infinity:', currentEnd === Number.POSITIVE_INFINITY);
+            break;
+        }
+        currentStart = currentEnd;
     }
 
+    //console.log('Final results:', results);
     return results;
 }
 

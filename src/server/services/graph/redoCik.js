@@ -44,7 +44,7 @@ async function redoCikVary(conn) {
 	const graph = await createConversionGraph(conn);
 	
 	// Processes suffix units to update graph and database (not used for now).
-	await handleSuffixUnits(graph, conn);
+	//await handleSuffixUnits(graph, conn);
 	// Uses final graph to create cik_vary array.
 	const cikVary = await createCikVaryArray(graph, conn);
 	
