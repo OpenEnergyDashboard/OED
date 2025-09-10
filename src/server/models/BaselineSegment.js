@@ -75,4 +75,81 @@ class BaselineSegment {
             await t.none(sqlFile('baselineSegment/update_baseline_segment.sql'), baselineSegment);
         });
     }
+
+    static async splitEarlier(meterId, newBaselineValue, newNote, originalStartTime, originalEndTime, splitTime, conn) {
+        return conn.tx(async t => {
+			// get all data for the original segment
+			const originalSegment = await t.one(sqlFile('baselineSegment/get_by_meter_id_start_end.sql'), {
+				meterId: meterId,
+				startTime: originalStartTime,
+				endTime: originalEndTime
+			});
+
+			// earlier segment - insert new
+			const earlierSegment = {
+				meterId: originalSegment.meterId,
+				baselineValue: newBaselineValue,
+				startTime: originalSegment.start_time,
+				endTime: splitTime,
+				note: newNote
+			}
+			await t.none(sqlFile('baselineSegment/insert_new_baseline_segment.sql'), earlierSegment);
+
+			// later segment - update start time
+			await t.none(sqlFile('baselineSegment/update_baseline_segment.sql'), {
+				meterId: originalSegment.meterId,
+				baselineValue: originalSegment.baselineValue,
+				startTime: splitTime,
+				endTime: originalSegment.end_time,
+				note: originalSegment.note,
+				originalStartTime: originalSegment.start_time,
+				originalEndTime: originalSegment.end_time
+			});
+		});
+    }
+
+    /**
+	 * Split a segment in two, the later segment uses the new baselineValue/note
+	 * @param {*} meterId The meter's id.
+	 * @param {*} newBaselineValue The baseline value for the new segment.
+	 * @param {*} newNote The note for the new segment.
+	 * @param {*} startTime When the current segment starts.
+	 * @param {*} endTime When the current segment ends.
+	 * @param {*} splitTime The time to split the segment at.
+	 * @param {*} conn The connection to use
+	 * @returns {Promise.<void>}
+	 */
+	static async splitLater(meterId, newBaselineValue, newNote, originalStartTime, originalEndTime, splitTime, conn) {
+		return conn.tx(async t => {
+			// get all data for the original segment
+			const originalSegment = await t.one(sqlFile('baselineSegment/get_by_meter_id_start_end.sql'), {
+				meterId: meterId,
+				startTime: originalStartTime,
+				endTime: originalEndTime
+			});
+
+			// earlier segment - update end time
+			await t.none(sqlFile('baselineSegment/update_baseline_segment.sql'), {
+				meterId: originalSegment.meterId,
+				baselineValue: originalSegment.baselineValue,
+				startTime: originalSegment.startTime,
+				endTime: splitTime,
+				note: originalSegment.note,
+				originalStartTime: originalSegment.startTime,
+				originalEndTime: originalSegment.endTime
+			});
+
+			// later segment - insert new
+			const earlierSegment = {
+				meterId: originalSegment.meterId,
+				baselineValue: newBaselineValue,
+				startTime: splitTime,
+				endTime: originalSegment.endTime,
+                calcStart: null,
+                calcEnd: null,
+				note: newNote
+			}
+			await t.none(sqlFile('baselineSegment/insert_new_baseline_segment.sql'), earlierSegment);
+		});
+	}
 }

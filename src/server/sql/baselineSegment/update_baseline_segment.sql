@@ -1,0 +1,3 @@
+-- TODO: Implement baseline_segments table updates with parameter: 
+-- meterId, baselineValue, startTime, endTime, note, originalStartTime, originalEndTime
+-- on row with corresponding meter_id, start_time and end_time
