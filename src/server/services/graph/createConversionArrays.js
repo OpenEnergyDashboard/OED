@@ -7,7 +7,6 @@ const Unit = require('../../models/Unit');
 const { getPath } = require('./createConversionGraph');
 const { pathConversion } = require('./pathConversion');
 const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
-const ConversionSegment = require('../../models/ConversionSegment');
 
 /**
  * Returns the Cik which gives the slope, intercept and suffix name between each meter and unit 
@@ -76,26 +75,21 @@ async function createCikArray(graph, conn) {
  */
 async function createCikVaryArray(graph, conn) {
 	const sources = await Unit.getTypeMeter(conn);
-	//console.log('Sources:', sources.map(u => ({ id: u.id, name: u.name, type: u.type })));
 	const destinations = (await Unit.getTypeUnit(conn)).concat(await Unit.getTypeSuffix(conn));
-	//console.log('Destinations:', destinations.map(u => ({ id: u.id, name: u.name, type: u.type })));
 	const c = [];
-	// Helper to fetch all segments for an edge
-	async function getEdgeConversions(sourceId, destinationId, conn) {
-		// Returns array of {start_time, end_time, slope, intercept}
-		const toReturn = await ConversionSegment.getAllForEdge(conn, sourceId, destinationId);
-		//console.log(`Edge conversions from ${sourceId} to ${destinationId}:`, toReturn);
-		return toReturn;
-	}
+
+	// Iterate over all possible meter unit sources
 	for (const source of sources) {
+		// Iterate over all possible unit destinations
 		for (const destination of destinations) {
 			const sourceId = source.id;
 			const destinationId = destination.id;
+			// The shortest path from source to destination.
 			const path = getPath(graph, sourceId, destinationId);
-			//console.log(`Path from ${sourceId} to ${destinationId}:`, path);
+			// If a valid path exists, compute all time-varying conversion segments along that path
 			if (path !== null) {
-				const segments = await timeVaryingPathConversion(path, conn, getEdgeConversions);
-				//console.log(`Segments for path ${sourceId} -> ${destinationId}:`, segments);
+				const segments = await timeVaryingPathConversion(path, conn);
+				// Add all segments to the result array
 				segments.forEach(seg => {
 					c.push({
 						source: sourceId,

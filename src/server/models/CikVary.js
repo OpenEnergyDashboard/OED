@@ -63,15 +63,15 @@ class CikVary {
 	}
 
 	/**
-	* Get CikVary conversions valid at a specific time.
+	* Get CikVary conversions rate at a specific time.
 	* @param {*} conn The database connection to use.
 	* @param {*} sourceId Source unit id.
 	* @param {*} destinationId Destination unit id.
 	* @param {*} queryTime Timestamp to check validity.
 	* @returns Matching CikVary objects
 	*/
-	static async getConversionAtTime(conn, sourceId, destinationId, queryTime) {
-		const rows = await conn.any(sqlFile('cik_vary/get_conversion.sql'), {
+	static async getBySourceDestinationTime(conn, sourceId, destinationId, queryTime) {
+		const rows = await conn.any(sqlFile('cik_vary/get_cik_vart_by_source_destination_start_end.sql'), {
 			sourceId,
 			destinationId,
 			queryTime
@@ -86,20 +86,22 @@ class CikVary {
 	* @param {*} conn The database connection to use.
 	*/
 	static async insert(cikVaryArr, conn) {
-		// Remove all the current values in the table.
-		await conn.none(sqlFile('cik_vary/delete_all_conversions.sql'));
+		return conn.tx(async t => {	
+			// Remove all the current values in the table.
+			await t.none(sqlFile('cik_vary/delete_all_cik_vary.sql'));
 
-		// Loop over all conversions in array and insert each in DB.
-		for (const conversion of cikVaryArr) {
-			await conn.none(sqlFile('cik_vary/insert_new_conversion.sql'), {
-				sourceId: conversion.source,
-				destinationId: conversion.destination,
-				startTime: conversion.start_time,
-				endTime: conversion.end_time,
-				slope: conversion.slope,
-				intercept: conversion.intercept
-			});
-		}
+			// Loop over all conversions in array and insert each in DB.
+			for (const conversion of cikVaryArr) {
+				await t.none(sqlFile('cik_vary/insert_new_cik_vary.sql'), {
+					sourceId: conversion.source,
+					destinationId: conversion.destination,
+					startTime: conversion.start_time,
+					endTime: conversion.end_time,
+					slope: conversion.slope,
+					intercept: conversion.intercept
+				});
+			}
+		});
 	}
 }
 

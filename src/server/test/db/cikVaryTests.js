@@ -111,7 +111,7 @@ mocha.describe('CIK Vary Chaining', () => {
 			await insertTestSegments(conn);
 			await redoCikVary(conn);
 			const results = await conn.any('SELECT * FROM cik_vary ORDER BY source_id, destination_id, start_time');
-			//console.log(results);
+			
 			expect(results).to.be.an('array').that.is.not.empty;
 			expect(results).to.have.lengthOf(7);
 		});
