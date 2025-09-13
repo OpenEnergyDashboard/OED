@@ -217,11 +217,17 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				// Use whatever the reading has (UTC if none)
 				endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			}
-			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				endTimestampTz = moment.parseZone(rows[index][1], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][1], undefined).tz(meterZone);
+				} else {
+					endTimestampTz = moment.parseZone(rows[index][1], undefined);
+				}
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
@@ -238,32 +244,44 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			if (useMeterZone) {
 				// Treat the reading as if it came in the meter time zone.
 				// This keeps the time the same but applies the time zone.
-				startTimestampTz = moment.tz(rows[index][1], meterZone);
+				startTimestampTz = moment(rows[index][1]).tz(meterZone);
 			} else {
 				// Use whatever the reading has (UTC if none)
 				startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			}
-			if (!startTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!startTimestampTz.isValid() && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
 				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				startTimestampTz = moment.parseZone(rows[index][1], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][1], undefined).tz(meterZone);
+				} else {
+					startTimestampTz = moment.parseZone(rows[index][1], undefined);
+				}
 			}
 			if (useMeterZone) {
 				// Treat the reading as if it came in the meter time zone.
 				// This keeps the time the same but applies the time zone.
-				endTimestampTz = moment.tz(rows[index][2], meterZone);
+				endTimestampTz = moment(rows[index][2]).tz(meterZone);
 			} else {
 				// Use whatever the reading has (UTC if none)
 				endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
 			}
-			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][2], undefined).tz(meterZone);
+				} else {
+					endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				}
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
@@ -288,8 +306,10 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		}
 		// Determine the meter reading value to use based on if the data is cumulative or not cumulative
 		if (isCumulative) {
-			meterReading1 = meter.reading; // In cumulative this is the canonical previous raw reading
-			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
+			// In cumulative this is the canonical previous raw reading
+			meterReading1 = meter.reading;
+			// In cumulative this is the canonical current raw reading
+			meterReading2 = rows[index][0];
 			// Check the current reading is a number. The previous one should already be checked.
 			if (isNaN(meterReading2)) {
 				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
@@ -344,6 +364,19 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// Get the shift in timezone for the start and end of this reading to see if crossed DST.
 			// Must do in the meter timezone and the reading must have an offset for this to work.
 			shift = dstShift(startTimestampTz, endTimestampTz);
+			if (index === startLoop && startTimestamp.isSameOrAfter(endTimestamp) && shift !== 0) {
+				// This is an invalid reading that is detected below. However, that test cannot happen yet because
+				// if the start & end are the same then maybe that happened due to crossing out of DST where the
+				// shift is the same as the reading. Thus, this only checks the first item in the loop
+				// in case the new reading timestamp is before that stored one from the previous upload.
+				// If that is the case, the start is >= the end (not in the TZ) and a shift was
+				// detected then it treats the shift as zero to avoid it thinking it crossed DST.
+				// Without this, it may set inDst to true so future points are incorrectly processed.
+				// Note this could happen with other bad values but limiting to first one since it is
+				// the obvious case to happen. Since not checking in TZ then it might be safe to do this
+				// in more cases but it is subtle and uncertain.
+				shift = 0;
+			}
 			if (shift < 0) {
 				// These are the examples on the left in the example diagram in the developer docs.
 				// This reading crossed and entered DST so went forward in time.
@@ -370,29 +403,18 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				// for inclusion. Thus, we mark that a split is needed.
 				splitDst = true;
 			} else if (shift > 0) {
-				// This is a hack where when doing meter time zone you don't do the DST processing when crossing out
-				// of DST. This can give duplicate values and miss if the readings don't align with the DST shift range.
-				// TODO fix this up so better.
-				if (!useMeterZone) {
-					// These are the examples on the right in the example diagram in the developer docs.
-					// This reading crossed and left DST so went back in time.
-					// The next two lines are similar use to above.
-					const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
-					zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
-					// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
-					// This may take multiple readings so store the time now.
-					prevEndTimestamp = prevReading.endTimestamp;
-					// We note we are in this situation and may need to remove and split readings.
-					inDst = true;
-				}
-			} else {
-				// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
-				// handled next.
-				if (useMeterZone) {
-					// TODO This is a big hack because we we don't do inDst for this case so reset. Similar to issue above.
-					splitDst = false;
-				}
+				// These are the examples on the right in the example diagram in the developer docs.
+				// This reading crossed and left DST so went back in time.
+				// The next two lines are similar use to above.
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
+				// This may take multiple readings so store the time now.
+				prevEndTimestamp = prevReading.endTimestamp;
+				// We note we are in this situation and may need to remove and split readings.
+				inDst = true;
 			}
+			// If shift = 0 then no DST crossing so do nothing.
 			if (inDst) {
 				if (endTimestamp.isAfter(prevEndTimestamp)) {
 					// This reading has some part of its time past the previous one used so need to use it and stop this process.
