@@ -274,10 +274,6 @@ const groupDatakWh = [
         childGroups: [],
     }
 ];
-function expectStatusToEqual(res, expectedStatus = 0) {
-    expect(res).to.have.status(expectedStatus);
-}
-
 
 module.exports = {
     prepareTest,
@@ -297,6 +293,5 @@ module.exports = {
     conversionDatakWh,
     meterDatakWh,
     meterDatakWhGroups,
-    groupDatakWh,
-    expectStatusToEqual 
+    groupDatakWh
 };
