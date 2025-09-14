@@ -68,29 +68,29 @@ async function validateMinMaxRelation({ endpoint, basePayload }) {
 
 /**
  * Validates a string field by testing required presence, min/max length, and enum constraints.
- *
- * @param field the name of the string field to validate
- * @param endpoint the API endpoint to test (e.g., /api/units/addUnit)
+ * Notes:
+ * - By default, no min/max length or enum checks are applied unless explicitly set.
+ * - `minLength` and `maxLength` default to -1, which means "no check".
+ * - If `minLength = 0`, the function ensures the empty string is invalid.
+ * - If `maxLength = 0`, only an empty string would be allowed.
+ * @param field       the name of the string field to validate
+ * @param endpoint    the API endpoint to test (e.g., /api/units/addUnit)
  * @param basePayload a valid payload object to start from
- * @param required whether the field is required (default: true)
- * @param minLength the minimum length allowed for the string (default: null)
- * @param maxLength the maximum length allowed for the string (default: null)
- * @param enumValues optional array of valid enum values to test against
+ * @param required    whether the field is required (default: true)
+ * @param minLength   the minimum length allowed for the string (default: -1 → no check)
+ * @param maxLength   the maximum length allowed for the string (default: -1 → no check)
+ * @param enumValues  optional array of valid enum values to test against
  */
-async function validateString({ field, endpoint, basePayload, required = true, minLength = null, maxLength = null, enumValues = null }) {
-
+ async function validateString({field, endpoint, basePayload, required = true, minLength = -1, maxLength = -1, enumValues = null}) {
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
-
-	if (minLength && minLength > 0) {
+	if (minLength >= 0) {
 		await testInvalidField({ field, invalidValue: 'x'.repeat(minLength - 1), endpoint, basePayload });
 	}
-
-	if (maxLength) {
+	if (maxLength >= 0) {
 		await testInvalidField({ field, invalidValue: 'x'.repeat(maxLength + 1), endpoint, basePayload });
 	}
-
 	if (enumValues) {
 		await testInvalidField({ field, invalidValue: 'INVALID_ENUM', endpoint, basePayload });
 	}
