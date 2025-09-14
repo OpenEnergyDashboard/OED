@@ -82,7 +82,7 @@ mocha.describe('Validation - /addUnit', () => {
 			endpoint: ADD_UNIT,
 			basePayload,
 			required: false
-		});		  
+		});
 		await validateString({
 			field: 'displayable',
 			endpoint: ADD_UNIT,
