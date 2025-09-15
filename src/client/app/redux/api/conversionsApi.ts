@@ -49,7 +49,6 @@ export const conversionsApi = baseApi.injectEndpoints({
 				body: { sourceId, destinationId, meterIds, groupIds }
 			}),
 			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
-				// TODO write more robust logic for error handling, and manually invalidate tags instead?
 				// TODO Verify Behavior w/ Maintainers
 				queryFulfilled
 					.then(() => {
@@ -59,7 +58,9 @@ export const conversionsApi = baseApi.injectEndpoints({
 								refreshReadingViews: false
 							}));
 					});
-			}
+			},
+			//These tags are invalidated because we want to rerender them in case default graphic unit is affected. Add more tags to invalidate if needed
+			invalidatesTags: ['MeterData', 'GroupData']
 		}),
 		editConversion: builder.mutation<void, { conversionData: ConversionData, shouldRedoCik: boolean }>({
 			query: ({ conversionData }) => ({

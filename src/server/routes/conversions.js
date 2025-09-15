@@ -181,7 +181,6 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 	if (!validatorResult.valid) {
 		log.error(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
-		return;
 	}
 	const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
 	const conn = getConnection();

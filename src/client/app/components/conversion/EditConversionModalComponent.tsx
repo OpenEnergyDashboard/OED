@@ -432,7 +432,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			groupIds: groupsWithLostDefault
 		};
 		try {
-			await deleteConversion(payload).unwrap();
+			await deleteConversion(payload);
 			showSuccessNotification(translate('conversion.delete.success'));
 		} catch (error) {
 			showErrorNotification(translate('conversion.delete.failure'));
