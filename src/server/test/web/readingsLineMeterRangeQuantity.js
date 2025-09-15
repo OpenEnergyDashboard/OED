@@ -137,7 +137,31 @@ mocha.describe('readings API', () => {
 
 				// Add LR13 here
 
+<<<<<<< HEAD
 				// Add LR18 here
+=======
+					mocha.it(
+						'LR7: range with partial days/hours for daily gives only full days',
+						async () => {
+							// Prepare test data using existing utility
+							await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+							//Get unit ID for kWh
+							const unitId = await getUnitId('kWh');
+							//Load the expected data for the LR7 date range and unit configuration
+							const expected = await parseExpectedCsv(
+								'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kWh_st_2022-08-20%07#25#35_et_2022-10-28%13#18#28.csv',
+							);
+							//Send API request using time range and graphic unit
+							const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+								.query({
+									timeInterval: createTimeString('2022-08-20', '07:25:35', '2022-10-28', '13:18:28'),
+									graphicUnitId: unitId
+								});
+							//Assert the response only includes data within that range and format
+							expectRangeToEqualExpected(res, expected);
+						},
+					);
+>>>>>>> 27d8cc6d3 (remove only)
 
 				// Add LR19 here
 
