@@ -159,20 +159,24 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		required: ['sourceId', 'destinationId', 'meterIds', 'groupIds'],
 		properties: {
 			sourceId: { 
-				type: 'number', 
+				type: 'integer', 
 				minimum: 0 
 			},
 			destinationId: { 
-				type: 'number', 
+				type: 'integer', 
 				minimum: 0 
 			},
 			meterIds: { 
 				type: 'array', 
-				items: { type: 'number' } 
+				items: { type: 'integer', minimum: 0 },
+				uniqueItems: true,
+				maxItems: 1000
 			},
 			groupIds: { 
 				type: 'array', 
-				items: { type: 'number' } 
+				items: { type: 'integer', minimum: 0 },
+				uniqueItems: true,
+				maxItems: 1000
 			}
 		}
 	};
@@ -200,18 +204,18 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		await conn.tx(async t => {
 			// Update meters if any
 			for (const meterId of meterIds) {
-				await t.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meterId]);
+				await t.none(`UPDATE meters SET default_graphic_unit = NULL WHERE id = ${meterId}`);
 			}
 			// Update groups if any
 			for (const groupId of groupIds) {
-				await t.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [groupId]);
+				await t.none(`UPDATE groups SET default_graphic_unit = NULL WHERE id = ${groupId}`);
 			}
 			// Delete conversion
 			await Conversion.delete(sourceId, destinationId, t);
 		});
 		success(res, 'Successfully deleted conversion and updated meters/groups');
 	} catch (err) {
-		log.error(`Error while deleting conversion transaction: ${err}`);
+		log.error(`Error while deleting conversion and updating meters/groups: ${err}`);
 		failure(res, 500, `Error while deleting conversion and updating meters/groups: ${err}`);
 	}
 });
