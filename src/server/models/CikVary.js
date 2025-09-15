@@ -58,7 +58,7 @@ class CikVary {
 	* @returns all CikVary objects
 	*/
 	static async getAll(conn) {
-		const rows = await conn.any(sqlFile('cik_vary/get_cik_vary.sql'));
+		const rows = await conn.any(sqlFile('cik_vary/get_all_cik_vary.sql'));
 		return rows.map(CikVary.mapRow);
 	}
 
@@ -70,7 +70,7 @@ class CikVary {
 	* @param {*} queryTime Timestamp to check validity.
 	* @returns Matching CikVary objects
 	*/
-	static async getBySourceDestinationTime(conn, sourceId, destinationId, queryTime) {
+	static async getBySourceDestinationStartEnd(conn, sourceId, destinationId, queryTime) {
 		const rows = await conn.any(sqlFile('cik_vary/get_cik_vart_by_source_destination_start_end.sql'), {
 			sourceId,
 			destinationId,

@@ -30,9 +30,7 @@ async function timeVaryingPathConversion(path, conn) {
 	// 3. Main loop
 	let currentStart = Number.NEGATIVE_INFINITY;
 	const results = [];
-	let loopCount = 0;
 	while (true) {
-		loopCount++;
 		// Find current segments for each edge
 		const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
 		// Find minimum end time among current segments
