@@ -9,6 +9,7 @@ const { redoCikVary } = require('../../services/graph/redoCik');
 const Conversion = require('../../models/Conversion');
 const Unit = require('../../models/Unit');
 const ConversionSegment = require('../../models/ConversionSegment');
+const CikVary = require('../../models/CikVary');
 
 async function setupTestData(conn) {
 	await new Unit(undefined, 'Unit 10', 'Unit 10', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.METER, '', Unit.displayableType.ADMIN, true, 'Note 10').insert(conn);
@@ -57,14 +58,14 @@ mocha.describe('redoCikVary integration', function () {
 
 	mocha.it('should populate cik_vary with correct number of segments', async function () {
 		await redoCikVary(conn);
-		const results = await conn.any('SELECT * FROM cik_vary ORDER BY source_id, destination_id, start_time');
+		const results = await CikVary.getAll(conn);
 		expect(results).to.be.an('array').that.is.not.empty;
 		expect(results).to.have.lengthOf(7);
 	});
 
 	mocha.it('should have correct slopes for each cik_vary segment', async function () {
 		await redoCikVary(conn);
-		const results = await conn.any('SELECT * FROM cik_vary ORDER BY source_id, destination_id, start_time');
+		const results = await CikVary.getAll(conn);
 		const expectedSlopes = {
 			'1->2': [1, 2, 3],
 			'1->3': [1, 12, 21, 24],
