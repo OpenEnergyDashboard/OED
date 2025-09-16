@@ -431,11 +431,13 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			meterIds: metersWithLostDefault,
 			groupIds: groupsWithLostDefault
 		};
-		deleteConversion(payload).then(() => {
-			showSuccessNotification(translate('conversion.delete.success'));
-		}).catch(error => {
-			showErrorNotification(translate('conversion.delete.failure') + error.data.message);
-		});
+		deleteConversion(payload)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('conversion.delete.success'));
+			}).catch(error => {
+				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
+			});
 	};
 
 	const handleCancelModalClose = () => {

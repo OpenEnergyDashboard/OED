@@ -158,33 +158,35 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		type: 'object',
 		required: ['sourceId', 'destinationId', 'meterIds', 'groupIds'],
 		properties: {
-			sourceId: { 
-				type: 'integer', 
-				minimum: 0 
+			sourceId: {
+				type: 'integer',
+				minimum: 0
 			},
-			destinationId: { 
-				type: 'integer', 
-				minimum: 0 
+			destinationId: {
+				type: 'integer',
+				minimum: 0
 			},
-			meterIds: { 
-				type: 'array', 
+			meterIds: {
+				type: 'array',
 				items: { type: 'integer', minimum: 0 },
 				uniqueItems: true,
 				maxItems: 1000
 			},
-			groupIds: { 
-				type: 'array', 
+			groupIds: {
+				type: 'array',
 				items: { type: 'integer', minimum: 0 },
 				uniqueItems: true,
 				maxItems: 1000
 			}
-		}
+		},
+		additionalProperties: false
 	};
 
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.error(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		return;
 	}
 	const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
 	const conn = getConnection();
@@ -204,11 +206,11 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		await conn.tx(async t => {
 			// Update meters if any
 			for (const meterId of meterIds) {
-				await t.none(`UPDATE meters SET default_graphic_unit = NULL WHERE id = ${meterId}`);
+				await t.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meterId]);
 			}
 			// Update groups if any
 			for (const groupId of groupIds) {
-				await t.none(`UPDATE groups SET default_graphic_unit = NULL WHERE id = ${groupId}`);
+				await t.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [groupId]);
 			}
 			// Delete conversion
 			await Conversion.delete(sourceId, destinationId, t);
@@ -226,21 +228,22 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 		properties: {
 			sourceId: { type: 'number', minimum: 0 },
 			destinationId: { type: 'number', minimum: 0 }
-		}
+		},
+		additionalProperties: false
 	};
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
-		return;
-	}
-	try {
-		const conn = getConnection();
-		const result = await simulateDeleteConversion(req.body, conn);
-		return res.json(result);
-	} catch (err) {
-		log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
-		failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
+	} else {
+		try {
+			const conn = getConnection();
+			const result = await simulateDeleteConversion(req.body, conn);
+			return res.json(result);
+		} catch (err) {
+			log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
+			failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
+		}
 	}
 });
 module.exports = router;
