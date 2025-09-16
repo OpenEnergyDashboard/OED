@@ -3,6 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const ConversionSegment = require('../../models/ConversionSegment');
+const Conversion = require('../../models/Conversion');
+const invertConversion = require('./pathConversion').invertConversion;
+const updatedConversion = require('./pathConversion').updatedConversion;
 
 /**
  * Chains time-varying conversions along a path, producing combined segments for cik_vary.
@@ -19,8 +22,28 @@ async function timeVaryingPathConversion(path, conn) {
 	for (let i = 0; i < path.length - 1; ++i) {
 		const sourceId = path[i].id;
 		const destinationId = path[i + 1].id;
+		//segments are sorted by start_time in getBySourceDestination
 		let segments = await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn);
-		segments = segments.sort((a, b) => parsePostgresDate(a.startTime) - parsePostgresDate(b.startTime));
+		// Did not find the conversion segments. Since conversion should exist, it must be the other way around and bidirectional.
+		if (!segments || segments.length === 0) {
+			// Check if reverse conversion exists and is bidirectional
+			const reverseConversion = await Conversion.getBySourceDestination(destinationId, sourceId, conn);
+			// This should never happen. It should have been in the table one way or the other.
+			if (!reverseConversion || !reverseConversion.bidirectional) {
+				throw Error(`No bidirectional conversion found between ${sourceId} and ${destinationId}`);
+			}
+			// Fetch reverse segments and invert them
+			const reverseSegments = await ConversionSegment.getBySourceDestination(destinationId, sourceId, conn);
+			// This is also really weird that it exist and yet no segments found.
+			if (!reverseSegments || reverseSegments.length === 0) {
+				throw Error(`No conversion segments found for reverse direction between ${destinationId} and ${sourceId}`);
+			}
+			segments = reverseSegments.map(seg => ({
+				...seg,
+				slope: invertConversion(seg.slope, seg.intercept)[0],
+				intercept: invertConversion(seg.slope, seg.intercept)[1]
+			}));
+		}
 		edgeSegments.push(segments);
 	}
 
@@ -30,7 +53,8 @@ async function timeVaryingPathConversion(path, conn) {
 	// 3. Main loop
 	let currentStart = Number.NEGATIVE_INFINITY;
 	const results = [];
-	while (true) {
+	let done = false;
+	while (!done) {
 		// Find current segments for each edge
 		const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
 		// Find minimum end time among current segments
@@ -49,9 +73,11 @@ async function timeVaryingPathConversion(path, conn) {
 			slope,
 			intercept
 		});
-
+		
+		if (currentEnd === Number.POSITIVE_INFINITY) {
+			done = true;
+		}
 		// Advance pointers for segments ending at currentEnd
-		let done = false;
 		for (let i = 0; i < pointers.length; ++i) {
 			if (parsePostgresDate(currentSegments[i].endTime) === currentEnd) {
 				pointers[i]++;
@@ -60,24 +86,12 @@ async function timeVaryingPathConversion(path, conn) {
 				}
 			}
 		}
-		if (done || currentEnd === Number.POSITIVE_INFINITY) {
-			break;
-		}
 		currentStart = currentEnd;
 	}
 
 	return results;
 }
 
-/**
- * Chains two conversions: (slope1, intercept1) and (slope2, intercept2)
- * Returns [slope, intercept] for the combined conversion.
- */
-function updatedConversion(origSlope, origIntercept, newSlope, newIntercept) {
-	const slope = origSlope * newSlope;
-	const intercept = newSlope * origIntercept + newIntercept;
-	return [slope, intercept];
-}
 
 function parsePostgresDate(val) {
 
