@@ -4,7 +4,6 @@
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # *
 
-version: "3.8"
 services:
     # Database service. It's PostgreSQL, see the
     # Dockerfile in ./database
@@ -101,6 +100,13 @@ services:
       environment:
         - CYPRESS_BASE_URL=http://web:3000
         - DISPLAY=:99
+        #Pass DB environment variables for resetDatabase.js to access them - ANGEL43V3R
+        - OED_DB_USER=oed
+        - OED_DB_PASSWORD=opened
+        - OED_DB_HOST=database
+        - OED_DB_PORT=5432
+        - OED_DB_TEST_DATABASE=oed_testing
+        #----edit end-----
       working_dir: /usr/src/app
       depends_on:
         web:

@@ -25,9 +25,18 @@
 		"noImplicitAny": true,
 		"strictNullChecks": true,
 		"noUnusedLocals": true,
+		//------------ANGEL43V3R-----------------
+		//Added for TypeScript to include Node.js type definitions to fix child_process error
+		"types": ["node"]
+		//-------------------------------
 	},
 	"include": [
-		"./src/client/app/**/*"
+		"./src/client/app/**/*",
+		//Add Cypress test folder
+		"./cypress.config.ts",
+		"./src/cypress/**/*.ts",
+		//Add server utiltity scripts
+		"./src/server/util/**/*.ts"
 	],
 	"exclude": [
 		"node_modules"
