@@ -673,7 +673,8 @@ const testMeters = {
 				true, //displayable
 				'obvius', //type
 				// 'US/Central', // timezone
-				null, // timezone
+				'America/Chicago', // timezone
+				// null, // timezone
 				gps, // gps
 				'pipe100b id', // identifier
 				'my Note', // note
@@ -790,7 +791,8 @@ const testMeters = {
 				true, //displayable
 				'obvius', //type
 				// 'US/Central', // timezone
-				null, // timezone
+				'America/Chicago', // timezone
+				// null, // timezone
 				gps, // gps
 				'pipe100b id', // identifier
 				'my Note', // note
@@ -879,7 +881,6 @@ for (let fileKey in testMeters) {
 				// eval the string to perform the upload. res is what is returned from the request.
 				// TODO It would be nice if this was not an eval. Tried a function with closure but could not get it to work as did not find chai.
 				const res = await eval(evalString);
-				// console.log('csvPipelineTest: index, res: ', index, res);
 				// Verify the request response code is what was expected.
 				expect(res).to.have.status(testMeters[fileKey]['responseCode'][index]);
 				// This is a web request that should return html.
