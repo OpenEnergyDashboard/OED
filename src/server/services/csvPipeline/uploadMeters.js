@@ -77,7 +77,6 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
 
-			console.log('meter in uploadMeters: ', meter);
 			if (normalizeBoolean(req.body.update)) {
 				// Updating the new meters.
 				// First get its id.
