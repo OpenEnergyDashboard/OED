@@ -59,9 +59,32 @@ mocha.describe('readings API', () => {
 						.query({ timeInterval: createTimeString('2022-08-18', '00:00:00', '2022-11-01', '00:00:00'), graphicUnitId: unitId });
 					// Check that the API reading is equal to what it is expected to equal
 					expectRangeToEqualExpected(res, expected);
-				});
+				}				);
 
-				// Add LR3 here
+				mocha.it('LR3: range should have daily points for middle readings of 15 minute for a 61 day period and quantity units with kWh as kWh', async () => {
+					// 1) Seed DB with the standard unit/meter data for kWh
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+
+					// 2) Resolve the kWh graphic unit id (DB can assign any id)
+					const unitId = await getUnitId('kWh');
+
+					// 3) Load the expected series for a 61-day window (daily points expected)
+					const expected = await parseExpectedCsv(
+						'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kWh_st_2022-08-25%00#00#00_et_2022-10-25%00#00#00.csv',
+					);
+
+					// 4) Hit the API for the same window & unit
+					const res = await chai
+						.request(app)
+						.get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({
+							timeInterval: createTimeString('2022-08-25', '00:00:00', '2022-10-25', '00:00:00'),
+							graphicUnitId: unitId,
+						});
+
+					// 5) Assert the API response matches the expected CSV (shape + values)
+					expectRangeToEqualExpected(res, expected);
+				});
 
 				mocha.it('LR4: range should have hourly points for middle readings of 15 minute for a 60 day period and quantity units with kWh as kWh', async () => {
 					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
