@@ -32,7 +32,7 @@ interface EditUserModalComponentProps {
 export default function EditUserModalComponent(props: EditUserModalComponentProps) {
 	const translate = useTranslate();
 
-	// boolean that updates if any change is made to user meter modal
+	// boolean that updates if any change is made to user modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
