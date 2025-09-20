@@ -12,6 +12,7 @@ const { getUnitId } = require('../../util/readingsUtils');
 const { validateString, validateInt, validateBool, validateMinMaxRelation, validateExtraFields, getToken } = require('../util/validationHelpers');
 
 const EDIT_UNIT = '/api/units/edit';
+const GLOBAL_STRING_MAX = 1024;
 
 const basePayload = {
 	name: 'Valid Name',
@@ -122,7 +123,8 @@ mocha.describe('Unit Routes - /edit Validation', () => {
 			field: 'note',
 			endpoint: EDIT_UNIT,
 			basePayload,
-			required: false
+			required: false,
+			maxLength: GLOBAL_STRING_MAX
 		});
 	});
 	mocha.it('should validate numeric and integer fields', async () => {

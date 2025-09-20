@@ -13,6 +13,8 @@ const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
 const router = express.Router();
 
+const GLOBAL_STRING_MAX = 1024;
+
 function formatUnitForResponse(unit) {
 	return {
 		id: unit.id,
@@ -216,7 +218,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			preferredDisplay: { type: 'boolean' },
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: NOTE_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
