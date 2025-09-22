@@ -13,7 +13,7 @@ import { metersApi, selectMeterById, selectMeterDataById } from '../../redux/api
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import {
-	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS, MIN_DATE, MIN_DATE_MOMENT, selectGraphicUnitCompatibility
+	MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS, MIN_DATE, MIN_DATE_MOMENT, selectBaselineExists, selectGraphicUnitCompatibility
 } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
@@ -28,6 +28,8 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import CreateBaselineModalComponent from '../baseline/CreateBaselineModalComponent';
+import EditBaselineModalComponent from '../baseline/EditBaselineModalComponent';
 
 interface EditMeterModalComponentProps {
 	show: boolean;
@@ -57,6 +59,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	const groupDataByID = useAppSelector(selectGroupDataById);
 	// TODO should this state be used for the meterState above or would that cause issues?
 	const meterDataByID = useAppSelector(selectMeterDataById);
+	const [ baselineExists, description, currentBaseline ] = useAppSelector(state => selectBaselineExists(state, props.meter.id));
 
 	useEffect(() => { setLocalMeterEdits(cloneDeep(meterState)); }, [meterState]);
 	/* State */
@@ -231,6 +234,31 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 		}
 		if (save) {
 			handleBooleanChange(e);
+		}
+	};
+
+	const [showModal, setShowModal] = useState(false);
+	const handleShowEditBaselineModal = () => setShowModal(true);
+	const handleCloseEditBaselineModal = () => setShowModal(false);
+
+	const handleCreateEditBaseline = () => {
+		// Show create modal if baseline does not exist for this meter
+		if (!baselineExists) {
+			console.log(description);
+			console.log("Creating baseline...");
+			return <CreateBaselineModalComponent currentMeterId={props.meter.id} />;
+		} else {
+			// Retrieve current baseline data using meter ID
+			// const { data: currentBaseline } = useGetBaselineByMeterIdQuery(props.meter.id);
+			if (currentBaseline) {
+				return <EditBaselineModalComponent 
+				show={showModal}
+				baseline={currentBaseline}
+				baselineIdentifier={currentBaseline.meterId.toString()}
+				handleShow={handleShowEditBaselineModal}
+				handleClose={handleCloseEditBaselineModal}
+  			/>;	
+			}
 		}
 	};
 
@@ -473,6 +501,13 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							value={nullToEmptyString(localMeterEdits.note)}
 							placeholder='Note' />
 					</FormGroup>
+
+					
+					<div>
+						{handleCreateEditBaseline()}
+					</div>
+				
+
 					<Row xs='1' lg='2'>
 						{/* cumulative input */}
 						<Col><FormGroup>

@@ -29,6 +29,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 	const helpUrl = useAppSelector(selectHelpUrl);
 
 	const helpLinks: Record<string, Record<string, string>> = {
+		'help.admin.baselinecreate': { link: `${helpUrl}/adminBaselineCreating/` },
 		'help.admin.conversioncreate': { link: `${helpUrl}/adminConversionCreating/` },
 		'help.admin.conversionedit': { link: `${helpUrl}/adminConversionEditing/` },
 		'help.admin.conversionview': { link: `${helpUrl}/adminConversionViewing/` },

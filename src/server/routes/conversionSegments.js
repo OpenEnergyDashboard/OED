@@ -31,6 +31,7 @@ function formatConversionSegmentForResponse(item) {
  * @param {int} sourceId The source meter's id.
  * @param {int} destinationId The destination meter's id.
  */
+// This should be a get
 router.post('/sourceDestination', adminAuthMiddleware('get conversion segment(s) by source and destination id'), async (req, res) => {
 	const validConversionSegment = {
 		type: 'object',
@@ -77,6 +78,7 @@ router.post('/sourceDestination', adminAuthMiddleware('get conversion segment(s)
  * @param {string} startTime The start time of the conversion segment.
  * @param {string} endTime The end time of the conversion segment.
  */
+// This should be a get
 router.post('/sourceDestinationStartEnd', adminAuthMiddleware('get conversion segment by source id, destination id, start time, and end time'), async (req, res) => {
 	const validConversionSegment = {
 		type: 'object',
