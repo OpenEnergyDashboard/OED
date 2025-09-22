@@ -75,7 +75,7 @@ export default function SplitBaselineSegmentComponent(props: SplitBaselineSegmen
 		if (!Number.isInteger(splitHour)) {
 			return false;
 		}
-		return splitHour > props.baselineSegment.startHour && splitHour < props.baselineSegment.endHour;
+		return splitHour > props.baselineSegment.startTime && splitHour < props.baselineSegment.endTime;
 
 	}, [splitHour, props.baselineSegment, props.direction]);
 
@@ -85,7 +85,7 @@ export default function SplitBaselineSegmentComponent(props: SplitBaselineSegmen
 			: splitLaterMutation;
 
 		handleHideSplitModal();
-		mutation({ ...newSegment, id: props.baselineSegment.id, splitTime: splitHour }).unwrap()
+		mutation({ ...newSegment, meterId: props.baselineSegment.meterId, splitTime: splitHour }).unwrap()
 			.then(() => {
 			})
 			.catch(error => {
@@ -132,17 +132,17 @@ export default function SplitBaselineSegmentComponent(props: SplitBaselineSegmen
 						<Input
 							id="split"
 							type="number"
-							min={props.baselineSegment.startHour + 1}
-							max={props.baselineSegment.endHour - 1}
+							min={props.baselineSegment.startTime + 1}
+							max={props.baselineSegment.endTime - 1}
 							step="1"
 							onChange={handleSplitInputChange}
-							placeholder={props.baselineSegment.startHour + 1 + ' - ' + (props.baselineSegment.endHour - 1)}
+							placeholder={props.baselineSegment.startTime + 1 + ' - ' + (props.baselineSegment.endTime - 1)}
 							invalid={!isSplitValid}
 						/>
 						<FormFeedback>
 							{!isSplitValid && translate('split.hour.invalid')
-								.replace('{start}', String(props.baselineSegment.startHour + 1))
-								.replace('{end}', String(props.baselineSegment.endHour - 1))}
+								.replace('{start}', String(props.baselineSegment.startTime + 1))
+								.replace('{end}', String(props.baselineSegment.endTime - 1))}
 						</FormFeedback>
 					</FormGroup>
 					<FormGroup>

@@ -30,7 +30,6 @@ import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateBaselineModalComponent from '../baseline/CreateBaselineModalComponent';
 import EditBaselineModalComponent from '../baseline/EditBaselineModalComponent';
-import { useGetBaselineByMeterIdQuery } from 'redux/api/baselineApi';
 
 interface EditMeterModalComponentProps {
 	show: boolean;

@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 		const rawBaselines = await Baseline.getAllBaselines(conn);
 		res.json(rawBaselines);
 	} catch (err) {
-		log(`Error while getting all baselines: ${err}`, 'error');
+		log.error(`Error while getting all baselines: ${err}`, 'error');
 	}
 });
 router.post('/new', async (req, res) => {

@@ -26,16 +26,41 @@ class BaselineSegment {
         this.calcEnd = momentToIsoOrInfinity(calcEnd);
         this.note = note;
     }
-
+    
     /**
      * Returns a promise to create the baseline_segments table.
      * @param {*} conn The connection to use.
      * @returns {Promise.<>}
      */
     static createTable(conn) {
-        // TODO: baseline segment table in db
         return conn.none(sqlFile('baselineSegment/create_baseline_segments_table.sql'));
     }
+
+    /**
+	 * Creates a new baseline segment from the data in a row.
+	 * @param {*} row The row from which the baseline segment will be created.
+	 * @returns BaselineSegment
+	 */
+	static mapRow(row) {
+		return new BaselineSegment(
+			row.meter_id, 
+			row.baseline_value, 
+			row.start_time, 
+			row.end_time, 
+            row.calc_start,
+            row.calc_end,
+			row.note);
+	}
+
+    /**
+	 * Get all baseline segments of the baseline/meter in the database.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<BaselineSegment>>}
+	 */
+	static async getAllByMeterId(meterId, conn) {
+		const rows = await conn.many(sqlFile('baselineSegment/get_all_by_meter_id.sql'), meterId);
+		return rows.map(BaselineSegment.mapRow);
+	}
 
     /**
          * Updates an existed baseline segment in the database.
@@ -79,7 +104,7 @@ class BaselineSegment {
     static async splitEarlier(meterId, newBaselineValue, newNote, originalStartTime, originalEndTime, splitTime, conn) {
         return conn.tx(async t => {
 			// get all data for the original segment
-			const originalSegment = await t.one(sqlFile('baselineSegment/get_by_meter_id_start_end.sql'), {
+			const originalSegment = await t.none(sqlFile('baselineSegment/get_by_meter_id_start_end.sql'), {
 				meterId: meterId,
 				startTime: originalStartTime,
 				endTime: originalEndTime
@@ -153,3 +178,5 @@ class BaselineSegment {
 		});
 	}
 }
+
+module.exports = BaselineSegment;

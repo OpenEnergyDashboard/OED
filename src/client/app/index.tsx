@@ -23,3 +23,5 @@ root.render(
 		< RouteComponent />
 	</Provider >
 );
+
+console.log("This works");

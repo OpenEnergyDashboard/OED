@@ -47,15 +47,12 @@ export default function BaselineViewComponent(props: BaselineViewComponentProps)
 			{/* <div className="identifier-container">
 				{conversionIdentifier}
 			</div> */}
-			<div className="item-container">
-				<b><FormattedMessage id="baseline.value" /></b> {props.baseline.baselineValue}
-			</div>
 			<div className={props.baseline.isActive.toString()}>
 				<b><FormattedMessage id="baseline.active" /></b> {translate(`TrueFalseType.${props.baseline.isActive.toString()}`)}
 			</div>
 			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
-				<b><FormattedMessage id="note" /></b> {props.baseline.note.slice(0, 29)}
+				<b><FormattedMessage id="note" /></b> {props.baseline.note?.slice(0, 29)}
 			</div>
 			<div className="edit-btn">
 				<Button color='secondary' onClick={handleShow}>

@@ -26,7 +26,7 @@ interface EditBaselineSegmentModalComponentProps {
 export default function EditBaselineSegmentModalComponent(props: EditBaselineSegmentModalComponentProps): React.ReactElement {
 
     const [baselineSegment, setBaselineSegment] = React.useState<UpdateBaselineSegmentPayload>(
-        { ...props.baselineSegment, originalStartHour: props.baselineSegment.startHour, originalEndHour: props.baselineSegment.endHour }
+        { ...props.baselineSegment, originalStartHour: props.baselineSegment.startTime, originalEndHour: props.baselineSegment.endTime }
     );
 
     // Fetch baseline segments by meter ID to validate start and end hours
@@ -65,39 +65,39 @@ export default function EditBaselineSegmentModalComponent(props: EditBaselineSeg
     }, [baselineSegments, props.baselineSegment.meterId]);
     // Validate start hour
     const isStartHourValid = React.useMemo(() => {
-        if (!Number.isInteger(baselineSegment.startHour) || baselineSegment.startHour < 0 || baselineSegment.startHour >= baselineSegment.endHour) {
+        if (!Number.isInteger(baselineSegment.startTime) || baselineSegment.startTime < 0 || baselineSegment.startTime >= baselineSegment.endTime) {
             return false;
         }
         // Check if the start hour does not conflict with existing segments
-        if (earlierSegment && baselineSegment.startHour <= earlierSegment.startHour) {
+        if (earlierSegment && baselineSegment.startTime <= earlierSegment.startTime) {
             return false;
         }
 
         return true;
-    }, [baselineSegment.startHour, baselineSegment.endHour, earlierSegment]);
+    }, [baselineSegment.startTime, baselineSegment.endTime, earlierSegment]);
     // Validate end hour
     const isEndHourValid = React.useMemo(() => {
-        if (!Number.isInteger(baselineSegment.endHour) || baselineSegment.endHour <= baselineSegment.startHour || baselineSegment.endHour > 24) {
+        if (!Number.isInteger(baselineSegment.endTime) || baselineSegment.endTime <= baselineSegment.startTime || baselineSegment.endTime > 24) {
             return false;
         }
         // Check if the end hour does not conflict with existing segments
-        if (laterSegment && baselineSegment.endHour >= laterSegment.endHour) {
+        if (laterSegment && baselineSegment.endTime >= laterSegment.endTime) {
             return false;
         }
 
         return true;
-    }, [baselineSegment.startHour, baselineSegment.endHour, laterSegment]);
+    }, [baselineSegment.startTime, baselineSegment.endTime, laterSegment]);
 
     // Validate the segment as a whole
     // It should have valid start and end hours
     const isSegmentValid = React.useMemo(() => {
         return isStartHourValid && isEndHourValid;
-    }, [baselineSegment.startHour, baselineSegment.endHour]);
+    }, [baselineSegment.startTime, baselineSegment.endTime]);
 
     const isSegmentUnchanged = React.useMemo(() => {
         return props.baselineSegment.baselineValue === baselineSegment.baselineValue &&
-            props.baselineSegment.startHour === baselineSegment.startHour &&
-            props.baselineSegment.endHour === baselineSegment.endHour &&
+            props.baselineSegment.startTime === baselineSegment.startTime &&
+            props.baselineSegment.endTime === baselineSegment.endTime &&
             props.baselineSegment.note === baselineSegment.note;
     }, [props.baselineSegment, baselineSegment]);
 
@@ -131,17 +131,17 @@ export default function EditBaselineSegmentModalComponent(props: EditBaselineSeg
                                     id="segment-start-hour"
                                     name="startHour"
                                     type="number"
-                                    min={earlierSegment ? earlierSegment.startHour + 1 : 0}
-                                    max={baselineSegment.endHour - 1}
+                                    min={earlierSegment ? earlierSegment.startTime + 1 : 0}
+                                    max={baselineSegment.endTime - 1}
                                     step="1"
-                                    value={baselineSegment.startHour}
+                                    value={baselineSegment.startTime}
                                     onChange={handleNumberChange}
                                     invalid={!isStartHourValid}
                                     disabled={baselineSegment.originalStartHour === 0}
                                 />
                                 <FormFeedback>
                                     <FormattedMessage id="baseline.segments.edit.start.hour.invalid" values={
-                                        { min: earlierSegment?.startHour ?? 0 }
+                                        { min: earlierSegment?.startTime ?? 0 }
                                     } />
                                 </FormFeedback>
                             </Col>
@@ -153,17 +153,17 @@ export default function EditBaselineSegmentModalComponent(props: EditBaselineSeg
                                     id="segment-end-hour"
                                     name="endHour"
                                     type="number"
-                                    min={baselineSegment.startHour + 1}
-                                    max={laterSegment ? laterSegment.endHour - 1 : 24}
+                                    min={baselineSegment.startTime + 1}
+                                    max={laterSegment ? laterSegment.endTime - 1 : 24}
                                     step="1"
-                                    value={baselineSegment.endHour}
+                                    value={baselineSegment.endTime}
                                     onChange={handleNumberChange}
                                     invalid={!isEndHourValid}
                                     disabled={baselineSegment.originalEndHour === 24}
                                 />
                                 <FormFeedback>
                                     <FormattedMessage id="baseline.segments.edit.end.hour.invalid" values={
-                                        { max: laterSegment?.endHour ?? 24 }
+                                        { max: laterSegment?.endTime ?? 24 }
                                     } />
                                 </FormFeedback>
                             </Col>

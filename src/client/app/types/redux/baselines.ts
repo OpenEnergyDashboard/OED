@@ -10,6 +10,7 @@ export interface Baseline {
 }
 
 export interface BaselineSegment {
+	id: number;
 	meterId: number;
 	// Calc range can be null if the value is manually enter
 	calcStart?: number;
@@ -31,6 +32,8 @@ export interface CreateBaselinePayload {
 	// Baseline note
 	note?: string;
 	baselineValue: number;
+	calcStart?: number | undefined;
+	calcEnd?: number | undefined;
 	// First segment note
 	segmentNote?: string;
 }

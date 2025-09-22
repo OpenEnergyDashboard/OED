@@ -72,8 +72,8 @@ export default function DeleteBaselineSegmentComponent(props: DeleteBaselineSegm
 				show={showDeleteModal}
 				actionConfirmMessage={
 					deleteConfirmationMessage
-						.replace('{startHour}', props.baselineSegment.startHour.toString())
-						.replace('{endHour}', props.baselineSegment.endHour.toString())
+						.replace('{startHour}', props.baselineSegment.startTime.toString())
+						.replace('{endHour}', props.baselineSegment.endTime.toString())
 				}
 				actionFunction={handleDeleteBaselineSegment}
 				handleClose={handleHideDeleteModal}

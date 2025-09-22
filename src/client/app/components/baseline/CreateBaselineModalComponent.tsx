@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
+import { Button, Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { baselineApi } from '../../redux/api/baselineApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
@@ -15,7 +15,7 @@ import { TrueFalseType } from '../../types/items';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
-import { isAction } from '@reduxjs/toolkit';
+// import { isAction } from '@reduxjs/toolkit';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 
@@ -68,13 +68,15 @@ export default function CreateBaselineModalComponent({ currentMeterId }: { curre
             isActive: patternState.Baseline.isActive,
             note: patternState.Baseline.note,
             baselineValue: patternState.initialSegment.baselineValue,
+            // calcStart: null,
+            // calcEnd: null,
             segmentNote: patternState.initialSegment.segmentNote
         }).unwrap()
             .then(() => {
-                showSuccessNotification(translate('day.create.success'));
+                showSuccessNotification(translate('baseline.create.success'));
             })
             .catch(error => {
-                showErrorNotification(translate('day.create.failure') + error);
+                showErrorNotification(translate('baseline.create.failure') + error);
             });
         resetState();
     };
