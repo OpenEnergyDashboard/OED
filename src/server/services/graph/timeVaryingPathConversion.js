@@ -73,16 +73,14 @@ async function timeVaryingPathConversion(path, conn) {
 			slope,
 			intercept
 		});
-		
+
 		if (currentEnd === Number.POSITIVE_INFINITY) {
 			done = true;
-		}
-		// Advance pointers for segments ending at currentEnd
-		for (let i = 0; i < pointers.length; ++i) {
-			if (parsePostgresDate(currentSegments[i].endTime) === currentEnd) {
-				pointers[i]++;
-				if (pointers[i] >= edgeSegments[i].length) {
-					done = true;
+		} else {
+			// Advance pointers for segments ending at currentEnd
+			for (let i = 0; i < pointers.length; ++i) {
+				if (parsePostgresDate(currentSegments[i].endTime) === currentEnd) {
+					pointers[i]++;
 				}
 			}
 		}
