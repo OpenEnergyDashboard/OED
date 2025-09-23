@@ -9,6 +9,7 @@ const Unit = require('./Unit');
 const { log } = require('../log');
 const sqlFile = database.sqlFile;
 
+// TODO: alter class to include weather_location_id
 class Meter {
 	/**
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created

@@ -12,6 +12,7 @@ import { groupsApi } from '../api/groupsApi';
 import { metersApi } from '../api/metersApi';
 import { preferencesApi } from '../api/preferencesApi';
 import { unitsApi } from '../api/unitsApi';
+import { weatherLocationApi } from '../api/weatherLocationApi';
 import { userApi } from '../api/userApi';
 import { versionApi } from '../api/versionApi';
 import { createThunkSlice } from '../sliceCreators';
@@ -104,6 +105,7 @@ export const appStateSlice = createThunkSlice({
 				// Request meter/group/details post-auth
 				dispatch(metersApi.endpoints.getMeters.initiate());
 				dispatch(groupsApi.endpoints.getGroups.initiate());
+				dispatch(weatherLocationApi.endpoints.getWeatherLocationDetails.initiate());
 			},
 			{
 				settled: state => {

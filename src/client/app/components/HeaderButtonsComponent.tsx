@@ -66,6 +66,7 @@ export default function HeaderButtonsComponent() {
 		shouldConversionsButtonDisabled: true,
 		shouldLogMsgButtonDisabled: true,
 		shouldVisualUnitMapButtonDisabled: true,
+		shouldWeatherButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
 		menuTitle: '',
 		// link to help page for page choices. Should not see default but use general help URL.
@@ -103,7 +104,8 @@ export default function HeaderButtonsComponent() {
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions',
 			shouldLogMsgButtonDisabled: pathname === '/logmsg',
-			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
+			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit',
+			shouldWeatherButtonDisabled: pathname === '/weather'
 		}));
 	}, [pathname]);
 
@@ -237,6 +239,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/visual-unit">
 								<FormattedMessage id='visual.unit' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldWeatherButtonDisabled}
+								tag={Link}
+								to="/weather">
+								<FormattedMessage id='weather' />
 							</DropdownItem>
 							<DropdownItem divider style={state.adminViewableLinkStyle} />
 							<DropdownItem

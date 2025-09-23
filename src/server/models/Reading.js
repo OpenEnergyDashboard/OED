@@ -6,6 +6,7 @@ const database = require('./database');
 const { mapToObject, threeDHoleAlgorithm } = require('../util');
 const determineMaxPoints = require('../util/determineMaxPoints');
 const log = require('../log');
+const moment = require('moment');
 
 const sqlFile = database.sqlFile;
 
@@ -208,6 +209,20 @@ class Reading {
 		// This does not do the usual row mapping because the identifiers are not the usual ones and there
 		// is no meter id. All this is to make the data smaller.
 		return rows;
+	}
+
+	/**
+	 * Returns a promise to get the earliest start timestamp from all readings.
+	 * @param conn the database connection to use
+	 * @returns {Promise<Moment>} the earliest start timestamp as a Moment object
+	 */
+	static async getEarliestTimeStamp(conn) {
+		try {
+			return moment( await conn.one(sqlFile('reading/get_earliest_timestamp.sql')));
+		} catch (err) {
+			log.error(`Error fetching the earliest start timestamp: ${err}`, err);
+			throw err;
+		}
 	}
 
 	/**
