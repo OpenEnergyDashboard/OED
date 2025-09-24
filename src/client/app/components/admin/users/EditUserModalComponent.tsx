@@ -303,7 +303,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										type='select'
 										value={userDetails.role}
 										onChange={handleRoleChange}
-										invalid={!userDetails.role}
+										required
 									>
 										{Object.entries(UserRole)
 											.filter(([role]) => role !== 'INVALID')
