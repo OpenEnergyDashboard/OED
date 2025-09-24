@@ -368,7 +368,7 @@ const LocaleTranslationData = {
 		"map.notify.calibration.needed": "Calibration needed before display",
 		"map.upload.new.file": "Upload New File",
 		"map.unavailable": "There's not an available map",
-		"maps": "maps",
+		"maps": "Maps",
 		"max": "max",
 		"max.value": "Maximum Reading Value Check",
 		"menu": "Menu",
