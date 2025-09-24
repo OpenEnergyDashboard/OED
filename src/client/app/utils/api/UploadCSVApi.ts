@@ -31,7 +31,8 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 		refreshReadings: uploadPreferences.refreshReadings,
 		honorDst: uploadPreferences.honorDst,
 		relaxedParsing: uploadPreferences.relaxedParsing,
-		useMeterZone: uploadPreferences.useMeterZone
+		useMeterZone: uploadPreferences.useMeterZone,
+		warnOnCumulativeReset: uploadPreferences.warnOnCumulativeReset
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());

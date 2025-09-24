@@ -5,14 +5,16 @@
 import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectShowMinMax } from '../redux/slices/graphSlice';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { checkboxStyle } from '../styles/modalStyle';
 
 /**
  * React Component rendering an Error Bar checkbox for toggle operation.
  * @returns Error Bar checkbox with tooltip and label
  */
 export default function ErrorBarComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const showMinMax = useAppSelector(selectShowMinMax);
 
@@ -20,7 +22,7 @@ export default function ErrorBarComponent() {
 		<div className='checkbox'>
 			<input
 				type='checkbox'
-				style={{ marginRight: '10px' }}
+				style={checkboxStyle}
 				// Dispatches an action to toggle visibility of min/max lines on checkbox interaction
 				onChange={() => dispatch(graphSlice.actions.toggleShowMinMax())}
 				checked={showMinMax}

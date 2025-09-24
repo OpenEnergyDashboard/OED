@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
-import { DropdownItem, DropdownMenu, DropdownToggle, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
+import { DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalHeader, Nav, NavLink, Navbar, UncontrolledDropdown } from 'reactstrap';
 import TooltipHelpComponent from '../components/TooltipHelpComponent';
 import { authApi } from '../redux/api/authApi';
 import { selectOEDVersion } from '../redux/api/versionApi';
@@ -15,16 +15,18 @@ import { selectHelpUrl } from '../redux/slices/adminSlice';
 import { selectOptionsVisibility, toggleOptionsVisibility } from '../redux/slices/appStateSlice';
 import { selectHasRolePermissions, selectIsAdmin, selectIsLoggedIn } from '../redux/slices/currentUserSlice';
 import { UserRole } from '../types/items';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { clearGraphHistory } from '../redux/slices/graphSlice';
+import LoginComponent from './LoginComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
  * @returns Header buttons element
  */
 export default function HeaderButtonsComponent() {
+	const translate = useTranslate();
 	const [logout] = authApi.useLogoutMutation();
 	const dispatch = useAppDispatch();
 	// Get the current page so know which one should not be shown in menu.
@@ -34,7 +36,7 @@ export default function HeaderButtonsComponent() {
 	const version = useAppSelector(selectOEDVersion);
 	const helpUrl = useAppSelector(selectHelpUrl);
 	// options help
-	const optionsHelp = helpUrl + '/optionsMenu.html';
+	const optionsHelp = helpUrl + '/optionsMenu/';
 
 	const loggedInAsAdmin = useAppSelector(selectIsAdmin);
 	const loggedIn = useAppSelector(selectIsLoggedIn);
@@ -62,6 +64,8 @@ export default function HeaderButtonsComponent() {
 		shouldCSVReadingsButtonDisabled: true,
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
+		shouldLogMsgButtonDisabled: true,
+		shouldVisualUnitMapButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
 		menuTitle: '',
 		// link to help page for page choices. Should not see default but use general help URL.
@@ -97,7 +101,9 @@ export default function HeaderButtonsComponent() {
 			shouldCSVMetersButtonDisabled: pathname === '/csvMeters',
 			shouldCSVReadingsButtonDisabled: pathname === '/csvReadings',
 			shouldUnitsButtonDisabled: pathname === '/units',
-			shouldConversionsButtonDisabled: pathname === '/conversions'
+			shouldConversionsButtonDisabled: pathname === '/conversions',
+			shouldLogMsgButtonDisabled: pathname === '/logmsg',
+			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
 		}));
 	}, [pathname]);
 
@@ -125,7 +131,7 @@ export default function HeaderButtonsComponent() {
 			display: pathname === '/' ? 'block' : 'none'
 		};
 		// Admin help or regular user page
-		const neededPage = loggedInAsAdmin ? '/adminPageChoices.html' : '/pageChoices.html';
+		const neededPage = loggedInAsAdmin ? '/adminPageChoices/' : '/pageChoices/';
 		const currentPageChoicesHelp = helpUrl + neededPage;
 
 		setState(prevState => ({
@@ -150,6 +156,17 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
+	// Handle modal visibility
+	const [showModal, setShowModal] = useState<boolean>(false);
+
+	const handleClose = () => {
+		setShowModal(false);
+	};
+
+	const handleShow = () => {
+		setShowModal(true);
+	};
+
 	return (
 		<div>
 			<Navbar expand>
@@ -214,6 +231,13 @@ export default function HeaderButtonsComponent() {
 								to="/units">
 								<FormattedMessage id='units' />
 							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldVisualUnitMapButtonDisabled}
+								tag={Link}
+								to="/visual-unit">
+								<FormattedMessage id='visual.unit' />
+							</DropdownItem>
 							<DropdownItem divider style={state.adminViewableLinkStyle} />
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
@@ -221,6 +245,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/admin">
 								<FormattedMessage id='admin.settings' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldLogMsgButtonDisabled}
+								tag={Link}
+								to="/logmsg">
+								<FormattedMessage id='log.messages' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
@@ -257,14 +288,11 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem divider />
 							<DropdownItem
 								style={state.loginLinkStyle}
-								tag={Link}
-								to='/login'>
+								onClick={handleShow}>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.logoutLinkStyle}
-								tag={Link}
-								to='/'
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
@@ -281,6 +309,17 @@ export default function HeaderButtonsComponent() {
 					</NavLink>
 				</Nav>
 			</Navbar>
+			<>
+				<Modal isOpen={showModal} toggle={handleClose}>
+					<ModalHeader>
+						{translate('log.in')}
+					</ModalHeader>
+					<ModalBody>
+						<LoginComponent handleClose={handleClose} />
+					</ModalBody>
+				</Modal>
+			</>
+
 		</div>
 	);
 }

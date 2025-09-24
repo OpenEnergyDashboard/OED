@@ -100,7 +100,7 @@ function handleStatus(req, res) {
 /**
  * Logs the Obvius request and sets the req.IP field to be the ip address.
  */
-function obviusLog(req, res, next){
+function obviusLog(req, res, next) {
 	// Log the IP of the requester
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	req.IP = ip;
@@ -111,7 +111,7 @@ function obviusLog(req, res, next){
 /**
  * Verifies an Obvius request via username and password.
  */
-function verifyObviusUser(req, res, next){
+function verifyObviusUser(req, res, next) {
 	// First we ensure that the password and username parameters are provided.
 	const password = req.param('password');
 	// TODO This is allowing for backwards compatibility if previous obvius meters are using the'email' parameter
@@ -157,6 +157,7 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 			return;
 		}
 		const conn = getConnection();
+		const loadLogfilePromises = [];
 		for (const fx of req.files) {
 			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
 			// Logfiles are always gzipped.
@@ -168,9 +169,19 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
 				return;
 			}
-			loadLogfileToReadings(req.param('serialnumber'), ip, data, conn);
+			// The original code did not await for the Promise to finish. The new version
+			// allows the files to run in parallel (as before) but then wait for them all
+			// to finish before returning.
+			loadLogfilePromises.push(loadLogfileToReadings(req.param('serialnumber'), ip, data, conn));
 		}
-		success(req, res, 'Logfile Upload IS PROVISIONAL');
+		// TODO This version returns an error. Should check all usage to be sure it is properly handled.
+		Promise.all(loadLogfilePromises).then(() => {
+			success(req, res, 'Logfile Upload IS PROVISIONAL');
+		}).catch((err) => {
+			log.warn(`Logfile Upload had issues from ip: ${ip}`, err)
+			failure(req, res, 'Logfile Upload had issues');
+		});
+		// This return may not be needed.
 		return;
 	}
 

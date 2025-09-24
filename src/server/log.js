@@ -5,6 +5,7 @@
 const fs = require('fs');
 const logFile = require('./config').logFile;
 const LogEmail = require('./models/LogEmail');
+const LogMsg = require('./models/LogMsg');
 const { getConnection } = require('./db');
 const moment = require('moment');
 
@@ -50,7 +51,8 @@ class Logger {
 	 * @param {boolean?} skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
 	 */
 	log(level, message, error = null, skipMail = false) {
-		let messageToLog = `[${level.name}@${moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')}] ${message}\n`;
+		let logTime = moment();
+		let messageToLog = `[${level.name}@${logTime.format('YYYY-MM-DDTHH:mm:ss.SSSZ')}] ${message}\n`;
 
 		const conn = getConnection();
 
@@ -71,11 +73,21 @@ class Logger {
 
 		// Always log to the logfile.
 		if (this.logToFile) {
-			fs.appendFile(logFile, messageToLog, err => {
+			fs.appendFile(logFile, messageToLog, async err => {
 				if (err) {
 					console.error(`Failed to write to log file: ${err} (${err.stack})`); // tslint:disable-line no-console
 				}
 			});
+
+			// Write the new log to the database
+			const logMsg = new LogMsg(level.name, message, logTime);
+			(async () => {
+				try {
+					await logMsg.insert(conn);
+				} catch (err) {
+					console.error(`Failed to write log to database: ${err} (${err.stack})`);
+				}
+			})();
 		}
 
 		// Only log elsewhere if given a high enough priority level.

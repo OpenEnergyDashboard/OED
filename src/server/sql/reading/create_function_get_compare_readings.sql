@@ -31,6 +31,9 @@ daily and hourly readings would help fix this.
 /*
 The following function returns data for plotting compare graphs. It works on meters.
 It should not be used on raw readings.
+This only works when the curr start/end times are on the hour as it uses the hourly reading view.
+It will truncate to lose partial hours if they are given. The current client code will only
+send full hours so this should be fine.
 It is the new version of compare_readings that works with units. It takes these parameters:
 meter_ids: A array of meter ids to query.
 graphic_unit_id: The unit id of the unit to use for the graph.
@@ -49,11 +52,11 @@ CREATE OR REPLACE FUNCTION meter_compare_readings_unit (
 	RETURNS TABLE(meter_id INTEGER, curr_use FLOAT, prev_use FLOAT)
 AS $$
 DECLARE
-	prev_start TIMESTAMP;
-	prev_end TIMESTAMP;
+	curr_tsrange TSRANGE;
+	prev_tsrange TSRANGE;
 BEGIN
-	prev_start := curr_start - shift;
-	prev_end := curr_end - shift;
+	curr_tsrange := tsrange(curr_start, curr_end);
+	prev_tsrange := tsrange(curr_start - shift, curr_end - shift);
 
 	RETURN QUERY
 	WITH
@@ -61,28 +64,32 @@ BEGIN
 		SELECT
 			meters.id AS meter_id,
 			-- Convert the reading based on the conversion found below.
-			SUM(r.reading) * c.slope + c.intercept AS reading
-		FROM (((readings r
-		INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
+			-- It is okay to sum the flow units because hourly readings has a rate of per hour so
+			-- to convert to a quantity would multiply by 1 so it is the same formula.
+			SUM(hourly.reading_rate) * c.slope + c.intercept AS reading
+		FROM (((hourly_readings_unit hourly
+		INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id)
 		INNER JOIN meters m ON m.id = meters.id)
 		-- This is getting the conversion for the meter and unit to graph.
 		-- The slope and intercept are used above the transform the reading to the desired unit.
 		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
-		WHERE r.start_timestamp >= curr_start AND r.end_timestamp <= curr_end
+		WHERE curr_tsrange @> hourly.time_interval
 		GROUP BY meters.id, c.slope, c.intercept
 	),
 	prev_period AS (
 		SELECT
 			meters.id AS meter_id,
 			-- Convert the reading based on the conversion found below.
-			SUM(r.reading) * c.slope + c.intercept AS reading
-		FROM (((readings r
-			INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id)
+			-- It is okay to sum the flow units because hourly readings has a rate of per hour so
+			-- to convert to a quantity would multiply by 1 so it is the same formula.
+			SUM(hourly.reading_rate) * c.slope + c.intercept AS reading
+		FROM (((hourly_readings_unit hourly
+		INNER JOIN unnest(meter_ids) meters(id) ON hourly.meter_id = meters.id)
 		INNER JOIN meters m ON m.id = meters.id)
 		-- This is getting the conversion for the meter and unit to graph.
 		-- The slope and intercept are used above the transform the reading to the desired unit.
 		INNER JOIN cik c on c.source_id = m.unit_id AND c.destination_id = graphic_unit_id)
-		WHERE r.start_timestamp >= prev_start AND r.end_timestamp <= prev_end
+		WHERE prev_tsrange @> hourly.time_interval
 		GROUP BY meters.id, c.slope, c.intercept
 	)
 	SELECT
@@ -99,8 +106,9 @@ $$ LANGUAGE 'plpgsql';
 
 
 /*
-The following function returns data for plotting bacompare graphs. It works on groups.
+The following function returns data for plotting compare graphs. It works on groups.
 It should not be used on raw readings.
+See meter version for needing start/end on the hour.
 It is the new version of group_compare_readings that works with units. It takes these parameters:
 group_ids: A array of group ids to query.
 graphic_unit_id: The unit id of the unit to use for the graph.

@@ -11,6 +11,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/card-page.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 import MapViewComponent from './MapViewComponent';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 
@@ -29,7 +30,7 @@ export default function MapsDetailComponent() {
 			<div className='container-fluid'>
 				<h2 className='text-center'>
 					<FormattedMessage id='maps' />
-					<div className='d-inline-block fs-5'>
+					<div style={tooltipBaseStyle}>
 						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 					</div>
 				</h2>

@@ -13,6 +13,7 @@ const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
+const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 
 mocha.describe('Compare readings', () => {
 	let meter, graphicUnitId, conversionSlope, conn;
@@ -72,13 +73,15 @@ mocha.describe('Compare readings', () => {
 		graphicUnitId = (await Unit.getByName('MJ', conn)).id;
 		// The conversion should be 3.6 from kWh -> MJ.
 		conversionSlope = 3.6;
+		await refreshAllReadingViews();
 	});
 
 	// TODO test readings, units.
 
 	mocha.it('Works for meters', async () => {
 		const result = await Reading.getMeterCompareReadings([meter.id], graphicUnitId, currStart, currEnd, shift, conn);
-		expect(result).to.deep.equal({ [meter.id]: { curr_use: 10 * conversionSlope, prev_use: 1 * conversionSlope } });
+		expect(result).to.have.property(`${meter.id}`).to.have.property('curr_use').to.be.closeTo(10 * conversionSlope, 0.0000001);
+		expect(result).to.have.property(`${meter.id}`).to.have.property('prev_use').to.be.closeTo(1 * conversionSlope, 0.0000001);
 	});
 
 	mocha.it('Works for groups', async () => {
@@ -86,6 +89,7 @@ mocha.describe('Compare readings', () => {
 		const group = await Group.getByName('Group', conn);
 		await group.adoptMeter(meter.id, conn);
 		const result = await Reading.getGroupCompareReadings([group.id], graphicUnitId, currStart, currEnd, shift, conn);
-		expect(result).to.deep.equal({ [group.id]: { curr_use: 10 * conversionSlope, prev_use: 1 * conversionSlope } });
+		expect(result).to.have.property(`${group.id}`).to.have.property('curr_use').to.be.closeTo(10 * conversionSlope, 0.0000001);
+		expect(result).to.have.property(`${group.id}`).to.have.property('prev_use').to.be.closeTo(1 * conversionSlope, 0.0000001);
 	});
 });

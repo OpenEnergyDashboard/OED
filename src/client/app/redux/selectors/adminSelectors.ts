@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { sortBy } from 'lodash';
 import * as moment from 'moment';
-import { selectConversionsDetails } from '../../redux/api/conversionsApi';
+import { selectCik, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectAllGroups } from '../../redux/api/groupsApi';
 import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi';
 import { selectAdminPreferences } from '../../redux/slices/adminSlice';
@@ -18,28 +17,31 @@ import translate from '../../utils/translate';
 import { selectAllUnits, selectUnitDataById } from '../api/unitsApi';
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors';
 import { createAppSelector } from './selectors';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { DisableChecksType } from '../../types/redux/units';
+import { MAX_VAL, MIN_VAL } from '../../utils/input';
 
-export const MIN_VAL = Number.MIN_SAFE_INTEGER;
-export const MAX_VAL = Number.MAX_SAFE_INTEGER;
 export const MIN_DATE_MOMENT = moment(0).utc();
 export const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
 export const MIN_DATE = MIN_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
 export const MAX_DATE = MAX_DATE_MOMENT.format('YYYY-MM-DD HH:mm:ssZ');
 export const MAX_ERRORS = 75;
-
 export const selectPossibleGraphicUnits = createAppSelector(
 	selectUnitDataById,
-	unitDataById => potentialGraphicUnits(unitDataById)
+	selectSelectedLanguage,
+	(unitDataById, selectSelectedLanguage) => potentialGraphicUnits(unitDataById, selectSelectedLanguage)
 );
 
 /**
  * Calculates the set of all possible meter units for a meter.
  * This is any unit that is of type meter.
+ * @param state # Redux state passed in as argument
+ * @param locale # Language selected as retrieved from state
  * @returns The set of all possible graphic units for a meter
  */
 export const selectPossibleMeterUnits = createAppSelector(
-	selectAllUnits,
-	unitData => {
+	[selectAllUnits, (state, locale) => locale],
+	(unitData, locale) => {
 		let possibleMeterUnits = new Set<UnitData>();
 		// The meter unit can be any unit of type meter.
 		unitData.forEach(unit => {
@@ -48,7 +50,8 @@ export const selectPossibleMeterUnits = createAppSelector(
 			}
 		});
 		// Put in alphabetical order.
-		possibleMeterUnits = new Set(sortBy(Array.from(possibleMeterUnits), unit => unit.identifier.toLowerCase(), 'asc'));
+		possibleMeterUnits = new Set(Array.from(possibleMeterUnits).sort((unitA, unitB) => unitA.identifier.toLowerCase().
+			localeCompare(unitB.identifier.toLowerCase(), locale, { sensitivity: 'accent' })));
 		// The default graphic unit can also be no unit/-99 but that is not desired so put last in list.
 		return possibleMeterUnits.add(noUnitTranslated());
 	}
@@ -85,10 +88,11 @@ export const selectGraphicUnitCompatibility = createAppSelector(
 	[
 		selectPossibleGraphicUnits,
 		selectPossibleMeterUnits,
+		selectCik,
 		(_state, meterDetails: MeterData) => meterDetails.unitId,
 		(_state, meterDetails: MeterData) => meterDetails.defaultGraphicUnit
 	],
-	(possibleGraphicUnits, possibleMeterUnits, unitId, defaultGraphicUnit) => {
+	(possibleGraphicUnits, possibleMeterUnits, globalCiksState, unitId, defaultGraphicUnit) => {
 		// Graphic units compatible with currently selected unit
 		const compatibleGraphicUnits = new Set<UnitData>();
 		// Graphic units incompatible with currently selected unit
@@ -96,7 +100,7 @@ export const selectGraphicUnitCompatibility = createAppSelector(
 		// If unit is not 'no unit'
 		if (unitId != -99) {
 			// Find all units compatible with the selected unit
-			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId);
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId, globalCiksState);
 			possibleGraphicUnits.forEach(unit => {
 				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
 				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id === -99) {
@@ -128,7 +132,7 @@ export const selectGraphicUnitCompatibility = createAppSelector(
 			// Find all units compatible with the selected graphic unit
 			possibleMeterUnits.forEach(unit => {
 				// Graphic units compatible with the current meter unit
-				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id);
+				const compatibleGraphicUnits = unitsCompatibleWithUnit(unit.id, globalCiksState);
 				// If the currently selected default graphic unit exists in the set of graphic units compatible with the current meter unit
 				// Also add the 'no unit' unit
 				if (compatibleGraphicUnits.has(defaultGraphicUnit) || unit.id === -99) {
@@ -153,9 +157,10 @@ export const selectCreateMeterUnitCompatibility = createAppSelector(
 	[
 		selectPossibleGraphicUnits,
 		selectPossibleMeterUnits,
+		selectCik,
 		(_state, meterDetails: MeterData) => meterDetails.unitId
 	],
-	(possibleGraphicUnits, possibleMeterUnits, unitId) => {
+	(possibleGraphicUnits, possibleMeterUnits, globalCiksState, unitId) => {
 		// Units always Editable, and default Grahpic changes based on this.
 		const compatibleUnits = new Set<UnitData>(possibleMeterUnits);
 		// Units incompatible with currently selected graphic unit
@@ -173,7 +178,7 @@ export const selectCreateMeterUnitCompatibility = createAppSelector(
 		else if (unitId != -99) {
 			// If unit is not 'no unit'
 			// Find all units compatible with the selected unit
-			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId);
+			const unitsCompatibleWithSelectedUnit = unitsCompatibleWithUnit(unitId, globalCiksState);
 			possibleGraphicUnits.forEach(unit => {
 				// If current graphic unit exists in the set of compatible graphic units OR if the current graphic unit is 'no unit'
 				if (unitsCompatibleWithSelectedUnit.has(unit.id) || unit.id === -99) {
@@ -217,7 +222,6 @@ export const selectIsValidConversion = createAppSelector(
 					Cannot mix unit represent
 					TODO Some of these can go away when we make the menus dynamic.
 				*/
-
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			return [false, translate('conversion.create.destination.meter')];
@@ -305,12 +309,12 @@ export const selectDefaultCreateMeterValues = createAppSelector(
 			previousEnd: '',
 			areaUnit: AreaUnitType.none,
 			readingFrequency: adminPreferences.defaultMeterReadingFrequency,
-			minVal: adminPreferences.defaultMeterMinimumValue,
-			maxVal: adminPreferences.defaultMeterMaximumValue,
 			minDate: adminPreferences.defaultMeterMinimumDate,
 			maxDate: adminPreferences.defaultMeterMaximumDate,
 			maxError: adminPreferences.defaultMeterMaximumErrors,
-			disableChecks: adminPreferences.defaultMeterDisableChecks
+			minVal: MIN_VAL,
+			maxVal: MAX_VAL,
+			disableChecks: DisableChecksType.reject_all
 		};
 		return defaultValues;
 	}

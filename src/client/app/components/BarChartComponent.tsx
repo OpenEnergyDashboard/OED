@@ -7,6 +7,7 @@ import { utc } from 'moment';
 import { PlotRelayoutEvent } from 'plotly.js';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/slices/graphSlice';
 import { readingsApi, stableEmptyBarReadings } from '../redux/api/readingsApi';
@@ -15,10 +16,11 @@ import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/sel
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectBarStacking } from '../redux/slices/graphSlice';
+import { selectSliderRangeInterval ,selectBarStacking, setInitialXAxisRange } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
-import translate from '../utils/translate';
 import SpinnerComponent from './SpinnerComponent';
+import { useTranslate } from '../redux/componentHooks';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
  * Passes the current redux state of the barchart, and turns it into props for the React
@@ -27,10 +29,12 @@ import SpinnerComponent from './SpinnerComponent';
  * @returns Plotly BarChart
  */
 export default function BarChartComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { barMeterDeps, barGroupDeps } = useAppSelector(selectPlotlyBarDeps);
 	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectBarChartQueryArgs);
 	const locale = useAppSelector(selectSelectedLanguage);
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 	const { data: meterReadings, isFetching: meterIsFetching } = readingsApi.useBarQuery(meterArgs, {
 		skip: meterShouldSkip,
 		selectFromResult: ({ data, ...rest }) => ({
@@ -52,9 +56,43 @@ export default function BarChartComponent() {
 	const raw = useAppSelector(selectIsRaw);
 	const unitLabel = useAppSelector(selectBarUnitLabel);
 
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
+		'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
+
+	// Getting the entire x-axis range from all traces
+	// This is used to set the initial x-axis range when the component mounts.
+	// It ensures that the graph starts with a range that covers all data points. That would be used for querying the data.
+	// If there are no data points, minX and maxX will be undefined.
+	const allX = React.useMemo(
+		() =>
+			datasets.flatMap(trace => {
+				if (!trace.x) return [];
+				// If trace.x is an array of arrays, flatten it
+				if (Array.isArray(trace.x[0])) {
+					return (trace.x as any[][]).flat();
+				}
+				// Otherwise, it's a flat array
+				return trace.x as (string | number | Date)[];
+			}),
+		[datasets]
+	);
+
+	const minX = allX.length ? utc(allX.reduce((a, b) => utc(a).isBefore(utc(b)) ? a : b)) : undefined;
+	const maxX = allX.length ? utc(allX.reduce((a, b) => utc(a).isAfter(utc(b)) ? a : b)) : undefined;
+
+	React.useEffect(() => {
+		if (minX && maxX) {
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+		}
+	}, [minX, maxX]);
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;
@@ -64,7 +102,7 @@ export default function BarChartComponent() {
 	// The Plotly toolbar is displayed if displayModeBar is set to true (not for bar charts)
 
 	if (raw) {
-		return <h1><b>${translate('bar.raw')}</b></h1>;
+		return <h1><b>{translate('bar.raw')}</b></h1>;
 	}
 	// At least one viable dataset.
 	const enoughData = datasets.find(dataset => dataset.x!.length >= 1);
@@ -79,8 +117,9 @@ export default function BarChartComponent() {
 		return (
 			<Plot
 				data={datasets}
-				style={{ width: '100%', height: '100%', minHeight: '700px' }}
+				style={fullSizeContainer}
 				layout={{
+					margin: { t: 0, b: 0, r: 3 }, // Eliminate top, bottom, and right margins
 					barmode: (barStacking ? 'stack' : 'group'),
 					bargap: 0.2, // Gap between different times of readings
 					bargroupgap: 0.1, // Gap between different meter's readings under the same timestamp
@@ -92,6 +131,8 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
+						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()],
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,
@@ -100,7 +141,17 @@ export default function BarChartComponent() {
 				}}
 				config={{
 					responsive: true,
-					displayModeBar: false,
+					displayModeBar: true,
+					modeBarButtonsToRemove: listOfButtons,
+					modeBarButtonsToAdd: [{
+						name: 'toggle-options',
+						title: translate('toggle.options'),
+						icon: Icons.pencil,
+						click: function () {
+							// # of items must differ so the length can tell which list of buttons is being set
+							setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+						}
+					}],
 					// Current Locale
 					locale,
 					// Available Locales
@@ -115,14 +166,14 @@ export default function BarChartComponent() {
 							const startTS = utc(e['xaxis.range[0]']);
 							const endTS = utc(e['xaxis.range[1]']);
 							const workingTimeInterval = new TimeInterval(startTS, endTS);
-							dispatch(updateSliderRange(workingTimeInterval.toString()));
+							dispatch(updateSliderRange(workingTimeInterval));
 						}
 						else if (e['xaxis.range']) {
 							// this case is when the slider knobs are dragged.
 							const range = e['xaxis.range']!;
 							const startTS = range && range[0];
 							const endTS = range && range[1];
-							const interval = new TimeInterval(utc(startTS), utc(endTS)).toString();
+							const interval = new TimeInterval(utc(startTS), utc(endTS));
 							dispatch(updateSliderRange(interval));
 
 						}

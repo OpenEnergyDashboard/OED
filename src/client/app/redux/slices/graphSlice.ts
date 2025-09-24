@@ -2,13 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createAction, createSelector, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
 import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
-import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
-import { SelectOption } from '../../types/items';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
@@ -21,12 +19,13 @@ const defaultState: GraphState = {
 	selectedAreaUnit: AreaUnitType.none,
 	// TODO appropriate default value?
 	selectedMap: 0,
-	queryTimeIntervalString: TimeInterval.unbounded().toString(),
-	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
-	barDuration: moment.duration(4, 'weeks').toISOString(),
-	mapsBarDuration: moment.duration(4, 'weeks').toISOString(),
-	compareTimeIntervalString: calculateCompareTimeInterval(ComparePeriod.Week, moment()).toString(),
+	lastAddedMeterOrGroup: undefined,
+	initialXAxisRange: TimeInterval.unbounded(),
+	queryTimeInterval: TimeInterval.unbounded(),
+	rangeSliderInterval: TimeInterval.unbounded(),
+	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
+	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
 	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
@@ -38,7 +37,9 @@ const defaultState: GraphState = {
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly
 	},
-	hotlinked: false
+	hotlinked: false,
+	shiftAmount: ShiftAmount.none,
+	shiftTimeInterval: TimeInterval.unbounded()
 };
 
 interface History<T> {
@@ -82,30 +83,31 @@ export const graphSlice = createSlice({
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.current.selectedAreaUnit = action.payload;
 		},
-		updateBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.barDuration = action.payload.toISOString();
+		updateDuration: (state, action: PayloadAction<moment.Duration>) => {
+			state.current.duration = action.payload;
 		},
-		updateMapsBarDuration: (state, action: PayloadAction<moment.Duration>) => {
-			state.current.mapsBarDuration = action.payload.toISOString();
+		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.queryTimeInterval = action.payload;
 		},
-		updateTimeInterval: (state, action: PayloadAction<string>) => {
-			// always update if action is bounded, else only set unbounded if current isn't already unbounded.
-			// clearing when already unbounded should be a no-op
-			if (TimeInterval.fromString(action.payload).getIsBounded() || TimeInterval.fromString(state.current.queryTimeIntervalString).getIsBounded()) {
-				state.current.queryTimeIntervalString = action.payload.toString();
-			}
+		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.shiftTimeInterval = action.payload;
 		},
-		changeSliderRange: (state, action: PayloadAction<string>) => {
-			if (TimeInterval.fromString(action.payload).getIsBounded() || TimeInterval.fromString(state.current.rangeSliderIntervalString).getIsBounded()) {
-				state.current.rangeSliderIntervalString = action.payload.toString();
-			}
+		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
+			state.current.shiftAmount = action.payload;
+		},
+		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.rangeSliderInterval = action.payload;
+		},
+		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.queryTimeInterval = action.payload;
+			state.current.rangeSliderInterval = action.payload;
 		},
 		resetRangeSliderStack: state => {
-			state.current.rangeSliderIntervalString = TimeInterval.unbounded().toString();
+			state.current.rangeSliderInterval = TimeInterval.unbounded();
 		},
 		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
 			state.current.comparePeriod = action.payload.comparePeriod;
-			state.current.compareTimeIntervalString = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime).toString();
+			state.current.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime);
 		},
 		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
 			state.current.chartToRender = action.payload;
@@ -142,12 +144,16 @@ export const graphSlice = createSlice({
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
+		// Added here because it is used to easily track if the last added was meter or group, which then used to select which is active in threeD
+		setLastAddedMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
+			state.current.lastAddedMeterOrGroup = action.payload;
+		},
+		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
 			if (state.current.threeD.meterOrGroup !== action.payload) {
 				state.current.threeD.meterOrGroup = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup | undefined }>) => {
 			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
 			updateThreeDMeterOrGroupID(state, graphSlice.actions.updateThreeDMeterOrGroupID(action.payload.meterOrGroupID));
 			updateThreeDMeterOrGroup(state, graphSlice.actions.updateThreeDMeterOrGroup(action.payload.meterOrGroup));
@@ -157,89 +163,16 @@ export const graphSlice = createSlice({
 			// 	state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
 			// }
 		},
-		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
-			const { current } = state;
-			// This reducer handles the addition and subtraction values for both the meter and group select components.
-			// The 'MeterOrGroup' type is heavily utilized in the reducer and other parts of the code.
-			// Note that this option is binary, if it's not a meter, then it's a group.
-
-			// Destructure payload
-			const { newMetersOrGroups, meta } = action.payload;
-			const cleared = meta.action === 'clear';
-			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue !== undefined;
-			const valueAdded = meta.action === 'select-option' && meta.option !== undefined;
-			let isAMeter = true;
-
-			if (cleared) {
-				const clearedMeterOrGroups = meta.removedValues;
-				// A Select has been cleared (all values removed with clear)
-				// use the first index of cleared items to check for meter or group
-				isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters;
-				// if a meter clear meters, else clear groups
-				isAMeter ? current.selectedMeters = [] : current.selectedGroups = [];
-
-			} else if (valueRemoved) {
-				isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
-				// An entry was deleted.
-				// Update either selected meters or groups
-
-				isAMeter
-					? current.selectedMeters = newMetersOrGroups
-					: current.selectedGroups = newMetersOrGroups;
-			} else if (valueAdded) {
-				isAMeter = meta.option?.meterOrGroup === MeterOrGroup.meters;
-				const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
-				// An entry was added,
-				// Update either selected meters or groups
-				isAMeter
-					? current.selectedMeters = newMetersOrGroups
-					: current.selectedGroups = newMetersOrGroups;
-
-				// If the current unit is -99, there is not yet a graphic unit
-				// Set the newly added meterOrGroup's default graphic unit as the current selected unit.
-				if (current.selectedUnit === -99 && addedMeterOrGroupUnit) {
-					current.selectedUnit = addedMeterOrGroupUnit;
-				}
-			}
-
-			// Blocks Pertaining to behaviors of specific pages below
-
-			// Additional 3d logic for each case.
-			// Reset Currently Selected 3D Meter Or Group if it has been removed from any page
-			if (cleared) {
-				const removedType = meta.removedValues[0].meterOrGroup;
-				const threeDSelectedType = current.threeD.meterOrGroup;
-				if (removedType === threeDSelectedType) {
-					current.threeD.meterOrGroupID = undefined;
-					current.threeD.meterOrGroup = undefined;
-
-				}
-			} else if (valueAdded && current.chartToRender === ChartTypes.threeD) {
-				// When a meter or group is selected/added, make it the currently active in 3D current.
-				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
-				// re-use existing reducers, action creators
-				graphSlice.caseReducers.updateThreeDMeterOrGroupInfo(state,
-					graphSlice.actions.updateThreeDMeterOrGroupInfo({
-						meterOrGroupID: meta.option!.value,
-						meterOrGroup: meta.option!.meterOrGroup!
-					})
-				);
-			} else if (valueRemoved) {
-				const idMatches = meta.removedValue.value === current.threeD.meterOrGroupID;
-				const typeMatches = meta.removedValue.meterOrGroup === current.threeD.meterOrGroup;
-				if (idMatches && typeMatches) {
-					current.threeD.meterOrGroupID = undefined;
-					current.threeD.meterOrGroup = undefined;
-				}
-			}
-		},
 		resetTimeInterval: state => {
-			if (!TimeInterval.fromString(state.current.queryTimeIntervalString).equals(TimeInterval.unbounded())) {
-				state.current.queryTimeIntervalString = TimeInterval.unbounded().toString();
+			if (!state.current.queryTimeInterval.equals(TimeInterval.unbounded())) {
+				state.current.queryTimeInterval = TimeInterval.unbounded();
 			}
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
 			state.current = action.payload;
+		},
+		setInitialXAxisRange: (state, action: PayloadAction<TimeInterval>) => {
+			state.current.initialXAxisRange = action.payload;
 		}
 
 	},
@@ -289,7 +222,7 @@ export const graphSlice = createSlice({
 			.addCase(
 				updateSliderRange,
 				(state, { payload }) => {
-					state.current.rangeSliderIntervalString = payload;
+					state.current.rangeSliderInterval = payload;
 				}
 			)
 			.addCase(
@@ -307,8 +240,8 @@ export const graphSlice = createSlice({
 							case 'areaUnit':
 								current.selectedAreaUnit = value as AreaUnitType;
 								break;
-							case 'barDuration':
-								current.barDuration = moment.duration(parseInt(value), 'days').toISOString();
+							case 'duration':
+								current.duration = moment.duration(parseInt(value), 'days');
 								break;
 							case 'barStacking':
 								current.barStacking = value === 'true';
@@ -319,7 +252,7 @@ export const graphSlice = createSlice({
 							case 'comparePeriod':
 								{
 									current.comparePeriod = validateComparePeriod(value);
-									current.compareTimeIntervalString = calculateCompareTimeInterval(validateComparePeriod(value), moment()).toString();
+									current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment());
 								}
 								break;
 							case 'compareSortingOrder':
@@ -351,14 +284,19 @@ export const graphSlice = createSlice({
 								current.threeD.readingInterval = parseInt(value);
 								break;
 							case 'serverRange':
-								current.queryTimeIntervalString = value;
+								current.queryTimeInterval = TimeInterval.fromString(value);
 								break;
 							case 'sliderRange':
-								// TODO omitted for now re-implement later.
-								// current.rangeSliderInterval = TimeInterval.fromString(value);
+								current.rangeSliderInterval = TimeInterval.fromString(value);
 								break;
 							case 'unitID':
 								current.selectedUnit = parseInt(value);
+								break;
+							case 'shiftAmount':
+								current.shiftAmount = value as ShiftAmount;
+								break;
+							case 'shiftTimeInterval':
+								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
 						}
 					});
@@ -392,6 +330,7 @@ export const graphSlice = createSlice({
 		selectShowMinMax: state => state.current.showMinMax,
 		selectBarStacking: state => state.current.barStacking,
 		selectSelectedMap: state => state.current.selectedMap,
+		selectWidthDays: state => state.current.duration,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
 		selectChartToRender: state => state.current.chartToRender,
@@ -400,50 +339,21 @@ export const graphSlice = createSlice({
 		selectSelectedMeters: state => state.current.selectedMeters,
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
+		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectInitialXAxisRange: state => state.current.initialXAxisRange,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
+		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
+		selectLastMeterOrGroup: state => state.current.lastAddedMeterOrGroup,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
-		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
-		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
-		selectQueryTimeIntervalString: state => state.current.queryTimeIntervalString,
-		selectCompareTimeIntervalString: state => state.current.compareTimeIntervalString,
-		selectSliderRangeIntervalString: state => state.current.rangeSliderIntervalString,
-
-		// Memoized selector(s) becuase creating new TimeInterval.fromString(), each execution leads to unnecessary re-renders
-		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
-		selectQueryTimeInterval: createSelector(
-			(sliceState: History<GraphState>) => sliceState.current.queryTimeIntervalString,
-			timeIntervalString => {
-				return TimeInterval.fromString(timeIntervalString);
-			}
-		),
-		selectSliderRangeInterval: createSelector(
-			(sliceState: History<GraphState>) => sliceState.current.rangeSliderIntervalString,
-			timeIntervalString => {
-				return TimeInterval.fromString(timeIntervalString);
-			}
-		),
-		selectCompareTimeInterval: createSelector(
-			(sliceState: History<GraphState>) => sliceState.current.compareTimeIntervalString,
-			timeIntervalString => {
-				return TimeInterval.fromString(timeIntervalString);
-			}
-		),
-		selectBarWidthDays: createSelector(
-			(sliceState: History<GraphState>) => sliceState.current.barDuration,
-			durationString => {
-				return moment.duration(durationString);
-			}
-		),
-		selectMapBarWidthDays: createSelector(
-			(sliceState: History<GraphState>) => sliceState.current.mapsBarDuration,
-			durationString => {
-				return moment.duration(durationString);
-			}
-		)
+		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
+		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
+		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
+		selectShiftAmount: state => state.current.shiftAmount,
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval
 	}
 });
 
@@ -452,17 +362,19 @@ export const {
 	selectAreaUnit, selectShowMinMax,
 	selectGraphState, selectPrevHistory,
 	selectThreeDState, selectBarStacking,
-	selectSortingOrder, selectBarWidthDays,
+	selectSortingOrder, selectWidthDays,
 	selectSelectedUnit, selectLineGraphRate,
 	selectComparePeriod, selectChartToRender,
 	selectForwardHistory, selectSelectedMeters,
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectGraphAreaNormalization, selectSliderRangeInterval,
-	selectDefaultGraphState, selectHistoryIsDirty,
-	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectMapBarWidthDays, selectSelectedMap
+	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectSliderRangeInterval, selectDefaultGraphState,
+	selectHistoryIsDirty, selectPlotlySliderMax,
+	selectPlotlySliderMin, selectShiftAmount,
+	selectShiftTimeInterval, selectInitialXAxisRange,
+	selectSelectedMap
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -470,28 +382,27 @@ export const {
 	setShowMinMax, setGraphState,
 	setBarStacking, toggleShowMinMax,
 	changeBarStacking, resetTimeInterval,
-	updateBarDuration, changeSliderRange,
+	updateDuration, changeSliderRange,
 	updateTimeInterval, updateSelectedUnit,
 	changeChartToRender, updateComparePeriod,
 	updateSelectedMeters, updateLineGraphRate,
 	setAreaNormalization, updateSelectedGroups,
 	resetRangeSliderStack, updateSelectedAreaUnit,
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
-	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
-	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateMapsBarDuration,
-	updateSelectedMaps
+	setLastAddedMeterOrGroup, changeCompareSortingOrder,
+	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
+	updateThreeDMeterOrGroupInfo, updateShiftAmount,
+	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
+	updateShiftTimeInterval, updateSelectedMaps
 } = graphSlice.actions;
 
 
 // Defined as External Reducers for middleware history implementation.
-// Extenrally defined actions to be acted upon in 'graphSlice.extraReducers'
+// Externally defined actions to be acted upon in 'graphSlice.extraReducers'
 export const historyStepBack = createAction('graph/historyStepBack');
 export const historyStepForward = createAction('graph/historyStepForward');
 export const updateHistory = createAction<GraphState>('graph/updateHistory');
 export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
 export const clearGraphHistory = createAction('graph/clearHistory');
-export const updateSliderRange = createAction<string>('graph/UpdateSliderRange');
+export const updateSliderRange = createAction<TimeInterval>('graph/UpdateSliderRange');
 export const setGraphSliceState = createAction<History<GraphState>>('graph/SetGraphSliceState');
-
-

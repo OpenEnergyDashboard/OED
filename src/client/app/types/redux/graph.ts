@@ -2,16 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import * as moment from 'moment';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
+import { TimeInterval } from '../../../../common/TimeInterval';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export enum ChartTypes {
 	line = 'line',
 	bar = 'bar',
-	compare = 'compare',
+	compare = 'compare.bar',
 	map = 'map',
 	radar = 'radar',
-	threeD = '3D'
+	threeD = '3D',
+	compareLine = 'compare.line'
 }
 
 // Rates that can be graphed, only relevant to line graphs.
@@ -53,6 +56,15 @@ export interface ThreeDState {
 	readingInterval: ReadingInterval;
 }
 
+export enum ShiftAmount {
+	none = 'none',
+	day = 'day',
+	week = 'week',
+	month = 'month',
+	year = 'year',
+	custom = 'custom'
+}
+
 export interface GraphState {
 	areaNormalization: boolean;
 	selectedMeters: number[];
@@ -60,20 +72,20 @@ export interface GraphState {
 	selectedUnit: number;
 	selectedMap: number;
 	selectedAreaUnit: AreaUnitType;
+	lastAddedMeterOrGroup: MeterOrGroup | undefined;
+	initialXAxisRange: TimeInterval;
+	rangeSliderInterval: TimeInterval;
+	duration: moment.Duration;
 	comparePeriod: ComparePeriod;
+	compareTimeInterval: TimeInterval;
 	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
 	lineGraphRate: LineGraphRate;
 	showMinMax: boolean;
 	threeD: ThreeDState;
+	queryTimeInterval: TimeInterval;
 	hotlinked: boolean;
-	// save time intervals as strings.
-	// convert to TimeInterval w/ TimeInterval.fromString()
-	rangeSliderIntervalString: string;
-	compareTimeIntervalString: string;
-	queryTimeIntervalString: string;
-	// save duration as string
-	barDuration: string;
-	mapsBarDuration: string;
+	shiftAmount: ShiftAmount;
+	shiftTimeInterval: TimeInterval;
 }

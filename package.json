@@ -6,7 +6,8 @@
 	"repository": "https://github.com/OpenEnergyDashboard/OED",
 	"scripts": {
 		"start": "node ./src/bin/www",
-		"start:dev": "nodemon --legacy-watch --inspect=0.0.0.0 ./src/bin/www",
+		"start:dev": "nodemon --legacy-watch --inspect=0.0.0.0:9229 ./src/bin/www",
+		"checkWebsiteStatus": "node src/server/services/checkWebsiteStatus.js",
 		"webpack:dev": "webpack watch --color --progress --mode development",
 		"webpack:build": "webpack build --node-env production",
 		"webpack": "webpack build --color --progress --mode development",
@@ -43,7 +44,8 @@
 		"generateCosineSquaredTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateCosineSquaredTestingData(2.5)'",
 		"generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
 		"testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
-		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'"
+		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
+		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'"
 	},
 	"nodemonConfig": {
 		"watch": [
@@ -64,6 +66,7 @@
 		"bootstrap": "~5.3.3",
 		"csv": "~5.3.2",
 		"csv-stringify": "~5.6.5",
+		"d3": "~7.8.5",
 		"dotenv": "~16.4.5",
 		"escape-html": "~1.0.3",
 		"express": "~4.19.2",
@@ -104,6 +107,7 @@
 	},
 	"devDependencies": {
 		"@redux-devtools/extension": "~3.2.5",
+		"@types/d3": "~7.4.3",
 		"@types/lodash": "~4.17.4",
 		"@types/node": "~20.14.10",
 		"@types/plotly.js": "~2.29.2",

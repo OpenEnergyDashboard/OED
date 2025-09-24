@@ -3,26 +3,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { cloneDeep, isEqual } from 'lodash';
+import * as moment from 'moment';
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Input } from 'reactstrap';
+import { Button, Input, FormFeedback } from 'reactstrap';
 import { UnsavedWarningComponent } from '../UnsavedWarningComponent';
 import { preferencesApi } from '../../redux/api/preferencesApi';
-import { PreferenceRequestItem, TrueFalseType } from '../../types/items';
+import {
+	MIN_DATE, MIN_DATE_MOMENT, MAX_DATE, MAX_DATE_MOMENT, MAX_ERRORS
+} from '../../redux/selectors/adminSelectors';
+import { PreferenceRequestItem } from '../../types/items';
 import { ChartTypes } from '../../types/redux/graph';
 import { LanguageTypes } from '../../types/redux/i18n';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
+import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
 
-
-// TODO: Add warning for invalid data
 /**
  * @returns Preferences Component for Administrative use
  */
 export default function PreferencesComponent() {
+	const translate = useTranslate();
 	const { data: adminPreferences = defaultAdminState } = preferencesApi.useGetPreferencesQuery();
 	const [localAdminPref, setLocalAdminPref] = React.useState<PreferenceRequestItem>(cloneDeep(adminPreferences));
 	const [submitPreferences] = preferencesApi.useSubmitPreferencesMutation();
@@ -40,6 +44,41 @@ export default function PreferencesComponent() {
 
 	const discardChanges = () => {
 		setLocalAdminPref(cloneDeep(adminPreferences));
+	};
+
+	// Functions for input validation and warnings. Each returns true if the user inputs invalid data into its field
+	// Need to be functions due to static reference. If they were booleans they wouldn't update when localAdminPref updates
+	const invalidFuncs = {
+		readingFreq: (): boolean => {
+			const frequency = moment.duration(localAdminPref.defaultMeterReadingFrequency);
+			return !frequency.isValid() || frequency.asSeconds() <= 0;
+		},
+		minDate: (): boolean => {
+			const minMoment = moment(localAdminPref.defaultMeterMinimumDate);
+			const maxMoment = moment(localAdminPref.defaultMeterMaximumDate);
+			return !minMoment.isValid() || !minMoment.isSameOrAfter(MIN_DATE_MOMENT) || !minMoment.isSameOrBefore(maxMoment);
+		},
+		maxDate: (): boolean => {
+			const minMoment = moment(localAdminPref.defaultMeterMinimumDate);
+			const maxMoment = moment(localAdminPref.defaultMeterMaximumDate);
+			return !maxMoment.isValid() || !maxMoment.isSameOrBefore(MAX_DATE_MOMENT) || !maxMoment.isSameOrAfter(minMoment);
+		},
+		readingGap: (): boolean => { return Number(localAdminPref.defaultMeterReadingGap) < 0; },
+
+		meterErrors: (): boolean => {
+			return Number(localAdminPref.defaultMeterMaximumErrors) < 0
+				|| Number(localAdminPref.defaultMeterMaximumErrors) > MAX_ERRORS;
+		},
+
+		warningFileSize: (): boolean => {
+			return Number(localAdminPref.defaultWarningFileSize) < 0
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+		},
+
+		fileSizeLimit: (): boolean => {
+			return Number(localAdminPref.defaultFileSizeLimit) < 0
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+		}
 	};
 
 	return (
@@ -63,7 +102,7 @@ export default function PreferencesComponent() {
 								<input
 									type='radio'
 									name='chartTypes'
-									style={{ marginRight: '10px' }}
+									style={checkboxStyle}
 									value={chartType}
 									onChange={e => makeLocalChanges('defaultChartToRender', e.target.value)}
 									checked={localAdminPref.defaultChartToRender === chartType}
@@ -81,7 +120,7 @@ export default function PreferencesComponent() {
 				<label>
 					<input
 						type='checkbox'
-						style={{ marginRight: '10px' }}
+						style={checkboxStyle}
 						onChange={e => makeLocalChanges('defaultBarStacking', e.target.checked)}
 						checked={localAdminPref.defaultBarStacking}
 					/>
@@ -92,7 +131,7 @@ export default function PreferencesComponent() {
 				<label>
 					<input
 						type='checkbox'
-						style={{ marginRight: '10px' }}
+						style={checkboxStyle}
 						onChange={e => makeLocalChanges('defaultAreaNormalization', e.target.checked)}
 						checked={localAdminPref.defaultAreaNormalization}
 					/>
@@ -110,7 +149,7 @@ export default function PreferencesComponent() {
 						<input
 							type='radio'
 							name='areaUnitType'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							value={AreaUnitType.feet}
 							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.feet}
@@ -123,7 +162,7 @@ export default function PreferencesComponent() {
 						<input
 							type='radio'
 							name='areaUnitType'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							value={AreaUnitType.meters}
 							onChange={e => makeLocalChanges('defaultAreaUnit', e.target.value)}
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
@@ -142,29 +181,11 @@ export default function PreferencesComponent() {
 					type='text'
 					value={localAdminPref.defaultMeterReadingFrequency}
 					onChange={e => makeLocalChanges('defaultMeterReadingFrequency', e.target.value)}
+					invalid={invalidFuncs.readingFreq()}
 				/>
-			</div>
-			<div>
-				<p className='mt-2' style={titleStyle}>
-					{`${translate('default.meter.minimum.value')}:`}
-				</p>
-				<Input
-					type='number'
-					value={localAdminPref.defaultMeterMinimumValue}
-					onChange={e => makeLocalChanges('defaultMeterMinimumValue', e.target.value)}
-					maxLength={50}
-				/>
-			</div>
-			<div>
-				<p className='mt-2' style={titleStyle}>
-					{`${translate('default.meter.maximum.value')}:`}
-				</p>
-				<Input
-					type='number'
-					value={localAdminPref.defaultMeterMaximumValue}
-					onChange={e => makeLocalChanges('defaultMeterMaximumValue', e.target.value)}
-					maxLength={50}
-				/>
+				<FormFeedback>
+					<FormattedMessage id="invalid.input" ></FormattedMessage>
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -175,7 +196,11 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultMeterMinimumDate}
 					onChange={e => makeLocalChanges('defaultMeterMinimumDate', e.target.value)}
 					placeholder='YYYY-MM-DD HH:MM:SS'
+					invalid={invalidFuncs.minDate()}
 				/>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: MIN_DATE, max: moment(localAdminPref.defaultMeterMaximumDate).utc().format() }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -186,7 +211,11 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultMeterMaximumDate}
 					onChange={e => makeLocalChanges('defaultMeterMaximumDate', e.target.value)}
 					placeholder='YYYY-MM-DD HH:MM:SS'
+					invalid={invalidFuncs.maxDate()}
 				/>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: moment(localAdminPref.defaultMeterMinimumDate).utc().format(), max: MAX_DATE }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -196,8 +225,13 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultMeterReadingGap}
 					onChange={e => makeLocalChanges('defaultMeterReadingGap', e.target.value)}
+					min='0'
 					maxLength={50}
+					invalid={invalidFuncs.readingGap()}
 				/>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: 0, max: Infinity }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -207,21 +241,14 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultMeterMaximumErrors}
 					onChange={e => makeLocalChanges('defaultMeterMaximumErrors', e.target.value)}
+					min='0'
+					max={MAX_ERRORS}
 					maxLength={50}
+					invalid={invalidFuncs.meterErrors()}
 				/>
-			</div>
-			<div>
-				<p className='mt-2' style={titleStyle}>
-					{`${translate('default.meter.disable.checks')}:`}
-				</p>
-				<Input
-					type='select'
-					value={localAdminPref.defaultMeterDisableChecks?.toString()}
-					onChange={e => makeLocalChanges('defaultMeterDisableChecks', e.target.value)}>
-					{Object.keys(TrueFalseType).map(key => {
-						return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
-					})}
-				</Input>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_ERRORS }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<h3 className='border-bottom mt-3'>{translate('site.settings')}</h3>
@@ -244,7 +271,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.en}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}
@@ -257,7 +284,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.fr}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}
@@ -270,7 +297,7 @@ export default function PreferencesComponent() {
 					<label>
 						<input
 							type='radio'
-							style={{ marginRight: '10px' }}
+							style={checkboxStyle}
 							name='languageTypes'
 							value={LanguageTypes.es}
 							onChange={e => makeLocalChanges('defaultLanguage', e.target.value)}
@@ -296,8 +323,14 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultWarningFileSize}
 					onChange={e => makeLocalChanges('defaultWarningFileSize', e.target.value)}
+					min='0'
+					max={Number(localAdminPref.defaultFileSizeLimit)}
 					maxLength={50}
+					invalid={invalidFuncs.warningFileSize()}
 				/>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: 0, max: Number(localAdminPref.defaultFileSizeLimit) }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -307,8 +340,13 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultFileSizeLimit}
 					onChange={e => makeLocalChanges('defaultFileSizeLimit', e.target.value)}
+					min={Number(localAdminPref.defaultWarningFileSize)}
 					maxLength={50}
+					invalid={invalidFuncs.fileSizeLimit()}
 				/>
+				<FormFeedback>
+					<FormattedMessage id="error.bounds" values={{ min: Number(localAdminPref.defaultWarningFileSize), max: Infinity }} />
+				</FormFeedback>
 			</div>
 			<div>
 				<p className='mt-2' style={titleStyle}>
@@ -326,6 +364,7 @@ export default function PreferencesComponent() {
 					onClick={discardChanges}
 					disabled={!hasChanges}
 					style={{ marginRight: '20px' }}
+					color='secondary'
 				>
 					{translate('discard.changes')}
 				</Button>
@@ -341,7 +380,8 @@ export default function PreferencesComponent() {
 								showErrorNotification(translate('failed.to.submit.changes'));
 							})
 					}
-					disabled={!hasChanges}
+					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
+					color='primary'
 				>
 					{translate('submit')}
 				</Button>
@@ -349,11 +389,6 @@ export default function PreferencesComponent() {
 		</div >
 	);
 }
-
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};
 
 const titleStyle: React.CSSProperties = {
 	fontWeight: 'bold',

@@ -1,8 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { sortBy } from 'lodash';
 import * as React from 'react';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
@@ -10,8 +10,9 @@ import {
 	Label, Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { GroupData } from 'types/redux/groups';
-import { groupsApi, selectGroupDataById } from '../../redux/api/groupsApi';
-import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectCik } from '../../redux/api/conversionsApi';
+import { groupsApi, selectAllGroups, selectGroupDataById } from '../../redux/api/groupsApi';
+import { selectAllMeters, selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectPossibleGraphicUnits } from '../../redux/selectors/adminSelectors';
@@ -29,28 +30,54 @@ import {
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString } from '../../utils/input';
 import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
-import translate from '../../utils/translate';
+import { useTranslate } from '../../redux/componentHooks';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { isEqual } from 'lodash';
 
 /**
  * Defines the create group modal form
  * @returns Group create element
  */
 export default function CreateGroupModalComponent() {
+	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any group modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			// Proceed to close the modal
+			handleClose();
+		}
+	};
+
 	const [createGroup] = groupsApi.useCreateGroupMutation();
 
+	const globalCikState = useAppSelector(selectCik);
 	// Meters state
 	const metersDataById = useAppSelector(selectMeterDataById);
+	const metersData = useAppSelector(selectAllMeters);
 	// Groups state
 	const groupDataById = useAppSelector(selectGroupDataById);
+	const groupsData = useAppSelector(selectAllGroups);
 	// Units state
 	const unitsDataById = useAppSelector(selectUnitDataById);
 	// Which units are possible for graphing state
 	const possibleGraphicUnits = useAppSelector(selectPossibleGraphicUnits);
-
+	// Obtaining language
+	const locale = useAppSelector(selectSelectedLanguage);
 	// Since creating group the initial values are effectively nothing or the desired defaults.
 	const defaultValues: GroupData = {
 		// ID not needed, assigned by DB, add here for TS
@@ -176,9 +203,6 @@ export default function CreateGroupModalComponent() {
 		setGraphicUnitsState(graphicUnitsStateDefaults);
 	};
 
-	// Unlike edit, we decided to discard inputs when you choose to leave the page. The reasoning is
-	// that create starts from an empty template.
-
 	// Save changes
 	const handleSubmit = () => {
 		// Close modal first to avoid repeat clicks
@@ -195,7 +219,8 @@ export default function CreateGroupModalComponent() {
 		// If the user input a value then gpsInput should be a string.
 		// null came from the DB and it is okay to just leave it - Not a string.
 		if (typeof gpsInput === 'string') {
-			if (isValidGPSInput(gpsInput)) {
+			const { validGps, message } = isValidGPSInput(gpsInput);
+			if (validGps) {
 				// Clearly gpsInput is a string but TS complains about the split so cast.
 				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
 				// It is valid and needs to be in this format for routing.
@@ -205,10 +230,7 @@ export default function CreateGroupModalComponent() {
 				};
 				// gpsInput must be of type string but TS does not think so so cast.
 			} else if ((gpsInput as string).length !== 0) {
-				// GPS not okay. Only true if some input.
-				// TODO isValidGPSInput currently pops up an alert so not doing it here, may change
-				// so leaving code commented out.
-				// showErrorNotification(translate('input.gps.range') + state.gps + '.');
+				showErrorNotification(message);
 				inputOk = false;
 			}
 		}
@@ -230,13 +252,13 @@ export default function CreateGroupModalComponent() {
 		// Can only vary if admin and only used then.
 		// This is the current deep meters of this group including any changes.
 		// The id is not really needed so set to -1 since same function for edit.
-		const groupDeepMeter = metersInChangedGroup(state);
+		const groupDeepMeter = metersInChangedGroup(state, groupDataById);
 		// Get meters that okay for this group in a format the component can display.
-		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter);
+		const possibleMeters = getMeterMenuOptionsForGroup(state.defaultGraphicUnit, groupDeepMeter, globalCikState, metersDataById, metersData, locale);
 		// Get groups okay for this group. Similar to meters.
 		// Since creating a group, the group cannot yet exist in the Redux state. Thus, the id is not used
 		// in this case so set to -1 so it never matches in this function.
-		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter);
+		const possibleGroups = getGroupMenuOptionsForGroup(-1, state.defaultGraphicUnit, groupDeepMeter, globalCikState, metersDataById, groupsData, locale);
 		// Update the state
 		setGroupChildrenState(groupChildrenState => ({
 			...groupChildrenState,
@@ -255,7 +277,7 @@ export default function CreateGroupModalComponent() {
 		// First must get a set from the array of deep meter numbers which is all meters currently in this group.
 		const deepMetersSet = new Set(state.deepMeters);
 		// Get the units that are compatible with this set of meters.
-		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet);
+		const allowedDefaultGraphicUnit = unitsCompatibleWithMeters(deepMetersSet, metersDataById, globalCikState);
 		// No unit allowed so modify allowed ones. Should not be there but will be fine if is.
 		allowedDefaultGraphicUnit.add(-99);
 		graphicUnitsState.possibleGraphicUnits.forEach(unit => {
@@ -278,6 +300,33 @@ export default function CreateGroupModalComponent() {
 		// pik is needed since the compatible units is not correct until pik is available.
 	}, [graphicUnitsState.possibleGraphicUnits, state.deepMeters]);
 
+	// Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if all of the required fields have been filled out.
+		const validChange = state.name !== defaultValues.name;
+		// Check children separately since lists.
+		const childMeterChanges = !isEqual(state.childMeters, defaultValues.childMeters);
+		const childGroupChanges = !isEqual(state.childGroups, defaultValues.childGroups);
+		//Compare the local changes to the default values
+		const editMade =
+			state.id !== defaultValues.id
+			|| state.name !== defaultValues.name
+			|| state.gps !== defaultValues.gps
+			|| state.displayable !== defaultValues.displayable
+			|| state.note !== defaultValues.note
+			|| state.area !== defaultValues.area
+			|| state.defaultGraphicUnit !== defaultValues.defaultGraphicUnit
+			|| state.areaUnit !== defaultValues.areaUnit
+			|| childMeterChanges
+			|| childGroupChanges;
+		setCanSave(validChange && editMade && validGroup);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [state, validGroup]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipCreateGroupView: 'help.admin.groupcreate'
@@ -285,11 +334,31 @@ export default function CreateGroupModalComponent() {
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
 			{/* Show modal button */}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.group" />
 			</Button>
-			<Modal isOpen={showModal} toggle={handleClose} size='lg' >
+			<Modal isOpen={showModal} toggle={handleToggle} size='lg' >
 				<ModalHeader>
 					<FormattedMessage id="create.group" />
 					<TooltipHelpComponent page='groups-create' />
@@ -308,7 +377,7 @@ export default function CreateGroupModalComponent() {
 								name='name'
 								type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								required value={state.name}
 								invalid={state.name === ''} />
 							<FormFeedback>
@@ -323,7 +392,7 @@ export default function CreateGroupModalComponent() {
 								name='defaultGraphicUnit'
 								type='select'
 								value={state.defaultGraphicUnit}
-								onChange={e => handleNumberChange(e)}>
+								onChange={e => {handleNumberChange(e);}}>
 								{/* First list the selectable ones and then the rest as disabled. */}
 								{Array.from(graphicUnitsState.compatibleGraphicUnits).map(unit => {
 									return (<option value={unit.id} key={unit.id}>{unit.identifier}</option>);
@@ -342,7 +411,7 @@ export default function CreateGroupModalComponent() {
 								name='displayable'
 								type='select'
 								value={state.displayable.toString()}
-								onChange={e => handleBooleanChange(e)}>
+								onChange={e => {handleBooleanChange(e);}}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -356,7 +425,7 @@ export default function CreateGroupModalComponent() {
 								name='gps'
 								type='text'
 								autoComplete='on'
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								value={getGPSString(state.gps)} />
 						</FormGroup></Col>
 					</Row><Row xs='1' lg='2'>
@@ -372,7 +441,7 @@ export default function CreateGroupModalComponent() {
 									// cannot use defaultValue because it won't update when area is auto calculated
 									// this makes the validation redundant but still a good idea
 									value={state.area}
-									onChange={e => handleNumberChange(e)}
+									onChange={e => {handleNumberChange(e);}}
 									invalid={state.area < 0} />
 								{/* Calculate sum of meter areas */}
 								<Button color='secondary' onClick={handleAutoCalculateArea}>
@@ -392,7 +461,7 @@ export default function CreateGroupModalComponent() {
 								name='areaUnit'
 								type='select'
 								value={state.areaUnit}
-								onChange={e => handleStringChange(e)}
+								onChange={e => {handleStringChange(e);}}
 								invalid={state.area > 0 && state.areaUnit === AreaUnitType.none}>
 								{Object.keys(AreaUnitType).map(key => {
 									return (<option value={key} key={key}>{translate(`AreaUnitType.${key}`)}</option>);
@@ -410,7 +479,7 @@ export default function CreateGroupModalComponent() {
 							id='note'
 							name='note'
 							type='textarea'
-							onChange={e => handleStringChange(e)}
+							onChange={e => {handleStringChange(e);}}
 							value={state.note} />
 					</FormGroup>
 					{/* The child meters in this group */}
@@ -426,13 +495,13 @@ export default function CreateGroupModalComponent() {
 									// Get the currently included/selected meters as an array of the ids.
 									const updatedChildMeters = newSelectedMeterOptions.map(meter => { return meter.value; });
 									// The id is not really needed so set to -1 since same function for edit.
-									const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 });
+									const newDeepMeters = metersInChangedGroup({ ...state, childMeters: updatedChildMeters, id: -1 }, groupDataById);
 									// The choice may have invalidated the default graphic unit so it needs
 									// to be reset to no unit.
 									// The selection encodes this information in the color but recalculate
 									// to see if this is the case.
 									// Get the units compatible with the new set of deep meters in group.
-									const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+									const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters), metersDataById, globalCikState);
 									// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
 									newAllowedDGU.add(-99);
 									let dgu = state.defaultGraphicUnit;
@@ -462,13 +531,13 @@ export default function CreateGroupModalComponent() {
 								// Get the currently included/selected meters as an array of the ids.
 								const updatedChildGroups = newSelectedGroupOptions.map(group => { return group.value; });
 								// The id is not really needed so set to -1 since same function for edit.
-								const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 });
+								const newDeepMeters = metersInChangedGroup({ ...state, childGroups: updatedChildGroups, id: -1 }, groupDataById);
 								// The choice may have invalidated the default graphic unit so it needs
 								// to be reset to no unit.
 								// The selection encodes this information in the color but recalculate
 								// to see if this is the case.
 								// Get the units compatible with the new set of deep meters in group.
-								const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters));
+								const newAllowedDGU = unitsCompatibleWithMeters(new Set(newDeepMeters), metersDataById, globalCikState);
 								// Add no unit (-99) since that is okay so no change needed if current default graphic unit.
 								newAllowedDGU.add(-99);
 								let dgu = state.defaultGraphicUnit;
@@ -498,7 +567,7 @@ export default function CreateGroupModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validGroup}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validGroup || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
@@ -522,7 +591,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedMetersUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedMetersUnsorted.sort((meterA, meterB) => meterA.label.toLowerCase()?.
+			localeCompare(meterB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**
@@ -541,7 +611,8 @@ export default function CreateGroupModalComponent() {
 			);
 		});
 		// Want chosen in sorted order.
-		return sortBy(selectedGroupsUnsorted, item => item.label.toLowerCase(), 'asc');
+		return selectedGroupsUnsorted.sort((groupA, groupB) => groupA.label.toLowerCase()?.
+			localeCompare(groupB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 	}
 
 	/**

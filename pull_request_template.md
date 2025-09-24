@@ -17,9 +17,9 @@ Fixes #[issue]
 
 (Note what you have done by placing an "x" instead of the space in the [ ] so it becomes [x]. It is hoped you do all of them.)
 
-- [ ] I have followed the [OED pull request](https://openenergydashboard.github.io/developer/pr.html) ideas
+- [ ] I have followed the [OED pull request](https://openenergydashboard.org/developer/pr/) ideas
 - [ ] I have removed text in ( ) from the issue request
-- [ ] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](https://openenergydashboard.github.io/developer/cla.html) and each author is listed in the Description section.
+- [ ] You acknowledge that every person contributing to this work has signed the [OED Contributing License Agreement](https://openenergydashboard.org/developer/cla/) and each author is listed in the Description section.
 
 ## Limitations
 

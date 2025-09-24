@@ -31,6 +31,29 @@ async function createConversionGraph(conn) {
 }
 
 /**
+ * Creates a conversion graph from arrays of units and conversions.
+ * Each unit becomes a node, and each conversion becomes a directed edge.
+ * Bidirectional conversions are represented as two edges (in both directions).
+ *
+ * @param {Array<{id: number, name: string}>} units - Array of unit objects with `id` and `name`.
+ * @param {Array<{sourceId: number, destinationId: number, bidirectional?: boolean}>} conversions - Array of conversion objects, each with `sourceId`, `destinationId`, and optional `bidirectional` flag.
+ * @returns {Object} The constructed graph instance (from ngraph.graph).
+ */
+function createConversionGraphFromArray(units, conversions) {
+	const graph = createGraph();
+	for (const unit of units) {
+		graph.addNode(unit.id, unit.name);
+	}
+	for (const c of conversions) {
+		graph.addLink(c.sourceId, c.destinationId);
+		if (c.bidirectional) {
+			graph.addLink(c.destinationId, c.sourceId);
+		}
+	}
+	return graph;
+}
+
+/**
  * Returns the list of units on the shortest path from source to destination.
  * @param {*} graph The conversion graph.
  * @param {*} sourceId The source unit's id.
@@ -73,6 +96,7 @@ function getAllPaths(graph, sourceId) {
 
 module.exports = {
 	createConversionGraph,
+	createConversionGraphFromArray,
 	getPath,
 	getAllPaths
 };

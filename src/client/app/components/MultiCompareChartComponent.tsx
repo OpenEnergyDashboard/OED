@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { UncontrolledAlert } from 'reactstrap';
-import CompareChartContainer, { CompareEntity } from '../containers/CompareChartContainer';
+import CompareBarComponent, { CompareEntity } from './CompareBarComponent';
 import { selectGraphAreaNormalization, selectSelectedGroups, selectSelectedMeters, selectSortingOrder } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
@@ -14,6 +14,8 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectCompareChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { SortingOrder } from '../utils/calculateCompare';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import { LanguageTypes } from 'types/redux/i18n';
 
 /**
  * Component that defines compare chart
@@ -28,6 +30,7 @@ export default function MultiCompareChartComponent() {
 	const sortingOrder = useAppSelector(selectSortingOrder);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const locale = useAppSelector(selectSelectedLanguage);
 
 	const meterDataByID = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -74,7 +77,7 @@ export default function MultiCompareChartComponent() {
 		}
 	});
 
-	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder);
+	selectedCompareEntities = sortIDs(selectedCompareEntities, sortingOrder, locale);
 
 
 	// Compute how much space should be used in the bootstrap grid system
@@ -108,7 +111,7 @@ export default function MultiCompareChartComponent() {
 						issues, this TS error is being suppressed for now.
 						eslint-disable-next-line @typescript-eslint/ban-ts-comment
 						@ts-ignore */}
-						<CompareChartContainer
+						<CompareBarComponent
 							key={compareEntity.id + compareEntity.name}
 							entity={compareEntity}
 						/>
@@ -128,33 +131,27 @@ export default function MultiCompareChartComponent() {
  *
  * @param currentPeriodUsage The current usage in the compare period
  * @param usedToThisPointLastTimePeriod The previous usage in the compare period
- * @returns The fraction change in usage where negative means less usage
+ * @returns The fraction change in usage where negative means less usage, or NaN if either is 0
  */
 function calculateChange(currentPeriodUsage: number, usedToThisPointLastTimePeriod: number): number {
+	// Assuming the usage is 0, then nothing to compare
+	// we do a !usedToThisPointLastTimePeriod check to avoid Null and Undefined values, which are falsy values not catched by an equal 0 check and isNaN
+	if (!usedToThisPointLastTimePeriod || !currentPeriodUsage || isNaN(usedToThisPointLastTimePeriod) || isNaN(currentPeriodUsage)) {
+		return NaN;
+	}
 	return -1 + (currentPeriodUsage / usedToThisPointLastTimePeriod);
 }
-
-
 
 /**
  * @param ids An array of items being compared that contain but are more than the id
  * @param sortingOrder The desired order or the comparison items based on change
+ * @param locale Current language selected from Redux state
  * @returns An array of items being compared in desired sortingOrder
  */
-function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder): CompareEntity[] {
+function sortIDs(ids: CompareEntity[], sortingOrder: SortingOrder, locale: LanguageTypes): CompareEntity[] {
 	switch (sortingOrder) {
 		case SortingOrder.Alphabetical:
-			ids.sort((a, b) => {
-				const identifierA = a.identifier.toLowerCase();
-				const identifierB = b.identifier.toLowerCase();
-				if (identifierA < identifierB) {
-					return -1;
-				}
-				if (identifierA > identifierB) {
-					return 1;
-				}
-				return 0;
-			});
+			ids.sort((idA, idB) => idA.identifier.toLowerCase().localeCompare(idB.identifier.toLowerCase(), locale, { sensitivity: 'accent' }));
 			break;
 		case SortingOrder.Ascending:
 			ids.sort((a, b) => {

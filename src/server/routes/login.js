@@ -10,6 +10,7 @@ const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
 const { log } = require('../log');
 const { getConnection } = require('../db');
+const { credentialsRequestValidationMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
@@ -18,7 +19,7 @@ const router = express.Router();
  * @param {String} username
  * @param {String} Password
  */
-router.post('/', async (req, res) => {
+router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 2,

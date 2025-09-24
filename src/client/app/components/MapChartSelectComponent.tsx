@@ -9,6 +9,8 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedMap, updateSelectedMaps } from '../redux/slices/graphSlice';
 import SingleSelectComponent from './SingleSelectComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  * Component used to select the desired map
@@ -18,10 +20,7 @@ export default function MapChartSelectComponent() {
 	const divBottomPadding: React.CSSProperties = {
 		paddingBottom: '15px'
 	};
-	const labelStyle: React.CSSProperties = {
-		fontWeight: 'bold',
-		margin: 0
-	};
+
 	const messages = defineMessages({
 		selectMap: { id: 'select.map' }
 	});
@@ -31,8 +30,19 @@ export default function MapChartSelectComponent() {
 	const dispatch = useAppDispatch();
 
 	const sortedMaps = useAppSelector(selectMapSelectOptions);
-	const selectedMapData = useAppSelector(state => selectMapById(state, selectSelectedMap(state)));
+	// TODO This is not optimal and probably should be revisited per the following comments.
+	// See src/client/app/redux/entityAdapters.ts for why it does not honor the user selected language.
+	// This sorts within the component based on the user selected language.
+	// The selectMapSelectOptions is already sorting so that could be stopped but is not in case
+	// a better solution is found.
+	// It would be nice to detect if the language used by selectMapSelectOptions is not the user selected
+	// one so it would only sort if needed.
+	// This is used for now since fast (very few maps) and easy.
+	const locale = useAppSelector(selectSelectedLanguage);
+	sortedMaps.sort((mapA, mapB) => mapA.label.toLowerCase().
+		localeCompare(mapB.label.toLowerCase(), String(locale), { sensitivity: 'accent' }));
 
+	const selectedMapData = useAppSelector(state => selectMapById(state, selectSelectedMap(state)));
 
 	//useIntl instead of injectIntl and WrappedComponentProps
 	const intl = useIntl();

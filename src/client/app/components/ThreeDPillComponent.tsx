@@ -3,20 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
+import { useEffect } from 'react';
 import { Badge } from 'reactstrap';
-import { selectGraphState, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
+import { selectGraphState, selectLastMeterOrGroup, selectThreeDState, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
 import { selectGroupDataById } from '../redux/api/groupsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { MeterOrGroup, MeterOrGroupPill } from '../types/redux/graph';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { selectMeterDataById } from '../redux/api/metersApi';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
+import { pillContainer, pillBoxLabel, pillBox, pills, pill } from '../styles/modalStyle';
 
 /**
  * A component used in the threeD graphics to select a single meter from the currently selected meters and groups.
  * @returns List of selected groups and meters as reactstrap Pills Badges
  */
 export default function ThreeDPillComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
@@ -40,6 +43,52 @@ export default function ThreeDPillComponent() {
 		return { meterOrGroupID: groupID, isDisabled: isDisabled, meterOrGroup: MeterOrGroup.groups } as MeterOrGroupPill;
 	});
 
+	// Merge meters and groups into one array
+	const combinedPillData = [...meterPillData, ...groupPillData];
+	// Track length of combinedPillData to determine if a new pill was added
+	const prevLengthRef = React.useRef(combinedPillData.length);
+	// selector to get if the last added thing is a meter or group (Returns MeterOrGroup type, not boolean)
+	const lastAddedType = useAppSelector(selectLastMeterOrGroup);
+	useEffect(() => {
+		// If only one item is selected, auto-select it
+		if (combinedPillData.length === 1) {
+			const singlePill = combinedPillData[0];
+			dispatch(updateThreeDMeterOrGroupInfo({
+				meterOrGroupID: singlePill.meterOrGroupID,
+				meterOrGroup: singlePill.meterOrGroup
+			}));
+		}
+		// If the current 3D selection is no longer present, clear it
+		const stillExists = combinedPillData.some(
+			pill => pill.meterOrGroupID === threeDState.meterOrGroupID && pill.meterOrGroup === threeDState.meterOrGroup
+		);
+		if (!stillExists && (threeDState.meterOrGroupID !== undefined)) {
+			dispatch(updateThreeDMeterOrGroupInfo({ meterOrGroupID: undefined, meterOrGroup: undefined }));
+		}
+		// Auto-select new item on 3D chart if a new pill was added
+		// If the number of pills increased, and the last added type is defined we can assume a new meter or group was added
+		// If the last added type is undefined, it means something messed up, and we have no clue what to select, so we do nothing
+		// If the last added type is defined, we select the last meter or group from the respective array
+		if (combinedPillData.length > prevLengthRef.current && lastAddedType) {
+			let lastAdded;
+			if (lastAddedType === MeterOrGroup.meters && meterPillData.length > 0) {
+				// Because meters and groups can share IDs, we need to check the last added type
+				// and select the last meter or group from the respective array, so we rely on the array to be sorted by chronological order
+				lastAdded = meterPillData[meterPillData.length - 1];
+			} else if (lastAddedType === MeterOrGroup.groups) {
+				lastAdded = groupPillData[groupPillData.length - 1];
+			}
+			if (lastAdded) {
+				dispatch(updateThreeDMeterOrGroupInfo({
+					meterOrGroupID: lastAdded.meterOrGroupID,
+					meterOrGroup: lastAdded.meterOrGroup
+				}));
+			}
+		}
+		// Update the previous length reference to the current length
+		prevLengthRef.current = combinedPillData.length;
+	}, [combinedPillData, dispatch]);
+
 	// When a Pill Badge is clicked update threeD state to indicate new meter or group to render.
 	const handlePillClick = (pillData: MeterOrGroupPill) => dispatch(
 		updateThreeDMeterOrGroupInfo({
@@ -49,13 +98,12 @@ export default function ThreeDPillComponent() {
 	);
 
 	// Method Generates Reactstrap Pill Badges for selected meters or groups
-	const populatePills = (meterOrGroupPillData: MeterOrGroupPill[]) => {
-		return meterOrGroupPillData.map(pillData => {
+	const populatePills = (pillDataArray: MeterOrGroupPill[]) => {
+		return pillDataArray.map(pillData => {
 			// retrieve data from appropriate state slice .meters or .group
-			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[pillData.meterOrGroupID]?.identifier
-				:
-				groupDataById[pillData.meterOrGroupID]?.name;
+			const meterOrGroupName = pillData.meterOrGroup === MeterOrGroup.meters
+				? `${meterDataById[pillData.meterOrGroupID]?.identifier ?? ''}ᴹ`
+				: `${groupDataById[pillData.meterOrGroupID]?.name ?? ''}ᴳ`;
 
 			// Get Selected ID from state
 			const selectedMeterOrGroupID = threeDState.meterOrGroupID;
@@ -77,74 +125,23 @@ export default function ThreeDPillComponent() {
 					color={pillData.isDisabled && !isCurrentlySelected ? 'dark' : colorToRender}
 					style={pill}
 					onClick={() => handlePillClick(pillData)}
-				>{meterOrGroupName}</Badge>
+				>
+					{meterOrGroupName}
+				</Badge>
 			);
 		});
 	};
 
 	return (
 		<div style={pillContainer}>
-			{meterPillData.length > 0 &&
+			{combinedPillData.length > 0 &&
 				<div style={pillBox}>
-					<p style={pillBoxLabel}>{translate('meters')}</p>
+					<p style={pillBoxLabel}>{translate('data.sources')}</p>
 					<div style={pills}>
-						{populatePills(meterPillData)}
-					</div>
-				</div>
-			}
-
-			{groupPillData.length > 0 &&
-				<div style={pillBox}>
-					<p style={pillBoxLabel}>{translate('groups')}</p>
-					<div style={pills} >
-						{populatePills(groupPillData)}
+						{populatePills(combinedPillData)}
 					</div>
 				</div>
 			}
 		</div >
 	);
 }
-
-// TODO Styling for the component, may need to be converted into .css files
-// TODO ISSUE when many meters selected they are cut off.
-const pillContainer: React.CSSProperties = {
-	display: 'flex',
-	justifyContent: 'space-between',
-	margin: '0px',
-	padding: '0px',
-	minHeight: '100px',
-	maxHeight: '200px'
-};
-
-const pillBoxLabel: React.CSSProperties = {
-	alignItems: 'start',
-	textAlign: 'left',
-	margin: '0px',
-	padding: '0px'
-};
-
-const pillBox: React.CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	justifyContent: 'left',
-	width: '45%',
-	maxHeight: '100%',
-	maxWidth: '45%',
-	margin: '0px',
-	padding: '0px'
-};
-
-const pills: React.CSSProperties = {
-	display: 'flex',
-	flexWrap: 'wrap',
-	justifyContent: 'left',
-	maxHeight: '100%',
-	margin: '0px',
-	padding: '0px'
-};
-
-const pill: React.CSSProperties = {
-	margin: '2px',
-	userSelect: 'none',
-	cursor: 'pointer'
-};

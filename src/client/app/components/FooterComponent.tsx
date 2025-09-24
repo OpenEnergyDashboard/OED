@@ -6,6 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppSelector } from '../redux/reduxHooks';
+import { footerStyle } from '../styles/modalStyle';
 
 /**
  *
@@ -16,24 +17,17 @@ export default function FooterComponent() {
 	return (
 		<div id='footer' style={footerStyle}>
 			<FormattedMessage id='oed.description' />
-			<a href='mailto:info@OpenEnergyDashboard.org'>
+			<a href='https://OpenEnergyDashboard.org/contact/'>
 				<FormattedMessage id='contact.us' />
 			</a>
 			<FormattedMessage id='visit' />
-			<a target='_blank' rel='noopener noreferrer' href='https://openenergydashboard.github.io/'>
+			<a target='_blank' rel='noopener noreferrer' href='https://openenergydashboard.org/'>
 				<FormattedMessage id='website' />
 			</a>
 			<FormattedMessage id='info' />
 			<FormattedMessage id='oed.version' />
 			{version}
+			.
 		</div>
 	);
 }
-
-
-const footerStyle: React.CSSProperties = {
-	borderTop: '1px #e1e4e8 solid',
-	padding: '10px 0px',
-	textAlign: 'center',
-	width: '100%'
-};

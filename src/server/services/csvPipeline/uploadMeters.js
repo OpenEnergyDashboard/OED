@@ -47,8 +47,9 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Skip if undefined.
 			if (gpsInput) {
 				// Verify GPS is okay values
-				if (!isValidGPSInput(gpsInput)) {
-					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid`;
+				const { validGps, message } = isValidGPSInput(gpsInput);
+				if (!validGps) {
+					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid with error of "${message}"`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
@@ -109,7 +110,7 @@ async function uploadMeters(req, res, filepath, conn) {
 						throw new CSVPipelineError(
 							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
 					}
-				);
+					);
 			}
 		}
 	} catch (error) {
@@ -117,6 +118,8 @@ async function uploadMeters(req, res, filepath, conn) {
 	}
 }
 
+// TODO This is almost the same as the client function in src/client/app/utils/calibration.ts. When the server side
+// is in TS then a single version should exist and be used.
 /**
  * Checks if the string is a valid GPS representation. This requires it to be two numbers
  * separated by a comma and the GPS values to be within allowed values. The should be a latitude, longitude pair.
@@ -125,19 +128,29 @@ async function uploadMeters(req, res, filepath, conn) {
  * @returns true if string is GPS and false otherwise.
  */
 function isValidGPSInput(input) {
+	let message = '';
+	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
-		return false;
+		message = 'GPS Input is missing a comma';
+		validGps = false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		return false;
+		message = 'GPS Input has too many commas';
+		validGps = false;
 	}
-	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-	const array = input.split(',').map(value => parseFloat(value));
-	const latitudeIndex = 0;
-	const longitudeIndex = 1;
-	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
-	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
-	const result = latitudeConstraint && longitudeConstraint;
-	return result;
+	if (validGps) {
+		// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
+		const array = input.split(',').map((value) => parseFloat(value));
+		const latitudeIndex = 0;
+		const longitudeIndex = 1;
+		const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+		const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+		const result = latitudeConstraint && longitudeConstraint;
+		if (!result) {
+			validGps = false;
+			message = 'Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: ' + input;
+		}
+	}
+	return { validGps, message };
 }
 
 /**

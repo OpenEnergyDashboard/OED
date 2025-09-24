@@ -43,7 +43,8 @@ export default function MapCalibrationInfoDisplayComponent() {
 			return;
 		}
 		const input = value;
-		if (isValidGPSInput(input)) {
+		const { validGps, message } = isValidGPSInput(input);
+		if (validGps) {
 			const array = input.split(',').map((value: string) => parseFloat(value));
 			const gps: GPSPoint = {
 				longitude: array[longitudeIndex],
@@ -53,7 +54,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 			dispatch(localEditsSlice.actions.offerCurrentGPS(gps));
 			resetInputField();
 		} else {
-			logToServer({ level: 'info', message: `refused data point with invalid input: ${input}` });
+			logToServer({ level: 'info', message: `refused data point with invalid input: ${input} and error of "${message}"` });
 		}
 	};
 

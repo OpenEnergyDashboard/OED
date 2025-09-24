@@ -16,6 +16,11 @@ services:
             - POSTGRES_PASSWORD=pleaseChange # default postgres password that should be changed for security.
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 10s
+            retries: 3
         # ports:
         #    - "5432:5432"
         # Uncomment the above lines to enable access to the PostgreSQL server
@@ -68,10 +73,15 @@ services:
             # and comment out the debug port and 3000:3000 line above
             # Don't bring this up without the DB
         depends_on:
-            - database
-              # database:
+            # - database
+            database:
               # We need the database and it has to be ready for work (see healthcheck above).
-              # condition: service_healthy
+              condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:3000"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         # Lets docker compose up work right
         # If environment variable install_args is not set then it becomes blank without warning user.
         command:
@@ -82,3 +92,23 @@ services:
             ]
         # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
         # command: ["bash", "./src/scripts/installOED.sh"]
+
+    # Cypress testing service
+    cypress:
+      image: cypress/included
+      profiles:
+        - ui-testing
+      environment:
+        - CYPRESS_BASE_URL=http://web:3000
+        - DISPLAY=:99
+      working_dir: /usr/src/app
+      depends_on:
+        web:
+          condition: service_healthy
+      volumes:
+        - ./:/usr/src/app
+      entrypoint: >
+        /bin/sh -c "
+        rm -f /tmp/.X99-lock &&
+        Xvfb :99 -screen 0 1024x768x16"
+        

@@ -7,10 +7,18 @@ import { GroupData } from '../types/redux/groups';
 import { MapMetadata } from '../types/redux/map';
 import { MeterData } from '../types/redux/meters';
 import { UnitData } from '../types/redux/units';
+
 const sortByIdentifierProperty = (a: any, b: any) => a.identifier?.localeCompare(b.identifier, undefined, { sensitivity: 'accent' });
+// This function is not supposed to access store so it does not know the OED selected language.
+// It uses the default system/browser language.
+// It was tested to see if store was accessed and then used. It was found that it uses the initial
+// site default language since that is what state.appState.selectedLanguage is set to at the start.
+// This did force the site language when used as the second argument to localeCompare
+// but did not allow for changing the language by the user. See src/client/app/components/MapChartSelectComponent.tsx
+// for sorting after the fact.
 const sortByNameProperty = (a: any, b: any) => a.name?.localeCompare(b.name, undefined, { sensitivity: 'accent' });
 
-// Adapters re-homed for compatability with localEditsSlice.ts/ prevents circular dependency issues.
+// Adapters re-homed for compatibility with localEditsSlice.ts/ prevents circular dependency issues.
 // Meters
 export const meterAdapter = createEntityAdapter<MeterData>({ sortComparer: sortByIdentifierProperty });
 export const metersInitialState = meterAdapter.getInitialState();

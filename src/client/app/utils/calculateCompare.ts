@@ -4,15 +4,15 @@
 
 import { TimeInterval } from '../../../common/TimeInterval';
 import * as moment from 'moment';
-import translate from '../utils/translate';
+import translate from './translate';
 
 /**
  * 'Day', 'Week' or 'FourWeeks'
  */
 export enum ComparePeriod {
-	Day = 'Day',
-	Week = 'Week',
-	FourWeeks = 'FourWeeks'
+	Day = '1',
+	Week = '7',
+	FourWeeks = '28'
 }
 
 /**
@@ -30,11 +30,11 @@ export enum SortingOrder {
  */
 export function validateComparePeriod(comparePeriod: string): ComparePeriod {
 	switch (comparePeriod) {
-		case 'Day':
+		case '1':
 			return ComparePeriod.Day;
-		case 'Week':
+		case '7':
 			return ComparePeriod.Week;
-		case 'FourWeeks':
+		case '28':
 			return ComparePeriod.FourWeeks;
 		default:
 			throw new Error(`Unknown period value: ${comparePeriod}`);

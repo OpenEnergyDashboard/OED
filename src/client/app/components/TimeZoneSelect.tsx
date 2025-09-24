@@ -5,7 +5,7 @@
 import * as React from 'react';
 import Select from 'react-select';
 import { TimeZoneOption } from 'types/timezone';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import * as moment from 'moment-timezone';
 
 interface TimeZoneSelectProps {
@@ -15,7 +15,7 @@ interface TimeZoneSelectProps {
 }
 
 const TimeZoneSelect: React.FC<TimeZoneSelectProps> = ({ current, handleClick }) => {
-
+	const translate = useTranslate();
 	const getTimeZones = () => {
 		const zoneNames = moment.tz.names();
 		return zoneNames.map(zoneName => {

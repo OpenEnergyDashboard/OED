@@ -9,21 +9,19 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { graphSlice, selectChartToRender } from '../redux/slices/graphSlice';
 import { ChartTypes } from '../types/redux/graph';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { labelStyle } from '../styles/modalStyle';
 
 /**
  *  A component that allows users to select which chart should be displayed.
  * @returns Chart select element
  */
 export default function ChartSelectComponent() {
+	const translate = useTranslate();
 	const currentChartToRender = useAppSelector(selectChartToRender);
 	const dispatch = useAppDispatch();
 	const [expand, setExpand] = useState(false);
-	// const mapsById = useAppSelector(selectMapDataById);
-	// const sortedMaps = sortBy(values(mapsById).map(map => (
-	// 	{ value: map.id, label: map.name, isDisabled: !(map.origin && map.opposite) } as SelectOption
-	// )), 'label');
 
 	return (
 		<>
@@ -38,6 +36,7 @@ export default function ChartSelectComponent() {
 				<DropdownMenu>
 					{
 						// Make items for dropdown from enum
+						// TODO these items should be sorted by the current language values
 						Object.values(ChartTypes)
 							// filter out current chart
 							.filter(chartType => chartType !== currentChartToRender)
@@ -59,7 +58,3 @@ export default function ChartSelectComponent() {
 		</ >
 	);
 }
-const labelStyle: React.CSSProperties = {
-	fontWeight: 'bold',
-	margin: 0
-};

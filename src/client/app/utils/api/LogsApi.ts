@@ -5,7 +5,8 @@
  */
 
 import ApiBackend from './ApiBackend';
-import {LogData} from '../../types/redux/logs';
+import { LogData } from '../../types/redux/logs';
+import { TimeInterval } from '../../../../common/TimeInterval';
 
 //TODO migrate to using RTKQuery for logging.
 // This will require logging to be initiated via dispatch, which differs, and conflicts with current implementation and usage.
@@ -27,4 +28,11 @@ export default class LogsApi {
 	public async error(log: LogData): Promise<void> {
 		return await this.backend.doPostRequest('/api/logs/error', log);
 	}
+
+	public async getLogsByDateRangeAndType(timeInterval: TimeInterval, logTypes: string, logLimit: string): Promise<LogData[]> {
+		const request = await this.backend.doGetRequest('/api/logs/logsmsg/getLogsByDateRangeAndType',
+			{ timeInterval: timeInterval.toString(), logTypes: logTypes, logLimit: logLimit });
+		return request as LogData[];
+	}
+
 }

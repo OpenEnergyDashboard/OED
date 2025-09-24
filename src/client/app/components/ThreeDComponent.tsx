@@ -12,26 +12,32 @@ import { useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { selectGraphState, selectQueryTimeInterval } from '../redux/slices/graphSlice';
+import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
 import { MeterDataByID } from '../types/redux/meters';
 import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
-import { AreaUnitType, getAreaUnitConversion } from '../utils/getAreaUnitConversion';
+import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
-import translate from '../utils/translate';
+// Both translates are used since some are in the function component where the React Hook is okay
+// and some are in other functions where the older method is needed.
+import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import Plot from 'react-plotly.js';
+import { Icons } from 'plotly.js';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
+import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
  * Component used to render 3D graphics
  * @returns 3D Plotly 3D Surface Graph
  */
 export default function ThreeDComponent() {
+	const translate = useTranslate();
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
@@ -41,13 +47,18 @@ export default function ThreeDComponent() {
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
-
-
 	// Initialize Default values
 	const threeDData = data;
 	let layout = {};
 	let dataToRender = null;
 
+	// Display Plotly Buttons Feature
+	// The number of items in defaultButtons and advancedButtons must differ as discussed below
+	const defaultButtons: Plotly.ModeBarDefaultButtons[] = ['zoom2d', 'pan2d', 'select2d', 'lasso2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d',
+		'resetScale2d'];
+	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['resetCameraDefault3d'];
+	// Manage button states with useState
+	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	if (!meterOrGroupID) {
 		// No selected Meters
@@ -67,7 +78,7 @@ export default function ThreeDComponent() {
 		// Special Case where meter frequency is greater than 12 hour intervals
 		layout = setHelpLayout(translate('threeD.incompatible'));
 	} else {
-		[dataToRender, layout] = formatThreeDData(threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
+		[dataToRender, layout] = formatThreeDData(translate, threeDData, meterOrGroupID, meterDataById, groupDataById, graphState, unitDataById);
 	}
 
 	return (
@@ -76,12 +87,22 @@ export default function ThreeDComponent() {
 			{isFetching
 				? <SpinnerComponent loading width={50} height={50} />
 				: <Plot
-					style={{ width: '100%', height: '100%', minHeight: '700px' }}
+					style={fullSizeContainer}
 					data={dataToRender as Plotly.PlotData[]}
 					layout={layout as Plotly.Layout}
 					config={{
 						responsive: true,
-						displayModeBar: false,
+						displayModeBar: true,
+						modeBarButtonsToRemove: listOfButtons,
+						modeBarButtonsToAdd: [{
+							name: 'more-options',
+							title: translate('toggle.options'),
+							icon: Icons.pencil,
+							click: function () {
+								// # of items must differ so the length can tell which list of buttons is being set
+								setListOfButtons(listOfButtons.length === defaultButtons.length ? advancedButtons : defaultButtons); // Update the state
+							}
+						}],
 						// Current Locale
 						locale,
 						// Available Locales
@@ -95,6 +116,7 @@ export default function ThreeDComponent() {
 
 /**
  * Formats Readings for plotly 3d surface
+ * @param translate translate function for internationalization
  * @param data 3D data to be formatted
  * @param selectedMeterOrGroupID meter or group id to lookup data for
  * @param meterDataById redux meters state
@@ -104,6 +126,7 @@ export default function ThreeDComponent() {
  * @returns Data, and Layout objects for a 3D Plotly Graph
  */
 function formatThreeDData(
+	translate: (messageID: string) => string,
 	data: ThreeDReading,
 	selectedMeterOrGroupID: number,
 	meterDataById: MeterDataByID,
@@ -111,6 +134,7 @@ function formatThreeDData(
 	graphState: GraphState,
 	unitDataById: UnitDataById
 ) {
+
 	// Initialize Plotly Data
 	const xDataToRender: string[] = [];
 	const yDataToRender: string[] = [];
@@ -135,23 +159,13 @@ function formatThreeDData(
 			// The rate will be 1 if it is per hour (since state readings are per hour) or no rate scaling so no change.
 			const rateScaling = needsRateScaling ? currentSelectedRate.rate : 1;
 
-			const meterArea = meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[selectedMeterOrGroupID].area
+			const entity = meterOrGroup === MeterOrGroup.meters ?
+				meterDataById[selectedMeterOrGroupID]
 				:
-				groupDataById[selectedMeterOrGroupID].area;
+				groupDataById[selectedMeterOrGroupID];
+			const scaling = selectScalingFromEntity(entity, graphState.selectedAreaUnit, graphState.areaNormalization, rateScaling);
 
-			const areaUnit = meterOrGroup === MeterOrGroup.meters ?
-				meterDataById[selectedMeterOrGroupID].areaUnit
-				:
-				groupDataById[selectedMeterOrGroupID].areaUnit;
-
-			// We either don't care about area, or we do in which case there needs to be a nonzero area.
-			if (!graphState.areaNormalization || (meterArea > 0 && areaUnit != AreaUnitType.none)) {
-				// Convert the meter area into the proper unit if normalizing by area or use 1 if not so won't change reading values.
-				const areaScaling = graphState.areaNormalization ?
-					meterArea * getAreaUnitConversion(areaUnit, graphState.selectedAreaUnit) : 1;
-				// Divide areaScaling into the rate so have complete scaling factor for readings.
-				const scaling = rateScaling / areaScaling;
+			if (!graphState.areaNormalization || (entity.area > 0 && entity.areaUnit != AreaUnitType.none)) {
 				zDataToRender = data.zData.map(day => day.map(reading => reading === null ? null : reading * scaling));
 			}
 		}
@@ -180,7 +194,6 @@ function formatThreeDData(
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
-
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
@@ -191,7 +204,7 @@ function formatThreeDData(
 		hoverinfo: 'text',
 		hovertext: hoverText
 	}];
-	const layout = setThreeDLayout(unitLabel, yDataToRender);
+	const layout = setThreeDLayout(translate, unitLabel, yDataToRender);
 	return [formattedData, layout];
 }
 
@@ -201,7 +214,7 @@ function formatThreeDData(
  * @param fontSize current application state
  * @returns plotly layout object.
  */
-function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
+export function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: number = 28) {
 	return {
 		'xaxis': {
 			'visible': false
@@ -223,11 +236,12 @@ function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize: numbe
 
 /**
  * Utility to get / set 3D graphic plotlyLayout
+ * @param translate translate function for internationalization
  * @param zLabelText 3D data to be formatted
  * @param yDataToRender Data range for yaxis
  * @returns plotly layout object.
  */
-function setThreeDLayout(zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
+export function setThreeDLayout(translate: (messageID: string) => string, zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
 	// Convert date strings to JavaScript Date objects and then get dataRange
 	const dateObjects = yDataToRender.map(dateStr => new Date(dateStr));
 	const dataMin = Math.min(...dateObjects.map(date => date.getTime()));
@@ -284,4 +298,6 @@ function setThreeDLayout(zLabelText: string = 'Resource Usage', yDataToRender: s
 		}
 	} as Partial<Plotly.Layout>;
 }
+
+
 

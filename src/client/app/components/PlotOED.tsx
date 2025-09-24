@@ -11,8 +11,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectPlotlySliderMax, selectPlotlySliderMin } from '../redux/slices/graphSlice';
-
-
+import { fullSizeContainer } from '../styles/modalStyle';
 
 export interface OEDPlotProps {
 	data: Partial<Plotly.PlotData>[];
@@ -44,14 +43,14 @@ export const PlotOED = (props: OEDPlotProps) => {
 				const startTS = moment.utc(e['xaxis.range[0]']);
 				const endTS = moment.utc(e['xaxis.range[1]']);
 				const workingTimeInterval = new TimeInterval(startTS, endTS);
-				dispatch(changeSliderRange(workingTimeInterval.toString()));
+				dispatch(changeSliderRange(workingTimeInterval));
 			}
 			else if (e['xaxis.range']) {
 				// this case is when the slider knobs are dragged.
 				const range = figure.current.layout?.xaxis?.range;
 				const startTS = range && range[0];
 				const endTS = range && range[1];
-				const interval = new TimeInterval(startTS, endTS).toString();
+				const interval = new TimeInterval(startTS, endTS);
 				dispatch(changeSliderRange(interval));
 
 			}
@@ -85,7 +84,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 	const end = rangeSliderMax ?? maxRange;
 
 	return (
-		<Plot style={{ width: '100%', height: '100%', minHeight: '700px' }}
+		<Plot style={fullSizeContainer}
 			data={props.data}
 			onRelayout={debouncedRelayout}
 			onUpdate={trackPlotly}

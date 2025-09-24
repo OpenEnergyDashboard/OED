@@ -22,4 +22,8 @@ export const graphHistoryListener = (startListening: AppListener) => {
 
 // listen to all graphSlice actions defined in graphSlice.reducers.
 // Updating state via graphsSlice.extraReducers will not trigger history middleware
-const isHistoryTrigger = isAnyOf(...Object.values(graphSlice.actions));
+const isHistoryTrigger = isAnyOf(
+	...Object.values(graphSlice.actions).filter(
+		a => a.type !== graphSlice.actions.setInitialXAxisRange.type
+	)
+);

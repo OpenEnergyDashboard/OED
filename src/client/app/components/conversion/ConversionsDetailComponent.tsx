@@ -13,6 +13,9 @@ import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConversionViewComponent from './ConversionViewComponent';
 import CreateConversionModalComponent from './CreateConversionModalComponent';
 import { unitsAdapter } from '../../redux/entityAdapters';
+import { useAppSelector } from '../../redux/reduxHooks';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 
 /**
  * Defines the conversions page card view
@@ -20,7 +23,7 @@ import { unitsAdapter } from '../../redux/entityAdapters';
  */
 export default function ConversionsDetailComponent() {
 	// The route stops you from getting to this page if not an admin.
-
+	const locale = useAppSelector(selectSelectedLanguage);
 	// Conversions state
 	const { data: conversionsState = stableEmptyConversions, isFetching: conversionsFetching } = conversionsApi.useGetConversionsDetailsQuery();
 	// Units DataById
@@ -31,13 +34,8 @@ export default function ConversionsDetailComponent() {
 		})
 	});
 
-	const titleStyle: React.CSSProperties = {
-		textAlign: 'center'
-	};
-
 	const tooltipStyle = {
-		display: 'inline-block',
-		fontSize: '50%',
+		...tooltipBaseStyle,
 		// For now, only an admin can see the conversion page.
 		tooltipConversionView: 'help.admin.conversionview'
 	};
@@ -69,10 +67,9 @@ export default function ConversionsDetailComponent() {
 							{
 								Object.values(conversionsState)
 									.sort((conversionA: ConversionData, conversionB: ConversionData) =>
-										((unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase() >
-											(unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase()) ? 1 :
-											(((unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase() >
-												(unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase()) ? -1 : 0))
+										((unitDataById[conversionA.sourceId]?.identifier + unitDataById[conversionA.destinationId]?.identifier).toLowerCase().localeCompare((
+											unitDataById[conversionB.sourceId]?.identifier + unitDataById[conversionB.destinationId]?.identifier).toLowerCase(), locale,
+										{ sensitivity: 'accent' })))
 									.map(conversionData => (
 										<ConversionViewComponent
 											conversion={conversionData}

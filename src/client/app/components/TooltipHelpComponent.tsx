@@ -9,7 +9,7 @@ import { selectOEDVersion } from '../redux/api/versionApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectHelpUrl } from '../redux/slices/adminSlice';
 import '../styles/tooltip.css';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -20,11 +20,10 @@ interface TooltipHelpProps {
  * @returns ToolTipHelpComponent
  */
 export default function TooltipHelpComponent(props: TooltipHelpProps) {
-
 	/**
 	 * @returns JSX to create the help icons with links
 	 */
-
+	const translate = useTranslate();
 
 	const version = useAppSelector(selectOEDVersion);
 	const helpUrl = useAppSelector(selectHelpUrl);
@@ -54,7 +53,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.chart.plotly.controls': { link: 'https://plotly.com/chart-studio-help/getting-to-know-the-plotly-modebar/' },
 		'help.home.chart.redraw.restore': { link: `${helpUrl}/lineGraphic/#redrawRestore` },
 		'help.home.chart.select': { link: `${helpUrl}/graphType/` },
-		'help.home.compare.interval.tip': { link: `${helpUrl}/compareGraphic/#usage` },
+		'help.home.compare.period.tip': { link: `${helpUrl}/compareGraphic/#usage` },
 		'help.home.compare.sort.tip': { link: `${helpUrl}/compareGraphic/#usage` },
 		'help.home.error.bar': { link: `${helpUrl}/errorBar/#usage` },
 		'help.home.export.graph.data': { link: `${helpUrl}/export/` },
@@ -64,14 +63,15 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.select.dateRange': { link: `${helpUrl}/dateRange/` },
 		'help.home.select.groups': { link: `${helpUrl}/graphingGroups/` },
 		'help.home.select.maps': { link: `${helpUrl}/mapGraphic/` },
-		'help.home.select.meters': { link: `${helpUrl}/graphingMeters/` },
+		'help.home.select.datasources': { link: `${helpUrl}/graphingDataSources/` },
 		'help.home.select.rates': { link: `${helpUrl}/graphingRates/` },
 		'help.home.select.units': { link: `${helpUrl}/graphingUnits/` },
 		'help.home.readings.per.day': { link: `${helpUrl}/readingsPerDay/` },
 		'help.home.toggle.chart.link': { link: `${helpUrl}/chartLink/` },
 		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing/#groupDetails` },
 		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },
-		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` }
+		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` },
+		'help.admin.unitconversionvisuals': { link: `${helpUrl}/adminUnitVisual/` }
 	};
 
 	return (

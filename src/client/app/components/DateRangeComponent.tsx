@@ -12,9 +12,10 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import { changeSliderRange, selectQueryTimeInterval, updateTimeInterval, selectChartToRender } from '../redux/slices/graphSlice';
 import '../styles/DateRangeCustom.css';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateRangeCompatibility';
-import translate from '../utils/translate';
+import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
+import { bottomSpace, labelStyle } from '../styles/modalStyle';
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
@@ -22,14 +23,15 @@ import { ChartTypes } from '../types/redux/graph';
  */
 export default function DateRangeComponent() {
 	const dispatch = useAppDispatch();
+	const translate = useTranslate();
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const chartType = useAppSelector(selectChartToRender);
 	const datePickerVisible = chartType !== ChartTypes.compare;
 
 	const handleChange = (value: Value) => {
-		dispatch(updateTimeInterval(dateRangeToTimeInterval(value).toString()));
-		dispatch(changeSliderRange(dateRangeToTimeInterval(value).toString()));
+		dispatch(updateTimeInterval(dateRangeToTimeInterval(value)));
+		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
 	};
 
 
@@ -41,20 +43,19 @@ export default function DateRangeComponent() {
 						{translate('date.range')}:
 						<TooltipMarkerComponent page='home' helpTextId='help.home.select.dateRange' />
 					</p>
-					<DateRangePicker
-						value={timeIntervalToDateRange(queryTimeInterval)}
-						onChange={handleChange}
-						calendarProps={{ defaultView: 'year' }}
-						minDate={new Date(1970, 0, 1)}
-						maxDate={new Date()}
-						locale={locale} // Formats Dates, and Calendar months base on locale
-						calendarIcon={null}
-					/>
+					<div style = {bottomSpace}>
+						<DateRangePicker
+							value={timeIntervalToDateRange(queryTimeInterval)}
+							onChange={handleChange}
+							calendarProps={{ defaultView: 'year' }}
+							minDate={new Date(1970, 0, 1)}
+							maxDate={new Date()}
+							locale={locale} // Formats Dates, and Calendar months base on locale
+							calendarIcon={null}
+						/>
+					</div>
 				</>
 			)}
 		</div>
 	);
 }
-
-// Needed to make this component work well if width is made small.
-const labelStyle: React.CSSProperties = { fontWeight: 'bold', margin: 0 };

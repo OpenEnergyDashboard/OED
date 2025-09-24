@@ -2,7 +2,7 @@
 
 ![Github Build](https://github.com/OpenEnergyDashboard/OED/workflows/Build/badge.svg)
 
-Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters or uploaded via CSV files. It is available to anyone and is optimized for non-technical users with a simple interface that provides access to your organization's energy data. To learn more, see [our website](https://openenergydashboard.github.io/).
+Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters or uploaded via CSV files. It is available to anyone and is optimized for non-technical users with a simple interface that provides access to your organization's energy data. To learn more, see [our website](https://openenergydashboard.org/).
 
 Open Energy Dashboard is available under the Mozilla Public License v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
 
@@ -30,11 +30,11 @@ For a list of contributors, [click here](https://github.com/OpenEnergyDashboard/
 
 This project is licensed under the MPL version 2.0.
 
-See the full licensing agreement [here](LICENSE.txt)
+See the full licensing agreement [here](License.txt)
 
 ## Contributions ##
 
-We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our [Contributor License Agreement](https://openenergydashboard.github.io/developer/cla.html). Web pages with [information for developers](https://openenergydashboard.github.io/developer/) is available. If you have any questions or concerns feel free to at engage@OpenEnergyDashboard.org.
+We welcome others to contribute to this project by writing code for submission or collaborating with us. Before contributing, please sign our [Contributor License Agreement](https://openenergydashboard.org/developer/cla/). Web pages with [information for developers](https://openenergydashboard.org/developer/developer/) is available. If you have any questions or concerns feel free to [contact us](https://OpenEnergyDashboard.org/contact/).
 
 ## Code of Conduct ##
 
@@ -53,4 +53,4 @@ If you think there is a security concern in the OED software, the please visit o
 
 ## Contact ##
 
-To contact us, see our [contact web page](https://openenergydashboard.github.io/contact.html), send an email to info@OpenEnergyDashboard.org or open an issue on GitHub.
+To contact us, see our [contact web page](https://openenergydashboard.org/contact/) or open an issue on GitHub.

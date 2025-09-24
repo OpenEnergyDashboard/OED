@@ -79,6 +79,7 @@ async function createSchema(conn) {
 	const Configfile = require('./obvius/Configfile');
 	const Migration = require('./Migration');
 	const LogEmail = require('./LogEmail');
+	const LogMsg = require('./LogMsg');
 	const Baseline = require('./Baseline');
 	const { Map } = require('./Map');
 	const Unit = require('./Unit');
@@ -89,6 +90,7 @@ async function createSchema(conn) {
 	await Unit.createUnitTypesEnum(conn);
 	await Unit.createAreaUnitTypesEnum(conn);
 	await Unit.createDisplayableTypesEnum(conn);
+	await Unit.createDisableChecksTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
 	await Unit.createTable(conn);
 	await Conversion.createTable(conn);
@@ -106,10 +108,12 @@ async function createSchema(conn) {
 	await Group.createTables(conn);
 	await Migration.createTable(conn);
 	await LogEmail.createTable(conn);
+	await LogMsg.createLogMsgTypeEnum(conn);
+	await LogMsg.createTable(conn);
 	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 	// For 3D reading
-	await Reading.create3DReadingsFunction(conn); 
+	await Reading.create3DReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));

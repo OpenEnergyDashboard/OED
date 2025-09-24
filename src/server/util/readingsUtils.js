@@ -76,25 +76,23 @@ function expectReadingToEqualExpected(res, expected, id = METER_ID) {
 }
 
 /**
- * Compares readings from api call against the expected readings csv (now with min/max)
+ * Compares readings from api call against the expected readings csv
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
  */
-function expectMaxMinToEqualExpected(res, expected, id = METER_ID) {
+function expectRangeToEqualExpected(res, expected, id = METER_ID) {
     expect(res).to.be.json;
     expect(res).to.have.status(HTTP_CODE.OK);
     // Did the response have the correct number of readings.
     expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
     // Loop over each reading
     for (let i = 0; i < expected.length; i++) {
-        // Check that the reading's value is within the expected tolerance (DELTA).
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][1]), DELTA);
-        // Reading also has correct max/min
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][2]), DELTA);
-        // Reading has correct start/end date and time
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][3]));
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][4]));
+        // Check that the reading's min/max is within the expected tolerance (DELTA).
+       expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
+       expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
+       // Reading has correct start/end date and time.
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
+        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
     }
 }
 
@@ -281,7 +279,7 @@ module.exports = {
     prepareTest,
     parseExpectedCsv,
     expectReadingToEqualExpected,
-    expectMaxMinToEqualExpected,
+    expectRangeToEqualExpected,
     expectCompareToEqualExpected,
     expectThreeDReadingToEqualExpected,
     createTimeString,
