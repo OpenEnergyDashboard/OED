@@ -13,6 +13,8 @@ import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
+import { useTranslate } from '../../redux/componentHooks';
+import { TrueFalseType } from '../../types/items';
 
 interface EditMapModalProps {
 	map: MapMetadata;
@@ -20,6 +22,8 @@ interface EditMapModalProps {
 
 // TODO: Migrate to RTK
 const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
+	const translate = useTranslate();
+
 	const [showModal, setShowModal] = useState(false);
 	const dispatch = useAppDispatch();
 	const [nameInput, setNameInput] = useState(map.name);
@@ -113,8 +117,13 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 								value={displayable.toString()}
 								onChange={e => setDisplayable(e.target.value === 'true')}
 							>
-								<option value="true">{intl.formatMessage({ id: 'map.is.displayable' })}</option>
-								<option value="false">{intl.formatMessage({ id: 'map.is.not.displayable' })}</option>
+								{Object.keys(TrueFalseType).map(key => {
+									return (
+										<option value={key} key={key}>
+											{translate(`TrueFalseType.${key}`)}
+										</option>
+									);
+								})}
 							</Input>
 						</FormGroup>
 						<FormGroup>
