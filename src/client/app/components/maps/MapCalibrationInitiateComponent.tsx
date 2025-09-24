@@ -44,7 +44,6 @@ export default function MapCalibrationInitiateComponent() {
 	const [angle, setAngle] = React.useState<string>('');
 	const fileRef = React.useRef<HTMLInputElement>(null);
 	const mapData = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, localEditsSlice.selectors.selectCalibrationMapId(state)));
-	console.log('EmpyMapData>: ', mapData);
 
 	const notify = (key: 'map.bad.number' | 'map.bad.digita' | 'map.bad.digitb' | 'map.bad.load' | 'map.bad.name') => {
 		showErrorNotification(translate(key));

@@ -13,8 +13,6 @@ export enum CalibrationModeTypes {
 	unavailable = 'unavailable'
 }
 
-
-
 /**
  * data format stored in the database
  * @param id
@@ -72,22 +70,4 @@ export interface MapMetadata {
  */
 export interface CalibrationSettings {
 	showGrid: boolean;
-}
-
-/**
- * @param mapID <= -1 means it's a new map;
- */
-interface MapMetadataByID extends Record<number, MapMetadata> { }
-
-
-export interface MapState {
-	isLoading: boolean;
-	byMapID: MapMetadataByID;
-	selectedMap: number;
-	calibratingMap: number;
-	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
-	// Maps the app is currently attempting to upload map changes
-	submitting: number[];
-	newMapCounter: number;
-	calibrationSettings: CalibrationSettings;
 }
