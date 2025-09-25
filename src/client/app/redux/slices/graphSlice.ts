@@ -23,9 +23,9 @@ const defaultState: GraphState = {
 	initialXAxisRangeString: TimeInterval.unbounded().toString(),
 	queryTimeIntervalString: TimeInterval.unbounded().toString(),
 	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
-	duration: moment.duration(4, 'weeks'),
+	duration: moment.duration(4, 'weeks').toISOString(),
 	comparePeriod: ComparePeriod.Week,
-	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
+	compareTimeIntervalString: calculateCompareTimeInterval(ComparePeriod.Week, moment()).toString(),
 	compareSortingOrder: SortingOrder.Descending,
 	chartToRender: ChartTypes.line,
 	barStacking: false,
@@ -83,7 +83,7 @@ export const graphSlice = createSlice({
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.current.selectedAreaUnit = action.payload;
 		},
-		updateDuration: (state, action: PayloadAction<moment.Duration>) => {
+		updateDuration: (state, action: PayloadAction<string>) => {
 			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
@@ -107,7 +107,7 @@ export const graphSlice = createSlice({
 		},
 		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
 			state.current.comparePeriod = action.payload.comparePeriod;
-			state.current.compareTimeInterval = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime);
+			state.current.compareTimeIntervalString = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime).toString();
 		},
 		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
 			state.current.chartToRender = action.payload;
@@ -241,7 +241,7 @@ export const graphSlice = createSlice({
 								current.selectedAreaUnit = value as AreaUnitType;
 								break;
 							case 'duration':
-								current.duration = moment.duration(parseInt(value), 'days');
+								current.duration = moment.duration(parseInt(value), 'days').toString();
 								break;
 							case 'barStacking':
 								current.barStacking = value === 'true';
@@ -252,7 +252,7 @@ export const graphSlice = createSlice({
 							case 'comparePeriod':
 								{
 									current.comparePeriod = validateComparePeriod(value);
-									current.compareTimeInterval = calculateCompareTimeInterval(validateComparePeriod(value), moment());
+									current.compareTimeIntervalString = calculateCompareTimeInterval(validateComparePeriod(value), moment()).toString();
 								}
 								break;
 							case 'compareSortingOrder':
@@ -330,7 +330,6 @@ export const graphSlice = createSlice({
 		selectShowMinMax: state => state.current.showMinMax,
 		selectBarStacking: state => state.current.barStacking,
 		selectSelectedMap: state => state.current.selectedMap,
-		selectWidthDays: state => state.current.duration,
 		selectAreaUnit: state => state.current.selectedAreaUnit,
 		selectSelectedUnit: state => state.current.selectedUnit,
 		selectChartToRender: state => state.current.chartToRender,
@@ -342,7 +341,6 @@ export const graphSlice = createSlice({
 		selectQueryTimeIntervalString: state => state.current.queryTimeIntervalString,
 		selectInitialXAxisRange: state => state.current.initialXAxisRangeString,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
-		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
@@ -359,6 +357,18 @@ export const graphSlice = createSlice({
 		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
 		selectQueryTimeInterval: createSelector(
 			(sliceState: History<GraphState>) => sliceState.current.queryTimeIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
+		selectWidthDays: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.duration,
+			durationString => {
+				return moment.duration(durationString);
+			}
+		),
+		selectCompareTimeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.compareTimeIntervalString,
 			timeIntervalString => {
 				return TimeInterval.fromString(timeIntervalString);
 			}

@@ -27,6 +27,7 @@ import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
 import { createAppSelector } from './selectors';
 import { selectCik } from '../api/conversionsApi';
+import moment from 'moment';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
@@ -479,7 +480,7 @@ export const selectChartLink = createAppSelector(
 		linkText += `&serverRange=${current.queryTimeIntervalString}`;
 		switch (current.chartToRender) {
 			case ChartTypes.bar:
-				linkText += `&duration=${current.duration.asDays()}`;
+				linkText += `&duration=${moment.duration(current.duration).asDays()}`;
 				linkText += `&barStacking=${current.barStacking}`;
 				linkText += `&sliderRange=${rangeSliderInterval}`;
 				break;

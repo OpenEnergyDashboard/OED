@@ -96,7 +96,7 @@ export default function IntervalControlsComponent() {
 	const updateDurationChange = (value: number) => {
 		// Update if okay value. May not be okay if this came from user entry in custom form.
 		if (daysValid(value)) {
-			dispatch(graphSlice.actions.updateDuration(moment.duration(value, 'days')));
+			dispatch(graphSlice.actions.updateDuration(moment.duration(value, 'days').toISOString()));
 		}
 	};
 

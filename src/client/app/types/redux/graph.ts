@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
@@ -75,9 +74,9 @@ export interface GraphState {
 	lastAddedMeterOrGroup: MeterOrGroup | undefined;
 	initialXAxisRangeString: string;
 	rangeSliderIntervalString: string;
-	duration: moment.Duration;
+	duration: string;
 	comparePeriod: ComparePeriod;
-	compareTimeInterval: TimeInterval;
+	compareTimeIntervalString: string;
 	compareSortingOrder: SortingOrder;
 	chartToRender: ChartTypes;
 	barStacking: boolean;
