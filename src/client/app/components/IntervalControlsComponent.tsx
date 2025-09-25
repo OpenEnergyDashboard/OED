@@ -103,7 +103,7 @@ export default function IntervalControlsComponent() {
 	// Handles change for compare period dropdown
 	const handleComparePeriodChange = (value: string) => {
 		const period = value as unknown as ComparePeriod;
-		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod: period, currentTime: moment() }));
+		dispatch(graphSlice.actions.updateComparePeriod({ comparePeriod: period, currentTime: moment().toString() }));
 	};
 
 	const comparePeriodTranslations: Record<keyof typeof ComparePeriod, string> = {

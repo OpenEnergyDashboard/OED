@@ -105,9 +105,10 @@ export const graphSlice = createSlice({
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderIntervalString = TimeInterval.unbounded().toString();
 		},
-		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
+		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: string }>) => {
 			state.current.comparePeriod = action.payload.comparePeriod;
-			state.current.compareTimeIntervalString = calculateCompareTimeInterval(action.payload.comparePeriod, action.payload.currentTime).toString();
+			state.current.compareTimeIntervalString =
+			calculateCompareTimeInterval(action.payload.comparePeriod, moment(action.payload.currentTime)).toString();
 		},
 		changeChartToRender: (state, action: PayloadAction<ChartTypes>) => {
 			state.current.chartToRender = action.payload;
