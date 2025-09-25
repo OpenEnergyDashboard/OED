@@ -89,6 +89,7 @@ async function createSchema(conn) {
 	const DaySegment = require('./DaySegment');
 	const Week = require('./Week');
 	const Cik = require('./Cik');
+	const CikVary = require('./CikVary');
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
@@ -103,6 +104,7 @@ async function createSchema(conn) {
 	await Conversion.createTable(conn);
 	await ConversionSegment.createTable(conn);
 	await Cik.createTable(conn);
+	await CikVary.createTable(conn);
 	await Meter.createMeterTypesEnum(conn);
 	// This sql code creates a function to check meter's timezone.
 	// It needs to be called before meter table is created.

@@ -326,6 +326,8 @@ class ConversionSegment {
 			});
 		});
 	}
+
+	
 }
 
 module.exports = ConversionSegment;
