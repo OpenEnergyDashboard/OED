@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PayloadAction, createAction, createSlice } from '@reduxjs/toolkit';
+import { PayloadAction, createAction, createSelector, createSlice } from '@reduxjs/toolkit';
 import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../../common/TimeInterval';
@@ -21,7 +21,7 @@ const defaultState: GraphState = {
 	selectedMap: 0,
 	lastAddedMeterOrGroup: undefined,
 	initialXAxisRangeString: TimeInterval.unbounded().toString(),
-	queryTimeInterval: TimeInterval.unbounded(),
+	queryTimeIntervalString: TimeInterval.unbounded().toString(),
 	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
@@ -87,7 +87,7 @@ export const graphSlice = createSlice({
 			state.current.duration = action.payload;
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.queryTimeInterval = action.payload;
+			state.current.queryTimeIntervalString = action.payload.toString();
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.shiftTimeInterval = action.payload;
@@ -99,7 +99,7 @@ export const graphSlice = createSlice({
 			state.current.rangeSliderIntervalString = action.payload.toString();
 		},
 		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.queryTimeInterval = action.payload;
+			state.current.queryTimeIntervalString = action.payload.toString();
 			state.current.rangeSliderIntervalString = action.payload.toString();
 		},
 		resetRangeSliderStack: state => {
@@ -164,8 +164,8 @@ export const graphSlice = createSlice({
 			// }
 		},
 		resetTimeInterval: state => {
-			if (!state.current.queryTimeInterval.equals(TimeInterval.unbounded())) {
-				state.current.queryTimeInterval = TimeInterval.unbounded();
+			if (!TimeInterval.fromString(state.current.queryTimeIntervalString).equals(TimeInterval.unbounded())) {
+				state.current.queryTimeIntervalString = TimeInterval.unbounded().toString();
 			}
 		},
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
@@ -284,7 +284,7 @@ export const graphSlice = createSlice({
 								current.threeD.readingInterval = parseInt(value);
 								break;
 							case 'serverRange':
-								current.queryTimeInterval = TimeInterval.fromString(value);
+								current.queryTimeIntervalString = value;
 								break;
 							case 'sliderRange':
 								current.rangeSliderIntervalString = value;
@@ -339,7 +339,7 @@ export const graphSlice = createSlice({
 		selectSelectedMeters: state => state.current.selectedMeters,
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
-		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectQueryTimeIntervalString: state => state.current.queryTimeIntervalString,
 		selectInitialXAxisRange: state => state.current.initialXAxisRangeString,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
@@ -353,7 +353,16 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
-		selectShiftTimeInterval: state => state.current.shiftTimeInterval
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
+
+		// Memoized selector(s) becuase creating new TimeInterval.fromString(), each execution leads to unnecessary re-renders
+		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
+		selectQueryTimeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.queryTimeIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
 	}
 });
 

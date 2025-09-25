@@ -84,7 +84,7 @@ export interface GraphState {
 	lineGraphRate: LineGraphRate;
 	showMinMax: boolean;
 	threeD: ThreeDState;
-	queryTimeInterval: TimeInterval;
+	queryTimeIntervalString: string;
 	hotlinked: boolean;
 	shiftAmount: ShiftAmount;
 	shiftTimeInterval: TimeInterval;

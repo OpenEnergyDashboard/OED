@@ -22,6 +22,7 @@ import { showInfoNotification, showWarnNotification } from '../utils/notificatio
 import { setHelpLayout } from './ThreeDComponent';
 import { toast } from 'react-toastify';
 import { useTranslate } from '../redux/componentHooks';
+import { TimeInterval } from '../../../common/TimeInterval';
 
 /**
  * @returns plotlyLine graphic
@@ -35,7 +36,7 @@ export default function CompareLineChartComponent() {
 	const shiftAmount = useAppSelector(selectShiftAmount);
 	const { args, shouldSkipQuery, argsDeps } = useAppSelector(selectCompareLineQueryArgs);
 	// getting the time interval of current data
-	const timeInterval = graphState.queryTimeInterval;
+	const timeInterval = TimeInterval.fromString(graphState.queryTimeIntervalString);
 	const shiftInterval = graphState.shiftTimeInterval;
 	// Layout for the plot
 	let layout = {};

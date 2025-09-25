@@ -476,7 +476,7 @@ export const selectChartLink = createAppSelector(
 		}
 		linkText += `chartType=${current.chartToRender}`;
 		// weeklyLink = linkText + '&serverRange=7dfp'; // dfp: days from present;
-		linkText += `&serverRange=${current.queryTimeInterval.toString()}`;
+		linkText += `&serverRange=${current.queryTimeIntervalString}`;
 		switch (current.chartToRender) {
 			case ChartTypes.bar:
 				linkText += `&duration=${current.duration.asDays()}`;
