@@ -90,7 +90,7 @@ export default function BarChartComponent() {
 
 	React.useEffect(() => {
 		if (minX && maxX) {
-			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX).toString()));
 		}
 	}, [minX, maxX]);
 

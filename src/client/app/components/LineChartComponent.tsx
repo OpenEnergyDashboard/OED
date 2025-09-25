@@ -93,7 +93,7 @@ export default function LineChartComponent() {
 
 	React.useEffect(() => {
 		if (minX && maxX) {
-			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX).toString()));
 		}
 	}, [minX, maxX]);
 

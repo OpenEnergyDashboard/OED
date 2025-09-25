@@ -106,8 +106,8 @@ export const RefreshGraphComponent = () => {
 			style={{ height: '25px', transform: `rotate(${time}deg)`, visibility: iconVisible ? 'visible' : 'hidden' }}
 			onClick={() => {
 				if (!somethingFetching) {
-					const minX = initialXAxisRange?.getStartTimestamp?.();
-					const maxX = initialXAxisRange?.getEndTimestamp?.();
+					const minX = TimeInterval.fromString(initialXAxisRange).getStartTimestamp();
+					const maxX = TimeInterval.fromString(initialXAxisRange).getEndTimestamp();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
 					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
 				}

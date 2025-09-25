@@ -20,7 +20,7 @@ const defaultState: GraphState = {
 	// TODO appropriate default value?
 	selectedMap: 0,
 	lastAddedMeterOrGroup: undefined,
-	initialXAxisRange: TimeInterval.unbounded(),
+	initialXAxisRangeString: TimeInterval.unbounded().toString(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
 	duration: moment.duration(4, 'weeks'),
@@ -171,8 +171,8 @@ export const graphSlice = createSlice({
 		setGraphState: (state, action: PayloadAction<GraphState>) => {
 			state.current = action.payload;
 		},
-		setInitialXAxisRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.initialXAxisRange = action.payload;
+		setInitialXAxisRange: (state, action: PayloadAction<string>) => {
+			state.current.initialXAxisRangeString = action.payload;
 		}
 
 	},
@@ -340,7 +340,7 @@ export const graphSlice = createSlice({
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
 		selectQueryTimeInterval: state => state.current.queryTimeInterval,
-		selectInitialXAxisRange: state => state.current.initialXAxisRange,
+		selectInitialXAxisRange: state => state.current.initialXAxisRangeString,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
