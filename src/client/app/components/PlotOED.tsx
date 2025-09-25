@@ -43,7 +43,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 				const startTS = moment.utc(e['xaxis.range[0]']);
 				const endTS = moment.utc(e['xaxis.range[1]']);
 				const workingTimeInterval = new TimeInterval(startTS, endTS);
-				dispatch(changeSliderRange(workingTimeInterval));
+				dispatch(changeSliderRange(workingTimeInterval.toString()));
 			}
 			else if (e['xaxis.range']) {
 				// this case is when the slider knobs are dragged.
@@ -51,7 +51,7 @@ export const PlotOED = (props: OEDPlotProps) => {
 				const startTS = range && range[0];
 				const endTS = range && range[1];
 				const interval = new TimeInterval(startTS, endTS);
-				dispatch(changeSliderRange(interval));
+				dispatch(changeSliderRange(interval.toString()));
 
 			}
 		}, 500, { leading: false, trailing: true });

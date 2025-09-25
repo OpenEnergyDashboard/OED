@@ -34,7 +34,7 @@ export default function LineChartComponent() {
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
 	// initial slider range
-	const sliderRangeIntervalString = useAppSelector(selectSliderRangeInterval);
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -124,8 +124,8 @@ export default function LineChartComponent() {
 					xaxis: {
 						rangeslider: { visible: true },
 						range: [
-							TimeInterval.fromString(sliderRangeIntervalString).getStartTimestamp()?.toISOString(),
-							TimeInterval.fromString(sliderRangeIntervalString).getEndTimestamp()?.toISOString()
+							sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()
 						],
 						showgrid: true,
 						gridcolor: '#ddd'

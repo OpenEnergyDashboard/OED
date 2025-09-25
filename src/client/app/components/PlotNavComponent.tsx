@@ -42,7 +42,7 @@ export const ExpandComponent = () => {
 	const dispatch = useAppDispatch();
 	return (
 		<img src='./expand.png' style={{ height: '25px' }}
-			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded())); }}
+			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded().toString())); }}
 		/>
 	);
 };
@@ -83,12 +83,12 @@ export const RefreshGraphComponent = () => {
 	 */
 	function getNextQueryTimeInterval(
 		prevQuery: TimeInterval,
-		slider: string,
+		slider: TimeInterval,
 		xAxisMin: moment.Moment | undefined,
 		xAxisMax: moment.Moment | undefined
 	): TimeInterval {
-		let start: moment.Moment | undefined = TimeInterval.fromString(slider).getStartTimestamp();
-		let end: moment.Moment | undefined = TimeInterval.fromString(slider).getEndTimestamp();
+		let start: moment.Moment | undefined = slider.getStartTimestamp();
+		let end: moment.Moment | undefined = slider.getEndTimestamp();
 
 		// If previous query was unbounded on the left and slider is at or before min, keep left unbounded
 		if (!prevQuery.getStartTimestamp() && start && xAxisMin && (start.isSameOrBefore(xAxisMin))) {
@@ -109,7 +109,7 @@ export const RefreshGraphComponent = () => {
 					const minX = TimeInterval.fromString(initialXAxisRange).getStartTimestamp();
 					const maxX = TimeInterval.fromString(initialXAxisRange).getEndTimestamp();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
-					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
+					dispatch(updateTimeIntervalAndSliderRange(nextInterval.toString()));
 				}
 			}}
 		/>

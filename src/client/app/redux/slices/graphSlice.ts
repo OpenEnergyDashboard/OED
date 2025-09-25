@@ -86,21 +86,21 @@ export const graphSlice = createSlice({
 		updateDuration: (state, action: PayloadAction<string>) => {
 			state.current.duration = action.payload;
 		},
-		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.queryTimeIntervalString = action.payload.toString();
+		updateTimeInterval: (state, action: PayloadAction<string>) => {
+			state.current.queryTimeIntervalString = action.payload;
 		},
-		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.shiftTimeIntervalString = action.payload.toString();
+		updateShiftTimeInterval: (state, action: PayloadAction<string>) => {
+			state.current.shiftTimeIntervalString = action.payload;
 		},
 		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
 			state.current.shiftAmount = action.payload;
 		},
-		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.rangeSliderIntervalString = action.payload.toString();
+		changeSliderRange: (state, action: PayloadAction<string>) => {
+			state.current.rangeSliderIntervalString = action.payload;
 		},
-		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.queryTimeIntervalString = action.payload.toString();
-			state.current.rangeSliderIntervalString = action.payload.toString();
+		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<string>) => {
+			state.current.queryTimeIntervalString = action.payload;
+			state.current.rangeSliderIntervalString = action.payload;
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderIntervalString = TimeInterval.unbounded().toString();
@@ -348,7 +348,6 @@ export const graphSlice = createSlice({
 		selectLastMeterOrGroup: state => state.current.lastAddedMeterOrGroup,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
-		selectSliderRangeInterval: state => state.current.rangeSliderIntervalString,
 		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
@@ -357,6 +356,12 @@ export const graphSlice = createSlice({
 		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
 		selectQueryTimeInterval: createSelector(
 			(sliceState: History<GraphState>) => sliceState.current.queryTimeIntervalString,
+			timeIntervalString => {
+				return TimeInterval.fromString(timeIntervalString);
+			}
+		),
+		selectSliderRangeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.rangeSliderIntervalString,
 			timeIntervalString => {
 				return TimeInterval.fromString(timeIntervalString);
 			}
