@@ -37,7 +37,7 @@ export default function CompareLineChartComponent() {
 	const { args, shouldSkipQuery, argsDeps } = useAppSelector(selectCompareLineQueryArgs);
 	// getting the time interval of current data
 	const timeInterval = TimeInterval.fromString(graphState.queryTimeIntervalString);
-	const shiftInterval = graphState.shiftTimeInterval;
+	const shiftInterval = TimeInterval.fromString(graphState.shiftTimeIntervalString);
 	// Layout for the plot
 	let layout = {};
 

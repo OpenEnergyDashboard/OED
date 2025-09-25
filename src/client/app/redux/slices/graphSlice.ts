@@ -39,7 +39,7 @@ const defaultState: GraphState = {
 	},
 	hotlinked: false,
 	shiftAmount: ShiftAmount.none,
-	shiftTimeInterval: TimeInterval.unbounded()
+	shiftTimeIntervalString: TimeInterval.unbounded().toString()
 };
 
 interface History<T> {
@@ -90,7 +90,7 @@ export const graphSlice = createSlice({
 			state.current.queryTimeIntervalString = action.payload.toString();
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.shiftTimeInterval = action.payload;
+			state.current.shiftTimeIntervalString = action.payload.toString();
 		},
 		updateShiftAmount: (state, action: PayloadAction<ShiftAmount>) => {
 			state.current.shiftAmount = action.payload;
@@ -296,7 +296,7 @@ export const graphSlice = createSlice({
 								current.shiftAmount = value as ShiftAmount;
 								break;
 							case 'shiftTimeInterval':
-								current.shiftTimeInterval = TimeInterval.fromString(value);
+								current.shiftTimeIntervalString = value;
 								break;
 						}
 					});
@@ -351,7 +351,6 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
-		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
 
 		// Memoized selector(s) becuase creating new TimeInterval.fromString(), each execution leads to unnecessary re-renders
 		// Avoids Saving Un-serializable objects (TimeIntervals) in store.
@@ -373,6 +372,12 @@ export const graphSlice = createSlice({
 				return TimeInterval.fromString(timeIntervalString);
 			}
 		),
+		selectShiftTimeInterval: createSelector(
+			(sliceState: History<GraphState>) => sliceState.current.shiftTimeIntervalString,
+			shiftIntervalString => {
+				return TimeInterval.fromString(shiftIntervalString);
+			}
+		)
 	}
 });
 

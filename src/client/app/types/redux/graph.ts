@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { ComparePeriod, SortingOrder } from '../../utils/calculateCompare';
-import { TimeInterval } from '../../../../common/TimeInterval';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 
 export enum ChartTypes {
@@ -86,5 +85,5 @@ export interface GraphState {
 	queryTimeIntervalString: string;
 	hotlinked: boolean;
 	shiftAmount: ShiftAmount;
-	shiftTimeInterval: TimeInterval;
+	shiftTimeIntervalString: string;
 }

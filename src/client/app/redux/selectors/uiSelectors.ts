@@ -503,7 +503,7 @@ export const selectChartLink = createAppSelector(
 				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
 				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
 				linkText += `&shiftAmount=${current.shiftAmount}`;
-				current.shiftAmount === ShiftAmount.custom && (linkText += `&shiftTimeInterval=${current.shiftTimeInterval}`);
+				current.shiftAmount === ShiftAmount.custom && (linkText += `&shiftTimeInterval=${current.shiftTimeIntervalString}`);
 				break;
 		}
 		const unitID = current.selectedUnit;
