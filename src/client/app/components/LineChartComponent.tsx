@@ -34,7 +34,7 @@ export default function LineChartComponent() {
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
 	// initial slider range
-	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
+	const sliderRangeIntervalString = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -123,8 +123,10 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [
+							TimeInterval.fromString(sliderRangeIntervalString).getStartTimestamp()?.toISOString(),
+							TimeInterval.fromString(sliderRangeIntervalString).getEndTimestamp()?.toISOString()
+						],
 						showgrid: true,
 						gridcolor: '#ddd'
 					}
@@ -155,7 +157,7 @@ export default function LineChartComponent() {
 							const startTS = utc(e['xaxis.range[0]']);
 							const endTS = utc(e['xaxis.range[1]']);
 							const workingTimeInterval = new TimeInterval(startTS, endTS);
-							dispatch(updateSliderRange(workingTimeInterval));
+							dispatch(updateSliderRange(workingTimeInterval.toString()));
 						}
 						else if (e['xaxis.range']) {
 							// this case is when the slider knobs are dragged.
@@ -163,7 +165,7 @@ export default function LineChartComponent() {
 							const startTS = range && range[0];
 							const endTS = range && range[1];
 							const interval = new TimeInterval(utc(startTS), utc(endTS));
-							dispatch(updateSliderRange(interval));
+							dispatch(updateSliderRange(interval.toString()));
 
 						}
 					}, 500, { leading: false, trailing: true })

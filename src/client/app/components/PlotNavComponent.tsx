@@ -83,12 +83,12 @@ export const RefreshGraphComponent = () => {
 	 */
 	function getNextQueryTimeInterval(
 		prevQuery: TimeInterval,
-		slider: TimeInterval,
+		slider: string,
 		xAxisMin: moment.Moment | undefined,
 		xAxisMax: moment.Moment | undefined
 	): TimeInterval {
-		let start: moment.Moment | undefined = slider.getStartTimestamp();
-		let end: moment.Moment | undefined = slider.getEndTimestamp();
+		let start: moment.Moment | undefined = TimeInterval.fromString(slider).getStartTimestamp();
+		let end: moment.Moment | undefined = TimeInterval.fromString(slider).getEndTimestamp();
 
 		// If previous query was unbounded on the left and slider is at or before min, keep left unbounded
 		if (!prevQuery.getStartTimestamp() && start && xAxisMin && (start.isSameOrBefore(xAxisMin))) {

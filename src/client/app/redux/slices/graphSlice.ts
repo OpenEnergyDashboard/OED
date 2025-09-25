@@ -22,7 +22,7 @@ const defaultState: GraphState = {
 	lastAddedMeterOrGroup: undefined,
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
-	rangeSliderInterval: TimeInterval.unbounded(),
+	rangeSliderIntervalString: TimeInterval.unbounded().toString(),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
@@ -96,14 +96,14 @@ export const graphSlice = createSlice({
 			state.current.shiftAmount = action.payload;
 		},
 		changeSliderRange: (state, action: PayloadAction<TimeInterval>) => {
-			state.current.rangeSliderInterval = action.payload;
+			state.current.rangeSliderIntervalString = action.payload.toString();
 		},
 		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.queryTimeInterval = action.payload;
-			state.current.rangeSliderInterval = action.payload;
+			state.current.rangeSliderIntervalString = action.payload.toString();
 		},
 		resetRangeSliderStack: state => {
-			state.current.rangeSliderInterval = TimeInterval.unbounded();
+			state.current.rangeSliderIntervalString = TimeInterval.unbounded().toString();
 		},
 		updateComparePeriod: (state, action: PayloadAction<{ comparePeriod: ComparePeriod, currentTime: moment.Moment }>) => {
 			state.current.comparePeriod = action.payload.comparePeriod;
@@ -222,7 +222,7 @@ export const graphSlice = createSlice({
 			.addCase(
 				updateSliderRange,
 				(state, { payload }) => {
-					state.current.rangeSliderInterval = payload;
+					state.current.rangeSliderIntervalString = payload;
 				}
 			)
 			.addCase(
@@ -287,7 +287,7 @@ export const graphSlice = createSlice({
 								current.queryTimeInterval = TimeInterval.fromString(value);
 								break;
 							case 'sliderRange':
-								current.rangeSliderInterval = TimeInterval.fromString(value);
+								current.rangeSliderIntervalString = value;
 								break;
 							case 'unitID':
 								current.selectedUnit = parseInt(value);
@@ -349,9 +349,9 @@ export const graphSlice = createSlice({
 		selectLastMeterOrGroup: state => state.current.lastAddedMeterOrGroup,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
-		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
-		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
-		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
+		selectSliderRangeInterval: state => state.current.rangeSliderIntervalString,
+		selectPlotlySliderMin: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getStartTimestamp()?.utc().toDate().toISOString(),
+		selectPlotlySliderMax: state => TimeInterval.fromString(state.current.rangeSliderIntervalString).getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
 		selectShiftTimeInterval: state => state.current.shiftTimeInterval
 	}
@@ -404,5 +404,5 @@ export const historyStepForward = createAction('graph/historyStepForward');
 export const updateHistory = createAction<GraphState>('graph/updateHistory');
 export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
 export const clearGraphHistory = createAction('graph/clearHistory');
-export const updateSliderRange = createAction<TimeInterval>('graph/UpdateSliderRange');
+export const updateSliderRange = createAction<string>('graph/UpdateSliderRange');
 export const setGraphSliceState = createAction<History<GraphState>>('graph/SetGraphSliceState');
