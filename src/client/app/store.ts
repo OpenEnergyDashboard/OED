@@ -12,6 +12,9 @@ import { rootReducer } from './redux/rootReducer';
 export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
+		// These used to be needed since the OED code was violating rules.
+		// They should generally pass now so should not be turned off again.
+		// TODO Remove in the future so old turnoff code is gone.
 		// immutableCheck: false,
 		// serializableCheck: false
 	}).prepend(listenerMiddleware.middleware)
