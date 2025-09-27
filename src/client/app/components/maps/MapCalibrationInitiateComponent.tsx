@@ -11,6 +11,7 @@ import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
+import { titleStyle } from '../../styles/modalStyle';
 
 /**
  * Accepts image file from user upload,
@@ -154,27 +155,36 @@ export default function MapCalibrationInitiateComponent() {
 
 	return (
 		<form onSubmit={confirmUpload}>
-			<label>
+			<h2 style={titleStyle}>
 				<FormattedMessage id='map.new.upload' />
-				<br />
+				{/* TODO Add tooltip info */}
+				{/* <div style={tooltipStyle}>
+					<TooltipMarkerComponent page='units' helpTextId={tooltipStyle.tooltipUnitView} />
+				</div> */}
+			</h2>
+			<div>
+				<h4>
+					<FormattedMessage id='map.image' />
+				</h4>
 				<input type='file' ref={fileRef} />
-			</label>
-			<br />
-			<label>
-				<FormattedMessage id='map.new.name' />
-				<br />
+			</div>
+			<div>
+				<h4>
+					<FormattedMessage id='map.new.name' />
+				</h4>
 				<textarea id={'text'} cols={50} value={mapName} onChange={handleNameInput} />
-			</label>
-			<br />
-			<label>
-				<FormattedMessage id='map.new.angle' />
-				<br />
+			</div>
+			<div>
+				<h4>
+					<FormattedMessage id='map.new.angle' />
+				</h4>
 				<input type='text' value={angle} onChange={handleAngleInput} />
-			</label>
-			<br />
-			<FormattedMessage id='map.new.submit'>
-				{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
-			</FormattedMessage>
+			</div>
+			<div style={{padding: '15px 0'}}>
+				<FormattedMessage id='map.new.submit'>
+					{placeholder => <input type='submit' value={(placeholder !== null && placeholder !== undefined) ? placeholder.toString() : 'undefined'} />}
+				</FormattedMessage>
+			</div>
 		</form>
 	);
 }
