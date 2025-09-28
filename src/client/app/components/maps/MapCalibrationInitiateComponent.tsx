@@ -46,7 +46,7 @@ export default function MapCalibrationInitiateComponent() {
 	const fileRef = React.useRef<HTMLInputElement>(null);
 	const mapData = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, localEditsSlice.selectors.selectCalibrationMapId(state)));
 
-	const notify = (key: 'map.bad.number' | 'map.bad.digita' | 'map.bad.digitb' | 'map.bad.load' | 'map.bad.name') => {
+	const notify = (key: 'map.bad.number' | 'map.bad.360' | 'map.bad.0' | 'map.bad.load' | 'map.bad.name') => {
 		showErrorNotification(translate(key));
 	};
 	const confirmUpload = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -74,11 +74,11 @@ export default function MapCalibrationInitiateComponent() {
 		}
 		else {
 			if (parseFloat(angle) > 360) {
-				notify('map.bad.digita');
+				notify('map.bad.360');
 				return false;
 			}
 			else if (parseFloat(angle) < 0) {
-				notify('map.bad.digitb');
+				notify('map.bad.0');
 				return false;
 			}
 			else {

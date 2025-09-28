@@ -5,31 +5,40 @@
 import * as React from 'react';
 import { ChangeEvent, FormEvent } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { logsApi } from '../../redux/api/logApi';
 import { mapsApi } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
-import { localEditsSlice } from '../../redux/slices/localEditsSlice';
+import { localEditsSlice, MIN_POINT_MAP_CALIBRATION  } from '../../redux/slices/localEditsSlice';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { Button } from 'reactstrap';
+import { showErrorNotification } from '../../utils/notifications';
 
 /**
  * @returns TODO DO ME
  */
 export default function MapCalibrationInfoDisplayComponent() {
+	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const [createNewMap] = mapsApi.useCreateMapMutation();
 	const [editMap] = mapsApi.useEditMapMutation();
-	const translate = useTranslate();
-	const [logToServer] = logsApi.useLogToServerMutation();
 	const [value, setValue] = React.useState<string>('');
 	const showGrid = useAppSelector(state => state.localEdits.calibrationSettings.showGrid);
 	const mapData = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, state.localEdits.calibratingMap));
-	const resultDisplay = (mapData.calibrationResult)
-		? `x: ${mapData.calibrationResult.maxError.x}%, y: ${mapData.calibrationResult.maxError.y}%`
-		: translate('need.more.points');
+
+	// Disable save if calibration incomplete.
+	let noSave = false;
+	let numPointsNeeded = 0;
+	if (!mapData.calibrationResult) {
+		noSave = true;
+		numPointsNeeded = MIN_POINT_MAP_CALIBRATION - mapData.calibrationSet.length;
+	}
+	const resultDisplay = (noSave)
+		// TS thinks mapData.calibrationResult can be undefined so added ?. noSave should protect against this.
+		? ' ' + numPointsNeeded + translate('need.more.points')
+		: ` x: ${mapData.calibrationResult?.maxError.x}%, y: ${mapData.calibrationResult?.maxError.y}%`;
 	const cartesianDisplay = (mapData.currentPoint)
 		? `x: ${mapData.currentPoint.cartesian.x}, y: ${mapData.currentPoint.cartesian.y}`
-		: translate('undefined');
+		: translate('map.need.click.point');
 
 	const handleGridDisplay = () => { dispatch(localEditsSlice.actions.toggleMapShowGrid()); };
 
@@ -39,7 +48,8 @@ export default function MapCalibrationInfoDisplayComponent() {
 		event.preventDefault();
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
-		if (cartesianDisplay === 'x: undefined, y: undefined') {
+		if (!mapData.currentPoint) {
+			showErrorNotification(translate('map.no.gps'));
 			return;
 		}
 		const input = value;
@@ -54,7 +64,8 @@ export default function MapCalibrationInfoDisplayComponent() {
 			dispatch(localEditsSlice.actions.offerCurrentGPS(gps));
 			resetInputField();
 		} else {
-			logToServer({ level: 'info', message: `refused data point with invalid input: ${input} and error of "${message}"` });
+			const msg = translate('map.no.save') + message;
+			showErrorNotification(msg);
 		}
 	};
 
@@ -65,15 +76,13 @@ export default function MapCalibrationInfoDisplayComponent() {
 	};
 
 	const handleChanges = () => {
-		console.log('MapID: ', mapData.id);
-
 		if (mapData.id < 0) {
 			createNewMap(mapData);
 		} else {
 			editMap(mapData);
 		}
 	};
-	const calibrationDisplay = `${resultDisplay}`;
+
 	return (
 		<div>
 			<div className='checkbox'>
@@ -82,31 +91,56 @@ export default function MapCalibrationInfoDisplayComponent() {
 				</label>
 			</div>
 			<div id='UserInput'>
+				{/* When this is fully converted to the more standard OED input methods, the button, text, etc. will look OED normal. */}
 				<form onSubmit={handleSubmit}>
+					{/* top & bottom padding */}
+					<div style={{ padding: '15px 0 0 0' }}>
+						<FormattedMessage id='calibration.display'>
+							{intlResult => <p>{intlResult.toString()}{resultDisplay}</p>}
+						</FormattedMessage>
+					</div>
 					<label>
-						<FormattedMessage id='input.gps.coords.first' /> {cartesianDisplay}
-						<br />
-						<FormattedMessage id='input.gps.coords.second' />
-						<br />
+						<div>
+							<FormattedMessage id='input.gps.coords.first' />
+						</div>
+						<div>
+							{cartesianDisplay}
+						</div>
+						{/* bottom padding */}
+						<div style={{ padding: '0 0 5px 0' }} >
+							{translate('input.gps.coords.second') + '"' + translate('calibration.submit.button') + '".'}
+						</div>
 						<textarea id={'text'} cols={50} value={value} onChange={handleGPSInput} />
 					</label>
-					<br />
-					<FormattedMessage id='calibration.submit.button'>
-						{intlSubmitText => <input type={'submit'} value={intlSubmitText.toString()} />}
-					</FormattedMessage>
+					{/* top & bottom padding */}
+					<div style={{ padding: '5px 0 15px 0' }}>
+						<FormattedMessage id='calibration.submit.button'>
+							{intlSubmitText => <input type={'submit'} value={intlSubmitText.toString()} />}
+						</FormattedMessage>
+					</div>
 				</form>
-				<FormattedMessage id='calibration.reset.button'>
-					{intlResetButton => <button onClick={dropCurrentCalibration}>{intlResetButton.toString()}</button>}
-				</FormattedMessage>
-				<FormattedMessage id='calibration.save.database'>
-					{intlSaveChanges => <button onClick={handleChanges}>{intlSaveChanges.toString()}</button>}
-				</FormattedMessage>
-				<FormattedMessage id='calibration.display'>
-					{intlResult => <p>{intlResult.toString()}{calibrationDisplay}</p>}
-				</FormattedMessage>
+				{/* bottom & right padding */}
+				<div style={{ padding: '0  45px 15px 0' }}>
+					{/* <FormattedMessage id='calibration.reset.button'>
+						{intlResetButton => <button onClick={dropCurrentCalibration}>{intlResetButton.toString()}</button>}
+					</FormattedMessage> */}
+
+					<Button color="primary" style={{ margin: '0 45px 0 0' }} onClick={dropCurrentCalibration}>
+						<FormattedMessage id="calibration.reset.button" />
+					</Button>
+					{/* This is a hack to put space between the buttons. */}
+					{/* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
+					{/* This is the original code. I'm unclear on the advantages to how it is done elsewhere in OED.
+						Also, I could not get the disable to work so switched to a reactstrap Button. 
+						To be consistent, I did for all of them. */}
+					{/* <FormattedMessage id='calibration.save.database'>
+						{intlSaveChanges => <button onClick={handleChanges}>{intlSaveChanges.toString()}</button>}
+					</FormattedMessage> */}
+					<Button color="primary" onClick={handleChanges} disabled={noSave}>
+						<FormattedMessage id="calibration.save.database" />
+					</Button>
+				</div>
 			</div>
-		</div>
+		</div >
 	);
-
 }
-

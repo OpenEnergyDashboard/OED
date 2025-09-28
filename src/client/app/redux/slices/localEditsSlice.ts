@@ -7,6 +7,9 @@ import { createThunkSlice } from '../../redux/sliceCreators';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { calibrate, CalibratedPoint, CartesianPoint, GPSPoint } from '../../utils/calibration';
 
+// Minimum umber of points need for map calibration.
+export const MIN_POINT_MAP_CALIBRATION = 3;
+
 const localEditAdapter = createEntityAdapter<MapMetadata>();
 const localSelectors = localEditAdapter.getSelectors();
 export const localEditsSlice = createThunkSlice({
@@ -17,7 +20,7 @@ export const localEditsSlice = createThunkSlice({
 		calibratingMap: 0,
 		newMapIdCounter: 0,
 		calibrationSettings: {
-			calibrationThreshold: 3,
+			calibrationThreshold: MIN_POINT_MAP_CALIBRATION,
 			showGrid: false
 		}
 	},
