@@ -88,6 +88,14 @@ export const localEditsSlice = createThunkSlice({
 					calibrationSet: []
 				}
 			});
+		}),
+		resetCurrentPoint: create.reducer<number>((state, { payload }) => {
+			localEditAdapter.updateOne(state.mapEdits, {
+				id: payload,
+				changes: {
+					currentPoint: undefined
+				}
+			});
 		})
 	}),
 

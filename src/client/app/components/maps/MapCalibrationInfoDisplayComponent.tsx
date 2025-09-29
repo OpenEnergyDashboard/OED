@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { mapsApi } from '../../redux/api/mapsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
-import { localEditsSlice, MIN_POINT_MAP_CALIBRATION  } from '../../redux/slices/localEditsSlice';
+import { localEditsSlice, MIN_POINT_MAP_CALIBRATION } from '../../redux/slices/localEditsSlice';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { Button } from 'reactstrap';
 import { showErrorNotification } from '../../utils/notifications';
@@ -42,7 +42,12 @@ export default function MapCalibrationInfoDisplayComponent() {
 
 	const handleGridDisplay = () => { dispatch(localEditsSlice.actions.toggleMapShowGrid()); };
 
-	const resetInputField = () => setValue('');
+	const resetInputField = () => {
+		// Remove GPS value.
+		setValue('');
+		// Remove point clicked.
+		dispatch(localEditsSlice.actions.resetCurrentPoint(mapData.id));
+	};
 
 	const handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
@@ -93,7 +98,8 @@ export default function MapCalibrationInfoDisplayComponent() {
 			<div id='UserInput'>
 				{/* When this is fully converted to the more standard OED input methods, the button, text, etc. will look OED normal. */}
 				<form onSubmit={handleSubmit}>
-					{/* top & bottom padding */}
+					{/* Status of the calibration. Either # points needed or accuracy result. */}
+					{/* top padding */}
 					<div style={{ padding: '15px 0 0 0' }}>
 						<FormattedMessage id='calibration.display'>
 							{intlResult => <p>{intlResult.toString()}{resultDisplay}</p>}
@@ -103,6 +109,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 						<div>
 							<FormattedMessage id='input.gps.coords.first' />
 						</div>
+						{/* The point clicked or empty if none. */}
 						<div>
 							{cartesianDisplay}
 						</div>
@@ -119,7 +126,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 						</FormattedMessage>
 					</div>
 				</form>
-				{/* bottom & right padding */}
+				{/*  right & bottom padding */}
 				<div style={{ padding: '0  45px 15px 0' }}>
 					{/* <FormattedMessage id='calibration.reset.button'>
 						{intlResetButton => <button onClick={dropCurrentCalibration}>{intlResetButton.toString()}</button>}

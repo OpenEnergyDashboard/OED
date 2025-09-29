@@ -20,7 +20,6 @@ export const MapCalibrationComponent = () => {
 		const data = localEditsSlice.selectors.selectLocalEdit(state, mapToCalibrate);
 		return data?.calibrationMode ?? CalibrationModeTypes.unavailable;
 	});
-	console.log(calibrationMode);
 	if (calibrationMode === CalibrationModeTypes.initiate) {
 		return (
 			<div className='container-fluid'>
