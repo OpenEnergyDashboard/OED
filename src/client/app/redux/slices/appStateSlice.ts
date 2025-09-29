@@ -115,8 +115,10 @@ export const appStateSlice = createThunkSlice({
 	extraReducers: builder => {
 		builder
 			.addCase(processGraphLink, (state, { payload }) => {
-				if (payload.has('optionsVisibility')) {
-					state.optionsVisibility = payload.get('optionsVisibility') === 'true';
+				// Convert the string passed back into a normal URLSearchParams object for processing.
+				const payloadSearchParams = new URLSearchParams(payload);
+				if (payloadSearchParams.has('optionsVisibility')) {
+					state.optionsVisibility = payloadSearchParams.get('optionsVisibility') === 'true';
 				}
 			})
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => {

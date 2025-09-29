@@ -230,7 +230,9 @@ export const graphSlice = createSlice({
 				processGraphLink,
 				({ current }, { payload }) => {
 					current.hotlinked = true;
-					payload.forEach((value, key) => {
+					// Convert the string passed back into a normal URLSearchParams object for processing.
+					const payloadSearchParams = new URLSearchParams(payload);
+					payloadSearchParams.forEach((value, key) => {
 						// TODO Needs to be refactored into a single dispatch/reducer pair.
 						// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
 						// TODO validation could be implemented across all cases similar to compare period and sorting order
@@ -432,7 +434,8 @@ export const {
 export const historyStepBack = createAction('graph/historyStepBack');
 export const historyStepForward = createAction('graph/historyStepForward');
 export const updateHistory = createAction<GraphState>('graph/updateHistory');
-export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
+// export const processGraphLink = createAction<URLSearchParams>('graph/graphLink');
+export const processGraphLink = createAction<string>('graph/graphLink');
 export const clearGraphHistory = createAction('graph/clearHistory');
 export const updateSliderRange = createAction<string>('graph/UpdateSliderRange');
 export const setGraphSliceState = createAction<History<GraphState>>('graph/SetGraphSliceState');
