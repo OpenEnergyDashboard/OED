@@ -12,6 +12,7 @@ import { localEditsSlice, MIN_POINT_MAP_CALIBRATION } from '../../redux/slices/l
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { Button } from 'reactstrap';
 import { showErrorNotification } from '../../utils/notifications';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * @returns TODO DO ME
@@ -19,6 +20,7 @@ import { showErrorNotification } from '../../utils/notifications';
 export default function MapCalibrationInfoDisplayComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 	const [createNewMap] = mapsApi.useCreateMapMutation();
 	const [editMap] = mapsApi.useEditMapMutation();
 	const [value, setValue] = React.useState<string>('');
@@ -86,6 +88,11 @@ export default function MapCalibrationInfoDisplayComponent() {
 		} else {
 			editMap(mapData);
 		}
+		// src/client/app/redux/api/mapsApi.ts is handling the unwrap of the Toolkit calls so it is
+		// Dealing with success/failure along with messages. Thus, after saving changes, the user is
+		// redirected back to the main maps page whether there is an error or not. This seems okay as
+		// one cannot easily recover from the issue.
+		navigate('/maps');
 	};
 
 	return (
@@ -109,7 +116,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 						<div>
 							<FormattedMessage id='input.gps.coords.first' />
 						</div>
-						{/* The point clicked or empty if none. */}
+						{/* The point clicked or message to click if none. */}
 						<div>
 							{cartesianDisplay}
 						</div>
@@ -135,8 +142,6 @@ export default function MapCalibrationInfoDisplayComponent() {
 					<Button color="primary" style={{ margin: '0 45px 0 0' }} onClick={dropCurrentCalibration}>
 						<FormattedMessage id="calibration.reset.button" />
 					</Button>
-					{/* This is a hack to put space between the buttons. */}
-					{/* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
 					{/* This is the original code. I'm unclear on the advantages to how it is done elsewhere in OED.
 						Also, I could not get the disable to work so switched to a reactstrap Button.
 						To be consistent, I did for all of them. */}

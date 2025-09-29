@@ -63,6 +63,11 @@ export const mapsApi = baseApi.injectEndpoints({
 				api.queryFulfilled
 					// TODO Serverlogs migrate to rtk Query to drop axios?
 					// Requires dispatch so inconvenient
+					// TODO src/client/app/components/maps/MapCalibrationInfoDisplayComponent.tsx would deal
+					// with errors if done as most places in OED. Doing it here is nice since it centralizes
+					// handling and showing messages. However, that component does not know (for now) if it
+					// was a success of failure so cannot change what it does based on that. Overall, OED
+					// needs to decide which way to do error handling and be consistent across the code base.
 					.then(() => {
 						if (map.calibrationResult) {
 							// logToServer('info', 'New calibrated map uploaded to database');
@@ -71,10 +76,11 @@ export const mapsApi = baseApi.injectEndpoints({
 							// logToServer('info', 'New map uploaded to database(without calibration)');
 							showSuccessNotification(translate('upload.new.map.without.calibration'));
 						}
-						// TODO DELETE ME
-						// api.dispatch(localEditsSlice.actions.removeOneEdit({ type: EntityType.MAP, id: map.id }));
-					}).catch(() => {
-						showErrorNotification(translate('failed.to.edit.map'));
+					}).catch(err => {
+						// TODO It isn't clear that getting the error this was is best and it will find
+						// the error string for all errors.
+						const msg = translate('failed.to.edit.map') + err.error.data.error;
+						showErrorNotification(msg);
 					});
 			},
 			invalidatesTags: ['MapsData']
