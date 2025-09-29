@@ -37,7 +37,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	return (
 		<div className="card">
 			<div className="identifier-container">
-				{`${mapToDisplay.name}:${localEditMap ? ' (Unsaved Edits)' : ''}`}
+				{`${mapToDisplay.name} ${localEditMap ? ': (Unsaved Edits)' : ''}`}
 			</div>
 			<div className={mapToDisplay.displayable.toString()}>
 				<b><FormattedMessage id="map.displayable" /></b> {translate(`TrueFalseType.${mapToDisplay.displayable.toString()}`)}
