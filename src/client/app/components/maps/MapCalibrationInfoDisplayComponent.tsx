@@ -138,7 +138,7 @@ export default function MapCalibrationInfoDisplayComponent() {
 					{/* This is a hack to put space between the buttons. */}
 					{/* &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
 					{/* This is the original code. I'm unclear on the advantages to how it is done elsewhere in OED.
-						Also, I could not get the disable to work so switched to a reactstrap Button. 
+						Also, I could not get the disable to work so switched to a reactstrap Button.
 						To be consistent, I did for all of them. */}
 					{/* <FormattedMessage id='calibration.save.database'>
 						{intlSaveChanges => <button onClick={handleChanges}>{intlSaveChanges.toString()}</button>}

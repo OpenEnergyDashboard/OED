@@ -46,7 +46,7 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 				<b><FormattedMessage id="map.circle.size" /></b> {mapToDisplay.circleSize}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="note" /></b> {mapToDisplay.note ? mapToDisplay.note.slice(0, 29) + ' ...' : ''}
+				<b><FormattedMessage id="note" /></b> {mapToDisplay.note ? mapToDisplay.note.slice(0, 25) + (mapToDisplay.note.length > 25 ? ' ...' : '') : ''}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.filename" /></b> {mapToDisplay.filename}
