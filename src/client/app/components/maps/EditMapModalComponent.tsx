@@ -15,6 +15,7 @@ import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import { TrueFalseType } from '../../types/items';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 
 interface EditMapModalProps {
 	map: MapMetadata;
@@ -65,12 +66,34 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 		handleClose();
 	};
 
+	/* Confirm Delete Modal */
+	// Separate from state comment to keep everything related to the warning confirmation modal together
+	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+	const deleteConfirmationMessage = translate('map.confirm.remove') + ' "' + map.name + '" ?';
+	const deleteConfirmText = translate('map.confirm.remove');
+	const deleteRejectText = translate('cancel');
+	// The first two handle functions below are required because only one Modal can be open at a time (properly)
+	const handleDeleteConfirmationModalClose = () => {
+		// Hide the warning modal
+		setShowDeleteConfirmationModal(false);
+		// Show the edit modal
+		handleShow();
+	};
+	const handleDeleteConfirmationModalOpen = () => {
+		// Hide the edit modal
+		handleClose();
+		// Show the warning modal
+		setShowDeleteConfirmationModal(true);
+	};
+
+	/* End Confirm Delete Modal */
+
 	const handleDelete = () => {
-		const consent = window.confirm(intl.formatMessage({ id: 'map.confirm.remove' }, { name: map.name }));
-		if (consent) {
-			deleteMap(map.id);
-			handleClose();
-		}
+		// Closes the warning modal
+		// Do not call the handler function because we do not want to open the parent modal
+		setShowDeleteConfirmationModal(false);
+		deleteMap(map.id);
+		handleClose();
 	};
 
 	const handleCalibrationSetting = (mode: CalibrationModeTypes) => {
@@ -95,6 +118,13 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 					<FormattedMessage id="edit.map" />
 				</Button>
 			</div>
+			<ConfirmActionModalComponent
+				show={showDeleteConfirmationModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleDeleteConfirmationModalClose}
+				actionFunction={handleDelete}
+				actionConfirmText={deleteConfirmText}
+				actionRejectText={deleteRejectText} />
 			<Modal isOpen={showModal} toggle={handleClose}>
 				<ModalHeader toggle={handleClose}>
 					<FormattedMessage id="edit.map" />
@@ -176,7 +206,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 					</div>
 				</ModalBody>
 				<ModalFooter>
-					<Button color="danger" onClick={handleDelete}>
+					<Button color="danger" onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="delete.map" />
 					</Button>
 					<Button color="secondary" onClick={handleClose}>
