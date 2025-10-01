@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { MapDataState, mapsAdapter, mapsInitialState } from '../../redux/entityAdapters';
 import { createAppSelector } from '../../redux/selectors/selectors';
 import { setGraphSliceState } from '../../redux/slices/graphSlice';
-import { emtpyMapMetadata, localEditsSlice } from '../../redux/slices/localEditsSlice';
+import { emptyMapMetadata, localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { RootState } from '../../store';
 import { MapData, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
@@ -19,10 +19,10 @@ const mapResponseImgSrcToDimensions = (response: MapMetadata[]) => Promise.all(
 		new Promise<MapMetadata>(resolve => {
 			const img = new Image();
 			img.onload = () => {
-				resolve({ ...emtpyMapMetadata, ...mapData, imgWidth: img.width, imgHeight: img.height });
+				resolve({ ...emptyMapMetadata, ...mapData, imgWidth: img.width, imgHeight: img.height });
 			};
 			img.onerror = () => {
-				resolve({ ...emtpyMapMetadata, ...mapData });
+				resolve({ ...emptyMapMetadata, ...mapData });
 			};
 			img.src = mapData.mapSource;
 		})

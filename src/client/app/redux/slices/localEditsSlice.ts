@@ -48,7 +48,7 @@ export const localEditsSlice = createThunkSlice({
 			state.newMapIdCounter = state.newMapIdCounter + 1;
 			const temporaryID = state.newMapIdCounter * -1;
 			state.calibratingMap = temporaryID;
-			localEditAdapter.setOne(state.mapEdits, { ...emtpyMapMetadata, id: temporaryID });
+			localEditAdapter.setOne(state.mapEdits, { ...emptyMapMetadata, id: temporaryID });
 		}),
 		offerCurrentGPS: create.reducer<GPSPoint>((state, { payload }) => {
 			// Stripped offerCurrentGPS thunk into a single reducer for simplicity. The only missing functionality are the serverlogs
@@ -104,7 +104,7 @@ export const localEditsSlice = createThunkSlice({
 		selectLocalEdit: (state, id: number) => localSelectors.selectById(state.mapEdits, id)
 	}
 });
-export const emtpyMapMetadata: MapMetadata = {
+export const emptyMapMetadata: MapMetadata = {
 	id: 0,
 	name: '',
 	displayable: false,
