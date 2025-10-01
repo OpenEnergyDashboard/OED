@@ -34,7 +34,6 @@ export default function MapsDetailComponent() {
 						<TooltipMarkerComponent page='maps' helpTextId='help.admin.mapview' />
 					</div>
 				</h2>
-				{ /* TODO: Change Link to <CreateMapModalComponent /> when it is completed */}
 				<div className="edit-btn">
 					<Link to='/calibration' onClick={() => dispatch(localEditsSlice.actions.createNewMap())}>
 						<Button color='primary'>
