@@ -7,7 +7,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Link } from 'react-router-dom';
-import { Button, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { mapsApi, selectMapById } from '../../redux/api/mapsApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
@@ -165,8 +165,13 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 								onChange={e => setCircleInput(parseFloat(e.target.value))}
 								invalid={!circIsValid}
 								step={0.1}
+								min={0}
+								max={2}
 								onBlur={toggleCircleEdit}
 							/>
+							<FormFeedback>
+								<FormattedMessage id="error.bounds" values={{ min: 0, max: 2 }} />
+							</FormFeedback>
 						</FormGroup>
 						<FormGroup>
 							<Label for="mapNote"><FormattedMessage id="note" /></Label>
