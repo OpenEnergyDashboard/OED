@@ -24,15 +24,17 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 	// Use local data first, if any
 	const mapToDisplay = localEditMap ?? apiMap;
 
+	// TODO This is not used now since a map must be calibrated. Decide if this is permanently
+	// gone or want to all uncalibrated.
 	// Helper function checks map to see if it's calibrated
-	const getCalibrationStatus = () => {
-		const isCalibrated = mapToDisplay.origin && mapToDisplay.opposite;
-		return {
-			color: isCalibrated ? 'black' : 'gray',
-			messageId: isCalibrated ? 'map.is.calibrated' : 'map.is.not.calibrated'
-		};
-	};
-	const { color, messageId } = getCalibrationStatus();
+	// const getCalibrationStatus = () => {
+	// 	const isCalibrated = mapToDisplay.origin && mapToDisplay.opposite;
+	// 	return {
+	// 		color: isCalibrated ? 'black' : 'gray',
+	// 		messageId: isCalibrated ? 'map.is.calibrated' : 'map.is.not.calibrated'
+	// 	};
+	// };
+	// const { color, messageId } = getCalibrationStatus();
 
 	return (
 		<div className="card">
@@ -56,12 +58,13 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 				{/* TODO I don't think this will properly internationalize. */}
 				{parseZone(apiMap.modifiedDate, undefined, true).format('dddd, MMM DD, YYYY hh:mm a')}
 			</div>
-			<div className="item-container">
+			{/* TODO See above about calibration. */}
+			{/* <div className="item-container">
 				<b><FormattedMessage id="map.calibration" /></b>
 				<span style={{ color }}>
 					<FormattedMessage id={messageId} />
 				</span>
-			</div>
+			</div> */}
 			<EditMapModalComponent
 				map={mapToDisplay}
 			/>
