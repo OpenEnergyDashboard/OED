@@ -11,6 +11,7 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById, unitsApi } from '../../redux/api/unitsApi';
+import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
@@ -87,6 +88,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const meterDataByID = useAppSelector(selectMeterDataById);
 	const unitDataByID = useAppSelector(selectUnitDataById);
+	const groupDataByID = useAppSelector(selectGroupDataById);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -157,19 +159,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		handleShow();
 	};
 	const handleDeleteConfirmationModalOpen = () => {
-		// Hide the edit modal
-		handleClose();
-		// Show the warning modal
-		setShowDeleteConfirmationModal(true);
-	};
-
-	/* End Confirm Delete Modal */
-
-	const handleDeleteUnit = () => {
-		// Closes the warning modal
-		// Do not call the handler function because we do not want to open the parent modal
-		setShowDeleteConfirmationModal(false);
-
+		// Check for dependencies before showing confirmation modal
 		let error_message = '';
 		for (const value of Object.values(meterDataByID)) {
 			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
@@ -181,6 +171,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			if (value.defaultGraphicUnit === state.id) {
 				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
 					`"${state.name}" ${translate('as.meter.defaultgraphicunit')};`;
+			}
+		}
+		for (const value of Object.values(groupDataByID)) {
+			// This unit is used as a default graphic unit by a group so cannot be deleted.
+			if (value.defaultGraphicUnit === state.id) {
+				error_message += ` ${translate('group')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
+					`"${state.name}" ${translate('as.group.defaultgraphicunit')};`;
 			}
 		}
 		for (let i = 0; i < conversionData.length; i++) {
@@ -200,16 +197,33 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					` "${state.name}" ${translate('unit.destination.error')};`;
 			}
 		}
+
 		if (error_message) {
+			// Show error notification and don't proceed with deletion
 			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
 			showErrorNotification(error_message);
 		} else {
-			// It is okay to delete this unit.
-			deleteUnit(state.id)
-				.unwrap()
-				.then(() => { showSuccessNotification(translate('unit.delete.success')); })
-				.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
+			// No dependencies found, proceed with confirmation modal
+			// Hide the edit modal
+			handleClose();
+			// Show the warning modal
+			setShowDeleteConfirmationModal(true);
 		}
+	};
+
+	/* End Confirm Delete Modal */
+
+	const handleDeleteUnit = () => {
+		// Closes the warning modal
+		// Do not call the handler function since the parent modal is not necessary to be opened
+		setShowDeleteConfirmationModal(false);
+
+		// Since we already checked for dependencies in handleDeleteConfirmationModalOpen,
+		// we can delete the unit directly
+		deleteUnit(state.id)
+			.unwrap()
+			.then(() => { showSuccessNotification(translate('unit.delete.success')); })
+			.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
 	};
 
 	// Keeps canSave state up to date. Checks if valid and if edit made.
