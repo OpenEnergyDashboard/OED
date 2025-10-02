@@ -138,12 +138,12 @@ export default function CompareLineChartComponent() {
 	// Adding information to the shifted data so that it can be plotted on the same graph with current data
 	const updateDataNew = dataNew.map(item => ({
 		...item,
-		name: 'Shifted ' + item.name,
+		name: translate('shifted') + ' ' + item.name,
 		line: { ...item.line, color: '#1AA5F0' },
 		xaxis: 'x2',
 		text: Array.isArray(item.text)
-			? item.text.map(text => text.replace('<br>', '<br>Shifted '))
-			: item.text?.replace('<br>', '<br>Shifted ')
+			? item.text.map(text => text.replace('<br>', '<br>' + translate('shifted') + ' '))
+			: item.text?.replace('<br>', '<br>' + translate('shifted') + ' ')
 	}));
 
 	return (

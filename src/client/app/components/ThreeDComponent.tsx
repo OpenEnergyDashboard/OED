@@ -298,6 +298,3 @@ export function setThreeDLayout(translate: (messageID: string) => string, zLabel
 		}
 	} as Partial<Plotly.Layout>;
 }
-
-
-
