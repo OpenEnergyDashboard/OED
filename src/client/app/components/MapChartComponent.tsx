@@ -110,7 +110,7 @@ export default function MapChartComponent() {
 				// Bar graphics are always quantities.
 				if (selectUnitState.unitRepresent === UnitRepresentType.quantity) {
 					// If it is a quantity unit then that is the unit you are graphing but it is normalized to per day.
-					unitLabel = selectUnitState.identifier + ' / day';
+					unitLabel = selectUnitState.identifier + ' / ' + translate('day');
 				} else if (selectUnitState.unitRepresent === UnitRepresentType.flow) {
 					// If it is a flow meter then you need to multiply by time to get the quantity unit then show as per day.
 					// The quantity/time for flow has varying time so label by multiplying by time.
@@ -119,7 +119,7 @@ export default function MapChartComponent() {
 					// It might not be usual to take a flow and make it into a quantity so this label is a little different to
 					// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
 					// of graphics as we are doing for rate.
-					unitLabel = selectUnitState.identifier + ' * time / day ≡ quantity / day';
+					unitLabel = selectUnitState.identifier + translate('map.flow.label');
 				}
 				if (areaNormalization) {
 					unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);
@@ -159,7 +159,7 @@ export default function MapChartComponent() {
 							// The usual color for this meter.
 							colors.push(getGraphColor(meterID, DataType.Meter));
 							if (!readingsData) {
-								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+								throw new Error(translate('map.unacceptable.condition'));
 							}
 							// Use the most recent time reading for the circle on the map.
 							// This has the limitations of the bar value where the last one can include ranges without
@@ -172,7 +172,7 @@ export default function MapChartComponent() {
 							if (readings.length === 0) {
 								// No data. The next lines causes an issue so set specially.
 								// There may be a better overall fix for no data.
-								timeReading = 'no data to display';
+								timeReading = translate('no.data.to.display');
 								size.push(0);
 							} else {
 								// only display a range of dates for the hover text if there is more than one day in the range
@@ -232,7 +232,7 @@ export default function MapChartComponent() {
 							// The usual color for this group.
 							colors.push(getGraphColor(groupID, DataType.Group));
 							if (!readingsData) {
-								throw new Error('Unacceptable condition: readingsData.readings is undefined.');
+								throw new Error(translate('map.unacceptable.condition'));
 							}
 							// Use the most recent time reading for the circle on the map.
 							// This has the limitations of the bar value where the last one can include ranges without
@@ -245,7 +245,7 @@ export default function MapChartComponent() {
 							if (readings.length === 0) {
 								// No data. The next lines causes an issue so set specially.
 								// There may be a better overall fix for no data.
-								timeReading = 'no data to display';
+								timeReading = translate('no.data.to.display');
 								size.push(0);
 							} else {
 								// only display a range of dates for the hover text if there is more than one day in the range
@@ -317,7 +317,7 @@ export default function MapChartComponent() {
 		} else if (size.length != 0 && max < 0) {
 			// Need to test the size.length because the value is -infinity if no values.
 			// TODO Must be internationalized.
-			showInfoNotification('All values are negative so the circle sizes act as if value range was positive which may change the relative sizes.');
+			showInfoNotification(translate('map.negative.sizes'));
 			// All the values are negative. Plotly will only show circles that are positive. It isn't clear
 			// there is a perfect solution. This will show the size as if it was positive. For example, if
 			// it is -100, -200 & -300 then it will use 100, 200, 300. Note the ratio of -100 to -200 (the
@@ -327,7 +327,7 @@ export default function MapChartComponent() {
 				// This takes care of case where the max is small so the shifted values will have a very small
 				// circle size. Force max to be at least minValue (note min negative so shift other way).
 				// TODO Must be internationalized.
-				showInfoNotification('Some values are close to zero so the small circle sizes may be a little larger to be visible');
+				showInfoNotification(translate('map.zero.sizes'));
 				shift = min - minValue;
 			} else {
 				shift = min + max;
@@ -341,7 +341,7 @@ export default function MapChartComponent() {
 			// Subtracting minValue shifts more to a larger value so the smallest one
 			// is the min value to give the smallest circle desired.
 			// TODO Must be internationalized. Same as message above.
-			showInfoNotification('Some values are close to zero so the small circle sizes may be a little larger to be visible.');
+			showInfoNotification(translate('map.zero.sizes'));
 			shift = min - minValue;
 			if (max > 0 && min < 0) {
 				// Tell user that there are negative and positive values.
@@ -350,7 +350,7 @@ export default function MapChartComponent() {
 				// Given this, shift as usual where the small value (large negative) will wind up near 0 and
 				// have a small circle size. This informs the user of the situation.
 				// TODO Must be internationalized.
-				showInfoNotification('There are negative and positive values and this impacts relative circle size.');
+				showInfoNotification('map.negative.positive.sizes');
 			}
 		}
 		// Change all the sizes by the desired shift. Note the hover is not changed so
