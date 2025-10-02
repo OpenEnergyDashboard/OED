@@ -140,7 +140,7 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 							/>
 						</FormGroup>
 						<FormGroup>
-							<Label for='map.displayable'><FormattedMessage id='map.displayable' /></Label>
+							<Label for='displayable'><FormattedMessage id='displayable' /></Label>
 							<Input
 								id="mapDisplayable"
 								type="select"

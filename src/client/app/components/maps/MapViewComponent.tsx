@@ -41,11 +41,11 @@ const MapViewComponent: React.FC<MapViewProps> = ({ mapID }) => {
 			<div className="identifier-container">
 				{`${mapToDisplay.name} ${localEditMap ? ': (Unsaved Edits)' : ''}`}
 			</div>
-			<div className={mapToDisplay.displayable.toString()}>
-				<b><FormattedMessage id="map.displayable" /></b> {translate(`TrueFalseType.${mapToDisplay.displayable.toString()}`)}
-			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="map.circle.size" /></b> {mapToDisplay.circleSize}
+			</div>
+			<div className={mapToDisplay.displayable.toString()}>
+				<b><FormattedMessage id="displayable" /></b> {translate(`TrueFalseType.${mapToDisplay.displayable.toString()}`)}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="note" /></b> {mapToDisplay.note ? mapToDisplay.note.slice(0, 25) + (mapToDisplay.note.length > 25 ? ' ...' : '') : ''}
