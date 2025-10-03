@@ -492,6 +492,7 @@ export const selectChartLink = createAppSelector(
 				linkText += `&compareSortingOrder=${current.compareSortingOrder}`;
 				break;
 			case ChartTypes.map:
+				linkText += `&duration=${moment.duration(current.duration).asDays()}`;
 				linkText += `&mapID=${selectedMap.toString()}`;
 				break;
 			case ChartTypes.threeD:
