@@ -27,7 +27,7 @@ import { selectVisibleMetersAndGroups, selectVisibleUnitOrSuffixState } from './
 import { selectDefaultGraphicUnitFromEntity, selectMeterOrGroupFromEntity, selectNameFromEntity } from './entitySelectors';
 import { createAppSelector } from './selectors';
 import { selectCik } from '../api/conversionsApi';
-import moment from 'moment';
+import * as moment from 'moment';
 
 export const selectCurrentUnitCompatibility = createAppSelector(
 	[
