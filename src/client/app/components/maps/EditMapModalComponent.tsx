@@ -2,20 +2,23 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { debounce, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Link } from 'react-router-dom';
 import { Button, Form, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { mapsApi, selectMapById } from '../../redux/api/mapsApi';
 import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
 import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
-import { showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import { TrueFalseType } from '../../types/items';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import TooltipHelpComponent from '../../components/TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { tooltipBaseStyle } from '../../styles/modalStyle';
 
 interface EditMapModalProps {
 	map: MapMetadata;
@@ -35,11 +38,42 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 	const [deleteMap] = mapsApi.useDeleteMapMutation();
 	// Only used to track stable reference changes to reset form.
 	const apiMapCache = useAppSelector(state => selectMapById(state, map.id));
-	const intl = useIntl();
 
+	const handleShow = () => {
+		setShowModal(true);
+	};
+	const handleClose = () => {
+		setShowModal(false);
+		resetState();
+	};
 
-	const handleShow = () => setShowModal(true);
-	const handleClose = () => setShowModal(false);
+	// boolean that updates if any change is made to any conversion modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			// Proceed to close the modal
+			handleClose();
+		}
+	};
+
+	const resetState = () => {
+		// TODO This duplicates code below. Decide if use function or if going to remove if change
+		// to other pages use where there is a state variable.
+		setNameInput(map.name);
+		setNoteInput(map.note || '');
+		setCircleInput(map.circleSize);
+		setDisplayable(map.displayable);
+	};
+
 	const updatedMap = (): MapMetadata => ({
 		...map,
 		name: nameInput,
@@ -47,11 +81,18 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 		circleSize: circleInput,
 		displayable: displayable
 	});
-	const debouncedLocalUpdate = React.useMemo(() => debounce(
-		(map: MapMetadata) => !isEqual(map, updatedMap()) && dispatch(localEditsSlice.actions.setOneEdit(map)),
-		1000
-	), []);
-	React.useEffect(() => { debouncedLocalUpdate(updatedMap()); }, [nameInput, noteInput, circleInput, displayable]);
+	// TODO This caused a delayed syncing between the edited state and the global Redux state of map.
+	// No other component does this so it was removed. I think OED wants to stick with the unsaved
+	// warning and not update the values while editing. Doing this causes the card values to change
+	// and are not reset on discard (at this point). It does indicate that there are unsaved values.
+	// Most OED pages use local state for edits but this does not. It seems more complicated to fix up
+	// since it interacts with the calibration. At some point this should be cleaned up to see if
+	// this system/global state should be left.
+	// const debouncedLocalUpdate = React.useMemo(() => debounce(
+	// 	(map: MapMetadata) => !isEqual(map, updatedMap()) && dispatch(localEditsSlice.actions.setOneEdit(map)),
+	// 	1000
+	// ), []);
+	// React.useEffect(() => { debouncedLocalUpdate(updatedMap()); }, [nameInput, noteInput, circleInput, displayable]);
 
 	// Sync with API Cache changes, if any.
 	React.useEffect(() => {
@@ -60,6 +101,15 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 		setCircleInput(map.circleSize);
 		setDisplayable(map.displayable);
 	}, [apiMapCache]);
+
+	// Checks for edits
+	React.useEffect(() => {
+		const editMade = !isEqual(map, updatedMap());
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade, then canSave is true (saving is enabled)
+		setCanSave(editMade && circIsValid);
+	}, [nameInput, noteInput, circleInput, displayable]);
 
 	const handleSave = () => {
 		submitEdit(updatedMap());
@@ -105,10 +155,10 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 	};
 
 	const circIsValid = circleInput > 0.0 && circleInput <= 2.0;
-	const toggleCircleEdit = () => {
-		if (!circIsValid) {
-			showErrorNotification(intl.formatMessage({ id: 'invalid.number' }));
-		}
+
+	const tooltipStyle = {
+		...tooltipBaseStyle,
+		tooltipEditUnitView: 'help.admin.mapedit'
 	};
 
 	return (
@@ -118,6 +168,26 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 					<FormattedMessage id="edit.map" />
 				</Button>
 			</div>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSave();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
@@ -125,9 +195,13 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 				actionFunction={handleDelete}
 				actionConfirmText={deleteConfirmText}
 				actionRejectText={deleteRejectText} />
-			<Modal isOpen={showModal} toggle={handleClose}>
-				<ModalHeader toggle={handleClose}>
+			<Modal isOpen={showModal} toggle={handleToggle}>
+				<ModalHeader>
 					<FormattedMessage id="edit.map" />
+					<TooltipHelpComponent page='units-edit' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='units-edit' helpTextId={tooltipStyle.tooltipEditUnitView} />
+					</div>
 				</ModalHeader>
 				<ModalBody>
 					<Form>
@@ -167,7 +241,6 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 								step={0.1}
 								min={0}
 								max={2}
-								onBlur={toggleCircleEdit}
 							/>
 							<FormFeedback>
 								<FormattedMessage id="error.bounds" values={{ min: 0, max: 2 }} />
@@ -192,11 +265,14 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 							defaultValue={map.filename}
 							disabled>
 						</Input>
-						<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
-							<Button color='primary' >
-								<FormattedMessage id='map.upload.new.file' />
-							</Button>
-						</Link>
+						{/* top padding */}
+						<div style={{ padding: '15px 0 0 0' }}>
+							<Link to='/calibration' onClick={() => handleCalibrationSetting(CalibrationModeTypes.initiate)}>
+								<Button color='primary' >
+									<FormattedMessage id='map.upload.new.file' />
+								</Button>
+							</Link>
+						</div>
 					</div>
 					<div>
 						<Label><FormattedMessage id="map.calibration" /></Label>
@@ -215,9 +291,9 @@ const EditMapModalComponent: React.FC<EditMapModalProps> = ({ map }) => {
 						<FormattedMessage id="delete.map" />
 					</Button>
 					<Button color="secondary" onClick={handleClose}>
-						<FormattedMessage id="cancel" />
+						<FormattedMessage id="discard.changes" />
 					</Button>
-					<Button color="primary" onClick={handleSave} disabled={!circIsValid}>
+					<Button color="primary" onClick={handleSave} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

@@ -11,6 +11,7 @@ import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import '../../styles/card-page.css';
 import translate from '../../utils/translate';
 import EditMapModalComponent from './EditMapModalComponent';
+
 interface MapViewProps {
 	mapID: number;
 }

@@ -36,6 +36,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.admin.groupedit': { link: `${helpUrl}/adminGroupEditing/` },
 		'help.admin.groupview': { link: `${helpUrl}/adminGroupViewing/` },
 		'help.admin.header': { link: `${helpUrl}/adminPreferences/` },
+		'help.admin.mapedit': { link: `${helpUrl}/adminMapEditing/` },
 		'help.admin.mapview': { link: `${helpUrl}/adminMapViewing/` },
 		'help.admin.metercreate': { link: `${helpUrl}/adminMeterCreating/` },
 		'help.admin.meteredit': { link: `${helpUrl}/adminMeterEditing/` },
