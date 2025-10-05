@@ -11,9 +11,9 @@ const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
+const { GLOBAL_STRING_MAX } = require('../util/routeTesting');
 const router = express.Router();
 
-const GLOBAL_STRING_MAX = 1024;
 
 function formatUnitForResponse(unit) {
 	return {
@@ -113,7 +113,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: { type: 'boolean' },
-			note: { type: 'string' },
+			note: { type: 'string', maxLength: GLOBAL_STRING_MAX },
 			minVal: { type: 'number' },
 			maxVal: { type: 'number' },
 			disableChecks: {
@@ -130,9 +130,12 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	validatorResult.errors = minMaxCheck.errors;
 
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors.map(e => e.message).join(', ')}`);
-	} else {
+		const message = `Got request to edit units with invalid unit data, errors: ${validatorResult.errors
+		  .map(e => e.message)
+		  .join(', ')}`;
+		log.warn(message);
+		failure(res, 400, message);
+	  } else {
 
 		const conn = getConnection();
 		try {
@@ -218,7 +221,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			preferredDisplay: { type: 'boolean' },
 			note: {
 				oneOf: [
-					{ type: 'string', maxLength: NOTE_MAX_LENGTH },
+					{ type: 'string', maxLength: GLOBAL_STRING_MAX },
 					{ type: 'null' }
 				]
 			},
@@ -232,14 +235,17 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 		}
 	};
 
-	const validationResult = validate(req.body, validUnit);
-    const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validationResult.errors);
-	validationResult.valid = validationResult.valid && minMaxCheck.valid;
-	validationResult.errors = minMaxCheck.errors;
+	const validatorResult = validate(req.body, validUnit);
+    const minMaxCheck = validateMinMax(req.body.minVal, req.body.maxVal, validatorResult.errors);
+	validatorResult.valid = validatorResult.valid && minMaxCheck.valid;
+	validatorResult.errors = minMaxCheck.errors;
 
-	if (!validationResult.valid) {
-		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-		failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
+	if (!validatorResult.valid) {
+		const message = `Got request to add units with invalid unit data, errors: ${validatorResult.errors
+		  .map(e => e.message)
+		  .join(', ')}`;
+		log.warn(message);
+		failure(res, 400, message);
 	} else {
 		const conn = getConnection();
 		try {

@@ -10,9 +10,10 @@ const Unit = require('../../models/Unit');
 const { insertUnits } = require('../../util/insertData');
 const { getUnitId } = require('../../util/readingsUtils');
 const { validateString, validateInt, validateBool, validateMinMaxRelation, validateExtraFields, getToken } = require('../util/validationHelpers');
+const { GLOBAL_STRING_MAX } = require('../../util/routeTesting');
 
 const EDIT_UNIT = '/api/units/edit';
-const GLOBAL_STRING_MAX = 1024;
+
 
 const basePayload = {
 	name: 'Valid Name',

@@ -8,6 +8,7 @@ const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const Unit = require('../../models/Unit');
 const { validateString, validateInt, validateBool, validateMinMaxRelation, validateExtraFields, getToken } = require('../util/validationHelpers');
+const { GLOBAL_STRING_MAX } = require('../../util/routeTesting');
 
 //This is the end point we use to test in this file.
 const ADD_UNIT = '/api/units/addUnit';
@@ -81,6 +82,7 @@ mocha.describe('Validation - /addUnit', () => {
 			field: 'note',
 			endpoint: ADD_UNIT,
 			basePayload,
+			maxLength: GLOBAL_STRING_MAX,
 			required: false
 		});
 		await validateString({

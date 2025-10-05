@@ -68,11 +68,7 @@ async function validateMinMaxRelation({ endpoint, basePayload }) {
 
 /**
  * Validates a string field by testing required presence, min/max length, and enum constraints.
- * Notes:
- * - By default, no min/max length or enum checks are applied unless explicitly set.
- * - `minLength` and `maxLength` default to -1, which means "no check".
- * - If `minLength = 0`, the function ensures the empty string is invalid.
- * - If `maxLength = 0`, only an empty string would be allowed.
+ *
  * @param field       the name of the string field to validate
  * @param endpoint    the API endpoint to test (e.g., /api/units/addUnit)
  * @param basePayload a valid payload object to start from
@@ -81,7 +77,7 @@ async function validateMinMaxRelation({ endpoint, basePayload }) {
  * @param maxLength   the maximum length allowed for the string (default: -1 → no check)
  * @param enumValues  optional array of valid enum values to test against
  */
- async function validateString({field, endpoint, basePayload, required = true, minLength = -1, maxLength = -1, enumValues = null}) {
+async function validateString({field, endpoint, basePayload, required = true, minLength = -1, maxLength = -1, enumValues = null}) {
 	if (required) {
 		await testInvalidField({ field, invalidValue: undefined, endpoint, basePayload });
 	}
