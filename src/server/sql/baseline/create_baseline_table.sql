@@ -5,10 +5,9 @@
 -- Allows us to use gist in this database
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- create baseline table
-
 CREATE TABLE IF NOT EXISTS baseline (
-    meter_id INT NOT NULL REFERENCES meters (id),
-    apply_range tsrange NOT NULL,
+	meter_id INT NOT NULL REFERENCES meters (id),
+	apply_range tsrange NOT NULL,
 	calc_range tsrange NOT NULL,
 	baseline_value DOUBLE PRECISION NOT NULL,
 	note TEXT,
@@ -16,5 +15,5 @@ CREATE TABLE IF NOT EXISTS baseline (
 	EXCLUDE USING GIST (
 		meter_id WITH =,
 		apply_range WITH &&
-)
+	)
 );
