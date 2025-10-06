@@ -108,7 +108,7 @@ export default function LineChartComponent() {
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (data.length === 0) {
 		return <h1>{`${translate('select.meter.group')}`}	</h1>;
-	} else if (!enoughData) {
+	} else if (!enoughData || !data[0].x) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
 		return (
@@ -123,11 +123,11 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [data[0].x[0], data[0].x[data[0].x.length - 1]],
 						showgrid: true,
 						gridcolor: '#ddd'
-					}
+					},
+					uirevision: 'static'
 				}}
 				config={{
 					responsive: true,
