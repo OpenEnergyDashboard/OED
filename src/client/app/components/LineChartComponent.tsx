@@ -111,20 +111,21 @@ export default function LineChartComponent() {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
 		// Adjust the min and max values for the x axis
+		// This goes through the list of groups/meters that have data to find the earliest and latest dates.
 		console.log(data);
-		let minX = "";
-		let maxX = "";
+		let minDate = "";
+		let maxDate = "";
 		for (const trace of data) {
 			if (trace.x && trace.x.length > 0) {
-				const traceMin = trace.x[0] as string;  // First element
-				const traceMax = trace.x[trace.x.length - 1] as string;  // Last element
+				const traceMin = trace.x[0] as string;  
+				const traceMax = trace.x[trace.x.length - 1] as string;  
 				// Update minX if this is the first trace or has an earlier date
-				if (minX === "" || traceMin < minX) {
-					minX = traceMin;
+				if (minDate === "" || traceMin < minDate) {
+					minDate = traceMin;
 				}
 				// Update maxX if this is the first trace or has a later date
-				if (maxX === "" || traceMax > maxX) {
-					maxX = traceMax;
+				if (maxDate === "" || traceMax > maxDate) {
+					maxDate = traceMax;
 				}
 			}
 
@@ -142,7 +143,7 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [minX, maxX],
+						range: [minDate, maxDate],
 						showgrid: true,
 						gridcolor: '#ddd'
 					},
