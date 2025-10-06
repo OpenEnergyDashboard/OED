@@ -113,18 +113,18 @@ export default function LineChartComponent() {
 		// Adjust the min and max values for the x axis
 		// This goes through the list of groups/meters that have data to find the earliest and latest dates.
 		console.log(data);
-		let minDate = "";
-		let maxDate = "";
+		let minDate = '';
+		let maxDate = '';
 		for (const trace of data) {
 			if (trace.x && trace.x.length > 0) {
-				const traceMin = trace.x[0] as string;  
-				const traceMax = trace.x[trace.x.length - 1] as string;  
+				const traceMin = trace.x[0] as string;
+				const traceMax = trace.x[trace.x.length - 1] as string;
 				// Update minX if this is the first trace or has an earlier date
-				if (minDate === "" || traceMin < minDate) {
+				if (minDate === '' || traceMin < minDate) {
 					minDate = traceMin;
 				}
 				// Update maxX if this is the first trace or has a later date
-				if (maxDate === "" || traceMax > maxDate) {
+				if (maxDate === '' || traceMax > maxDate) {
 					maxDate = traceMax;
 				}
 			}
@@ -146,7 +146,7 @@ export default function LineChartComponent() {
 						range: [minDate, maxDate],
 						showgrid: true,
 						gridcolor: '#ddd'
-					},
+					}
 					
 				}}
 				config={{
