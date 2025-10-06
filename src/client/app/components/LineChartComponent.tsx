@@ -34,7 +34,7 @@ export default function LineChartComponent() {
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
 	// initial slider range
-	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
+	// const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -111,6 +111,26 @@ export default function LineChartComponent() {
 	} else if (!enoughData || !data[0].x) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
+		// Adjust the min and max values for the x axis
+		console.log(data);
+		let minX = "";
+		let maxX = "";
+		for (const trace of data) {
+			if (trace.x && trace.x.length > 0) {
+				const traceMin = trace.x[0] as string;  // First element
+				const traceMax = trace.x[trace.x.length - 1] as string;  // Last element
+				// Update minX if this is the first trace or has an earlier date
+				if (minX === "" || traceMin < minX) {
+					minX = traceMin;
+				}
+				// Update maxX if this is the first trace or has a later date
+				if (maxX === "" || traceMax > maxX) {
+					maxX = traceMax;
+				}
+			}
+
+
+		}
 		return (
 			<Plot
 				data={data}
@@ -123,7 +143,7 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [data[0].x[0], data[0].x[data[0].x.length - 1]],
+						range: [minX, maxX],
 						showgrid: true,
 						gridcolor: '#ddd'
 					},
