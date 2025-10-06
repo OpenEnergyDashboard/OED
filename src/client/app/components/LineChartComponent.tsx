@@ -19,7 +19,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
-import { setInitialXAxisRange, selectSliderRangeInterval } from '../redux/slices/graphSlice';
+import { setInitialXAxisRange } from '../redux/slices/graphSlice';
 import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
@@ -34,7 +34,6 @@ export default function LineChartComponent() {
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
 	// initial slider range
-	// const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -147,7 +146,7 @@ export default function LineChartComponent() {
 						showgrid: true,
 						gridcolor: '#ddd'
 					},
-					uirevision: 'static'
+					
 				}}
 				config={{
 					responsive: true,
