@@ -147,7 +147,6 @@ export default function LineChartComponent() {
 						showgrid: true,
 						gridcolor: '#ddd'
 					}
-					
 				}}
 				config={{
 					responsive: true,
