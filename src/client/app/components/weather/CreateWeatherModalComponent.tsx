@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
+import { Button, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { FormattedMessage } from 'react-intl';
 import '../../styles/modal.css';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -53,7 +53,7 @@ export default function CreateWeatherModalComponent() {
 
 	const [validUnit, setValidUnit] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.identifier !== '' && state.gps !== '' );
+		setValidUnit(state.identifier !== '' && state.gps !== '');
 	}, [state.identifier, state.gps]);
 
 	const resetState = () => {
@@ -96,14 +96,14 @@ export default function CreateWeatherModalComponent() {
 		const latitude = typeof gps?.latitude === 'number' ? parseFloat(gps.latitude.toString()) : 0;
 
 		// Submit the form with updated state
-		if(inputOk) {
+		if (inputOk) {
 			submitCreateWeatherLocation({
 				...state,
 				longitude,
 				latitude
 			})
 				.unwrap()
-				.then(()=> {
+				.then(() => {
 					showSuccessNotification(translate('weather.successfully.create.location'));
 				})
 				.catch(() => {

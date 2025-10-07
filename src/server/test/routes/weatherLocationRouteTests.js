@@ -10,14 +10,14 @@ const app = require('../../app');
 const { expect } = require('chai');
 
 mocha.describe('Weather Location Routes', () => {
-    mocha.describe('GET all weather locations', () => {
-        mocha.it('correct call', async () => {
+	mocha.describe('GET all weather locations', () => {
+		mocha.it('correct call', async () => {
 			const response = await request(app).get('/api/weatherLocation');
 			// Check for successful response
 			expect(response.status).to.equal(200);
 			expect(response.body).to.be.an('array');
-        });
-    });
+		});
+	});
 
 	mocha.describe('POST for adding a weather location', () => {
 		mocha.it('correct call', async () => {
@@ -29,8 +29,8 @@ mocha.describe('Weather Location Routes', () => {
 			};
 			// Check for successful response
 			const response = await request(app)
-			    .post('/api/weatherLocation/addWeatherLocation')
-			    .send(newWeatherLocation);
+				.post('/api/weatherLocation/addWeatherLocation')
+				.send(newWeatherLocation);
 			expect(response.status).to.equal(200);
 		});
 		// TODO: more test cases with invalid data

@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Button, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
+import { Button, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { weatherLocationApi } from '../../redux/api/weatherLocationApi';
 import { useTranslate } from '../../redux/componentHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
-import { WeatherLocationData} from '../../types/redux/weather';
+import { WeatherLocationData } from '../../types/redux/weather';
 import { showErrorNotification, showSuccessNotification, showInfoNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
@@ -52,9 +52,9 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 	};
 
 	/* Edit WeatherLocation Validation:
-        Identifier cannot be blank
-        GPS cannot be blank
-    */
+		Identifier cannot be blank
+		GPS cannot be blank
+	*/
 	const [validLocation, setValidLocation] = useState(false);
 	useEffect(() => {
 		setValidLocation(state.identifier !== '' && state.gps !== '');
@@ -103,7 +103,7 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
-		if(!compareLocations(state, localValues)) {
+		if (!compareLocations(state, localValues)) {
 			const gpsInput = state.gps;
 
 			let gps: GPSPoint | null = null;
