@@ -148,7 +148,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + values.identifier + '] ?';
+	const [showCancelModal, setShowCancelModal] = useState(false);
+	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
+		<div>{translate('unit.delete.unit')} [{values.identifier}] ?</div>);
 	const deleteConfirmText = translate('unit.delete.unit');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
@@ -158,52 +160,131 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Show the edit modal
 		handleShow();
 	};
+	const handleCancelModalOpen = () => {
+		// Hide the edit modal
+		handleClose();
+		// Show the cancel modal
+		setShowCancelModal(true);
+	};
+	const handleCancelModalClose = () => {
+		// Hide the cancel modal
+		setShowCancelModal(false);
+		// Close the edit modal and return to main units page
+		handleClose();
+	};
 	const handleDeleteConfirmationModalOpen = () => {
 		// Check for dependencies before showing confirmation modal
-		let error_message = '';
-		for (const value of Object.values(meterDataByID)) {
-			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
-			if (value.unitId === state.id) {
-				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
-				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
-					`"${state.name}" ${translate('as.meter.unit')};`;
-			}
-			if (value.defaultGraphicUnit === state.id) {
-				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
-					`"${state.name}" ${translate('as.meter.defaultgraphicunit')};`;
-			}
-		}
-		for (const value of Object.values(groupDataByID)) {
-			// This unit is used as a default graphic unit by a group so cannot be deleted.
-			if (value.defaultGraphicUnit === state.id) {
-				error_message += ` ${translate('group')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
-					`"${state.name}" ${translate('as.group.defaultgraphicunit')};`;
-			}
-		}
+		const msgElements: React.ReactNode[] = [];
+		let cancel = false;
+		let hasConversionErrors = false;
+
+		// Check conversions first (highest priority)
 		for (let i = 0; i < conversionData.length; i++) {
 			if (conversionData[i].sourceId === state.id) {
 				// This unit is the source of a conversion so cannot be deleted.
-				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
-					`${conversionArrow(conversionData[i].bidirectional)}` +
-					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
-					` "${state.name}" ${translate('unit.source.error')};`;
+				msgElements.push(
+					<div key={`conversion-source-${i}`}>
+						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
+						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
+						{conversionArrow(conversionData[i].bidirectional)}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}
+						"{state.name}" {translate('unit.source.error')}
+					</div>
+				);
+				cancel = true;
+				hasConversionErrors = true;
 			}
 
 			if (conversionData[i].destinationId === state.id) {
 				// This unit is the destination of a conversion so cannot be deleted.
-				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
-					`${conversionArrow(conversionData[i].bidirectional)}` +
-					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
-					` "${state.name}" ${translate('unit.destination.error')};`;
+				msgElements.push(
+					<div key={`conversion-dest-${i}`}>
+						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
+						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
+						{conversionArrow(conversionData[i].bidirectional)}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}
+						"{state.name}" {translate('unit.destination.error')}
+					</div>
+				);
+				cancel = true;
+				hasConversionErrors = true;
 			}
 		}
 
-		if (error_message) {
-			// Show error notification and don't proceed with deletion
-			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
-			showErrorNotification(error_message);
+		// Only check default graphic units if no conversion errors (as per mentor's feedback)
+		if (!hasConversionErrors) {
+			// Check meters using this unit
+			const metersUsingUnit = Object.values(meterDataByID).filter(meter => meter.unitId === state.id);
+			if (metersUsingUnit.length > 0) {
+				msgElements.push(
+					<div key="meters-using-unit">
+						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
+						{translate('meter')} {translate('uses')} {translate('unit')} "{state.name}" {translate('as.meter.unit')}:
+						<ul>
+							{metersUsingUnit.map(meter => (
+								<li key={meter.id}>"{meter.name}"</li>
+							))}
+						</ul>
+					</div>
+				);
+				cancel = true;
+			}
+
+			// Check meters with this unit as default graphic unit
+			const metersWithDefault = Object.values(meterDataByID).filter(meter => meter.defaultGraphicUnit === state.id);
+			if (metersWithDefault.length > 0) {
+				msgElements.push(
+					<div key="meters-default-graphic">
+						<span className="bold">{translate('unit.delete.meter.default.lost')}</span>
+						<ul>
+							{metersWithDefault.map(meter => (
+								<li key={meter.id}>
+									"{meter.name}"
+									<br />
+									({translate('unit.default.graphic.unit')}: "{unitDataByID[meter.defaultGraphicUnit].name}")
+								</li>
+							))}
+						</ul>
+					</div>
+				);
+			}
+
+			// Check groups with this unit as default graphic unit
+			const groupsWithDefault = Object.values(groupDataByID).filter(group => group.defaultGraphicUnit === state.id);
+			if (groupsWithDefault.length > 0) {
+				msgElements.push(
+					<div key="groups-default-graphic">
+						<span className="bold">{translate('unit.delete.group.default.lost')}</span>
+						<ul>
+							{groupsWithDefault.map(group => (
+								<li key={group.id}>
+									"{group.name}"
+									<br />
+									({translate('unit.default.graphic.unit')}: "{unitDataByID[group.defaultGraphicUnit].name}")
+								</li>
+							))}
+						</ul>
+					</div>
+				);
+			}
+		}
+
+		if (cancel) {
+			msgElements.push(
+				<div key="restricted">
+					<br />
+					{translate('unit.delete.restricted')}
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
+			handleCancelModalOpen();
 		} else {
-			// No dependencies found, proceed with confirmation modal
+			msgElements.push(
+				<div key="final-confirm">
+					{translate('unit.delete.unit')} [{values.identifier}] ?
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
 			// Hide the edit modal
 			handleClose();
 			// Show the warning modal
@@ -396,6 +477,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					disabled={!canSave}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={showCancelModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleCancelModalClose}
+				actionFunction={handleCancelModalClose}
+				actionConfirmText={translate('ok')}
+				actionRejectText={translate('cancel')} />
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
