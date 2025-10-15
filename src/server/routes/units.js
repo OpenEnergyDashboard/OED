@@ -251,12 +251,17 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 	} else {
 		const conn = getConnection();
 		try {
-			// Don't worry about checking if the unit already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Unit.delete(req.body.id, conn);
-			success(res, 'Successfully deleted conversion');
+			await conn.tx(async t => {
+				// Update meters that use this unit as default graphic unit
+				await t.none(`UPDATE meters SET default_graphic_unit = NULL WHERE default_graphic_unit = ${req.body.id}`);
+				// Update groups that use this unit as default graphic unit
+				await t.none(`UPDATE groups SET default_graphic_unit = NULL WHERE default_graphic_unit = ${req.body.id}`);
+				// Delete the unit
+				await Unit.delete(req.body.id, t);
+			});
+			success(res, 'Successfully deleted unit and updated meters/groups');
 		} catch (err) {
-			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			const errorMsg = `Error while deleting unit and updating meters/groups: ${err}`;
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
