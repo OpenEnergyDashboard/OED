@@ -447,7 +447,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 									>
 										{Object.keys(UnitType).map(key => {
 											const isMeter = key === UnitType.meter;
-											const disableMeter = isMeter && inConversions()
+											const disableMeter = isMeter && inConversions();
 											return (
 												<option
 													value={key}
