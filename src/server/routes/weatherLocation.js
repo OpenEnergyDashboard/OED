@@ -9,14 +9,19 @@ const WeatherLocation = require('../models/WeatherLocation');
 const moment = require('moment');
 const Reading = require('../models/Reading');
 const validate = require('jsonschema').validate;
+const Point = require('../models/Point');
 const { success, failure } = require('./response');
 
 const router = express.Router();
 
 function formatWeatherLocationForResponse(item) {
     return {
-        id: item.id, identifier: item.identifier,
-        longitude: item.longitude, latitude: item.latitude, note: item.note
+        id: item.id,
+        identifier: item.identifier,
+        gps: item.gps,
+        // longitude: item.longitude,
+        // latitude: item.latitude,
+        note: item.note
     };
 }
 
@@ -33,24 +38,30 @@ router.get('/', async (req, res) => {
     }
 });
 
-/**
- * Route for POST add weather location.
- */
-router.post('/addWeatherLocation', async (req, res) => {
-    const validWeatherLocation = {
+// This checks params for both edit and create. In principle they could differ since not all needed for create
+// but they are the same due to current routing for now.
+function validateWeatherLocationParams(params) {
+    const validParams = {
         type: 'object',
-        required: ['identifier', 'longitude', 'latitude'],
+        required: ['identifier', 'gps'],
         properties: {
             // Removed id from properties list since it is set to undefined no matter what is passed.
             identifier: {
                 type: 'string',
                 minLength: 1
             },
-            longitude: {
-                type: 'number',
-            },
-            latitude: {
-                type: 'number',
+            gps: {
+                oneOf: [
+                    {
+                        type: 'object',
+                        required: ['latitude', 'longitude'],
+                        properties: {
+                            latitude: { type: 'number', minimum: '-90', maximum: '90' },
+                            longitude: { type: 'number', minimum: '-180', maximum: '180' }
+                        }
+                    },
+                    { type: 'null' }
+                ]
             },
             note: {
                 oneOf: [
@@ -59,24 +70,69 @@ router.post('/addWeatherLocation', async (req, res) => {
                 ]
             }
         }
-    };
-    const validationResult = validate(req.body, validWeatherLocation);
-    if (!validationResult.valid) {
-        log.error(`Got request to edit weather location with invalid weather data, errors: ${validationResult.errors}`);
-        failure(res, 400, `Got request to add weather location with invalid weather data, errors: ${validationResult.errors}`);
+    }
+    const paramsValidationResult = validate(params, validParams);
+    return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
+}
+
+/**
+ * Route for POST add weather location.
+ */
+router.post('/addWeatherLocation', async (req, res) => {
+    // const validWeatherLocation = {
+    //     type: 'object',
+    //     required: ['identifier', 'longitude', 'latitude'],
+    //     properties: {
+    //         // Removed id from properties list since it is set to undefined no matter what is passed.
+    //         identifier: {
+    //             type: 'string',
+    //             minLength: 1
+    //         },
+    //         longitude: {
+    //             type: 'number',
+    //         },
+    //         latitude: {
+    //             type: 'number',
+    //         },
+    //         note: {
+    //             oneOf: [
+    //                 { type: 'string' },
+    //                 { type: 'null' }
+    //             ]
+    //         }
+    //     }
+    // };
+    const response = validateWeatherLocationParams(req.body);
+    if (!response.valid) {
+        log.warn(`Got request to edit a weather location with invalid weather data, errors: ${response.errors}`);
+        failure(res, 400, 'validation failed with ' + response.errors.toString());
+        // const validationResult = validate(req.body, validWeatherLocation);
+        // if (!validationResult.valid) {
+        //     log.error(`Got request to edit weather location with invalid weather data, errors: ${validationResult.errors}`);
+        //     failure(res, 400, `Got request to add weather location with invalid weather data, errors: ${validationResult.errors}`);
     } else {
         const conn = getConnection();
         try {
-            await conn.tx(async t => {
-                const newLocation = new WeatherLocation(
-                    undefined, // id
-                    req.body.identifier,
-                    req.body.latitude,
-                    req.body.longitude,
-                    req.body.note
-                );
-                await newLocation.insert(t);
-            });
+            const newLocation = new WeatherLocation(
+                undefined, // id
+                req.body.identifier,
+                req.body.gps ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null,
+                req.body.note
+            );
+            await newLocation.insert(conn);
+            res.json(formatWeatherLocationForResponse(newLocation));
+            // const conn = getConnection();
+            // try {
+            //     await conn.tx(async t => {
+            //         const newLocation = new WeatherLocation(
+            //             undefined, // id
+            //             req.body.identifier,
+            //             req.body.latitude,
+            //             req.body.longitude,
+            //             req.body.note
+            //         );
+            //         await newLocation.insert(t);
+            //     });
 
             //   const earliestMoment = await Reading.getEarliestTimeStamp(conn);
 
@@ -96,7 +152,7 @@ router.post('/addWeatherLocation', async (req, res) => {
             //     await newData.insert(t);
             // }
 
-            success(res);
+            // success(res);
         } catch (err) {
             log.error(`Error while inserting new weather location ${err}`, err);
             failure(res, 500, `Error while inserting new weather location ${err}`);
@@ -152,12 +208,25 @@ router.post('/edit', async (req, res) => {
             identifier: {
                 type: 'string'
             },
-            longitude: {
-                type: 'number',
+            gps: {
+                oneOf: [
+                    {
+                        type: 'object',
+                        required: ['latitude', 'longitude'],
+                        properties: {
+                            latitude: { type: 'number', minimum: '-90', maximum: '90' },
+                            longitude: { type: 'number', minimum: '-180', maximum: '180' }
+                        }
+                    },
+                    { type: 'null' }
+                ]
             },
-            latitude: {
-                type: 'number',
-            },
+            // longitude: {
+            //     type: 'number',
+            // },
+            // latitude: {
+            //     type: 'number',
+            // },
             note: {
                 type: 'string',
 
@@ -173,9 +242,12 @@ router.post('/edit', async (req, res) => {
         const conn = getConnection();
         try {
             const location = await WeatherLocation.getByID(req.body.id, conn);
+            const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
             location.identifier = req.body.identifier;
-            location.longitude = req.body.longitude;
-            location.latitude = req.body.latitude;
+            location.gps = newGPS,
+                // location.gps = req.body.gps;
+                // location.longitude = req.body.longitude;
+                // location.latitude = req.body.latitude;
             location.note = req.body.note;
             await location.update(conn);
         } catch (err) {

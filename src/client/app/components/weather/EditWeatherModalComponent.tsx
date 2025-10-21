@@ -32,7 +32,8 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 	// Set existing weather location values
 	const values = {
 		identifier: props.location.identifier,
-		gps: `${props.location.latitude},${props.location.longitude}`,
+		gps: props.location.gps === null ? '' : props.location.gps.latitude + ',' + props.location.gps.longitude,
+		// gps: `${props.location.latitude},${props.location.longitude}`,
 		note: props.location.note,
 		id: props.location.id
 	};
@@ -128,9 +129,9 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 					inputOk = false;
 				}
 			}
-			// Convert longitude and latitude to numbers
-			const longitude = typeof gps?.longitude === 'number' ? parseFloat(gps.longitude.toString()) : 0;
-			const latitude = typeof gps?.latitude === 'number' ? parseFloat(gps.latitude.toString()) : 0;
+			// // Convert longitude and latitude to numbers
+			// const longitude = typeof gps?.longitude === 'number' ? parseFloat(gps.longitude.toString()) : 0;
+			// const latitude = typeof gps?.latitude === 'number' ? parseFloat(gps.latitude.toString()) : 0;
 
 			if (inputOk) {
 				// The input passed validation.
@@ -138,8 +139,9 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 				submitEditedLocation({
 					editedLocation: {
 						...state,
-						longitude,
-						latitude
+						gps: gps
+						// longitude,
+						// latitude
 					}
 				})
 					.unwrap()

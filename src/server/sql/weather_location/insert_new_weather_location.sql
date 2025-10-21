@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 
-  INSERT INTO weather_location(identifier, latitude, longitude, note)
-  VALUES (${identifier}, ${latitude}, ${longitude}, ${note});
+	INSERT INTO weather_location(identifier, gps, note)
+  	VALUES (${identifier}, ${gps}, ${note});
+	-- INSERT INTO weather_location(identifier, latitude, longitude, note)
+	-- VALUES (${identifier}, ${latitude}, ${longitude}, ${note});
 

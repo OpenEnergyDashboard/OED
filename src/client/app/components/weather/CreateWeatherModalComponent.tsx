@@ -91,16 +91,17 @@ export default function CreateWeatherModalComponent() {
 				inputOk = false;
 			}
 		}
-		// Convert longitude and latitude to numbers
-		const longitude = typeof gps?.longitude === 'number' ? parseFloat(gps.longitude.toString()) : 0;
-		const latitude = typeof gps?.latitude === 'number' ? parseFloat(gps.latitude.toString()) : 0;
+		// // Convert longitude and latitude to numbers
+		// const longitude = typeof gps?.longitude === 'number' ? parseFloat(gps.longitude.toString()) : 0;
+		// const latitude = typeof gps?.latitude === 'number' ? parseFloat(gps.latitude.toString()) : 0;
 
 		// Submit the form with updated state
 		if (inputOk) {
 			submitCreateWeatherLocation({
 				...state,
-				longitude,
-				latitude
+				gps: gps
+				// longitude,
+				// latitude
 			})
 				.unwrap()
 				.then(() => {

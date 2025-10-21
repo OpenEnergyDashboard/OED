@@ -20,7 +20,6 @@ import WeatherViewComponent from './WeatherViewComponent';
 export default function WeatherDetailComponent() {
 	const { status } = useAppSelector(selectWeatherLocationDataResult);
 	const weatherData = useAppSelector(selectAllWeatherLocations);
-	console.log(weatherData);
 	return (
 		<div className='flexGrowOne'>
 			{status === QueryStatus.pending ? (
