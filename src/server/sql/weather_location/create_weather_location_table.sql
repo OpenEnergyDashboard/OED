@@ -6,7 +6,5 @@ CREATE TABLE IF NOT EXISTS weather_location(
 	id SERIAL PRIMARY KEY NOT NULL,
 	identifier TEXT UNIQUE NOT NULL CHECK (char_length(identifier) >= 1),
 	gps POINT DEFAULT NULL,
-	-- latitude FLOAT NOT NULL,
-	-- longitude FLOAT NOT NULL,
 	note TEXT
 );

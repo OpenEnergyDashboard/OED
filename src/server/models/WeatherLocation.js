@@ -19,20 +19,6 @@ class WeatherLocation {
         this.gps = gps;
         this.note = note;
     }
-    // /**
-    //  * @param id This weather location's ID. 
-    //  * @param identifier This weather location's identifier
-    //  * @param longitude The weather locations's longitude
-    //  * @param latitude The weather locations's latitude
-    //  * @param note The weather location's note
-    //  */
-    // constructor(id, identifier, longitude, latitude, note) {
-    //     this.id = id;
-    //     this.identifier = identifier
-    //     this.longitude = longitude;
-    //     this.latitude = latitude;
-    //     this.note = note;
-    // }
 
     /**
      * Returns a promise to create the weather locations table
@@ -74,7 +60,6 @@ class WeatherLocation {
     static async getAll(conn) {
         const rows = await conn.any(sqlFile('weather_location/get_all_weather_locations.sql'));
         return rows.map(row => new WeatherLocation(row.id, row.identifier, row.gps, row.note));
-        // return rows.map(row => new WeatherLocation(row.id, row.identifier, row.latitude, row.longitude, row.note));
     }
 
     /**

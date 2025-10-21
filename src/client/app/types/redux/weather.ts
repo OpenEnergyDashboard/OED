@@ -7,8 +7,6 @@ export interface WeatherLocationData {
 	id: number;
 	identifier: string;
 	gps: GPSPoint | null;
-	// longitude: number;
-	// latitude: number;
 	note: string;
 }
 
@@ -16,8 +14,6 @@ export interface WeatherLocationEditData {
 	id: number;
 	identifier: string;
 	gps: GPSPoint | null;
-	// longitude: number;
-	// latitude: number;
 	note: string;
 }
 

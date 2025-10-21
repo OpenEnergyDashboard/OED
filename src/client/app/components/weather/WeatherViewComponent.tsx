@@ -41,11 +41,9 @@ export default function WeatherViewComponent(props: WeatherViewComponentProps) {
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="weather.longitude" /></b> {props.weather.gps === null ? '' : props.weather.gps.longitude}
-				{/* <b><FormattedMessage id="weather.longitude" /></b> {props.weather.longitude} */}
 			</div>
 			<div className="item-container">
 				<b><FormattedMessage id="weather.latitude" /></b> {props.weather.gps === null ? '' : props.weather.gps.latitude}
-				{/* <b><FormattedMessage id="weather.latitude" /></b> {props.weather.latitude} */}
 			</div>
 			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line. Protect against null from DB in note. */}

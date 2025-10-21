@@ -5,7 +5,5 @@
 UPDATE weather_location
 	SET identifier = ${identifier},
 		gps = ${gps},
-		-- longitude = ${longitude},
-		-- latitude = ${latitude},
 		note = ${note}
 	WHERE id = ${id};
