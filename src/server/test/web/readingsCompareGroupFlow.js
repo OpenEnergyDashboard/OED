@@ -314,15 +314,101 @@ mocha.describe('readings API', () => {
 
                 // Add CG20 here
                 
-                //1. Load up unitData
-                //2. Load up conversionData
-                //3. Load up meterDatakGroups data
-                //4. Load up group Data
-                //5. Load data into database (await preparetest...)
-                //6. Set up constants unitId and expected with graphic unit and expected value
-                //7. Make the API call to the database using (start time, end time, shift, and graphicUnit)
-                //8. Compare the results of the API call to the expected values
 
+                mocha.it('CG20: 28 day shift end 2022-10-31 17:12:34 (partial hour) for 15 minute reading intervals and flow units & kW as kW', async () => {
+
+                    const unitData = [
+                        {
+                            // u4
+                            name: 'kW',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true,
+                            notes: 'kilowatts',
+                        },
+
+                        {
+
+                            // u5
+                            name: 'Electric',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            notes: 'special unit'
+
+                        }
+                    ];
+
+                    const conversionData = [
+                        {
+                            // c4
+                            sourceName: 'Electric',
+                            destinationName: 'kW',
+                            bydirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'Electric → kW'
+
+                        }
+                    ];
+
+                    // meterDatakWGroups vs meterDatakWGroups
+                    const meterDatakWGroups = [
+                        {
+                            name: 'meterDatakW',
+                            unit: 'Electric',
+                            defaultGraphicUnit: 'kW',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv', // possible source of error? 
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        },
+
+                        // add meterDatakWOther if test fails
+                    ];
+
+                    const groupData = [
+                        {
+                            id: GROUP_ID,
+                            name: 'meterDatakW + meterDatakWOther',
+                            displayable: true,
+                            note: 'special group',
+                            defaultGraphicUnit: 'kW',
+                            childMeters: ['meterDatakW', 'meterDatakWOther'],
+                            childGroups: []
+                        }
+                    ];
+
+                    // load data into database
+                    await prepareTest(unitData, conversionData, meterDatakWGroups, groupData);
+                    
+                    // get unit ID because DB can use value
+                    const unitId = await getUnitId('kW');
+                    const expected = [54294.7361355451, 54544.4808583878];
+
+                    // make API call to get results
+                    const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-09 00:00:00',
+							curr_end: '2022-10-31 17:12:34',
+							shift: 'P28D',
+							graphicUnitId: unitId,
+						});
+                    
+                    // compare expected and res
+                    expectCompareToEqualExpected(res, expected, GROUP_ID);
+                });
 
 
 			});
