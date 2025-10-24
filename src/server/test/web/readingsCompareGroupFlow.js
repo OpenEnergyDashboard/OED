@@ -313,6 +313,18 @@ mocha.describe('readings API', () => {
                 // Add CG19 here
 
                 // Add CG20 here
+                
+                //1. Load up unitData
+                //2. Load up conversionData
+                //3. Load up meterDatakGroups data
+                //4. Load up group Data
+                //5. Load data into database (await preparetest...)
+                //6. Set up constants unitId and expected with graphic unit and expected value
+                //7. Make the API call to the database using (start time, end time, shift, and graphicUnit)
+                //8. Compare the results of the API call to the expected values
+
+
+
 			});
 		});
 	});
