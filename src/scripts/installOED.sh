@@ -191,7 +191,7 @@ if [ "$dostart" == "yes" ]; then
 		npm run start
 	else
 		printf "%s\n" "Starting OED in development mode"
-		./src/scripts/devstart.sh
+		sh ./src/scripts/devstart.sh
 	fi
 else
 	printf "%s\n" "Not starting OED due to --nostart"

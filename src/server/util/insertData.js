@@ -353,7 +353,10 @@ async function insertMeters(metersToInsert, conn) {
 		if (ok) {
 			console.log(`            loading meter ${meterData.name}`);
 			// Get the unit by name if provided or -99 if not
+			console.log(meterData);
+            console.log(await Unit.getByName(meterData.unit, conn));
 			meterData.unit = meterData.unit ? (await Unit.getByName(meterData.unit, conn)).id : -99;
+
 			meterData.defaultGraphicUnit = meterData.defaultGraphicUnit ? (await Unit.getByName(meterData.defaultGraphicUnit, conn)).id : -99;
 			// enabled and displayable are false by default.
 			meterData.enabled = meterData.enabled ? meterData.enabled : false;

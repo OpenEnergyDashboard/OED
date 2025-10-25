@@ -212,7 +212,99 @@ mocha.describe('readings API', () => {
                 // Add BG20 here
 
                 // Add BG21 here
+                mocha.it('76 day bars (no values) for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
+                    const unitDatakW = [
+                        { 
+                            // u4
+                            name: 'kW', 
+                            identifier: '', 
+                            unitRepresent: Unit.unitRepresentType.FLOW, 
+                            secInRate: 3600, 
+                            typeOfUnit: Unit.unitType.UNIT, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.ALL, 
+                            preferredDisplay: true, 
+                            note: 'kilowatts' 
+                        },
+                        { 
+                            // u5
+                            name: 'Electric', 
+                            identifier: '', 
+                            unitRepresent: Unit.unitRepresentType.FLOW, 
+                            secInRate: 3600, 
+                            typeOfUnit: Unit.unitType.METER, 
+                            suffix: '', 
+                            displayable: Unit.displayableType.NONE, 
+                            preferredDisplay: false, 
+                            note: 'special unit' 
+                        },
+                    ];
+                    const conversionDatakW = [
+                        { 
+                            // c4
+                            sourceName: 'Electric', 
+                            destinationName: 'kW', 
+                            bidirectional: false, 
+                            slope: 1, 
+                            intercept: 0, 
+                            note: 'Electric → kW' 
+                        }
+                    ];
+                    const meterDatakWh = [
+                        {
+                            name: 'Electric Utility kWh',
+                            unit: 'Electric_Utility',
+                            defaultGraphicUnit: 'kWh',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            // Note the meter ID is set so we know what to expect when a query is made.
+                            id: METER_ID
+                        },
+                        {
+                            name: 'Electric Utility Other',
+                            unit: 'Electric_Utility',
+                            defaultGraphicUnit: 'kWh',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '20 minutes',
+                            id: (METER_ID + 1)
+                        }
+                    ];
+                    const groupDatakWh = [
+                        {
+                            id: GROUP_ID,
+                            name: 'Electric Utility kWh + Other',
+                            displayable: true,
+                            note: 'special group',
+                            defaultGraphicUnit: 'kWh',
+                            childMeters: ['Electric Utility kWh', 'Electric Utility Other'],
+                            childGroups: [],
+                        }
+                    ];
 
+                    //load data into database
+                    await prepareTest(unitDatakW, conversionDatakW, meterDatakWh, groupDatakWh);
+                    //get unit ID since the DB could use any value.
+                    const unitId = await getUnitId('kW');
+                    console.log(unitId);
+                    // Load the expected response data from the corresponding csv file
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_76.csv');
+                    // Create a request to the API for unbounded reading times and save the response
+                    const res = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
+                        .query({ 
+                            timeInterval: ETERNITY.toString(), 
+                            barWidthDays: '76',
+                            graphicUnitId: unitId });
+                    // Check that the API reading is equal to what it is expected to equal
+                    expectReadingToEqualExpected(res, expected, GROUP_ID);
+                })
                 // Add BG22 here
             });
         });
