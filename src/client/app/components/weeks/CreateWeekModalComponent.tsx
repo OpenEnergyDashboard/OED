@@ -5,6 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'reactstrap';
+import { daySegmentsApi } from '../../redux/api/daySegmentsApi';
 import { daysApi } from '../../redux/api/daysApi';
 import { weeksApi } from '../../redux/api/weeksApi';
 import { useTranslate } from '../../redux/componentHooks';
@@ -16,6 +17,7 @@ import { Week } from '../../types/redux/weeks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
+import { generateRruleFromWeek } from '../../utils/generateRrule';
 
 /**
  * Defines a button that opens a modal to create a new weekly conversion pattern.
@@ -40,6 +42,9 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 
 	// Fetch weeks data (used to check if week name already exists)
 	const { data: weeks } = weeksApi.useGetWeeksQuery();
+	
+	// Prepare to fretch day segments
+	const [fetchDaySegments] = daySegmentsApi.useLazyGetDaySegmentsByDayIdQuery();
 
 	const [addWeekMutation, { isLoading: isSaving }] = weeksApi.useAddWeekMutation();
 
@@ -69,12 +74,63 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 		setShowModal(false);
 		addWeekMutation(weekDetails).unwrap()
 			.then(() => {
+				// generateRruleFromWeek(weeks);
 				showSuccessNotification(translate('week.create.success'));
 			})
 			.catch(error => {
 				showErrorNotification(translate('week.create.failure') + error);
 			});
 		resetState();
+	};
+
+	// TEST
+	const generateRrule = async (weekIndex: number) => {
+		const week = weeks?.[weekIndex];
+		if (!week) return console.warn("No week found at index", weekIndex);
+
+		const weekDayIds = [
+			week.sunday,
+			week.monday,
+			week.tuesday,
+			week.wednesday,
+			week.thursday,
+			week.friday,
+			week.saturday,
+		].filter(Boolean);
+
+		console.log("DEBUG: weekDayIds:", weekDayIds);
+
+		// for 2D array
+		// const segmentPromises = weekDayIds.map((dayId) => fetchDaySegments(dayId).unwrap());
+		// const daySegments = await Promise.all(segmentPromises);
+
+		// get only unique dayIds (convert to Set then Array again)
+		const uniqueWeekDayIds = Array.from(new Set(weekDayIds.map(obj => 
+														JSON.stringify(obj))))
+																.map(e => JSON.parse(e));
+
+		// console.log("DEBUG: uniqueWeekDayIds:", uniqueWeekDayIds);
+		
+		// Fetch all daySegments for each day in the week (parallel requests)
+    const segmentPromises = uniqueWeekDayIds.map((dayId) =>
+      fetchDaySegments(dayId).unwrap()
+    );
+
+    // Wait for all responses
+    const daySegmentResponses = await Promise.all(segmentPromises);
+
+		// console.log("DEBUG: daySegmentResponses:", daySegmentResponses);
+
+    // Flatten and annotate each with its corresponding dayId
+    const daySegmentsForWeek = uniqueWeekDayIds.map((dayId, i) => ({
+      dayId,
+      segments: daySegmentResponses[i],
+    }));
+
+    // console.log("DEBUG: daySegmentsForWeek:", daySegmentsForWeek);
+
+    // Pass data to generator
+    generateRruleFromWeek(week, days, daySegmentsForWeek);
 	};
 
 	// Function to reset the week details to default values. Called when modal is closed.
@@ -120,6 +176,10 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 			{/* Show create modal button */}
 			<Button color="secondary" onClick={handleShowModal}>
 				<FormattedMessage id="week.create" />
+			</Button>
+
+			<Button color="secondary" onClick={() => generateRrule(2)}>
+				Generate Rrule
 			</Button>
 
 			<Modal
