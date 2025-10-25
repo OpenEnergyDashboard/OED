@@ -147,6 +147,7 @@ export default function SplitConversionSegmentModalComponent(props: SplitConvers
 				<ModalBody>
 					<FormGroup>
 						<Label for="splitTime"><FormattedMessage id="conversion.split.datetime.prompt" /></Label>
+						{/* !!fieldError converts string/undefined into a strict boolean */}
 						<Input
 							type="text"
 							name="splitTime"

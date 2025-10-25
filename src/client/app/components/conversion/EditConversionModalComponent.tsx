@@ -491,7 +491,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											<td>{segment.startTime} to {segment.endTime}</td>
 											<td>{(segment.weekPatternsId ?? -99) === -99 ? segment.slope : ''}</td>
 											<td>{(segment.weekPatternsId ?? -99) === -99 ? segment.intercept : ''}</td>
-											<td>{weekPatterns.find(wp => wp.id === segment.weekPatternsId)?.name ?? 'No Pattern'}</td>
+											<td>{weekPatterns.find(wp => wp.id === segment.weekPatternsId)?.name ?? translate('conversion.pattern.no')}</td>
 											<td
 												style={{ cursor: 'pointer' }}
 												onClick={() => handleNoteModal(segment)}
