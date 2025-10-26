@@ -211,7 +211,7 @@ mocha.describe('readings API', () => {
 
                 // Add BG20 here
                 // Add BG21 here
-                mocha.it('76 day bars (no values) for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
+                mocha.it('BG21: 76 day bars (no values) for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
                     const unitDatakW = [
                         { 
                             // u4
