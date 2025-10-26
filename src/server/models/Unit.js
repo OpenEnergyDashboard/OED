@@ -194,6 +194,10 @@ class Unit {
 	 * @returns {Promise.<Unit>}
 	 */
 	static async getByName(name, conn) {
+		const qf = sqlFile('unit/get_by_name.sql');
+		const formatted = conn.$config.pgp.as.format(qf, { name });
+		console.log('Formatted SQL:', formatted);
+		console.log('Looking for unit:', name);
 		const row = await conn.oneOrNone(sqlFile('unit/get_by_name.sql'), { name: name });
 		return row === null ? null : Unit.mapRow(row);
 	}
