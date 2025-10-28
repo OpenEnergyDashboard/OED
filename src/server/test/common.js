@@ -13,12 +13,22 @@ const chaiAsPromised = require('chai-as-promised');
 const chaiHttp = require('chai-http');
 const bcrypt = require('bcryptjs');
 const expect = chai.expect;
-
 const { log, LogLevel } = require('../log');
-// Disable logging during tests.
-// TODO: Move logging disabling to a better place.
+
+// TODO: Move logging controls to a better place.
+// During testing do not show errors since many tests generate them.
 log.level = LogLevel.SILENT;
+// If tests are failing then turning on the console messages can help. Commenting the line
+// above and uncommenting the next line will do that.
+// log.level = LogLevel.DEBUG;
+// During testing do not do emails. Since DB wiped and not set up for emails this would not do anything.
 log.emailLevel = LogLevel.SILENT;
+// Logging to the DB during testing has issues. First, the test DB is wiped before each test so it does not actually
+// stay around. Second, if one test finishes
+// quickly after the DB logging starts (async) then the next test starts and the beforeEach wipes the DB.
+// If the attempt to put the log msg in the DB
+// happens before it is initialized again then the log table is missing and causes an error.
+log.logToDb = false;
 
 const User = require('../models/User');
 const { getDB, createSchema, stopDB } = require('../models/database');
@@ -36,7 +46,7 @@ chai.use(chaiHttp);
 let testDB = {
 	_connection: null,
 	config: null,
-	getConnection: function() {
+	getConnection: function () {
 		return this._connection;
 	}
 };

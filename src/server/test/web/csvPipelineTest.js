@@ -672,8 +672,7 @@ const testMeters = {
 				true, // enabled
 				true, //displayable
 				'obvius', //type
-				'US/Central', // timezone
-				// null, // timezone
+				'America/Chicago', // timezone
 				gps, // gps
 				'pipe100b id', // identifier
 				'my Note', // note
@@ -789,8 +788,7 @@ const testMeters = {
 				true, // enabled
 				true, //displayable
 				'obvius', //type
-				'US/Central', // timezone
-				// null, // timezone
+				'America/Chicago', // timezone
 				gps, // gps
 				'pipe100b id', // identifier
 				'my Note', // note

@@ -287,6 +287,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 										onChange={handleStringChange}
 										invalid={!userDetails.username || userDetails.username.length < 3}
 									/>
+									<FormFeedback>
+										{translate('user.username.length')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -310,6 +313,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 												</option>
 											))}
 									</Input>
+									<FormFeedback>
+										{translate('user.role.required')}
+									</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>
