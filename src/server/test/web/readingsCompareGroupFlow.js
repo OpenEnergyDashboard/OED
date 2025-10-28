@@ -213,7 +213,6 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 
-                // Add CG17 here
                 mocha.it('CG17: 1 full day shift for 15 minute reading intervals and flow units & kW as kW ', async () => {
                     
                     const unitDatakW = [
