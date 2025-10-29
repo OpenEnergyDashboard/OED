@@ -107,3 +107,46 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
 export function isValidThreeDInterval(timeInterval: TimeInterval): boolean {
 	return timeInterval.getIsBounded() && timeInterval.duration('days') <= 367;
 }
+
+/**
+ * Auto-adjusts a time interval to the most recent year of data for 3D graphics.
+ * This provides the most relevant data while maintaining performance.
+ * @param timeInterval - the original time interval that may exceed 1 year
+ * @param maxDataDate - the maximum date with actual data (optional, defaults to now)
+ * @returns a time interval adjusted to show the most recent 365 days of data
+ */
+export function autoAdjustThreeDInterval(timeInterval: TimeInterval, maxDataDate?: moment.Moment): TimeInterval {
+	// Ensure maxDataDate is valid
+	const validMaxDate = maxDataDate && maxDataDate.isValid() ? maxDataDate : moment();
+
+	if (!timeInterval.getIsBounded()) {
+		// For unbounded ranges, use the last year from max data date or now
+		const endDate = validMaxDate.clone();
+		const startDate = endDate.clone().subtract(365, 'days');
+		return new TimeInterval(startDate, endDate);
+	}
+
+	const originalEnd = timeInterval.getEndTimestamp();
+	const maxDate = validMaxDate.isBefore(originalEnd) ? validMaxDate : originalEnd;
+
+	// Calculate the most recent year from the end date
+	const adjustedEnd = maxDate.clone();
+	const adjustedStart = adjustedEnd.clone().subtract(365, 'days');
+
+	// Ensure the start date is not before the max data date's earliest possible date
+	const earliestStart = validMaxDate.clone().subtract(365, 'days');
+	if (adjustedStart.isBefore(earliestStart)) {
+		adjustedStart.set(earliestStart.toObject());
+	}
+
+	return new TimeInterval(adjustedStart, adjustedEnd);
+}
+
+/**
+ * Checks if a time interval needs auto-adjustment for 3D graphics.
+ * @param timeInterval - the time interval to check
+ * @returns true if the interval exceeds 1 year and needs adjustment
+ */
+export function needsThreeDAdjustment(timeInterval: TimeInterval): boolean {
+	return timeInterval.getIsBounded() && timeInterval.duration('days') > 367;
+}
