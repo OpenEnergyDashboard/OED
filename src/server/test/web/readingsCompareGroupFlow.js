@@ -405,7 +405,7 @@ mocha.describe('readings API', () => {
                     // load data into database
                     await prepareTest(unitData, conversionDatakW, meterDatakWGroups, groupDatakW);
                     
-                    // get unit ID because DB can use value
+                    // get unit ID because DB can use any value
                     const unitId = await getUnitId('kW');
                     const expected = [54294.7361355451, 54544.4808583878];
 
