@@ -210,7 +210,7 @@ mocha.describe('readings API', () => {
                 // Add BG19 here
 
                 // Add BG20 here
-                // Add BG21 here
+
                 mocha.it('BG21: 76 day bars (no values) for 15 + 20 minute reading intervals and flow units with +-inf start/end time & kW as kW', async () => {
                     const unitDatakW = [
                         { 
@@ -286,7 +286,7 @@ mocha.describe('readings API', () => {
                                 childGroups: [],
                             }
                         ]
-
+                        
                     //load data into database
                     await prepareTest(unitDatakW, conversionDatakW, meterDatakWGroups, groupDatakW);
                     //get unit ID since the DB could use any value.
