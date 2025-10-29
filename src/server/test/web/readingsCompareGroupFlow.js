@@ -328,7 +328,7 @@ mocha.describe('readings API', () => {
                             suffix: '',
                             displayable: Unit.displayableType.ALL,
                             preferredDisplay: true,
-                            notes: 'kilowatts',
+                            note: 'kilowatts',
                         },
 
                         {
@@ -342,17 +342,17 @@ mocha.describe('readings API', () => {
                             suffix: '',
                             displayable: Unit.displayableType.NONE,
                             preferredDisplay: false,
-                            notes: 'special unit'
+                            note: 'special unit'
 
                         }
                     ];
 
-                    const conversionData = [
+                    const conversionDatakW = [
                         {
                             // c4
                             sourceName: 'Electric',
                             destinationName: 'kW',
-                            bydirectional: false,
+                            bidirectional: false,
                             slope: 1,
                             intercept: 0,
                             note: 'Electric → kW'
@@ -376,9 +376,21 @@ mocha.describe('readings API', () => {
                         },
 
                         // add meterDatakWOther if test fails
+                        {
+                            name: 'meterDatakWOther',
+                            unit: 'Electric',
+                            defaultGraphicUnit: 'kW',
+                            displayable: true, 
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_20_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '20 minutes',
+                            id: (METER_ID + 1)
+                        }
                     ];
 
-                    const groupData = [
+                    const groupDatakW = [
                         {
                             id: GROUP_ID,
                             name: 'meterDatakW + meterDatakWOther',
@@ -391,7 +403,7 @@ mocha.describe('readings API', () => {
                     ];
 
                     // load data into database
-                    await prepareTest(unitData, conversionData, meterDatakWGroups, groupData);
+                    await prepareTest(unitData, conversionDatakW, meterDatakWGroups, groupDatakW);
                     
                     // get unit ID because DB can use value
                     const unitId = await getUnitId('kW');
