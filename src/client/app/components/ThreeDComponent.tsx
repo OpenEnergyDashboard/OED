@@ -8,17 +8,19 @@ import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppSelector, useAppDispatch } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
 import { selectGraphState } from '../redux/slices/graphSlice';
+import { updateTimeInterval } from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
 import { MeterDataByID } from '../types/redux/meters';
 import { UnitDataById } from '../types/redux/units';
 import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
+import { needsThreeDAdjustment, autoAdjustThreeDInterval } from '../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 // Both translates are used since some are in the function component where the React Hook is okay
@@ -38,6 +40,7 @@ import { fullSizeContainer } from '../styles/modalStyle';
  */
 export default function ThreeDComponent() {
 	const translate = useTranslate();
+	const dispatch = useAppDispatch();
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
@@ -46,6 +49,50 @@ export default function ThreeDComponent() {
 	const graphState = useAppSelector(selectGraphState);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
+
+	// Get data range for auto-adjustment
+	const { data: dataRange } = readingsApi.endpoints.dataRange.useQuery(
+		{ id: meterOrGroupID!, meterOrGroup: graphState.threeD.meterOrGroup! },
+		{ skip: !meterOrGroupID || !graphState.threeD.meterOrGroup }
+	);
+
+	// Track if auto-adjustment has been performed for current meter/group
+	const autoAdjustedRef = React.useRef<string | null>(null);
+
+	// Auto-adjust time interval if needed
+	React.useEffect(() => {
+		const currentKey = `${meterOrGroupID}-${graphState.threeD.meterOrGroup}`;
+
+		if (meterOrGroupID && dataRange?.maxDate && needsThreeDAdjustment(graphState.queryTimeInterval) && autoAdjustedRef.current !== currentKey) {
+			const maxDataDate = moment(dataRange.maxDate);
+
+			// Ensure maxDataDate is valid
+			if (!maxDataDate.isValid()) {
+				console.warn('Invalid maxDataDate received:', dataRange.maxDate);
+				return;
+			}
+
+			const adjustedInterval = autoAdjustThreeDInterval(graphState.queryTimeInterval, maxDataDate);
+
+			// Ensure the adjusted interval is valid before dispatching
+			if (adjustedInterval.getIsBounded() &&
+				adjustedInterval.getStartTimestamp() &&
+				adjustedInterval.getEndTimestamp() &&
+				adjustedInterval.getStartTimestamp().isValid() &&
+				adjustedInterval.getEndTimestamp().isValid()) {
+				dispatch(updateTimeInterval(adjustedInterval));
+				autoAdjustedRef.current = currentKey; // Mark as adjusted for this meter/group
+			} else {
+				console.warn('Invalid adjusted interval created:', adjustedInterval);
+			}
+		}
+
+		// Reset the ref when meter/group changes
+		if (autoAdjustedRef.current && autoAdjustedRef.current !== currentKey) {
+			autoAdjustedRef.current = null;
+		}
+	}, [meterOrGroupID, dataRange, graphState.queryTimeInterval, dispatch, graphState.threeD.meterOrGroup]);
+
 	// Initialize Default values
 	const threeDData = data;
 	let layout = {};
@@ -65,8 +112,8 @@ export default function ThreeDComponent() {
 	} else if (graphState.areaNormalization && !isAreaCompatible) {
 		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
 	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.queryTimeInterval))) {
-		// Not a valid time interval. ThreeD can only support up to 1 year of readings
-		layout = setHelpLayout(translate('threeD.date.range.too.long'));
+		// Auto-adjustment is handled in useEffect above, but show loading while adjusting
+		layout = setHelpLayout(translate('threeD.rendering'));
 	} else if (!threeDData) {
 		// Not actually 'rendering', but from the user perspective should make sense.
 		layout = setHelpLayout(translate('threeD.rendering'));
