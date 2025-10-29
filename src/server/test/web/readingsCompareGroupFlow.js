@@ -360,7 +360,6 @@ mocha.describe('readings API', () => {
                         }
                     ];
 
-                    // meterDatakWGroups vs meterDatakWGroups
                     const meterDatakWGroups = [
                         {
                             name: 'meterDatakW',
@@ -369,13 +368,11 @@ mocha.describe('readings API', () => {
                             displayable: true,
                             gps: undefined,
                             note: 'special meter',
-                            file: 'test/web/readingsData/readings_ri_15_days_75.csv', // possible source of error? 
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
                             deleteFile: false,
                             readingFrequency: '15 minutes',
                             id: METER_ID
                         },
-
-                        // add meterDatakWOther if test fails
                         {
                             name: 'meterDatakWOther',
                             unit: 'Electric',
