@@ -466,25 +466,17 @@ function createRouter() {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range to validate 1 year or less.
+			// Get time range - auto-adjustment handled on frontend
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
-				const durationInYears = duration.years();
-				if (durationInYears >= 1) {
-					// Limit 3D to one year of data.
-					res.sendStatus(400);
-				} else {
-					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-					const graphicUnitID = req.query.graphicUnitId;
-					const readingInterval = req.query.readingInterval;
-					const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
-					res.json(forJson);
-				}
+				const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+				const graphicUnitID = req.query.graphicUnitId;
+				const readingInterval = req.query.readingInterval;
+				const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
+				res.json(forJson);
 			}
 		}
 	});
@@ -494,25 +486,80 @@ function createRouter() {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range to validate 1 year or less.
+			// Get time range - auto-adjustment handled on frontend
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
-				const durationInYears = duration.years();
-				if (durationInYears >= 1) {
-					// Limit 3D to one year of data.
-					res.sendStatus(400);
+				const groupID = req.params.group_id;
+				const graphicUnitID = req.query.graphicUnitId;
+				const readingInterval = req.query.readingInterval;
+				const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
+				res.json(forJson);
+			}
+		}
+	});
+
+	// Route for getting data range for meter/group (for 3D auto-adjustment)
+	router.get('/dataRange/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
+		if (!validateMeterLineReadingsParams(req.params)) {
+			res.sendStatus(400);
+		} else {
+			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+			const conn = getConnection();
+			try {
+				const result = await conn.oneOrNone(`
+					SELECT 
+						MIN(start_timestamp) as min_date,
+						MAX(end_timestamp) as max_date
+					FROM readings 
+					WHERE meter_id = ANY($1)
+				`, [meterIDs]);
+				
+				if (result && result.min_date && result.max_date) {
+					res.json({
+						minDate: result.min_date,
+						maxDate: result.max_date
+					});
 				} else {
-					const groupID = req.params.group_id;
-					const graphicUnitID = req.query.graphicUnitId;
-					const readingInterval = req.query.readingInterval;
-					const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
-					res.json(forJson);
+					res.json({ minDate: null, maxDate: null });
 				}
+			} catch (error) {
+				console.error('Error getting meter data range:', error);
+				res.sendStatus(500);
+			}
+		}
+	});
+
+	// Route for getting data range for group
+	router.get('/dataRange/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
+		if (!validateGroupThreeDReadingsParams(req.params)) {
+			res.sendStatus(400);
+		} else {
+			const groupID = req.params.group_id;
+			const conn = getConnection();
+			try {
+				const result = await conn.oneOrNone(`
+					SELECT 
+						MIN(r.start_timestamp) as min_date,
+						MAX(r.end_timestamp) as max_date
+					FROM readings r
+					INNER JOIN groups_deep_meters gdm ON r.meter_id = gdm.meter_id
+					WHERE gdm.group_id = $1
+				`, [groupID]);
+				
+				if (result && result.min_date && result.max_date) {
+					res.json({
+						minDate: result.min_date,
+						maxDate: result.max_date
+					});
+				} else {
+					res.json({ minDate: null, maxDate: null });
+				}
+			} catch (error) {
+				console.error('Error getting group data range:', error);
+				res.sendStatus(500);
 			}
 		}
 	});
