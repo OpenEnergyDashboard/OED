@@ -150,6 +150,10 @@ export const readingsApi = baseApi.injectEndpoints({
 				return error ? { error } : { data: data as LineReadings };
 			},
 			providesTags: ['Readings']
+		}),
+		dataRange: builder.query<{ minDate: string | null, maxDate: string | null }, { id: number, meterOrGroup: 'meters' | 'groups' }>({
+			query: ({ id, meterOrGroup }) => `api/unitReadings/dataRange/${meterOrGroup}/${id}`,
+			providesTags: ['Readings']
 		})
 
 	})
