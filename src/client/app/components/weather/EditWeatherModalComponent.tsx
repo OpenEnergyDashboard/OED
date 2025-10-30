@@ -159,11 +159,11 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		deleteLocation(state.id)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('weather-location.delete.success'));
+				showSuccessNotification(translate('weather.successfully.delete.location"'));
 				handleClose();
 			})
 			.catch(error => {
-				showErrorNotification(translate('weather-location.delete.failure') + error.data);
+				showErrorNotification(translate('"weather.failed.to.delete.location"') + error.data);
 			});
 	};
 	// Toggles Delete Warning Modal
@@ -173,7 +173,7 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
-		tooltipEditWeatherLocationView: 'help.admin.weather-location-edit'
+		tooltipEditWeatherLocationView: 'help.admin.weatheredit'
 	};
 
 
