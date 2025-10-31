@@ -330,7 +330,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 
-
+			// TODO DEBUG: added in to test the showErrorNotification
+			//submitState.secInRate = -1;
 			// Save our changes by dispatching the submitEditedUnit mutation
 			submitEditedUnit({ editedUnit: submitState, shouldRedoCik, shouldRefreshReadingViews })
 				.unwrap()
@@ -379,7 +380,12 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					// TODO DEBUG: Disabled is always set to false,
+					// which ignores the cases of invalid saves being rejected
+					// This is needed in order to test the showErrorNotification
+					// This test does not work********
 					disabled={!canSave}
+					//disabled={false}
 				/>
 			)}
 			<ConfirmActionModalComponent
@@ -670,6 +676,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
+					{/*
+						// TODO DEBUG: Disabled is always set to false,
+						// which ignores the cases of invalid saves being rejected
+						// This is needed in order to test the showErrorNotification
+						// This test does not work*******
+						//disabled={!canSave}
+					*/}
 					<Button color='primary' onClick={handleSaveChanges} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>

@@ -214,6 +214,8 @@ export default function CreateUnitModalComponent() {
 			// set unit to suffix if suffix is not empty
 			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
 		};
+		// TODO DEBUG: added in to test the showErrorNotification
+		//submitState.secInRate = -1;
 		// Add the new unit and update the store
 		submitCreateUnit(submitState)
 			.unwrap()
@@ -250,7 +252,12 @@ export default function CreateUnitModalComponent() {
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
+					// TODO DEBUG: Disabled is always set to false,
+					// which ignores the cases of invalid saves being rejected
+					// This is needed in order to test the showErrorNotification
+					// Test does not work*****
 					disabled={!canSave}
+					//disabled={false}
 				/>
 			)}
 			{/* Show modal button */}
@@ -550,6 +557,13 @@ export default function CreateUnitModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
+					{/*
+						// TODO DEBUG: Disabled is always set to false,
+						// which ignores the cases of invalid saves being rejected
+						// This is needed in order to test the showErrorNotification
+						// This test does not work***
+						//disabled={!canSave}
+					*/}
 					<Button color="primary" onClick={handleSaveChanges} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>

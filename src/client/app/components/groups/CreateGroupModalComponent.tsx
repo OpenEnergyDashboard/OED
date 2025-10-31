@@ -239,6 +239,8 @@ export default function CreateGroupModalComponent() {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
+			// TODO DEBUG: added in to test the showErrorNotification
+			submitState.name = '';
 			createGroup(submitState);
 			resetState();
 		} else {
