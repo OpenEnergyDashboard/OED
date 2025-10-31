@@ -416,7 +416,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='identifier'
 										type='text'
 										autoComplete='on'
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.identifier} />
 								</FormGroup>
 							</Col>
@@ -429,7 +429,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='name'
 										type='text'
 										autoComplete='on'
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.name}
 										invalid={state.name === ''} />
 									<FormFeedback>
@@ -447,16 +447,18 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										id='typeOfUnit'
 										name='typeOfUnit'
 										type='select'
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.typeOfUnit}
 										invalid={state.typeOfUnit !== UnitType.suffix && state.suffix !== ''}
 									>
 										{Object.keys(UnitType).map(key => {
+											const isMeter = key === UnitType.meter;
+											const disableMeter = isMeter && inConversions();
 											return (
 												<option
 													value={key}
 													key={key}
-													disabled={state.suffix !== '' && key !== UnitType.suffix}
+													disabled={(state.suffix !== '' && key !== UnitType.suffix) || disableMeter}
 												>
 													{translate(`UnitType.${key}`)}
 												</option>
@@ -478,7 +480,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										type='select'
 										value={state.unitRepresent}
 										disabled={inConversions()}
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 									>
 										{Object.keys(UnitRepresentType).map(key => {
 											return (
@@ -500,7 +502,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='displayable'
 										type='select'
 										value={state.displayable}
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										invalid={
 											state.displayable !== DisplayableType.none &&
 											(state.typeOfUnit === UnitType.meter || state.suffix !== '')
@@ -538,7 +540,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='preferredDisplay'
 										type='select'
 										value={state.preferredDisplay.toString()}
-										onChange={e => {handleBooleanChange(e);}}>
+										onChange={e => { handleBooleanChange(e); }}>
 										{Object.keys(TrueFalseType).map(key => {
 											return (
 												<option value={key} key={key}>
@@ -560,7 +562,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='secInRate'
 										type='select'
 										value={rate}
-										onChange={e => {handleRateChange(e);}}>
+										onChange={e => { handleRateChange(e); }}>
 										{Object.entries(LineGraphRates).map(
 											([rateKey, rateValue]) => (
 												<option value={rateValue * 3600} key={rateKey}>
@@ -584,7 +586,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												value={customRate}
 												min={1}
 												invalid={!customRateValid(customRate)}
-												onChange={e => {handleCustomRateChange(e);}}
+												onChange={e => { handleCustomRateChange(e); }}
 												// This grabs each key hit and then finishes input when hit enter.
 												onKeyDown={e => { handleEnter(e.key); }}
 											/>
@@ -605,7 +607,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										name='suffix'
 										type='text'
 										value={state.suffix}
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
 									<FormFeedback>
 										<FormattedMessage id="error.required" />
@@ -618,7 +620,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Col><FormGroup>
 								<Label for='minVal'>{translate('min.value')}</Label>
 								<Input id='minVal' name='minVal' type='number'
-									onChange={e => {handleNumberChange(e);}}
+									onChange={e => { handleNumberChange(e); }}
 									min={MIN_VAL}
 									max={state.maxVal}
 									required value={state.minVal}
@@ -631,7 +633,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Col><FormGroup>
 								<Label for='maxVal'>{translate('max.value')}</Label>
 								<Input id='maxVal' name='maxVal' type='number'
-									onChange={e => {handleNumberChange(e);}}
+									onChange={e => { handleNumberChange(e); }}
 									min={state.minVal}
 									max={MAX_VAL}
 									required value={state.maxVal}
@@ -646,7 +648,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 							<Col><FormGroup>
 								<Label for='disableChecks'>{translate('disable.checks')}</Label>
 								<Input id='disableChecks' name='disableChecks' type='select'
-									onChange={e => {handleStringChange(e);}}
+									onChange={e => { handleStringChange(e); }}
 									value={state.disableChecks}>
 									{Object.keys(DisableChecksType).map(key => {
 										return (<option value={key} key={key} >
@@ -663,7 +665,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 								name='note'
 								type='textarea'
 								value={state.note}
-								onChange={e => {handleStringChange(e);}}
+								onChange={e => { handleStringChange(e); }}
 							/>
 						</FormGroup>
 					</Container></ModalBody>
