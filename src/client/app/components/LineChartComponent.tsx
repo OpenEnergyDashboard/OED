@@ -19,7 +19,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
-import { setInitialXAxisRange } from '../redux/slices/graphSlice';
+import { setInitialXAxisRange, selectSliderRangeInterval } from '../redux/slices/graphSlice';
 import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
@@ -34,6 +34,7 @@ export default function LineChartComponent() {
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);
 	// initial slider range
+	const sliderRangeInterval = useAppSelector(selectSliderRangeInterval);
 
 	// Fetch data, and derive plotly points
 	const { data: meterPlotlyData, isFetching: meterIsFetching } = readingsApi.useLineQuery(meterArgs,
@@ -107,12 +108,9 @@ export default function LineChartComponent() {
 	// See https://community.plotly.com/t/replacing-an-empty-graph-with-a-message/31497 for showing text not plot.
 	if (data.length === 0) {
 		return <h1>{`${translate('select.meter.group')}`}	</h1>;
-	} else if (!enoughData || !data[0].x) {
+	} else if (!enoughData) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
-		// Adjust the min and max values for the x axis
-		// This goes through the list of groups/meters that have data to find the earliest and latest dates.
-		console.log(data);
 		let minDate = '';
 		let maxDate = '';
 		for (const trace of data) {
@@ -120,17 +118,19 @@ export default function LineChartComponent() {
 				const traceMin = trace.x[0] as string;
 				const traceMax = trace.x[trace.x.length - 1] as string;
 				// Update minX if this is the first trace or has an earlier date
-				if (minDate === '' || traceMin < minDate) {
+				if (minDate === '' || utc(traceMin).isBefore(utc(minDate))) {
 					minDate = traceMin;
 				}
 				// Update maxX if this is the first trace or has a later date
-				if (maxDate === '' || traceMax > maxDate) {
+				if (maxDate === '' || utc(traceMax).isAfter(utc(maxDate))) {
 					maxDate = traceMax;
 				}
 			}
-
-
 		}
+		// Tries to get the range from the slider range interval, undefined if not bounded
+		const sliderRange = sliderRangeInterval?.getIsBounded() ? [sliderRangeInterval.getStartTimestamp()!.utc().toISOString(), sliderRangeInterval.getEndTimestamp()!.utc().toISOString()]: undefined;
+		// X range is defined as either the slider range interval or the initial min max
+		const xRange = sliderRange ?? [minDate, maxDate];
 		return (
 			<Plot
 				data={data}
@@ -143,7 +143,7 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [minDate, maxDate],
+						range: xRange,
 						showgrid: true,
 						gridcolor: '#ddd'
 					}
