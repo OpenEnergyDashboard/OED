@@ -128,9 +128,12 @@ export default function LineChartComponent() {
 			}
 		}
 		// Tries to get the range from the slider range interval, undefined if not bounded
-		const sliderRange: [string, string] | undefined = sliderRangeInterval?.getIsBounded() ? 
-		[sliderRangeInterval.getStartTimestamp()!.utc().toISOString(), 
-		sliderRangeInterval.getEndTimestamp()!.utc().toISOString()] : undefined;
+		const sliderRange: [string, string] | undefined = sliderRangeInterval?.getIsBounded()
+			? [
+				sliderRangeInterval.getStartTimestamp()!.utc().toISOString(),
+				sliderRangeInterval.getEndTimestamp()!.utc().toISOString()
+			]
+			: undefined;
 		// Either sets the xRange to the minDate maxDate or the saved slider range. This keeps the range from resetting when we toggle error bars.
 		const xRange: [string, string] = sliderRange ?? [minDate, maxDate];
 		return (
