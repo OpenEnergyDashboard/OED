@@ -17,7 +17,7 @@ import { Week } from '../../types/redux/weeks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { generateRruleFromWeek } from '../../utils/generateRrule';
+import { generateRrule } from '../../utils/generateRrule';
 
 /**
  * Defines a button that opens a modal to create a new weekly conversion pattern.
@@ -84,7 +84,7 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 	};
 
 	// TEST
-	const generateRrule = async (weekIndex: number) => {
+	const generateRruleTest = async (weekIndex: number) => {
 		const week = weeks?.[weekIndex];
 		if (!week) return console.warn("No week found at index", weekIndex);
 
@@ -98,7 +98,7 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 			week.saturday,
 		].filter(Boolean);
 
-		console.log("DEBUG: weekDayIds:", weekDayIds);
+		// console.log("DEBUG: weekDayIds:", weekDayIds);
 
 		// for 2D array
 		// const segmentPromises = weekDayIds.map((dayId) => fetchDaySegments(dayId).unwrap());
@@ -130,7 +130,7 @@ export default function CreateWeekModalComponent(): React.ReactElement {
     // console.log("DEBUG: daySegmentsForWeek:", daySegmentsForWeek);
 
     // Pass data to generator
-    generateRruleFromWeek(week, days, daySegmentsForWeek);
+    generateRrule(week, days, daySegmentsForWeek);
 	};
 
 	// Function to reset the week details to default values. Called when modal is closed.
@@ -178,7 +178,7 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 				<FormattedMessage id="week.create" />
 			</Button>
 
-			<Button color="secondary" onClick={() => generateRrule(2)}>
+			<Button color="secondary" onClick={() => generateRruleTest(2)}>
 				Generate Rrule
 			</Button>
 

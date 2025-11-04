@@ -1,91 +1,109 @@
-import { RRule } from "rrule";
+import { datetime, RRule } from "rrule";
 
-export interface RruleWithMeta {
+export interface Occurrence {
   rule: RRule;
-  slope: number;
-  intercept: number;
   dayId: number;
   segmentId: number;
+  duration: number;
+  slope: number;
+  intercept: number;
 }
 
-export function generateRruleFromWeek(
-  week: any,
+interface WeekDayPair {
+  dayId: number;
+  rruleDay: any;
+}
+export interface DayIdToRruleDays {
+  dayId: number;
+  rruleDays: any[];
+}
+
+
+export function generateRrule(
+  week: any,    // from getWeek()
   days: any[],
   daySegments: any[] // {int dayId, daySegments[] segments}
-): RruleWithMeta[] {
-  console.log("DEBUG: week:", week);
-  console.log("DEBUG: days:", days);
-  console.log("DEBUG: daySegments:", daySegments);
+): Occurrence[] {
 
-  const dayIdToName: Record<number, string> = Object.fromEntries(
-    days.map((d) => [d.id, d.name])
-  );
+  // console.log("DEBUG: generateRrule.week:", week);
+  // console.log("DEBUG: generateRrule.days:", days);
+  // console.log("DEBUG: generateRrule.daySegments:", daySegments);
 
-  const weekdayMap: Record<string, any> = {
-    Sunday: RRule.SU,
-    Monday: RRule.MO,
-    Tuesday: RRule.TU,
-    Wednesday: RRule.WE,
-    Thursday: RRule.TH,
-    Friday: RRule.FR,
-    Saturday: RRule.SA,
-  };
+  const occurrences: Occurrence[] = [];
 
-  const rulesWithMeta: RruleWithMeta[] = [];
+  const weekDayPairs: WeekDayPair[] = [
+    { dayId: week.sunday, rruleDay: RRule.SU },
+    { dayId: week.monday, rruleDay: RRule.MO },
+    { dayId: week.tuesday, rruleDay: RRule.TU },
+    { dayId: week.wednesday, rruleDay: RRule.WE },
+    { dayId: week.thursday, rruleDay: RRule.TH },
+    { dayId: week.friday, rruleDay: RRule.FR },
+    { dayId: week.saturday, rruleDay: RRule.SA },
+  ];
 
-  // const dayIds = [
-  //   week.sunday,
-  //   week.monday,
-  //   week.tuesday,
-  //   week.wednesday,
-  //   week.thursday,
-  //   week.friday,
-  //   week.saturday,
-  // ].filter(Boolean);
+  const dayIdMappings: DayIdToRruleDays[] = [];
 
-  daySegments.forEach((day) => {
-    console.log("DEBUG: day", day);
+  weekDayPairs.forEach((pair) => {
+    const id = pair.dayId;
 
-    // day.segments.forEach((segment) => {
-    //   console.log("DEBUG: segment", segment);
-    // });
+    // find existing entry or create new one
+    let existing = dayIdMappings.find(d => d.dayId === id);
+
+    if (!existing) {
+      existing = { dayId: id, rruleDays: [] };
+      dayIdMappings.push(existing);
+    }
+
+    existing.rruleDays.push(pair.rruleDay);
   });
 
-  // dayIds.forEach((dayId, i) => {
-  //   const dayName = dayIdToName[dayId];
-  //   const segments = daySegments[i] ?? [];
+  // console.log("dayIdMappings:", dayIdMappings);
 
-  //   segments.forEach((segment: any) => {
-  //     const { startHour, slope, intercept, id: segmentId } = segment;
+  daySegments.forEach((day: any) => {
+    // console.log("DEBUG: day", day);
 
-  //     const startDate = new Date();
-  //     startDate.setHours(startHour, 0, 0, 0);
+    day.segments.forEach((segment: any) => {
+      // console.log("DEBUG: segment", segment);
+       
+      const dayId = segment.dayId;
 
-  //     console.log("DEBUG: dayName:", dayName);
-  //     console.log("DEBUG: byweekday:", [weekdayMap[dayName]]);
-  //     const rule = new RRule({
-  //       freq: RRule.WEEKLY,
-  //       interval: 1,
-  //       byweekday: [weekdayMap[dayName]],
-  //       dtstart: startDate,
-  //     });
+      const { id: segmentId, startHour, endHour, slope, intercept } = segment;
+      const weekDayArray = dayIdMappings.find(d => d.dayId === dayId)?.rruleDays;
+      const duration = endHour - startHour;
 
-  //     rulesWithMeta.push({
-  //       rule,
-  //       slope,
-  //       intercept,
-  //       dayId,
-  //       segmentId,
-  //     });
-  //   });
-  // });
+      console.log("startHour:", startHour);
 
-  // console.log("Generated rules:", rulesWithMeta.map((r) => ({
-  //   rrule: r.rule.toString(),
-  //   slope: r.slope,
-  //   intercept: r.intercept,
-  //   dayId: r.dayId,
-  // })));
+      const rule = new RRule({
+        freq: RRule.WEEKLY,
+        byweekday: weekDayArray,
+        dtstart: datetime(2024, 0, 1, startHour, 0) // timezone: UTC
+      });
 
-  return rulesWithMeta;
+      console.log("DEBUG: rrule: ", rule.toText());
+      console.log("DEBUG: string: ", rule.toString());
+
+      console.log("TEST (UTC): ", 
+        rule.between(datetime(2024, 4, 10), datetime(2024, 4, 24))
+      );
+     
+      occurrences.push({
+        rule,
+        dayId,
+        segmentId,
+        duration,
+        slope,
+        intercept
+      });
+
+    });
+    console.log("Generated rules:", occurrences.map((r) => ({
+      rrule: r.rule.toString(),
+      slope: r.slope,
+      intercept: r.intercept,
+      dayId: r.dayId,
+    })));
+  });
+
+
+  return occurrences;
 }
