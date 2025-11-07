@@ -46,7 +46,7 @@
 		"testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
 		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
 		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'",
-		"fetchData": "node src/server/services/weather/fetchData.js"
+		"fetchWeatherData": "node ./src/server/services/weather/fetchData.js"
 	},
 	"nodemonConfig": {
 		"watch": [

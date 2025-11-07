@@ -14,57 +14,57 @@ const { fetchWeatherApi } = require('openmeteo');
 // const moment = require('moment');
 // Updated function to accept startDate and endDate parameters
 function fetchWeatherData(latitude, longitude, startDate, endDate) {
-    const params = {
-        "latitude": latitude,
-        "longitude": longitude,
-        "start_date": startDate,
-        "end_date": endDate,
-        "hourly": "temperature_2m",
-        "temperature_unit": "fahrenheit",
-        "timezone": "America/Los_Angeles" // TODO: should not be static
-    };
-    const url = "https://archive-api.open-meteo.com/v1/archive";
+	const params = {
+		"latitude": latitude,
+		"longitude": longitude,
+		"start_date": startDate,
+		"end_date": endDate,
+		"hourly": "temperature_2m",
+		"temperature_unit": "fahrenheit",
+		"timezone": "America/Los_Angeles" // TODO: should not be static
+	};
+	const url = "https://archive-api.open-meteo.com/v1/archive";
 
-    return fetchWeatherApi(url, params).then(responses => {
-        const response = responses[0];
-        const utcOffsetSeconds = response.utcOffsetSeconds();
-        // console.log(utcOffsetSeconds);
-        const timezone = response.timezone();
-        // console.log(timezone);
-        const timezoneAbbreviation = response.timezoneAbbreviation();
-        // console.log(timezoneAbbreviation);
-        const latitude = response.latitude();
-        const longitude = response.longitude();
+	return fetchWeatherApi(url, params).then(responses => {
+		const response = responses[0];
+		const utcOffsetSeconds = response.utcOffsetSeconds();
+		// console.log(utcOffsetSeconds);
+		const timezone = response.timezone();
+		// console.log(timezone);
+		const timezoneAbbreviation = response.timezoneAbbreviation();
+		// console.log(timezoneAbbreviation);
+		const latitude = response.latitude();
+		const longitude = response.longitude();
 
-        const hourly = response.hourly();
+		const hourly = response.hourly();
 
-        // Helper function to form time ranges
-        const range = (start, stop, step) =>
-            Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+		// Helper function to form time ranges
+		const range = (start, stop, step) =>
+			Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
 
-        const weatherData = {
-            hourly: {
-                time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
-                    (t) => new Date((t + utcOffsetSeconds) * 1000)
-                ),
-                temperature2m: hourly.variables(0).valuesArray(),
-            },
-        };
+		const weatherData = {
+			hourly: {
+				time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
+					(t) => new Date((t + utcOffsetSeconds) * 1000)
+				),
+				temperature2m: hourly.variables(0).valuesArray(),
+			},
+		};
 
-        // for (let i = 0; i < weatherData.hourly.time.length; i++) {
-        //     console.log(
-        //         weatherData.hourly.time[i].toISOString(),
-        //         weatherData.hourly.temperature2m[i]
-        //     );
-        // }
-        // Instead of logging, return the formatted weather data
-        return weatherData.hourly.time.map((time, index) => ({
-            time: time,
-            temperature: weatherData.hourly.temperature2m[index]
-        }));
-    }).catch(err => {
-        console.error('Error fetching weather data:', err);
-    });
+		// for (let i = 0; i < weatherData.hourly.time.length; i++) {
+		//     console.log(
+		//         weatherData.hourly.time[i].toISOString(),
+		//         weatherData.hourly.temperature2m[i]
+		//     );
+		// }
+		// Instead of logging, return the formatted weather data
+		return weatherData.hourly.time.map((time, index) => ({
+			time: time,
+			temperature: weatherData.hourly.temperature2m[index]
+		}));
+	}).catch(err => {
+		console.error('Error fetching weather data:', err);
+	});
 }
 
 // Example usage of the function
@@ -79,3 +79,30 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 //   .catch(error => {
 //     console.error('Error fetching weather data:', error);
 //   });
+
+// if (require.main === module) {
+// 	const args = process.argv.slice(2);
+
+// 	if (args.length < 4) {
+// 		console.log('Usage: npm run fetchWeatherData -- <latitude> <longitude> <startDate> <endDate>');
+// 		console.log('Example: npm run fetchWeatherData -- 36.6537 121.799 2024-04-20 2025-11-01');
+// 		process.exit(1);
+// 	}
+
+// 	const [latitude, longitude, startDate, endDate] = args;
+
+// 	fetchWeatherData(
+// 		parseFloat(latitude),
+// 		parseFloat(longitude),
+// 		startDate,
+// 		endDate
+// 	).then(data => {
+// 		console.log('Weather Data Retrieved:');
+// 		console.log(JSON.stringify(data, null, 2));
+// 	}).catch(error => {
+// 		console.error('Error:', error);
+// 		process.exit(1);
+// 	});
+// }
+
+// module.exports = { fetchWeatherData };
