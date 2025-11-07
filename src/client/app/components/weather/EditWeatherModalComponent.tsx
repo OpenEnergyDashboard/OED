@@ -141,7 +141,7 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 				})
 					.unwrap()
 					.then(() => {
-						showSuccessNotification(translate('weather.successfully.edited.location'));
+						showSuccessNotification(translate('weather.successfully.edit.location'));
 					})
 					.catch(() => {
 						showErrorNotification(translate('weather.failed.to.edit.location'));
