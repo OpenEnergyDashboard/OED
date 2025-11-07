@@ -1,33 +1,13 @@
 import { datetime, RRule } from "rrule";
 
-export interface Occurrence {
-  rule: RRule;
-  dayId: number;
-  segmentId: number;
-  duration: number;
-  slope: number;
-  intercept: number;
-}
-
-interface WeekDayPair {
-  dayId: number;
-  rruleDay: any;
-}
-export interface DayIdToRruleDays {
-  dayId: number;
-  rruleDays: any[];
-}
-
-
 export function generateRrule(
-  week: any,    // from getWeek()
-  // days: any[],
-  daySegments: any[] // {int dayId, daySegments[] segments}
-): Occurrence[] {
+  week,        // from getWeek()
+  daySegments  // {int dayId, daySegments[] segments}
+) {
 
-  const occurrences: Occurrence[] = [];
+  const occurrences = [];
 
-  const weekDayPairs: WeekDayPair[] = [
+  const weekDayPairs = [
     { dayId: week.sunday, rruleDay: RRule.SU },
     { dayId: week.monday, rruleDay: RRule.MO },
     { dayId: week.tuesday, rruleDay: RRule.TU },
@@ -37,7 +17,7 @@ export function generateRrule(
     { dayId: week.saturday, rruleDay: RRule.SA },
   ];
 
-  const dayIdMappings: DayIdToRruleDays[] = [];
+  const dayIdMappings = [];
 
   weekDayPairs.forEach((pair) => {
     const id = pair.dayId;
@@ -53,14 +33,8 @@ export function generateRrule(
     existing.rruleDays.push(pair.rruleDay);
   });
 
-  // console.log("dayIdMappings:", dayIdMappings);
-
-  daySegments.forEach((day: any) => {
-    // console.log("DEBUG: day", day);
-
-    day.segments.forEach((segment: any) => {
-      // console.log("DEBUG: segment", segment);
-       
+  daySegments.forEach((day) => {
+    day.segments.forEach((segment) => {
       const dayId = segment.dayId;
 
       const { id: segmentId, startHour, endHour, slope, intercept } = segment;
@@ -78,10 +52,10 @@ export function generateRrule(
       console.log("DEBUG: rrule: ", rule.toText());
       console.log("DEBUG: string: ", rule.toString());
 
-      console.log("TEST (UTC): ", 
+      console.log("TEST (UTC): ",
         rule.between(datetime(2024, 4, 10), datetime(2024, 4, 24))
       );
-     
+
       occurrences.push({
         rule,
         dayId,
@@ -92,6 +66,7 @@ export function generateRrule(
       });
 
     });
+
     console.log("Generated rules:", occurrences.map((r) => ({
       rrule: r.rule.toString(),
       slope: r.slope,
@@ -99,7 +74,6 @@ export function generateRrule(
       dayId: r.dayId,
     })));
   });
-
 
   return occurrences;
 }
