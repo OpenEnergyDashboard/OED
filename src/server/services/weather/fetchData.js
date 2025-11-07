@@ -80,12 +80,14 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 //     console.error('Error fetching weather data:', error);
 //   });
 
+// TODO: fetchData.js should fetch both weatherData and weatherLocation information.
+
 // if (require.main === module) {
 // 	const args = process.argv.slice(2);
 
 // 	if (args.length < 4) {
 // 		console.log('Usage: npm run fetchWeatherData -- <latitude> <longitude> <startDate> <endDate>');
-// 		console.log('Example: npm run fetchWeatherData -- 36.6537 121.799 2024-04-20 2025-11-01');
+// 		console.log('Example: npm run fetchWeatherData -- 36.6537 121.799 2024-04-20 2024-04-23');
 // 		process.exit(1);
 // 	}
 
