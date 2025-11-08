@@ -126,24 +126,6 @@ CREATE OR REPLACE FUNCTION group_compare_readings_unit (
 )
 	RETURNS TABLE(group_id INTEGER, curr_use FLOAT, prev_use FLOAT)
 AS $$
--- DECLARE
--- 	meter_ids INTEGER[];
--- BEGIN
--- 	SELECT array_agg(DISTINCT meter_id) INTO meter_ids
--- 	FROM unnest(group_ids) gids(id)
--- 	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id;
-
--- 	RETURN QUERY
--- 	SELECT
--- 		gids.id AS group_id,
--- 		SUM(cr.curr_use) AS curr_use,
--- 		SUM(cr.prev_use) AS prev_use
--- 	FROM unnest(group_ids) gids(id)
--- 	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id
--- 	INNER JOIN meter_compare_readings_unit(meter_ids, graphic_unit_id, curr_start, curr_end, shift) cr
--- 			ON cr.meter_id = gdm.meter_id
--- 	GROUP by gids.id;
-
 DECLARE
 	curr_tsrange TSRANGE;
 	prev_tsrange TSRANGE;
@@ -182,5 +164,3 @@ BEGIN
 		LEFT JOIN curr_period ON gids.id = curr_period.group_id;
 END;
 $$ LANGUAGE 'plpgsql';
-
-

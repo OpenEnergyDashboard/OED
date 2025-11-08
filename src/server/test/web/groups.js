@@ -193,12 +193,9 @@ mocha.describe('groups API', () => {
 						// login
 						res = await chai.request(app).post('/api/login')
 							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-						// console.log("Res:", res);
 						currentToken = res.body.token;
-						// console.log("CurrentToken:", currentToken);
 						// edit
 						res = await chai.request(app).put('/api/groups/edit').set('token', currentToken);
-						// console.log("Res:", res);
 						expect(res).to.have.status(expectedResponseStatus);
 					});
 

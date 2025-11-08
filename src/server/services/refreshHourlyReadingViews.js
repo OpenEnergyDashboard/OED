@@ -10,9 +10,9 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 
 /** 
-* @deprecated Please use do not use this function anymore
+* @deprecated OED only supports refreshing all views so please use refreshAllReadingViews.
+* See src/server/services/refreshAllReadingViews.js
 **/
-
 async function refreshHourlyReadingViews() {
 	const conn = getConnection();
 

@@ -16,8 +16,7 @@ const { insertStandardUnits, insertStandardConversions } = require('../../util/i
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
-// Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
-const DELTA = 0.0000001;
+import { DELTA } from '../../util/readingsUtils.js';
 
 // TODO add tests that check flow readings.
 
@@ -456,9 +455,7 @@ mocha.describe('Line & bar Readings', () => {
 
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
-
 		});
-
 
 		mocha.it('Hourly readings with two meters in a group', async () => {
 			const startOfDay = moment.utc('2018-01-01');
@@ -497,7 +494,7 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
 			], conn);
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			// Associate both meters with a single group
 			await group1.adoptMeter(meter1.id, conn);

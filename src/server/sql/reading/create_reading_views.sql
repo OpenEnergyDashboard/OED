@@ -259,7 +259,6 @@ DECLARE
 	child_meters_unit_ids INTEGER[];
 	unit_ids INTEGER[] := '{}';
 	unit_id INTEGER;
-	curr_src_id INTEGER;
 	
 BEGIN
 	-- get the units of all child meters in group
@@ -301,7 +300,7 @@ CREATE MATERIALIZED VIEW IF NOT EXISTS
 group_daily_readings_unit
 	AS SELECT
 		gdm.group_id,
-		sum(dr.reading_rate  * c.slope + c.intercept) AS reading_rate,
+		sum(dr.reading_rate * c.slope + c.intercept) AS reading_rate,
 		dr.time_interval,
 		gu.graphic_unit_id AS graphic_unit_id
 	
@@ -336,7 +335,7 @@ group_hourly_readings_unit
 	GROUP BY gdm.group_id, gu.graphic_unit_id, hr.time_interval
 	ORDER BY gdm.group_id;
 
-CREATE INDEX if not exists idx_group_hourly_readings_unit ON group_hourly_readings_unit USING GIST(time_interval, group_id, graphic_unit_id);
+CREATE INDEX if not exists idx_group_hourly_readings_unit ON group_hourly_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
@@ -682,8 +681,6 @@ BEGIN
 	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
-
-	RAISE NOTICE 'real_start_stamp: %, real_end_stamp: %, num_bars: %',
     real_start_stamp, real_end_stamp, num_bars;
 
 	RETURN QUERY
