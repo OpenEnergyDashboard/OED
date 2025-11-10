@@ -48,6 +48,7 @@ const LocaleTranslationData = {
 		"calibration.save.database": "Save changes to database",
 		"calibration.submit.button": "Submit",
 		"cancel": "Cancel",
+		"change.password": "Change password",
 		"chart.link": "Chart Link",
 		"child.groups": "Child Groups",
 		"child.meters": "Child Meters",

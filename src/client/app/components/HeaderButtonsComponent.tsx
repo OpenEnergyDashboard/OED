@@ -296,6 +296,9 @@ export default function HeaderButtonsComponent() {
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
+							<DropdownItem>
+								<FormattedMessage id='change.password' />
+							</DropdownItem>
 							<DropdownItem divider />
 							<DropdownItem
 								href={optionsHelp}>
