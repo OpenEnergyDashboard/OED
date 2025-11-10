@@ -130,8 +130,8 @@ mocha.describe('readings API', () => {
 					}
 					// Define conversion c2 for kWh to MJ
 					const c2 = {
-						sourceName: 'MJ',
-						destinationName: 'kWh',
+						sourceName: 'kWh',
+						destinationName: 'MJ',
 						bidirectional: true,
 						slope: 3.6,
 						intercept: 0,
