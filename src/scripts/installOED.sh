@@ -188,11 +188,80 @@ printf "%s\n" "OED install finished"
 if [ "$dostart" == "yes" ]; then
 	if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
 		printf "%s\n" "Starting OED in production mode"
+		#Checking if the user has set a mail method and left one of the mailing environment variables default, warning if so
+		if [ -z "$OED_MAIL_METHOD" ] || [ "$OED_MAIL_METHOD" != "none" ]; then
+			if [ "$OED_MAIL_SMTP" = "smtp.example.com" ] || \
+			[ "$OED_MAIL_SMTP_PORT" = "465" ] || \
+			[ "$OED_MAIL_IDENT" = "someone@example.com" ] || \
+			[ "$OED_MAIL_CREDENTIAL" = "credential" ] || \
+			[ "$OED_MAIL_FROM" = "mydomain@example.com" ] || \
+			[ "$OED_MAIL_TO" = "someone@example.com" ] || \
+			[ "$OED_MAIL_ORG" = "My Organization Name" ]; then
+				printf "\n********************************************************************************\n"
+				printf "* WARNING: You have set your mail method but one or more of the mail environment variables are still set to the default value!*\n"
+				printf "********************************************************************************\n\n"
+			fi
+		fi
+		#If the user is in production and their token secret has been left default, generating a random one
+		if [ -z "$OED_TOKEN_SECRET" ] || [ "$OED_TOKEN_SECRET" = "?" ]; then
+			printf "\nNo valid OED_TOKEN_SECRET detected. Generating a secure random secret...\n"
+	
+			# Generate 32 bytes of random data and convert to 64-character hex
+			OED_TOKEN_SECRET=$(openssl rand -hex 32)
+			export OED_TOKEN_SECRET
+
+			printf "Generated OED_TOKEN_SECRET: %s\n" "$OED_TOKEN_SECRET"
+
+			# Save to .env for future runs
+			if [ -f ".env" ]; then
+				if grep -q "^OED_TOKEN_SECRET=" .env; then
+					sed -i "s/^OED_TOKEN_SECRET=.*/OED_TOKEN_SECRET=$OED_TOKEN_SECRET/" .env
+				else
+					echo "OED_TOKEN_SECRET=$OED_TOKEN_SECRET" >> .env
+				fi
+			else
+				echo "OED_TOKEN_SECRET=$OED_TOKEN_SECRET" > .env
+			fi
+		fi
+		#If the user is in production and their postgres password has been left default, generating a random one
+		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
+			printf "\n No valid PostgreSQL password detected. Generating a secure random password...\n"
+			POSTGRES_PASSWORD=$(openssl rand -base64 12)
+			export POSTGRES_PASSWORD
+			printf "Generated PostgreSQL password: %s\n" "$POSTGRES_PASSWORD"
+			printf "\n Make sure to save or change this value"
+
+			# Save to .env
+			if [ -f ".env" ]; then
+				if grep -q "^POSTGRES_PASSWORD=" .env; then
+					sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
+				else
+					echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
+				fi
+			else
+				echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" > .env
+			fi
+		fi
 		npm run start
-	else
-		printf "%s\n" "Starting OED in development mode"
+	elif [ "$OED_PRODUCTION" == "no" ]; then
+		#Warning the user if they've left their token or postgres password default, we don't randomly generate it in dev mode 
+		if [ -z "$OED_TOKEN_SECRET" ] || [ "$OED_TOKEN_SECRET" = "?" ]; then
+			printf "\n********************************************************************************\n"
+			printf "WARNING: YOU ARE USING OED IN DEVELOPMENT MODE WITH THE DEFAULT OED_TOKEN_SECRET SET IN docker-compose.yml IF THIS IS NOT INTENTIONAL GO THERE TO CHANGE IT.\n"
+			printf "********************************************************************************\n\n"
+		fi
+		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
+			printf "\n********************************************************************************\n"
+			printf "* WARNING: YOU ARE USING OED IN DEVELOPMENT MODE WITH THE DEFAULT POSTGRESQL PASSWORD SET IN docker-compose.yml IF THIS IS NOT INTENTIONAL GO THERE TO CHANGE IT. *\n"
+			printf "********************************************************************************\n\n"
+		fi
+		printf "%s\n" "Starting OED in development mode."
 		./src/scripts/devstart.sh
-	fi
+	else
+		printf "\nFailure: Invalid or missing enviroment configuration."
+		printf "\nSet OED_PRODUCTION to 'yes' for production or 'no' for development."
+		exit 10
+	fi 
 else
-	printf "%s\n" "Not starting OED due to --nostart"
+	printf "%s\n" "Not starting OED due to --nostart."
 fi
