@@ -158,8 +158,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-/* Gets group meters graphing data for 3D graphic by returning points that span the requested  
-  length of time over the days requested. 
+/* Gets group meters graphing data for 3D graphic by returning points that span the requested
+  length of time over the days requested.
 */
 CREATE OR REPLACE FUNCTION group_3d_readings_unit (
 	--Desire group ID

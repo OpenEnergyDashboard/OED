@@ -22,7 +22,7 @@ async function refreshAllReadingViews() {
 	// Refresh group views
 	log.info('Refreshing Group Reading Views');
 	await Promise.all([Reading.refreshGroupDailyReadings(conn), Reading.refreshGroupHourlyReadings(conn)]);
-	log.info('Group Views Refreshed');
+	log.info('refreshAllReadingViews completed');
 }
 
 module.exports = { refreshAllReadingViews };

@@ -681,7 +681,6 @@ BEGIN
 	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
-    real_start_stamp, real_end_stamp, num_bars;
 
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,

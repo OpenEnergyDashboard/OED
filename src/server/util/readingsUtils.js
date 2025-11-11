@@ -45,7 +45,7 @@ async function prepareTest(unitData, conversionData, meterData, groupData = []) 
 
     // Only refresh meter views if there is no group changes.
     if (groupData.length == 0) {
-        await Reading.refreshMeterReadingsView(conn);
+        await Reading.refreshMeterReadingsViews(conn);
     }
     else {
         await Group.refreshGroupsDeepMetersView(conn);

@@ -12,7 +12,7 @@ const Reading = require('../models/Reading');
 /** 
 * @deprecated OED only supports refreshing all views so please use refreshAllReadingViews.
 * See src/server/services/refreshAllReadingViews.js
-**/
+*/
 async function refreshHourlyReadingViews() {
 	const conn = getConnection();
 
