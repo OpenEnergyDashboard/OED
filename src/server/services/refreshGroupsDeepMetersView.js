@@ -17,7 +17,7 @@ async function refreshGroupsDeepMetersView() {
     log.info('Materialized Groups Deep Meters View Refreshed');
     // Refresh group readings views
 	log.info('Refreshing Group Reading Views');
-	await Promise.all([Reading.refreshGroupDailyReadings(conn), Reading.refreshGroupHourlyReadings(conn)]);
+	await Reading.refreshGroupReadingsViews(conn);
 	log.info('...Group Views Refreshed!');
 }
 

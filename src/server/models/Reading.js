@@ -107,24 +107,18 @@ class Reading {
 		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
 	}
 
-	/**
-	 * Refreshes the group daily readings view.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
-	 */
-	static refreshGroupDailyReadings(conn) {
-		return conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit');
-	}
 
 	/**
-	 * Refreshes the group hourly readings view.
+	 * Refreshes group readings views.
 	 * Should be called at least once a day, preferably in the middle of the night.
 	 * @param conn The connection to use
 	 * @returns {Promise<void>}
 	 */
-	static refreshGroupHourlyReadings(conn) {
-		return conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit');
+	static refreshGroupReadingsViews(conn) {
+		// It is safe to refresh the hourly and daily group views in parallel since they
+		// do not depend one each other unlike meters.
+		return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
+			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
 	}
 
 	/**
