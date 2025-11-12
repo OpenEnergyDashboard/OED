@@ -183,6 +183,9 @@ CREATE MATERIALIZED VIEW daily_readings_unit
 	GROUP BY h.meter_id, gen.interval_start, u.unit_represent
 	ORDER BY gen.interval_start, h.meter_id;
 
+-- TODO Check if needed and when to use as not done for hourly.
+-- With the index added in 3D readings, this should be consider as part of the decision
+-- on if this is needed.
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 -- We need a gist index to support the @> operation.
 CREATE INDEX if not exists idx_daily_readings_unit ON daily_readings_unit USING GIST(time_interval, meter_id);
@@ -192,23 +195,22 @@ CREATE INDEX if not exists idx_daily_readings_unit ON daily_readings_unit USING 
 	to all child meters in that group.
 */
 CREATE OR REPLACE FUNCTION get_graphic_unit (
-	meters_group_id INTEGER
+	requested_group_id INTEGER
 )
 RETURNS INTEGER[] AS $$
 DECLARE
 	src_ids INTEGER[];
 	dest_ids INTEGER[];
 	child_meters_unit_ids INTEGER[];
-	unit_ids INTEGER[] := '{}';
+	unit_ids_compatible INTEGER[] := '{}';
 	unit_id INTEGER;
-	curr_src_id INTEGER;
-	
+
 BEGIN
 	-- get the units of all child meters in group
 	SELECT array_agg(DISTINCT m.unit_id) INTO child_meters_unit_ids
 	FROM groups_deep_meters gdm
 	JOIN meters m ON m.id = gdm.meter_id
-	WHERE gdm.group_id = meters_group_id;
+	WHERE gdm.group_id = requested_group_id;
 
 	-- get all possible destination units
 	SELECT array_agg(u.id) INTO dest_ids
@@ -226,15 +228,15 @@ BEGIN
 	 		-- append each compatible unit id once into array
 			IF src_ids @> child_meters_unit_ids
 			THEN 
-				IF NOT (unit_id = ANY (unit_ids))
+				IF NOT (unit_id = ANY (unit_ids_compatible))
 				THEN
-					unit_ids := array_append(unit_ids, unit_id);
+					unit_ids_compatible := array_append(unit_ids_compatible, unit_id);
 				END IF;
 			END IF;
 		END;
     END LOOP;
 
-	RETURN unit_ids;
+	RETURN unit_ids_compatible;
 END;
 $$ LANGUAGE 'plpgsql';
 
@@ -242,7 +244,7 @@ $$ LANGUAGE 'plpgsql';
 CREATE MATERIALIZED VIEW group_daily_readings_unit
 	AS SELECT
 		gdm.group_id,
-		sum(dr.reading_rate  * c.slope + c.intercept) AS reading_rate,
+		sum(dr.reading_rate * c.slope + c.intercept) AS reading_rate,
 		dr.time_interval,
 		gu.graphic_unit_id AS graphic_unit_id
 	
@@ -276,7 +278,7 @@ CREATE MATERIALIZED VIEW group_hourly_readings_unit
 	GROUP BY gdm.group_id, gu.graphic_unit_id, hr.time_interval
 	ORDER BY gdm.group_id;
 
-CREATE INDEX if not exists idx_group_hourly_readings_unit ON group_hourly_readings_unit USING GIST(time_interval, group_id, graphic_unit_id);
+CREATE INDEX if not exists idx_group_hourly_readings_unit ON group_hourly_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
@@ -622,9 +624,6 @@ BEGIN
 	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
-
-	RAISE NOTICE 'real_start_stamp: %, real_end_stamp: %, num_bars: %',
-    real_start_stamp, real_end_stamp, num_bars;
 
 	RETURN QUERY
 		SELECT dr.meter_id AS meter_id,

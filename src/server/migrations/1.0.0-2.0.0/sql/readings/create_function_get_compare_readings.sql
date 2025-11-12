@@ -123,7 +123,7 @@ shift: How far back in time to shift the curr_start and curr_end date/time to ge
 	times to compare.
  */
 CREATE OR REPLACE FUNCTION group_compare_readings_unit (
-	group_ids INTEGER[],
+	requested_graphic_unit_id INTEGER[],
 	graphic_unit_id INTEGER,
 	curr_start TIMESTAMP,
 	curr_end TIMESTAMP,
