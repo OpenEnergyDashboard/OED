@@ -66,7 +66,10 @@ export const groupsApi = baseApi.injectEndpoints({
 				// omit the 'id' property of the groupData or api errors/fails
 				body: omit(groupData, 'id')
 			}),
-			invalidatesTags: ['GroupData', 'GroupChildrenData']
+			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
+				await queryFulfilled;
+				dispatch(groupsApi.endpoints.refreshGroups.initiate());
+			}
 		}),
 		editGroup: builder.mutation<void, { editedGroup: Omit<GroupData, 'deepMeters'>, shouldRefreshGroupsDeepMetersView: boolean }>({
 			query: group => ({
