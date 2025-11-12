@@ -575,8 +575,8 @@ mocha.describe('Line & bar Readings', () => {
 
 			for (let i = 0; i < readingsForMeterComparable.length; i++) {
 				expect(readingsForMeterComparable[i].reading).to.be.closeTo((100 + (i * 100)) * conversionSlope, DELTA);
-				expect(readingsForMeterComparable[i].start_timestamp).to.be.closeTo(start_timestamps[i], DELTA);
-				expect(readingsForMeterComparable[i].end_timestamp).to.be.closeTo(end_timestamps[i], DELTA);
+				expect(readingsForMeterComparable[i].start_timestamp).equal(start_timestamps[i]);
+				expect(readingsForMeterComparable[i].end_timestamp).equal(end_timestamps[i]);
 			}
 		});
 
@@ -599,13 +599,13 @@ mocha.describe('Line & bar Readings', () => {
 			);
 
 			expect(readingsForMeterComparable[0].reading).to.be.closeTo(300 * conversionSlope, DELTA);
-			expect(readingsForMeterComparable[0].start_timestamp).to.be.closeTo(timestamp1.valueOf(), DELTA);
-			expect(readingsForMeterComparable[0].end_timestamp).to.be.closeTo(timestamp3.valueOf(), DELTA);
+			expect(readingsForMeterComparable[0].start_timestamp).equal(timestamp1.valueOf());
+			expect(readingsForMeterComparable[0].end_timestamp).equal(timestamp3.valueOf());
 
 
 			expect(readingsForMeterComparable[1].reading).to.be.closeTo(700 * conversionSlope, DELTA);
-			expect(readingsForMeterComparable[1].start_timestamp).to.be.closeTo(timestamp3.valueOf(), DELTA);
-			expect(readingsForMeterComparable[1].end_timestamp).to.be.closeTo(timestamp5.valueOf(), DELTA);
+			expect(readingsForMeterComparable[1].start_timestamp).equal(timestamp3.valueOf());
+			expect(readingsForMeterComparable[1].end_timestamp).equal(timestamp5.valueOf());
 
 		});
 

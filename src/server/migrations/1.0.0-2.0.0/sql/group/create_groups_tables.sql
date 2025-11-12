@@ -2,6 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+-- The old table was not a view.
+-- Unclear if a cascade is needed but it may be so doing since seems okay.
+DROP TABLE IF EXISTS groups_deep_meters CASCADE;
+
 /*
   This view has a row for each (group, deep child meter) relationship represented by the groups DAG.
   It also includes a boolean column, is_shadowed, that is true when that group has another meter that monitors a superset

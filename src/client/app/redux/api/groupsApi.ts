@@ -89,7 +89,8 @@ export const groupsApi = baseApi.injectEndpoints({
 				url: 'api/groups/refresh',
 				method: 'POST'
 			}),
-			// Only the group readings really need invalidation
+			// This can modify the groups due to refreshing deep meters and the
+			// readings due to refreshing the group views.
 			invalidatesTags: ['GroupData', 'GroupChildrenData', 'Readings'],
 			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
 				dispatch(setRefreshingReadings(true));
