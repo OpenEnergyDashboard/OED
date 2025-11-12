@@ -54,6 +54,7 @@ export interface ThreeDState {
 	meterOrGroupID: MeterOrGroupID | undefined;
 	meterOrGroup: MeterOrGroup | undefined;
 	readingInterval: ReadingInterval;
+	numDays: number | undefined; // Number of days for 3D graphic span (undefined means use default: 1 year)
 }
 
 export enum ShiftAmount {
@@ -84,6 +85,7 @@ export interface GraphState {
 	showMinMax: boolean;
 	threeD: ThreeDState;
 	queryTimeInterval: TimeInterval;
+	threeDInterval: TimeInterval | undefined; // Calculated 3D date range (separate from queryTimeInterval)
 	hotlinked: boolean;
 	shiftAmount: ShiftAmount;
 	shiftTimeInterval: TimeInterval;
