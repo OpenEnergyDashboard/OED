@@ -100,53 +100,133 @@ export function roundTimeIntervalForFetch(timeInterval: TimeInterval): TimeInter
 }
 
 /**
- * Determines if Time Interval is valid for 3d graphic. Is bounded, and a year or less.
+ * Maximum number of days allowed for 3D graphics.
+ * Based on data size calculations: 3 years ≈ 823 KB of data.
+ * This should be tested for performance and adjusted as needed.
+ */
+export const MAX_3D_DAYS = 1095; // 3 years
+
+/**
+ * Default number of days for 3D graphics if not specified by user.
+ */
+export const DEFAULT_3D_DAYS = 365; // 1 year
+
+/**
+ * Determines if Time Interval is valid for 3d graphic. Is bounded, and within maxDays limit.
  * @param timeInterval - current redux state
- * @returns the a time interval into a dateRange compatible for a date-picker.
+ * @param maxDays - maximum allowed days (defaults to MAX_3D_DAYS)
+ * @returns true if the interval is bounded and within the maxDays limit
  */
-export function isValidThreeDInterval(timeInterval: TimeInterval): boolean {
-	return timeInterval.getIsBounded() && timeInterval.duration('days') <= 367;
-}
-
-/**
- * Auto-adjusts a time interval to the most recent year of data for 3D graphics.
- * This provides the most relevant data while maintaining performance.
- * @param timeInterval - the original time interval that may exceed 1 year
- * @param maxDataDate - the maximum date with actual data (optional, defaults to now)
- * @returns a time interval adjusted to show the most recent 365 days of data
- */
-export function autoAdjustThreeDInterval(timeInterval: TimeInterval, maxDataDate?: moment.Moment): TimeInterval {
-	// Ensure maxDataDate is valid
-	const validMaxDate = maxDataDate && maxDataDate.isValid() ? maxDataDate : moment();
-
+export function isValidThreeDInterval(timeInterval: TimeInterval, maxDays: number = MAX_3D_DAYS): boolean {
 	if (!timeInterval.getIsBounded()) {
-		// For unbounded ranges, use the last year from max data date or now
-		const endDate = validMaxDate.clone();
-		const startDate = endDate.clone().subtract(365, 'days');
-		return new TimeInterval(startDate, endDate);
+		return false;
 	}
-
-	const originalEnd = timeInterval.getEndTimestamp();
-	const maxDate = validMaxDate.isBefore(originalEnd) ? validMaxDate : originalEnd;
-
-	// Calculate the most recent year from the end date
-	const adjustedEnd = maxDate.clone();
-	const adjustedStart = adjustedEnd.clone().subtract(365, 'days');
-
-	// Ensure the start date is not before the max data date's earliest possible date
-	const earliestStart = validMaxDate.clone().subtract(365, 'days');
-	if (adjustedStart.isBefore(earliestStart)) {
-		adjustedStart.set(earliestStart.toObject());
-	}
-
-	return new TimeInterval(adjustedStart, adjustedEnd);
+	const days = timeInterval.duration('days');
+	return days > 0 && days <= maxDays;
 }
 
 /**
- * Checks if a time interval needs auto-adjustment for 3D graphics.
- * @param timeInterval - the time interval to check
- * @returns true if the interval exceeds 1 year and needs adjustment
+ * Calculates the 3D date range based on the date range picker values and numDays setting.
+ * This implements the 4-case logic for handling bounded/unbounded date ranges.
+ * @param queryTimeInterval - The date range from the date range picker (DRS, DRE)
+ * @param numDays - Number of days the 3D graphic should span
+ * @param maxDays - Maximum allowed days (for validation)
+ * @param maxDataDate - The latest full day with actual data (from dataRange API)
+ * @param minDataDate - The earliest date with actual data (optional, for validation)
+ * @returns Object with:
+ *   - threeDInterval: The calculated 3D date range (TimeInterval)
+ *   - shouldWarn: true if user should be warned (exceeds maxDays)
+ *   - shouldShowGraph: false if graph should not be shown
  */
-export function needsThreeDAdjustment(timeInterval: TimeInterval): boolean {
-	return timeInterval.getIsBounded() && timeInterval.duration('days') > 367;
+export function calculateThreeDDateRange(
+	queryTimeInterval: TimeInterval,
+	numDays: number,
+	maxDays: number = MAX_3D_DAYS,
+	maxDataDate?: moment.Moment,
+	minDataDate?: moment.Moment
+): { threeDInterval: TimeInterval; shouldWarn: boolean; shouldShowGraph: boolean } {
+	const drs = queryTimeInterval.getStartTimestamp(); // Date Range Start
+	const dre = queryTimeInterval.getEndTimestamp(); // Date Range End
+	const drsBounded = drs !== undefined;
+	const dreBounded = dre !== undefined;
+
+	// Ensure maxDataDate is valid, default to now if not provided
+	const validMaxDataDate = maxDataDate && maxDataDate.isValid()
+		? maxDataDate.clone().endOf('day')
+		: moment().endOf('day');
+
+	// Get the latest full day for this data source (end of day)
+	const threeDEndDate = validMaxDataDate.clone();
+
+	let threeDStartDate: moment.Moment;
+	let shouldWarn = false;
+	let shouldShowGraph = true;
+
+	if (drsBounded && dreBounded) {
+		// Case 1: bounded, bounded
+		// If DRE - DRS > maxDays then warn user and no graphic. Otherwise, use 3D DRS, DRE.
+		const daysDiff = dre.diff(drs, 'days');
+		if (daysDiff > maxDays) {
+			shouldWarn = true;
+			shouldShowGraph = false;
+			// Return a dummy interval (won't be used since shouldShowGraph is false)
+			return {
+				threeDInterval: new TimeInterval(drs, dre),
+				shouldWarn: true,
+				shouldShowGraph: false
+			};
+		}
+		// Use the date range picker values directly
+		threeDStartDate = drs.clone();
+	} else if (!drsBounded && dreBounded) {
+		// Case 2: unbounded, bounded
+		// Use DRE - numDays, DRE
+		threeDStartDate = dre.clone().subtract(numDays, 'days');
+	} else if (drsBounded && !dreBounded) {
+		// Case 3: bounded, unbounded
+		// Use max(DRS, 3D end date - numDays), latest full day for this data source
+		const calculatedStart = threeDEndDate.clone().subtract(numDays, 'days');
+		threeDStartDate = moment.max(drs, calculatedStart);
+	} else {
+		// Case 4: unbounded, unbounded
+		// Use 3D end date - numDays, latest full day for this data source
+		threeDStartDate = threeDEndDate.clone().subtract(numDays, 'days');
+	}
+
+	// Ensure start date is at beginning of day and end date is at end of day
+	threeDStartDate.startOf('day');
+	// threeDEndDate is already endOf('day')
+
+	// Ensure the calculated range doesn't exceed maxDays
+	const calculatedDays = threeDEndDate.diff(threeDStartDate, 'days');
+	if (calculatedDays > maxDays) {
+		shouldWarn = true;
+		shouldShowGraph = false;
+	}
+
+	// Ensure start date is not before minDataDate if provided
+	if (minDataDate && minDataDate.isValid()) {
+		const minDateStart = minDataDate.clone().startOf('day');
+		if (threeDStartDate.isBefore(minDateStart)) {
+			threeDStartDate = minDateStart;
+		}
+	}
+
+	// Ensure end date doesn't exceed maxDataDate
+	if (threeDEndDate.isAfter(validMaxDataDate)) {
+		threeDEndDate.set(validMaxDataDate.toObject());
+	}
+
+	const threeDInterval = new TimeInterval(threeDStartDate, threeDEndDate);
+	return { threeDInterval, shouldWarn, shouldShowGraph };
+}
+
+/**
+ * Gets the effective number of days to use for 3D graphics.
+ * Returns numDays if provided, otherwise defaults to DEFAULT_3D_DAYS.
+ * @param numDays - Number of days from Redux state (may be undefined)
+ * @returns The number of days to use
+ */
+export function getEffectiveNumDays(numDays: number | undefined): number {
+	return numDays !== undefined ? numDays : DEFAULT_3D_DAYS;
 }
