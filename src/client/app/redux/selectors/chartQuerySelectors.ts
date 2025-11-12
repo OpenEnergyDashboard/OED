@@ -12,7 +12,7 @@ import {
 	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState,
-	selectShiftAmount
+	selectThreeDInterval, selectShiftAmount
 } from '../slices/graphSlice';
 import { omit } from 'lodash';
 import { selectLineChartDeps } from './lineChartSelectors';
@@ -194,17 +194,21 @@ export const selectMapChartQueryArgs = createSelector(
 
 export const selectThreeDQueryArgs = createSelector(
 	selectQueryTimeInterval,
+	selectThreeDInterval,
 	selectSelectedUnit,
 	selectThreeDState,
-	(queryTimeInterval, selectedUnit, threeD) => {
+	(queryTimeInterval, threeDInterval, selectedUnit, threeD) => {
+		// Use the calculated 3D interval if available, otherwise fall back to queryTimeInterval
+		const intervalToUse = threeDInterval || queryTimeInterval;
 		const args: ThreeDReadingApiArgs = {
 			id: threeD.meterOrGroupID!,
-			timeInterval: roundTimeIntervalForFetch(queryTimeInterval).toString(),
+			timeInterval: roundTimeIntervalForFetch(intervalToUse).toString(),
 			graphicUnitId: selectedUnit,
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
 		};
-		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
+		// Skip query if no meter/group selected or if interval is not bounded
+		const shouldSkipQuery = !threeD.meterOrGroupID || !intervalToUse.getIsBounded();
 		return { args, shouldSkipQuery };
 	}
 );
