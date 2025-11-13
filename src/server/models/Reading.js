@@ -70,17 +70,6 @@ class Reading {
 	}
 
 	/**
-	 * Refreshes the daily readings view.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
-	 */
-	static refreshDailyReadings(conn) {
-		// This can't be a function because you can't call REFRESH inside a function
-		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
-	}
-
-	/**
 	 * Refreshes the hourly readings view.
 	 * Should be called at least once a day but need to do hourly if the site wants zooming in
 	 * to see hourly data as it is available. This function can take more time than refreshing
@@ -94,6 +83,42 @@ class Reading {
 		// This can't be a function because you can't call REFRESH inside a function
 		// TODO This will be removed once we completely transition to the unit version.
 		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+	}
+
+	/**
+	 * Refreshes the daily readings view.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @returns {Promise<void>}
+	 */
+	static refreshDailyReadings(conn) {
+		// This can't be a function because you can't call REFRESH inside a function
+		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+	}
+	
+	/**
+	 * Refreshes meter readings views.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @returns {Promise<void>}
+	 */
+	static async refreshMeterReadingsViews(conn) {
+		await conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+	}
+
+
+	/**
+	 * Refreshes group readings views.
+	 * Should be called at least once a day, preferably in the middle of the night.
+	 * @param conn The connection to use
+	 * @returns {Promise<void>}
+	 */
+	static refreshGroupReadingsViews(conn) {
+		// It is safe to refresh the hourly and daily group views in parallel since they
+		// do not depend one each other unlike meters.
+		return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
+			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
 	}
 
 	/**

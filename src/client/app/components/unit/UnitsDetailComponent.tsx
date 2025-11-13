@@ -25,7 +25,6 @@ export default function UnitsDetailComponent() {
 	//Units state
 	const { status } = useAppSelector(selectUnitDataResult);
 	const unitData = useAppSelector(selectAllUnits);
-
 	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
 
 	return (

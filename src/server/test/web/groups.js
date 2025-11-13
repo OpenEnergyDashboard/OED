@@ -11,6 +11,7 @@ const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
 const User = require('../../models/User');
 const Unit = require('../../models/Unit');
+const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const gpsPoint = new Point(90, 45);
 
 mocha.describe('groups API', () => {
@@ -55,6 +56,7 @@ mocha.describe('groups API', () => {
 		await Promise.all([groupA.adoptMeter(meterA.id, conn), groupA.adoptGroup(groupB.id, conn),
 		groupB.adoptGroup(groupC.id, conn), groupB.adoptMeter(meterB.id, conn),
 		groupC.adoptMeter(meterC.id, conn)]);
+		await refreshGroupsDeepMetersView();
 	});
 	mocha.describe('retrieval', () => {
 		mocha.it('returns the list of existing groups', async () => {

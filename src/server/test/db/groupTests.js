@@ -9,6 +9,7 @@ const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
 const Unit = require('../../models/Unit');
+const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const gps = new Point(90, 45);
 
 async function setupGroupsAndMeters(conn) {
@@ -39,6 +40,7 @@ async function setupGroupsAndMeters(conn) {
 	25.5, '0003-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitCId, unitAId,
 	Unit.areaUnitType.METERS, undefined);
 	await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+	await refreshGroupsDeepMetersView();
 }
 
 /**
@@ -107,6 +109,7 @@ mocha.describe('Groups', () => {
 			const parent = await Group.getByName('GA', conn);
 			const child = await Group.getByName('GB', conn);
 			await parent.adoptGroup(child.id, conn);
+			await refreshGroupsDeepMetersView();
 			const childrenOfParent = await (Group.getImmediateGroupsByGroupID(parent.id, conn));
 			expect(childrenOfParent).to.deep.equal([child.id]);
 			const parentsOfChild = await child.getParents(conn);
@@ -118,6 +121,7 @@ mocha.describe('Groups', () => {
 			const parent = await Group.getByName('GA', conn);
 			const meter = await Meter.getByName('MA', conn);
 			await parent.adoptMeter(meter.id, conn);
+			await refreshGroupsDeepMetersView();
 			const metersOfParent = await (Group.getImmediateMetersByGroupID(parent.id, conn));
 			expect(metersOfParent).to.deep.equal([meter.id]);
 			const deepMetersOfParent = await Group.getDeepMetersByGroupID(parent.id, conn);
@@ -148,6 +152,7 @@ mocha.describe('Groups', () => {
 			await child.adoptMeter(childsMeter.id, conn);
 			await child.adoptGroup(grandchild.id, conn);
 			await grandchild.adoptMeter(grandchildsMeter.id, conn);
+			await refreshGroupsDeepMetersView();
 
 			const deepMetersOfParent = await Group.getDeepMetersByGroupID(parent.id, conn);
 			const deepGroupsOfParent = await Group.getDeepGroupsByGroupID(parent.id, conn);

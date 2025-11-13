@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS groups_immediate_meters (
   TODO: Deal with parent meters that are installed after their children. They only shadow them from a start-date onwards.
   The above to-do is probably going to require a significant reworking of some stuff.
  */
-CREATE OR REPLACE VIEW groups_deep_meters AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS groups_deep_meters AS
 	/* First we need to get all the deep child meters for each group. We just join groups_immediate_meters to
     groups_deep_children to grab all the meters associated with a group or one of its deep children.
   */

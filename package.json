@@ -31,6 +31,7 @@
 		"refreshAllReadingViews": "node -e 'require(\"./src/server/services/refreshAllReadingViews\").refreshAllReadingViews()'",
 		"refreshDailyReadingViews": "node -e 'require(\"./src/server/services/refreshReadingViews\").refreshReadingViews()'",
 		"refreshHourlyReadingViews": "node -e 'require(\"./src/server/services/refreshHourlyReadingViews\").refreshHourlyReadingViews()'",
+		"refreshGroupsDeepMeters": "node -e 'require(\"./src/server/services/refreshGroupsDeepMetersView\").refreshGroupsDeepMetersView()'",
 		"updateCikAndViews": "node -e 'require(\"./src/server/services/graph/redoCik.js\").updateCikAndViews()'",
 		"obvius:showConfigfiles": "node ./src/server/services/obvius/showConfigfiles.js",
 		"obvius:purgeConfigfiles": "node ./src/server/services/obvius/purgeConfigfiles.js",

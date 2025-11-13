@@ -123,7 +123,7 @@ shift: How far back in time to shift the curr_start and curr_end date/time to ge
 	times to compare.
  */
 CREATE OR REPLACE FUNCTION group_compare_readings_unit (
-	group_ids INTEGER[],
+	requested_graphic_unit_id INTEGER[],
 	graphic_unit_id INTEGER,
 	curr_start TIMESTAMP,
 	curr_end TIMESTAMP,
@@ -132,21 +132,40 @@ CREATE OR REPLACE FUNCTION group_compare_readings_unit (
 	RETURNS TABLE(group_id INTEGER, curr_use FLOAT, prev_use FLOAT)
 AS $$
 DECLARE
-	meter_ids INTEGER[];
+	curr_tsrange TSRANGE;
+	prev_tsrange TSRANGE;
 BEGIN
-	SELECT array_agg(DISTINCT meter_id) INTO meter_ids
-	FROM unnest(group_ids) gids(id)
-	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id;
+	curr_tsrange := tsrange(curr_start, curr_end);
+	prev_tsrange := tsrange(curr_start - shift, curr_end - shift);
 
 	RETURN QUERY
+	WITH
+	curr_period AS (
+		SELECT
+			hourly.group_id,
+			SUM(hourly.reading_rate) AS reading
+		FROM group_hourly_readings_unit hourly
+		WHERE curr_tsrange @> hourly.time_interval
+		AND requested_graphic_unit_id = hourly.graphic_unit_id
+		GROUP BY hourly.group_id
+	),
+	prev_period AS (
+		SELECT
+			hourly.group_id,
+			SUM(hourly.reading_rate) AS reading
+		FROM group_hourly_readings_unit hourly
+		WHERE prev_tsrange @> hourly.time_interval
+		AND requested_graphic_unit_id = hourly.graphic_unit_id
+		GROUP BY hourly.group_id
+	)
 	SELECT
 		gids.id AS group_id,
-		SUM(cr.curr_use) AS curr_use,
-		SUM(cr.prev_use) AS prev_use
-	FROM unnest(group_ids) gids(id)
-	INNER JOIN groups_deep_meters gdm ON gdm.group_id = gids.id
-	INNER JOIN meter_compare_readings_unit(meter_ids, graphic_unit_id, curr_start, curr_end, shift) cr
-			ON cr.meter_id = gdm.meter_id
-	GROUP by gids.id;
+		curr_period.reading::FLOAT AS curr_use,
+		prev_period.reading::FLOAT AS prev_use
+	FROM
+		unnest(group_ids) gids(id)
+		-- Left joins here so we get nulls instead of missing rows if readings don't exist for some time intervals
+		LEFT JOIN prev_period ON gids.id = prev_period.group_id
+		LEFT JOIN curr_period ON gids.id = curr_period.group_id;
 END;
 $$ LANGUAGE 'plpgsql';

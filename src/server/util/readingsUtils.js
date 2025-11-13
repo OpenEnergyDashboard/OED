@@ -10,6 +10,8 @@ const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const readCsv = require('../services/pipeline-in-progress/readCsv');
 const moment = require('moment');
+const Group = require('../models/Group');
+const Reading = require('../models/Reading');
 
 const ETERNITY = TimeInterval.unbounded();
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
@@ -40,7 +42,15 @@ async function prepareTest(unitData, conversionData, meterData, groupData = []) 
     const result = await insertMeters(meterData, conn);
     await insertGroups(groupData, conn);
     await redoCik(conn);
-    await refreshAllReadingViews();
+
+    // Only refresh meter views if there is no group changes.
+    if (groupData.length == 0) {
+        await Reading.refreshMeterReadingsViews(conn);
+    }
+    else {
+        await Group.refreshGroupsDeepMetersView(conn);
+        await refreshAllReadingViews();
+    }
 }
 
 /**

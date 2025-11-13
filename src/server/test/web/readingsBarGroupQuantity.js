@@ -29,12 +29,11 @@ mocha.describe('readings API', () => {
             mocha.describe('for quantity groups', () => {
                 mocha.it('BG1: 1 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
                     //loads data into database
-                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh)
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     //gets unit ID
                     const unitId = await getUnitId('kWh');
                     //load data from mcsv file
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_1.csv')
-
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_1.csv');
                     const res = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
                         .query({
                             timeInterval: ETERNITY.toString(),
@@ -47,11 +46,11 @@ mocha.describe('readings API', () => {
 
                 mocha.it('BG2: 7 day bars for 15 + 20 minute reading intervals and quantity units with +-inf start/end time & kWh as kWh', async () => {
                     //loads data into database
-                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh)
+                    await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWhGroups, groupDatakWh);
                     //gets unit ID
                     const unitId = await getUnitId('kWh');
                     //load data from mcsv file
-                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_7.csv')
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_bar_group_ri_15-20_mu_kWh_gu_kWh_st_-inf_et_inf_bd_7.csv');
 
                     const res = await chai.request(app).get(`/api/unitReadings/bar/groups/${GROUP_ID}`)
                         .query({

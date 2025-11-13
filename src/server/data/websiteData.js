@@ -10,6 +10,7 @@
  */
 
 const Unit = require('../models/Unit');
+const Group = require('../models/Group');
 const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const { getConnection } = require('../db');
@@ -758,9 +759,11 @@ async function insertWebsiteData() {
     await insertMeters(meters, conn);
 	// Recreate the Cik entries since changed meters.
 	await redoCik(conn);
+	await insertGroups(groups, conn);
+	// Refresh groups deep meters view after adding new groups.
+	await Group.refreshGroupsDeepMetersView(conn);
 	// Refresh the readings since added new ones.
 	await refreshAllReadingViews();
-	await insertGroups(groups, conn);
 }
 
 /**

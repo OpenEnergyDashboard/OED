@@ -514,6 +514,8 @@ async function insertMeters(metersToInsert, conn) {
 
 /**
  * Inserts groups specified into the database.
+ * This function does not automatically refresh groups deep meters and its dependent materialized view so this need to be done manually after each 
+ * function call.
  * @param [[]] groupsToInsert array of arrays that specify the group info for inserting groups where each row has:
  * group name, default graphic unit name, displayable, gps, note, array of meter names to add to group, array of group names to add to group, group id.
  * A final [5] optional item in row can be the value to set the meter id to.

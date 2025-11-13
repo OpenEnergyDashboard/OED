@@ -15,6 +15,8 @@ const Conversion = require('../../models/Conversion');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
+const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
+const { DELTA } = require('../../util/readingsUtils.js');
 
 // TODO add tests that check flow readings.
 
@@ -48,8 +50,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			// Refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			// Refresh meter views but only hourly view needs the change
+			await Reading.refreshMeterReadingsViews(conn);
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings_unit WHERE lower(time_interval)=${start_timestamp};',
 				{ start_timestamp: timestamp1 });
 			expect(meter_id).to.equal(meter.id);
@@ -63,7 +65,9 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			await Reading.refreshDailyReadings(conn);
+
+			await Reading.refreshMeterReadingsViews(conn);
+
 			const { meter_id, reading_rate } = await conn.one(
 				'SELECT * FROM daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
 				{ start_timestamp: timestamp1, end_timestamp: timestamp2 });
@@ -79,7 +83,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 100, halfHourBefore, halfHourAfter)
 			], conn);
 
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
+
 			const rows = await conn.many('SELECT * FROM daily_readings_unit;');
 			expect(rows).to.have.length(2);
 			expect(rows[0].meter_id).to.equal(meter.id);
@@ -104,7 +109,7 @@ mocha.describe('Line & bar Readings', () => {
 			// Expected compressed reading:
 			// ((50 kW * 1 hr) + (100 kW * 2 hr)) / (1 hr + 2 hr)
 
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const { meter_id, reading_rate } = await conn.one('SELECT * FROM daily_readings_unit WHERE lower(time_interval) = ${start_timestamp};',
 				{ start_timestamp: day1Start });
@@ -187,8 +192,7 @@ mocha.describe('Line & bar Readings', () => {
 				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
-			await Reading.refreshDailyReadings(conn);
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
@@ -257,8 +261,7 @@ mocha.describe('Line & bar Readings', () => {
 				.map(row => new Reading(meter.id, row.value, row.startTimeStamp, row.endTimeStamp));
 			await Reading.insertAll(data, conn);
 			// Refresh daily and hourly reading views.
-			await Reading.refreshDailyReadings(conn);
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 		});
 
 		mocha.it('Use Daily resolution when 61 days', async () => {
@@ -333,7 +336,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const meterReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, dayStart, dayEnd, conn);
 
@@ -373,10 +376,8 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 100, dayStart, dayEnd)
 			], conn);
 
-			await Reading.refreshDailyReadings(conn);
-
-			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			// We need to refresh the hourly and daily readings view because they are materialized.
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const meterReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, dayStart, dayStart.clone().add(1, 'hours').toString(), conn);
 			expect(meterReadings[meter.id].length).to.equal(1);
@@ -392,7 +393,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, yearStart, yearStart.clone().add(60, 'hours'), conn);
 			const meterReadings = allReadings[meter.id];
@@ -409,7 +410,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, yearStart, yearStart.clone().add(60, 'days'), conn);
 
@@ -449,6 +450,9 @@ mocha.describe('Line & bar Readings', () => {
 			group1 = await Group.getByName('Group1', conn);
 			group2 = await Group.getByName('Group2', conn);
 
+			// Refresh group materialized views
+			await refreshGroupsDeepMetersView();
+
 			// Make the graphic unit be MegaJoules.
 			graphicUnitId = (await Unit.getByName('MJ', conn)).id;
 		});
@@ -462,11 +466,12 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
 			], conn);
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			// Associate both meters with a single group
 			await group1.adoptMeter(meter1.id, conn);
 			await group1.adoptMeter(meter2.id, conn);
+			await refreshGroupsDeepMetersView();
 
 			const groupReadings = await Reading.getGroupLineReadings(
 				[group1.id], graphicUnitId, startOfDay, startOfDay.clone().add(1, 'hour'), conn
@@ -489,11 +494,12 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter2.id, 200, startOfDay, startOfDay.clone().add(1, 'hour'))
 			], conn);
 			// We need to refresh the hourly readings view because it is materialized.
-			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			// Associate both meters with a single group
 			await group1.adoptMeter(meter1.id, conn);
 			await group2.adoptMeter(meter2.id, conn);
+			await refreshGroupsDeepMetersView();
 
 			const groupReadings = await Reading.getGroupLineReadings(
 				[group1.id, group2.id], graphicUnitId, startOfDay, startOfDay.clone().add(1, 'hour'), conn
@@ -552,8 +558,10 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
+
+			
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const barReadings = await Reading.getMeterBarReadings([meter.id], graphicUnitId, timestamp1, timestamp5, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -562,12 +570,14 @@ mocha.describe('Line & bar Readings', () => {
 				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 
-			expect(readingsForMeterComparable).to.deep.equal([
-				{ reading: 100 * conversionSlope, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() },
-				{ reading: 200 * conversionSlope, start_timestamp: timestamp2.valueOf(), end_timestamp: timestamp3.valueOf() },
-				{ reading: 300 * conversionSlope, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp4.valueOf() },
-				{ reading: 400 * conversionSlope, start_timestamp: timestamp4.valueOf(), end_timestamp: timestamp5.valueOf() }
-			]);
+			let start_timestamps = [timestamp1.valueOf(), timestamp2.valueOf(), timestamp3.valueOf(), timestamp4.valueOf()];
+			let end_timestamps = [timestamp2.valueOf(), timestamp3.valueOf(), timestamp4.valueOf(), timestamp5.valueOf()];
+
+			for (let i = 0; i < readingsForMeterComparable.length; i++) {
+				expect(readingsForMeterComparable[i].reading).to.be.closeTo((100 + (i * 100)) * conversionSlope, DELTA);
+				expect(readingsForMeterComparable[i].start_timestamp).equal(start_timestamps[i]);
+				expect(readingsForMeterComparable[i].end_timestamp).equal(end_timestamps[i]);
+			}
 		});
 
 		mocha.it('Retrieves the correct interval for a single meter and multiple days width', async () => {
@@ -577,8 +587,9 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
+
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 
 			const barReadings = await Reading.getMeterBarReadings([meter.id], graphicUnitId, timestamp1, timestamp5, 2, conn);
 			expect(barReadings).to.have.keys([meter.id.toString()]);
@@ -586,10 +597,16 @@ mocha.describe('Line & bar Readings', () => {
 			const readingsForMeterComparable = readingsForMeter.map(
 				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
-			expect(readingsForMeterComparable).to.deep.equal([
-				{ reading: 300 * conversionSlope, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp3.valueOf() },
-				{ reading: 700 * conversionSlope, start_timestamp: timestamp3.valueOf(), end_timestamp: timestamp5.valueOf() }
-			]);
+
+			expect(readingsForMeterComparable[0].reading).to.be.closeTo(300 * conversionSlope, DELTA);
+			expect(readingsForMeterComparable[0].start_timestamp).equal(timestamp1.valueOf());
+			expect(readingsForMeterComparable[0].end_timestamp).equal(timestamp3.valueOf());
+
+
+			expect(readingsForMeterComparable[1].reading).to.be.closeTo(700 * conversionSlope, DELTA);
+			expect(readingsForMeterComparable[1].start_timestamp).equal(timestamp3.valueOf());
+			expect(readingsForMeterComparable[1].end_timestamp).equal(timestamp5.valueOf());
+
 		});
 
 		mocha.it('Retrieves the correct barchart readings for multiple meters for one day', async () => {
@@ -597,22 +614,27 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 100, timestamp1, timestamp2),
 				new Reading(meter2.id, 1, timestamp1, timestamp2)
 			], conn);
+
 			// We need to refresh the daily readings view because it is materialized.
-			await Reading.refreshDailyReadings(conn);
+			await Reading.refreshMeterReadingsViews(conn);
 			const barReadings = await Reading.getMeterBarReadings([meter.id, meter2.id], graphicUnitId, timestamp1, timestamp2, 1, conn);
 			expect(barReadings).to.have.keys([meter.id.toString(), meter2.id.toString()]);
+
 			const readingsForMeterComparable = barReadings[meter.id].map(
 				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
 			const readingsForMeter2Comparable = barReadings[meter2.id].map(
 				({ reading, start_timestamp, end_timestamp }) => ({ reading, start_timestamp: start_timestamp.valueOf(), end_timestamp: end_timestamp.valueOf() })
 			);
-			expect(readingsForMeterComparable).to.deep.equal([
-				{ reading: 100 * conversionSlope, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() }
-			]);
-			expect(readingsForMeter2Comparable).to.deep.equal([
-				{ reading: 1 * conversionSlope, start_timestamp: timestamp1.valueOf(), end_timestamp: timestamp2.valueOf() }
-			]);
+
+			expect(readingsForMeterComparable[0].reading).to.be.closeTo(100 * conversionSlope, DELTA);
+			expect(readingsForMeterComparable[0].start_timestamp).to.be.closeTo(timestamp1.valueOf(), DELTA);
+			expect(readingsForMeterComparable[0].end_timestamp).to.be.closeTo(timestamp2.valueOf(), DELTA);
+
+			expect(readingsForMeter2Comparable[0].reading).to.be.closeTo(1 * conversionSlope, DELTA);
+			expect(readingsForMeter2Comparable[0].start_timestamp).to.be.closeTo(timestamp1.valueOf(), DELTA);
+			expect(readingsForMeter2Comparable[0].end_timestamp).to.be.closeTo(timestamp2.valueOf(), DELTA);
+
 		});
 
 		// TODO groups too

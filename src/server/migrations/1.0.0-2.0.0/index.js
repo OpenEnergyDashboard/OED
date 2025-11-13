@@ -9,6 +9,7 @@ module.exports = {
     fromVersion: '1.0.0',
     toVersion: '2.0.0',
     up: async db => {
+        await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/group/create_groups_tables.sql'));
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/readings/create_reading_views.sql'));
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/readings/create_function_get_compare_readings.sql'));
         await db.none(sqlFile('../migrations/1.0.0-2.0.0/sql/meter/add_meter_pipeline_checks.sql'));

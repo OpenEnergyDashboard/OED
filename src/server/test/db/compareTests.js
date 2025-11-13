@@ -14,6 +14,7 @@ const { insertStandardUnits, insertStandardConversions } = require('../../util/i
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { redoCik } = require('../../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
+const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 
 mocha.describe('Compare readings', () => {
 	let meter, graphicUnitId, conversionSlope, conn;
@@ -88,6 +89,7 @@ mocha.describe('Compare readings', () => {
 		await new Group(undefined, 'Group').insert(conn);
 		const group = await Group.getByName('Group', conn);
 		await group.adoptMeter(meter.id, conn);
+		await refreshGroupsDeepMetersView();
 		const result = await Reading.getGroupCompareReadings([group.id], graphicUnitId, currStart, currEnd, shift, conn);
 		expect(result).to.have.property(`${group.id}`).to.have.property('curr_use').to.be.closeTo(10 * conversionSlope, 0.0000001);
 		expect(result).to.have.property(`${group.id}`).to.have.property('prev_use').to.be.closeTo(1 * conversionSlope, 0.0000001);

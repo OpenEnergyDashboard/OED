@@ -13,6 +13,8 @@ const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator
 const { log } = require('../log');
 const Point = require('../models/Point');
 const { failure, success } = require('./response');
+const { refreshGroupsDeepMetersView } = require('../services/refreshGroupsDeepMetersView');
+const { MIN_ITEMS, MAX_ITEMS } = require('../util/globalConst');
 
 const router = express.Router();
 
@@ -332,14 +334,18 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				}
+				},
+				minItems: MIN_ITEMS,
+				maxItems: MAX_ITEMS
 			},
 			childMeters: {
 				type: 'array',
 				uniqueItems: true,
 				items: {
 					type: 'integer'
-				}
+				},
+				minItems: MIN_ITEMS,
+				maxItems: MAX_ITEMS
 			},
 			defaultGraphicUnit: { type: 'integer' },
 			areaUnit: {
@@ -350,47 +356,47 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 		}
 	};
 
-	const validatorResult = validate(req.body, validGroup);
+	const editedGroup = req.body;
+
+	const validatorResult = validate(editedGroup, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to edit group with invalid data, errors: ${validatorResult.errors}`);
 		failure(res, 400, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		try {
 			const conn = getConnection();
-			const currentGroup = await Group.getByID(req.body.id, conn);
+			const currentGroup = await Group.getByID(editedGroup.id, conn);
 			const currentChildGroups = await Group.getImmediateGroupsByGroupID(currentGroup.id, conn);
 			const currentChildMeters = await Group.getImmediateMetersByGroupID(currentGroup.id, conn);
-
 			await conn.tx(async t => {
-				const newGPS = (req.body.gps) ? new Point(req.body.gps.longitude, req.body.gps.latitude) : null;
+				const newGPS = (editedGroup.gps) ? new Point(editedGroup.gps.longitude, editedGroup.gps.latitude) : null;
 				const newGroup = new Group(
-					req.body.id,
-					req.body.name,
-					req.body.displayable,
+					editedGroup.id,
+					editedGroup.name,
+					editedGroup.displayable,
 					newGPS,
-					req.body.note,
-					req.body.area,
-					req.body.defaultGraphicUnit,
-					req.body.areaUnit
+					editedGroup.note,
+					editedGroup.area,
+					editedGroup.defaultGraphicUnit,
+					editedGroup.areaUnit
 				);
-
 				await newGroup.update(t);
 
-				const adoptedGroups = difference(req.body.childGroups, currentChildGroups);
+				const adoptedGroups = difference(editedGroup.childGroups, currentChildGroups);
 				const adoptGroupsQueries = adoptedGroups.map(gid => currentGroup.adoptGroup(gid, t));
 
-				const disownedGroups = difference(currentChildGroups, req.body.childGroups);
+				const disownedGroups = difference(currentChildGroups, editedGroup.childGroups);
 				const disownGroupsQueries = disownedGroups.map(gid => currentGroup.disownGroup(gid, t));
 
 				// Compute meters differences and adopt/disown to make changes
-				const adoptedMeters = difference(req.body.childMeters, currentChildMeters);
+				const adoptedMeters = difference(editedGroup.childMeters, currentChildMeters);
 				const adoptMetersQueries = adoptedMeters.map(mid => currentGroup.adoptMeter(mid, t));
 
-				const disownedMeters = difference(currentChildMeters, req.body.childMeters);
+				const disownedMeters = difference(currentChildMeters, editedGroup.childMeters);
 				const disownMetersQueries = disownedMeters.map(mid => currentGroup.disownMeter(mid, t));
-
 				return t.batch(flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
+
 			res.sendStatus(200);
 		} catch (err) {
 			if (err.message && err.message === 'Cyclic group detected') {
@@ -399,6 +405,20 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 				log.error(`Error while editing existing group ${err}`, err);
 				res.sendStatus(500);
 			}
+		}
+	}
+});
+
+router.post('/refresh', adminAuthMiddleware('refresh group views'), async (req, res) => {
+	try { 
+		await refreshGroupsDeepMetersView();
+		res.sendStatus(200);
+	} catch (err) {
+		if (err.message && err.message === 'Cyclic group detected') {
+			res.status(400).send({ message: err.message });
+		} else {
+			log.error(`Error while editing existing group ${err}`, err);
+			res.sendStatus(500);
 		}
 	}
 });

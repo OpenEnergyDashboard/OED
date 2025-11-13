@@ -4,10 +4,14 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
+import { QueryStatus } from '@reduxjs/toolkit/query';
 import TooltipHelpComponent from '../TooltipHelpComponent';
+import SpinnerComponent from '../SpinnerComponent';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { selectVisibleMeterAndGroupData } from '../../redux/selectors/adminSelectors';
+import { selectRefreshingReadings } from '../../redux/slices/appStateSlice';
+import { selectGroupDataResult } from '../../redux/api/groupsApi';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateGroupModalComponent from './CreateGroupModalComponent';
 import GroupViewComponent from './GroupViewComponent';
@@ -21,45 +25,56 @@ export default function GroupsDetailComponent() {
 	// Check for admin status
 	const isAdmin = useAppSelector(state => selectIsAdmin(state));
 
+	//Group state
+	const { status } = useAppSelector(selectGroupDataResult);
+
 	// page may contain admin info so verify admin status while admin is authenticated.
 	authApi.useTokenPollQuery(undefined, { skip: !isAdmin, pollingInterval: authPollInterval });
 
 	// We only want displayable groups if non-admins because they still have non-displayable in state.
 	const { visibleGroups } = useAppSelector(state => selectVisibleMeterAndGroupData(state));
-
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		// Switch help depending if admin or not.
 		tooltipGroupView: isAdmin ? 'help.admin.groupview' : 'help.groups.groupview'
 	};
-
+	const isRefreshingReadings = useAppSelector(selectRefreshingReadings);
 	return (
 		<div className='flexGrowOne'>
-			<TooltipHelpComponent page='groups' />
+			{status === QueryStatus.pending || isRefreshingReadings ? (
+				<div className='text-center'>
+					<SpinnerComponent loading width={50} height={50} />
+					<FormattedMessage id='redo.cik.and.refresh.db.views'></FormattedMessage>
+				</div>
+			) : (
+				<div>
+					<TooltipHelpComponent page='groups' />
 
-			<div className='container-fluid'>
-				<h2 style={titleStyle}>
-					<FormattedMessage id='groups' />
-					<div style={tooltipStyle}>
-						<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
+					<div className='container-fluid'>
+						<h2 style={titleStyle}>
+							<FormattedMessage id='groups' />
+							<div style={tooltipStyle}>
+								<TooltipMarkerComponent page='groups' helpTextId={tooltipStyle.tooltipGroupView} />
+							</div>
+						</h2>
+						{isAdmin &&
+							<div className="edit-btn">
+								{/* The actual button for create is inside this component. */}
+								< CreateGroupModalComponent />
+							</div>
+						}
+						{
+							<div className="card-container">
+								{Object.values(visibleGroups)
+									.map(groupData => (<GroupViewComponent
+										group={groupData}
+										key={groupData.id}
+									/>))}
+							</div>
+						}
 					</div>
-				</h2>
-				{isAdmin &&
-					<div className="edit-btn">
-						{/* The actual button for create is inside this component. */}
-						< CreateGroupModalComponent />
-					</div>
-				}
-				{
-					<div className="card-container">
-						{Object.values(visibleGroups)
-							.map(groupData => (<GroupViewComponent
-								group={groupData}
-								key={groupData.id}
-							/>))}
-					</div>
-				}
-			</div>
+				</div>
+			)}
 		</div>
 	);
 }

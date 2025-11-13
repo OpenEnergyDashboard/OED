@@ -24,7 +24,7 @@ export interface AppState {
 	chartLinkHideOptions: boolean;
 	selectedLanguage: LanguageTypes;
 	languageManuallySet: boolean;
-	refreshingReadings: boolean;
+	refreshingReadings: boolean
 }
 
 const defaultState: AppState = {
@@ -58,11 +58,11 @@ export const appStateSlice = createThunkSlice({
 		}),
 		setChartLinkOptionsVisibility: create.reducer<boolean>((state, action) => {
 			state.chartLinkHideOptions = action.payload;
-
 		}),
-		setRefresingReadings: create.reducer<boolean>((state, action) => {
+		setRefreshingReadings: create.reducer<boolean>((state, action) => {
 			state.refreshingReadings = action.payload;
 		}),
+
 		initApp: create.asyncThunk(
 			// Thunk initiates many data fetching calls on startup before react begins to render
 			async (_: void, { dispatch }) => {
@@ -99,7 +99,6 @@ export const appStateSlice = createThunkSlice({
 						deleteToken();
 						dispatch(currentUserSlice.actions.clearCurrentUser());
 					}
-
 				}
 				// Request meter/group/details post-auth
 				dispatch(metersApi.endpoints.getMeters.initiate());
@@ -110,7 +109,6 @@ export const appStateSlice = createThunkSlice({
 					state.initComplete = true;
 				}
 			}
-
 		)
 	}),
 	extraReducers: builder => {
@@ -143,7 +141,7 @@ export const {
 	setOptionsVisibility,
 	updateSelectedLanguage,
 	setChartLinkOptionsVisibility,
-	setRefresingReadings
+	setRefreshingReadings
 } = appStateSlice.actions;
 
 export const {

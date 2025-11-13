@@ -36,7 +36,7 @@ import {
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString } from '../../utils/input';
-import { showErrorNotification } from '../../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
@@ -336,9 +336,20 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
 						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
 					};
+
+					const shouldRefreshGroupsDeepMeters = childMeterChanges || childGroupChanges;
+
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
-					submitGroupEdits(submitState);
+					submitGroupEdits({ editedGroup: submitState, shouldRefreshGroupsDeepMetersView: shouldRefreshGroupsDeepMeters })
+						.unwrap()
+						.then(() => {
+							showSuccessNotification(translate('group.successfully.edited.group'));
+						})
+						.catch(() => {
+							console.log(`Submitted group: ${submitState.name}.`);
+							showErrorNotification(translate('group.failed.to.edit.group'));
+						});
 				});
 			} else {
 				showErrorNotification(translate('group.input.error'));

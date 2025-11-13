@@ -9,6 +9,7 @@ import { GroupChildren, GroupData } from '../../types/redux/groups';
 import { showErrorNotification } from '../../utils/notifications';
 import { selectIsAdmin } from '../slices/currentUserSlice';
 import { baseApi } from './baseApi';
+import { setRefreshingReadings } from '../../redux/slices/appStateSlice';
 
 export const groupsAdapter = createEntityAdapter<GroupData>({
 	sortComparer: (groupA, groupB) => groupA.name?.localeCompare(groupB.name, undefined, { sensitivity: 'accent' })
@@ -65,15 +66,43 @@ export const groupsApi = baseApi.injectEndpoints({
 				// omit the 'id' property of the groupData or api errors/fails
 				body: omit(groupData, 'id')
 			}),
-			invalidatesTags: ['GroupData', 'GroupChildrenData']
+			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
+				await queryFulfilled;
+				dispatch(groupsApi.endpoints.refreshGroups.initiate());
+			}
 		}),
-		editGroup: builder.mutation<void, Omit<GroupData, 'deepMeters'>>({
+		editGroup: builder.mutation<void, { editedGroup: Omit<GroupData, 'deepMeters'>, shouldRefreshGroupsDeepMetersView: boolean }>({
 			query: group => ({
 				url: 'api/groups/edit',
 				method: 'PUT',
-				body: group
+				body: group.editedGroup
 			}),
-			invalidatesTags: ['GroupData', 'GroupChildrenData']
+			onQueryStarted: async ({ shouldRefreshGroupsDeepMetersView }, { queryFulfilled, dispatch }) => {
+				await queryFulfilled;
+
+				if (shouldRefreshGroupsDeepMetersView) {
+					dispatch(groupsApi.endpoints.refreshGroups.initiate());
+				} else {
+					dispatch(groupsApi.util.invalidateTags(['GroupData']));
+				}
+			}
+		}),
+		refreshGroups: builder.mutation<void, void>({
+			query: () => ({
+				url: 'api/groups/refresh',
+				method: 'POST'
+			}),
+			// This can modify the groups due to refreshing deep meters and the
+			// readings due to refreshing the group views.
+			invalidatesTags: ['GroupData', 'GroupChildrenData', 'Readings'],
+			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
+				dispatch(setRefreshingReadings(true));
+				try {
+					await queryFulfilled;
+				} finally {
+					dispatch(setRefreshingReadings(false));
+				}
+			}
 		}),
 		deleteGroup: builder.mutation<void, number>({
 			query: groupId => ({
