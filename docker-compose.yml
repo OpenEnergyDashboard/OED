@@ -21,7 +21,7 @@ services:
             interval: 10s
             timeout: 10s
             retries: 3
-        ports:
+        # ports:
         # - "5432:5432"
         # Uncomment the above lines to enable access to the PostgreSQL server
         # from the host machine.
