@@ -157,8 +157,6 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 
-				// Add CG9 here
-
 				mocha.it('CG9: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as MJ reverse conversion', async () => {
 					// Define unit u3 for MJ (megajoules)
 					const u3 = {
