@@ -129,8 +129,29 @@ mocha.describe('readings API', () => {
                             displayable: Unit.displayableType.NONE,
                             preferredDisplay: false,
                             note: 'special unit'
-                        }
-                    })
+                        };
+                        const unitData = [unitC, unitDegrees, unitF];
+                        const conversionData = [
+                            {
+                                // c5
+                                sourceName: 'Degrees',
+                                destinationName: 'C',
+                                bidirectional: false,
+                                slope: 1,
+                                intercept: 0,
+                                note: 'Degrees → C'
+                            },
+                            {
+                                // c7
+                                sourceName: 'C',
+                                destinationName: 'F',
+                                bidirectional: true,
+                                slope: 1.8,
+                                intercept: 32,
+                                note: 'Celsius → Fahrenheit'
+                            }
+                        ];
+                    });
                     // Add LR15 here
 
                     // Add LR16 here
