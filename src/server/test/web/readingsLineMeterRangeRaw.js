@@ -95,19 +95,19 @@ mocha.describe('readings API', () => {
                     // Add LR14 here
                     mocha.it('range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
                         const unitC = {
-                            // u6
+                            // u6, used for conversion instead of display
                             name: 'C',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.RAW,
                             secInRate: 3600,
                             typeOfUnit: Unit.unitType.UNIT,
                             suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: true,
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
                             note: 'Celsius'
                         };
                         const unitDegrees = {
-                            // u7
+                            // u7, raw units stored in meter
                             name: 'Degrees',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.RAW,
@@ -119,16 +119,16 @@ mocha.describe('readings API', () => {
                             note: 'special unit'
                         };
                         const unitF = {
-                            // u8
+                            // u8, display unit for graph
                             name: 'F',
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.RAW,
                             secInRate: 3600,
                             typeOfUnit: Unit.unitType.METER,
                             suffix: '',
-                            displayable: Unit.displayableType.NONE,
+                            displayable: Unit.displayableType.ALL,
                             preferredDisplay: false,
-                            note: 'special unit'
+                            note: 'OED created standard unit unit'
                         };
                         const unitData = [unitC, unitDegrees, unitF];
                         const conversionData = [
