@@ -22,7 +22,7 @@ services:
             timeout: 10s
             retries: 3
         # ports:
-        # - "5432:5432"
+        #    - "5432:5432"
         # Uncomment the above lines to enable access to the PostgreSQL server
         # from the host machine.
         # Web service runs Node
