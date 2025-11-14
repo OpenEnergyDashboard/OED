@@ -93,7 +93,9 @@ mocha.describe('readings API', () => {
                     });
 
                     // Add LR14 here
-
+                    mocha.it('range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
+                        
+                    })
                     // Add LR15 here
 
                     // Add LR16 here
