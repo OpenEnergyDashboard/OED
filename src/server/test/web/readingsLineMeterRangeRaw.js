@@ -94,7 +94,42 @@ mocha.describe('readings API', () => {
 
                     // Add LR14 here
                     mocha.it('range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
-                        
+                        const unitC = {
+                            // u6
+                            name: 'C',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.RAW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: true,
+                            note: 'Celsius'
+                        };
+                        const unitDegrees = {
+                            // u7
+                            name: 'Degrees',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.RAW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        };
+                        const unitF = {
+                            // u8
+                            name: 'F',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.RAW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'special unit'
+                        }
                     })
                     // Add LR15 here
 
