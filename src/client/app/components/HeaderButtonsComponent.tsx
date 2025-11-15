@@ -157,15 +157,14 @@ export default function HeaderButtonsComponent() {
 		}
 	};
 	// Handle modal visibility
-	type ModalType = 'login' | 'changePassword' | null;
-	const [modalType, setModalType] = useState<ModalType>(null);
+	const [showModal, setShowModal] = useState<boolean>(false);
 
 	const handleClose = () => {
-		setModalType(null);
+		setShowModal(false);
 	};
 
-	const handleShow = (type: ModalType) => {
-		setModalType(type);
+	const handleShow = () => {
+		setShowModal(true);
 	};
 
 	return (
@@ -289,7 +288,7 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem divider />
 							<DropdownItem
 								style={state.loginLinkStyle}
-								onClick={() => handleShow('login')}>
+								onClick={handleShow}>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem
@@ -297,9 +296,7 @@ export default function HeaderButtonsComponent() {
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
 							</DropdownItem>
-							<DropdownItem
-								style={state.logoutLinkStyle}
-								onClick={() => handleShow('changePassword')}>
+							<DropdownItem>
 								<FormattedMessage id='change.password' />
 							</DropdownItem>
 							<DropdownItem divider />
@@ -316,28 +313,14 @@ export default function HeaderButtonsComponent() {
 				</Nav>
 			</Navbar>
 			<>
-				{modalType === 'login' && (
-					<Modal isOpen toggle={handleClose}>
-						<ModalHeader>
-							{translate('log.in')}
-						</ModalHeader>
-						<ModalBody>
-							<LoginComponent handleClose={handleClose} />
-						</ModalBody>
-					</Modal>
-				)}
-			</>
-			<>
-				{modalType === 'changePassword' && (
-					<Modal isOpen toggle={handleClose}>
-						<ModalHeader>
-							{translate('change.password')}
-						</ModalHeader>
-						<ModalBody>
-							<LoginComponent handleClose={handleClose} />
-						</ModalBody>
-					</Modal>
-				)}
+				<Modal isOpen={showModal} toggle={handleClose}>
+					<ModalHeader>
+						{translate('log.in')}
+					</ModalHeader>
+					<ModalBody>
+						<LoginComponent handleClose={handleClose} />
+					</ModalBody>
+				</Modal>
 			</>
 
 		</div>
