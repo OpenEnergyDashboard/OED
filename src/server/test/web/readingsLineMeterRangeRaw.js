@@ -151,6 +151,19 @@ mocha.describe('readings API', () => {
                                 note: 'Celsius → Fahrenheit'
                             }
                         ];
+
+                        //const variable for meter data here
+
+                        //fill emptied database with test units/data defined above using prepareTest()
+
+                        //Get the graphic unit ID for 'F'
+
+                        //load expected readings into variable using parseExpectedCsv()
+
+                        //api call to get line chart readings from meter using METER_ID, convert to graphic unit defined above, then store in variable
+
+                        //check if response from api call matches values in expected readings csv using expectRangeToEqualExpected()
+                        
                     });
                     // Add LR15 here
 
