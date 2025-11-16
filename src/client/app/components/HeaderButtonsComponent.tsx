@@ -20,6 +20,7 @@ import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import LoginComponent from './LoginComponent';
+import ChangePasswordModalComponent from './ChangePasswordModalComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -334,7 +335,7 @@ export default function HeaderButtonsComponent() {
 							{translate('change.password')}
 						</ModalHeader>
 						<ModalBody>
-							<LoginComponent handleClose={handleClose} />
+							<ChangePasswordModalComponent handleClose={handleClose} />
 						</ModalBody>
 					</Modal>
 				)}
