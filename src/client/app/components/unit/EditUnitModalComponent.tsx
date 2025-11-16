@@ -11,7 +11,6 @@ import TooltipHelpComponent from '../../components/TooltipHelpComponent';
 import { selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById, unitsApi } from '../../redux/api/unitsApi';
-import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
@@ -88,7 +87,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	const conversionData = useAppSelector(selectConversionsDetails);
 	const meterDataByID = useAppSelector(selectMeterDataById);
 	const unitDataByID = useAppSelector(selectUnitDataById);
-	const groupDataByID = useAppSelector(selectGroupDataById);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -176,50 +174,60 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Check for dependencies before showing confirmation modal
 		const msgElements: React.ReactNode[] = [];
 		let cancel = false;
-		let hasConversionErrors = false;
 
 		// Check conversions first (highest priority)
+		const conversionSources: React.ReactNode[] = [];
+		const conversionDestinations: React.ReactNode[] = [];
 		for (let i = 0; i < conversionData.length; i++) {
 			if (conversionData[i].sourceId === state.id) {
 				// This unit is the source of a conversion so cannot be deleted.
-				msgElements.push(
+				conversionSources.push(
 					<div key={`conversion-source-${i}`}>
-						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
 						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
 						{conversionArrow(conversionData[i].bidirectional)}
-						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}
-						"{state.name}" {translate('unit.source.error')}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}"{state.name}" {translate('unit.source.error')}
 					</div>
 				);
 				cancel = true;
-				hasConversionErrors = true;
 			}
 
 			if (conversionData[i].destinationId === state.id) {
 				// This unit is the destination of a conversion so cannot be deleted.
-				msgElements.push(
+				conversionDestinations.push(
 					<div key={`conversion-dest-${i}`}>
-						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
 						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
 						{conversionArrow(conversionData[i].bidirectional)}
-						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}
-						"{state.name}" {translate('unit.destination.error')}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}"{state.name}" {translate('unit.destination.error')}
 					</div>
 				);
 				cancel = true;
-				hasConversionErrors = true;
 			}
 		}
 
-		// Only check default graphic units if no conversion errors (as per mentor's feedback)
-		if (!hasConversionErrors) {
-			// Check meters using this unit
-			const metersUsingUnit = Object.values(meterDataByID).filter(meter => meter.unitId === state.id);
+		// Check meters using this unit
+		const metersUsingUnit = Object.values(meterDataByID).filter(meter => meter.unitId === state.id);
+
+		if (cancel || metersUsingUnit.length > 0) {
+			if (conversionSources.length > 0 || conversionDestinations.length > 0 || metersUsingUnit.length > 0) {
+				msgElements.push(
+					<div key="error-header">
+						<span className="bold">{translate('unit.failed.to.delete.unit')}:</span>
+					</div>
+				);
+			}
+
+			if (conversionSources.length > 0) {
+				msgElements.push(...conversionSources);
+			}
+
+			if (conversionDestinations.length > 0) {
+				msgElements.push(...conversionDestinations);
+			}
+
 			if (metersUsingUnit.length > 0) {
 				msgElements.push(
 					<div key="meters-using-unit">
-						<span className="bold">{translate('unit.failed.to.delete.unit')}: </span>
-						{translate('meter')} {translate('uses')} {translate('unit')} "{state.name}" {translate('as.meter.unit')}:
+						{translate('meter')} {translate('uses')} {translate('unit')}"{state.name}" {translate('as.meter.unit')}:
 						<ul>
 							{metersUsingUnit.map(meter => (
 								<li key={meter.id}>"{meter.name}"</li>
@@ -228,44 +236,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					</div>
 				);
 				cancel = true;
-			}
-
-			// Check meters with this unit as default graphic unit
-			const metersWithDefault = Object.values(meterDataByID).filter(meter => meter.defaultGraphicUnit === state.id);
-			if (metersWithDefault.length > 0) {
-				msgElements.push(
-					<div key="meters-default-graphic">
-						<span className="bold">{translate('unit.delete.meter.default.lost')}</span>
-						<ul>
-							{metersWithDefault.map(meter => (
-								<li key={meter.id}>
-									"{meter.name}"
-									<br />
-									({translate('unit.default.graphic.unit')}: "{unitDataByID[meter.defaultGraphicUnit].name}")
-								</li>
-							))}
-						</ul>
-					</div>
-				);
-			}
-
-			// Check groups with this unit as default graphic unit
-			const groupsWithDefault = Object.values(groupDataByID).filter(group => group.defaultGraphicUnit === state.id);
-			if (groupsWithDefault.length > 0) {
-				msgElements.push(
-					<div key="groups-default-graphic">
-						<span className="bold">{translate('unit.delete.group.default.lost')}</span>
-						<ul>
-							{groupsWithDefault.map(group => (
-								<li key={group.id}>
-									"{group.name}"
-									<br />
-									({translate('unit.default.graphic.unit')}: "{unitDataByID[group.defaultGraphicUnit].name}")
-								</li>
-							))}
-						</ul>
-					</div>
-				);
 			}
 		}
 
@@ -483,7 +453,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				handleClose={handleCancelModalClose}
 				actionFunction={handleCancelModalClose}
 				actionConfirmText={translate('ok')}
-				actionRejectText={translate('cancel')} />
+				actionRejectText={translate('cancel')}
+				forceCancel={true} />
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
