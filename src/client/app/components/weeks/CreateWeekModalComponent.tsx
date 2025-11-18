@@ -98,12 +98,6 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 			week.saturday,
 		].filter(Boolean);
 
-		// console.log("DEBUG: weekDayIds:", weekDayIds);
-
-		// for 2D array
-		// const segmentPromises = weekDayIds.map((dayId) => fetchDaySegments(dayId).unwrap());
-		// const daySegments = await Promise.all(segmentPromises);
-
 		// get only unique dayIds (convert to Set then Array again)
 		const uniqueWeekDayIds = Array.from(new Set(weekDayIds.map(obj => 
 														JSON.stringify(obj))))
@@ -127,10 +121,11 @@ export default function CreateWeekModalComponent(): React.ReactElement {
       segments: daySegmentResponses[i],
     }));
 
+		// console.log("DEBUG: week:", week);
     // console.log("DEBUG: daySegmentsForWeek:", daySegmentsForWeek);
 
     // Pass data to generator
-    generateRrule(week, days, daySegmentsForWeek);
+    generateRrule(week, daySegmentsForWeek);
 	};
 
 	// Function to reset the week details to default values. Called when modal is closed.
