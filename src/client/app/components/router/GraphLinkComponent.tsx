@@ -6,17 +6,18 @@ import * as React from 'react';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { useWaitForInit } from '../../redux/componentHooks';
 import { useAppDispatch } from '../../redux/reduxHooks';
-import { processGraphLink } from '../../redux/actions/extraActions';
 import InitializingComponent from '../router/InitializingComponent';
+import { processGraphLink } from '../../redux/slices/graphSlice';
 
 export const GraphLink = () => {
 	const dispatch = useAppDispatch();
-	const [URLSearchParams] = useSearchParams();
+	const [searchParams] = useSearchParams();
 	const { initComplete } = useWaitForInit();
 	React.useEffect(() => {
-		const linkIsValid = validateHotlink(URLSearchParams);
+		const linkIsValid = validateHotlink(searchParams);
 		if (linkIsValid) {
-			dispatch(processGraphLink(URLSearchParams));
+			// Passing searchParams directly leads to non-serializable issues with Redux so pass as a string.
+			dispatch(processGraphLink(searchParams.toString()));
 		}
 	}, []);
 

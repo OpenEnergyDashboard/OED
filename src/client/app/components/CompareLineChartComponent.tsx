@@ -22,6 +22,7 @@ import { showInfoNotification, showWarnNotification } from '../utils/notificatio
 import { setHelpLayout } from './ThreeDComponent';
 import { toast } from 'react-toastify';
 import { useTranslate } from '../redux/componentHooks';
+import { TimeInterval } from '../../../common/TimeInterval';
 
 /**
  * @returns plotlyLine graphic
@@ -35,8 +36,8 @@ export default function CompareLineChartComponent() {
 	const shiftAmount = useAppSelector(selectShiftAmount);
 	const { args, shouldSkipQuery, argsDeps } = useAppSelector(selectCompareLineQueryArgs);
 	// getting the time interval of current data
-	const timeInterval = graphState.queryTimeInterval;
-	const shiftInterval = graphState.shiftTimeInterval;
+	const timeInterval = TimeInterval.fromString(graphState.queryTimeIntervalString);
+	const shiftInterval = TimeInterval.fromString(graphState.shiftTimeIntervalString);
 	// Layout for the plot
 	let layout = {};
 
@@ -137,12 +138,12 @@ export default function CompareLineChartComponent() {
 	// Adding information to the shifted data so that it can be plotted on the same graph with current data
 	const updateDataNew = dataNew.map(item => ({
 		...item,
-		name: 'Shifted ' + item.name,
+		name: translate('shifted') + ' ' + item.name,
 		line: { ...item.line, color: '#1AA5F0' },
 		xaxis: 'x2',
 		text: Array.isArray(item.text)
-			? item.text.map(text => text.replace('<br>', '<br>Shifted '))
-			: item.text?.replace('<br>', '<br>Shifted ')
+			? item.text.map(text => text.replace('<br>', '<br>' + translate('shifted') + ' '))
+			: item.text?.replace('<br>', '<br>' + translate('shifted') + ' ')
 	}));
 
 	return (

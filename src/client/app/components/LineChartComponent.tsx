@@ -9,7 +9,7 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { updateSliderRange } from '../redux/actions/extraActions';
+import { updateSliderRange } from '../redux/slices/graphSlice';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
@@ -93,7 +93,7 @@ export default function LineChartComponent() {
 
 	React.useEffect(() => {
 		if (minX && maxX) {
-			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX).toString()));
 		}
 	}, [minX, maxX]);
 
@@ -123,8 +123,10 @@ export default function LineChartComponent() {
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [
+							sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()
+						],
 						showgrid: true,
 						gridcolor: '#ddd'
 					}
@@ -155,14 +157,15 @@ export default function LineChartComponent() {
 							const startTS = utc(e['xaxis.range[0]']);
 							const endTS = utc(e['xaxis.range[1]']);
 							const workingTimeInterval = new TimeInterval(startTS, endTS);
-							dispatch(updateSliderRange(workingTimeInterval));
+							dispatch(updateSliderRange(workingTimeInterval.toString()));
 						}
 						else if (e['xaxis.range']) {
 							// this case is when the slider knobs are dragged.
 							const range = e['xaxis.range']!;
 							const startTS = range && range[0];
 							const endTS = range && range[1];
-							dispatch(updateSliderRange(new TimeInterval(utc(startTS), utc(endTS))));
+							const interval = new TimeInterval(utc(startTS), utc(endTS));
+							dispatch(updateSliderRange(interval.toString()));
 
 						}
 					}, 500, { leading: false, trailing: true })

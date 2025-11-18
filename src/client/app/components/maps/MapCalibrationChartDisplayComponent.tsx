@@ -2,23 +2,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { connect } from 'react-redux';
+import { PlotData, PlotMouseEvent } from 'plotly.js';
+import * as React from 'react';
 import Plot from 'react-plotly.js';
-import { State } from '../../types/redux/state';
-import * as plotly from 'plotly.js';
-import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
-import { updateCurrentCartesian } from '../../redux/actions/map';
-import { store }  from '../../store';
-import { CalibrationSettings } from '../../types/redux/map';
+import { useAppDispatch, useAppSelector } from '../../redux/reduxHooks';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { localEditsSlice } from '../../redux/slices/localEditsSlice';
 import Locales from '../../types/locales';
+import { CalibrationSettings } from '../../types/redux/map';
+import { CartesianPoint, Dimensions, normalizeImageDimensions } from '../../utils/calibration';
 
-function mapStateToProps(state: State) {
+/**
+ * @returns TODO DO ME
+ */
+export default function MapCalibrationChartDisplayContainer() {
+	const dispatch = useAppDispatch();
 	const x: number[] = [];
 	const y: number[] = [];
 	const texts: string[] = [];
+	const currentLanguange = useAppSelector(selectSelectedLanguage);
+	const map = useAppSelector(state => localEditsSlice.selectors.selectLocalEdit(state, localEditsSlice.selectors.selectCalibrationMapId(state)));
 
-	const mapID = state.maps.calibratingMap;
-	const map = state.maps.editedMaps[mapID];
+	const settings = useAppSelector(state => state.localEdits.calibrationSettings);
 	const points = map.calibrationSet;
 	if (points) {
 		for (const point of points) {
@@ -28,10 +33,9 @@ function mapStateToProps(state: State) {
 		}
 	}
 	const imageDimensions: Dimensions = normalizeImageDimensions({
-		width: map.image.width,
-		height: map.image.height
+		width: map.imgWidth,
+		height: map.imgHeight
 	});
-	const settings = state.maps.calibrationSettings;
 	const backgroundTrace = createBackgroundTrace(imageDimensions, settings);
 	const dataPointTrace = {
 		x,
@@ -49,7 +53,7 @@ function mapStateToProps(state: State) {
 	};
 	const data = [backgroundTrace, dataPointTrace];
 
-	const imageSource = map.image.src;
+	const imageSource = map.mapSource;
 
 	// for a detailed description of layout attributes: https://plotly.com/javascript/reference/#layout
 	const layout: any = {
@@ -80,23 +84,37 @@ function mapStateToProps(state: State) {
 		}]
 	};
 
-	/***
-	 * Usage:
-	 *  <Plot data={toJS(this.model_data)}
-	 *               layout={layout}
-	 *               onClick={({points, event}) => console.log(points, event)}>
-	 * Plotly no longer has IPlotlyChartProps so we will use any for now.
-	 */
-	const props: any = {
-		data,
-		layout,
-		onClick: (event: plotly.PlotMouseEvent) => handlePointClick(event),
-		config: {
-			locales: Locales // makes locales available for use
-		}
-	};
-	props.config.locale = state.appState.selectedLanguage;
-	return props;
+	return <Plot
+		data={data as PlotData[]}
+		layout={layout}
+		config={{
+			// makes locales available for use
+			locales: Locales,
+			locale: currentLanguange
+		}}
+		onClick={(event: PlotMouseEvent) => {
+			// trace 0 keeps a transparent trace of closely positioned points used for calibration(backgroundTrace),
+			// trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
+			// event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
+			// so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
+			event.event.preventDefault();
+			const eligiblePoints = [];
+			for (const point of event.points) {
+				const traceNumber = point.curveNumber;
+				if (traceNumber === 0) {
+					eligiblePoints.push(point);
+				}
+			}
+			// TODO VERIFY
+			const xValue = eligiblePoints[0].x as number;
+			const yValue = eligiblePoints[0].y as number;
+			const clickedPoint: CartesianPoint = {
+				x: Number(xValue.toFixed(6)),
+				y: Number(yValue.toFixed(6))
+			};
+			dispatch(localEditsSlice.actions.updateCurrentCartesian(clickedPoint));
+		}}
+	/>;
 }
 
 /**
@@ -139,35 +157,3 @@ function createBackgroundTrace(imageDimensions: Dimensions, settings: Calibratio
 	};
 	return trace;
 }
-
-function handlePointClick(event: plotly.PlotMouseEvent) {
-	event.event.preventDefault();
-	const currentPoint: CartesianPoint = getClickedCoordinates(event);
-	store.dispatch(updateCurrentCartesian(currentPoint));
-}
-
-function getClickedCoordinates(event: plotly.PlotMouseEvent) {
-	event.event.preventDefault();
-	/*
-	 *  trace 0 keeps a transparent trace of closely positioned points used for calibration(backgroundTrace),
-	 *  trace 1 keeps the data points used for calibration are automatically added to the same trace(dataPointTrace),
-	 *  event.points will include all points near a mouse click, including those in the backgroundTrace and the dataPointTrace,
-	 *  so the algorithm only looks at trace 0 since points from trace 1 are already put into the data set used for calibration.
-	   */
-	const eligiblePoints = [];
-	for (const point of event.points) {
-		const traceNumber = point.curveNumber;
-		if (traceNumber === 0) {
-			eligiblePoints.push(point);
-		}
-	}
-	const xValue = eligiblePoints[0].x as number;
-	const yValue = eligiblePoints[0].y as number;
-	const clickedPoint: CartesianPoint = {
-		x: Number(xValue.toFixed(6)),
-		y: Number(yValue.toFixed(6))
-	};
-	return clickedPoint;
-}
-
-export default connect(mapStateToProps)(Plot);

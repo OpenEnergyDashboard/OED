@@ -146,7 +146,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + values.identifier + '] ?';
+	const deleteConfirmationMessage = translate('unit.delete.unit') + ' "' + values.identifier + '" ?';
 	const deleteConfirmText = translate('unit.delete.unit');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
@@ -664,7 +664,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 						</FormGroup>
 					</Container></ModalBody>
 				<ModalFooter>
-					<Button variant="warning" color='danger' onClick={handleDeleteConfirmationModalOpen}>
+					<Button variant="danger" color='danger' onClick={handleDeleteConfirmationModalOpen}>
 						<FormattedMessage id="unit.delete.unit" />
 					</Button>
 					{/* Hides the modal */}

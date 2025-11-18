@@ -36,7 +36,7 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
+	if (!validate(req.params, validParams).valid && !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();
@@ -84,7 +84,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
+	if (!validate(req.params, validParams).valid && !validate(req.query, validQueries).valid) {
 		res.sendStatus(400);
 	} else {
 		const conn = getConnection();

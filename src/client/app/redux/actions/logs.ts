@@ -11,6 +11,8 @@ import { logsApi } from '../../utils/api';
  * @param error An optional error object to provide a stacktrace
  * @param skipMail Don't e-mail this message even if we would normally emit an e-mail for this level.
  * @returns logs to server based on level
+ * TODO migrate to using RTKQuery for logging.
+ * This will require logging to be initiated via dispatch, which differs, and conflicts with current implementation and usage.
  */
 export function logToServer(level: string, message: string, error?: Error, skipMail?: boolean) {
 	const log: LogData = {

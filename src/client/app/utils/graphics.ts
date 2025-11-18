@@ -74,7 +74,7 @@ export function barUnitLabel(selectUnitState: UnitData, areaNormalization: boole
 		// It might not be usual to take a flow and make it into a quantity so this label is a little different to
 		// catch people's attention. If sites/users don't like OED doing this then we can eliminate flow for these types
 		// of graphics as we are doing for rate.
-		unitLabel = selectUnitState.identifier + ' * time ≡ quantity';
+		unitLabel = selectUnitState.identifier + translate('bar.label');
 	}
 	if (areaNormalization) {
 		unitLabel += ' / ' + translate(`AreaUnitType.${selectedAreaUnit}`);

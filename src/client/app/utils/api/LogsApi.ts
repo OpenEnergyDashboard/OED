@@ -8,6 +8,8 @@ import ApiBackend from './ApiBackend';
 import { LogData } from '../../types/redux/logs';
 import { TimeInterval } from '../../../../common/TimeInterval';
 
+//TODO migrate to using RTKQuery for logging.
+// This will require logging to be initiated via dispatch, which differs, and conflicts with current implementation and usage.
 export default class LogsApi {
 	private readonly backend: ApiBackend;
 

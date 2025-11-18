@@ -3,19 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import { RootState } from 'store';
+import { omit } from 'lodash';
 import { MeterOrGroup, ReadingInterval } from '../../types/redux/graph';
 import { calculateCompareShift } from '../../utils/calculateCompare';
 import { roundTimeIntervalForFetch } from '../../utils/dateRangeCompatibility';
+import { selectLineChartDeps } from './lineChartSelectors';
+import { createAppSelector } from './selectors';
 import {
 	selectWidthDays, selectComparePeriod,
 	selectCompareTimeInterval, selectQueryTimeInterval,
-	selectSelectedGroups, selectSelectedMeters,
+	selectSelectedGroups, selectSelectedMap, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState,
 	selectShiftAmount
 } from '../slices/graphSlice';
-import { omit } from 'lodash';
-import { selectLineChartDeps } from './lineChartSelectors';
 
 // query args that 'most' graphs share
 export interface commonQueryArgs {
@@ -167,11 +167,11 @@ export const selectCompareChartQueryArgs = createSelector(
 	}
 );
 
-export const selectMapChartQueryArgs = createSelector(
+export const selectMapChartQueryArgs = createAppSelector(
 	selectBarChartQueryArgs,
 	selectWidthDays,
-	(state: RootState) => state.maps,
-	(barChartArgs, barWidthDays, maps) => {
+	selectSelectedMap,
+	(barChartArgs, barWidthDays, selectedMap) => {
 		const durationDays = Math.round(barWidthDays.asDays());
 
 		const meterArgs: MapReadingApiArgs = {
@@ -185,8 +185,8 @@ export const selectMapChartQueryArgs = createSelector(
 			barWidthDays: durationDays
 
 		};
-		const meterShouldSkip = barChartArgs.meterShouldSkip || maps.selectedMap === 0;
-		const groupShouldSkip = barChartArgs.groupShouldSkip || maps.selectedMap === 0;
+		const meterShouldSkip = barChartArgs.meterShouldSkip || selectedMap === 0;
+		const groupShouldSkip = barChartArgs.groupShouldSkip || selectedMap === 0;
 		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
 	}
 

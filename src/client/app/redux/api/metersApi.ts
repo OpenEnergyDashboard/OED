@@ -2,22 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { NamedIDItem } from 'types/items';
 import { RawReadings } from 'types/readings';
-import { TimeInterval } from '../../../../common/TimeInterval';
 import { RootState } from '../../store';
 import { MeterData } from '../../types/redux/meters';
 import { durationFormat } from '../../utils/durationFormat';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
-
-export const meterAdapter = createEntityAdapter<MeterData>({
-	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
-
-});
-export const metersInitialState = meterAdapter.getInitialState();
-export type MeterDataState = EntityState<MeterData, number>;
+import { MeterDataState, meterAdapter, metersInitialState } from '../../redux/entityAdapters';
 
 export const metersApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -63,14 +55,14 @@ export const metersApi = baseApi.injectEndpoints({
 				});
 			}
 		}),
-		lineReadingsCount: builder.query<number, { meterIDs: number[], timeInterval: TimeInterval }>({
-			query: ({ meterIDs, timeInterval }) => `api/readings/line/count/meters/${meterIDs.join(',')}?timeInterval=${timeInterval.toString()}`
+		lineReadingsCount: builder.query<number, { meterIDs: number[], timeIntervalString: string }>({
+			query: ({ meterIDs, timeIntervalString }) => `api/readings/line/count/meters/${meterIDs.join(',')}?timeInterval=${timeIntervalString}`
 		}),
 		details: builder.query<NamedIDItem[], void>({
 			query: () => 'api/meters'
 		}),
-		rawLineReadings: builder.query<RawReadings[], { meterID: number, timeInterval: TimeInterval }>({
-			query: ({ meterID, timeInterval }) => `api/readings/line/raw/meter/${meterID}?timeInterval=${timeInterval.toString()}`
+		rawLineReadings: builder.query<RawReadings[], { meterID: number, timeIntervalString: string }>({
+			query: ({ meterID, timeIntervalString }) => `api/readings/line/raw/meter/${meterID}?timeInterval=${timeIntervalString}`
 		})
 	})
 });

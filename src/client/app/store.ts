@@ -3,20 +3,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { configureStore } from '@reduxjs/toolkit';
-import { rootReducer } from './redux/rootReducer';
-import { baseApi } from './redux/api/baseApi';
-import { Dispatch } from './types/redux/actions';
-import { listenerMiddleware } from './redux/listenerMiddleware';
 import { setGlobalDevModeChecks } from 'reselect';
+import { baseApi } from './redux/api/baseApi';
+import { devToolsConfig } from './redux/devToolConfig';
+import { listenerMiddleware } from './redux/listenerMiddleware';
+import { rootReducer } from './redux/rootReducer';
 
 export const store = configureStore({
 	reducer: rootReducer,
 	middleware: getDefaultMiddleware => getDefaultMiddleware({
-		immutableCheck: false,
-		serializableCheck: false
-	})
-		.prepend(listenerMiddleware.middleware)
-		.concat(baseApi.middleware)
+		// These used to be needed since the OED code was violating rules.
+		// They should generally pass now so should not be turned off again.
+		// TODO Remove in the future so old turnoff code is gone.
+		// immutableCheck: false,
+		// serializableCheck: false
+	}).prepend(listenerMiddleware.middleware)
+		.concat(baseApi.middleware),
+	devTools: devToolsConfig
+
 });
 
 // stability check for ALL createSelector instances.
@@ -26,6 +30,10 @@ setGlobalDevModeChecks({ inputStabilityCheck: 'always', identityFunctionCheck: '
 // https://react-redux.js.org/using-react-redux/usage-with-typescript#define-root-state-and-dispatch-types
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
-	// Adding old dispatch definition for backwards compatibility with useAppDispatch and older style thunks
-	// TODO eventually move away and delete Dispatch Type entirely
-	& Dispatch
+
+
+/**
+ * The type of the redux-thunk getState function.
+ * TODO verify if applicable to RTK (should be? for getState in RTKQ lifecycle thunks, and CreateAsyncThunk?)
+ */
+export type GetState = () => RootState;

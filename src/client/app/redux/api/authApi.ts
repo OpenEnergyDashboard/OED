@@ -23,7 +23,7 @@ export const authApi = baseApi.injectEndpoints({
 			// next time the corresponding endpoint is queried, cache will be ignored and overwritten by a fresh query.
 			// in this case, a user logged in which means that some info for ADMIN meters groups etc.
 			// invalidate forces a refetch to any subscribed components or the next query.
-			invalidatesTags: ['MeterData', 'GroupData']
+			invalidatesTags: ['MeterData', 'GroupData', 'MapsData']
 		}),
 		verifyToken: builder.mutation<{ success: boolean }, string>({
 			query: token => ({
@@ -49,10 +49,10 @@ export const authApi = baseApi.injectEndpoints({
 				dispatch(currentUserSlice.actions.clearCurrentUser());
 				return { data: null };
 			},
-			invalidatesTags: ['MeterData', 'GroupData']
+			invalidatesTags: ['MeterData', 'GroupData', 'MapsData']
 		})
 	})
 });
 
 // Poll interval in milliseconds (1 minute)
-export const authPollInterval = 60000;
+export const authPollInterval = 1000 * 60 * 60;

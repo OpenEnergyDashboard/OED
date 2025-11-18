@@ -47,7 +47,7 @@ export default function CompareLineControlsComponent() {
 		if (shiftAmount !== ShiftAmount.custom && timeInterval.getIsBounded()) {
 			const { shiftedStart, shiftedEnd } = shiftDate(timeInterval.getStartTimestamp(), timeInterval.getEndTimestamp(), shiftAmount);
 			const newInterval = new TimeInterval(shiftedStart, shiftedEnd);
-			dispatch(updateShiftTimeInterval(newInterval));
+			dispatch(updateShiftTimeInterval(newInterval.toString()));
 			// set the custom date range to the new interval
 			setCustomDateRange(newInterval);
 		}
@@ -66,7 +66,7 @@ export default function CompareLineControlsComponent() {
 	// Update date when the data range picker is used in custome shifting option
 	const handleCustomShiftDateChange = (value: Value) => {
 		setCustomDateRange(dateRangeToTimeInterval(value));
-		dispatch(updateShiftTimeInterval(dateRangeToTimeInterval(value)));
+		dispatch(updateShiftTimeInterval(dateRangeToTimeInterval(value).toString()));
 	};
 
 	return (

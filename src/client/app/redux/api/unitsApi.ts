@@ -2,16 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { EntityState, createEntityAdapter } from '@reduxjs/toolkit';
 import { RootState } from 'store';
 import { UnitData, UnitDataById } from '../../types/redux/units';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
-export const unitsAdapter = createEntityAdapter<UnitData>({
-	sortComparer: (unitA, unitB) => unitA.identifier?.localeCompare(unitB.identifier, undefined, { sensitivity: 'accent' })
-});
-export const unitsInitialState = unitsAdapter.getInitialState();
-export type UnitDataState = EntityState<UnitData, number>;
+import { UnitDataState, unitsAdapter, unitsInitialState } from '../../redux/entityAdapters';
 
 export const unitsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({

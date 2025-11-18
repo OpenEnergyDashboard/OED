@@ -9,14 +9,14 @@ import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { updateSliderRange } from '../redux/actions/extraActions';
+import { updateSliderRange } from '../redux/slices/graphSlice';
 import { readingsApi, stableEmptyBarReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/selectors/barChartSelectors';
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectSliderRangeInterval ,selectBarStacking, setInitialXAxisRange } from '../redux/slices/graphSlice';
+import { selectSliderRangeInterval, selectBarStacking, setInitialXAxisRange } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
@@ -62,7 +62,7 @@ export default function BarChartComponent() {
 		'resetScale2d'];
 	const advancedButtons: Plotly.ModeBarDefaultButtons[] = ['select2d', 'lasso2d', 'autoScale2d', 'resetScale2d'];
 	// Manage button states with useState
-	const	[listOfButtons, setListOfButtons] = React.useState(defaultButtons);
+	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
@@ -90,7 +90,7 @@ export default function BarChartComponent() {
 
 	React.useEffect(() => {
 		if (minX && maxX) {
-			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX).toString()));
 		}
 	}, [minX, maxX]);
 
@@ -131,8 +131,10 @@ export default function BarChartComponent() {
 					},
 					xaxis: {
 						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						range: [
+							sliderRangeInterval.getStartTimestamp()?.toISOString(),
+							sliderRangeInterval.getEndTimestamp()?.toISOString()
+						],
 						showgrid: true, gridcolor: '#ddd',
 						tickangle: -45, autotick: true,
 						nticks: 10,
@@ -166,14 +168,15 @@ export default function BarChartComponent() {
 							const startTS = utc(e['xaxis.range[0]']);
 							const endTS = utc(e['xaxis.range[1]']);
 							const workingTimeInterval = new TimeInterval(startTS, endTS);
-							dispatch(updateSliderRange(workingTimeInterval));
+							dispatch(updateSliderRange(workingTimeInterval.toString()));
 						}
 						else if (e['xaxis.range']) {
 							// this case is when the slider knobs are dragged.
 							const range = e['xaxis.range']!;
 							const startTS = range && range[0];
 							const endTS = range && range[1];
-							dispatch(updateSliderRange(new TimeInterval(utc(startTS), utc(endTS))));
+							const interval = new TimeInterval(utc(startTS), utc(endTS));
+							dispatch(updateSliderRange(interval.toString()));
 
 						}
 					}, 500, { leading: false, trailing: true })}

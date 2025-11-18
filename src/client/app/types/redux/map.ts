@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { ActionType } from './actions';
-import { CalibratedPoint, CalibrationResult, CartesianPoint, GPSPoint } from '../../utils/calibration';
+import { CalibratedPoint, CalibrationResult, GPSPoint } from '../../utils/calibration';
 
 /**
  * 'initiate', 'calibrate' or 'unavailable'
@@ -13,107 +12,6 @@ export enum CalibrationModeTypes {
 	calibrate = 'calibrate',
 	unavailable = 'unavailable'
 }
-
-export interface ChangeMapModeAction {
-	type: ActionType.UpdateCalibrationMode;
-	nextMode: CalibrationModeTypes;
-}
-
-export interface RequestMapsDetailsAction {
-	type: ActionType.RequestMapsDetails;
-}
-
-export interface ReceiveMapsDetailsAction {
-	type: ActionType.ReceiveMapsDetails;
-	data: MapData[];
-}
-
-export interface UpdateMapSourceAction {
-	type: ActionType.UpdateMapSource;
-	data: MapMetadata;
-}
-
-export interface ChangeGridDisplayAction {
-	type: ActionType.ChangeGridDisplay;
-}
-
-export interface UpdateSelectedMapAction {
-	type: ActionType.UpdateSelectedMap;
-	mapID: number;
-}
-
-export interface UpdateCurrentCartesianAction {
-	type: ActionType.UpdateCurrentCartesian;
-	currentCartesian: CartesianPoint;
-}
-
-export interface ResetCurrentPointAction {
-	type: ActionType.ResetCurrentPoint;
-}
-
-export interface AppendCalibrationSetAction {
-	type: ActionType.AppendCalibrationSet;
-	calibratedPoint: CalibratedPoint;
-}
-
-export interface UpdateCalibrationResultAction {
-	type: ActionType.UpdateCalibrationResults;
-	result: CalibrationResult;
-}
-
-export interface DeleteMapAction {
-	type: ActionType.DeleteMap;
-	mapID: number;
-}
-
-export interface EditMapDetailsAction {
-	type: ActionType.EditMapDetails;
-	map: MapMetadata;
-}
-
-export interface SubmitEditedMapAction {
-	type: ActionType.SubmitEditedMap;
-	mapID: number;
-}
-
-export interface ConfirmEditedMapAction {
-	type: ActionType.ConfirmEditedMap;
-	mapID: number;
-}
-
-export interface SetCalibrationAction {
-	type: ActionType.SetCalibration;
-	mapID: number;
-	mode: CalibrationModeTypes;
-}
-
-export interface IncrementCounterAction {
-	type: ActionType.IncrementCounter;
-}
-
-export interface ResetCalibrationAction {
-	type: ActionType.ResetCalibration;
-	mapID: number;
-}
-
-export type MapsAction =
-	| ChangeMapModeAction
-	| UpdateSelectedMapAction
-	| RequestMapsDetailsAction
-	| ReceiveMapsDetailsAction
-	| UpdateMapSourceAction
-	| ChangeGridDisplayAction
-	| EditMapDetailsAction
-	| SubmitEditedMapAction
-	| ConfirmEditedMapAction
-	| UpdateCurrentCartesianAction
-	| ResetCurrentPointAction
-	| AppendCalibrationSetAction
-	| UpdateCalibrationResultAction
-	| SetCalibrationAction
-	| ResetCalibrationAction
-	| IncrementCounterAction
-	| DeleteMapAction;
 
 /**
  * data format stored in the database
@@ -145,6 +43,7 @@ export interface MapData {
  *  @param name
  *  @param displayable
  */
+
 export interface MapMetadata {
 	id: number;
 	name: string;
@@ -154,13 +53,16 @@ export interface MapMetadata {
 	modifiedDate: string;
 	origin?: GPSPoint;
 	opposite?: GPSPoint;
-	image: HTMLImageElement;
-	calibrationMode?: CalibrationModeTypes;
-	currentPoint?: CalibratedPoint;
-	calibrationSet?: CalibratedPoint[];
-	calibrationResult?: CalibrationResult;
+	mapSource: string;
 	northAngle: number;
 	circleSize: number;
+	// image: HTMLImageElement;
+	imgHeight: number;
+	imgWidth: number;
+	calibrationMode?: CalibrationModeTypes;
+	currentPoint?: CalibratedPoint;
+	calibrationSet: CalibratedPoint[];
+	calibrationResult?: CalibrationResult;
 }
 
 /**
@@ -168,22 +70,4 @@ export interface MapMetadata {
  */
 export interface CalibrationSettings {
 	showGrid: boolean;
-}
-
-/**
- * @param mapID <= -1 means it's a new map;
- */
-interface MapMetadataByID extends Record<number, MapMetadata> { }
-
-
-export interface MapState {
-	isLoading: boolean;
-	byMapID: MapMetadataByID;
-	selectedMap: number;
-	calibratingMap: number;
-	editedMaps: MapMetadataByID; // Holds all maps that have been edited locally
-	// Maps the app is currently attempting to upload map changes
-	submitting: number[];
-	newMapCounter: number;
-	calibrationSettings: CalibrationSettings;
 }

@@ -5,7 +5,7 @@
 import * as React from 'react';
 import * as moment from 'moment';
 import { TimeInterval } from '../../../common/TimeInterval';
-import { clearGraphHistory } from '../redux/actions/extraActions';
+import { clearGraphHistory } from '../redux/slices/graphSlice';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectAnythingFetching } from '../redux/selectors/apiSelectors';
 import {
@@ -42,7 +42,7 @@ export const ExpandComponent = () => {
 	const dispatch = useAppDispatch();
 	return (
 		<img src='./expand.png' style={{ height: '25px' }}
-			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded())); }}
+			onClick={() => { dispatch(changeSliderRange(TimeInterval.unbounded().toString())); }}
 		/>
 	);
 };
@@ -106,10 +106,10 @@ export const RefreshGraphComponent = () => {
 			style={{ height: '25px', transform: `rotate(${time}deg)`, visibility: iconVisible ? 'visible' : 'hidden' }}
 			onClick={() => {
 				if (!somethingFetching) {
-					const minX = initialXAxisRange?.getStartTimestamp?.();
-					const maxX = initialXAxisRange?.getEndTimestamp?.();
+					const minX = TimeInterval.fromString(initialXAxisRange).getStartTimestamp();
+					const maxX = TimeInterval.fromString(initialXAxisRange).getEndTimestamp();
 					const nextInterval = getNextQueryTimeInterval(queryTimeInterval, sliderInterval, minX, maxX);
-					dispatch(updateTimeIntervalAndSliderRange(nextInterval));
+					dispatch(updateTimeIntervalAndSliderRange(nextInterval.toString()));
 				}
 			}}
 		/>

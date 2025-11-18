@@ -2,19 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { EntityState, Update, createEntityAdapter } from '@reduxjs/toolkit';
+import { Update } from '@reduxjs/toolkit';
 import { omit } from 'lodash';
+import { GroupDataState, groupsAdapter, groupsInitialState } from '../../redux/entityAdapters';
 import { RootState } from '../../store';
 import { GroupChildren, GroupData } from '../../types/redux/groups';
 import { showErrorNotification } from '../../utils/notifications';
 import { selectIsAdmin } from '../slices/currentUserSlice';
 import { baseApi } from './baseApi';
 
-export const groupsAdapter = createEntityAdapter<GroupData>({
-	sortComparer: (groupA, groupB) => groupA.name?.localeCompare(groupB.name, undefined, { sensitivity: 'accent' })
-});
-export const groupsInitialState = groupsAdapter.getInitialState();
-export type GroupDataState = EntityState<GroupData, number>;
 
 export const groupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({

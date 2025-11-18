@@ -11,8 +11,8 @@ import { selectUnitDataById } from '../redux/api/unitsApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
+import { selectGraphState, selectQueryTimeInterval } from '../redux/slices/graphSlice';
 import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
-import { selectGraphState } from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
@@ -44,6 +44,7 @@ export default function ThreeDComponent() {
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const graphState = useAppSelector(selectGraphState);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
 	// Initialize Default values
@@ -64,7 +65,7 @@ export default function ThreeDComponent() {
 		layout = setHelpLayout(translate('select.meter.group'));
 	} else if (graphState.areaNormalization && !isAreaCompatible) {
 		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.queryTimeInterval))) {
+	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(queryTimeInterval))) {
 		// Not a valid time interval. ThreeD can only support up to 1 year of readings
 		layout = setHelpLayout(translate('threeD.date.range.too.long'));
 	} else if (!threeDData) {
@@ -297,6 +298,3 @@ export function setThreeDLayout(translate: (messageID: string) => string, zLabel
 		}
 	} as Partial<Plotly.Layout>;
 }
-
-
-

@@ -122,109 +122,113 @@ export const exportRawReadings = createAppThunk(
 
 		const dispatch = api.dispatch;
 		const meterIDs = selectSelectedMeters(state);
-		const timeInterval = selectQueryTimeInterval(state);
+		const timeIntervalString = selectQueryTimeInterval(state).toString();
 		const adminState = selectAdminState(state);
 		const { meterDataById, compatibleEntities } = selectPlotlyMeterDeps(state);
 		const conversionState = selectConversionsDetails(state);
 		const unitsDataById = selectUnitDataById(state);
-		// Function to export raw readings of graphic data shown.
-		// Get the total number of readings for all meters so can warn user if large.
-		// Soon OED will be able to estimate the number of readings based on reading frequency. However,
-		// we will still get the correct count since this is not done very often and don't want to get
-		// the wrong value. The time to do this is small compared to most raw exports (if file is large
-		// when it matters).
-		const count = await dispatch(metersApi.endpoints.lineReadingsCount.initiate({ meterIDs, timeInterval })).unwrap();
-		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
-		// This is just a decent estimate for larger files.
-		const fileSize = (count * 0.082 / 1000);
-		// Decides if the readings should be exported, true if should.
-		let shouldDownload = false;
-		if (fileSize <= adminState.defaultWarningFileSize) {
-			// File sizes that anyone can download without prompting so fine
-			shouldDownload = true;
-		} else if (fileSize > adminState.defaultFileSizeLimit) {
+		// Skip process if no meters.
+		// TODO Maybe good if warned user that groups not exported if any on graph or if no meters (or disable button to do export if no meters)?
+		if (meterIDs.length != 0) {
+			// Function to export raw readings of graphic data shown.
+			// Get the total number of readings for all meters so can warn user if large.
+			// Soon OED will be able to estimate the number of readings based on reading frequency. However,
+			// we will still get the correct count since this is not done very often and don't want to get
+			// the wrong value. The time to do this is small compared to most raw exports (if file is large
+			// when it matters).
+			// TODO This and the route below should deal with errors.
+			const count = await dispatch(metersApi.endpoints.lineReadingsCount.initiate({ meterIDs, timeIntervalString })).unwrap();
+			// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
+			// This is just a decent estimate for larger files.
+			const fileSize = (count * 0.082 / 1000);
+			// Decides if the readings should be exported, true if should.
+			let shouldDownload = false;
+			if (fileSize <= adminState.defaultWarningFileSize) {
+				// File sizes that anyone can download without prompting so fine
+				shouldDownload = true;
+			} else if (fileSize > adminState.defaultFileSizeLimit) {
 
-			// Exceeds the size allowed unless admin or export role and must verify want to continue.
-			if (selectHasRolePermissions(state, UserRole.EXPORT)) {
-				// A user allowed to do this but need to check okay with them.
+				// Exceeds the size allowed unless admin or export role and must verify want to continue.
+				if (selectHasRolePermissions(state, UserRole.EXPORT)) {
+					// A user allowed to do this but need to check okay with them.
+					const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
+						translate('csv.download.size.warning.verify') + '?';
+					const consent = window.confirm(msg);
+					if (consent) {
+						shouldDownload = true;
+					}
+				} else {
+					// User not allowed to download.
+					const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
+						translate('csv.download.size.limit');
+					showErrorNotification(msg);
+				}
+			} else {
+				// Anyone can download if they approve
 				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
 					translate('csv.download.size.warning.verify') + '?';
 				const consent = window.confirm(msg);
 				if (consent) {
 					shouldDownload = true;
 				}
-			} else {
-				// User not allowed to download.
-				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
-					translate('csv.download.size.limit');
-				showErrorNotification(msg);
 			}
-		} else {
-			// Anyone can download if they approve
-			const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
-				translate('csv.download.size.warning.verify') + '?';
-			const consent = window.confirm(msg);
-			if (consent) {
-				shouldDownload = true;
-			}
-		}
 
-		if (shouldDownload) {
-			// Loop over each selected meter in graphic. Does nothing if no meters selected.
-			for (const meterID of compatibleEntities) {
-				// export if area normalization is off or the meter can be normalized
-				// Which selected meter being processed.
-				// const currentMeter = graphState.selectedMeters[i];
-				// Identifier for current meter.
-				const currentMeterIdentifier = meterDataById[meterID].identifier;
-				// The unit of the currentMeter.
-				const meterUnitId = meterDataById[meterID].unitId;
-				// Note that each meter can have a different unit so look up for each one.
-				let unitIdentifier;
-				// A complication is that a unit associated with a meter is not the one the user
-				// sees when graphing. Now try to find the graphing unit.
-				// Try to find expected conversion from meter with slope = 1 and intercept = 0
-				const conversion = find(conversionState, function (c: ConversionData) {
-					return c.sourceId === meterUnitId && c.slope === 1 && c.intercept === 0;
-				});
-				if (!conversion) {
-					// This is the unusual case where the conversion is not 1, 0.
-					// We find the first conversion and use it.
-					const anyConversion = find(conversionState, function (c: ConversionData) {
-						// Conversion has source that is the meter unit.
-						return c.sourceId === meterUnitId;
+			if (shouldDownload) {
+				// Loop over each selected meter in graphic. Does nothing if no meters selected.
+				for (const meterID of compatibleEntities) {
+					// export if area normalization is off or the meter can be normalized
+					// Which selected meter being processed.
+					// const currentMeter = graphState.selectedMeters[i];
+					// Identifier for current meter.
+					const currentMeterIdentifier = meterDataById[meterID].identifier;
+					// The unit of the currentMeter.
+					const meterUnitId = meterDataById[meterID].unitId;
+					// Note that each meter can have a different unit so look up for each one.
+					let unitIdentifier;
+					// A complication is that a unit associated with a meter is not the one the user
+					// sees when graphing. Now try to find the graphing unit.
+					// Try to find expected conversion from meter with slope = 1 and intercept = 0
+					const conversion = find(conversionState, function (c: ConversionData) {
+						return c.sourceId === meterUnitId && c.slope === 1 && c.intercept === 0;
 					});
-					if (!anyConversion) {
-						// Could not find a conversion with this meter. This should never happen.
-						// Use the identifier of currentMeter unit and extra info.
-						unitIdentifier = unitsDataById[meterUnitId].identifier +
-							' (this is the meter unit which is unusual)';
-						// Nice if logged warning but no easy way so don't.
+					if (!conversion) {
+						// This is the unusual case where the conversion is not 1, 0.
+						// We find the first conversion and use it.
+						const anyConversion = find(conversionState, function (c: ConversionData) {
+							// Conversion has source that is the meter unit.
+							return c.sourceId === meterUnitId;
+						});
+						if (!anyConversion) {
+							// Could not find a conversion with this meter. This should never happen.
+							// Use the identifier of currentMeter unit and extra info.
+							unitIdentifier = unitsDataById[meterUnitId].identifier +
+								' (this is the meter unit which is unusual)';
+							// Nice if logged warning but no easy way so don't.
+						} else {
+							// Use this conversion but give slope/destination since changes values.
+							unitIdentifier = unitsDataById[anyConversion.destinationId].identifier +
+								` (but conversion from meter values of slope = ${anyConversion.slope} and intercept = ${anyConversion.intercept}`;
+						}
 					} else {
-						// Use this conversion but give slope/destination since changes values.
-						unitIdentifier = unitsDataById[anyConversion.destinationId].identifier +
-							` (but conversion from meter values of slope = ${anyConversion.slope} and intercept = ${anyConversion.intercept}`;
+						// This is the typical case where there was a conversion from the meter of 1, 0.
+						unitIdentifier = unitsDataById[conversion.destinationId].identifier;
 					}
-				} else {
-					// This is the typical case where there was a conversion from the meter of 1, 0.
-					unitIdentifier = unitsDataById[conversion.destinationId].identifier;
+
+					// TODO The new line readings route for graphs allows one to get the raw data. Maybe we should try to switch to that and then modify
+					// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
+					// The long reading work will modify how you get raw data and probably make this easier. However, it does return the meter id for
+					// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
+
+					// Get the raw readings.
+					const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeIntervalString }));
+					const lineReadings = await response.unwrap();
+					// unsub from query after a minute.
+					setTimeout(() => { response.unsubscribe(); }, 60000);
+					// Get the CSV to to user.
+					downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
 				}
-
-				// TODO The new line readings route for graphs allows one to get the raw data. Maybe we should try to switch to that and then modify
-				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
-				// The long reading work will modify how you get raw data and probably make this easier. However, it does return the meter id for
-				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
-
-				// Get the raw readings.
-				const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval }));
-				const lineReadings = await response.unwrap();
-				// unsub from query after a minute.
-				setTimeout(() => { response.unsubscribe(); }, 60000);
-				// Get the CSV to to user.
-				downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
 			}
 		}
-
 
 		return api.fulfillWithValue('success');
 	}
