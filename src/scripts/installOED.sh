@@ -58,6 +58,21 @@ if [ -f ".env" ]; then
 	source .env
 fi
 
+# Creating a centralized variable to keep track of the type of installation. 
+INSTALL_MODE="invalid"
+
+if [ "$production" = "yes" ] || [ "$OED_PRODUCTION" = "yes" ]; then
+	INSTALL_MODE="production"
+elif [ "$production" = "no" ] || [ "$OED_PRODUCTION" = "no" ]; then
+	INSTALL_MODE="development"
+fi
+
+if [ "$INSTALL_MODE" = "invalid" ]; then
+	printf "\nFailure: Invalid or missing environment configuration."
+	printf "\nSet OED_PRODUCTION to 'yes' for production or 'no' for development."
+	exit 10
+fi
+
 # Skip the install if the node_modules were installed before the package files.
 # The two package files
 packageFile="package.json"
@@ -147,7 +162,7 @@ else
 
 	# Create a user
 	set -e
-	if [ "$production" == "no" ] && [ ! "$OED_PRODUCTION" == "yes" ]; then
+	if [ "$INSTALL_MODE" = "development" ]; then
 		npm run createUser -- $usernameTest password
 		createuserTest_code=$?
 		# this second username uses an email: test@example.com and we will remove this eventually
@@ -176,7 +191,7 @@ else
 fi
 
 # Build webpack if needed
-if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
+if [ "$INSTALL_MODE" = "production" ]; then
 	npm run webpack:build
 elif [ "$dostart" == "no" ]; then
 	npm run webpack
@@ -186,9 +201,9 @@ printf "%s\n" "OED install finished"
 
 # Start OED
 if [ "$dostart" == "yes" ]; then
-	if [ "$production" == "yes" ] || [ "$OED_PRODUCTION" == "yes" ]; then
+	if [ "$INSTALL_MODE" = "production" ]; then
 		printf "%s\n" "Starting OED in production mode"
-		#Checking if the user has set a mail method and left one of the mailing environment variables default, warning if so
+		# Checking if the user has set a mail method and left one of the mailing environment variables default, warning if so
 		if [ -z "$OED_MAIL_METHOD" ] || [ "$OED_MAIL_METHOD" != "none" ]; then
 			if [ "$OED_MAIL_SMTP" = "smtp.example.com" ] || \
 			[ "$OED_MAIL_SMTP_PORT" = "465" ] || \
@@ -202,15 +217,18 @@ if [ "$dostart" == "yes" ]; then
 				printf "********************************************************************************\n\n"
 			fi
 		fi
-		#If the user is in production and their token secret has been left default, generating a random one
+		# If the user is in production and their token secret has been left default, generating a random one
 		if [ -z "$OED_TOKEN_SECRET" ] || [ "$OED_TOKEN_SECRET" = "?" ]; then
 			printf "\nNo valid OED_TOKEN_SECRET detected. Generating a secure random secret...\n"
 	
 			# Generate 32 bytes of random data and convert to 64-character hex
 			OED_TOKEN_SECRET=$(openssl rand -hex 32)
 			export OED_TOKEN_SECRET
-
+			
+			printf "\n********************************************************************************\n"
 			printf "Generated OED_TOKEN_SECRET: %s\n" "$OED_TOKEN_SECRET"
+			printf "\n Make sure to save or change this value"
+			printf "********************************************************************************\n\n"
 
 			# Save to .env for future runs
 			if [ -f ".env" ]; then
@@ -223,13 +241,16 @@ if [ "$dostart" == "yes" ]; then
 				echo "OED_TOKEN_SECRET=$OED_TOKEN_SECRET" > .env
 			fi
 		fi
-		#If the user is in production and their postgres password has been left default, generating a random one
+		# If the user is in production and their postgres password has been left default, generating a random one
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
-			printf "\n No valid PostgreSQL password detected. Generating a secure random password...\n"
+			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
 			POSTGRES_PASSWORD=$(openssl rand -base64 12)
 			export POSTGRES_PASSWORD
+
+			printf "\n********************************************************************************\n"
 			printf "Generated PostgreSQL password: %s\n" "$POSTGRES_PASSWORD"
-			printf "\n Make sure to save or change this value"
+			printf "\nMake sure to save or change this value"
+			printf "********************************************************************************\n\n"
 
 			# Save to .env
 			if [ -f ".env" ]; then
@@ -243,8 +264,8 @@ if [ "$dostart" == "yes" ]; then
 			fi
 		fi
 		npm run start
-	elif [ "$OED_PRODUCTION" == "no" ]; then
-		#Warning the user if they've left their token or postgres password default, we don't randomly generate it in dev mode 
+	elif [ "$INSTALL_MODE" = "development" ]; then
+		# Warning the user if they've left their token or postgres password default, we don't randomly generate it in dev mode 
 		if [ -z "$OED_TOKEN_SECRET" ] || [ "$OED_TOKEN_SECRET" = "?" ]; then
 			printf "\n********************************************************************************\n"
 			printf "WARNING: YOU ARE USING OED IN DEVELOPMENT MODE WITH THE DEFAULT OED_TOKEN_SECRET SET IN docker-compose.yml IF THIS IS NOT INTENTIONAL GO THERE TO CHANGE IT.\n"
@@ -257,11 +278,7 @@ if [ "$dostart" == "yes" ]; then
 		fi
 		printf "%s\n" "Starting OED in development mode."
 		./src/scripts/devstart.sh
-	else
-		printf "\nFailure: Invalid or missing enviroment configuration."
-		printf "\nSet OED_PRODUCTION to 'yes' for production or 'no' for development."
-		exit 10
-	fi 
+	fi
 else
 	printf "%s\n" "Not starting OED due to --nostart."
 fi
