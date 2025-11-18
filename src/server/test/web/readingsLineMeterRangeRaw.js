@@ -93,7 +93,7 @@ mocha.describe('readings API', () => {
                     });
 
                     // Add LR14 here
-                    mocha.it('range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
+                    mocha.it('LR14: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
                         const unitC = {
                             // u6, used for conversion instead of display
                             name: 'C',
@@ -124,7 +124,7 @@ mocha.describe('readings API', () => {
                             identifier: '',
                             unitRepresent: Unit.unitRepresentType.RAW,
                             secInRate: 3600,
-                            typeOfUnit: Unit.unitType.METER,
+                            typeOfUnit: Unit.unitType.UNIT,
                             suffix: '',
                             displayable: Unit.displayableType.ALL,
                             preferredDisplay: false,
