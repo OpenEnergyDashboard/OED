@@ -18,6 +18,7 @@ class Preferences {
 	 * @param {Number} defaultFileSizeLimit - Option to set the default file size limit
 	 * @param {Number} defaultAreaNormalization - Option to set the default toggle of area normalization
 	 * @param {String} defaultAreaUnit - The default area unit to normalize by
+	 * @param {String} defaultTemperatureUnit - The default temperature unit to normalize by
 	 * @param {String} defaultMeterReadingFrequency - The default meter reading frequency if none is given
 	 * @param {String} defaultMeterMinimumDate - Option to set the default meter minimum date
 	 * @param {String} defaultMeterMaximumDate - Option to set the default meter maximum date
@@ -26,8 +27,9 @@ class Preferences {
 	 * @param {String} defaultHelpUrl - Option to set the default help page url
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
-		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit, defaultMeterReadingFrequency,
-		defaultMeterMinimumDate, defaultMeterMaximumDate, defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl) {
+		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit,
+		defaultTemperatureUnit, defaultMeterReadingFrequency, defaultMeterMinimumDate, defaultMeterMaximumDate,
+		defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -37,6 +39,7 @@ class Preferences {
 		this.defaultFileSizeLimit = defaultFileSizeLimit;
 		this.defaultAreaNormalization = defaultAreaNormalization;
 		this.defaultAreaUnit = defaultAreaUnit;
+		this.defaultTemperatureUnit = defaultTemperatureUnit;
 		this.defaultMeterReadingFrequency = defaultMeterReadingFrequency;
 		this.defaultMeterMinimumDate = defaultMeterMinimumDate;
 		this.defaultMeterMaximumDate = defaultMeterMaximumDate;
@@ -111,6 +114,7 @@ class Preferences {
 				defaultFileSizeLimit: preferences.defaultFileSizeLimit,
 				defaultAreaNormalization: preferences.defaultAreaNormalization,
 				defaultAreaUnit: preferences.defaultAreaUnit,
+				defaultTemperatureUnit: preferences.defaultTemperatureUnit,
 				defaultMeterReadingFrequency: preferences.defaultMeterReadingFrequency,
 				defaultMeterMinimumDate: preferences.defaultMeterMinimumDate,
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,

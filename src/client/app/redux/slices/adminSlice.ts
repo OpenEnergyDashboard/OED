@@ -13,6 +13,7 @@ import { durationFormat } from '../../utils/durationFormat';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
 import { selectOEDVersion } from '../../redux/api/versionApi';
+import { TemperatureUnitType } from '../../utils/getTemperatureUnitConversion';
 
 export const defaultAdminState: AdminState = {
 	displayTitle: '',
@@ -27,6 +28,7 @@ export const defaultAdminState: AdminState = {
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
+	defaultTemperatureUnit: TemperatureUnitType.celcius,
 	defaultMeterReadingFrequency: '00:15:00',
 	defaultMeterMinimumDate: moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
@@ -57,6 +59,10 @@ export const adminSlice = createSlice({
 		},
 		updateDefaultAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.defaultAreaUnit = action.payload;
+			state.submitted = false;
+		},
+		updateDefaultTemperatureUnit: (state, action: PayloadAction<TemperatureUnitType>) => {
+			state.defaultTemperatureUnit = action.payload;
 			state.submitted = false;
 		},
 		updateDefaultTimezone: (state, action: PayloadAction<string>) => {
@@ -143,6 +149,7 @@ export const {
 	updateDefaultWarningFileSize,
 	updateDefaultFileSizeLimit,
 	updateDefaultAreaUnit,
+	updateDefaultTemperatureUnit,
 	updateDefaultMeterReadingFrequency,
 	updateDefaultMeterMinimumDate,
 	updateDefaultMeterMaximumDate,
@@ -169,6 +176,7 @@ export const selectAdminPreferences = createAppSelector(
 		defaultFileSizeLimit: adminState.defaultFileSizeLimit,
 		defaultAreaNormalization: adminState.defaultAreaNormalization,
 		defaultAreaUnit: adminState.defaultAreaUnit,
+		defaultTemperatureUnit: adminState.defaultTemperatureUnit,
 		defaultMeterReadingFrequency: adminState.defaultMeterReadingFrequency,
 		defaultMeterMinimumDate: adminState.defaultMeterMinimumDate,
 		defaultMeterMaximumDate: adminState.defaultMeterMaximumDate,

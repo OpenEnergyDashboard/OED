@@ -5,6 +5,7 @@
 import { ChartTypes } from './graph';
 import { LanguageTypes } from './i18n';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
+import { TemperatureUnitType } from 'utils/getTemperatureUnitConversion';
 
 
 export interface AdminState {
@@ -20,6 +21,7 @@ export interface AdminState {
 	isUpdatingCikAndDBViews: boolean;
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
+	defaultTemperatureUnit: TemperatureUnitType;
 	defaultMeterReadingFrequency: string;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
