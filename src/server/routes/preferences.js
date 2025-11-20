@@ -80,6 +80,9 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 				},
 				defaultHelpUrl: {
 					type: 'string'
+				},
+				defaultWeatherLocation: {
+					type: 'string'
 				}
 			}
 		}

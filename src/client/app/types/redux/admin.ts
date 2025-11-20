@@ -28,4 +28,5 @@ export interface AdminState {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultHelpUrl: string;
+	defaultWeatherLocation: string;
 }

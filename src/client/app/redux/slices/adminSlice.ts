@@ -34,7 +34,8 @@ export const defaultAdminState: AdminState = {
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
-	defaultHelpUrl: ''
+	defaultHelpUrl: '',
+	defaultWeatherLocation: '',
 };
 
 export const adminSlice = createSlice({
@@ -125,6 +126,10 @@ export const adminSlice = createSlice({
 		updateDefaultHelpUrl: (state, action: PayloadAction<string>) => {
 			state.defaultHelpUrl = action.payload;
 			state.submitted = false;
+		},
+		updateDefaultWeatherLocation: (state, action: PayloadAction<string>) => {
+			state.defaultWeatherLocation = action.payload;
+			state.submitted = false;
 		}
 	},
 	extraReducers: builder => {
@@ -182,7 +187,8 @@ export const selectAdminPreferences = createAppSelector(
 		defaultMeterMaximumDate: adminState.defaultMeterMaximumDate,
 		defaultMeterReadingGap: adminState.defaultMeterReadingGap,
 		defaultMeterMaximumErrors: adminState.defaultMeterMaximumErrors,
-		defaultHelpUrl: adminState.defaultHelpUrl
+		defaultHelpUrl: adminState.defaultHelpUrl,
+		defaultWeatherLocation: adminState.defaultWeatherLocation
 	})
 );
 

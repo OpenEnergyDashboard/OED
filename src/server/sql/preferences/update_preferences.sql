@@ -19,5 +19,6 @@ SET
 	default_meter_maximum_date = ${defaultMeterMaximumDate},
 	default_meter_reading_gap = ${defaultMeterReadingGap},
 	default_meter_maximum_errors = ${defaultMeterMaximumErrors},
-	default_help_url = ${defaultHelpUrl}
+	default_help_url = ${defaultHelpUrl},
+	default_weather_location = ${defaultWeatherLocation}
 ;

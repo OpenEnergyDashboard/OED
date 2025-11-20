@@ -391,6 +391,16 @@ export default function PreferencesComponent() {
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
 				/>
 			</div>
+			<div>
+				<p className='mt-2' style={titleStyle}>
+					<FormattedMessage id='default.weather.location' />:
+				</p>
+				<Input
+					type='text'
+					value={localAdminPref.defaultWeatherLocation}
+					onChange={e => makeLocalChanges('defaultWeatherLocation', e.target.value)}
+				/>
+			</div>
 			<div className='d-flex justify-content-end mt-3'>
 				<Button
 					type='button'

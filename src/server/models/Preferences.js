@@ -25,11 +25,12 @@ class Preferences {
 	 * @param {Number} defaultMeterReadingGap - Option to set the default meter reading gap
 	 * @param {Number} defaultMeterMaximumErrors - Option to set the default meter maximum number of errors
 	 * @param {String} defaultHelpUrl - Option to set the default help page url
+	 * @param {String} defaultWeatherLocation - Option to set the default weather location url
 	*/
 	constructor(displayTitle, defaultChartToRender, defaultBarStacking, defaultLanguage, defaultTimezone,
 		defaultWarningFileSize, defaultFileSizeLimit, defaultAreaNormalization, defaultAreaUnit,
 		defaultTemperatureUnit, defaultMeterReadingFrequency, defaultMeterMinimumDate, defaultMeterMaximumDate,
-		defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl) {
+		defaultMeterReadingGap, defaultMeterMaximumErrors, defaultHelpUrl, defaultWeatherLocation) {
 		this.displayTitle = displayTitle;
 		this.defaultChartToRender = defaultChartToRender;
 		this.defaultBarStacking = defaultBarStacking;
@@ -46,6 +47,7 @@ class Preferences {
 		this.defaultMeterReadingGap = defaultMeterReadingGap;
 		this.defaultMeterMaximumErrors = defaultMeterMaximumErrors;
 		this.defaultHelpUrl = defaultHelpUrl;
+		this.defaultWeatherLocation = defaultWeatherLocation;
 	}
 
 	/**
@@ -77,12 +79,14 @@ class Preferences {
 			row.default_file_size_limit,
 			row.default_area_normalization,
 			row.default_area_unit,
+			row.default_temperature_unit,
 			row.default_meter_reading_frequency,
 			row.default_meter_minimum_date,
 			row.default_meter_maximum_date,
 			row.default_meter_reading_gap,
 			row.default_meter_maximum_errors,
-			row.default_help_url
+			row.default_help_url,
+			row.default_weather_location
 		);
 	}
 
@@ -120,7 +124,8 @@ class Preferences {
 				defaultMeterMaximumDate: preferences.defaultMeterMaximumDate,
 				defaultMeterReadingGap: preferences.defaultMeterReadingGap,
 				defaultMeterMaximumErrors: preferences.defaultMeterMaximumErrors,
-				defaultHelpUrl: preferences.defaultHelpUrl
+				defaultHelpUrl: preferences.defaultHelpUrl,
+				defaultWeatherLocation: preferences.defaultWeatherLocation
 			});
 		// Postgres interprets the defaultMeterReadingFrequency and it might not be what was
 		// input so return the new preferences. Easier just to return them all and only

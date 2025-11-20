@@ -64,6 +64,7 @@ export interface PreferenceRequestItem {
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultHelpUrl: string;
+	defaultWeatherLocation: string;
 }
 
 /**
