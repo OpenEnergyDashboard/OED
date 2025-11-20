@@ -21,6 +21,7 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
+import { TemperatureUnitType } from '../../utils/getTemperatureUnitConversion';
 
 /**
  * @returns Preferences Component for Administrative use
@@ -168,6 +169,38 @@ export default function PreferencesComponent() {
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
 						/>
 						{translate('AreaUnitType.meters')}
+					</label>
+				</div>
+			</div>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					{translate('default.temperature.unit')}
+
+				</p>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='temperatureUnitType'
+							style={checkboxStyle}
+							value={TemperatureUnitType.celsius}
+							onChange={e => makeLocalChanges('defaultTemperatureUnit', e.target.value)}
+							checked={localAdminPref.defaultTemperatureUnit === TemperatureUnitType.celsius}
+						/>
+						{translate('TemperatureUnitType.celsius')}
+					</label>
+				</div>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='temperatureUnitType'
+							style={checkboxStyle}
+							value={TemperatureUnitType.fahrenheit}
+							onChange={e => makeLocalChanges('defaultTemperatureUnit', e.target.value)}
+							checked={localAdminPref.defaultTemperatureUnit === TemperatureUnitType.fahrenheit}
+						/>
+						{translate('TemperatureUnitType.fahrenheit')}
 					</label>
 				</div>
 			</div>

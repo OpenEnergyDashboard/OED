@@ -28,7 +28,7 @@ export const defaultAdminState: AdminState = {
 	isUpdatingCikAndDBViews: false,
 	defaultAreaNormalization: false,
 	defaultAreaUnit: AreaUnitType.none,
-	defaultTemperatureUnit: TemperatureUnitType.celcius,
+	defaultTemperatureUnit: TemperatureUnitType.celsius,
 	defaultMeterReadingFrequency: '00:15:00',
 	defaultMeterMinimumDate: moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'),
 	defaultMeterMaximumDate: moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'),

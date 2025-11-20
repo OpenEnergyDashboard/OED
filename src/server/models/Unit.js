@@ -287,7 +287,7 @@ Unit.areaUnitType = Object.freeze({
 });
 
 Unit.temperatureUnitType = Object.freeze({
-	CELCIUS: 'celcius',
+	CELSIUS: 'celsius',
 	FAHRENHEIT: 'fahrenheit'
 
 });

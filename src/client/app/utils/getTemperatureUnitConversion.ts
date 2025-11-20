@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 export enum TemperatureUnitType {
-	celcius = 'celcius',
+	celsius = 'celsius',
 	fahrenheit = 'fahrenheit'
 }
 
@@ -17,10 +17,10 @@ export function getTemperatureUnitConversion(fromUnit: TemperatureUnitType, toUn
 	if (fromUnit === toUnit) {
 		return 1;
 	}
-	if (fromUnit === TemperatureUnitType.celcius && toUnit === TemperatureUnitType.fahrenheit) {
+	if (fromUnit === TemperatureUnitType.celsius && toUnit === TemperatureUnitType.fahrenheit) {
 		return 1.8; // NOTE: when used must add 32 using conditional
 	}
-	if (fromUnit === TemperatureUnitType.fahrenheit && toUnit === TemperatureUnitType.celcius) {
+	if (fromUnit === TemperatureUnitType.fahrenheit && toUnit === TemperatureUnitType.celsius) {
 		return 1 / 1.8; // NOTE: when used must subtract 32 using conditional
 	}
 	return 0;

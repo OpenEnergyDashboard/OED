@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 DO $$ BEGIN 
-	CREATE TYPE temperature_unit_type AS ENUM('celcius', 'fahrenheit');
+	CREATE TYPE temperature_unit_type AS ENUM('celsius', 'fahrenheit');
 EXCEPTION
 	WHEN duplicate_object THEN null;
 END $$;
