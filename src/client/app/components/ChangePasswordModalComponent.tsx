@@ -201,7 +201,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 									id='newPassword'
 									name='newPassword'
 									type='password'
-									placeholder={translate('user.password.new')}
+									placeholder={translate('password.new.enter')}
 									value={passwordDetails.newPassword}
 									onChange={handlePasswordChange}
 									invalid={!passwordDetails.passwordLength}
@@ -220,6 +220,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 									id='confirmPassword'
 									name='confirmPassword'
 									type='password'
+									placeholder={translate('password.confirm.enter')}
 									value={passwordDetails.confirmPassword}
 									onChange={handlePasswordChange}
 									invalid={!passwordDetails.passwordMatch}
