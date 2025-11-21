@@ -34,7 +34,7 @@ export const userApi = baseApi.injectEndpoints({
 		}),
 		selfEditUser: builder.mutation<void, User>({
 			query: user => ({
-				url: 'api/users/edit',
+				url: 'api/users/edit_password',
 				method: 'POST',
 				body: { user }
 			}),
