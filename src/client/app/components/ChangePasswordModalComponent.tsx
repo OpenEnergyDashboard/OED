@@ -47,7 +47,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 	});
 
 	// User API
-	const [submitPasswordChange] = userApi.useChangePasswordMutation();
+	const [submitPasswordChange] = userApi.useSelfEditUserMutation();
 
 	// check if passwords match and if password length is at least 8
 	useEffect(() => {
