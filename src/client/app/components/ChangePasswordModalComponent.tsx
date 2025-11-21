@@ -135,7 +135,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 
 	const tooltipStyle = {
 		...tooltipBaseStyle,
-		tooltipChangePassword: 'help.home.change.password'
+		tooltipChangePassword: 'Change user\'s password by entering current password, entering new password, and confirming new password.'
 	};
 
 	return (
