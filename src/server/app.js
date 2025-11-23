@@ -31,6 +31,10 @@ const csv = require('./routes/csv');
 const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
+const conversionSegments = require('./routes/conversionSegments');
+const days = require('./routes/days');
+const daySegments = require('./routes/daySegments');
+const weeks = require('./routes/weeks');
 const ciks = require('./routes/ciks');
 
 // Limit the rate of overall requests to OED
@@ -135,6 +139,10 @@ app.use('/api/csv', csv);
 app.use('/api/conversion-array', conversionArray);
 app.use('/api/units', units);
 app.use('/api/conversions', conversions);
+app.use('/api/conversionSegments', conversionSegments);
+app.use('/api/days', days);
+app.use('/api/daySegments', daySegments);
+app.use('/api/weeks', weeks);
 app.use('/api/ciks', ciks);
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/indent */
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { omit } from 'lodash';
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -46,49 +46,166 @@ export default function CreateConversionModalComponent() {
 	const handleShow = () => setShowModal(true);
 
 	// Handlers for each type of input change
-	const [conversionState, setConversionState] = useState(defaultValues);
+	const [conversionState, setConversionState] = useState({
+  overallConversion: {
+    sourceId: defaultValues.sourceId,
+    destinationId: defaultValues.destinationId,
+    bidirectional: defaultValues.bidirectional,
+    note: defaultValues.overallConversionNote
+  },
+  initialConversion: {
+    sourceId: defaultValues.sourceId,
+    destinationId: defaultValues.destinationId,
+    bidirectional: defaultValues.bidirectional,
+    slope: defaultValues.slope,
+    intercept: defaultValues.intercept,
+    pattern: defaultValues.weeklyPattern,
+    note: defaultValues.initialConversionNote
+  },
+  sourceOptions: defaultValues.sourceOptions,
+  destinationOptions: defaultValues.destinationOptions,
+  weeklyPatterns: defaultValues.weeklyPattern
+});
 
 	// If the currently selected conversion is valid
-	const [validConversion, reason] = useAppSelector(state => selectIsValidConversion(state, conversionState));
+	// TODO: Add a check for the weekly pattern as well.
+	const [validConversion, reason] = useAppSelector(state =>
+		selectIsValidConversion(state, {
+			sourceId: conversionState.initialConversion.sourceId,
+			destinationId: conversionState.initialConversion.destinationId,
+			bidirectional: conversionState.initialConversion.bidirectional,
+			slope: conversionState.initialConversion.slope,
+			intercept: conversionState.initialConversion.intercept,
+			//pattern: conversionState.initialConversion.pattern,
+			note: conversionState.initialConversion.note
+		})
+	);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setConversionState({ ...conversionState, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'overallConversionNote') {
+        setConversionState(prev => ({
+            ...prev,
+            overallConversion: {
+                ...prev.overallConversion,
+                note: value
+            }
+        }));
+    } else if (name === 'initialConversionNote') {
+        setConversionState(prev => ({
+            ...prev,
+            initialConversion: {
+                ...prev.initialConversion,
+                note: value
+            }
+        }));
+    }
+};
+	// const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	setConversionState({ ...conversionState, [e.target.name]: JSON.parse(e.target.value) });
+	// };
+
+	// const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	// once a source or destination is selected, it will be removed from the other options.
+	// 	if (e.target.name === 'sourceId') {
+	// 		setConversionState(state => ({
+	// 			...state,
+	// 			sourceId: Number(e.target.value),
+	// 			destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== Number(e.target.value))
+	// 		}));
+	// 	} else if (e.target.name === 'destinationId') {
+	// 		setConversionState(state => ({
+	// 			...state,
+	// 			destinationId: Number(e.target.value),
+	// 			sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== Number(e.target.value))
+	// 		}));
+	// 	} else {
+	// 		setConversionState(state => ({ ...state, [e.target.name]: Number(e.target.value) }));
+	// 	}
+	// };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const newValue = Number(value);
+
+    setConversionState(prev => {
+        if (name === 'sourceId') {
+            return {
+                ...prev,
+                overallConversion: {
+                    ...prev.overallConversion,
+                    sourceId: newValue
+                },
+                initialConversion: {
+                    ...prev.initialConversion,
+                    sourceId: newValue
+                },
+                destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== newValue)
+            };
+        } else if (name === 'destinationId') {
+            return {
+                ...prev,
+                overallConversion: {
+                    ...prev.overallConversion,
+                    destinationId: newValue
+                },
+                initialConversion: {
+                    ...prev.initialConversion,
+                    destinationId: newValue
+                },
+                sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== newValue)
+            };
+        } else {
+            return {
+                ...prev,
+                initialConversion: {
+                    ...prev.initialConversion,
+                    [name]: newValue
+                }
+            };
+        }
+    });
 	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setConversionState({ ...conversionState, [e.target.name]: JSON.parse(e.target.value) });
+		const value = e.target.value === 'true';
+		setConversionState(prev => ({
+			...prev,
+			overallConversion: {
+				...prev.overallConversion,
+				bidirectional: value
+			},
+			initialConversion: {
+				...prev.initialConversion,
+				bidirectional: value
+			}
+		}));
 	};
 
-	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// once a source or destination is selected, it will be removed from the other options.
-		if (e.target.name === 'sourceId') {
-			setConversionState(state => ({
-				...state,
-				sourceId: Number(e.target.value),
-				destinationOptions: defaultValues.destinationOptions.filter(destination => destination.id !== Number(e.target.value))
-			}));
-		} else if (e.target.name === 'destinationId') {
-			setConversionState(state => ({
-				...state,
-				destinationId: Number(e.target.value),
-				sourceOptions: defaultValues.sourceOptions.filter(source => source.id !== Number(e.target.value))
-			}));
-		} else {
-			setConversionState(state => ({ ...state, [e.target.name]: Number(e.target.value) }));
-		}
+	const handleInitialPatternChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const selectedPattern = e.target.value;
+		setConversionState(prev => ({
+			...prev,
+			initialConversion: {
+				...prev.initialConversion,
+				pattern: selectedPattern,
+				slope: selectedPattern === 'No Pattern' ? prev.initialConversion.slope : 0,
+				intercept: selectedPattern === 'No Pattern' ? prev.initialConversion.intercept : 0
+			}
+		}));
 	};
 	/* End State */
 
 	// Determines whether the selected source is of type meter
 	const isMeterSource = () => {
-		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.sourceId);
+		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.overallConversion.sourceId);
 		return source?.typeOfUnit === UnitType.meter;
 	};
 
 	// Determine whether the selected source or destination is a suffix unit
 	const isSuffixUsed = () => {
-		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.sourceId);
-		const dest = defaultValues.sourceOptions.find(u => u.id === conversionState.destinationId);
+		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.overallConversion.sourceId);
+		const dest = defaultValues.sourceOptions.find(u => u.id === conversionState.overallConversion.destinationId);
 		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
 	};
 
@@ -97,10 +214,23 @@ export default function CreateConversionModalComponent() {
 		//Close the warning modal
 		setShowWarningModal(false);
 
-		//Proceed with the creation of the conversion
-		setShowModal(false);
-		addConversionMutation({...omit(conversionState, 'sourceOptions'),
-			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+		// TODO: Replace this with a proper overall and initial conversion creation logic once the backend is ready
+		// Create a placeholder payload for the conversion creation until backend is ready
+		const payload = {
+			sourceId: conversionState.overallConversion.sourceId,
+			destinationId: conversionState.overallConversion.destinationId,
+			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.overallConversion.bidirectional,
+			note: conversionState.overallConversion.note,
+			slope: conversionState.initialConversion.slope,
+			intercept: conversionState.initialConversion.intercept,
+			pattern: conversionState.initialConversion.pattern,
+			initialNote: conversionState.initialConversion.note
+		};
+		console.log(
+			'sourceId:', conversionState.overallConversion.sourceId, typeof conversionState.overallConversion.sourceId,
+			'destinationId:', conversionState.overallConversion.destinationId, typeof conversionState.overallConversion.destinationId
+		);
+		addConversionMutation(payload);
 		resetState();
 	};
 
@@ -111,14 +241,33 @@ export default function CreateConversionModalComponent() {
 
 	// Reset the state to default values
 	const resetState = () => {
-		setConversionState(defaultValues);
+		setConversionState({
+			overallConversion: {
+				sourceId: defaultValues.sourceId,
+				destinationId: defaultValues.destinationId,
+				bidirectional: defaultValues.bidirectional,
+				note: defaultValues.overallConversionNote
+			},
+			initialConversion: {
+				sourceId: defaultValues.sourceId,
+				destinationId: defaultValues.destinationId,
+				bidirectional: defaultValues.bidirectional,
+				slope: defaultValues.slope,
+				intercept: defaultValues.intercept,
+				pattern: defaultValues.weeklyPattern,
+				note: defaultValues.initialConversionNote
+			},
+			sourceOptions: defaultValues.sourceOptions,
+			destinationOptions: defaultValues.destinationOptions,
+			weeklyPatterns: defaultValues.weeklyPattern
+		});
 	};
 	/* End Warning Modal */
 
 	// Submit
 	const handleSubmit = () => {
 		// Show warning modal if slope and intercept are both 0
-		if (conversionState.slope === 0 && conversionState.intercept === 0) {
+		if (conversionState.initialConversion.slope === 0 && conversionState.initialConversion.intercept === 0) {
 			setWarningMessage(translate('conversion.slope.intercept.zero'));
 			setShowWarningModal(true);
 		} else if (validConversion) {
@@ -128,8 +277,29 @@ export default function CreateConversionModalComponent() {
 			// Omit the source options , do not need to send in request so remove here.
 			// If source is a meter, make bidirectional false
 			// If source or destination is a suffix unit, make bidirectional false
-			addConversionMutation({...omit(conversionState, 'sourceOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+
+			// TODO: Replace this with a proper overall and initial conversion creation logic once the backend is ready
+			// Example updated logic for creating a conversion:
+			// 1. Create overall conversion
+			//const overallResult = await addConversionMutation(conversionState.overallConversion).unwrap();
+			// 2. Create initial conversion with foreign key
+			// await addConversionMutation({
+			// 	...conversionState.initialConversion,
+			// 	overallConversionId: overallResult.id
+			// });
+
+			// Create a placeholder payload for the conversion creation until backend is ready
+			const payload = {
+        sourceId: conversionState.overallConversion.sourceId,
+        destinationId: conversionState.overallConversion.destinationId,
+        bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.overallConversion.bidirectional,
+        note: conversionState.overallConversion.note,
+        slope: conversionState.initialConversion.slope,
+        intercept: conversionState.initialConversion.intercept,
+        pattern: conversionState.initialConversion.pattern,
+        initialNote: conversionState.initialConversion.note
+			};
+			addConversionMutation(payload);
 			resetState();
 		} else {
 			showErrorNotification(reason);
@@ -176,13 +346,13 @@ export default function CreateConversionModalComponent() {
 										id='sourceId'
 										name='sourceId'
 										type='select'
-										value={conversionState.sourceId}
+										value={conversionState.overallConversion.sourceId}
 										onChange={e => handleNumberChange(e)}
-										invalid={conversionState.sourceId === -999}>
+										invalid={conversionState.overallConversion.sourceId === -999}>
 										{<option
 											value={-999}
 											key={-999}
-											hidden={conversionState.sourceId !== -999}
+											hidden={conversionState.overallConversion.sourceId !== -999}
 											disabled>
 											{translate('conversion.select.source') + '...'}
 										</option>}
@@ -203,13 +373,13 @@ export default function CreateConversionModalComponent() {
 										id='destinationId'
 										name='destinationId'
 										type='select'
-										value={conversionState.destinationId}
+										value={conversionState.overallConversion.destinationId}
 										onChange={e => handleNumberChange(e)}
-										invalid={conversionState.destinationId === -999}>
+										invalid={conversionState.overallConversion.destinationId === -999}>
 										{<option
 											value={-999}
 											key={-999}
-											hidden={conversionState.destinationId !== -999}
+											hidden={conversionState.overallConversion.destinationId !== -999}
 											disabled>
 											{translate('conversion.select.destination') + '...'}
 										</option>}
@@ -231,23 +401,35 @@ export default function CreateConversionModalComponent() {
 								name='bidirectional'
 								type='select'
 								onChange={e => handleBooleanChange(e)}
-								value={String(conversionState.bidirectional)}
-								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.bidirectional === true}>
+								value={String(conversionState.overallConversion.bidirectional)}
+								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.overallConversion.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
 							</Input>
-							{isMeterSource() && conversionState.bidirectional === true && (
+							{isMeterSource() && conversionState.overallConversion.bidirectional === true && (
 								<FormFeedback className='d-block'>
 									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
 								</FormFeedback>
 							)}
-							{isSuffixUsed() && conversionState.bidirectional === true &&  (
+							{isSuffixUsed() && conversionState.overallConversion.bidirectional === true &&  (
 								<FormFeedback className='d=block'>
 									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
 								</FormFeedback>
 							)}
 						</FormGroup>
+						{/* Note input for overall conversion*/}
+						<FormGroup>
+							<Label for='note'>{translate('note')}</Label>
+							<Input
+								id='overallConversionNote'
+								name='overallConversionNote'
+								type='textarea'
+								onChange={e => handleStringChange(e)}
+								value={conversionState.overallConversion.note} />
+						</FormGroup>
+						{/*Initial conversion*/}
+						<h5 className="mt-3 mb-2">Initial Conversion</h5>
 						<Row xs='1' lg='2'>
 							<Col>
 								{/* Slope input*/}
@@ -257,8 +439,9 @@ export default function CreateConversionModalComponent() {
 										id='slope'
 										name='slope'
 										type='number'
-										value={conversionState.slope}
-										onChange={e => handleNumberChange(e)} />
+										value={conversionState.initialConversion.slope}
+										onChange={e => handleNumberChange(e)}
+										disabled={conversionState.initialConversion.pattern !== 'No Pattern'} />
 								</FormGroup>
 							</Col>
 							<Col>
@@ -269,20 +452,40 @@ export default function CreateConversionModalComponent() {
 										id='intercept'
 										name='intercept'
 										type='number'
-										value={conversionState.intercept}
-										onChange={e => handleNumberChange(e)} />
+										value={conversionState.initialConversion.intercept}
+										onChange={e => handleNumberChange(e)}
+										disabled={conversionState.initialConversion.pattern !== 'No Pattern'} />
 								</FormGroup>
 							</Col>
 						</Row>
-						{/* Note input*/}
+						{/* Pattern dropdown for weekly pattern or no pattern */}
+						<FormGroup>
+							<Label for='pattern'>{translate('conversion.pattern')}</Label>
+							<Input
+								id='pattern'
+								name='pattern'
+								type='select'
+								value={conversionState.initialConversion.pattern}
+								onChange={handleInitialPatternChange}>
+								{/* TODO: Replace with actual patterns from the backend
+									<option value='No Pattern'>No Pattern</option>
+								{defaultValues.weeklyPatterns?.map(p => (
+									<option key={p} value={p}>{p}</option>
+								))} */}
+								<option value='No Pattern'>No Pattern</option>
+								<option value='Pattern 1'>Pattern 1</option>
+								<option value='Pattern 2'>Pattern 2</option>
+							</Input>
+						</FormGroup>
+						{/* Note input for initial conversion*/}
 						<FormGroup>
 							<Label for='note'>{translate('note')}</Label>
 							<Input
-								id='note'
-								name='note'
+								id='initialConversionNote'
+								name='initialConversionNote'
 								type='textarea'
 								onChange={e => handleStringChange(e)}
-								value={conversionState.note} />
+								value={conversionState.initialConversion.note} />
 						</FormGroup>
 					</Container>
 				</ModalBody>

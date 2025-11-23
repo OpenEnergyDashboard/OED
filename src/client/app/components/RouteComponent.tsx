@@ -4,29 +4,31 @@
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import ReadingsCSVUploadComponent from '../components/csv/ReadingsCSVUploadComponent';
 import MetersCSVUploadComponent from '../components/csv/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from '../components/csv/ReadingsCSVUploadComponent';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
 import AdminComponent from './admin/AdminComponent';
+import LogMsgComponent from './admin/LogMsgComponent';
 import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
+import DayDetailComponent from './daily-pattern/DayDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
+import ErrorComponent from './router/ErrorComponent';
 import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
-import ErrorComponent from './router/ErrorComponent';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import LogMsgComponent from './admin/LogMsgComponent';
 import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
+import WeeksDetailComponent from './weeks/WeeksDetailComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -57,13 +59,15 @@ const router = createBrowserRouter([
 					{ path: 'admin', element: <AdminComponent /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
+					{ path: 'dailyPatterns', element: <DayDetailComponent /> },
+					{ path: 'weeks', element: <WeeksDetailComponent /> },
 					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> },
 					{ path: 'maps', element: <MapsDetailContainer /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },
 					{ path: 'users', element: <UsersDetailComponent /> },
 					{ path: 'logmsg', element: <LogMsgComponent /> },
 					{ path: 'users', element: <UsersDetailComponent /> },
-					{ path: 'visual-unit', element: <VisualUnitDetailComponent/> }
+					{ path: 'visual-unit', element: <VisualUnitDetailComponent /> }
 				]
 			},
 			{
