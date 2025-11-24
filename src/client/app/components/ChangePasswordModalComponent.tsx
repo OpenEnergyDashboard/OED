@@ -146,7 +146,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 					<Row>
 						<Col>
 							<p>
-								<FormattedMessage id='change.password.for' values={{ username: currentUser.username }} />
+								<FormattedMessage id='password.change.username.label' values={{ username: currentUser.username }} />
 							</p>
 						</Col>
 					</Row>
