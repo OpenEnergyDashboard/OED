@@ -446,15 +446,11 @@ const LocaleTranslationData = {
 		"page.restart.button": "Restart OED session",
 		"page.user.refresh.directions": "If clicking the \"Return to Dashboard\" button does not work then please click the button below to restart your OED session",
 		"password": "Password: ",
-		"password.change.username.label": "Username: {username}",
 		"password.confirm": "Confirm password: ",
-<<<<<<< HEAD
-=======
 		"password.confirm.enter": "Confirm new password",
 		"password.new.enter": "Enter new password",
 		"password.successfully.changed": "Password changed successfully",
 		"password.failed.to.change": "Failed to change password",
->>>>>>> f52bf39aa62ee4727c989a0d7c6a1a1ba7a735b4
 		"user.password.new": "New password",
 		"per.day": "Per Day",
 		"per.hour": "Per Hour",
