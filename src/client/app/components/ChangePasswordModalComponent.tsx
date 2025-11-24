@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, ModalFooter, Row } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
 import { userApi } from '../redux/api/userApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../redux/slices/currentUserSlice';
@@ -15,7 +14,6 @@ import { useTranslate } from '../redux/componentHooks';
 import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
 
 interface ChangePasswordModalComponentProps {
-	user: User;
 	handleClose: () => void;
 }
 
