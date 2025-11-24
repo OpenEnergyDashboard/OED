@@ -12,7 +12,6 @@ import { User } from '../types/items';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
-import { current } from '@reduxjs/toolkit';
 
 interface ChangePasswordModalComponentProps {
 	handleClose: () => void;
