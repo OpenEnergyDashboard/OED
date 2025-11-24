@@ -144,14 +144,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 					<Row>
 						<Col>
 							<FormGroup>
-								<Label>
-									{translate('password.change.username')}
-								</Label>
-								<Input
-									type='text'
-									value={currentUser.username}
-									disabled
-								/>
+								<Label id='password.change.username.label' values={{ username: currentUser.username }} />
 							</FormGroup>
 						</Col>
 					</Row>
