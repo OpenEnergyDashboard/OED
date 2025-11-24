@@ -15,6 +15,37 @@ const secretToken = require('../config').secretToken;
 const router = express.Router();
 
 /**
+ * Middleware that requires authentication (any logged-in user)
+ * Similar to adminAuthMiddleware but doesn't check for admin role
+ */
+function requireAuthMiddleware(req, res, next) {
+	const token = req.headers.token || req.body.token || req.query.token;
+	const validParams = {
+		type: 'string'
+	};
+	if (!validate(token, validParams).valid) {
+		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
+	} else if (token) {
+		jwt.verify(token, secretToken, async (err, decoded) => {
+			if (err) {
+				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+			} else {
+				try {
+					const conn = getConnection();
+					await User.getByID(decoded.data, conn); // checks if
+					req.decoded = decoded;
+					next();
+				} catch (error) {
+					res.status(401).json({ success: false, message: 'User does not exist in database.' });
+				}
+			}
+		});
+			} else {
+				res.status(403).send({ success: false, message: 'No token provided.' });
+			}
+}
+
+/**
  * Route for listing all users.
  */
 router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
@@ -246,6 +277,54 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			log.error('Error while performing delete user request', error);
 			res.sendStatus(500);
 		}
+	}
+});
+
+// Route for a user to change their own password.
+router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
+	const validParams = {
+		type: 'object',
+		required: ['currentPassword', 'newPassword'],
+		properties: {
+			currentPassword: {
+				type: 'string',
+				minLength: 8,
+				maxLength: 128
+			},
+			newPassword: {
+				type: 'string',
+				minLength: 8,
+				maxLength: 128
+			}
+		}
+	};
+if (!validate(req.body, validParams).valid) {
+	res.status(400).json({ message: 'Invalid params' });
+	return;
+}
+try {
+	const conn = getConnection();
+	const userId = req.decoded.data; // From the authenticated token
+	const { currentPassword, newPassword } = req.body;
+	// Get the current user
+	const user = await User.getByID(userId, conn);
+	if (user === null) {
+		res.status(401).json({ message: 'User not found' });
+		return;
+	}
+	// Verify current password
+	const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+	if (!isValidPassword) {
+		res.status(401).json({ message: 'Current password is incorrecet' });
+		return;
+	}
+// Hash and update the new password
+		const hashedPassword = await bcrypt.hash(newPassword, 10);
+		await User.updateUserPassword(userId, hashedPassword, conn);
+		res.sendStatus(200);
+	} catch (error) {
+		log.error('Error while performing change password request', error );
+		res.status(500).json({ message: 'Internal Server Error', error: error } );
 	}
 });
 
