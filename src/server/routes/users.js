@@ -16,37 +16,6 @@ const secretToken = require('../config').secretToken;
 const router = express.Router();
 
 /**
- * Middleware that requires authentication (any logged-in user)
- * Similar to adminAuthMiddleware but doesn't check for admin role
- */
-function requireAuthMiddleware(req, res, next) {
-	const token = req.headers.token || req.body.token || req.query.token;
-	const validParams = {
-		type: 'string'
-	};
-	if (!validate(token, validParams).valid) {
-		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
-	} else if (token) {
-		jwt.verify(token, secretToken, async (err, decoded) => {
-			if (err) {
-				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-			} else {
-				try {
-					const conn = getConnection();
-					await User.getByID(decoded.data, conn); // checks if
-					req.decoded = decoded;
-					next();
-				} catch (error) {
-					res.status(401).json({ success: false, message: 'User does not exist in database.' });
-				}
-			}
-		});
-			} else {
-				res.status(403).send({ success: false, message: 'No token provided.' });
-			}
-}
-
-/**
  * Route for listing all users.
  */
 router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
