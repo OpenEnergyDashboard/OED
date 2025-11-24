@@ -12,6 +12,7 @@ import { User } from '../types/items';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
+import { current } from '@reduxjs/toolkit';
 
 interface ChangePasswordModalComponentProps {
 	handleClose: () => void;
@@ -144,7 +145,14 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 					<Row>
 						<Col>
 							<FormGroup>
-								<Label id='password.change.username.label' values={{ username: currentUser.username }} />
+								<Label>
+								{translate('password.change.username.')}
+								</Label>
+								<Input
+								type='text'
+								value={currentUser.username}
+								disabled
+								/>
 							</FormGroup>
 						</Col>
 					</Row>
