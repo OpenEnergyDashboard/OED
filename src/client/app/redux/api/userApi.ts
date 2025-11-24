@@ -32,13 +32,12 @@ export const userApi = baseApi.injectEndpoints({
 			}),
 			invalidatesTags: ['Users']
 		}),
-		selfEditUser: builder.mutation<void, User>({
-			query: user => ({
-				url: 'api/users/edit_password',
+		changePassword: builder.mutation<void, {currentPassword: string, newPassword: string}>({
+			query: passwords => ({
+				url: 'api/users/changePassword',
 				method: 'POST',
-				body: { user }
-			}),
-			invalidatesTags: ['Users']
+				body: passwords
+			})
 		}),
 		deleteUsers: builder.mutation<void, string>({
 			query: username => ({

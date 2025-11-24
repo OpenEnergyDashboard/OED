@@ -5,16 +5,12 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, ModalFooter, Row } from 'reactstrap';
-import { FormattedMessage } from 'react-intl';
 import { userApi } from '../redux/api/userApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../redux/slices/currentUserSlice';
 import { User } from '../types/items';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
-import TooltipHelpComponent from './TooltipHelpComponent';
-import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { tooltipBaseStyle } from '../styles/modalStyle';
 import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
 
 interface ChangePasswordModalComponentProps {
@@ -37,17 +33,19 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 	// get current logged in user
 	const currentUser = useAppSelector(selectCurrentUserProfile) as User;
 
+	// user edit form state and use the defaults plus the user's data
+
 	// State for password fields
 	const [passwordDetails, setPasswordDetails] = useState({
 		currentPassword: '',
 		newPassword: '',
 		confirmPassword: '',
-		passwordMatch: true,
-		passwordLength: true
+		passwordMatch: false,
+		passwordLength: false
 	});
 
 	// User API
-	const [submitPasswordChange] = userApi.useSelfEditUserMutation();
+	const [submitPasswordChange] = userApi.useChangePasswordMutation();
 
 	// check if passwords match and if password length is at least 8
 	useEffect(() => {
@@ -98,10 +96,6 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 		});
 	};
 
-
-	// Displays the unsaved warning component whenever there's unsaved changes
-	// (toggle handled by parent modal; child closes via handleCloseModal)
-
 	// Handle close modal
 	const handleCloseModal = () => {
 		resetPasswordFields();
@@ -113,16 +107,10 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 		// Close modal
 		props.handleClose();
 
-		// Create user object with current password (for verification) and new password
-		const updatedUser: User = {
-			id: currentUser.id,
-			username: currentUser.username,
-			role: currentUser.role,
-			password: passwordDetails.currentPassword,  // Current password for backend verification
-			note: passwordDetails.newPassword  // New password temporarily stored in note field for API
-		};
-
-		submitPasswordChange(updatedUser)
+		submitPasswordChange({
+			currentPassword: passwordDetails.currentPassword,
+			newPassword: passwordDetails.newPassword
+		})
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('password.successfully.changed'));
@@ -131,11 +119,6 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 			.catch(error => {
 				showErrorNotification(translate('password.failed.to.change') + ' ' + error.data.message);
 			});
-	};
-
-	const tooltipStyle = {
-		...tooltipBaseStyle,
-		tooltipChangePassword: 'Change user\'s password by entering current password, entering new password, and confirming new password.'
 	};
 
 	return (
@@ -157,20 +140,19 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 				/>
 			)}
 			<div>
-				{/* Header is provided by the parent Modal; include help marker in body instead */}
-				<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-					<div />
-					<div style={tooltipStyle}>
-						<TooltipHelpComponent page='change-password' />
-						<TooltipMarkerComponent page='change-password' helpTextId={tooltipStyle.tooltipChangePassword} />
-					</div>
-				</div>
 				<Container>
 					<Row>
 						<Col>
-							<p>
-								<FormattedMessage id='change.password.for' values={{ username: currentUser.username }} />
-							</p>
+							<FormGroup>
+								<Label>
+									{translate('password.change.username')}
+								</Label>
+								<Input
+									type='text'
+									value={currentUser.username}
+									disabled
+								/>
+							</FormGroup>
 						</Col>
 					</Row>
 					<Row>

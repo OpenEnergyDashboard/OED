@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
+const { resetWarningCache } = require('prop-types');
 
 /**
  * Middleware function to force a route to require authentication
@@ -205,6 +206,33 @@ optionalAuthMiddleware = (req, res, next) => {
 	}
 };
 
+function requireAuthMiddleware(req, res, next) {
+	const token = req.headers.token || req.body.token || req.query.token;
+	const validParams = {
+		type: 'string'
+	};
+	if (!validate(token, validParams).valid) {
+		res.status(403).json({ success: false, message: 'No token provided'});
+	} else if (token) {
+		jwt.verify(token, secretToken, async (err, decoded) => {
+			if (err) {
+				res.status(401).json({ success: false, message: 'Falied token verification'});
+			} else {
+				try {
+					const conn = getConnection();
+					await User.getByID(decoded.data, conn);
+					req.decoded = decoded;
+					next();
+				} catch (error) {
+					res.status(401).json({ success: false, message: 'User not found'});
+				}
+			}
+		});
+	} else {
+		res.status(403).send({ success: false, message: 'No token provided'});
+	}
+}
+
 module.exports = {
 	adminAuthMiddleware,
 	csvAuthMiddleware,
@@ -212,5 +240,6 @@ module.exports = {
 	obviusUsernameAndPasswordAuthMiddleware,
 	optionalAuthMiddleware,
 	verifyCredentials,
-	credentialsRequestValidationMiddleware
+	credentialsRequestValidationMiddleware,
+	requireAuthMiddleware
 };
