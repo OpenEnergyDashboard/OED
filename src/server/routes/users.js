@@ -262,7 +262,7 @@ router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
 		// Verify current password
 		const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
 		if (!isValidPassword) {
-			res.status(401).json({ message: 'Current password is incorrect'});
+			res.status(400).json({ message: 'Current password is incorrect' });
 			return;
 		}
 
@@ -343,10 +343,11 @@ try {
 	}
 	// Verify current password
 	const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
-	if (!isValidPassword) {
-		res.status(401).json({ message: 'Current password is incorrecet' });
-		return;
-	}
+		if (!isValidPassword) {
+			// Return 400 (Bad Request) instead of 401 to avoid invalidating the token
+			res.status(400).json({ message: 'Current password is incorrect' });
+			return;
+		}
 // Hash and update the new password
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 		await User.updateUserPassword(userId, hashedPassword, conn);
