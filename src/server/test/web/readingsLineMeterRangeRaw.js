@@ -94,43 +94,45 @@ mocha.describe('readings API', () => {
 
                     // Add LR14 here
                     mocha.it('LR14: range should have daily points for 15 minute reading intervals aawnd r units with +-inf start/end time & C as F with intercept', async () => {
-                        const unitC = {
-                            // u6, used for conversion instead of display
-                            name: 'C',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.RAW,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.NONE,
-                            preferredDisplay: false,
-                            note: 'Celsius'
-                        };
-                        const unitDegrees = {
-                            // u7, raw units stored in meter
-                            name: 'Degrees',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.RAW,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.METER,
-                            suffix: '',
-                            displayable: Unit.displayableType.NONE,
-                            preferredDisplay: false,
-                            note: 'special unit'
-                        };
-                        const unitF = {
-                            // u8, display unit for graph
-                            name: 'F',
-                            identifier: '',
-                            unitRepresent: Unit.unitRepresentType.RAW,
-                            secInRate: 3600,
-                            typeOfUnit: Unit.unitType.UNIT,
-                            suffix: '',
-                            displayable: Unit.displayableType.ALL,
-                            preferredDisplay: false,
-                            note: 'OED created standard unit unit'
-                        };
-                        const unitData = [unitC, unitDegrees, unitF];
+                        const unitData = [
+                            {
+                                // u6, used for conversion instead of display
+                                name: 'C',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.NONE,
+                                preferredDisplay: false,
+                                note: 'Celsius'
+                            },
+                            {
+                                // u7, raw units stored in meter
+                                name: 'Degrees',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.METER,
+                                suffix: '',
+                                displayable: Unit.displayableType.NONE,
+                                preferredDisplay: false,
+                                note: 'special unit'
+                            },
+                            {
+                                // u8, display unit for graph
+                                name: 'F',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.ALL,
+                                preferredDisplay: false,
+                                note: 'OED created standard unit unit'
+                            }
+
+                        ];
                         const conversionData = [
                             {
                                 // c5
