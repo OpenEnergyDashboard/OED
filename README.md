@@ -1,26 +1,3 @@
-# Open Energy Dashboard - Learning Sandbox 🎓
-
-![Github Build](https://github.com/OpenEnergyDashboard/OED/workflows/Build/badge.svg)
-
-> **📌 This is a fork**: This repository (`aldungo/OED-dungo`) is a learning sandbox forked from the main [OpenEnergyDashboard/OED](https://github.com/OpenEnergyDashboard/OED) project for educational purposes.
-
-## About This Fork
-
-This fork is used for a **CodeDay MicroInternship** where students learn:
-- ✅ Open-source contribution workflow
-- ✅ Git/GitHub best practices (branching, PRs, code review)
-- ✅ Automated testing with Mocha/Chai
-- ✅ Team collaboration in a real codebase
-- ✅ Professional software development practices
-
-**Current Project**: Implementing test cases for OED's reading API endpoints (Issue #962)
-
-**For Students**: See [QUICK_START.md](QUICK_START.md) to get started!
-
----
-
-## About Open Energy Dashboard
-
 Open Energy Dashboard is a user-friendly way to display energy information from smart energy meters or uploaded via CSV files. It is available to anyone and is optimized for non-technical users with a simple interface that provides access to your organization's energy data. To learn more, see [our website](https://openenergydashboard.org/).
 
 Open Energy Dashboard is available under the Mozilla Public License v2, and contributions, in the form of bug reports, feature requests, and code contributions, are welcome.
