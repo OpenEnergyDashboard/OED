@@ -218,65 +218,6 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	}
 });
 
-// Route for changing a user's own password
-router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
-	
-	const validParams = {
-		type: 'object',
-		required: ['currentPassword', 'newPassword'],
-		properties: {
-			currentPassword: {
-				type: 'string',
-				minLength: 8,
-				maxLength: 128
-			},
-			newPassword: {
-				type: 'string',
-				minLength: 8,
-				maxLength: 128
-			}
-		}
-	};
-
-	if (!validate(req.body, validParams).valid) {
-		res.status(400).json({ message: 'Invalid params' });
-		return;
-	}
-	try {
-		const conn = getConnection();
-		// Check if user is authenticated
-		if (!req.decoded || !req.decoded.data) {
-			res.status(401).json({ message: 'User is not authenticated' });
-			return;
-		}
-		const userId = req.decoded.data;
-		const {currentPassword, newPassword} = req.body;
-
-		// Get current user
-		const user = await User.getByID(userId, conn);
-		if (user === null) {
-			res.status(401).json({ message: 'User not found' });
-			return;
-		}
-
-		// Verify current password
-		const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
-		if (!isValidPassword) {
-			res.status(400).json({ message: 'Current password is incorrect' });
-			return;
-		}
-
-		// Hash and update the new password
-		const hashedPassword = await bcrypt.hash(newPassword, 10);
-		await User.updateUserPassword(userId, hashedPassword, conn);
-
-		res.sendStatus(200);
-	} catch (error) {
-		log.error('Error while performing change password request', error);
-		res.status(500).json({ message: 'Internal Server Error', error: error});
-	}
-});
-
 // Route for deleting a user.
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
@@ -335,12 +276,14 @@ try {
 	const conn = getConnection();
 	const userId = req.decoded.data; // From the authenticated token
 	const { currentPassword, newPassword } = req.body;
+
 	// Get the current user
 	const user = await User.getByID(userId, conn);
 	if (user === null) {
 		res.status(401).json({ message: 'User not found' });
 		return;
 	}
+
 	// Verify current password
 	const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
 		if (!isValidPassword) {
@@ -348,7 +291,8 @@ try {
 			res.status(400).json({ message: 'Current password is incorrect' });
 			return;
 		}
-// Hash and update the new password
+
+		// Hash and update the new password
 		const hashedPassword = await bcrypt.hash(newPassword, 10);
 		await User.updateUserPassword(userId, hashedPassword, conn);
 		res.sendStatus(200);

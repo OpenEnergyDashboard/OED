@@ -25,15 +25,13 @@ interface ChangePasswordModalComponentProps {
 export default function ChangePasswordModalComponent(props: ChangePasswordModalComponentProps) {
 	const translate = useTranslate();
 
-	// boolean that updates if any change is made to user modal
+	// Boolean that updates if any change is made to user modal
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
 	const [canSave, setCanSave] = useState(false);
 
-	// get current logged in user
+	// Get current logged in user
 	const currentUser = useAppSelector(selectCurrentUserProfile) as User;
-
-	// user edit form state and use the defaults plus the user's data
 
 	// State for password fields
 	const [passwordDetails, setPasswordDetails] = useState({
@@ -47,11 +45,11 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 	// User API
 	const [submitPasswordChange] = userApi.useChangePasswordMutation();
 
-	// check if passwords match and if password length is at least 8
+	// Check if passwords match and if password length is at least 8
 	useEffect(() => {
-		// If any character is added in either field, it will count as password
-		// being modified. This will actively update the passwordModified
-		// boolean value when any change is made.
+		// If any character is added in either field, it will
+		// actively update the passwordModified boolean value 
+		// when any change is made.
 		const passwordModified = passwordDetails.currentPassword.length > 0 ||
 			passwordDetails.newPassword.length > 0 ||
 			passwordDetails.confirmPassword.length > 0;
@@ -69,7 +67,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 			passwordDetails.newPassword.length > 7);
 	}, [passwordDetails.currentPassword, passwordDetails.newPassword, passwordDetails.confirmPassword]);
 
-	// check if form is valid
+	// Check if form is valid
 	const isFormValid = () => {
 		return passwordDetails.currentPassword.length > 0 &&
 			passwordDetails.passwordMatch &&
@@ -107,6 +105,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 		// Close modal
 		props.handleClose();
 
+		// Submit password change to API
 		submitPasswordChange({
 			currentPassword: passwordDetails.currentPassword,
 			newPassword: passwordDetails.newPassword

@@ -206,6 +206,11 @@ optionalAuthMiddleware = (req, res, next) => {
 	}
 };
 
+/**
+ * Middleware function to require authentication.
+ * Verifies the request's token against the server's secret token.
+ * If verified, checks that the user exists in the database.
+ */
 function requireAuthMiddleware(req, res, next) {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
