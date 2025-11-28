@@ -48,7 +48,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 	// Check if passwords match and if password length is at least 8
 	useEffect(() => {
 		// If any character is added in either field, it will
-		// actively update the passwordModified boolean value 
+		// actively update the passwordModified boolean value
 		// when any change is made.
 		const passwordModified = passwordDetails.currentPassword.length > 0 ||
 			passwordDetails.newPassword.length > 0 ||

@@ -157,7 +157,7 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
-	
+
 	// Handle modal visibility
 	type ModalType = 'login' | 'changePassword' | null;
 	const [modalType, setModalType] = useState<ModalType>(null);
@@ -341,7 +341,6 @@ export default function HeaderButtonsComponent() {
 					</Modal>
 				)}
 			</>
-
 		</div>
 	);
 }
