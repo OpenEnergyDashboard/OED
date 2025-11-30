@@ -91,9 +91,7 @@ mocha.describe('readings API', () => {
                         // Check result matches expected csv file
                         expectRangeToEqualExpected(res, expected);
                     });
-
-                    // Add LR14 here
-                    mocha.it('LR14: range should have daily points for 15 minute reading intervals aawnd r units with +-inf start/end time & C as F with intercept', async () => {
+                    mocha.it('LR14: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
                         const unitData = [
                             {
                                 // u6, used for conversion instead of display
