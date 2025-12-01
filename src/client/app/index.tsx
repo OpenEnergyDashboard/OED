@@ -1,6 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 const __webpack_nonce__ = (document.querySelector('script[nonce]') as HTMLScriptElement | null)?.nonce;
 (window as any).__webpack_nonce__ = __webpack_nonce__;
 (window as any).__plotly_nonce__ = __webpack_nonce__;
@@ -22,7 +23,7 @@ document.head.appendChild = function (node: any) {
 		node instanceof HTMLStyleElement
 	) {
 		console.log('Appending style, has nonce:', __webpack_nonce__);
-		node.setAttribute('nonce',__webpack_nonce__|| '');
+		node.setAttribute('nonce', __webpack_nonce__ || '');
 	}
 
 	try {
