@@ -13,7 +13,10 @@ import ReactTooltip from 'react-tooltip';
 import { Badge } from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectMeterGroupSelectData } from '../redux/selectors/uiSelectors';
-import { selectChartToRender, updateSelectedMetersOrGroups, updateThreeDMeterOrGroupInfo } from '../redux/slices/graphSlice';
+import {
+	selectChartToRender, selectSelectedUnit, updateSelectedMeters, updateThreeDMeterOrGroupInfo,
+	updateSelectedGroups, updateSelectedUnit, setLastAddedMeterOrGroup
+} from '../redux/slices/graphSlice';
 import { GroupedOption, SelectOption } from '../types/items';
 import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
@@ -23,37 +26,82 @@ import { labelStyle } from '../styles/modalStyle';
 
 /**
  * Creates a React-Select component for the UI Options Panel.
- * @param props - Helps differentiate between meter or group options
  * @returns A React-Select component.
  */
-export default function MeterAndGroupSelectComponent(props: MeterAndGroupSelectProps) {
+export default function MeterAndGroupSelectComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { meterGroupedOptions, groupsGroupedOptions, allSelectedMeterValues, allSelectedGroupValues } = useAppSelector(selectMeterGroupSelectData);
+	const selectedUnit = useAppSelector(selectSelectedUnit);
 	const somethingIsFetching = useAppSelector(selectAnythingFetching);
-	const { meterOrGroup } = props;
-	// Set the current component's appropriate meter or group update from the graphSlice's Payload-Action Creator
-	const value = meterOrGroup === MeterOrGroup.meters ? allSelectedMeterValues : allSelectedGroupValues;
 
-	// Set the current component's appropriate meter or group SelectOption
-	const options = meterOrGroup === MeterOrGroup.meters ? meterGroupedOptions : groupsGroupedOptions;
+	// Merge meterGroupedOptions and groupsGroupedOptions into a single list with two categories
+	const combinedOptions = [
+		{
+			label: 'Options', // Category name
+			options: [
+				// Compatible meters with "ᵐ" added to the label
+				...meterGroupedOptions.find(group => group.label === 'Meters')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᴹ`
+				})) || [],
+				// Compatible groups with "ᶢ" added to the label
+				...groupsGroupedOptions.find(group => group.label === 'Options')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᴳ`
+				})) || []
+			].sort((a, b) => a.label.localeCompare(b.label)) //Sort alphabetically by label
+		},
+		{
+			label: 'Incompatible Options',
+			options: [
+				// Incompatible meters with "ᵐ" added to the label
+				...meterGroupedOptions.find(group => group.label === 'Incompatible Meters')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᴹ`
+				})) || [],
+				// Incompatible groups with "ᶢ" added to the label
+				...groupsGroupedOptions.find(group => group.label === 'Incompatible Options')?.options.map(option => ({
+					...option,
+					label: `${option.label}ᴳ`
+				})) || []
+			].sort((a, b) => a.label.localeCompare(b.label))
+		}
+	];
+	//Combine the selected values into one array with a type property to differentiate between meters and groups
+	const combinedValue = [
+		...allSelectedMeterValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.meters })),
+		...allSelectedGroupValues.map(value => ({ ...value, meterOrGroup: MeterOrGroup.groups }))
+	];
 
 	const onChange = (newValues: MultiValue<SelectOption>, meta: ActionMeta<SelectOption>) => {
-		const newMetersOrGroups = newValues.map(option => option.value);
-		dispatch(updateSelectedMetersOrGroups({ newMetersOrGroups, meta }));
+		const newMeters = newValues.filter(option => option.meterOrGroup === MeterOrGroup.meters).map(option => option.value);
+		const newGroups = newValues.filter(option => option.meterOrGroup === MeterOrGroup.groups).map(option => option.value);
+
+		dispatch(updateSelectedMeters(newMeters));
+		dispatch(updateSelectedGroups(newGroups));
+		// Track last added type
+		if (meta.action === 'select-option' && meta.option) {
+			dispatch(setLastAddedMeterOrGroup(meta.option.meterOrGroup));
+		}
+		const lastAdded = newValues[newValues.length - 1];
+		if (lastAdded && selectedUnit === -99 && lastAdded.defaultGraphicUnit) {
+			dispatch(updateSelectedUnit(lastAdded.defaultGraphicUnit));
+		}
+
 	};
 
 	return (
 		<>
 			<p style={labelStyle}>
-				{translate(`${meterOrGroup}`)}:
-				<TooltipMarkerComponent page='home' helpTextId={`help.home.select.${meterOrGroup}`} />
+				{translate('data.sources')}:
+				<TooltipMarkerComponent page='home' helpTextId={'help.home.select.datasources'} />
 			</p>
 			<Select<SelectOption, true, GroupedOption>
 				isMulti
-				placeholder={translate(`select.${meterOrGroup}`)}
-				options={options}
-				value={value}
+				placeholder={translate('select.meter.group')}
+				options={combinedOptions}
+				value={combinedValue}
 				onChange={onChange}
 				closeMenuOnSelect={false}
 				// Customize Labeling for Grouped Labels
@@ -82,9 +130,6 @@ const formatGroupLabel = (data: GroupedOption) => {
 	);
 };
 
-interface MeterAndGroupSelectProps {
-	meterOrGroup: MeterOrGroup;
-}
 
 const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, GroupedOption>) => {
 	// Types for makeAnimated are generic, and does not offer completion, so type assert
@@ -97,10 +142,12 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 	const onThreeD = useAppSelector(state => selectChartToRender(state) === ChartTypes.threeD);
 	// TODO Verify behavior, and set proper message/ translate
 	return (
-		< div ref={ref}
+		<div ref={ref}
 			key={`${typedProps.data.value}:${typedProps.data.label}:${typedProps.data.isDisabled}`}
 			data-for={isDisabled ? 'home' : 'select-tooltips'}
-			data-tip={isDisabled ? 'help.home.area.normalize' : `${props.data.label}`}
+			data-tip={isDisabled
+				? 'help.home.area.normalize'
+				: `${props.data.label}${props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}`}
 			onMouseDown={e => {
 				e.stopPropagation();
 				ReactTooltip.rebuild();
@@ -129,7 +176,19 @@ const MultiValueLabel = (props: MultiValueGenericProps<SelectOption, true, Group
 				ref.current && ReactTooltip.hide(ref.current);
 			}}
 		>
-			<components.MultiValueLabel {...props} />
+			<span
+				style={{
+					display: 'inline-block',
+					maxWidth: '120px', // adjust as needed
+					whiteSpace: 'nowrap',
+					overflow: 'hidden',
+					textOverflow: 'ellipsis',
+					verticalAlign: 'middle'
+				}}
+			>
+				{props.data.label}
+				{props.data.meterOrGroup === MeterOrGroup.meters ? 'ᴹ' : props.data.meterOrGroup === MeterOrGroup.groups ? 'ᴳ' : ''}
+			</span>
 		</div >
 	);
 

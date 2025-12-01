@@ -20,7 +20,7 @@ class Unit {
 	 * @param {*} note Note about this unit.
 	 * @param minVal inclusive minimum acceptable reading value
 	 * @param maxVal inclusive maximum acceptable reading value
-	 * @param disableChecks controls impact of failures of checks on meter: reject_none (disable checks),
+	 * @param disableChecks controls impact of failures of checks on meter: reject_disable (disable checks), reject_none (reject no readings but do checks),
 	 * 	reject_all (add no readings on issue; default), reject_bad (only reject readings with issues).
 	 */
 	constructor(id, name, identifier = name, unitRepresent, secInRate = 3600, typeOfUnit, suffix = '', displayable, preferredDisplay, note, minVal = Number.MIN_SAFE_INTEGER, maxVal = Number.MAX_SAFE_INTEGER, disableChecks = Unit.disableChecksType.REJECT_ALL) {
@@ -86,7 +86,7 @@ class Unit {
 	}
 
 	/**
-	 * Returns a promise to create the disableChecksType enum of reject_bad, reject_all, and reject_none.
+	 * Returns a promise to create the disableChecksType enum in DB.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
 	 */
@@ -258,6 +258,7 @@ Unit.displayableType = Object.freeze({
 });
 
 Unit.disableChecksType = Object.freeze({
+	REJECT_DISABLED: 'reject_disabled',
 	REJECT_BAD: 'reject_bad',
 	REJECT_ALL: 'reject_all',
 	REJECT_NONE: 'reject_none'

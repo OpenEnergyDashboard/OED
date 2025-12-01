@@ -16,7 +16,7 @@ import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../utils/dateR
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
-import { labelStyle } from '../styles/modalStyle';
+import { bottomSpace, labelStyle } from '../styles/modalStyle';
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
@@ -44,15 +44,17 @@ export default function DateRangeComponent() {
 						{translate('date.range')}:
 						<TooltipMarkerComponent page='home' helpTextId='help.home.select.dateRange' />
 					</p>
-					<DateRangePicker
-						value={timeIntervalToDateRange(queryTimeInterval)}
-						onChange={handleChange}
-						calendarProps={{ defaultView: 'year' }}
-						minDate={new Date(1970, 0, 1)}
-						maxDate={new Date()}
-						locale={locale} // Formats Dates, and Calendar months base on locale
-						calendarIcon={null}
-					/>
+					<div style = {bottomSpace}>
+						<DateRangePicker
+							value={timeIntervalToDateRange(queryTimeInterval)}
+							onChange={handleChange}
+							calendarProps={{ defaultView: 'year' }}
+							minDate={new Date(1970, 0, 1)}
+							maxDate={new Date()}
+							locale={locale} // Formats Dates, and Calendar months base on locale
+							calendarIcon={null}
+						/>
+					</div>
 				</>
 			)}
 		</div>

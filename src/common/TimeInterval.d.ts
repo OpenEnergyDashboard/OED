@@ -10,7 +10,7 @@ export class TimeInterval {
 	public static unbounded(): TimeInterval;
 	public static fromString(stringified: string): TimeInterval;
 
-	public constructor(startTimestamp: moment.Moment, endTimestamp: moment.Moment);
+	public constructor(startTimestamp?: moment.Moment, endTimestamp?: moment.Moment);
 	public toString(): string;
 	public equals(other: TimeInterval): boolean;
 	public contains(other: TimeInterval): boolean;
@@ -19,4 +19,5 @@ export class TimeInterval {
 	public getStartTimestamp(): moment.Moment;
 	public getEndTimestamp(): moment.Moment;
 	public getIsBounded(): boolean;
+	public getIsHalfBounded(): boolean;
 }

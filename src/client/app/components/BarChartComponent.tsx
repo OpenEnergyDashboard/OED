@@ -16,7 +16,7 @@ import { selectPlotlyBarDataFromResult, selectPlotlyBarDeps } from '../redux/sel
 import { selectBarChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectBarUnitLabel, selectIsRaw } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import { selectSliderRangeInterval ,selectBarStacking } from '../redux/slices/graphSlice';
+import { selectSliderRangeInterval ,selectBarStacking, setInitialXAxisRange } from '../redux/slices/graphSlice';
 import Locales from '../types/locales';
 import SpinnerComponent from './SpinnerComponent';
 import { useTranslate } from '../redux/componentHooks';
@@ -66,6 +66,33 @@ export default function BarChartComponent() {
 
 	// useQueryHooks for data fetching
 	const datasets: Partial<Plotly.PlotData>[] = meterReadings.concat(groupData);
+
+	// Getting the entire x-axis range from all traces
+	// This is used to set the initial x-axis range when the component mounts.
+	// It ensures that the graph starts with a range that covers all data points. That would be used for querying the data.
+	// If there are no data points, minX and maxX will be undefined.
+	const allX = React.useMemo(
+		() =>
+			datasets.flatMap(trace => {
+				if (!trace.x) return [];
+				// If trace.x is an array of arrays, flatten it
+				if (Array.isArray(trace.x[0])) {
+					return (trace.x as any[][]).flat();
+				}
+				// Otherwise, it's a flat array
+				return trace.x as (string | number | Date)[];
+			}),
+		[datasets]
+	);
+
+	const minX = allX.length ? utc(allX.reduce((a, b) => utc(a).isBefore(utc(b)) ? a : b)) : undefined;
+	const maxX = allX.length ? utc(allX.reduce((a, b) => utc(a).isAfter(utc(b)) ? a : b)) : undefined;
+
+	React.useEffect(() => {
+		if (minX && maxX) {
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+		}
+	}, [minX, maxX]);
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;

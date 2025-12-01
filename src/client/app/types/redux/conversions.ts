@@ -19,3 +19,21 @@ export interface ConversionsState {
 	submitting: ConversionData[];
 	conversions: ConversionData[];
 }
+
+export interface SimulateDeleteResult {
+	affectedMeters: SimulateDeleteAffectedMeter[];
+	affectedGroups: SimulateDeleteAffectedGroup[];
+}
+
+export interface SimulateDeleteAffectedMeter {
+	meterId: number;
+	meterName: string;
+	lostUnits: number[];
+}
+
+export interface SimulateDeleteAffectedGroup {
+	groupId: number;
+	groupName: string;
+	lostUnits: number[];
+	orphaned: boolean;
+}

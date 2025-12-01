@@ -458,7 +458,9 @@ async function insertMeters(metersToInsert, conn) {
 						conn,
 						meter.honorDst,
 						meter.relaxedParsing,
-						meter.useMeterZone
+						meter.useMeterZone,
+						// TODO fix up to get from meter for warnOnCumulativeReset
+						false
 					));
 					// Delete mathematical test data file just uploaded. They have true for delete.
 					// Try to delete even if not uploaded since created anyway.

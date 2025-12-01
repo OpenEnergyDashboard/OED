@@ -62,6 +62,9 @@ async function createCikArray(graph, conn) {
 	// TODO: The table in the database for the logical Cik needs to be wiped and these values stored. This code 
 	// will be added once the database table for using it to get readings is set.
 	// At the moment, we just return the array.
+	// WARNING: Currently this function is used to simulate deletion of conversions in conversions.js,
+	// if at some point we do change the database when the function is called
+	// then we can have an optional parameter to not write to the database. or resolve it however you see fit.
 	return c;
 }
 

@@ -3,11 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { ChartTypes, MeterOrGroup } from '../types/redux/graph';
+import { ChartTypes } from '../types/redux/graph';
 import MeterAndGroupSelectComponent from './MeterAndGroupSelectComponent';
 import UnitSelectComponent from './UnitSelectComponent';
 import { useAppSelector } from '../redux/reduxHooks';
-import { selectChartToRender, selectQueryTimeInterval} from '../redux/slices/graphSlice';
+import { selectChartToRender, selectQueryTimeInterval } from '../redux/slices/graphSlice';
 import DateRangeComponent from './DateRangeComponent';
 
 /**
@@ -17,14 +17,15 @@ import DateRangeComponent from './DateRangeComponent';
 export default function ChartDataSelectComponent() {
 	const chartToRender = useAppSelector(selectChartToRender);
 	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+	const isHalfBounded = queryTimeInterval.getIsHalfBounded();
 	const isBounded = queryTimeInterval.getIsBounded();
+	const visibleDateRange = isHalfBounded || isBounded;
 
 	return (
 		<div>
-			<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.groups} />
-			<MeterAndGroupSelectComponent meterOrGroup={MeterOrGroup.meters} />
+			<MeterAndGroupSelectComponent />
 			<UnitSelectComponent />
-			{(isBounded && chartToRender !== ChartTypes.threeD && chartToRender !== ChartTypes.compareLine) && <DateRangeComponent />}
+			{(visibleDateRange && chartToRender !== ChartTypes.threeD && chartToRender !== ChartTypes.compareLine) && <DateRangeComponent />}
 		</div>
 	);
 }

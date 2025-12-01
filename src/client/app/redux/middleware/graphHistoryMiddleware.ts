@@ -22,4 +22,8 @@ export const graphHistoryListener = (startListening: AppListener) => {
 };
 
 // listen to all graphSlice actions
-const isHistoryTrigger = isAnyOf(...Object.values(graphSlice.actions));
+const isHistoryTrigger = isAnyOf(
+	...Object.values(graphSlice.actions).filter(
+		a => a.type !== graphSlice.actions.setInitialXAxisRange.type
+	)
+);

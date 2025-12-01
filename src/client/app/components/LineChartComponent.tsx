@@ -19,7 +19,7 @@ import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import Locales from '../types/locales';
 import { useTranslate } from '../redux/componentHooks';
 import SpinnerComponent from './SpinnerComponent';
-import { selectSliderRangeInterval } from '../redux/slices/graphSlice';
+import { setInitialXAxisRange, selectSliderRangeInterval } from '../redux/slices/graphSlice';
 import { fullSizeContainer } from '../styles/modalStyle';
 
 /**
@@ -70,7 +70,32 @@ export default function LineChartComponent() {
 	const [listOfButtons, setListOfButtons] = React.useState(defaultButtons);
 
 	const data: Partial<Plotly.PlotData>[] = React.useMemo(() => meterPlotlyData.concat(groupPlotlyData), [meterPlotlyData, groupPlotlyData]);
+	// Getting the entire x-axis range from all traces
+	// This is used to set the initial x-axis range when the component mounts.
+	// It ensures that the graph starts with a range that covers all data points. That would be used for querying the data.
+	// If there are no data points, minX and maxX will be undefined.
+	const allX = React.useMemo(
+		() =>
+			data.flatMap(trace => {
+				if (!trace.x) return [];
+				// If trace.x is an array of arrays, flatten it
+				if (Array.isArray(trace.x[0])) {
+					return (trace.x as any[][]).flat();
+				}
+				// Otherwise, it's a flat array
+				return trace.x as (string | number | Date)[];
+			}),
+		[data]
+	);
 
+	const minX = allX.length ? utc(allX.reduce((a, b) => utc(a).isBefore(utc(b)) ? a : b)) : undefined;
+	const maxX = allX.length ? utc(allX.reduce((a, b) => utc(a).isAfter(utc(b)) ? a : b)) : undefined;
+
+	React.useEffect(() => {
+		if (minX && maxX) {
+			dispatch(setInitialXAxisRange(new TimeInterval(minX, maxX)));
+		}
+	}, [minX, maxX]);
 
 	if (meterIsFetching || groupIsFetching) {
 		return <SpinnerComponent loading height={50} width={50} />;
@@ -86,6 +111,31 @@ export default function LineChartComponent() {
 	} else if (!enoughData) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
+		let minDate = '';
+		let maxDate = '';
+		for (const trace of data) {
+			if (trace.x && trace.x.length > 0) {
+				const traceMin = trace.x[0] as string;
+				const traceMax = trace.x[trace.x.length - 1] as string;
+				// Update minX if this is the first trace or has an earlier date
+				if (minDate === '' || utc(traceMin).isBefore(utc(minDate))) {
+					minDate = traceMin;
+				}
+				// Update maxX if this is the first trace or has a later date
+				if (maxDate === '' || utc(traceMax).isAfter(utc(maxDate))) {
+					maxDate = traceMax;
+				}
+			}
+		}
+		// Tries to get the range from the slider range interval, undefined if not bounded
+		const sliderRange: [string, string] | undefined = sliderRangeInterval?.getIsBounded()
+			? [
+				sliderRangeInterval.getStartTimestamp()!.utc().toISOString(),
+				sliderRangeInterval.getEndTimestamp()!.utc().toISOString()
+			]
+			: undefined;
+		// Either sets the xRange to the minDate maxDate or the saved slider range. This keeps the range from resetting when we toggle error bars.
+		const xRange: [string, string] = sliderRange ?? [minDate, maxDate];
 		return (
 			<Plot
 				data={data}
@@ -97,9 +147,8 @@ export default function LineChartComponent() {
 					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
-						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						rangeslider: { visible: true, range: [minDate, maxDate] },
+						range: xRange,
 						showgrid: true,
 						gridcolor: '#ddd'
 					}

@@ -193,7 +193,6 @@ function formatThreeDData(
 		const readingValue = readings === null ? null : readings.toPrecision(6);
 		return `${translate('threeD.date')}: ${date}<br>${translate('threeD.time')}: ${time}<br>${unitLabel}: ${readingValue}`;
 	}));
-
 	const formattedData = [{
 		type: 'surface',
 		showlegend: false,
@@ -241,8 +240,7 @@ export function setHelpLayout(helpText: string = 'Help Text Goes Here', fontSize
  * @param yDataToRender Data range for yaxis
  * @returns plotly layout object.
  */
-function setThreeDLayout(translate: (messageID: string) => string, zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
-
+export function setThreeDLayout(translate: (messageID: string) => string, zLabelText: string = 'Resource Usage', yDataToRender: string[]) {
 	// Convert date strings to JavaScript Date objects and then get dataRange
 	const dateObjects = yDataToRender.map(dateStr => new Date(dateStr));
 	const dataMin = Math.min(...dateObjects.map(date => date.getTime()));
@@ -299,4 +297,6 @@ function setThreeDLayout(translate: (messageID: string) => string, zLabelText: s
 		}
 	} as Partial<Plotly.Layout>;
 }
+
+
 

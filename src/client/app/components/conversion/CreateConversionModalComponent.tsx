@@ -4,7 +4,7 @@
 
 import { omit } from 'lodash';
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -19,6 +19,7 @@ import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import { UnitType } from '../../types/redux/units';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 /**
  * Defines the create conversion modal form
@@ -26,6 +27,31 @@ import { UnitType } from '../../types/redux/units';
  */
 export default function CreateConversionModalComponent() {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any conversion modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If user can save
+	const [canSave, setCanSave] = useState(false);
+	// If user has an invalid save (slope intercept is 0) with unsaved warning.
+	// Stores the conversion data so that it can be used in either
+	// handleSubmit() or handleWarningConfirm().
+	// This addresses an issue of where the conversionState does not carry over
+	// when going from unsaved warning to the invalid save modal.
+	const [pendingConversion, setPendingConversion] = useState<any>(null);
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			// Proceed to close the modal
+			handleClose();
+		}
+	};
+
 	const [addConversionMutation] = conversionsApi.useAddConversionMutation();
 	// Want units in sorted order by identifier regardless of case.
 
@@ -99,8 +125,7 @@ export default function CreateConversionModalComponent() {
 
 		//Proceed with the creation of the conversion
 		setShowModal(false);
-		addConversionMutation({...omit(conversionState, 'sourceOptions'),
-			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+		addConversionMutation(pendingConversion);
 		resetState();
 	};
 
@@ -112,6 +137,7 @@ export default function CreateConversionModalComponent() {
 	// Reset the state to default values
 	const resetState = () => {
 		setConversionState(defaultValues);
+		setPendingConversion(null);
 	};
 	/* End Warning Modal */
 
@@ -119,6 +145,8 @@ export default function CreateConversionModalComponent() {
 	const handleSubmit = () => {
 		// Show warning modal if slope and intercept are both 0
 		if (conversionState.slope === 0 && conversionState.intercept === 0) {
+			setPendingConversion({...omit(conversionState, 'sourceOptions'),
+				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 			setWarningMessage(translate('conversion.slope.intercept.zero'));
 			setShowWarningModal(true);
 		} else if (validConversion) {
@@ -136,6 +164,28 @@ export default function CreateConversionModalComponent() {
 		}
 	};
 
+	// Checks if valid and if edit made.
+	// References the original implementation in EditUnitModalComponent.tsx
+	useEffect(() => {
+		// This checks if all of the required fields have been filled out.
+		const validChange =
+			conversionState.sourceId !== defaultValues.sourceId
+			&& conversionState.destinationId !== defaultValues.destinationId;
+		// Compare the local changes to the default values
+		const editMade =
+			conversionState.sourceId !== defaultValues.sourceId
+			|| conversionState.destinationId !== defaultValues.destinationId
+			|| conversionState.bidirectional !== defaultValues.bidirectional
+			|| conversionState.slope !== defaultValues.slope
+			|| conversionState.intercept !== defaultValues.intercept
+			|| conversionState.note !== defaultValues.note;
+		setCanSave(validChange && editMade && validConversion);
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+	}, [conversionState, validConversion]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipCreateConversionView: 'help.admin.conversioncreate'
@@ -143,6 +193,39 @@ export default function CreateConversionModalComponent() {
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						if (conversionState.slope === 0 && conversionState.intercept === 0) {
+							setPendingConversion({...omit(conversionState, 'sourceOptions'),
+								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+							setWarningMessage(translate('conversion.slope.intercept.zero'));
+							setShowWarningModal(true);
+						}
+						else if (validConversion) {
+							setShowModal(false);
+							addConversionMutation({...omit(conversionState, 'sourceOptions'),
+								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+							resetState();
+						}
+						else {
+							handleClose();
+						}
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
 			<ConfirmActionModalComponent
 				show={showWarningModal}
 				actionConfirmMessage={warningMessage}
@@ -156,7 +239,7 @@ export default function CreateConversionModalComponent() {
 				<FormattedMessage id="create.conversion" />
 			</Button>
 
-			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
+			<Modal isOpen={showModal} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.conversion" />
 					<TooltipHelpComponent page='conversions-create' />
@@ -177,7 +260,7 @@ export default function CreateConversionModalComponent() {
 										name='sourceId'
 										type='select'
 										value={conversionState.sourceId}
-										onChange={e => handleNumberChange(e)}
+										onChange={e => {handleNumberChange(e);}}
 										invalid={conversionState.sourceId === -999}>
 										{<option
 											value={-999}
@@ -204,7 +287,7 @@ export default function CreateConversionModalComponent() {
 										name='destinationId'
 										type='select'
 										value={conversionState.destinationId}
-										onChange={e => handleNumberChange(e)}
+										onChange={e => {handleNumberChange(e);}}
 										invalid={conversionState.destinationId === -999}>
 										{<option
 											value={-999}
@@ -230,7 +313,7 @@ export default function CreateConversionModalComponent() {
 								id='bidirectional'
 								name='bidirectional'
 								type='select'
-								onChange={e => handleBooleanChange(e)}
+								onChange={e => {handleBooleanChange(e);}}
 								value={String(conversionState.bidirectional)}
 								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -258,7 +341,8 @@ export default function CreateConversionModalComponent() {
 										name='slope'
 										type='number'
 										value={conversionState.slope}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 							<Col>
@@ -270,7 +354,8 @@ export default function CreateConversionModalComponent() {
 										name='intercept'
 										type='number'
 										value={conversionState.intercept}
-										onChange={e => handleNumberChange(e)} />
+										onChange={e => {handleNumberChange(e);}}
+									/>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -281,8 +366,9 @@ export default function CreateConversionModalComponent() {
 								id='note'
 								name='note'
 								type='textarea'
-								onChange={e => handleStringChange(e)}
-								value={conversionState.note} />
+								onChange={e => {handleStringChange(e);}}
+								value={conversionState.note}
+							/>
 						</FormGroup>
 					</Container>
 				</ModalBody>
@@ -297,7 +383,7 @@ export default function CreateConversionModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSubmit} disabled={!validConversion} >
+					<Button color='primary' onClick={handleSubmit} disabled={!validConversion || !canSave} >
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>

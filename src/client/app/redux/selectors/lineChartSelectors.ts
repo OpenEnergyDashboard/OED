@@ -35,7 +35,7 @@ export const selectPlotlyMeterData = selectFromLineReadingsResult(
 				const meterInfo = meterDataById[Number(id)];
 
 				const scaling = selectScalingFromEntity(meterInfo, areaUnit, areaNormalization, rateScaling);
-				const label = selectNameFromEntity(meterInfo);
+				const label = selectNameFromEntity(meterInfo) + 'ᴹ';
 				const colorID = meterInfo.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data from the line readings
@@ -108,7 +108,7 @@ export const selectPlotlyGroupData = selectFromLineReadingsResult(
 			.map(([id, readings]) => {
 				const groupInfo = groupDataById[Number(id)];
 				const scaling = selectScalingFromEntity(groupInfo, areaUnit, areaNormalization, rateScaling);
-				const label = selectNameFromEntity(groupInfo);
+				const label = selectNameFromEntity(groupInfo) + 'ᴳ';
 				const colorID = groupInfo.id;
 
 				// Create two arrays for the x and y values. Fill the array with the data from the line readings
