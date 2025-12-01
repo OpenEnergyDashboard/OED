@@ -176,16 +176,14 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		let cancel = false;
 
 		// Check conversions first (highest priority)
-		const conversionSources: React.ReactNode[] = [];
-		const conversionDestinations: React.ReactNode[] = [];
 		for (let i = 0; i < conversionData.length; i++) {
 			if (conversionData[i].sourceId === state.id) {
 				// This unit is the source of a conversion so cannot be deleted.
-				conversionSources.push(
+				msgElements.push(
 					<div key={`conversion-source-${i}`}>
 						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
 						{conversionArrow(conversionData[i].bidirectional)}
-						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}"{state.name}" {translate('unit.source.error')}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')} "{state.name}" {translate('unit.source.error')}
 					</div>
 				);
 				cancel = true;
@@ -193,11 +191,11 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 			if (conversionData[i].destinationId === state.id) {
 				// This unit is the destination of a conversion so cannot be deleted.
-				conversionDestinations.push(
+				msgElements.push(
 					<div key={`conversion-dest-${i}`}>
 						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
 						{conversionArrow(conversionData[i].bidirectional)}
-						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')}"{state.name}" {translate('unit.destination.error')}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')} "{state.name}" {translate('unit.destination.error')}
 					</div>
 				);
 				cancel = true;
@@ -206,37 +204,28 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 
 		// Check meters using this unit
 		const metersUsingUnit = Object.values(meterDataByID).filter(meter => meter.unitId === state.id);
+		if (metersUsingUnit.length > 0) {
+			msgElements.push(
+				<div key="meters-using-unit">
+					<span className="bold">{translate('unit.delete.meters.use')} </span>
+					"{state.name}" {translate('as.meter.unit')}:
+					<ul>
+						{metersUsingUnit.map(meter => (
+							<li key={meter.id}>"{meter.name}"</li>
+						))}
+					</ul>
+				</div>
+			);
+			cancel = true;
+		}
 
-		if (cancel || metersUsingUnit.length > 0) {
-			if (conversionSources.length > 0 || conversionDestinations.length > 0 || metersUsingUnit.length > 0) {
-				msgElements.push(
-					<div key="error-header">
-						<span className="bold">{translate('unit.failed.to.delete.unit')}:</span>
-					</div>
-				);
-			}
-
-			if (conversionSources.length > 0) {
-				msgElements.push(...conversionSources);
-			}
-
-			if (conversionDestinations.length > 0) {
-				msgElements.push(...conversionDestinations);
-			}
-
-			if (metersUsingUnit.length > 0) {
-				msgElements.push(
-					<div key="meters-using-unit">
-						{translate('meter')} {translate('uses')} {translate('unit')}"{state.name}" {translate('as.meter.unit')}:
-						<ul>
-							{metersUsingUnit.map(meter => (
-								<li key={meter.id}>"{meter.name}"</li>
-							))}
-						</ul>
-					</div>
-				);
-				cancel = true;
-			}
+		// If any errors were found, add the header message at the beginning
+		if (msgElements.length > 0) {
+			msgElements.splice(0, 0,
+				<div key="error-header">
+					<span className="bold">{translate('unit.failed.to.delete.unit')}:</span>
+				</div>
+			);
 		}
 
 		if (cancel) {
