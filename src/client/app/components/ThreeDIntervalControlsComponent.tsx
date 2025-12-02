@@ -10,7 +10,7 @@ import { graphSlice, selectThreeDNumDays } from '../redux/slices/graphSlice';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { labelStyle, divTopBottomPadding } from '../styles/modalStyle';
-import { MAX_3D_DAYS, DEFAULT_3D_DAYS, getEffectiveNumDays } from '../utils/dateRangeCompatibility';
+import { MAX_3D_DAYS, getEffectiveNumDays } from '../utils/dateRangeCompatibility';
 
 /**
  * Standard numDays options for 3D graphics
@@ -112,18 +112,8 @@ export default function ThreeDIntervalControlsComponent() {
 		SixMonths: '6.months',
 		OneYear: '1.year',
 		TwoYears: '2.years',
-		Max: 'max',
+		Max: '3.years',
 		Custom: 'custom.value'
-	};
-
-	// Helper function to get display label for a value
-	const getLabelForValue = (value: number): string => {
-		if (value === ThreeDNumDays.OneMonth) return translate(numDaysTranslations.OneMonth);
-		if (value === ThreeDNumDays.SixMonths) return translate(numDaysTranslations.SixMonths);
-		if (value === ThreeDNumDays.OneYear) return translate(numDaysTranslations.OneYear);
-		if (value === ThreeDNumDays.TwoYears) return translate(numDaysTranslations.TwoYears);
-		if (value === ThreeDNumDays.Max) return translate(numDaysTranslations.Max);
-		return value.toString();
 	};
 
 	return (
