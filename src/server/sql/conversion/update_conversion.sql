@@ -3,9 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 UPDATE conversions
-	SET
-        bidirectional = ${bidirectional},
-        -- slope = ${slope},
-        -- intercept = ${intercept},
+	SET bidirectional = ${bidirectional},
+        slope = ${slope},
+        intercept = ${intercept},
         note = ${note}
 	WHERE source_id = ${sourceId} AND destination_id = ${destinationId};

@@ -35,9 +35,7 @@ export const baseApi = createApi({
 		'ConversionDetails',
 		'Units',
 		'Cik',
-		'Readings',
-		'Weeks',
-		'DayDetails'
+		'Readings'
 	],
 	// Initially no defined endpoints, Use rtk query's injectEndpoints
 	endpoints: () => ({})

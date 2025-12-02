@@ -10,12 +10,16 @@ class Conversion {
 	 * @param {*} sourceId The unit id of the source.
 	 * @param {*} destinationId The unit id of the destination.
 	 * @param {*} bidirectional Is this conversion bidirectional?
+	 * @param {*} slope The slope of the conversion.
+	 * @param {*} intercept The intercept of the conversion.
 	 * @param {*} note Comments by the admin or OED inserted.
 	 */
-	constructor(sourceId, destinationId, bidirectional, note) {
+	constructor(sourceId, destinationId, bidirectional, slope, intercept, note) {
 		this.sourceId = sourceId;
 		this.destinationId = destinationId;
 		this.bidirectional = bidirectional;
+		this.slope = slope;
+		this.intercept = intercept;
 		this.note = note;
 	}
 
@@ -34,7 +38,7 @@ class Conversion {
 	 * @returns The new conversion object.
 	 */
 	static mapRow(row) {
-		return new Conversion(row.source_id, row.destination_id, row.bidirectional, row.note);
+		return new Conversion(row.source_id, row.destination_id, row.bidirectional, row.slope, row.intercept, row.note);
 	}
 
 	/**
@@ -63,40 +67,12 @@ class Conversion {
 	}
 
 	/**
-	 * Inserts a new conversion to the database, along with a conversion segment.
-	 * The default conversion segment spans from -inf to inf.
+	 * Inserts a new conversion to the database.
 	 * @param {*} conn The connection to use.
 	 */
-	async insert(weekPatternsId, slope, intercept, segmentNote, conn) {
+	async insert(conn) {
 		const conversion = this;
-
-		if (conversion.id !== undefined) {
-			throw new Error(`Attempted to insert a conversion that already has an ID ${conversion.id}`);
-		}
-
-		// insert new conversion
-		const conversionData = {
-			sourceId: this.sourceId,
-			destinationId: this.destinationId,
-			bidirectional: this.bidirectional,
-			note: this.note
-		};
-
-		await conn.none(sqlFile('conversion/insert_new_conversion.sql'), conversionData);
-
-		// insert new conversion segment
-		const conversionSegment = {
-			sourceId: this.sourceId,
-			destinationId: this.destinationId,
-			weekPatternsId: weekPatternsId,
-			slope: slope,
-			intercept: intercept,
-			startTime: '-infinity',
-			endTime: 'infinity',
-			note: segmentNote
-		};
-
-		await conn.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), conversionSegment);
+		await conn.none(sqlFile('conversion/insert_new_conversion.sql'), conversion);
 	}
 
 	/**

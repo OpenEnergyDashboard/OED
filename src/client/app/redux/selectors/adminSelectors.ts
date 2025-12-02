@@ -7,18 +7,19 @@ import { selectCik, selectConversionsDetails } from '../../redux/api/conversions
 import { selectAllGroups } from '../../redux/api/groupsApi';
 import { selectAllMeters, selectMeterById } from '../../redux/api/metersApi';
 import { selectAdminPreferences } from '../../redux/slices/adminSlice';
-import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { ConversionData } from '../../types/redux/conversions';
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
-import { DisableChecksType, UnitData, UnitType } from '../../types/redux/units';
-import { Week } from '../../types/redux/weeks';
+import { UnitData, UnitType } from '../../types/redux/units';
 import { unitsCompatibleWithUnit } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
-import { MAX_VAL, MIN_VAL, noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
+import { noUnitTranslated, potentialGraphicUnits } from '../../utils/input';
 import translate from '../../utils/translate';
 import { selectAllUnits, selectUnitDataById } from '../api/unitsApi';
 import { selectVisibleMetersAndGroups } from './authVisibilitySelectors';
 import { createAppSelector } from './selectors';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { DisableChecksType } from '../../types/redux/units';
+import { MAX_VAL, MIN_VAL } from '../../utils/input';
 
 export const MIN_DATE_MOMENT = moment(0).utc();
 export const MAX_DATE_MOMENT = moment(0).utc().add(5000, 'years');
@@ -330,29 +331,12 @@ export const selectDefaultCreateConversionValues = createAppSelector(
 			destinationId: -999,
 			destinationOptions: sortedUnitData.filter(unit => unit.typeOfUnit !== 'meter'),
 			bidirectional: true,
-			overallConversionNote: '',
-			initialConversionNote: '',
 			slope: 0,
 			intercept: 0,
-			weeklyPattern: 'No Pattern'
+			note: ''
 		};
 		return defaultValues;
 	}
-);
-
-export const selectDefaultCreateWeekValues = createAppSelector<[], Omit<Week, 'id'>>(
-	[],
-	() => ({
-		weekName: '',
-		note: '',
-		sunday: -999,
-		monday: -999,
-		tuesday: -999,
-		wednesday: -999,
-		thursday: -999,
-		friday: -999,
-		saturday: -999
-	})
 );
 
 /* Create Meter Validation:
