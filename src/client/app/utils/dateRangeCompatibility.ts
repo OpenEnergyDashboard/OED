@@ -180,17 +180,17 @@ export function calculateThreeDDateRange(
 		threeDStartDate = drs.clone();
 	} else if (!drsBounded && dreBounded) {
 		// Case 2: unbounded, bounded
-		// Use DRE - numDays, DRE
-		threeDStartDate = dre.clone().subtract(numDays, 'days');
+		// Use DRE - (numDays - 1), DRE to get exactly numDays calendar days
+		threeDStartDate = dre.clone().subtract(numDays - 1, 'days');
 	} else if (drsBounded && !dreBounded) {
 		// Case 3: bounded, unbounded
-		// Use max(DRS, 3D end date - numDays), latest full day for this data source
-		const calculatedStart = threeDEndDate.clone().subtract(numDays, 'days');
+		// Use max(DRS, 3D end date - (numDays - 1)), latest full day for this data source
+		const calculatedStart = threeDEndDate.clone().subtract(numDays - 1, 'days');
 		threeDStartDate = moment.max(drs, calculatedStart);
 	} else {
 		// Case 4: unbounded, unbounded
-		// Use 3D end date - numDays, latest full day for this data source
-		threeDStartDate = threeDEndDate.clone().subtract(numDays, 'days');
+		// Use 3D end date - (numDays - 1), latest full day for this data source
+		threeDStartDate = threeDEndDate.clone().subtract(numDays - 1, 'days');
 	}
 
 	// Ensure start date is at beginning of day and end date is at end of day
@@ -198,7 +198,8 @@ export function calculateThreeDDateRange(
 	// threeDEndDate is already endOf('day')
 
 	// Ensure the calculated range doesn't exceed maxDays
-	const calculatedDays = threeDEndDate.diff(threeDStartDate, 'days');
+	// Add 1 to diff to get actual number of calendar days (inclusive of both start and end)
+	const calculatedDays = threeDEndDate.diff(threeDStartDate, 'days') + 1;
 	if (calculatedDays > maxDays) {
 		shouldWarn = true;
 		shouldShowGraph = false;
@@ -215,6 +216,12 @@ export function calculateThreeDDateRange(
 	// Ensure end date doesn't exceed maxDataDate
 	if (threeDEndDate.isAfter(validMaxDataDate)) {
 		threeDEndDate.set(validMaxDataDate.toObject());
+	}
+
+	// Ensure start date is not after end date (can happen if data range is too small)
+	if (threeDStartDate.isAfter(threeDEndDate)) {
+		shouldShowGraph = false;
+		shouldWarn = true;
 	}
 
 	const threeDInterval = new TimeInterval(threeDStartDate, threeDEndDate);
