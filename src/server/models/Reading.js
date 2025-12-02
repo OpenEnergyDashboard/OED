@@ -475,6 +475,55 @@ class Reading {
 		return groupThreeDData;
 	}
 
+	/**
+	 * Gets the data range (min and max timestamps) for a single meter
+	 * Used for 3D auto-adjustment to determine available data range
+	 * @param meterID The meter ID to get data range for
+	 * @param conn the connection to use
+	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
+	 */
+	static async getMeterDataRange(meterID, conn) {
+		const result = await conn.oneOrNone(`
+			SELECT 
+				MIN(start_timestamp) as min_date,
+				MAX(end_timestamp) as max_date
+			FROM readings 
+			WHERE meter_id = $1
+		`, [meterID]);
+		if (result && result.min_date && result.max_date) {
+			return {
+				minDate: result.min_date,
+				maxDate: result.max_date
+			};
+		}
+		return { minDate: null, maxDate: null };
+	}
+
+	/**
+	 * Gets the data range (min and max timestamps) for a group
+	 * Used for 3D auto-adjustment to determine available data range
+	 * @param groupID The group ID to get data range for
+	 * @param conn the connection to use
+	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
+	 */
+	static async getGroupDataRange(groupID, conn) {
+		const result = await conn.oneOrNone(`
+			SELECT 
+				MIN(r.start_timestamp) as min_date,
+				MAX(r.end_timestamp) as max_date
+			FROM readings r
+			INNER JOIN groups_deep_meters gdm ON r.meter_id = gdm.meter_id
+			WHERE gdm.group_id = $1
+		`, [groupID]);
+		if (result && result.min_date && result.max_date) {
+			return {
+				minDate: result.min_date,
+				maxDate: result.max_date
+			};
+		}
+		return { minDate: null, maxDate: null };
+	}
+
 	toString() {
 		return `Reading [id: ${this.meterID}, reading: ${this.reading}, startTimestamp: ${this.startTimestamp}, endTimestamp: ${this.endTimestamp}]`;
 	}

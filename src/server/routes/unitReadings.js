@@ -12,6 +12,7 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
+const { log } = require('../log');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -342,7 +343,7 @@ function validateGroupThreeDReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_id'],
 		properties: {
-			meter_ids: {
+			group_id: {
 				type: 'string',
 				// Matches a single integer value
 				pattern: '^\\d+$'
@@ -351,6 +352,16 @@ function validateGroupThreeDReadingsParams(params) {
 	};
 	const paramsValidationResult = validate(params, validParams);
 	return paramsValidationResult.valid;
+}
+
+// Simple validation for single meter ID (for dataRange endpoint)
+function validateSingleMeterID(params) {
+	return params.meter_id && /^\d+$/.test(params.meter_id);
+}
+
+// Simple validation for single group ID (for dataRange endpoint)
+function validateSingleGroupID(params) {
+	return params.group_id && /^\d+$/.test(params.group_id);
 }
 
 function validateThreeDQueryParams(queryParams) {
@@ -466,17 +477,27 @@ function createRouter() {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range - auto-adjustment handled on frontend
+			// Security: This is an open route (login not needed). Enforce MAX_3D_DAYS limit to prevent abuse.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-				const graphicUnitID = req.query.graphicUnitId;
-				const readingInterval = req.query.readingInterval;
-				const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
-				res.json(forJson);
+				// Calculate calendar days (inclusive of both start and end day) to match client calculation
+				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
+				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
+				// Security: Limit 3D to MAX_3D_DAYS (1095 days = 3 years) to prevent abuse from unauthenticated users.
+				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
+				if (durationInDays > 1095) {
+					res.sendStatus(400);
+				} else {
+					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+					const graphicUnitID = req.query.graphicUnitId;
+					const readingInterval = req.query.readingInterval;
+					// readingInterval is validated by validateThreeDQueryParams (1, 2, 3, 4, 6, 8, or 12 hours only)
+					const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
+					res.json(forJson);
+				}
 			}
 		}
 	});
@@ -486,47 +507,44 @@ function createRouter() {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range - auto-adjustment handled on frontend
+			// Security: This is an open route (login not needed). Enforce MAX_3D_DAYS limit to prevent abuse.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const groupID = req.params.group_id;
-				const graphicUnitID = req.query.graphicUnitId;
-				const readingInterval = req.query.readingInterval;
-				const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
-				res.json(forJson);
+				// Calculate calendar days (inclusive of both start and end day) to match client calculation
+				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
+				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
+				// Security: Limit 3D to MAX_3D_DAYS (1095 days = 3 years) to prevent abuse from unauthenticated users.
+				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
+				if (durationInDays > 1095) {
+					res.sendStatus(400);
+				} else {
+					const groupID = req.params.group_id;
+					const graphicUnitID = req.query.graphicUnitId;
+					const readingInterval = req.query.readingInterval;
+					// readingInterval is validated by validateThreeDQueryParams (1, 2, 3, 4, 6, 8, or 12 hours only)
+					const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
+					res.json(forJson);
+				}
 			}
 		}
 	});
 
-	// Route for getting data range for meter/group (for 3D auto-adjustment)
-	router.get('/dataRange/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
-		if (!validateMeterLineReadingsParams(req.params)) {
+	// Route for getting data range for a single meter (for 3D auto-adjustment)
+	router.get('/dataRange/meters/:meter_id', optionalAuthMiddleware, async (req, res) => {
+		if (!validateSingleMeterID(req.params)) {
+			log.warn(`Invalid meter ID for dataRange request: ${req.params.meter_id}`);
 			res.sendStatus(400);
 		} else {
-			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+			const meterID = Number(req.params.meter_id);
 			const conn = getConnection();
 			try {
-				const result = await conn.oneOrNone(`
-					SELECT 
-						MIN(start_timestamp) as min_date,
-						MAX(end_timestamp) as max_date
-					FROM readings 
-					WHERE meter_id = ANY($1)
-				`, [meterIDs]);
-				
-				if (result && result.min_date && result.max_date) {
-					res.json({
-						minDate: result.min_date,
-						maxDate: result.max_date
-					});
-				} else {
-					res.json({ minDate: null, maxDate: null });
-				}
+				const dataRange = await Reading.getMeterDataRange(meterID, conn);
+				res.json(dataRange);
 			} catch (error) {
-				console.error('Error getting meter data range:', error);
+				log.error('Error getting meter data range:', error);
 				res.sendStatus(500);
 			}
 		}
@@ -534,31 +552,17 @@ function createRouter() {
 
 	// Route for getting data range for group
 	router.get('/dataRange/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
-		if (!validateGroupThreeDReadingsParams(req.params)) {
+		if (!validateSingleGroupID(req.params)) {
+			log.warn(`Invalid group ID for dataRange request: ${req.params.group_id}`);
 			res.sendStatus(400);
 		} else {
-			const groupID = req.params.group_id;
+			const groupID = Number(req.params.group_id);
 			const conn = getConnection();
 			try {
-				const result = await conn.oneOrNone(`
-					SELECT 
-						MIN(r.start_timestamp) as min_date,
-						MAX(r.end_timestamp) as max_date
-					FROM readings r
-					INNER JOIN groups_deep_meters gdm ON r.meter_id = gdm.meter_id
-					WHERE gdm.group_id = $1
-				`, [groupID]);
-				
-				if (result && result.min_date && result.max_date) {
-					res.json({
-						minDate: result.min_date,
-						maxDate: result.max_date
-					});
-				} else {
-					res.json({ minDate: null, maxDate: null });
-				}
+				const dataRange = await Reading.getGroupDataRange(groupID, conn);
+				res.json(dataRange);
 			} catch (error) {
-				console.error('Error getting group data range:', error);
+				log.error('Error getting group data range:', error);
 				res.sendStatus(500);
 			}
 		}
