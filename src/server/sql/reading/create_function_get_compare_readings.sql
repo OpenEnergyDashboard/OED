@@ -67,6 +67,8 @@ BEGIN
 			hourly.meter_id AS meter_id,
 			SUM(hourly.reading_rate) AS reading
 		FROM meter_hourly_readings_unit hourly
+		-- This is getting the conversion for the meter and unit to graph.
+		-- The slope and intercept are used above the transform the reading to the desired unit.
 		WHERE
 			-- The range requested must be completely within the hour so partial hours are not included.
 			curr_tsrange @> hourly.time_interval AND
@@ -79,6 +81,8 @@ BEGIN
 			hourly.meter_id AS meter_id,
 			SUM(hourly.reading_rate) AS reading
 		FROM meter_hourly_readings_unit hourly
+		-- This is getting the conversion for the meter and unit to graph.
+		-- The slope and intercept are used above the transform the reading to the desired unit.
 		WHERE
 			-- The range requested must be completely within the hour so partial hours are not included.
 			prev_tsrange @> hourly.time_interval AND
@@ -154,6 +158,7 @@ BEGIN
 		FROM group_hourly_readings_unit hourly
 		WHERE curr_tsrange @> hourly.time_interval
 		AND requested_graphic_unit_id = hourly.graphic_unit_id
+		AND hourly.group_id = ANY(group_ids) 
 		GROUP BY hourly.group_id
 	),
 	prev_period AS (
@@ -163,6 +168,7 @@ BEGIN
 		FROM group_hourly_readings_unit hourly
 		WHERE prev_tsrange @> hourly.time_interval
 		AND requested_graphic_unit_id = hourly.graphic_unit_id
+		AND hourly.group_id = ANY(group_ids) 
 		GROUP BY hourly.group_id
 	)
 	SELECT
@@ -176,5 +182,3 @@ BEGIN
 		LEFT JOIN curr_period ON gids.id = curr_period.group_id;
 END;
 $$ LANGUAGE 'plpgsql';
-
-

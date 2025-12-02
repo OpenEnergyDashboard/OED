@@ -1,3 +1,7 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 -- Current Working Versions, not dependent on old hourly_readings_unit view, uses a CTE instead
 -- This version only handles 1 conversion per hourly reading
 -- It can not handle multiple conversions per reading or conversions that overlap the time interval.

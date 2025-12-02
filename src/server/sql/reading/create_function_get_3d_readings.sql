@@ -44,10 +44,6 @@ AS $$
 DECLARE
 	-- Holds the range of dates for returned data that fits the actual data.
 	requested_range TSRANGE;
-	-- The slope of the conversion from meter to graphing units
-	slope FLOAT;
-   -- The intercept of the conversion from meter to graphing units
-	intercept FLOAT;
 	-- The length of each reading returned as an interval
 	reading_length_interval INTERVAL;
 	-- Which index of the meter_id array you are currently working on.
@@ -151,6 +147,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* Gets group meters graphing data for 3D graphic by returning points that span the requested
+  length of time over the days requested. 
+*/
 CREATE OR REPLACE FUNCTION group_3d_readings_unit (
 	--Desire group ID
 	--For 3D graphics, users will only be able to select 1 group to graph.

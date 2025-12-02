@@ -9,6 +9,7 @@ Trying to only use case statements led to issues so the following functions
 mix case and if statements.
 */
 
+-- We need a gist index to support the @> operation.
 CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 /*
@@ -115,6 +116,16 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+/**
+The next two create a view/table that takes the raw/meter readings and averages them for each day or hour AND applies
+the unit conversions from the cik table.
+This is used by the line graph function below to make them faster since the values
+are already averaged and the conversions applied. There are two types of readings: quantity and flow/raw. The quantity
+readings must be normalized by their time length. The flow/raw readings are already by time
+so they are just averaged. The one table contains both types of readings but are now equivalent
+so the line reading functions can use them both in the same way.
+ */
+
 -- Current Working Versions, not dependent on old hourly_readings_unit view, uses a CTE instead
 -- This version only handles 1 conversion per hourly reading
 -- It can not handle multiple conversions per reading or conversions that overlap the time interval.
@@ -129,7 +140,7 @@ WITH base_hourly AS (
 		WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
 			(
 			SUM(
-				-- Reading rate in kw
+				-- Reading rate
 				(r.reading * 3600 / EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp))) *
 				-- The number of seconds that the reading shares with the interval
 				EXTRACT(EPOCH FROM LEAST(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - GREATEST(r.start_timestamp, gen.interval_start))
@@ -159,7 +170,7 @@ WITH base_hourly AS (
 			MAX(
 			-- Extract the maximum rate over each day
 			(
-				-- Reading rate in kw
+				-- Reading rate
 				(r.reading * 3600 / EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp))) *
 				-- The number of seconds that the reading shares with the interval
 				EXTRACT(EPOCH FROM LEAST(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - GREATEST(r.start_timestamp, gen.interval_start))
@@ -171,7 +182,7 @@ WITH base_hourly AS (
 			-- For flow and raw data the max/min is per minute, so we multiply the max/min by 24 hrs * 60 min
 			MAX(
 			(
-				-- Reading rate in kw
+				-- Reading rate
 				(r.reading * 3600 / u.sec_in_rate) *
 				-- The number of seconds that the reading shares with the interval
 				EXTRACT(EPOCH FROM LEAST(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - GREATEST(r.start_timestamp, gen.interval_start))
@@ -186,7 +197,7 @@ WITH base_hourly AS (
 			MIN(
 			--Extract the minimum rate over each day
 			(
-				-- Reading rate in kw
+				-- Reading rate
 				(r.reading * 3600 / EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp))) *
 				-- The number of seconds that the reading shares with the interval
 				EXTRACT(EPOCH FROM LEAST(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - GREATEST(r.start_timestamp, gen.interval_start))
@@ -197,7 +208,7 @@ WITH base_hourly AS (
 		WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN
 			MIN(
 			(
-				-- Reading rate in kw
+				-- Reading rate
 				(r.reading * 3600 / u.sec_in_rate) *
 				-- The number of seconds that the reading shares with the interval
 				EXTRACT(EPOCH FROM LEAST(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - GREATEST(r.start_timestamp, gen.interval_start))
@@ -210,6 +221,7 @@ WITH base_hourly AS (
 		tsrange(gen.interval_start, gen.interval_start + INTERVAL '1 hour', '()') AS time_interval
 
 	FROM readings r
+	-- This sequence of joins takes the meter id to its unit and a unit.
 	INNER JOIN meters m ON r.meter_id = m.id
 	INNER JOIN units u ON m.unit_id = u.id
 	CROSS JOIN LATERAL generate_series(
@@ -222,18 +234,19 @@ WITH base_hourly AS (
 )
 SELECT
 	m.id AS meter_id,
-  	SUM(bh.reading_rate * c.slope + c.intercept) AS reading_rate,
-  	SUM(bh.min_rate     * c.slope + c.intercept) AS min_rate,
-  	SUM(bh.max_rate     * c.slope + c.intercept) AS max_rate,
-  	bh.time_interval,
-  	c.destination_id AS graphic_unit_id
+	SUM(bh.reading_rate * c.slope + c.intercept) AS reading_rate,
+	SUM(bh.min_rate     * c.slope + c.intercept) AS min_rate,
+	SUM(bh.max_rate     * c.slope + c.intercept) AS max_rate,
+	bh.time_interval,
+	c.destination_id AS graphic_unit_id
 
 FROM base_hourly bh
 JOIN meters m ON m.id = bh.meter_id
 JOIN units  u ON u.id = m.unit_id
 JOIN cik c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && bh.time_interval
 GROUP BY m.id, graphic_unit_id, bh.time_interval
-ORDER BY meter_id;
+-- The order by ensures that the materialized view will be clustered in this way.
+ORDER BY bh.time_interval, meter_id;
 
 -- Used by the line/3d/compare functions.
 CREATE INDEX if not exists idx_meter_hourly_ordering ON meter_hourly_readings_unit (meter_id, graphic_unit_id, lower(time_interval));
@@ -284,7 +297,7 @@ group_daily_readings_unit
 -- Index on interval, graphic_unit_id, group_id
 CREATE INDEX if not exists idx_group_daily_readings_unit ON group_daily_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
---Modified to use meter_hourly_readings_unit in stead of old hourly_readings_unit view.
+--Modified to use meter_hourly_readings_unit instead of old hourly_readings_unit view.
 --No longer needs to apply conversions since that is done in meter_hourly_readings_unit view.
 CREATE MATERIALIZED VIEW IF NOT EXISTS
 group_hourly_readings_unit
@@ -630,7 +643,8 @@ end_timestamp: The end timestamp of the data to return.
 -- New version of meter_bar_readings_unit that uses the new meter_daily_readings_unit view.
 CREATE OR REPLACE FUNCTION meter_bar_readings_unit (
 	meter_ids INTEGER[],
-	passed_graphic_unit_id INTEGER, -- This is the graphic unit id, changed from graphic_unit_id to avoid confusion with the graphic unit id in the view.
+	-- This is the graphic unit id, changed from graphic_unit_id to avoid confusion with the graphic unit id in the view.
+	passed_graphic_unit_id INTEGER,
 	bar_width_days INTEGER,
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP
@@ -675,8 +689,6 @@ BEGIN
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
 
-	RAISE NOTICE 'real_start_stamp: %, real_end_stamp: %, num_bars: %',
-	real_start_stamp, real_end_stamp, num_bars;
 
 	RETURN QUERY
 		SELECT
