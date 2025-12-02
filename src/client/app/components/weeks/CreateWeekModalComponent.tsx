@@ -83,51 +83,6 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 		resetState();
 	};
 
-	// TEST
-	const generateRruleTest = async (weekIndex: number) => {
-		const week = weeks?.[weekIndex];
-		if (!week) return console.warn("No week found at index", weekIndex);
-
-		const weekDayIds = [
-			week.sunday,
-			week.monday,
-			week.tuesday,
-			week.wednesday,
-			week.thursday,
-			week.friday,
-			week.saturday,
-		].filter(Boolean);
-
-		// get only unique dayIds (convert to Set then Array again)
-		const uniqueWeekDayIds = Array.from(new Set(weekDayIds.map(obj => 
-														JSON.stringify(obj))))
-																.map(e => JSON.parse(e));
-
-		// console.log("DEBUG: uniqueWeekDayIds:", uniqueWeekDayIds);
-		
-		// Fetch all daySegments for each day in the week (parallel requests)
-    const segmentPromises = uniqueWeekDayIds.map((dayId) =>
-      fetchDaySegments(dayId).unwrap()
-    );
-
-    // Wait for all responses
-    const daySegmentResponses = await Promise.all(segmentPromises);
-
-		// console.log("DEBUG: daySegmentResponses:", daySegmentResponses);
-
-    // Flatten and annotate each with its corresponding dayId
-    const daySegmentsForWeek = uniqueWeekDayIds.map((dayId, i) => ({
-      dayId,
-      segments: daySegmentResponses[i],
-    }));
-
-		// console.log("DEBUG: week:", week);
-    // console.log("DEBUG: daySegmentsForWeek:", daySegmentsForWeek);
-
-    // Pass data to generator
-    generateRrule(week, daySegmentsForWeek);
-	};
-
 	// Function to reset the week details to default values. Called when modal is closed.
 	const resetState = () => {
 		setWeekDetails(defaultValues);
@@ -171,10 +126,6 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 			{/* Show create modal button */}
 			<Button color="secondary" onClick={handleShowModal}>
 				<FormattedMessage id="week.create" />
-			</Button>
-
-			<Button color="secondary" onClick={() => generateRruleTest(2)}>
-				Generate Rrule
 			</Button>
 
 			<Modal

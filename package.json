@@ -47,7 +47,7 @@
 		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
 		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'",
 		"timeVaryingPathConversion": "node -e 'require(\"./src/server/services/graph/timeVaryingPathConversion.js\").timeVaryingPathConversion()'",
-		"updateCikVaryAndViews": "node -e 'require(\"./src/server/services/graph/redoCik.js\").redoCik()'"
+		"updateCikVaryAndViews": "node -e 'require(\"./src/server/services/graph/redoCik.js\").updateCikVaryAndViews()'"
 	},
 	"nodemonConfig": {
 		"watch": [
