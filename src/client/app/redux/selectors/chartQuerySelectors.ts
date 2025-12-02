@@ -198,17 +198,21 @@ export const selectThreeDQueryArgs = createSelector(
 	selectSelectedUnit,
 	selectThreeDState,
 	(queryTimeInterval, threeDInterval, selectedUnit, threeD) => {
-		// Use the calculated 3D interval if available, otherwise fall back to queryTimeInterval
-		const intervalToUse = threeDInterval || queryTimeInterval;
+		// Use the calculated 3D interval if available (it should always be bounded)
+		// Skip query if no meter/group selected or if threeDInterval is not ready yet
+		const shouldSkipQuery = !threeD.meterOrGroupID || !threeDInterval || !threeDInterval.getIsBounded();
+		// Only compute args if we're not skipping the query
+		if (shouldSkipQuery) {
+			return { args: undefined, shouldSkipQuery: true };
+		}
+
 		const args: ThreeDReadingApiArgs = {
 			id: threeD.meterOrGroupID!,
-			timeInterval: roundTimeIntervalForFetch(intervalToUse).toString(),
+			timeInterval: roundTimeIntervalForFetch(threeDInterval).toString(),
 			graphicUnitId: selectedUnit,
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
 		};
-		// Skip query if no meter/group selected or if interval is not bounded
-		const shouldSkipQuery = !threeD.meterOrGroupID || !intervalToUse.getIsBounded();
 		return { args, shouldSkipQuery };
 	}
 );

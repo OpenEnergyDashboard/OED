@@ -39,7 +39,8 @@ const defaultState: GraphState = {
 		meterOrGroupID: undefined,
 		meterOrGroup: undefined,
 		readingInterval: ReadingInterval.Hourly,
-		numDays: undefined // Default to undefined, will use 1 year (365 days) if not set
+		// Default to undefined, will use 1 year (365 days) if not set
+		numDays: undefined
 	},
 	hotlinked: false,
 	shiftAmount: ShiftAmount.none,

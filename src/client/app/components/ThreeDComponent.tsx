@@ -12,14 +12,25 @@ import { useAppSelector, useAppDispatch } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
-import { selectGraphState } from '../redux/slices/graphSlice';
-import { updateTimeInterval, updateThreeDInterval, selectThreeDNumDays, selectQueryTimeInterval, selectThreeDMeterOrGroup } from '../redux/slices/graphSlice';
+import {
+	selectGraphState,
+	updateThreeDInterval,
+	selectThreeDNumDays,
+	selectQueryTimeInterval,
+	selectThreeDMeterOrGroup
+} from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
 import { MeterDataByID } from '../types/redux/meters';
 import { UnitDataById } from '../types/redux/units';
-import { isValidThreeDInterval, roundTimeIntervalForFetch, calculateThreeDDateRange, getEffectiveNumDays, MAX_3D_DAYS } from '../utils/dateRangeCompatibility';
+import {
+	isValidThreeDInterval,
+	roundTimeIntervalForFetch,
+	calculateThreeDDateRange,
+	getEffectiveNumDays,
+	MAX_3D_DAYS
+} from '../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 // Both translates are used since some are in the function component where the React Hook is okay
@@ -42,7 +53,8 @@ export default function ThreeDComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	// When shouldSkipQuery is true, args is undefined but the query won't execute, so the non-null assertion is safe
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args!, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
@@ -109,7 +121,8 @@ export default function ThreeDComponent() {
 		} else if (!result.shouldWarn) {
 			prevWarningRef.current = false;
 		}
-	}, [meterOrGroupID, dataRange, queryTimeInterval, numDays, dispatch, threeDMeterOrGroup, translate]);
+		// dispatch and translate are stable and don't need to be in dependencies
+	}, [meterOrGroupID, dataRange, queryTimeInterval, numDays, threeDMeterOrGroup]);
 
 	// Initialize Default values
 	const threeDData = data;
