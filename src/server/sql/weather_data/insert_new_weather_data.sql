@@ -4,5 +4,5 @@
 
 DO $$ BEGIN
   INSERT INTO weather_data (weather_location_id, start_time, end_time, temperature)
-  VALUES (${weatherLocationId}, '${startTime}', '${endTime}', ${temperature});
+  VALUES (${weatherLocationId}, ${startTime}, ${endTime}, ${temperature});
 END $$;

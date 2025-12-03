@@ -9,9 +9,10 @@
 // Attribution
 // <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a>
 
-// TODO: Fetch data by user gps/ user input
+// TODO Fetch data by user gps/ user input
 const { fetchWeatherApi } = require('openmeteo');
-// const moment = require('moment');
+const moment = require('moment');
+
 // Updated function to accept startDate and endDate parameters
 function fetchWeatherData(latitude, longitude, startDate, endDate) {
 	const params = {
@@ -21,7 +22,7 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 		"end_date": endDate,
 		"hourly": "temperature_2m",
 		"temperature_unit": "fahrenheit",
-		"timezone": "America/Los_Angeles" // TODO: should not be static
+		"timezone": "America/New_York" // TODO: should not be static
 	};
 	const url = "https://archive-api.open-meteo.com/v1/archive";
 
@@ -59,7 +60,8 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 		// }
 		// Instead of logging, return the formatted weather data
 		return weatherData.hourly.time.map((time, index) => ({
-			time: time,
+			// TODO Lock to correct timezone.
+			time: moment(time),
 			temperature: weatherData.hourly.temperature2m[index]
 		}));
 	}).catch(err => {
@@ -107,4 +109,4 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 // 	});
 // }
 
-// module.exports = { fetchWeatherData };
+module.exports = { fetchWeatherData };

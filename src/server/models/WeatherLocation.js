@@ -72,7 +72,9 @@ class WeatherLocation {
         if (weatherLocation.id !== undefined) {
             throw new Error('Attempted to insert a weatherLocation that already has an ID');
         }
-        await conn.none(sqlFile('weather_location/insert_new_weather_location.sql'), weatherLocation);
+        const resp = await conn.one(sqlFile('weather_location/insert_new_weather_location.sql'), weatherLocation);
+		// resp = { id: 42 }, hence this line
+		this.id = resp.id;
     }
 
     /**

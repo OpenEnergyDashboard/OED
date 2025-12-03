@@ -76,9 +76,17 @@ function validateWeatherLocationParams(params) {
 	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
 }
 
+/**
+ * Fetches and inserts weather data for a newly created weather location.
+ * If the location has no existing weather data, it retrieves data starting from the earliest reading timestamp.
+ * @param location - Instance of WeatherLocation.
+ * @param conn - The database connection.
+ */
 async function addWeatherDataForLocation(location, conn) {
+	// Find last timestamp for that location 
 	let earliestDate = await WeatherData.getLatestTimeStamp(location.id, conn);
 
+	// If no weather data exists, use earliest reading timestamp
 	if (earliestDate === null) {
 		earliestDate = await Reading.getEarliestTimeStamp(conn);
 		if (earliestDate === null) {
@@ -87,12 +95,14 @@ async function addWeatherDataForLocation(location, conn) {
 		}
 	}
 
+	// Round to the hour and prepare date range
 	// const roundedearliestDate = earliestDate.startOf('hour');
 	// earliestDate = earliestDate.format('YYYY-MM-DD');
 	earliestDate = '2025-12-01';
 	// const latestDate = moment().format('YYYY-MM-DD');
 	const latestDate = moment('2025-12-02').format('YYYY-MM-DD');
 
+	// Fetch weather data for this location's coordinates
 	const weatherData = await fetchWeatherData(
 		location.gps.latitude,
 		location.gps.longitude,
@@ -100,9 +110,11 @@ async function addWeatherDataForLocation(location, conn) {
 		latestDate
 	);
 
+	// Insert weather data records
 	if (weatherData) {
 		await conn.tx(async t => {
 			for (const data of weatherData) {
+				// TODO Verify that data.time is start of the weather value and always getting one hour of data. 
 				const endDate = data.time.clone().add(1, 'hours');
 				const newData = new WeatherData(
 					location.id,
@@ -134,23 +146,6 @@ router.post('/addWeatherLocation', adminAuthMiddleware('add weather locations'),
 				req.body.note
 			);
 			await newLocation.insert(conn);
-			//   const earliestMoment = await Reading.getEarliestTimeStamp(conn);
-
-			//   const earliestDate = earliestMoment.format('YYYY-MM-DD');
-			//   const latestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
-
-			//   const weatherData = fetchWeatherData(newLocation.latitude, newLocation.longitude, earliestDate, latestDate);
-
-			//   // Assuming weatherData is an array of {time, temperature}
-			//   for (const data of weatherData) {
-			//     const newData = new WeatherData({
-			//         weather_location_id: newLocation.id,  // Assuming this ID is returned or accessible after insertion
-			//         start_time: data.time,
-			//         end_time: latestDate,  // Assuming end_time is the 3 days ago (this might need to be changed)
-			//         temperature: data.temperature
-			//     });
-			//     await newData.insert(t);
-			// }
 			await addWeatherDataForLocation(newLocation, conn);
 			res.json(formatWeatherLocationForResponse(newLocation));
 		} catch (err) {
@@ -186,11 +181,11 @@ router.post('/delete', adminAuthMiddleware('delete weather locations'), async (r
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
 			await WeatherLocation.delete(req.body.id, conn);
 		} catch (err) {
-			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			const errorMsg = `Error while deleting weather location with error(s): ${err}`;
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
-		success(res, 'Successfully deleted conversion');
+		success(res, 'Successfully deleted weather location');
 	}
 });
 

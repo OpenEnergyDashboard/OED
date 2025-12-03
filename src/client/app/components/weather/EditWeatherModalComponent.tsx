@@ -159,11 +159,11 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		deleteLocation(state.id)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('weather.successfully.delete.location"'));
+				showSuccessNotification(translate('weather.successfully.delete.location'));
 				handleClose();
 			})
 			.catch(error => {
-				showErrorNotification(translate('"weather.failed.to.delete.location"') + error.data);
+				showErrorNotification(translate('weather.failed.to.delete.location') + error.data);
 			});
 	};
 	// Toggles Delete Warning Modal
