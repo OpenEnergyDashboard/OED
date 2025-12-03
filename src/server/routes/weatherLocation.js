@@ -12,6 +12,8 @@ const Reading = require('../models/Reading');
 const validate = require('jsonschema').validate;
 const Point = require('../models/Point');
 const { success, failure } = require('./response');
+const WeatherData = require('../models/WeatherData');
+const { fetchWeatherData } = require('../services/weather/fetchData')
 
 const router = express.Router();
 
@@ -74,6 +76,46 @@ function validateWeatherLocationParams(params) {
 	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
 }
 
+async function addWeatherDataForLocation(location, conn) {
+	let earliestDate = await WeatherData.getLatestTimeStamp(location.id, conn);
+
+	if (earliestDate === null) {
+		earliestDate = await Reading.getEarliestTimeStamp(conn);
+		if (earliestDate === null) {
+			log.warn('addWeatherDataForLocation(): Cannot find earliest time from WeatherData or Reading.');
+			return;
+		}
+	}
+
+	// const roundedearliestDate = earliestDate.startOf('hour');
+	// earliestDate = earliestDate.format('YYYY-MM-DD');
+	earliestDate = '2025-12-01';
+	// const latestDate = moment().format('YYYY-MM-DD');
+	const latestDate = moment('2025-12-02').format('YYYY-MM-DD');
+
+	const weatherData = await fetchWeatherData(
+		location.gps.latitude,
+		location.gps.longitude,
+		earliestDate,
+		latestDate
+	);
+
+	if (weatherData) {
+		await conn.tx(async t => {
+			for (const data of weatherData) {
+				const endDate = data.time.clone().add(1, 'hours');
+				const newData = new WeatherData(
+					location.id,
+					data.time,
+					endDate,
+					data.temperature
+				);
+				await newData.insert(t);
+			}
+		});
+	}
+}
+
 /**
  * Route for POST add weather location.
  */
@@ -92,8 +134,6 @@ router.post('/addWeatherLocation', adminAuthMiddleware('add weather locations'),
 				req.body.note
 			);
 			await newLocation.insert(conn);
-			res.json(formatWeatherLocationForResponse(newLocation));
-
 			//   const earliestMoment = await Reading.getEarliestTimeStamp(conn);
 
 			//   const earliestDate = earliestMoment.format('YYYY-MM-DD');
@@ -111,7 +151,8 @@ router.post('/addWeatherLocation', adminAuthMiddleware('add weather locations'),
 			//     });
 			//     await newData.insert(t);
 			// }
-
+			await addWeatherDataForLocation(newLocation, conn);
+			res.json(formatWeatherLocationForResponse(newLocation));
 		} catch (err) {
 			log.error(`Error while inserting new weather location ${err}`, err);
 			failure(res, 500, `Error while inserting new weather location ${err}`);
