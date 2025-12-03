@@ -59,7 +59,7 @@ if [ -f ".env" ]; then
 fi
 
 # Creating a centralized variable to keep track of the type of installation. 
-INSTALL_MODE="invalid"
+INSTALL_MODE="production"
 
 if [ "$production" = "yes" ] || [ "$OED_PRODUCTION" = "yes" ]; then
 	INSTALL_MODE="production"
@@ -245,36 +245,20 @@ if [ "$dostart" == "yes" ]; then
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
 			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
 			POSTGRES_PASSWORD=$(openssl rand -base64 12)
-			export POSTGRES_PASSWORD
-
+			node ./src/scripts/changePass.js "$POSTGRES_PASSWORD"
 			printf "\n********************************************************************************\n"
-			printf "Generated PostgreSQL password: %s\n" "$POSTGRES_PASSWORD"
-			printf "\nMake sure to save or change this value"
-			printf "********************************************************************************\n\n"
-
-			# Save to .env
-			if [ -f ".env" ]; then
-				if grep -q "^POSTGRES_PASSWORD=" .env; then
-					sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$POSTGRES_PASSWORD/" .env
-				else
-					echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> .env
-				fi
-			else
-				echo "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" > .env
-			fi
+			printf "Generated POSTGRES_PASSWORD: %s\n" "$POSTGRES_PASSWORD"
+			printf "\n Make sure to save or change this value"
+			printf "\n********************************************************************************\n\n"
 		fi
 		npm run start
-	elif [ "$INSTALL_MODE" = "development" ]; then
+	else
 		# Warning the user if they've left their token or postgres password default, we don't randomly generate it in dev mode 
 		if [ -z "$OED_TOKEN_SECRET" ] || [ "$OED_TOKEN_SECRET" = "?" ]; then
-			printf "\n********************************************************************************\n"
-			printf "WARNING: YOU ARE USING OED IN DEVELOPMENT MODE WITH THE DEFAULT OED_TOKEN_SECRET SET IN docker-compose.yml IF THIS IS NOT INTENTIONAL GO THERE TO CHANGE IT.\n"
-			printf "********************************************************************************\n\n"
+			printf "Warning: you are using OED in development mode with the default OED_TOKEN_SECRET set in docker-compose.yml. If this is not intentional, please update it there.\n"
 		fi
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
-			printf "\n********************************************************************************\n"
-			printf "* WARNING: YOU ARE USING OED IN DEVELOPMENT MODE WITH THE DEFAULT POSTGRESQL PASSWORD SET IN docker-compose.yml IF THIS IS NOT INTENTIONAL GO THERE TO CHANGE IT. *\n"
-			printf "********************************************************************************\n\n"
+			printf "* Warning: you are using OED in development mode with the default PostgreSQL password set in docker-compose.yml. If this is not intentional, please update it there. *\n"			printf "********************************************************************************\n\n"
 		fi
 		printf "%s\n" "Starting OED in development mode."
 		./src/scripts/devstart.sh

@@ -15,7 +15,7 @@ services:
             - PGDATA=/var/lib/postgresql/data/pgdata
             # In development password may (and should be) be manually changed.
             # In production it will be automatically changed and stored in .env
-            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pleaseChange}
+            - POSTGRES_PASSWORD=pleaseChange
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
         healthcheck:
