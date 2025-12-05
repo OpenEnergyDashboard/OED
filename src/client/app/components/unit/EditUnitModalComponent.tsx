@@ -441,7 +441,6 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				actionConfirmMessage={deleteConfirmationMessage}
 				handleClose={handleCancelModalClose}
 				actionFunction={handleCancelModalClose}
-				actionConfirmText={translate('ok')}
 				actionRejectText={translate('cancel')}
 				forceCancel={true} />
 			<ConfirmActionModalComponent
