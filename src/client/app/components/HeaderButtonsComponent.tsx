@@ -158,12 +158,16 @@ export default function HeaderButtonsComponent() {
 		}
 	};
 
-	// Handle modal visibility
-	type ModalType = 'login' | 'changePassword' | null;
-	const [modalType, setModalType] = useState<ModalType>(null);
+	// enum to handle modal visibility
+	enum ModalType {
+		LOGIN = 'login',
+		CHANGE_PASSWORD = 'changePassword',
+		NONE = 'none'
+	}
+	const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
 
 	const handleClose = () => {
-		setModalType(null);
+		setModalType(ModalType.NONE);
 	};
 
 	const handleShow = (type: ModalType) => {
@@ -291,7 +295,7 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem divider />
 							<DropdownItem
 								style={state.loginLinkStyle}
-								onClick={() => handleShow('login')}>
+								onClick={() => handleShow(ModalType.LOGIN)}>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem
@@ -301,7 +305,7 @@ export default function HeaderButtonsComponent() {
 							</DropdownItem>
 							<DropdownItem
 								style={state.logoutLinkStyle}
-								onClick={() => handleShow('changePassword')}>
+								onClick={() => handleShow(ModalType.CHANGE_PASSWORD)}>
 								<FormattedMessage id='password.change' />
 							</DropdownItem>
 							<DropdownItem divider />
