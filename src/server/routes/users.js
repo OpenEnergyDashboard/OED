@@ -269,7 +269,7 @@ router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
 	};
 const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to change password with invalid parameter, errors: ${validatorResult.errors}`);
+		log.warn(`Got request to change password with invalid parameters, errors: ${validatorResult.errors}`);
 		res.status(400).json({ message: 'Invalid params' });
 	} else {
 		try {
