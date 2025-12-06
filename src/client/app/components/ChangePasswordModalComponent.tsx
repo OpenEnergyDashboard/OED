@@ -23,7 +23,7 @@ interface ChangePasswordModalComponentProps {
  */
 export default function ChangePasswordModalComponent(props: ChangePasswordModalComponentProps) {
 	const translate = useTranslate();
-	
+
 	// If there are no changes, then save is disabled
 	const [canSave, setCanSave] = useState(false);
 
@@ -188,7 +188,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 									invalid={!passwordDetails.passwordMatch}
 								/>
 								<FormFeedback>
-										{translate('user.password.mismatch')}
+									{translate('user.password.mismatch')}
 								</FormFeedback>
 							</FormGroup>
 						</Col>
