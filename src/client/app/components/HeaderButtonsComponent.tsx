@@ -302,7 +302,7 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem
 								style={state.logoutLinkStyle}
 								onClick={() => handleShow('changePassword')}>
-								<FormattedMessage id='change.password' />
+								<FormattedMessage id='password.change' />
 							</DropdownItem>
 							<DropdownItem divider />
 							<DropdownItem
@@ -333,7 +333,7 @@ export default function HeaderButtonsComponent() {
 				{modalType === 'changePassword' && (
 					<Modal isOpen toggle={handleClose}>
 						<ModalHeader>
-							{translate('change.password')}
+							{translate('password.change')}
 						</ModalHeader>
 						<ModalBody>
 							<ChangePasswordModalComponent handleClose={handleClose} />
