@@ -236,7 +236,8 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const { username } = req.body;
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
-			if (user.username === username) {// Admins cannot delete themselves
+			// Admins cannot delete themselves
+			if (user.username === username) {
 				res.sendStatus(400);
 			} else {
 				await User.deleteUser(username, conn);
