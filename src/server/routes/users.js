@@ -10,7 +10,6 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
-const { resetWarningCache } = require('prop-types');
 const secretToken = require('../config').secretToken;
 
 const router = express.Router();
@@ -268,37 +267,40 @@ router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
 			}
 		}
 	};
-if (!validate(req.body, validParams).valid) {
-	res.status(400).json({ message: 'Invalid params' });
-	return;
-}
-try {
-	const conn = getConnection();
-	const userId = req.decoded.data; // From the authenticated token
-	const { currentPassword, newPassword } = req.body;
+const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		log.warn(`Got request to change password with invalid parameter, errors: ${validatorResult.errors}`);
+		res.status(400).json({ message: 'Invalid params' });
+	} else {
+		try {
+			const conn = getConnection();
+			// From the authenticated token
+			const userId = req.decoded.data;
+			const { currentPassword, newPassword } = req.body;
 
-	// Get the current user
-	const user = await User.getByID(userId, conn);
-	if (user === null) {
-		res.status(401).json({ message: 'User not found' });
-		return;
-	}
+			// Get the current user
+			const user = await User.getByID(userId, conn);
+			if (user === null) {
+				res.status(401).json({ message: 'User not found' });
+				return;
+			}
 
-	// Verify current password
-	const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
-		if (!isValidPassword) {
-			// Return 400 (Bad Request) instead of 401 to avoid invalidating the token
-			res.status(400).json({ message: 'Current password is incorrect' });
-			return;
+			// Verify current password
+			const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
+			if (!isValidPassword) {
+				// Return 400 (Bad Request) instead of 401 to avoid invalidating the token
+				res.status(400).json({ message: 'Current password is incorrect' });
+				return;
+			}
+
+			// Hash and update the new password
+			const hashedPassword = await bcrypt.hash(newPassword, 10);
+			await User.updateUserPassword(userId, hashedPassword, conn);
+			res.sendStatus(200);
+		} catch (error) {
+			log.error('Error while performing change password request', error );
+			res.status(500).json({ message: 'Internal Server Error', error: error } );
 		}
-
-		// Hash and update the new password
-		const hashedPassword = await bcrypt.hash(newPassword, 10);
-		await User.updateUserPassword(userId, hashedPassword, conn);
-		res.sendStatus(200);
-	} catch (error) {
-		log.error('Error while performing change password request', error );
-		res.status(500).json({ message: 'Internal Server Error', error: error } );
 	}
 });
 
