@@ -11,7 +11,6 @@ import { selectCurrentUserProfile } from '../redux/slices/currentUserSlice';
 import { User } from '../types/items';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
-import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
 
 interface ChangePasswordModalComponentProps {
 	handleClose: () => void;
@@ -24,9 +23,7 @@ interface ChangePasswordModalComponentProps {
  */
 export default function ChangePasswordModalComponent(props: ChangePasswordModalComponentProps) {
 	const translate = useTranslate();
-
-	// Boolean that updates if any change is made to user modal
-	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	
 	// If there are no changes, then save is disabled
 	const [canSave, setCanSave] = useState(false);
 
@@ -115,29 +112,13 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 				showSuccessNotification(translate('password.successfully.changed'));
 				resetPasswordFields();
 			})
-			.catch(error => {
-				showErrorNotification(translate('password.failed.to.change') + ' ' + error.data.message);
+			.catch(() =>{
+				showErrorNotification(translate('password.failed.to.change'));
 			});
 	};
 
 	return (
 		<>
-			{/* Unsaved Warning Component */}
-			{showUnsavedWarning && (
-				<SimpleUnsavedWarningComponent
-					isOpen={showUnsavedWarning}
-					onDiscard={() => {
-						setShowUnsavedWarning(false);
-						handleCloseModal();
-					}}
-					onConfirm={() => {
-						setShowUnsavedWarning(false);
-						handleSaveChanges();
-					}}
-					onCancel={() => setShowUnsavedWarning(false)}
-					disabled={!canSave || !isFormValid()}
-				/>
-			)}
 			<div>
 				<Container>
 					<Row>
@@ -207,7 +188,7 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 									invalid={!passwordDetails.passwordMatch}
 								/>
 								<FormFeedback>
-									{translate('user.password.mismatch')}
+										{translate('user.password.mismatch')}
 								</FormFeedback>
 							</FormGroup>
 						</Col>
