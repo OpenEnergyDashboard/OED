@@ -11,7 +11,6 @@ const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
-const { resetWarningCache } = require('prop-types');
 
 /**
  * Middleware function to force a route to require authentication
@@ -221,7 +220,7 @@ function requireAuthMiddleware(req, res, next) {
 	} else if (token) {
 		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
-				res.status(401).json({ success: false, message: 'Falied token verification'});
+				res.status(401).json({ success: false, message: 'Failed token verification'});
 			} else {
 				try {
 					const conn = getConnection();
