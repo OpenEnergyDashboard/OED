@@ -116,6 +116,12 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
+/*
+This may still apply.
+The following views are all generated.
+This is necessary because they can't be wrapped in a function (otherwise predicates would not be pushed down).
+*/
+
 /**
 The next two create a view/table that takes the raw/meter readings and averages them for each day or hour AND applies
 the unit conversions from the cik table.
@@ -271,31 +277,11 @@ meter_daily_readings_unit
 	WHERE tsrange(gen.interval_start, gen.interval_start + INTERVAL '1 day', '()') @> h.time_interval
 	GROUP BY h.meter_id, h.graphic_unit_id, gen.interval_start
 	ORDER BY h.meter_id, graphic_unit_id, gen.interval_start;
+
  -- Used by the line/bar/compare functions.
 CREATE INDEX if not exists idx_meter_daily_ordering ON meter_daily_readings_unit (meter_id, graphic_unit_id, lower(time_interval));
 -- This index sometimes performs faster(for the bar function) than the above index but is likely not worth the additional overhead.
 -- CREATE INDEX if not exists idx_mdr_meter_graphic ON meter_daily_readings_unit (meter_id, graphic_unit_id);
-
---Modified to use meter_daily_readings_unit in stead of old daily_readings_unit view.
---No longer needs to apply conversions since that is done in meter_daily_readings_unit view.
-CREATE MATERIALIZED VIEW IF NOT EXISTS
-group_daily_readings_unit
-	AS SELECT
-		gdm.group_id,
-		SUM(dr.reading_rate) AS reading_rate,
-		dr.time_interval,
-		dr.graphic_unit_id
-
-	FROM meter_daily_readings_unit dr
-	INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
-	INNER JOIN unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id) ON dr.graphic_unit_id = gu.graphic_unit_id
-	-- group meter readings of each group on the the same day, of the same graphic unit
-	GROUP BY gdm.group_id, dr.graphic_unit_id, dr.time_interval
-	-- order by time interval instead
-	ORDER BY dr.time_interval, dr.graphic_unit_id, gdm.group_id;
-
--- Index on interval, graphic_unit_id, group_id
-CREATE INDEX if not exists idx_group_daily_readings_unit ON group_daily_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
 --Modified to use meter_hourly_readings_unit instead of old hourly_readings_unit view.
 --No longer needs to apply conversions since that is done in meter_hourly_readings_unit view.
@@ -315,6 +301,27 @@ group_hourly_readings_unit
 	ORDER BY gdm.group_id;
 
 CREATE INDEX if not exists idx_group_hourly_readings_unit ON group_hourly_readings_unit USING GIST(time_interval, group_id, graphic_unit_id);
+
+--Modified to use meter_daily_readings_unit instead of old daily_readings_unit view.
+--No longer needs to apply conversions since that is done in meter_daily_readings_unit view.
+CREATE MATERIALIZED VIEW IF NOT EXISTS
+group_daily_readings_unit
+	AS SELECT
+		gdm.group_id,
+		SUM(dr.reading_rate) AS reading_rate,
+		dr.time_interval,
+		dr.graphic_unit_id
+
+	FROM meter_daily_readings_unit dr
+	INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
+	INNER JOIN unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id) ON dr.graphic_unit_id = gu.graphic_unit_id
+	-- group meter readings of each group on the the same day, of the same graphic unit
+	GROUP BY gdm.group_id, dr.graphic_unit_id, dr.time_interval
+	-- order by time interval instead
+	ORDER BY dr.time_interval, dr.graphic_unit_id, gdm.group_id;
+
+-- Index on interval, graphic_unit_id, group_id
+CREATE INDEX if not exists idx_group_daily_readings_unit ON group_daily_readings_unit USING GIST(time_interval, graphic_unit_id, group_id);
 
 /*
 The following function determines the correct duration view to query from, and returns averaged or raw reading from it.
@@ -412,13 +419,14 @@ DECLARE
 
 		IF (current_point_accuracy = 'raw'::reading_line_accuracy) THEN
 			-- Gets raw meter data to graph.
-			RETURN QUERY  --Modified to allow for raw time varying conversions.
+			-- Modified to allow for raw time varying conversions.
+			RETURN QUERY
 				SELECT r.meter_id as meter_id,
 				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
 					-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
 					-- the 3600 is needed since EPOCH is in seconds.
 					-- Normalize to rate over reading interval
-					 SUM(
+					SUM(
 						--Wrapped in SUM to handle multiple matching cik conversions
 						-- Weight by conversion duration(intersection of reading and conversion time ranges is necessary because the conversion may overlap the reading time range)
 						 (EXTRACT(EPOCH FROM (
@@ -426,7 +434,7 @@ DECLARE
 							-
 							lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
 		  					)) / 3600)
-						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600))+ c.intercept)
+						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) + c.intercept)
 	  				) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
 				WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
 					-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
@@ -604,7 +612,6 @@ BEGIN
 				readings.reading_rate,
 				lower(readings.time_interval) AS start_timestamp,
 				upper(readings.time_interval) AS end_timestamp
-
 			FROM group_daily_readings_unit readings
 			INNER JOIN unnest(group_ids) gids(id) ON readings.group_id = gids.id
 			WHERE readings.graphic_unit_id = requested_graphic_unit_id
@@ -688,7 +695,6 @@ BEGIN
 	-- Since the inner join on the generate_series adds the bar_width, we need to back up the
 	-- end timestamp by that amount so it stops at the desired end timestamp.
 	real_end_stamp := real_end_stamp - bar_width;
-
 
 	RETURN QUERY
 		SELECT

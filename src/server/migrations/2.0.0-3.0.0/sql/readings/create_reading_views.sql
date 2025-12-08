@@ -286,7 +286,7 @@ DECLARE
 							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
 							-
 							lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-		  					)) / 3600)
+							)) / 3600)
 						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600))+ c.intercept)
 	  				) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
 				WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN

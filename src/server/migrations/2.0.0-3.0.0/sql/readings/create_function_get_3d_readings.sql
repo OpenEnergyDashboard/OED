@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+
 /*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for the readings in the supplied meter. This can be an issue, in particular,
@@ -66,7 +67,7 @@ BEGIN
 	SELECT min(reading_frequency) INTO meter_frequency
 	FROM (meters m
 	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id);
-  	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
+	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
 	meter_frequency_hour_up := CEIL((SELECT * FROM EXTRACT(EPOCH FROM meter_frequency)) / 3600);
 	-- Use the hours that is the largest of the request and the meter values.
 	max_frequency := GREATEST(meter_frequency_hour_up, reading_length_hours);

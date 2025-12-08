@@ -65,10 +65,11 @@ BEGIN
 	curr_period AS (
 		SELECT
 			hourly.meter_id AS meter_id,
+			-- It is okay to sum the flow units because hourly readings has a rate of per hour so
+			-- to convert to a quantity would multiply by 1 so it is the same formula.
 			SUM(hourly.reading_rate) AS reading
 		FROM meter_hourly_readings_unit hourly
 		-- This is getting the conversion for the meter and unit to graph.
-		-- The slope and intercept are used above the transform the reading to the desired unit.
 		WHERE
 			-- The range requested must be completely within the hour so partial hours are not included.
 			curr_tsrange @> hourly.time_interval AND
