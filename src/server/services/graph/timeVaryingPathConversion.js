@@ -17,16 +17,16 @@ const updatedConversion = require('./pathConversion').updatedConversion;
  */
 // async function timeVaryingPathConversion(path, conn) {
 async function timeVaryingPathConversion(path, conn) {
-
-	console.log("TESTING");
-
 	// 1. Fetch and sort segments for each edge
 	const edgeSegments = [];
 	for (let i = 0; i < path.length - 1; ++i) {
 		const sourceId = path[i].id;
 		const destinationId = path[i + 1].id;
-		//segments are sorted by start_time in getBySourceDestination
+		// segments are sorted by start_time in getBySourceDestination
 		let segments = await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn);
+		console.log("DEBUG: segments:", segments);
+		// Tell if the conversion direction is okay (false) or must be reversed (true). Assumed false unless found otherwise in next step.
+		let reversed = false;
 		// Did not find the conversion segments. Since conversion should exist, it must be the other way around and bidirectional.
 		if (!segments || segments.length === 0) {
 			// Check if reverse conversion exists and is bidirectional
@@ -41,13 +41,16 @@ async function timeVaryingPathConversion(path, conn) {
 			if (!reverseSegments || reverseSegments.length === 0) {
 				throw Error(`No conversion segments found for reverse direction between ${destinationId} and ${sourceId}`);
 			}
-			segments = reverseSegments.map(seg => ({
-				...seg,
-				slope: invertConversion(seg.slope, seg.intercept)[0],
-				intercept: invertConversion(seg.slope, seg.intercept)[1]
-			}));
+			reversed = true; // NEW
+			// segments = reverseSegments.map(seg => ({
+			// 	...seg,
+			// 	slope: invertConversion(seg.slope, seg.intercept)[0],
+			// 	intercept: invertConversion(seg.slope, seg.intercept)[1]
+			// }));
 		}
-		edgeSegments.push(segments);
+		// edgeSegments.push(segments);
+		// console.log("DEBUG: edgeSegments (after push(segments)):", edgeSegments);
+
 		// NEW - start
 		for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
 			console.log("DEBUG: segmentIndex = ", segmentIndex);
@@ -56,7 +59,7 @@ async function timeVaryingPathConversion(path, conn) {
 			if (curSegment.week_patterns_id == null) {
 				// The segment does not have a pattern so can use the segments found above for slope/intercept.
 				if (reversed) {
-					//  Reversed so invert segment found.
+					// Reversed so invert segment found.
 					const { convertedSlope, convertedIntercept } = invertConversion(curSegment.slope, curSegment.intercept)
 					curSegment = {
 						...curSegment,
@@ -68,7 +71,11 @@ async function timeVaryingPathConversion(path, conn) {
 				// too many without a pattern it probably is not too important.
 				edgeSegments.push(curSegment);
 			
+				console.log("DEBUG: edgeSegments (after push(curSegment)):", edgeSegments);
+			
 			} else {	// deal with conversionSegments that have a WEEK_PATTERN_ID
+
+				console.log("DEBUG: TESTING IN ELSE");
 				
 				// The curSegment has a pattern.
 				// Here are the steps needed:
@@ -96,9 +103,14 @@ async function timeVaryingPathConversion(path, conn) {
 	let done = false;
 	while (!done) {
 		// Find current segments for each edge
-		const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
+		console.log("DEBUG: edgeSegments:", edgeSegments);
+		const currentSegments = edgeSegments;
+		// const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
+		console.log("DEBUG: currentSegments:", currentSegments);
+		
 		// Find minimum end time among current segments
 		let currentEnd = Math.min(...currentSegments.map(seg => parsePostgresDate(seg.endTime)));
+		// let currentEnd = currentSegments.map(seg => {seg.endTime == undefined ? console.log("DEBUG: seg: ", seg) : true });
 
 		// Combine conversions for the path
 		let slope = 1, intercept = 0;

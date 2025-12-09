@@ -102,4 +102,4 @@ async function pathConversion(path, conn) {
 	return [slope, intercept, suffix];
 }
 
-module.exports = { pathConversion };
+module.exports = { invertConversion, updatedConversion, pathConversion };
