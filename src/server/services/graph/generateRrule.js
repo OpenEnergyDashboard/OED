@@ -1,9 +1,46 @@
-import { datetime, RRule } from "rrule";
+const { RRule, datetime } = require("rrule");   // import { datetime, RRule } from "rrule";
+const Week = require('../../models/Week');
+const DaySegment = require('../../models/DaySegment');
 
-export function generateRrule(
-  week,        // from getWeek()
-  daySegments  // {int dayId, daySegments[] segments}
-) {
+async function generateRrule(weekId, conn) {
+
+  // get Week from weekId
+  const week = await Week.getById(weekId, conn);
+  console.log("DEBUG: week:", week);
+
+  // get 2D array of daySegments
+  const weekDayIds = [
+		week.sunday,
+		week.monday,
+		week.tuesday,
+		week.wednesday,
+		week.thursday,
+		week.friday,
+		week.saturday,
+	].filter(Boolean);
+
+	// get only unique dayIds (convert to Set then Array again)
+	const uniqueWeekDayIds = Array.from(new Set(weekDayIds.map(obj => 
+												JSON.stringify(obj))))
+														.map(e => JSON.parse(e));
+		
+	// Fetch all daySegments for each day in the week (parallel requests)
+  const segmentPromises = uniqueWeekDayIds.map((dayId) =>
+    // fetchDaySegments(dayId).unwrap()
+    DaySegment.getByDayId(dayId, conn)
+  );
+
+  // Wait for all responses
+  const daySegmentResponses = await Promise.all(segmentPromises);
+
+  // Flatten and annotate each with its corresponding dayId
+  const daySegments = uniqueWeekDayIds.map((dayId, i) => ({
+    dayId,
+    segments: daySegmentResponses[i],
+  }));
+
+  // console.log("DEBUG (generateRrule): week:", week);
+  // console.log("DEBUG (generateRrule): daySegments:", daySegments);
 
   const occurrences = [];
 
@@ -35,7 +72,7 @@ export function generateRrule(
 
   daySegments.forEach((day) => {
     day.segments.forEach((segment) => {
-      const dayId = segment.dayId;
+      const dayId = segment.id;
 
       const { id: segmentId, startHour, endHour, slope, intercept } = segment;
       const weekDayArray = dayIdMappings.find(d => d.dayId === dayId)?.rruleDays;
@@ -77,3 +114,5 @@ export function generateRrule(
 
   return occurrences;
 }
+
+module.exports = { generateRrule };
