@@ -107,12 +107,12 @@ async function generateRrule(weekId, conn, startTime, endTime) {
 
   });
 
-    console.log("Generated rules:", occurrences.map((r) => ({
-      rrule: r.rule.toString(),
-      duration: r.duration,
-      slope: r.slope,
-      intercept: r.intercept,
-    })));
+  // console.log("Generated rules:", occurrences.map((r) => ({
+  //   rrule: r.rule.toString(),
+  //   duration: r.duration,
+  //   slope: r.slope,
+  //   intercept: r.intercept,
+  // })));
 
   return occurrences;
   // return rrules;
