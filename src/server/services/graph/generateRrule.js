@@ -2,7 +2,7 @@ const { RRule, datetime } = require("rrule");   // import { datetime, RRule } fr
 const Week = require('../../models/Week');
 const DaySegment = require('../../models/DaySegment');
 
-async function generateRrule(weekId, conn, start_time, end_time) {
+async function generateRrule(weekId, conn, startTime, endTime) {
 
   // get Week from weekId
   const week = await Week.getById(weekId, conn);
@@ -79,14 +79,17 @@ async function generateRrule(weekId, conn, start_time, end_time) {
       const { id: segmentId, startHour, endHour, slope, intercept } = segment;
       const weekDayArray = dayIdMappings.find(d => d.dayId === dayId)?.rruleDays;
       const duration = endHour - startHour;
-
       // console.log("DEBUG (generateRrule): startHour:", startHour);
+
+      // startTime
+      const start = new Date(startTime);
+      start.setHours(startHour, 0, 0, 0);
 
       const rule = new RRule({
         freq: RRule.WEEKLY,
         byweekday: weekDayArray,
-        dtstart: new Date(start_time),
-        until: new Date(end_time)
+        dtstart: start,
+        until: new Date(endTime)
       });
 
       rrules.push(rule);
@@ -102,15 +105,14 @@ async function generateRrule(weekId, conn, start_time, end_time) {
 
     });
 
-
   });
 
-  // console.log("Generated rules:", occurrences.map((r) => ({
-  //   rrule: r.rule.toString(),
-  //   duration: r.duration,
-  //   slope: r.slope,
-  //   intercept: r.intercept,
-  // })));
+    console.log("Generated rules:", occurrences.map((r) => ({
+      rrule: r.rule.toString(),
+      duration: r.duration,
+      slope: r.slope,
+      intercept: r.intercept,
+    })));
 
   return occurrences;
   // return rrules;
