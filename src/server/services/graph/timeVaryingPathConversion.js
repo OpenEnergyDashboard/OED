@@ -27,7 +27,6 @@ async function timeVaryingPathConversion(path, conn) {
 		const destinationId = path[i + 1].id;
 		// segments are sorted by start_time in getBySourceDestination
 		let segments = await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn);
-		// console.log("DEBUG: segments:", segments);
 		// Tell if the conversion direction is okay (false) or must be reversed (true). Assumed false unless found otherwise in next step.
 		let reversed = false;
 		// Did not find the conversion segments. Since conversion should exist, it must be the other way around and bidirectional.
@@ -52,7 +51,6 @@ async function timeVaryingPathConversion(path, conn) {
 			const curSegment = segments[segmentIndex];
 
 			// deal with conversionSegments that have a SLOPE & INTERCEPT
-			// if (curSegment.week_patterns_id == null) {
 			if (curSegment.weekPatternsId == null) {
 				// The segment does not have a pattern so can use the segments found above for slope/intercept.
 				if (reversed) {
@@ -93,7 +91,6 @@ async function timeVaryingPathConversion(path, conn) {
 						};
 					}
 				});
-
 				// console.log("DEBUG: occurrences:", occurrences);
 
 				// 3. Each segment is added to edgeSegments with the start_time, end_time, slope & intercept.

@@ -1,4 +1,4 @@
-const { RRule, datetime } = require("rrule");   // import { datetime, RRule } from "rrule";
+const { RRule, datetime } = require("rrule");
 const Week = require('../../models/Week');
 const DaySegment = require('../../models/DaySegment');
 
@@ -25,7 +25,6 @@ async function generateRrule(weekId, conn, startTime, endTime) {
 		
 	// Fetch all daySegments for each day in the week (parallel requests)
   const segmentPromises = uniqueWeekDayIds.map((dayId) =>
-    // fetchDaySegments(dayId).unwrap()
     DaySegment.getByDayId(dayId, conn)
   );
 
@@ -74,12 +73,9 @@ async function generateRrule(weekId, conn, startTime, endTime) {
     day.segments.forEach((segment) => {
       const dayId = segment.dayId;
 
-      // console.log("DEBUG (generateRrule): segment:", segment);
-
       const { id: segmentId, startHour, endHour, slope, intercept } = segment;
       const weekDayArray = dayIdMappings.find(d => d.dayId === dayId)?.rruleDays;
       const duration = endHour - startHour;
-      // console.log("DEBUG (generateRrule): startHour:", startHour);
 
       // startTime
       const start = new Date(startTime);
@@ -96,8 +92,6 @@ async function generateRrule(weekId, conn, startTime, endTime) {
 
       occurrences.push({
         rule,
-        // dayId,
-        // segmentId,
         duration,
         slope,
         intercept
