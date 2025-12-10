@@ -2,11 +2,10 @@ const { RRule, datetime } = require("rrule");   // import { datetime, RRule } fr
 const Week = require('../../models/Week');
 const DaySegment = require('../../models/DaySegment');
 
-async function generateRrule(weekId, conn) {
+async function generateRrule(weekId, conn, start_time, end_time) {
 
   // get Week from weekId
   const week = await Week.getById(weekId, conn);
-  console.log("DEBUG: week:", week);
 
   // get 2D array of daySegments
   const weekDayIds = [
@@ -43,6 +42,7 @@ async function generateRrule(weekId, conn) {
   // console.log("DEBUG (generateRrule): daySegments:", daySegments);
 
   const occurrences = [];
+  const rrules = [];
 
   const weekDayPairs = [
     { dayId: week.sunday, rruleDay: RRule.SU },
@@ -72,31 +72,29 @@ async function generateRrule(weekId, conn) {
 
   daySegments.forEach((day) => {
     day.segments.forEach((segment) => {
-      const dayId = segment.id;
+      const dayId = segment.dayId;
+
+      // console.log("DEBUG (generateRrule): segment:", segment);
 
       const { id: segmentId, startHour, endHour, slope, intercept } = segment;
       const weekDayArray = dayIdMappings.find(d => d.dayId === dayId)?.rruleDays;
       const duration = endHour - startHour;
 
-      console.log("startHour:", startHour);
+      // console.log("DEBUG (generateRrule): startHour:", startHour);
 
       const rule = new RRule({
         freq: RRule.WEEKLY,
         byweekday: weekDayArray,
-        dtstart: datetime(2024, 0, 1, startHour, 0) // timezone: UTC
+        dtstart: new Date(start_time),
+        until: new Date(end_time)
       });
 
-      console.log("DEBUG: rrule: ", rule.toText());
-      console.log("DEBUG: string: ", rule.toString());
-
-      console.log("TEST (UTC): ",
-        rule.between(datetime(2024, 4, 10), datetime(2024, 4, 24))
-      );
+      rrules.push(rule);
 
       occurrences.push({
         rule,
-        dayId,
-        segmentId,
+        // dayId,
+        // segmentId,
         duration,
         slope,
         intercept
@@ -104,15 +102,18 @@ async function generateRrule(weekId, conn) {
 
     });
 
-    console.log("Generated rules:", occurrences.map((r) => ({
-      rrule: r.rule.toString(),
-      slope: r.slope,
-      intercept: r.intercept,
-      dayId: r.dayId,
-    })));
+
   });
 
+  // console.log("Generated rules:", occurrences.map((r) => ({
+  //   rrule: r.rule.toString(),
+  //   duration: r.duration,
+  //   slope: r.slope,
+  //   intercept: r.intercept,
+  // })));
+
   return occurrences;
+  // return rrules;
 }
 
 module.exports = { generateRrule };

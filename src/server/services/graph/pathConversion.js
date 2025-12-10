@@ -49,6 +49,7 @@ function invertConversion(slope, intercept) {
 	// destination_value = slope * source_value + intercept
 	// Invert this equation to give:
 	// source_value = (1/slope) * destination_value - (intercept / slope)
+	// TODO: fix when slope is 0 !
 	const convertedSlope = 1.0 / slope;
 	const convertedIntercept = -(intercept / slope);
 	return [convertedSlope, convertedIntercept];
