@@ -96,6 +96,83 @@ class Conversion {
 			destination: destination
 		});
 	}
+
+	/**
+	 * Gets all conversions involving a specific unit (as source or destination).
+	 * @param {number} unitId The unit ID to search for
+	 * @param {*} conn The connection to use
+	 * @returns {Promise.<Array.<Conversion>>} Array of conversions involving the unit
+	 */
+	static async getConversionsByUnitId(unitId, conn) {
+		const rows = await conn.any(`
+			SELECT * FROM conversions 
+			WHERE source_id = $1 OR destination_id = $1
+		`, [unitId]);
+		return rows.map(Conversion.mapRow);
+	}
+
+	/**
+	 * Deletes a conversion and all related suffix units/conversions in a transaction.
+	 * Checks for dependencies before deletion and throws error if unit is used in meters/groups.
+	 * @param {number} sourceId The source unit ID
+	 * @param {number} destinationId The destination unit ID
+	 * @param {*} conn The connection to use (should be a transaction)
+	 * @returns {Promise.<Object>} Object with deletedUnits and deletedConversions arrays
+	 * @throws {Error} If unit has dependencies (meters/groups)
+	 */
+	static async deleteConversionAndRelatedSuffixes(sourceId, destinationId, conn) {
+		const Unit = require('./Unit');
+		const { checkUnitDependencies } = require('../services/graph/checkUnitDependencies');
+		const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
+
+		const deletedUnits = [];
+		const deletedConversions = [];
+
+		// Get source and destination units
+		const source = await Unit.getById(sourceId, conn);
+		const dest = await Unit.getById(destinationId, conn);
+
+		if (!source || !dest) {
+			throw new Error('Source or destination unit not found');
+		}
+
+		// Check dependencies for suffix units
+		if (source.typeOfUnit === Unit.unitType.SUFFIX) {
+			const deps = await checkUnitDependencies(sourceId, conn);
+			if (deps.meters.length > 0 || deps.groups.length > 0) {
+				const meterNames = deps.meters.map(m => m.name).join(', ');
+				const groupNames = deps.groups.map(g => g.name).join(', ');
+				throw new Error(`Cannot delete: source unit "${source.name}" is used in ${deps.meters.length} meter(s): ${meterNames} and ${deps.groups.length} group(s): ${groupNames}`);
+			}
+			await removeAdditionalConversionsAndUnits(source, conn);
+		}
+
+		if (dest.typeOfUnit === Unit.unitType.SUFFIX) {
+			const deps = await checkUnitDependencies(destinationId, conn);
+			if (deps.meters.length > 0 || deps.groups.length > 0) {
+				const meterNames = deps.meters.map(m => m.name).join(', ');
+				const groupNames = deps.groups.map(g => g.name).join(', ');
+				throw new Error(`Cannot delete: destination unit "${dest.name}" is used in ${deps.meters.length} meter(s): ${meterNames} and ${deps.groups.length} group(s): ${groupNames}`);
+			}
+			await removeAdditionalConversionsAndUnits(dest, conn);
+		}
+
+		// Delete the conversion
+		await Conversion.delete(sourceId, destinationId, conn);
+		deletedConversions.push({ sourceId, destinationId });
+
+		// Handle bidirectional conversion
+		const conversion = await Conversion.getBySourceDestination(sourceId, destinationId, conn);
+		if (conversion && conversion.bidirectional) {
+			const reverseConversion = await Conversion.getBySourceDestination(destinationId, sourceId, conn);
+			if (reverseConversion) {
+				await Conversion.delete(destinationId, sourceId, conn);
+				deletedConversions.push({ sourceId: destinationId, destinationId: sourceId });
+			}
+		}
+
+		return { deletedUnits, deletedConversions };
+	}
 }
 
 module.exports = Conversion;
