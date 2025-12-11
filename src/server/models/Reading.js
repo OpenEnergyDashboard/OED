@@ -483,20 +483,11 @@ class Reading {
 	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
 	 */
 	static async getMeterDataRange(meterID, conn) {
-		const result = await conn.oneOrNone(`
-			SELECT 
-				MIN(start_timestamp) as min_date,
-				MAX(end_timestamp) as max_date
-			FROM readings 
-			WHERE meter_id = $1
-		`, [meterID]);
-		if (result && result.min_date && result.max_date) {
-			return {
-				minDate: result.min_date,
-				maxDate: result.max_date
-			};
-		}
-		return { minDate: null, maxDate: null };
+		const result = await conn.oneOrNone(sqlFile('reading/get_meter_data_range.sql'), { meterID });
+		return {
+			minDate: result?.min_date || null,
+			maxDate: result?.max_date || null
+		};
 	}
 
 	/**
@@ -507,21 +498,11 @@ class Reading {
 	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
 	 */
 	static async getGroupDataRange(groupID, conn) {
-		const result = await conn.oneOrNone(`
-			SELECT 
-				MIN(r.start_timestamp) as min_date,
-				MAX(r.end_timestamp) as max_date
-			FROM readings r
-			INNER JOIN groups_deep_meters gdm ON r.meter_id = gdm.meter_id
-			WHERE gdm.group_id = $1
-		`, [groupID]);
-		if (result && result.min_date && result.max_date) {
-			return {
-				minDate: result.min_date,
-				maxDate: result.max_date
-			};
-		}
-		return { minDate: null, maxDate: null };
+		const result = await conn.oneOrNone(sqlFile('reading/get_group_data_range.sql'), { groupID });
+		return {
+			minDate: result?.min_date || null,
+			maxDate: result?.max_date || null
+		};
 	}
 
 	toString() {
