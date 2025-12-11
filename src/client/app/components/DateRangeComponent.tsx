@@ -17,8 +17,6 @@ import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import { ChartTypes } from '../types/redux/graph';
 import { bottomSpace, labelStyle } from '../styles/modalStyle';
-import * as moment from 'moment';
-import { TimeInterval } from '../../../common/TimeInterval';
 
 /**
  * A component which allows users to select date ranges in lieu of a slider (line graphic)
@@ -37,15 +35,6 @@ export default function DateRangeComponent() {
 		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
 	};
 
-	// Provide a default date range if the interval is unbounded to prevent error display
-	// Default to last 30 days when unbounded
-	const displayInterval = queryTimeInterval.getIsBounded()
-		? queryTimeInterval
-		: new TimeInterval(
-			moment().subtract(30, 'days').startOf('day'),
-			moment().endOf('day')
-		);
-
 	return (
 		<div style={{ width: '100%' }}>
 			{datePickerVisible && (
@@ -56,7 +45,7 @@ export default function DateRangeComponent() {
 					</p>
 					<div style = {bottomSpace}>
 						<DateRangePicker
-							value={timeIntervalToDateRange(displayInterval)}
+							value={timeIntervalToDateRange(queryTimeInterval)}
 							onChange={handleChange}
 							calendarProps={{ defaultView: 'year' }}
 							minDate={new Date(1970, 0, 1)}
