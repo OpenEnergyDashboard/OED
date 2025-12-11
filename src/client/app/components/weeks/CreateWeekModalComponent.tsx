@@ -17,7 +17,6 @@ import { Week } from '../../types/redux/weeks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
-import { generateRrule } from '../../utils/generateRrule';
 
 /**
  * Defines a button that opens a modal to create a new weekly conversion pattern.
@@ -42,9 +41,6 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 
 	// Fetch weeks data (used to check if week name already exists)
 	const { data: weeks } = weeksApi.useGetWeeksQuery();
-	
-	// Prepare to fretch day segments
-	const [fetchDaySegments] = daySegmentsApi.useLazyGetDaySegmentsByDayIdQuery();
 
 	const [addWeekMutation, { isLoading: isSaving }] = weeksApi.useAddWeekMutation();
 
