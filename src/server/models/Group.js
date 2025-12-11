@@ -8,7 +8,7 @@ const Unit = require('./Unit');
 
 const sqlFile = database.sqlFile;
 
-// TODO: alter class to include weather_location_id
+// TODO: alter class to include weatherLocationId
 class Group {
 
 	/**

@@ -11,15 +11,15 @@ const sqlFile = database.sqlFile;
 class WeatherData {
 	/**
 	 * Constructor without the id sine it's not in the schema
-	 * @param weather_location_id The weather location id
-	 * @param {Moment} start_time The weather data's start_time
-	 * @param {Moment} end_time The weather data's end_time
+	 * @param weatherLocationId The weather location id
+	 * @param {Moment} startTime The weather data's startTime
+	 * @param {Moment} endTime The weather data's endTime
 	 * @param temperature The actual weather data (temperature)
 	 */
-	constructor(weather_location_id, start_time, end_time, temperature) {
-		this.weather_location_id = weather_location_id;
-		this.start_time = start_time;
-		this.end_time = end_time;
+	constructor(weatherLocationId, startTime, endTime, temperature) {
+		this.weatherLocationId = weatherLocationId;
+		this.startTime = startTime;
+		this.endTime = endTime;
 		this.temperature = temperature;
 	}
 
@@ -29,7 +29,7 @@ class WeatherData {
 	 * @returns The new WeatherData object.
 	 */
 	static mapRow(row) {
-		return new WeatherData(row.weather_location_id, row.start_time, row.end_time, row.temperature);
+		return new WeatherData(row.weatherLocationId, row.startTime, row.endTime, row.temperature);
 	}
 
 	/**
@@ -60,7 +60,7 @@ class WeatherData {
 	 */
 	static async getLatestTimeStamp(id, conn) {
 		try {
-			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weather_location_id: id }));
+			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weatherLocationId: id }));
 		} catch (err) {
 			log.error(`Error fetching the latest end timestamp: ${err}`, err);
 			throw err;
@@ -74,9 +74,9 @@ class WeatherData {
 	  */
 	async insert(conn) {
 		return await conn.none(sqlFile('weather_data/insert_new_weather_data.sql'), {
-			weatherLocationId: this.weather_location_id,
-			startTime: this.start_time,
-			endTime: this.end_time,
+			weatherLocationId: this.weatherLocationId,
+			startTime: this.startTime,
+			endTime: this.endTime,
 			temperature: this.temperature
 		});
 	}

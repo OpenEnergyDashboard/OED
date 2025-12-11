@@ -36,6 +36,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		res.json(rows.map(formatWeatherLocationForResponse));
 	} catch (err) {
 		log.error(`Error while performing GET weather location details query: ${err}`, err);
+		failure(res, 500, `Error while retrieving weather locations ${err}`);
 	}
 });
 
@@ -95,12 +96,11 @@ async function addWeatherDataForLocation(location, conn) {
 		}
 	}
 
-	// Round to the hour and prepare date range
-	// const roundedearliestDate = earliestDate.startOf('hour');
+	// this only gets the data for the current day(?)
 	// earliestDate = earliestDate.format('YYYY-MM-DD');
-	earliestDate = '2025-12-01';
 	// const latestDate = moment().format('YYYY-MM-DD');
-	const latestDate = moment('2025-12-02').format('YYYY-MM-DD');
+	earliestDate = '2025-12-11'; // test date
+	const latestDate = moment().format('YYYY-MM-DD');
 
 	// Fetch weather data for this location's coordinates
 	const weatherData = await fetchWeatherData(
