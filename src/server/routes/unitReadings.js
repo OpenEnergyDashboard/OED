@@ -14,6 +14,9 @@ const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
 const { log } = require('../log');
 
+// Maximum number of days allowed for 3D graphics (security limit for unauthenticated users)
+const MAX_3D_DAYS = 1095; // 3 years
+
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
 		type: 'object',
@@ -486,9 +489,9 @@ function createRouter() {
 				// Calculate calendar days (inclusive of both start and end day) to match client calculation
 				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
 				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
-				// Security: Limit 3D to MAX_3D_DAYS (1095 days = 3 years) to prevent abuse from unauthenticated users.
+				// Security: Limit 3D to MAX_3D_DAYS to prevent abuse from unauthenticated users.
 				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
-				if (durationInDays > 1095) {
+				if (durationInDays > MAX_3D_DAYS) {
 					res.sendStatus(400);
 				} else {
 					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -516,9 +519,9 @@ function createRouter() {
 				// Calculate calendar days (inclusive of both start and end day) to match client calculation
 				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
 				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
-				// Security: Limit 3D to MAX_3D_DAYS (1095 days = 3 years) to prevent abuse from unauthenticated users.
+				// Security: Limit 3D to MAX_3D_DAYS to prevent abuse from unauthenticated users.
 				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
-				if (durationInDays > 1095) {
+				if (durationInDays > MAX_3D_DAYS) {
 					res.sendStatus(400);
 				} else {
 					const groupID = req.params.group_id;
