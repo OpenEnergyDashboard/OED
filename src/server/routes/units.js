@@ -7,6 +7,7 @@ const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
+const Conversion = require('../models/Conversion');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
@@ -222,51 +223,102 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		required: ['id'],
 		properties: { id: { type: 'integer' } }
 	};
-<<<<<<< HEAD
-	const result = validate(req.body, paramsSchema);
-	if (!result.valid) {
-		log.warn(`Invalid delete-unit payload: ${result.errors}`);
-		return failure(res, 400, `Validation errors: ${result.errors}`);
-	}
-
-	const conn = getConnection();
-	try {
-		const unit = await Unit.getById(req.body.id, conn);
-		if (unit.typeOfUnit === 'suffix') {
-			log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
-			await removeAdditionalConversionsAndUnits(unit, conn);
-		}
-		await Unit.delete(req.body.id, conn);
-		success(res, 'Unit deleted successfully');
-	} catch (err) {
-		log.error(`Error deleting unit: ${err}`, err);
-		failure(res, 500, 'Unable to delete unit');
-=======
 	// Ensure delete request is valid
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
-		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
+		const errorMsg = `Got request to delete a unit with invalid data, error(s): ${validatorResult.errors}`;
 		log.warn(errorMsg);
 		failure(res, 400, errorMsg);
-	} else {
+		return;
+	}
+	
 		const conn = getConnection();
 		const unitId = req.body.id;
 		try {
-			const unit = await Unit.getById(req.body.id, conn);
-			if (unit.typeOfUnit === 'suffix') {
-				log.info('Deleting a suffix unit. Now deleting associated units and conversions.');
-				await removeAdditionalConversionsAndUnits(unit, conn);
+		const unit = await Unit.getById(unitId, conn);
+		if (!unit) {
+			failure(res, 404, 'Unit not found');
+			return;
+		}
+		
+		// Check for dependencies before deletion
+		const { checkUnitDependencies } = require('../services/graph/checkUnitDependencies');
+		const deps = await checkUnitDependencies(unitId, conn);
+		
+		// If unit has meter/group dependencies, provide detailed error
+		if (deps.meters.length > 0 || deps.groups.length > 0) {
+			const meterNames = deps.meters.map(m => `"${m.name}"`).join(', ');
+			const groupNames = deps.groups.map(g => `"${g.name}"`).join(', ');
+			
+			let errorMsg = `Cannot delete unit "${unit.name}" (ID: ${unitId}): used by `;
+			const parts = [];
+			if (deps.meters.length > 0) {
+				parts.push(`${deps.meters.length} meter(s): ${meterNames}`);
 			}
-			// Don't worry about checking if the unit already exists
-			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Unit.delete(unitId, conn);
+			if (deps.groups.length > 0) {
+				parts.push(`${deps.groups.length} group(s): ${groupNames}`);
+			}
+			errorMsg += parts.join(' and ');
+			
+			log.warn(`Unit deletion blocked due to dependencies: ${errorMsg}`);
+			failure(res, 400, errorMsg);
+			return;
+		}
+		
+		// Perform all operations in a single transaction for atomicity
+		await conn.tx(async t => {
+			// Lock the unit to prevent concurrent modifications
+			await t.one('SELECT * FROM units WHERE id = $1 FOR UPDATE', [unitId]);
+			
+			// Reload unit within transaction to ensure consistency
+			const unitInTx = await Unit.getById(unitId, t);
+			
+			// Handle suffix-type units (created by OED)
+			if (unitInTx.typeOfUnit === 'suffix') {
+				log.info(`Deleting suffix-type unit ${unitId}. Cleaning up associated units and conversions.`);
+				await removeAdditionalConversionsAndUnits(unitInTx, t);
+			}
+			
+			// Handle units with suffix string (not suffix-type)
+			// These units may have conversions involving suffix units that need cleanup
+			if (unitInTx.suffix && unitInTx.suffix.trim() !== '') {
+				log.info(`Unit ${unitId} has suffix "${unitInTx.suffix}". Checking for suffix-involved conversions.`);
+				
+				// Get all conversions involving this unit
+				const allConversions = await Conversion.getAll(t);
+				const relatedConversions = allConversions.filter(c =>
+					c.sourceId === unitId || c.destinationId === unitId
+				);
+				
+				// Delete bidirectional conversions safely
+				for (const conversion of relatedConversions) {
+					// Delete the conversion
+					await Conversion.delete(conversion.sourceId, conversion.destinationId, t);
+					
+					// If bidirectional, also delete reverse if it exists separately
+					if (conversion.bidirectional) {
+						const reverseConversion = await Conversion.getBySourceDestination(
+							conversion.destinationId,
+							conversion.sourceId,
+							t
+						);
+						if (reverseConversion) {
+							await Conversion.delete(conversion.destinationId, conversion.sourceId, t);
+							log.info(`Deleted bidirectional conversion pair: ${conversion.sourceId} <-> ${conversion.destinationId}`);
+						}
+					}
+				}
+			}
+			
+			// Delete the unit
+			await Unit.delete(unitId, t);
+		});
+		
 			success(res, 'Successfully deleted unit');
 		} catch (err) {
 			const errorMsg = `Error while deleting unit with error(s): ${err}`;
-			log.error(errorMsg);
+		log.error(errorMsg, err);
 			failure(res, 500, errorMsg);
-		}
->>>>>>> b1157f050 (fix undesired changes to unit.js route)
 	}
 });
 
