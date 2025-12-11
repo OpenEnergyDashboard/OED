@@ -19,7 +19,7 @@ import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { MeterOrGroup, ShiftAmount } from '../types/redux/graph';
 import { showInfoNotification, showWarnNotification } from '../utils/notifications';
-import { setHelpLayout } from './ThreeDComponent';
+import { setHelpLayout } from '../utils/setLayout';
 import { toast } from 'react-toastify';
 import { useTranslate } from '../redux/componentHooks';
 

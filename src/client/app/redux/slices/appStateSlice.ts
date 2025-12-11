@@ -25,7 +25,6 @@ export interface AppState {
 	selectedLanguage: LanguageTypes;
 	refreshingReadings: boolean;
 	languageManuallySet: boolean;
-	refreshingReadings: boolean;
 }
 
 const defaultState: AppState = {
