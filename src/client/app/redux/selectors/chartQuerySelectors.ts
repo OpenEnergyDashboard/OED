@@ -193,11 +193,10 @@ export const selectMapChartQueryArgs = createSelector(
 );
 
 export const selectThreeDQueryArgs = createSelector(
-	selectQueryTimeInterval,
 	selectThreeDInterval,
 	selectSelectedUnit,
 	selectThreeDState,
-	(queryTimeInterval, threeDInterval, selectedUnit, threeD) => {
+	(threeDInterval, selectedUnit, threeD) => {
 		// Use the calculated 3D interval if available (it should always be bounded)
 		// Skip query if no meter/group selected or if threeDInterval is not ready yet
 		const shouldSkipQuery = !threeD.meterOrGroupID || !threeDInterval || !threeDInterval.getIsBounded();
