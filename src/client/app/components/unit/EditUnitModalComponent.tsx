@@ -146,7 +146,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const deleteConfirmationMessage = translate('unit.delete.unit') + ' [' + values.identifier + '] ?';
+	const [showCancelModal, setShowCancelModal] = useState(false);
+	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
+		<div>{translate('unit.delete.unit')} [{values.identifier}] ?</div>);
 	const deleteConfirmText = translate('unit.delete.unit');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
@@ -156,60 +158,112 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// Show the edit modal
 		handleShow();
 	};
-	const handleDeleteConfirmationModalOpen = () => {
+	const handleCancelModalOpen = () => {
 		// Hide the edit modal
 		handleClose();
-		// Show the warning modal
-		setShowDeleteConfirmationModal(true);
+		// Show the cancel modal
+		setShowCancelModal(true);
+	};
+	const handleCancelModalClose = () => {
+		// Hide the cancel modal
+		setShowCancelModal(false);
+		// Close the edit modal and return to main units page
+		handleClose();
+	};
+	const handleDeleteConfirmationModalOpen = () => {
+		// Check for dependencies before showing confirmation modal
+		const msgElements: React.ReactNode[] = [];
+		let cancel = false;
+
+		// Check conversions first (highest priority)
+		for (let i = 0; i < conversionData.length; i++) {
+			if (conversionData[i].sourceId === state.id) {
+				// This unit is the source of a conversion so cannot be deleted.
+				msgElements.push(
+					<div key={`conversion-source-${i}`}>
+						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
+						{conversionArrow(conversionData[i].bidirectional)}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')} "{state.name}" {translate('unit.source.error')}
+					</div>
+				);
+				cancel = true;
+			}
+
+			if (conversionData[i].destinationId === state.id) {
+				// This unit is the destination of a conversion so cannot be deleted.
+				msgElements.push(
+					<div key={`conversion-dest-${i}`}>
+						{translate('conversion')} {unitDataByID[conversionData[i].sourceId].name}
+						{conversionArrow(conversionData[i].bidirectional)}
+						{unitDataByID[conversionData[i].destinationId].name} {translate('uses')} {translate('unit')} "{state.name}" {translate('unit.destination.error')}
+					</div>
+				);
+				cancel = true;
+			}
+		}
+
+		// Check meters using this unit
+		const metersUsingUnit = Object.values(meterDataByID).filter(meter => meter.unitId === state.id);
+		if (metersUsingUnit.length > 0) {
+			msgElements.push(
+				<div key="meters-using-unit">
+					<span className="bold">{translate('unit.delete.meters.use')} </span>
+					"{state.name}" {translate('as.meter.unit')}:
+					<ul>
+						{metersUsingUnit.map(meter => (
+							<li key={meter.id}>"{meter.name}"</li>
+						))}
+					</ul>
+				</div>
+			);
+			cancel = true;
+		}
+
+		// If any errors were found, add the header message at the beginning
+		if (msgElements.length > 0) {
+			msgElements.splice(0, 0,
+				<div key="error-header">
+					<span className="bold">{translate('unit.failed.to.delete.unit')}:</span>
+				</div>
+			);
+		}
+
+		if (cancel) {
+			msgElements.push(
+				<div key="restricted">
+					<br />
+					{translate('unit.delete.restricted')}
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
+			handleCancelModalOpen();
+		} else {
+			msgElements.push(
+				<div key="final-confirm">
+					{translate('unit.delete.unit')} [{values.identifier}] ?
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
+			// Hide the edit modal
+			handleClose();
+			// Show the warning modal
+			setShowDeleteConfirmationModal(true);
+		}
 	};
 
 	/* End Confirm Delete Modal */
 
 	const handleDeleteUnit = () => {
 		// Closes the warning modal
-		// Do not call the handler function because we do not want to open the parent modal
+		// Do not call the handler function since the parent modal is not necessary to be opened
 		setShowDeleteConfirmationModal(false);
 
-		let error_message = '';
-		for (const value of Object.values(meterDataByID)) {
-			// This unit is used by a meter so cannot be deleted. Note if in a group then in a meter so covers both.
-			if (value.unitId === state.id) {
-				// TODO see EditMeterModalComponent for issue with line breaks. Same issue in strings below.
-				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
-					`"${state.name}" ${translate('as.meter.unit')};`;
-			}
-			if (value.defaultGraphicUnit === state.id) {
-				error_message += ` ${translate('meter')} "${value.name}" ${translate('uses')} ${translate('unit')} ` +
-					`"${state.name}" ${translate('as.meter.defaultgraphicunit')};`;
-			}
-		}
-		for (let i = 0; i < conversionData.length; i++) {
-			if (conversionData[i].sourceId === state.id) {
-				// This unit is the source of a conversion so cannot be deleted.
-				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
-					`${conversionArrow(conversionData[i].bidirectional)}` +
-					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
-					` "${state.name}" ${translate('unit.source.error')};`;
-			}
-
-			if (conversionData[i].destinationId === state.id) {
-				// This unit is the destination of a conversion so cannot be deleted.
-				error_message += ` ${translate('conversion')} ${unitDataByID[conversionData[i].sourceId].name}` +
-					`${conversionArrow(conversionData[i].bidirectional)}` +
-					`${unitDataByID[conversionData[i].destinationId].name} ${translate('uses')} ${translate('unit')}` +
-					` "${state.name}" ${translate('unit.destination.error')};`;
-			}
-		}
-		if (error_message) {
-			error_message = `${translate('unit.failed.to.delete.unit')}: ${error_message}`;
-			showErrorNotification(error_message);
-		} else {
-			// It is okay to delete this unit.
-			deleteUnit(state.id)
-				.unwrap()
-				.then(() => { showSuccessNotification(translate('unit.delete.success')); })
-				.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
-		}
+		// Since we already checked for dependencies in handleDeleteConfirmationModalOpen,
+		// we can delete the unit directly
+		deleteUnit(state.id)
+			.unwrap()
+			.then(() => { showSuccessNotification(translate('unit.delete.success')); })
+			.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
 	};
 
 	// Keeps canSave state up to date. Checks if valid and if edit made.
@@ -382,6 +436,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					disabled={!canSave}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={showCancelModal}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={handleCancelModalClose}
+				actionFunction={handleCancelModalClose}
+				actionRejectText={translate('cancel')}
+				forceCancel={true} />
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
 				actionConfirmMessage={deleteConfirmationMessage}
