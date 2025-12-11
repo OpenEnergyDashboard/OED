@@ -66,9 +66,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 	};
 
-	// 1. Store current state
-	const oldConversions = [...conversionDetails];
-	const [affectedMeters, setAffectedMeters] = useState<SimulateDeleteAffectedMeter[]>([]);
 	// Set existing conversion values
 	const values = { ...props.conversion };
 
@@ -129,6 +126,39 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			}
 		}
 		return count;
+	};
+	/* Confirm Delete Modal */
+	// Separate from state comment to keep everything related to the warning confirmation modal together
+	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
+	const [showCancelModal, setShowCancelModal] = useState(false);
+	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
+		<div>{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?</div>);
+	const deleteConfirmText = translate('conversion.delete.conversion');
+	const deleteRejectText = translate('cancel');
+	// The first two handle functions below are required because only one Modal can be open at a time (properly)
+	const handleDeleteConfirmationModalClose = () => {
+		// Hide the warning modal
+		setShowDeleteConfirmationModal(false);
+		// Show the edit modal
+		props.handleShow();
+	};
+	const handleCancelModalClose = () => {
+		// Hide the warning modal
+		setShowCancelModal(false);
+		// Show the edit modal
+		props.handleShow();
+	};
+	const handleDeleteConfirmationModalOpen = () => {
+		// Hide the edit modal
+		props.handleClose();
+		// Show the warning modal
+		setShowDeleteConfirmationModal(true);
+	};
+	const handleCancelModalOpen = () => {
+		// Hide the edit modal
+		props.handleClose();
+		// Show the warning modal
+		setShowCancelModal(true);
 	};
 	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
 	const checkState = async () => {
@@ -226,32 +256,110 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				);
 			}
 		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
-			const unit = source.typeOfUnit === UnitType.suffix ? source : dest;
-			// Get the units that use this suffix
-			const affectedUnits = Object.values(unitDataById).filter(u => u.suffix === unit.identifier);
-			// Get the conversions that use these units
-			const affectedConversions = conversionDetails.filter(c =>
-				affectedUnits.some(u => u.id === c.sourceId || u.id === c.destinationId)
+			const suffixUnit = source.typeOfUnit === UnitType.suffix ? source : dest;
+			// Find all conversions involving this suffix unit (as source or destination)
+			const suffixUnitConversions = conversionDetails.filter(c =>
+				c.sourceId === suffixUnit.id || c.destinationId === suffixUnit.id ||
+				(c.bidirectional && (c.sourceId === suffixUnit.id || c.destinationId === suffixUnit.id))
 			);
-			// Send user a warning before deletion
-			if (affectedUnits.length > 0) {
-				msg += `${translate('conversion.delete.suffix.units.to.delete')}:\n`;
-				affectedUnits.forEach(u => {
-					msg += `- ${u.name} (${u.identifier})\n`;
-				});
+
+			// Find suffix-type units that would be hidden (OED-created suffix units)
+			const suffixTypeUnitsToHide = suffixUnitConversions
+				.map(c => {
+					const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
+					return unitDataById[otherId];
+				})
+				.filter(u => u && u.typeOfUnit === UnitType.suffix);
+
+			// Get unique conversions that would be deleted
+			const conversionsToDelete = suffixUnitConversions.filter(c => {
+				const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
+				const otherUnit = unitDataById[otherId];
+				return otherUnit && otherUnit.typeOfUnit === UnitType.suffix;
+			});
+
+			// Check for meters/groups using affected suffix units
+			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToHide.map(u => u.id));
+			affectedSuffixUnitIds.add(suffixUnit.id); // Also check the main suffix unit
+
+			// Check meters using these units (as unitId or defaultGraphicUnit)
+			const affectedMetersList = Object.values(meterDataById).filter(meter =>
+				affectedSuffixUnitIds.has(meter.unitId) ||
+				(meter.defaultGraphicUnit !== null && affectedSuffixUnitIds.has(meter.defaultGraphicUnit))
+			);
+
+			// Check groups using these units (as defaultGraphicUnit)
+			const affectedGroupsList = Object.values(groupDataById).filter(group =>
+				group.defaultGraphicUnit !== null && affectedSuffixUnitIds.has(group.defaultGraphicUnit)
+			);
+
+			// Display dependency warnings if any
+			if (affectedMetersList.length > 0 || affectedGroupsList.length > 0) {
+				msgElements.push(
+					<div key="suffix-dependencies-warning">
+						<span className="bold">{translate('conversion.delete.suffix.dependencies.warning')}</span>
+						{affectedMetersList.length > 0 && (
+							<div style={{ marginTop: '8px' }}>
+								<span className="bold">{translate('conversion.delete.suffix.meters.affected')}:</span>
+								<ul>
+									{affectedMetersList.map(m => (
+										<li key={m.id}>"{m.name}"</li>
+									))}
+								</ul>
+							</div>
+						)}
+						{affectedGroupsList.length > 0 && (
+							<div style={{ marginTop: '8px' }}>
+								<span className="bold">{translate('conversion.delete.suffix.groups.affected')}:</span>
+								<ul>
+									{affectedGroupsList.map(g => (
+										<li key={g.id}>"{g.name}"</li>
+									))}
+								</ul>
+							</div>
+						)}
+					</div>
+				);
 			}
-			if (affectedConversions.length > 0) {
-				msg += `${translate('conversion.delete.suffix.conversions.to.delete')}:\n`;
-				affectedConversions.forEach(c => {
-					const s = unitDataById[c.sourceId]?.identifier || c.sourceId;
-					const d = unitDataById[c.destinationId]?.identifier || c.destinationId;
-					msg += `- ${s} -> ${d}\n`;
-				});
+
+			// Display warnings using React elements for consistency
+			if (suffixTypeUnitsToHide.length > 0) {
+				msgElements.push(
+					<div key="suffix-units-to-hide">
+						<span className="bold">{translate('conversion.delete.suffix.units.to.delete')}:</span>
+						<ul>
+							{suffixTypeUnitsToHide.map(u => (
+								<li key={u.id}>"{u.name}" ({u.identifier})</li>
+							))}
+						</ul>
+					</div>
+				);
+			}
+
+			if (conversionsToDelete.length > 0) {
+				msgElements.push(
+					<div key="suffix-conversions-to-delete">
+						<span className="bold">{translate('conversion.delete.suffix.conversions.to.delete')}:</span>
+						<ul>
+							{conversionsToDelete.map((c, idx) => {
+								const s = unitDataById[c.sourceId]?.name || unitDataById[c.sourceId]?.identifier || c.sourceId;
+								const d = unitDataById[c.destinationId]?.name || unitDataById[c.destinationId]?.identifier || c.destinationId;
+								const bidirectional = c.bidirectional ? ' ↔ ' : ' → ';
+								return (
+									<li key={`${c.sourceId}-${c.destinationId}-${idx}`}>
+										"{s}"{bidirectional}"{d}"
+									</li>
+								);
+							})}
+						</ul>
+					</div>
+				);
 			}
 		}
 
-		// Only run simulation if the previous orphan check passed and it's unit-to-unit
-		if (source.typeOfUnit !== UnitType.suffix && dest.typeOfUnit === UnitType.unit && !cancel) {
+		// Run simulation if the previous orphan check passed and it's not cancelled
+		// Now supports suffix units since simulation has been enhanced
+		if ((source.typeOfUnit !== UnitType.suffix || dest.typeOfUnit !== UnitType.suffix) && !cancel) {
 			try {
 				const result = await triggerSimulate({
 					sourceId: state.sourceId,
@@ -378,29 +486,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				);
 				cancel = true;
 			}
-		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
-			const unit = source.typeOfUnit === UnitType.suffix ? source : dest;
-			// Get the units that use this suffix
-			const affectedUnits = Object.values(unitDataById).filter(u => u.suffix === unit.identifier);
-			// Get the conversions that use these units
-			const affectedConversions = conversionDetails.filter(c =>
-				affectedUnits.some(u => u.id === c.sourceId || u.id === c.destinationId)
-			);
-			// Send user a warning before deletion
-			if (affectedUnits.length > 0) {
-				msg += `${translate('conversion.delete.suffix.units.to.delete')}:\n`;
-				affectedUnits.forEach(u => {
-					msg += `- ${u.name} (${u.identifier})\n`;
-				});
-			}
-			if (affectedConversions.length > 0) {
-				msg += `${translate('conversion.delete.suffix.conversions.to.delete')}:\n`;
-				affectedConversions.forEach(c => {
-					const s = unitDataById[c.sourceId]?.identifier || c.sourceId;
-					const d = unitDataById[c.destinationId]?.identifier || c.destinationId;
-					msg += `- ${s} -> ${d}\n`;
-				});
-			}
 		}
 
 		if (cancel) {
@@ -422,27 +507,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			handleDeleteConfirmationModalOpen();
 		}
 	};
-	/* Confirm Delete Modal */
-	// Separate from state comment to keep everything related to the warning confirmation modal together
-	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
-	const [showCancelModal, setShowCancelModal] = useState(false);
-	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
-		<div>{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?</div>);
-	const deleteConfirmText = translate('conversion.delete.conversion');
-	const deleteRejectText = translate('cancel');
-	// The first two handle functions below are required because only one Modal can be open at a time (properly)
-	const handleDeleteConfirmationModalClose = () => {
-		// Hide the warning modal
-		setShowDeleteConfirmationModal(false);
-		// Show the edit modal
-		handleShow();
-	};
-	const handleDeleteConfirmationModalOpen = () => {
-		// Hide the edit modal
-		handleClose();
-		// Show the warning modal
-		setShowDeleteConfirmationModal(true);
-	};
 	const handleDeleteConversion = async () => {
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
@@ -463,18 +527,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			});
 	};
 
-	const handleCancelModalClose = () => {
-		// Hide the warning modal
-		setShowCancelModal(false);
-		// Show the edit modal
-		handleShow();
-	};
-	const handleCancelModalOpen = () => {
-		// Hide the edit modal
-		handleClose();
-		// Show the warning modal
-		setShowCancelModal(true);
-	};
 	const handleCancel = () => {
 		// Closes the warning modal
 		setShowCancelModal(false);
@@ -489,10 +541,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	// Failure to edit conversions will not trigger a re-render, as no state has changed. Therefore, we must manually reset the values
 	const resetState = () => {
 		setState(values);
-	};
-
-	const handleShow = () => {
-		props.handleShow();
 	};
 
 	const handleClose = () => {
