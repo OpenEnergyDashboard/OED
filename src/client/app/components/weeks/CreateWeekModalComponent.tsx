@@ -5,7 +5,6 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'reactstrap';
-import { daySegmentsApi } from '../../redux/api/daySegmentsApi';
 import { daysApi } from '../../redux/api/daysApi';
 import { weeksApi } from '../../redux/api/weeksApi';
 import { useTranslate } from '../../redux/componentHooks';
