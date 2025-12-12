@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -131,7 +132,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 
 // Route for updating an existing user.
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
-	
+
 	const validParams = {
 		type: 'object',
 		required: ['user'],
@@ -147,7 +148,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 						type: 'string',
 						minLength: 3,
 						maxLength: 254
-							},
+					},
 					role: {
 						type: 'string',
 						enum: Object.values(User.role)
@@ -156,7 +157,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 						type: 'string',
 						// TODO Do not have minLength: 8 because this is optional. Nice if could check if present.
 						maxLength: 128
-		
+
 					},
 					note: {
 						type: 'string'
@@ -172,8 +173,8 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 		try {
 			const conn = getConnection();
 			const { user } = req.body;
-			const userBeforeChanges = await User.getByID(user.id,conn);
-			
+			const userBeforeChanges = await User.getByID(user.id, conn);
+
 			// This protects the database so that there will always be at least one admin
 			if (userBeforeChanges.role === 'admin' && user.role !== 'admin') {
 				const numberOfAdmins = await User.getNumberOfAdmins(conn);
@@ -193,8 +194,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			userUpdates.push(
 				User.updateUser(user.id, user.username, user.role, user.note, conn)
 			);
-			
-			
+
 			// update the user's password if needed
 			if (user.password) {
 				const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -207,7 +207,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			return res.sendStatus(200);
 
 		} catch (error) {
-			
+
 			log.error('Error while performing edit user request.', error);
 			res.status(500).json({
 				message: 'Error while performing edit user request.',
@@ -250,6 +250,8 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 	}
 });
 
+// TODO May want to separately rate limit this route to slow attempts but should
+// not really be needed since should not leak any info.
 // Route for a user to change their own password.
 router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
 	const validParams = {
@@ -268,10 +270,11 @@ router.post('/changePassword', requireAuthMiddleware, async (req, res) => {
 			}
 		}
 	};
-const validatorResult = validate(req.body, validParams);
+	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to change password with invalid parameters, errors: ${validatorResult.errors}`);
-		res.status(400).json({ message: 'Invalid params' });
+		failure(res, 400, `Got request to change a password with invalid information, errors: ${validatorResult.errors}`);
+		return;
 	} else {
 		try {
 			const conn = getConnection();
@@ -279,28 +282,41 @@ const validatorResult = validate(req.body, validParams);
 			const userId = req.decoded.data;
 			const { currentPassword, newPassword } = req.body;
 
+			let isValidUser, isValidPassword;
 			// Get the current user
 			const user = await User.getByID(userId, conn);
 			if (user === null) {
-				res.status(401).json({ message: 'User not found' });
-				return;
+				isValidUser = false;
+				// Hash dummy password so takes the same time to avoid timing attacks even though do not use.
+				await bcrypt.compare(currentPassword, 'NotRealPassword');
+				isValidPassword = false;
+			} else {
+				isValidUser = true;
+				// Verify current password
+				isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
 			}
 
-			// Verify current password
-			const isValidPassword = await bcrypt.compare(currentPassword, user.passwordHash);
-			if (!isValidPassword) {
-				// Return 400 (Bad Request) instead of 401 to avoid invalidating the token
-				res.status(400).json({ message: 'Current password is incorrect' });
+			if (!isValidUser || !isValidPassword) {
+				// Return 400 (Bad Request) instead of 401 to avoid invalidating the token.
+				// The message is deliberately vague to avoid telling a non-admin requestor which caused the issue
+				// for security reasons.
+				log.info(`Attempt to change password for user id ${userId} failed with isValidUser of ${isValidUser} and isValidPassword of ${isValidPassword}`);
+				failure(res, 400, 'Password or user issue with request to change password');
 				return;
 			}
 
 			// Hash and update the new password
 			const hashedPassword = await bcrypt.hash(newPassword, 10);
 			await User.updateUserPassword(userId, hashedPassword, conn);
-			res.sendStatus(200);
+			log.info(`Changed password for user ${user.username}`);
+			success(res);
+			return;
 		} catch (error) {
-			log.error('Error while performing change password request', error );
-			res.status(500).json({ message: 'Internal Server Error', error: error } );
+			const msg = 'Server error while performing change password request';
+			log.error(msg + ' with error: ', error);
+			// This generally should not happen. Unlike most places, do not return the actual error
+			// to avoid showing to a non-admin in case this is an attack.
+			failure(res, 500, msg);
 		}
 	}
 });

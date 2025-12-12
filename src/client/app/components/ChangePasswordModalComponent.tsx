@@ -112,8 +112,8 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 				showSuccessNotification(translate('password.successfully.changed'));
 				resetPasswordFields();
 			})
-			.catch(() =>{
-				showErrorNotification(translate('password.failed.to.change'));
+			.catch(error =>{
+				showErrorNotification(translate('password.failed.to.change') + error.data);
 			});
 	};
 
