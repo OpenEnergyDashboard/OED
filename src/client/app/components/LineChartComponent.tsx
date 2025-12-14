@@ -111,6 +111,31 @@ export default function LineChartComponent() {
 	} else if (!enoughData) {
 		return <h1>{`${translate('no.data.in.range')}`}</h1>;
 	} else {
+		let minDate = '';
+		let maxDate = '';
+		for (const trace of data) {
+			if (trace.x && trace.x.length > 0) {
+				const traceMin = trace.x[0] as string;
+				const traceMax = trace.x[trace.x.length - 1] as string;
+				// Update minX if this is the first trace or has an earlier date
+				if (minDate === '' || utc(traceMin).isBefore(utc(minDate))) {
+					minDate = traceMin;
+				}
+				// Update maxX if this is the first trace or has a later date
+				if (maxDate === '' || utc(traceMax).isAfter(utc(maxDate))) {
+					maxDate = traceMax;
+				}
+			}
+		}
+		// Tries to get the range from the slider range interval, undefined if not bounded
+		const sliderRange: [string, string] | undefined = sliderRangeInterval?.getIsBounded()
+			? [
+				sliderRangeInterval.getStartTimestamp()!.utc().toISOString(),
+				sliderRangeInterval.getEndTimestamp()!.utc().toISOString()
+			]
+			: undefined;
+		// Either sets the xRange to the minDate maxDate or the saved slider range. This keeps the range from resetting when we toggle error bars.
+		const xRange: [string, string] = sliderRange ?? [minDate, maxDate];
 		return (
 			<Plot
 				data={data}
@@ -122,9 +147,8 @@ export default function LineChartComponent() {
 					yaxis: { title: unitLabel, gridcolor: '#ddd', fixedrange: true },
 					// 'fixedrange' on the yAxis means that dragging is only allowed on the xAxis which we utilize for selecting dateRanges
 					xaxis: {
-						rangeslider: { visible: true },
-						range: [sliderRangeInterval.getStartTimestamp()?.toISOString(),
-							sliderRangeInterval.getEndTimestamp()?.toISOString()],
+						rangeslider: { visible: true, range: [minDate, maxDate] },
+						range: xRange,
 						showgrid: true,
 						gridcolor: '#ddd'
 					}

@@ -12,7 +12,7 @@ interface ConfirmActionModalComponentProps {
 	show: boolean;
 	actionTitle?: string;
 	// Message to display when action button is rendered
-	actionConfirmMessage: React.ReactNode;
+	actionConfirmMessage?: React.ReactNode;
 	// Overrides the default action confirmation text 'yes'
 	actionConfirmText?: string;
 	// Overrides the default action confirmation text 'no'
@@ -55,7 +55,9 @@ export default function ConfirmActionModalComponent(props: ConfirmActionModalCom
 					{props.actionTitle ? props.actionTitle : translate('confirm.action')}
 				</ModalHeader>
 				{/* Passed message is already translated */}
-				<ModalBody><div className="confirmation-message">{props.actionConfirmMessage}</div></ModalBody>
+				{props.actionConfirmMessage && (
+					<ModalBody><div className="confirmation-message">{props.actionConfirmMessage}</div></ModalBody>
+				)}
 				<ModalFooter>
 					{props.forceCancel ? (
 						// Render a single cancel button if forceCancel is true
