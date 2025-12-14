@@ -75,7 +75,8 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	// user apis
-	const [submitUserEdits] = userApi.useEditUserMutation();
+	// TODO DEBUG: added in to test the showErrorNotification
+	//const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 
 	// check if passwords match and if password length is at least 8
@@ -184,13 +185,16 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	const handleSaveChanges = async () => {
 		// close modal
 		props.handleClose();
+		// TODO DEBUG: added in to test the showErrorNotification
 		// set needed user details into a user and send to backend
-		const editedUser: User = {
-			id: userDetails.id, username: userDetails.username, role: userDetails.role,
-			password: userDetails.password, note: userDetails.note
-		};
-		submitUserEdits(editedUser)
-			.unwrap()
+		//const editedUser: User = {
+		//	id: userDetails.id, username: userDetails.username, role: userDetails.role,
+		//	password: userDetails.password, note: userDetails.note
+		//};
+
+		Promise.reject({ data: { message: 'Test error message' } })
+		//submitUserEdits(editedUser)
+		//	.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
 			})

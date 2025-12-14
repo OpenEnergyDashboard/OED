@@ -241,6 +241,7 @@ export default function CreateGroupModalComponent() {
 			const submitState = { ...state, gps: gps };
 			// TODO DEBUG: added in to test the showErrorNotification
 			submitState.name = '';
+			
 			createGroup(submitState);
 			resetState();
 		} else {

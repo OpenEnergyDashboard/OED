@@ -39,6 +39,8 @@ export default function PreferencesComponent() {
 	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
 	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
+		// TODO DEBUG: added in to test the showErrorNotification
+		
 		setLocalAdminPref({ ...localAdminPref, [key]: value });
 	};
 

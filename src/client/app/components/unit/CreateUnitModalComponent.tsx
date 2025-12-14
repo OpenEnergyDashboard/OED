@@ -215,7 +215,7 @@ export default function CreateUnitModalComponent() {
 			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
 		};
 		// TODO DEBUG: added in to test the showErrorNotification
-		//submitState.secInRate = -1;
+		submitState.secInRate = -1;
 		// Add the new unit and update the store
 		submitCreateUnit(submitState)
 			.unwrap()

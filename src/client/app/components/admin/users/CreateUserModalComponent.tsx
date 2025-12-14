@@ -8,8 +8,10 @@ import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
 	ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-import { userApi } from '../../../redux/api/userApi';
-import { User, UserRole, userDefaults } from '../../../types/items';
+// TODO DEBUG: added in to test the showErrorNotification
+//import { userApi } from '../../../redux/api/userApi';
+//import { User, UserRole, userDefaults } from '../../../types/items';
+import { UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
@@ -46,7 +48,8 @@ export default function CreateUserModal() {
 	const [userDetails, setUserDetails] = useState(userDefaults);
 
 	// user api
-	const [createUser] = userApi.useCreateUserMutation();
+	// TODO DEBUG: added in to test the showErrorNotification
+	//const [createUser] = userApi.useCreateUserMutation();
 	const userRoleIsSelected = userDetails.role !== UserRole.INVALID;
 
 	// check if passwords match
@@ -108,9 +111,11 @@ export default function CreateUserModal() {
 	// End Modal show/close
 
 	const handleSubmit = async () => {
-		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
-		createUser(newUser)
-			.unwrap()
+		//const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
+		// TODO DEBUG: added in to test the showErrorNotification
+		//createUser(newUser)
+		Promise.reject({ data: { message: 'Test error message' } })
+			//.unwrap()
 			.then(() => {
 				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username);
 				resetForm();

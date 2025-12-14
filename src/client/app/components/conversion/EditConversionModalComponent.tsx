@@ -507,6 +507,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 			// Only do work if there are changes
 			if (conversionHasChanges) {
+
+				// TODO DEBUG: added in to test the showErrorNotification
+				state.sourceId = -1;
+				state.destinationId = -1;
+			
 				// Save our changes
 				editConversion({
 					conversionData: {

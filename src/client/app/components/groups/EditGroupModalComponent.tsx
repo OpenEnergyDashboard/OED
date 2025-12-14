@@ -356,6 +356,10 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
 						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
 					};
+
+					// TODO DEBUG: added in to test the showErrorNotification
+					submitState.name = '';
+					
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
 					submitGroupEdits(submitState);

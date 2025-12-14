@@ -189,7 +189,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
 			};
 			// TODO DEBUG: added in to test the showErrorNotification
-			//submitState.name = '';
+			submitState.name = '';
+			submitState.identifier = '';
+			
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
 			submitAddMeter(submitState)
