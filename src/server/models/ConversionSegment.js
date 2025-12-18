@@ -64,7 +64,7 @@ class ConversionSegment {
 	 * @returns {Promise.<ConversionSegment>}
 	 */
 	static async getBySourceDestination(sourceId, destinationId, conn) {
-		const rows = await conn.many(sqlFile('conversionSegment/get_by_source_destination.sql'), {
+		const rows = await conn.any(sqlFile('conversionSegment/get_by_source_destination.sql'), {
 			sourceId: sourceId,
 			destinationId: destinationId
 		});
