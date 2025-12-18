@@ -40,12 +40,12 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
@@ -77,11 +77,11 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
 				req.body.slope, req.body.intercept, req.body.note);
 			await updatedConversion.update(conn);
+			success(res);
 		} catch (err) {
 			log.error(`Error while editing conversion with error(s): ${err}`);
 			failure(res, 500, `Error while editing conversion with error(s): ${err}`);
 		}
-		success(res);
 	}
 });
 
@@ -94,17 +94,29 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			bidirectional: {
 				type: 'boolean'
+			},
+			note: {
+				oneOf: [
+					{ type: 'string' },
+					{ type: 'null' }
+				]
+			},
+			weekPatternsId: {
+				oneOf: [
+					{ type: 'integer' },
+					{ type: 'null' }
+				]
 			},
 			slope: {
 				type: 'float'
@@ -156,12 +168,12 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		required: ['sourceId', 'destinationId'],
 		properties: {
 			sourceId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			},
 			destinationId: {
-				type: 'number',
+				type: 'integer',
 				// Do not allow negatives for now
 				minimum: 0
 			}

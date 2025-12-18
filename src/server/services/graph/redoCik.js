@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const { createConversionGraph } = require('./createConversionGraph');
-const { createCikArray } = require('./createConversionArrays');
+const { createCikArray, createCikVaryArray } = require('./createConversionArrays');
 const Cik = require('../../models/Cik');
-const { handleSuffixUnits} = require('./handleSuffixUnits');
+const CikVary = require('../../models/CikVary');
+const { handleSuffixUnits } = require('./handleSuffixUnits');
 const { getConnection } = require('../../db');
 const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 
@@ -34,7 +35,36 @@ async function updateCikAndViews() {
 	await refreshAllReadingViews();
 }
 
+/**
+ * Creates CikVary based on units and conversion segments and then inserts these values
+ * in the cik_vary table in the database.
+ */
+async function redoCikVary(conn) {
+	// Create graph based on units and conversion segments.
+	const graph = await createConversionGraph(conn);
+
+	// Processes suffix units to update graph and database (not used for now).
+	await handleSuffixUnits(graph, conn);
+	// Uses final graph to create cik_vary array.
+	const cikVary = await createCikVaryArray(graph, conn);
+
+	// Inserts cik_vary array into database where old values are deleted.
+	await CikVary.insert(cikVary, conn);
+}
+
+/**
+ * Needed to call from npm run for CikVary. Give new name so hopefully won't use in regular code.
+*/
+async function updateCikVaryAndViews() {
+	const conn = getConnection();
+	await redoCikVary(conn);
+	// We need to update views if CikVary changes.
+	await refreshAllReadingViews();
+}
+
 module.exports = {
 	redoCik,
-	updateCikAndViews
+	updateCikAndViews,
+	redoCikVary,
+	updateCikVaryAndViews
 };

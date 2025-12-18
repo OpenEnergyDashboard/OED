@@ -14,7 +14,6 @@ const { log } = require('../log');
 const Point = require('../models/Point');
 const { failure, success } = require('./response');
 const { refreshGroupsDeepMetersView } = require('../services/refreshGroupsDeepMetersView');
-const { property } = require('lodash');
 const { MIN_ITEMS, MAX_ITEMS } = require('../util/globalConst');
 
 const router = express.Router();
@@ -300,7 +299,6 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
 		maxProperties: 10,
-		
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
 			id: { type: 'integer' },
@@ -401,7 +399,6 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 
 			res.sendStatus(200);
 		} catch (err) {
-			console.log("200", err);
 			if (err.message && err.message === 'Cyclic group detected') {
 				res.status(400).send({ message: err.message });
 			} else {
@@ -413,8 +410,17 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 });
 
 router.post('/refresh', adminAuthMiddleware('refresh group views'), async (req, res) => {
-	await refreshGroupsDeepMetersView();
-	res.sendStatus(200);
+	try { 
+		await refreshGroupsDeepMetersView();
+		res.sendStatus(200);
+	} catch (err) {
+		if (err.message && err.message === 'Cyclic group detected') {
+			res.status(400).send({ message: err.message });
+		} else {
+			log.error(`Error while editing existing group ${err}`, err);
+			res.sendStatus(500);
+		}
+	}
 });
 
 router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) => {

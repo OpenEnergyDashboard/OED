@@ -3,6 +3,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+-- By indexing both columns together, the database can efficiently handle queries that involve both meter_id and time_interval.
+-- Created to support the usage of the view by 3d.
+-- TODO verify helps with newer views.
+CREATE INDEX IF NOT EXISTS idx_meter_hourly_readings_unit_meter_time
+ON meter_hourly_readings_unit (meter_id, lower(time_interval));
+-- TODO How does this relate to index for same view in create_reading_views? Are both needed?
+CREATE INDEX if not exists idx_two_group_hourly_readings_unit
+ON group_hourly_readings_unit (group_id, graphic_unit_id, lower(time_interval));
+
 /*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for the readings in the supplied meter. This can be an issue, in particular,
@@ -21,6 +30,66 @@ BEGIN
 	RETURN tsrange_to_shrink * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
+
+/* Similar to meter version but for a group */
+CREATE OR REPLACE FUNCTION shrink_tsrange_to_group_readings_by_day(tsrange_to_shrink TSRANGE, group_id_desired INTEGER)
+	RETURNS TSRANGE
+AS $$
+DECLARE
+	readings_max_tsrange TSRANGE;
+BEGIN
+	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	FROM group_daily_readings_unit
+	where group_id = group_id_desired;
+	RETURN tsrange_to_shrink * readings_max_tsrange;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+-- Determines the spacing between 3D points. It uses the lowest one for all meters passed
+-- that is valid.
+CREATE OR REPLACE FUNCTION reading_interval_3d (
+    -- The desired meter ids.
+    IN meter_ids_requested INTEGER[],
+	-- The number of hours in each reading requested
+    IN reading_length_hours INTEGER,
+	-- The number of hours in each reading determined
+	OUT reading_length_hours_use INTEGER,
+	-- The number of hours in each reading determined as an interval
+	OUT reading_length_interval INTERVAL
+)
+AS $$
+DECLARE
+    -- The meter frequency from all meters.
+ 	meter_frequency INTERVAL;
+    -- The meter frequency rounded up to a whole number of hours.
+   	meter_frequency_hour_up INTEGER;
+    -- The larger of the meter value and the argument sent.
+    max_frequency INTEGER;
+BEGIN
+    -- Get the smallest reading frequency for all meters requested.
+    SELECT min(reading_frequency) INTO meter_frequency
+	FROM (meters m
+	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id);
+  	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
+    meter_frequency_hour_up := CEIL((SELECT * FROM EXTRACT(EPOCH FROM meter_frequency)) / 3600);
+    -- Use the hours that is the largest of the request and the meter values.
+    max_frequency := GREATEST(meter_frequency_hour_up, reading_length_hours);
+    -- The value used must be a divisor of 24 or greater than 12.
+    IF (max_frequency = 5) THEN
+        reading_length_hours_use := 6;
+    ELSIF (max_frequency = 7) THEN
+        reading_length_hours_use := 8;
+    ELSIF (max_frequency > 8 AND max_frequency < 12) THEN
+        reading_length_hours_use := 12;
+    ELSE
+        reading_length_hours_use := max_frequency;
+    END IF;
+    -- Hours per reading determined returned as an interval.
+    reading_length_interval := (reading_length_hours_use::TEXT || ' hour')::INTERVAL;
+END;
+$$ LANGUAGE 'plpgsql';
+
 
 -- Gets meters graphing data for 3D graphic by returning points that span the requested
 -- length of time over the days requested. This function can be slower than line readings
@@ -59,26 +128,8 @@ DECLARE
 	-- The actual number of hours in a reading to use.
 	reading_length_hours_use INTEGER;
 BEGIN
-	-- Get the smallest reading frequency for all meters requested.
-	SELECT min(reading_frequency) INTO meter_frequency
-	FROM (meters m
-	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id);
-  	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
-	meter_frequency_hour_up := CEIL((SELECT * FROM EXTRACT(EPOCH FROM meter_frequency)) / 3600);
-	-- Use the hours that is the largest of the request and the meter values.
-	max_frequency := GREATEST(meter_frequency_hour_up, reading_length_hours);
-	-- The value used must be a divisor of 24 or greater than 12.
-	IF (max_frequency = 5) THEN
-		reading_length_hours_use := 6;
-	ELSIF (max_frequency = 7) THEN
-		reading_length_hours_use := 8;
-	ELSIF (max_frequency > 8 AND max_frequency < 12) THEN
-		reading_length_hours_use := 12;
-	ELSE
-		reading_length_hours_use := max_frequency;
-	END IF;
-	-- Hours per reading determined returned as an interval.
-	reading_length_interval := (reading_length_hours_use::TEXT || ' hour')::INTERVAL;
+	-- Find the correct number of hours per reading returned.
+	SELECT * from reading_interval_3d(meter_ids_requested, reading_length_hours) into reading_length_hours_use, reading_length_interval;
 
 	-- Loop over all meters.
 	WHILE current_meter_index <= cardinality(meter_ids_requested) LOOP
@@ -155,7 +206,7 @@ CREATE OR REPLACE FUNCTION group_3d_readings_unit (
 	--For 3D graphics, users will only be able to select 1 group to graph.
 	group_id_requested INTEGER,
 	-- The desired graphic unit of the returned data
-	graphic_unit_id INTEGER,
+	graphic_unit_id_requested INTEGER,
 	-- The start and end time for the data to return
 	start_stamp TIMESTAMP,
 	end_stamp TIMESTAMP,
@@ -165,8 +216,15 @@ CREATE OR REPLACE FUNCTION group_3d_readings_unit (
 	RETURNS TABLE(reading_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
 DECLARE
-	--Holds the desired meter IDs in order to call meter_3d_readings_unit in the query below.
+	-- Holds the desired meter IDs in order to call meter_3d_readings_unit in the query below.
 	meter_ids INTEGER[];
+    -- Holds the range of dates for returned data that fits the actual data.
+    requested_range TSRANGE;
+	--Holds the desired meter IDs in order to call meter_3d_readings_unit in the query below. 
+	-- The number of hours in each reading determined
+	reading_length_hours_use INTEGER;
+	-- The number of hours in each reading determined as an interval
+	reading_length_interval INTERVAL;
 BEGIN
 	--Get all the meter IDS that will be included in the group being requested.
 	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
@@ -180,6 +238,7 @@ BEGIN
 			readings.start_timestamp,
 			readings.end_timestamp
 		-- Call meter_3d_readings_unit that will return the reading rate for the meters in the group that was requested.
+		-- TODO Does this work correctly?????? What if some meters return -999 and others do not??????
 		FROM meter_3d_readings_unit(meter_ids, graphic_unit_id, start_stamp, end_stamp, reading_length_hours) readings
 		-- Group data by start timestamp and end timestamp.
 		GROUP BY readings.start_timestamp, readings.end_timestamp

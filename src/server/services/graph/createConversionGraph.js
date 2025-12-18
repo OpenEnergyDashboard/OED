@@ -5,6 +5,7 @@
 const createGraph = require('ngraph.graph');
 const Unit = require('../../models/Unit');
 const Conversion = require('../../models/Conversion');
+const ConversionSegment = require('../../models/ConversionSegment');
 const path = require('ngraph.path');
 
 /**
@@ -29,6 +30,7 @@ async function createConversionGraph(conn) {
 
 	return graph;
 }
+
 
 /**
  * Returns the list of units on the shortest path from source to destination.

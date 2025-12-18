@@ -10,16 +10,12 @@ class Conversion {
 	 * @param {*} sourceId The unit id of the source.
 	 * @param {*} destinationId The unit id of the destination.
 	 * @param {*} bidirectional Is this conversion bidirectional?
-	 * @param {*} slope The slope of the conversion.
-	 * @param {*} intercept The intercept of the conversion.
 	 * @param {*} note Comments by the admin or OED inserted.
 	 */
-	constructor(sourceId, destinationId, bidirectional, slope, intercept, note) {
+	constructor(sourceId, destinationId, bidirectional, note) {
 		this.sourceId = sourceId;
 		this.destinationId = destinationId;
 		this.bidirectional = bidirectional;
-		this.slope = slope;
-		this.intercept = intercept;
 		this.note = note;
 	}
 
@@ -67,12 +63,38 @@ class Conversion {
 	}
 
 	/**
-	 * Inserts a new conversion to the database.
+	 * Inserts a new conversion to the database, along with a conversion segment.
+	 * The default conversion segment spans from -inf to inf.
+	 * @param {*} weekPatternsId The id for a weekly pattern
+	 * @param {*} slope The slope for the conversion segment
+	 * @param {*} intercept The intercept for the conversion segment
+	 * @param {*} segmentNote The note for the default conversion segment
 	 * @param {*} conn The connection to use.
 	 */
-	async insert(conn) {
-		const conversion = this;
-		await conn.none(sqlFile('conversion/insert_new_conversion.sql'), conversion);
+	async insert(weekPatternsId, slope, intercept, segmentNote, conn) {
+		return conn.tx(async t => { 
+			// insert new conversion
+			const conversionData = {
+				sourceId: this.sourceId,
+				destinationId: this.destinationId,
+				bidirectional: this.bidirectional,
+				note: this.note
+			};
+			await t.none(sqlFile('conversion/insert_new_conversion.sql'), conversionData);
+
+			// insert new conversion segment
+			const conversionSegment = {
+				sourceId: this.sourceId,
+				destinationId: this.destinationId,
+				weekPatternsId: weekPatternsId,
+				slope: slope,
+				intercept: intercept,
+				startTime: '-infinity',
+				endTime: 'infinity',
+				note: segmentNote
+			};
+			await t.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), conversionSegment);
+		});
 	}
 
 	/**
