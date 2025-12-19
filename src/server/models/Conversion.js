@@ -34,7 +34,7 @@ class Conversion {
 	 * @returns The new conversion object.
 	 */
 	static mapRow(row) {
-		return new Conversion(row.source_id, row.destination_id, row.bidirectional, row.slope, row.intercept, row.note);
+		return new Conversion(row.source_id, row.destination_id, row.bidirectional, row.note);
 	}
 
 	/**

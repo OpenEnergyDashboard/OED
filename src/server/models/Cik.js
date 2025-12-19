@@ -62,7 +62,7 @@ class Cik {
 		// TODO This should be a transaction to avoid issues for any request made to the database.
 
 		// Remove all the current values in the table.
-		await conn.none(sqlFile('cik/delete_all_conversions.sql'));
+		await conn.none(sqlFile('cik/delete_all_cik.sql'));
 
 		// Loop over all conversions in cik array and insert each in DB.
 		// This used to be a foreEach but that caused issues as forEach should not have an async func.

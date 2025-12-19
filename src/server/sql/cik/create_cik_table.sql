@@ -8,7 +8,5 @@ CREATE TABLE IF NOT EXISTS cik (
 	destination_id INTEGER REFERENCES units(id),
 	slope FLOAT,
 	intercept FLOAT,
-	start_time TIMESTAMP DEFAULT '-infinity',
-	end_time TIMESTAMP DEFAULT 'infinity',
-	PRIMARY KEY (source_id, destination_id, start_time)
+	PRIMARY KEY (source_id, destination_id)
 );
