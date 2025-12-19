@@ -122,7 +122,7 @@ This is necessary because they can't be wrapped in a function (otherwise predica
 
 /**
 The next two create a view/table that takes the raw/meter readings and averages them for each day or hour AND applies
-the unit conversions from the cik table.
+the unit conversions from the cik_vary table.
 This is used by the line graph function below to make them faster since the values
 are already averaged and the conversions applied. There are two types of readings: quantity and flow/raw. The quantity
 readings must be normalized by their time length. The flow/raw readings are already by time
@@ -247,7 +247,7 @@ SELECT
 FROM base_hourly bh
 JOIN meters m ON m.id = bh.meter_id
 JOIN units  u ON u.id = m.unit_id
-JOIN cik c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && bh.time_interval
+JOIN cik_vary c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && bh.time_interval
 GROUP BY m.id, graphic_unit_id, bh.time_interval
 -- The order by ensures that the materialized view will be clustered in this way.
 ORDER BY bh.time_interval, meter_id;
@@ -425,7 +425,7 @@ DECLARE
 					-- the 3600 is needed since EPOCH is in seconds.
 					-- Normalize to rate over reading interval
 					SUM(
-						--Wrapped in SUM to handle multiple matching cik conversions
+						--Wrapped in SUM to handle multiple matching cik_vary conversions
 						-- Weight by conversion duration(intersection of reading and conversion time ranges is necessary because the conversion may overlap the reading time range)
 						 (EXTRACT(EPOCH FROM (
 							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
@@ -438,7 +438,7 @@ DECLARE
 					-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
 					-- to per hour.
 					SUM(
-						--Wrapped in SUM to handle multiple matching cik conversions
+						--Wrapped in SUM to handle multiple matching cik_vary conversions
 						-- Weight by conversion duration (intersection of reading and conversion time ranges is necessary because the conversion may overlap the reading time range)
 						 (EXTRACT(EPOCH FROM (
 							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
@@ -458,10 +458,10 @@ DECLARE
 				FROM (((readings r
 				INNER JOIN meters m ON m.id = current_meter_id)
 				INNER JOIN units u ON m.unit_id = u.id)
-				INNER JOIN cik c on c.source_id = m.unit_id
+				INNER JOIN cik_vary c on c.source_id = m.unit_id
 					AND c.destination_id = passed_graphic_unit_id
-					--The condition below was added for time varying conversions (allows for multiple cik rows to be applied to a single reading)
-					--The cik exclusive bounds '()' ensures no two conversions overlap.
+					--The condition below was added for time varying conversions (allows for multiple cik_vary rows to be applied to a single reading)
+					--The cik_vary exclusive bounds '()' ensures no two conversions overlap.
 					AND tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]'))
 				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = current_meter_id
 				-- Added GROUP BY to allow SUM to aggregate correctly across multiple rows.
