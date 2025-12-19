@@ -15,6 +15,7 @@ const { insertSpecialUnits, insertSpecialConversions } = require('../../data/aut
 const { redoCik } = require('../../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
+const { redoCikVary } = require('../../services/graph/redoCik');
 
 mocha.describe('Compare readings', () => {
 	let meter, graphicUnitId, conversionSlope, conn;
@@ -66,6 +67,7 @@ mocha.describe('Compare readings', () => {
 			undefined // reading frequency
 		).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
+		await redoCikVary(conn);
 		await Reading.insertAll([
 			new Reading(meter.id, 1, prevStart, prevEnd),
 			new Reading(meter.id, 10, currStart, currEnd)
