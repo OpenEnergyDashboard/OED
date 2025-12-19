@@ -86,10 +86,10 @@ class CikVary {
 	* @param {*} conn The database connection to use.
 	*/
 	static async insert(cikVaryArr, conn) {
-		return conn.tx(async t => {	
+		return conn.tx(async t => {
+			// cik_vary
 			// Remove all the current values in the table.
 			await t.none(sqlFile('cik_vary/delete_all_cik_vary.sql'));
-
 			// Loop over all conversions in array and insert each in DB.
 			for (const conversion of cikVaryArr) {
 				await t.none(sqlFile('cik_vary/insert_new_cik_vary.sql'), {
@@ -101,6 +101,16 @@ class CikVary {
 					intercept: conversion.intercept
 				});
 			}
+
+			// cik
+			// Remove all the current values in the table.
+			await t.none(sqlFile('cik/delete_all_cik.sql'));
+			// The following finds each unique (by source/i and destination/k) entry in cik_vary and then
+			// inserts and entry in cik. Done as one sql call to be more efficient.
+			// It is also possible to create the needed information during createCikVaryArray for each source
+			// and destination. That might be a little more efficient but this way is simple and guarantees
+			// that cik_vary and cik represent the same information.
+			await t.none(sqlFile('cik/insert_unique_cik_vary_in_cik.sql'));
 		});
 	}
 }

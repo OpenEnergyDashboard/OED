@@ -103,8 +103,8 @@ class Reading {
 	 * @returns {Promise<void>}
 	 */
 	static async refreshMeterReadingsViews(conn) {
-		await conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
-		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
 	}
 
 
