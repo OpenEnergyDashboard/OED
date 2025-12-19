@@ -4,7 +4,7 @@
 
 const express = require('express');
 const { getConnection } = require('../db');
-const { redoCik } = require('../services/graph/redoCik');
+const { redoCikVary } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const { adminAuthMiddleware } = require('./authenticator');
 
@@ -16,7 +16,7 @@ const router = express.Router();
 router.post('/refresh', adminAuthMiddleware('conversion refresh system data'), async (req, res) => {
 	if (req.body.redoCik) {
 		const conn = getConnection();
-		await redoCik(conn);
+		await redoCikVary(conn);
 	}
 	if (req.body.refreshReadingViews) {
 		await refreshAllReadingViews();

@@ -6,7 +6,7 @@ const { expect, testDB } = require('../test/common');
 const { TimeInterval } = require('../../common/TimeInterval');
 const { insertUnits, insertConversions, insertMeters, insertGroups } = require('./insertData');
 const Unit = require('../models/Unit');
-const { redoCik } = require('../services/graph/redoCik');
+const { redoCikVary } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const readCsv = require('../services/pipeline-in-progress/readCsv');
 const moment = require('moment');
@@ -29,7 +29,7 @@ const HTTP_CODE = {
 
 /**
  * Initialize test database, call the functions to insert data into the database,
- * then redoCik and refresh views to ensure everything works.
+ * then redoCikVary and refresh views to ensure everything works.
  * @param {array} unitData parameters for insertUnits
  * @param {array} conversionData parameters for insertConversions
  * @param {array} meterData parameters for insertMeters
@@ -41,7 +41,7 @@ async function prepareTest(unitData, conversionData, meterData, groupData = []) 
 	await insertConversions(conversionData, conn);
 	const result = await insertMeters(meterData, conn);
 	await insertGroups(groupData, conn);
-	await redoCik(conn);
+	await redoCikVary(conn);
 
     // Only refresh meter views if there is no group changes.
     if (groupData.length == 0) {

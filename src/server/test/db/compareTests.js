@@ -12,7 +12,6 @@ const Group = require('../../models/Group');
 const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
-const { redoCik } = require('../../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const { redoCikVary } = require('../../services/graph/redoCik');
@@ -33,7 +32,6 @@ mocha.describe('Compare readings', () => {
 		await insertStandardConversions(conn);
 		await insertSpecialUnits(conn);
 		await insertSpecialConversions(conn);
-		await redoCik(conn);
 		// Make the meter be a kWh meter.
 		const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 		await new Meter(

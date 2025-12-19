@@ -14,7 +14,7 @@ const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
 const { insertUnits, insertConversions } = require('../../util/insertData');
-const { redoCik } = require('../../services/graph/redoCik');
+const { redoCikVary } = require('../../services/graph/redoCik');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const { getUnitId, unitDatakWh, conversionDatakWh } = require('../../util/readingsUtils');
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
@@ -43,7 +43,7 @@ mocha.describe('Line & bar Readings', () => {
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
 				undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
 				undefined, undefined, undefined, undefined, undefined, meterUnitId, unitId, undefined, '01:00:00').insert(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			meter = await Meter.getByName('Meter', conn);
 			// kwh = await Unit.getByName('kWh', conn);
 			unitId = await getUnitId('kWh');
@@ -135,7 +135,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			// Put a shorter meter reading frequency so it will return daily rather than raw since only one reading.
@@ -187,7 +187,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -255,7 +255,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			// The default frequency of reading is 15-min so set to 23 for this meter.
@@ -322,7 +322,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -440,7 +440,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -542,7 +542,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
