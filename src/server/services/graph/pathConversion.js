@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Conversion = require('../../models/Conversion');
+const ConversionSegment = require('../../models/ConversionSegment');
 const Unit = require('../../models/Unit');
 
 /**
@@ -14,23 +15,34 @@ const Unit = require('../../models/Unit');
  * @returns 
  */
 async function conversionValues(sourceUnit, destinationUnit, conn) {
-	let desiredConversion = await Conversion.getBySourceDestination(sourceUnit, destinationUnit, conn);
+	let desiredConversion = await ConversionSegment.getBySourceDestination(sourceUnit, destinationUnit, conn);
 	let slope;
 	let intercept;
 	let suffix;
-	if (desiredConversion === null) {
+	if (desiredConversion.length === 0) {
 		// Did not find the conversion. Since conversion should exist, it must be the other way around and bidirectional.
-		desiredConversion = await Conversion.getBySourceDestination(destinationUnit, sourceUnit, conn);
+		desiredConversion = await ConversionSegment.getBySourceDestination(destinationUnit, sourceUnit, conn);
 		if (desiredConversion === null || desiredConversion.bidirectional === false) {
 			// This should never happen. It should have been in the table one way or the other.
 			throw Error(`The conversions from ${sourceUnit} to ${destinationUnit} doesn't exist`);
+		} else if (desiredConversion.length !== 1) {
+			// TODO This needs to be fixed up to handle suffix units on paths with time-varying conversions.
+			// There are multiple conversion segments so time-varying.
+			throw Error(`The conversions from ${destinationUnit} to ${sourceUnit} is time-varying so cannot include`);
 		}
+		desiredConversion = desiredConversion[0];
 		// We need to invert the conversion since it needs to go the other way from how stored.
 		[slope, intercept] = invertConversion(desiredConversion.slope, desiredConversion.intercept);
 		// Since we inverted the conversion, we use the suffix from the destination.
 		suffix = (await Unit.getById(destinationUnit, conn)).suffix;
 	} else {
+		// TODO This needs to be fixed up to handle suffix units on paths with time-varying conversions.
+		if (desiredConversion.length !== 1) {
+			// There are multiple conversion segments so time-varying.
+			throw Error(`The conversions from ${sourceUnit} to ${destinationUnit} is time-varying so cannot include`);
+		}
 		// We found it in the desired order.
+		desiredConversion = desiredConversion[0];
 		slope = desiredConversion.slope;
 		intercept = desiredConversion.intercept;
 		suffix = (await Unit.getById(sourceUnit, conn)).suffix;

@@ -82,14 +82,14 @@ async function verifyConversion(expectedSlope, expectedIntercept, source, destin
 		);
 		// Insert the new conversion to the graph
 		graph.addLink(sourceId, destinationId);
-	} 
-// TODO: This check needs to be finalized soon to reflect the updated Conversion table
-// else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
-// 		// While unlikely, the conversion changed so update
-// 		currentConversion.slope = expectedSlope;
-// 		currentConversion.intercept = expectedIntercept;
-// 		await currentConversion.update(conn);
-// 	}
+	}
+	// TODO: This check needs to be finalized soon to reflect the updated Conversion table
+	// else if (currentConversion.slope !== expectedSlope || currentConversion.intercept !== expectedIntercept) {
+	// 		// While unlikely, the conversion changed so update
+	// 		currentConversion.slope = expectedSlope;
+	// 		currentConversion.intercept = expectedIntercept;
+	// 		await currentConversion.update(conn);
+	// 	}
 }
 
 /**
