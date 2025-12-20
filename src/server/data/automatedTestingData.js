@@ -8,11 +8,11 @@
 
 const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
+const Group = require('../models/Group');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { getConnection } = require('../db');
 const { redoCikVary } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
-const fs = require('fs').promises;
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -1344,9 +1344,11 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	await testData();
 	// Recreate the Cik entries since changed meters.
 	await redoCikVary(conn);
-	// Refresh the readings since added new ones.
-	await refreshAllReadingViews();
 	await insertGroups(specialGroups, conn);
+	// Refresh groups deep meters view after adding new groups.
+	await Group.refreshGroupsDeepMetersView(conn);
+	// Refresh the readings since added new ones & groups.
+	await refreshAllReadingViews();
 }
 
 /*
