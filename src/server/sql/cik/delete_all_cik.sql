@@ -4,7 +4,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
--- Get all ciks
-SELECT source_id AS meter_unit_id, destination_id AS non_meter_unit_id
-FROM cik
-;
+-- Remove all current values from the cik_vary table.
+DELETE FROM cik;

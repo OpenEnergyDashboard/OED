@@ -11,7 +11,7 @@
 
 const Unit = require('../models/Unit');
 const Group = require('../models/Group');
-const { redoCik } = require('../services/graph/redoCik');
+const { redoCikVary } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
 const { getConnection } = require('../db');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
@@ -753,12 +753,12 @@ async function insertWebsiteData() {
 	await insertConversions(conversions, conn);
 	// Recreate the Cik entries since changed units/conversions.
 	// Do now since needed to insert meters with suffix units.
-	await redoCik(conn);
+	await redoCikVary(conn);
 	console.log(`Start loading each set of test data into OED meters (${meters.length} files of varying length, may take minutes):`);
 	// await Meter.insertMany(meters, conn);
     await insertMeters(meters, conn);
 	// Recreate the Cik entries since changed meters.
-	await redoCik(conn);
+	await redoCikVary(conn);
 	await insertGroups(groups, conn);
 	// Refresh groups deep meters view after adding new groups.
 	await Group.refreshGroupsDeepMetersView(conn);

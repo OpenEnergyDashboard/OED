@@ -11,7 +11,7 @@ const Unit = require('../../models/Unit');
 const { prepareTest,
 	expectCompareToEqualExpected,
 	getUnitId,
-	METER_ID} = require('../../util/readingsUtils');
+	METER_ID } = require('../../util/readingsUtils');
 
 mocha.describe('readings API', () => {
 	mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -72,7 +72,6 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterData);
 					const unitId = await getUnitId('kW');
 					const expected = [1990.55774277443, 2057.611897078];
-
 					const res = await chai.request(app)
 						.get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
@@ -84,7 +83,6 @@ mocha.describe('readings API', () => {
 
 					expectCompareToEqualExpected(res, expected);
 				});
-
 				mocha.it('C16: 7 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and flow units & thing as thing where rate is 36', async () => {
 					// These are the 2D arrays for units and conversions to feed into the database
 					// For Thing units.
@@ -114,7 +112,6 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						}
 					];
-
 					const conversionDataThing_36 = [
 						{
 							// c15
@@ -126,7 +123,6 @@ mocha.describe('readings API', () => {
 							note: 'Thing_36 → thing unit'
 						}
 					];
-
 					const meterDataThing_36 = [
 						{
 							name: 'Thing_36 thing unit',
@@ -141,15 +137,12 @@ mocha.describe('readings API', () => {
 							id: METER_ID
 						}
 					]
-
 					// Initialize test database with "thing" data
 					await prepareTest(unitDataThing, conversionDataThing_36, meterDataThing_36);
-
 					// Get the unit ID since the DB could use any value
 					const unitId = await getUnitId('thing unit');
 					// Expected was taken from the `curr use, prev use` column for this test case, since this is a compare readings test
 					const expected = [199055.77427744, 205761.1897078];
-
 					// Create a request to the API and save the response
 					// Note: the api paths are located in app.js, but this specific one points to compareReadings.js
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
@@ -159,11 +152,9 @@ mocha.describe('readings API', () => {
 							shift: 'P7D',
 							graphicUnitId: unitId
 						});
-
 					// Check that the API reading is equal to what it is expected to equal
 					expectCompareToEqualExpected(res, expected, METER_ID);
 				})
-
 				mocha.it('C17: 1 full day shift for 15 minute reading intervals and flow units & kW as kW', async () => {
 					// Units and Conversions
 					const unitData = [
@@ -192,7 +183,6 @@ mocha.describe('readings API', () => {
 							note: 'special unit'
 						}
 					];
-
 					const conversionDataElectric = [
 						{
 							// c4
@@ -204,7 +194,6 @@ mocha.describe('readings API', () => {
 							note: 'Electric → kW'
 						}
 					];
-
 					const meterDataElectric = [
 						{
 							name: 'Electric kW',
@@ -219,11 +208,9 @@ mocha.describe('readings API', () => {
 							id: METER_ID
 						}
 					];
-
 					await prepareTest(unitData, conversionDataElectric, meterDataElectric);
 					const unitId = await getUnitId('kW');
 					const expected = [1210.55315436926, 1349.13987250313];
-
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
 							curr_start: '2022-10-30 00:00:00',
@@ -231,13 +218,11 @@ mocha.describe('readings API', () => {
 							shift: "P1D",
 							graphicUnitId: unitId
 						});
-
 					expectCompareToEqualExpected(res, expected);
-
 				});
 
-				mocha.it('C18: 28 day shift for 26 days for 15 minute reading intervals and flow units & kW as kW', async () =>{
-					unitData = [ 
+				mocha.it('C18: 28 day shift for 26 days for 15 minute reading intervals and flow units & kW as kW', async () => {
+					unitData = [
 						{
 							//u4
 							name: 'kW',
@@ -274,7 +259,6 @@ mocha.describe('readings API', () => {
 							note: 'Electric → kW'
 						}
 					];
-
 					const meterData = [
 						{
 							name: 'Electric kW',
@@ -289,10 +273,9 @@ mocha.describe('readings API', () => {
 							id: METER_ID
 						}
 					];
-
 					await prepareTest(unitData, conversionData, meterData);
 					const unitId = await getUnitId('kW');
-					const expected = [30830.9420431404, 31064.5397007187];    
+					const expected = [30830.9420431404, 31064.5397007187];
 
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
@@ -301,11 +284,10 @@ mocha.describe('readings API', () => {
 							shift: 'P28D',
 							graphicUnitId: unitId
 						});
-					
-						expectCompareToEqualExpected(res, expected, METER_ID);
-					});
-				
-	
+					expectCompareToEqualExpected(res, expected, METER_ID);
+				});
+
+
 				mocha.it('C19: 7 day shift end 2022-11-01 15:00:00 (beyond data) for 15 minute reading intervals and quantity units & kW as kW', async () => {
 					const unitData = [
 						{
@@ -361,7 +343,6 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterData);
 					const unitId = await getUnitId('kW');
 					const expected = [2283.20315493009, 3286.9345597083];
-
 					const res = await chai.request(app)
 						.get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
@@ -370,13 +351,12 @@ mocha.describe('readings API', () => {
 							shift: 'P7D',
 							graphicUnitId: unitId
 						});
-
 					expectCompareToEqualExpected(res, expected);
 				});
 
-				mocha.it('C20: 28 day shift end 2022-10-31 17:12:34 (partial hour) for 15 minute reading intervals and quantity units & kW as kW', async () =>{
+				mocha.it('C20: 28 day shift end 2022-10-31 17:12:34 (partial hour) for 15 minute reading intervals and quantity units & kW as kW', async () => {
 					// Units and Conversions
-					unitData = [ 
+					unitData = [
 						{
 							//u4
 							name: 'kW',
@@ -413,7 +393,6 @@ mocha.describe('readings API', () => {
 							note: 'Electric → kW'
 						}
 					];
-
 					const meterData = [
 						{
 							name: 'Electric kW',
@@ -430,7 +409,7 @@ mocha.describe('readings API', () => {
 					];
 					await prepareTest(unitData, conversionData, meterData);
 					const unitId = await getUnitId('kW');
-					const expected = [27067.4812056454, 27222.4619148768];    
+					const expected = [27067.4812056454, 27222.4619148768];
 
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
@@ -439,10 +418,8 @@ mocha.describe('readings API', () => {
 							shift: 'P28D',
 							graphicUnitId: unitId
 						});
-					
 					expectCompareToEqualExpected(res, expected, METER_ID);
 				});
-				
 			});
 		});
 	});

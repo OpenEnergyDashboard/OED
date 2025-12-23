@@ -11,18 +11,20 @@ const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');
 const { generateSineData } = require('../../data/generateTestingData');
 const Unit = require('../../models/Unit');
-const Conversion = require('../../models/Conversion');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
-const { redoCik } = require('../../services/graph/redoCik');
+const { insertUnits, insertConversions } = require('../../util/insertData');
+const { redoCikVary } = require('../../services/graph/redoCik');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
+const { getUnitId, unitDatakWh, conversionDatakWh } = require('../../util/readingsUtils');
+// Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
 const { DELTA } = require('../../util/readingsUtils.js');
 
 // TODO add tests that check flow readings.
 
 mocha.describe('Line & bar Readings', () => {
 	mocha.describe('Check daily and hourly reading views', () => {
-		let meter, conn;
+		let meter, unitId, conn;
 		// Need to work in UTC time since that is what the database returns and comparing
 		// to database values. Done in all moment objects in this test.
 		const timestamp1 = moment.utc('2017-01-01');
@@ -34,13 +36,17 @@ mocha.describe('Line & bar Readings', () => {
 		mocha.beforeEach(async () => {
 			conn = testDB.getConnection();
 			// Insert the special units. Really only need 1-2 but this is easy.
-			await insertSpecialUnits(conn);
+			await insertUnits(unitDatakWh, false, conn);
+			await insertConversions(conversionDatakWh, conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
 				undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined, '01:00:00').insert(conn);
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, unitId, undefined, '01:00:00').insert(conn);
+			await redoCikVary(conn);
 			meter = await Meter.getByName('Meter', conn);
+			// kwh = await Unit.getByName('kWh', conn);
+			unitId = await getUnitId('kWh');
 		});
 
 		mocha.it('Hourly readings when readings line up with hour', async () => {
@@ -50,10 +56,10 @@ mocha.describe('Line & bar Readings', () => {
 				new Reading(meter.id, 300, timestamp3, timestamp4),
 				new Reading(meter.id, 400, timestamp4, timestamp5)
 			], conn);
-			// Refresh meter views but only hourly view needs the change
-			await Reading.refreshMeterReadingsViews(conn);
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM hourly_readings_unit WHERE lower(time_interval)=${start_timestamp};',
-				{ start_timestamp: timestamp1 });
+			// Refresh the hourly readings view because it is materialized.
+			await Reading.refreshHourlyReadings(conn);
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_hourly_readings_unit WHERE lower(time_interval)=${start_timestamp} and graphic_unit_id = ${graphic_unit};',
+				{ start_timestamp: timestamp1, graphic_unit: unitId });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal(100);
 		});
@@ -69,8 +75,8 @@ mocha.describe('Line & bar Readings', () => {
 			await Reading.refreshMeterReadingsViews(conn);
 
 			const { meter_id, reading_rate } = await conn.one(
-				'SELECT * FROM daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp});',
-				{ start_timestamp: timestamp1, end_timestamp: timestamp2 });
+				'SELECT * FROM meter_daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp}) and graphic_unit_id = ${graphic_unit};',
+				{ start_timestamp: timestamp1, end_timestamp: timestamp2, graphic_unit: unitId });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal((100 + 200 + 300 + 400) / 4);
 		});
@@ -85,7 +91,7 @@ mocha.describe('Line & bar Readings', () => {
 
 			await Reading.refreshMeterReadingsViews(conn);
 
-			const rows = await conn.many('SELECT * FROM daily_readings_unit;');
+			const rows = await conn.many('SELECT * FROM meter_daily_readings_unit;');
 			expect(rows).to.have.length(2);
 			expect(rows[0].meter_id).to.equal(meter.id);
 			expect(rows[1].meter_id).to.equal(meter.id);
@@ -111,54 +117,56 @@ mocha.describe('Line & bar Readings', () => {
 
 			await Reading.refreshMeterReadingsViews(conn);
 
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM daily_readings_unit WHERE lower(time_interval) = ${start_timestamp};',
-				{ start_timestamp: day1Start });
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_daily_readings_unit WHERE lower(time_interval) = ${start_timestamp} and graphic_unit_id = ${graphic_unit};',
+				{ start_timestamp: day1Start, graphic_unit: unitId });
 
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.be.closeTo(((50 * 1) + (100 * 2)) / (1 + 2), 0.0001);
 		});
 	});
 
-	// mocha.describe('Check intervals', () => {
-	// 	let meter, graphicUnitId, conn;
+	mocha.describe('Check intervals', () => {
+		let meter, graphicUnitId, conn;
 
-	// 	mocha.beforeEach(async function () {
-	// 		conn = testDB.getConnection();
-	// 		// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
-	// 		await insertStandardUnits(conn);
-	// 		await insertStandardConversions(conn);
-	// 		await insertSpecialUnits(conn);
-	// 		await insertSpecialConversions(conn);
-	// 		await redoCik(conn);
-	// 		// Make the meter be a kWh meter.
-	// 		const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
-	// 		await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
-	// 			undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined, '1 year').insert(conn);
-	// 		meter = await Meter.getByName('Meter', conn);
-	// 		// Make the graphic unit be MegaJoules.
-	// 		graphicUnitId = (await Unit.getByName('MJ', conn)).id;
-	// 	});
+		mocha.beforeEach(async function () {
+			conn = testDB.getConnection();
+			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
+			await insertStandardUnits(conn);
+			await insertStandardConversions(conn);
+			await insertSpecialUnits(conn);
+			await insertSpecialConversions(conn);
+			await redoCikVary(conn);
+			// Make the meter be a kWh meter.
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
+			// Put a shorter meter reading frequency so it will return daily rather than raw since only one reading.
+			graphicUnitId = (await Unit.getByName('kWh', conn)).id;
+			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, graphicUnitId, undefined, '15 minutes').insert(conn);
+			meter = await Meter.getByName('Meter', conn);
+			// Make the graphic unit be MegaJoules.
+		});
 
-	// 	// TODO This test no longer does what is desired because so few readings will return the 1 raw point.
-	// 	// Until we have an interface to allow setting the frequency desired this test is commented out.
-	// 	mocha.it('Correctly shrinks infinite intervals', async () => {
-	// 		// TODO: Test infinite range with bounded timestamp to ensure proper shrink
-	// 		const yearStart = moment.utc('2018-01-01');
-	// 		const yearEnd = yearStart.clone().add(1, 'year');
+		// TODO This test no longer does what is desired because so few readings will return the 1 raw point.
+		// Until we have an interface to allow setting the frequency desired this test is commented out.
+		mocha.it('Correctly shrinks infinite intervals', async () => {
+			// TODO: Test infinite range with bounded timestamp to ensure proper shrink
+			const yearStart = moment.utc('2018-01-01');
+			const yearEnd = yearStart.clone().add(1, 'year');
 
-	// 		await Reading.insertAll([
-	// 			new Reading(meter.id, 100, yearStart, yearEnd)
-	// 		], conn);
-	// 		// Refresh daily reading views.
-	// 		await Reading.refreshDailyReadings(conn);
-	// 		const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, null, null, conn);
-	// 		const meterReadings = allReadings[meter.id];
-	// 		expect(meterReadings.length).to.equal(365); // 365 days in a year
-	// 		const aRow = meterReadings[0];
-	// 		const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
-	// 		expect(rowWidth.asDays()).to.equal(1);
-	// 	});
-	// });
+			await Reading.insertAll([
+				new Reading(meter.id, 100, yearStart, yearEnd)
+			], conn);
+			// Refresh reading views.
+			await Reading.refreshHourlyReadings(conn);
+			await Reading.refreshDailyReadings(conn);
+			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, null, null, conn);
+			const meterReadings = allReadings[meter.id];
+			expect(meterReadings.length).to.equal(365); // 365 days in a year
+			const aRow = meterReadings[0];
+			const rowWidth = moment.duration(aRow.end_timestamp.diff(aRow.start_timestamp));
+			expect(rowWidth.asDays()).to.equal(1);
+		});
+	});
 
 
 	// TODO modify so checks values too.
@@ -179,7 +187,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -247,7 +255,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			// The default frequency of reading is 15-min so set to 23 for this meter.
@@ -314,7 +322,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -432,7 +440,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter1', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
@@ -534,7 +542,7 @@ mocha.describe('Line & bar Readings', () => {
 			await insertStandardConversions(conn);
 			await insertSpecialUnits(conn);
 			await insertSpecialConversions(conn);
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// Make the meter be a kWh meter.
 			meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 			await new Meter(undefined, 'Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,

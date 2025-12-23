@@ -82,7 +82,7 @@ class Reading {
 	static refreshHourlyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
 		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+		return conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
 	}
 
 	/**
@@ -93,7 +93,7 @@ class Reading {
 	 */
 	static refreshDailyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
-		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+		return conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
 	}
 	
 	/**
@@ -103,8 +103,8 @@ class Reading {
 	 * @returns {Promise<void>}
 	 */
 	static async refreshMeterReadingsViews(conn) {
-		await conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
-		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
 	}
 
 

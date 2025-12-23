@@ -204,9 +204,9 @@ async function insertConversions(conversionsToInsert, conn) {
 				const destinationId = (await Unit.getByName(conversionData.destinationName, conn)).id;
 				if (await Conversion.getBySourceDestination(sourceId, destinationId, conn) === null) {
 					await new Conversion(
-						sourceId, 
-						destinationId, 
-						conversionData.bidirectional,  
+						sourceId,
+						destinationId,
+						conversionData.bidirectional,
 						conversionData.note
 					).insert(
 						null,

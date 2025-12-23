@@ -3,47 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /*
-There were issues (possibly with syntax) in where a case and an if statement
-could be used. They are very similar where case seems more general.
-Trying to only use case statements led to issues so the following functions
-mix case and if statements.
-*/
-
--- We need a gist index to support the @> operation.
-CREATE EXTENSION IF NOT EXISTS btree_gist;
-
-/*
-Rounds a timestamp up to the next interval
- */
-CREATE OR REPLACE FUNCTION date_trunc_up(interval_precision TEXT, ts TIMESTAMP)
-	RETURNS TIMESTAMP LANGUAGE SQL
-IMMUTABLE
-AS $$
-SELECT CASE
-	 WHEN ts = date_trunc(interval_precision, ts) THEN ts
-	 ELSE date_trunc(interval_precision, ts + ('1 ' || interval_precision)::INTERVAL)
-	 END
-$$;
-
-/*
-This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
-not exceed the start/end times for the readings for the supplied meters. This can be an issue, in particular,
-because infinity is used to indicate to graph all readings.
- */
-CREATE OR REPLACE FUNCTION shrink_tsrange_to_real_readings(tsrange_to_shrink TSRANGE, meter_ids INTEGER[])
-	RETURNS TSRANGE
-AS $$
-DECLARE
-	readings_max_tsrange TSRANGE;
-BEGIN
-	SELECT tsrange(min(start_timestamp), max(end_timestamp)) INTO readings_max_tsrange
-	FROM (readings r
-		INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id);
-	RETURN tsrange_to_shrink * readings_max_tsrange;
-END;
-$$ LANGUAGE 'plpgsql';
-
-/*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for all the readings. This can be an issue, in particular,
 because infinity is used to indicate to graph all readings. This version does it to the nearest
