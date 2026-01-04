@@ -29,7 +29,7 @@ import {
 } from '../../utils/determineCompatibleUnits';
 import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConversion';
 import { getGPSString } from '../../utils/input';
-import { showErrorNotification, showWarnNotification } from '../../utils/notifications';
+import { showSuccessNotification, showErrorNotification, showWarnNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
@@ -240,10 +240,21 @@ export default function CreateGroupModalComponent() {
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
 			// TODO DEBUG: added in to test the showErrorNotification
-			submitState.name = '';
+			//submitState.name = '';
 			
-			createGroup(submitState);
-			resetState();
+			//createGroup(submitState);
+			createGroup(submitState)
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(
+						translate('group.successfully.create.group') + ' "' + submitState.name + '"');
+					resetState();
+				})
+				.catch(err => {
+					showErrorNotification(
+						translate('group.failed.to.create.group') + '"' + err.data + '"');
+				});
+				resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
 			showErrorNotification(translate('group.input.error'));
