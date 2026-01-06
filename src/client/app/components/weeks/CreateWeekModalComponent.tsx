@@ -69,7 +69,6 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 		setShowModal(false);
 		addWeekMutation(weekDetails).unwrap()
 			.then(() => {
-				// generateRruleFromWeek(weeks);
 				showSuccessNotification(translate('week.create.success'));
 			})
 			.catch(error => {

@@ -7,8 +7,6 @@ const Conversion = require('../../models/Conversion');
 const invertConversion = require('./pathConversion').invertConversion;
 const updatedConversion = require('./pathConversion').updatedConversion;
 const generateRrule = require('./generateRrule').generateRrule;
-const { RRule, datetime, RRuleSet, rrulestr } = require("rrule");
-const { forEach } = require('lodash');
 
 /**
  * Chains time-varying conversions along a path, producing combined segments for cik_vary.
@@ -66,7 +64,9 @@ async function timeVaryingPathConversion(path, conn) {
 				// too many without a pattern it probably is not too important.
 				edgeSegments.push(curSegment);
 			
-			} else {	// deal with conversionSegments that have a WEEK_PATTERN_ID
+			} else {
+				// Deal with conversionSegments that have a WEEK_PATTERN_ID
+
 				const weekId = curSegment.weekPatternsId;
 				
 				// 1. Use the pattern for this segment to create an RRULE.
@@ -74,7 +74,7 @@ async function timeVaryingPathConversion(path, conn) {
 
 				// 2. Use an RRULE generator to create all the needed conversions from segments.start_time to segments.end_time
 				const occurrences = [];
-				// occurences is 2D array, each array the occurences for each generated rrule 
+				// occurrences is 2D array, each array the occurrences for each generated rrule 
 				const start = new Date(curSegment.startTime);
 				const end   = new Date(curSegment.endTime);
 				ruleInfo.forEach((info) => {
@@ -91,29 +91,25 @@ async function timeVaryingPathConversion(path, conn) {
 						};
 					}
 				});
-				// console.log("DEBUG: occurrences:", occurrences);
 
 				// 3. Each segment is added to edgeSegments with the start_time, end_time, slope & intercept.
 				var r = 0;
-				occurrences.forEach((patternOccurences) => {
-					patternOccurences.forEach((occur) => {
-						// console.log("DEBUG occur:", occur);
+				occurrences.forEach((patternOccurrences) => {
+					patternOccurrences.forEach((occur) => {
 
 						const end = new Date(occur);
 						end.setHours(ruleInfo[r].duration, 0, 0, 0);
 
-						// (sourceId, destinationId, weekPatternsId, slope, intercept, startTime, endTime, note)
 						const newSegment = new ConversionSegment(
-							curSegment.sourceId, 
-							curSegment.destinationId,
-							null,
-							ruleInfo[r].slope,
-							ruleInfo[r].intercept,
-							occur,
-							end,
-							''
+							curSegment.sourceId, 					// sourceId
+							curSegment.destinationId,			// destinationId
+							null,													// weekPatternsId
+							ruleInfo[r].slope,						// slope
+							ruleInfo[r].intercept,				// intercept
+							occur,												// startTime
+							end,													// endTime
+							''														// note
 						);
-						// console.log("DEBUG newSegment:", newSegment);
 						edgeSegments.push(newSegment);
 					});
 
