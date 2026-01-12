@@ -13,9 +13,10 @@ services:
         environment:
             # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
-            # In development password may (and should be) be manually changed.
-            # In production it will be automatically changed and stored in .env
-            - POSTGRES_PASSWORD=pleaseChange
+            # The postgres database will only pull from this value on the first
+            # startup of OED. If a change is desired after this, one must manually
+            # do so via SQL.
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pleaseChange}
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
         healthcheck:
@@ -36,7 +37,7 @@ services:
             - OED_DB_USER=oed
             - OED_DB_DATABASE=oed
             - OED_DB_TEST_DATABASE=oed_testing
-            - OED_DB_PASSWORD=opened
+            - OED_DB_PASSWORD=opened # See comment regarding POSTGRES_PASSWORD above, same situation
             - OED_DB_HOST=database # Docker will set this hostname
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=${OED_TOKEN_SECRET:-?} #Automatically generated when OED is run in production

@@ -65,9 +65,7 @@ if [ "$production" = "yes" ] || [ "$OED_PRODUCTION" = "yes" ]; then
 	INSTALL_MODE="production"
 elif [ "$production" = "no" ] || [ "$OED_PRODUCTION" = "no" ]; then
 	INSTALL_MODE="development"
-fi
-
-if [ "$INSTALL_MODE" = "invalid" ]; then
+else
 	printf "\nFailure: Invalid or missing environment configuration."
 	printf "\nSet OED_PRODUCTION to 'yes' for production or 'no' for development."
 	exit 10
@@ -250,6 +248,12 @@ if [ "$dostart" == "yes" ]; then
 			printf "Generated POSTGRES_PASSWORD: %s\n" "$POSTGRES_PASSWORD"
 			printf "\n Make sure to save or change this value"
 			printf "\n********************************************************************************\n\n"
+			if grep -q "^POSTGRES_PASSWORD=" .env; then
+				# Don't want to store the password in plain text in the .env file, but need to let the code know the password has been changed
+    			sed -i.bak 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=autoSet/' .env 
+			else
+    			echo "POSTGRES_PASSWORD=autoSet" >> .env
+			fi
 		fi
 		npm run start
 	else
