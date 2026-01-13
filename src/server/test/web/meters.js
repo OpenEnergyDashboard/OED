@@ -71,6 +71,8 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('startTimestamp', '0001-01-01 23:59:59');
 			expect(meter).to.have.property('endTimestamp', '2020-07-02 01:00:10');
 			expect(meter).to.have.property('previousEnd', '2020-03-05T13:15:13.000Z');
+			expect(meter).to.have.property('areaUnit', Unit.areaUnitType.METERS);
+			expect(meter).to.have.property('readingFrequency', 'PT13H57M19S');
 		} else {
 			expect(meter).to.have.property('name', null);
 			expect(meter).to.have.property('url', null);
@@ -90,6 +92,9 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('startTimestamp', null);
 			expect(meter).to.have.property('endTimestamp', null);
 			expect(meter).to.have.property('previousEnd', null);
+			expect(meter).to.have.property('areaUnit', Unit.areaUnitType.METERS);
+			expect(meter).to.have.property('readingFrequency', null);
+
 		}
 	}
 }

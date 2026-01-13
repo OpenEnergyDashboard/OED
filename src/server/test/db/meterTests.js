@@ -20,7 +20,7 @@ const gps = new Point(90, 45);
  * @param expected expected meter properties
  * @param actual actual meter properties
  */
-function expectMetersToBeEquivalent(expected, actual) {
+function expectMetersToBeEquivalent(expected, actual) { 
 	expect(actual).to.have.property('id', expected.id);
 	expect(actual).to.have.property('name', expected.name);
 	expect(actual).to.have.property('enabled', expected.enabled);

@@ -9,7 +9,7 @@ const Unit = require('./Unit');
 const { log } = require('../log');
 const sqlFile = database.sqlFile;
 
-class Meter {
+class Meter { 
 	/**
 	 * @param id This meter's ID. Should be undefined if the meter is being newly created
 	 * @param name This meter's name
