@@ -148,6 +148,7 @@ router.get('*', (req, res) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 
+		//Creates a randomized nonce
 		const nonce = crypto.randomBytes(16).toString('base64url')
 		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce)
 
