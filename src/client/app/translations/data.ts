@@ -236,6 +236,8 @@ const LocaleTranslationData = {
 		"group.create.nounit": "The default graphic unit was changed to no unit from ",
 		"group.delete.group": "Delete Group",
 		"group.delete.issue": "is contained in the following groups and cannot be deleted",
+		"group.delete.success": "Successfully deleted group.",
+		"group.delete.failure": "Failed to delete group.",
 		"group.details": "Group Details",
 		"group.edit.cancelled": "THE CHANGE TO THE GROUP IS CANCELLED",
 		"group.edit.changed": "will have its compatible units changed by the edit to this group",

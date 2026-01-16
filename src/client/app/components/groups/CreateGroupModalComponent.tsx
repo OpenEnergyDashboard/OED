@@ -240,21 +240,23 @@ export default function CreateGroupModalComponent() {
 			// GPS may have been updated so create updated state to submit.
 			const submitState = { ...state, gps: gps };
 			// TODO DEBUG: added in to test the showErrorNotification
-			//submitState.name = '';
-			
+			submitState.name = '';
+
 			//createGroup(submitState);
 			createGroup(submitState)
 				.unwrap()
 				.then(() => {
 					showSuccessNotification(
-						translate('group.successfully.create.group') + ' "' + submitState.name + '"');
+						translate('group.successfully.create.group') + ' "' + submitState.name +
+						'" (id: ' + submitState.id + ', default graphic unit: ' + submitState.defaultGraphicUnit + ')'
+					);
 					resetState();
 				})
 				.catch(err => {
 					showErrorNotification(
 						translate('group.failed.to.create.group') + '"' + err.data + '"');
 				});
-				resetState();
+			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
 			showErrorNotification(translate('group.input.error'));

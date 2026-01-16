@@ -9,9 +9,9 @@ import {
 	ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 // TODO DEBUG: added in to test the showErrorNotification
-//import { userApi } from '../../../redux/api/userApi';
-//import { User, UserRole, userDefaults } from '../../../types/items';
-import { UserRole, userDefaults } from '../../../types/items';
+import { userApi } from '../../../redux/api/userApi';
+import { User, UserRole, userDefaults } from '../../../types/items';
+//import { UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
@@ -49,7 +49,8 @@ export default function CreateUserModal() {
 
 	// user api
 	// TODO DEBUG: added in to test the showErrorNotification
-	//const [createUser] = userApi.useCreateUserMutation();
+	const [createUser] = userApi.useCreateUserMutation();
+
 	const userRoleIsSelected = userDetails.role !== UserRole.INVALID;
 
 	// check if passwords match
@@ -111,13 +112,15 @@ export default function CreateUserModal() {
 	// End Modal show/close
 
 	const handleSubmit = async () => {
-		//const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
+		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		// TODO DEBUG: added in to test the showErrorNotification
-		//createUser(newUser)
-		Promise.reject({ data: { message: 'Test error message' } })
+		createUser(newUser)
+		//Promise.reject({ data: { message: 'Test error message' } })
 			//.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username);
+				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username +
+				'" (role: ' + userDetails.role + ')'
+				);
 				resetForm();
 				handleCloseModal();
 			})

@@ -409,7 +409,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		deleteConversion(payload)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('conversion.delete.success'));
+				showSuccessNotification(translate('conversion.delete.success') +
+				' (sourceID: ' + payload.sourceId + ', destinationID: ' + payload.destinationId + ')'
+				);
 			}).catch(error => {
 				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
 			});
@@ -509,16 +511,28 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			if (conversionHasChanges) {
 
 				// TODO DEBUG: added in to test the showErrorNotification
-				state.sourceId = -1;
-				state.destinationId = -1;
-			
+				//state.sourceId = -1;
+				//state.destinationId = -1;
+
 				// Save our changes
 				editConversion({
 					conversionData: {
 						...state,
 						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
 					}, shouldRedoCik
-				});
+				})
+					.unwrap()
+					.then(() => {
+						showSuccessNotification(
+							translate('conversion.successfully.edited.conversion') +
+						' (sourceID: ' + state.sourceId + ', destinationID: ' + state.destinationId + ')'
+						);
+					})
+					.catch(err => {
+						showErrorNotification(
+							translate('conversion.failed.to.edit.conversion') + '"' + err.data + '"'
+						);
+					});
 			}
 		}
 	};

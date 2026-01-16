@@ -241,13 +241,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// TODO DEBUG: added in to test the showErrorNotification
 				//submitState.name = '';
 				//submitState.identifier = '';
-				
+
 				// Submit new meter if checks where ok.
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 					.unwrap()
 					.then(() => {
 						showSuccessNotification(
-							translate('meter.successfully.edited.meter') + '"' + submitState.name + '"');
+							translate('meter.successfully.edited.meter') + '"' + submitState.name +
+						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.meterType + ')'
+						);
 					})
 					.catch(err => {
 						showErrorNotification(

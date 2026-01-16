@@ -215,15 +215,20 @@ export default function CreateUnitModalComponent() {
 			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
 		};
 		// TODO DEBUG: added in to test the showErrorNotification
-		submitState.secInRate = -1;
+		//submitState.secInRate = -1;
 		// Add the new unit and update the store
 		submitCreateUnit(submitState)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('unit.successfully.create.unit'));
+				showSuccessNotification(
+					translate('unit.successfully.create.unit') + ' "' + submitState.name +
+					'" (identifier: ' + submitState.identifier + ', type: ' + submitState.typeOfUnit + ')'
+				);
 			})
-			.catch(() => {
-				showErrorNotification(translate('unit.failed.to.create.unit'));
+			.catch(err => {
+				showErrorNotification(
+					translate('unit.failed.to.create.unit') + '"' + err.data + '"'
+				);
 			});
 		resetState();
 	};

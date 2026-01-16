@@ -39,8 +39,6 @@ export default function PreferencesComponent() {
 	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
 	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
-		// TODO DEBUG: added in to test the showErrorNotification
-		
 		setLocalAdminPref({ ...localAdminPref, [key]: value });
 	};
 
@@ -372,16 +370,16 @@ export default function PreferencesComponent() {
 				</Button>
 				<Button
 					type='submit'
-					onClick={() =>
+					onClick={() => {
 						submitPreferences(localAdminPref)
 							.unwrap()
 							.then(() => {
 								showSuccessNotification(translate('updated.preferences'));
 							})
-							.catch(() => {
-								showErrorNotification(translate('failed.to.submit.changes'));
-							})
-					}
+							.catch(err => {
+								showErrorNotification(translate('failed.to.submit.changes') + err.data);
+							});
+					}}
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
 					color='primary'
 				>

@@ -189,9 +189,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
 			};
 			// TODO DEBUG: added in to test the showErrorNotification
-			//submitState.name = '';
-			//submitState.identifier = '';
-			
+			submitState.name = '';
+			submitState.identifier = '';
+
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
 			submitAddMeter(submitState)
@@ -199,7 +199,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				.then(() => {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(
-						translate('meter.successfully.create.meter') + '"' + submitState.name + '"');
+						translate('meter.successfully.create.meter') + '"' + submitState.name +
+						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.meterType + ')'
+					);
 					resetState();
 					// if props exist, then return the identifier
 					//  or return the name if identifier is not set because the identifier will be set from the name

@@ -76,7 +76,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 
 	// user apis
 	// TODO DEBUG: added in to test the showErrorNotification
-	//const [submitUserEdits] = userApi.useEditUserMutation();
+	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 
 	// check if passwords match and if password length is at least 8
@@ -187,16 +187,21 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		props.handleClose();
 		// TODO DEBUG: added in to test the showErrorNotification
 		// set needed user details into a user and send to backend
-		//const editedUser: User = {
-		//	id: userDetails.id, username: userDetails.username, role: userDetails.role,
-		//	password: userDetails.password, note: userDetails.note
-		//};
+		// (Comment this out to test failure)
+		const editedUser: User = {
+			id: userDetails.id, username: userDetails.username, role: userDetails.role,
+			password: userDetails.password, note: userDetails.note
+		};
 
-		Promise.reject({ data: { message: 'Test error message' } })
-		//submitUserEdits(editedUser)
-		//	.unwrap()
+		// TODO DEBUG: added in to test the showErrorNotification
+		// set needed user details into a user and send to backend
+		//Promise.reject({ data: { message: 'Test error message' } })
+		submitUserEdits(editedUser)
+			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
+				showSuccessNotification(translate('users.successfully.edit.user') + userDetails.username +
+				'" (role: ' + userDetails.role + ')'
+				);
 			})
 			.catch(error => {
 				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);

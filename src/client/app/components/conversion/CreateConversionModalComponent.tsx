@@ -14,7 +14,7 @@ import { selectDefaultCreateConversionValues, selectIsValidConversion } from '..
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
-import { showErrorNotification } from '../../utils/notifications';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
@@ -154,15 +154,27 @@ export default function CreateConversionModalComponent() {
 			setShowModal(false);
 
 			// TODO DEBUG: added in to test the showErrorNotification
-			conversionState.sourceId = -1;
-			conversionState.destinationId = -1;
+			//conversionState.sourceId = -1;
+			//conversionState.destinationId = -1;
 
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			// If source is a meter, make bidirectional false
 			// If source or destination is a suffix unit, make bidirectional false
 			addConversionMutation({...omit(conversionState, 'sourceOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional})
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(
+						translate('conversion.successfully.create.conversion') +
+						' (sourceID: ' + conversionState.sourceId + ', destinationID: ' + conversionState.destinationId + ')'
+					);
+					resetState();
+				})
+				.catch(err => {
+					showErrorNotification(
+						translate('group.failed.to.create.group') + '"' + err.data + '"');
+				});
 			resetState();
 		} else {
 			showErrorNotification(reason);

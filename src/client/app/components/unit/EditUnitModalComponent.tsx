@@ -262,7 +262,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// we can delete the unit directly
 		deleteUnit(state.id)
 			.unwrap()
-			.then(() => { showSuccessNotification(translate('unit.delete.success')); })
+			.then(() => { showSuccessNotification(translate('unit.delete.success') + ': ' + state.name); })
 			.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
 	};
 
@@ -385,15 +385,20 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 
 			// TODO DEBUG: added in to test the showErrorNotification
-			submitState.secInRate = -1;
+			//submitState.secInRate = -1;
 			// Save our changes by dispatching the submitEditedUnit mutation
 			submitEditedUnit({ editedUnit: submitState, shouldRedoCik, shouldRefreshReadingViews })
 				.unwrap()
 				.then(() => {
-					showSuccessNotification(translate('unit.successfully.edited.unit'));
+					showSuccessNotification(
+						translate('unit.successfully.edited.unit') + ' "' + submitState.name +
+						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.typeOfUnit + ')'
+					);
 				})
-				.catch(() => {
-					showErrorNotification(translate('unit.failed.to.edit.unit'));
+				.catch(err => {
+					showErrorNotification(
+						translate('unit.failed.to.edit.unit') + '"' + err.data + '"')
+					;
 				});
 		}
 	};
