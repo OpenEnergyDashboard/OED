@@ -100,18 +100,11 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 				// Suffix changes so some conversions and units need to be removed.
 				await removeAdditionalConversionsAndUnits(unit, conn);
 			}
-			unit.name = req.body.name;
-			unit.displayable = req.body.displayable;
-			unit.identifier = req.body.identifier;
-			unit.unitRepresent = req.body.unitRepresent;
-			unit.typeOfUnit = req.body.typeOfUnit;
-			unit.preferredDisplay = req.body.preferredDisplay;
-			unit.secInRate = req.body.secInRate;
-			unit.suffix = req.body.suffix;
-			unit.note = req.body.note;
-			unit.minVal = req.body.minVal;
-			unit.maxVal = req.body.maxVal;
-			unit.disableChecks = req.body.disableChecks;
+			for (const key of Object.keys(unit)) {
+				if (Object.hasOwn(req.body, key)) {
+					unit[key] = req.body[key]
+				}
+			}
 			// TODO Consider if this might be a better way.
 			// Object.assign(unit, req.body);
 			await unit.update(conn);
@@ -230,13 +223,14 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		failure(res, 400, errorMsg);
 	} else {
 		const conn = getConnection();
+		const unitId = req.body.id;
 		try {
 			// Don't worry about checking if the unit already exists
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Unit.delete(req.body.id, conn);
-			success(res, 'Successfully deleted conversion');
+			await Unit.delete(unitId, conn);
+			success(res, 'Successfully deleted unit');
 		} catch (err) {
-			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			const errorMsg = `Error while deleting unit with error(s): ${err}`;
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
