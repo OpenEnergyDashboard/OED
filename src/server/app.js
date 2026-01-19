@@ -148,6 +148,7 @@ router.get('*', (req, res) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 
+		//assigns a value to the nonce in order to check for authenticity
 		const nonce = crypto.randomBytes(16).toString('base64url')
 		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce)
 

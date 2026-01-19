@@ -23,35 +23,20 @@
     
     
     <!--
-    The meta tag with "Content-Security-Policy" below is the Content Security Policy, by having default-src as self all CSP rules that are unspecified will only 
-    allow the OED site and resources to be used/displayed. Tags like img-src, media-src, and script-src are also set to self to ensure that only 
-    resources like images, audio/videos, and scripts like JavaScript and TypeScript can only be from OED and will block any types of injections. 
-    The tag font-src is the exception to this as OED also uses a font from a bootstrapcdn.com sub-domain and has this site listed next to 'self'.
-    To test CSP rules change http-equiv=”Content-Security-Policy” to http-equiv=”Content-Security-Policy-Report-Only” this allows us to send reports of 
-    what would have been blocked without actually blocking it.
+    The meta tag with "Content-Security-Policy" below is the Content Security Policy, by having default-src as self all CSP rules that are
+    unspecified will only allow the OED site and resources to be used/displayed. Tags like img-src, media-src, and script-src are also set to self
+    to ensure that only resources like images, audio/videos, and scripts like JavaScript and TypeScript can only be from OED and will block any
+    types of injections. The tag font-src is the exception to this as OED also uses a font from a bootstrapcdn.com sub-domain and has this site
+    listed next to 'self'. To test CSP rules change http-equiv=”Content-Security-Policy” to http-equiv=”Content-Security-Policy-Report-Only” this
+    allows us to send reports of what would have been blocked without actually blocking it.
     
-    For sites using OED and are blocked by these CSP rules may add their site to the exception they may list their website link next to the tag that is blocking 
-    the user site. The site link must be added after 'self' but before the semi colon marking the end of that tag. The font-src tag is a great example on how to implement 
-    a site to the exception list. Another example for adding a site (https://newException.com) to a tag with multiple sites as an exceptions would be : 
-    img-src 'self' http://example.com https://site_example.net; becomes img-src 'self' http://example.com https://site_example.net https://newException.com;
+    For sites using OED and are blocked by these CSP rules may add their site to the exception they may list their website link next to the tag that
+    is blocking the user site. The site link must be added after 'self' but before the semi colon marking the end of that tag. The font-src tag is a
+    great example on how to implement a site to the exception list. Another example for adding a site (https://newException.com) to a tag with
+    multiple sites as an exceptions would be : img-src 'self' http://example.com https://site_example.net; becomes img-src 'self'
+    http://example.com https://site_example.net https://newException.com;
     -->
-    <!-- <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self';
-    img-src 'self'; 
-    font-src 'self' https://maxcdn.bootstrapcdn.com; 
-    media-src 'self'; 
-    script-src 'self' 'nonce-__NONCE__';
-    style-src 'self' 'nonce-__NONCE__'; "> -->
-    
-    
-    <!-- <link rel="stylesheet" href="styles/card-page.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/DateRangeCustom.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/index.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/modal.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/react-select-css.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/spinner.css" nonce="__NONCE__">
-    <link rel="stylesheet" href="styles/tooltip.css" nonce="__NONCE__">
-    -->
+
 </head>
 
 <body>
