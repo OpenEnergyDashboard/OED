@@ -243,9 +243,9 @@ if [ "$dostart" == "yes" ]; then
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
 			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
 			POSTGRES_PASSWORD=$(openssl rand -base64 12)
-			node ./src/scripts/changePass.js "$POSTGRES_PASSWORD"
+			node ./src/scripts/changePostgresPass.js "$POSTGRES_PASSWORD"
 			printf "\n********************************************************************************\n"
-			printf "Generated POSTGRES_PASSWORD: %s\n" "$POSTGRES_PASSWORD"
+			printf "Generated a secure PostgreSQL password and set PostgreSQL to use it: %s\n" "$POSTGRES_PASSWORD"
 			printf "\n Make sure to save or change this value"
 			printf "\n********************************************************************************\n\n"
 			if grep -q "^POSTGRES_PASSWORD=" .env; then

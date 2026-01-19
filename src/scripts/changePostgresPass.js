@@ -4,15 +4,15 @@
 
 const { Client } = require('pg');
 
-const newPassword = process.argv[2];
-
-console.log('Attempting to change postgres user password...');
-
 function escapePassword(password) {
 	return password.replace(/'/g, "''");
 }
 
+// Create a connection to the Postgres database and send the query to change the user's password
 async function changePassword() {
+	const newPassword = process.argv[2];
+	console.log('Attempting to change postgres user password...');
+	// Connect using the default password and the postgres user
 	const client = new Client({
 		host: process.env.OED_DB_HOST,
 		port: parseInt(process.env.OED_DB_PORT),
@@ -22,6 +22,7 @@ async function changePassword() {
 		connectionTimeoutMillis: 10000
 	});
 
+	// Send the query to change the user's password to the secure one from the default
 	try {
 		await client.connect();
 		
@@ -32,7 +33,7 @@ async function changePassword() {
 		await client.end();
 		
 	} catch (error) {
-		console.error('Error:', error.message);
+		console.error('Error during Postgres password change:', error.message);
 		
 		if (error.message.includes('ECONNREFUSED')) {
 			console.error('Database is not accepting connections yet.');
