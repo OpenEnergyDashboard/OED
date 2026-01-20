@@ -4,13 +4,14 @@
 
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, ModalFooter, Row } from 'reactstrap';
+import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalFooter, Row } from 'reactstrap';
 import { userApi } from '../redux/api/userApi';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectCurrentUserProfile } from '../redux/slices/currentUserSlice';
 import { User } from '../types/items';
 import { showErrorNotification, showSuccessNotification } from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
+import { SimpleUnsavedWarningComponent } from './SimpleUnsavedWarningComponent';
 
 interface ChangePasswordModalComponentProps {
 	handleClose: () => void;
@@ -24,11 +25,27 @@ interface ChangePasswordModalComponentProps {
 export default function ChangePasswordModalComponent(props: ChangePasswordModalComponentProps) {
 	const translate = useTranslate();
 
+	// boolean that updates if any change is made to any user modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
 	// If there are no changes, then save is disabled
 	const [canSave, setCanSave] = useState(false);
 
 	// Get current logged in user
 	const currentUser = useAppSelector(selectCurrentUserProfile) as User;
+
+	// displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			// Proceed to close the modal
+			handleCloseModal();
+		}
+	};
 
 	// State for password fields
 	const [passwordDetails, setPasswordDetails] = useState({
@@ -50,6 +67,8 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 		const passwordModified = passwordDetails.currentPassword.length > 0 ||
 			passwordDetails.newPassword.length > 0 ||
 			passwordDetails.confirmPassword.length > 0;
+		
+		setHasUnsavedChanges(passwordModified);
 
 		setPasswordDetails(prevDetails => ({
 			...prevDetails,
@@ -119,90 +138,110 @@ export default function ChangePasswordModalComponent(props: ChangePasswordModalC
 
 	return (
 		<>
-			<div>
-				<Container>
-					<Row>
-						<Col>
-							<FormGroup>
-								<Label>
-									{translate('username')}
-								</Label>
-								<Input
-									type='text'
-									value={currentUser.username}
-									disabled
-								/>
-							</FormGroup>
-						</Col>
-					</Row>
-					<Row>
-						<Col>
-							<FormGroup>
-								<Label for='currentPassword'>
-									{translate('current.password')}
-								</Label>
-								<Input
-									id='currentPassword'
-									name='currentPassword'
-									type='password'
-									placeholder={translate('current.password.enter')}
-									value={passwordDetails.currentPassword}
-									onChange={handlePasswordChange}
-									required
-								/>
-							</FormGroup>
-						</Col>
-					</Row>
-					<Row xs='1' lg='2'>
-						<Col>
-							<FormGroup>
-								<Label for='newPassword'>
-									{translate('password')}
-								</Label>
-								<Input
-									id='newPassword'
-									name='newPassword'
-									type='password'
-									placeholder={translate('password.new.enter')}
-									value={passwordDetails.newPassword}
-									onChange={handlePasswordChange}
-									invalid={!passwordDetails.passwordLength}
-								/>
-								<FormFeedback>
-									{translate('user.password.length')}
-								</FormFeedback>
-							</FormGroup>
-						</Col>
-						<Col>
-							<FormGroup>
-								<Label for='confirmPassword'>
-									{translate('password.confirm')}
-								</Label>
-								<Input
-									id='confirmPassword'
-									name='confirmPassword'
-									type='password'
-									placeholder={translate('password.confirm.enter')}
-									value={passwordDetails.confirmPassword}
-									onChange={handlePasswordChange}
-									invalid={!passwordDetails.passwordMatch}
-								/>
-								<FormFeedback>
-									{translate('user.password.mismatch')}
-								</FormFeedback>
-							</FormGroup>
-						</Col>
-					</Row>
-				</Container>
-			</div>
-			<ModalFooter>
-				<Button color='secondary' onClick={handleCloseModal}>
-					{translate('cancel')}
-				</Button>
-				<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid() || !canSave}>
-					{translate('save.all')}
-				</Button>
-			</ModalFooter>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleCloseModal();
+						resetPasswordFields();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+						handleCloseModal();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave || !isFormValid()}
+				/>
+			)}
+				<Modal isOpen={true} toggle={handleToggle}>
+					<Container>
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label>
+										{translate('username')}
+									</Label>
+									<Input
+										type='text'
+										value={currentUser.username}
+										disabled
+									/>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label for='currentPassword'>
+										{translate('current.password')}
+									</Label>
+									<Input
+										id='currentPassword'
+										name='currentPassword'
+										type='password'
+										placeholder={translate('password.current.enter')}
+										value={passwordDetails.currentPassword}
+										onChange={handlePasswordChange}
+										required
+									/>
+								</FormGroup>
+							</Col>
+						</Row>
+						<Row xs='1' lg='2'>
+							<Col>
+								<FormGroup>
+									<Label for='newPassword'>
+										{translate('password')}
+									</Label>
+									<Input
+										id='newPassword'
+										name='newPassword'
+										type='password'
+										placeholder={translate('password.new.enter')}
+										value={passwordDetails.newPassword}
+										onChange={handlePasswordChange}
+										invalid={!passwordDetails.passwordLength}
+									/>
+									<FormFeedback>
+										{translate('user.password.length')}
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+							<Col>
+								<FormGroup>
+									<Label for='confirmPassword'>
+										{translate('password.confirm')}
+									</Label>
+									<Input
+										id='confirmPassword'
+										name='confirmPassword'
+										type='password'
+										placeholder={translate('password.confirm.enter')}
+										value={passwordDetails.confirmPassword}
+										onChange={handlePasswordChange}
+										invalid={!passwordDetails.passwordMatch}
+									/>
+									<FormFeedback>
+										{translate('user.password.mismatch')}
+									</FormFeedback>
+								</FormGroup>
+							</Col>
+						</Row>
+					</Container>
+					<ModalFooter>
+					<Button color='secondary' onClick={handleCloseModal}>
+						{translate('cancel')}
+					</Button>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!isFormValid() || !canSave}>
+						{translate('save.all')}
+					</Button>
+					</ModalFooter>
+			</Modal>
 		</>
 	);
 }
