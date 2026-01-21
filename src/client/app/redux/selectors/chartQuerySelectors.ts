@@ -12,7 +12,7 @@ import {
 	selectCompareTimeInterval, selectQueryTimeInterval,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSelectedUnit, selectThreeDState,
-	selectShiftAmount
+	selectThreeDInterval, selectShiftAmount
 } from '../slices/graphSlice';
 import { omit } from 'lodash';
 import { selectLineChartDeps } from './lineChartSelectors';
@@ -193,18 +193,25 @@ export const selectMapChartQueryArgs = createSelector(
 );
 
 export const selectThreeDQueryArgs = createSelector(
-	selectQueryTimeInterval,
+	selectThreeDInterval,
 	selectSelectedUnit,
 	selectThreeDState,
-	(queryTimeInterval, selectedUnit, threeD) => {
+	(threeDInterval, selectedUnit, threeD) => {
+		// Use the calculated 3D interval if available (it should always be bounded)
+		// Skip query if no meter/group selected or if threeDInterval is not ready yet
+		const shouldSkipQuery = !threeD.meterOrGroupID || !threeDInterval || !threeDInterval.getIsBounded();
+		// Only compute args if we're not skipping the query
+		if (shouldSkipQuery) {
+			return { args: undefined, shouldSkipQuery: true };
+		}
+
 		const args: ThreeDReadingApiArgs = {
 			id: threeD.meterOrGroupID!,
-			timeInterval: roundTimeIntervalForFetch(queryTimeInterval).toString(),
+			timeInterval: roundTimeIntervalForFetch(threeDInterval).toString(),
 			graphicUnitId: selectedUnit,
 			readingInterval: threeD.readingInterval,
 			meterOrGroup: threeD.meterOrGroup!
 		};
-		const shouldSkipQuery = !threeD.meterOrGroupID || !queryTimeInterval.getIsBounded();
 		return { args, shouldSkipQuery };
 	}
 );

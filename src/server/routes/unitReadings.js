@@ -12,6 +12,10 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
+const { log } = require('../log');
+
+// Maximum number of days allowed for 3D graphics (security limit for unauthenticated users)
+const MAX_3D_DAYS = 1095; // 3 years
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -342,7 +346,7 @@ function validateGroupThreeDReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_id'],
 		properties: {
-			meter_ids: {
+			group_id: {
 				type: 'string',
 				// Matches a single integer value
 				pattern: '^\\d+$'
@@ -351,6 +355,16 @@ function validateGroupThreeDReadingsParams(params) {
 	};
 	const paramsValidationResult = validate(params, validParams);
 	return paramsValidationResult.valid;
+}
+
+// Simple validation for single meter ID (for dataRange endpoint)
+function validateSingleMeterID(params) {
+	return params.meter_id && /^\d+$/.test(params.meter_id);
+}
+
+// Simple validation for single group ID (for dataRange endpoint)
+function validateSingleGroupID(params) {
+	return params.group_id && /^\d+$/.test(params.group_id);
 }
 
 function validateThreeDQueryParams(queryParams) {
@@ -466,22 +480,24 @@ function createRouter() {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range to validate 1 year or less.
+			// Security: This is an open route (login not needed). Enforce MAX_3D_DAYS limit to prevent abuse.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
-				const durationInYears = duration.years();
-				if (durationInYears >= 1) {
-					// Limit 3D to one year of data.
+				// Calculate calendar days (inclusive of both start and end day) to match client calculation
+				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
+				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
+				// Security: Limit 3D to MAX_3D_DAYS to prevent abuse from unauthenticated users.
+				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
+				if (durationInDays > MAX_3D_DAYS) {
 					res.sendStatus(400);
 				} else {
 					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 					const graphicUnitID = req.query.graphicUnitId;
 					const readingInterval = req.query.readingInterval;
+					// readingInterval is validated by validateThreeDQueryParams (1, 2, 3, 4, 6, 8, or 12 hours only)
 					const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
 					res.json(forJson);
 				}
@@ -494,25 +510,63 @@ function createRouter() {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
 			res.sendStatus(400);
 		} else {
-			// Get time range to validate 1 year or less.
+			// Security: This is an open route (login not needed). Enforce MAX_3D_DAYS limit to prevent abuse.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
 				res.sendStatus(400);
 			} else {
-				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
-				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
-				const durationInYears = duration.years();
-				if (durationInYears >= 1) {
-					// Limit 3D to one year of data.
+				// Calculate calendar days (inclusive of both start and end day) to match client calculation
+				// Client uses: threeDEndDate.diff(threeDStartDate, 'days') + 1
+				const durationInDays = timeInterval.endTimestamp.diff(timeInterval.startTimestamp, 'days') + 1;
+				// Security: Limit 3D to MAX_3D_DAYS to prevent abuse from unauthenticated users.
+				// Frontend auto-adjustment provides UX, but backend must enforce security limits.
+				if (durationInDays > MAX_3D_DAYS) {
 					res.sendStatus(400);
 				} else {
 					const groupID = req.params.group_id;
 					const graphicUnitID = req.query.graphicUnitId;
 					const readingInterval = req.query.readingInterval;
+					// readingInterval is validated by validateThreeDQueryParams (1, 2, 3, 4, 6, 8, or 12 hours only)
 					const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
 					res.json(forJson);
 				}
+			}
+		}
+	});
+
+	// Route for getting data range for a single meter (for 3D auto-adjustment)
+	router.get('/dataRange/meters/:meter_id', optionalAuthMiddleware, async (req, res) => {
+		if (!validateSingleMeterID(req.params)) {
+			log.warn(`Invalid meter ID for dataRange request: ${req.params.meter_id}`);
+			res.sendStatus(400);
+		} else {
+			const meterID = Number(req.params.meter_id);
+			const conn = getConnection();
+			try {
+				const dataRange = await Reading.getMeterDataRange(meterID, conn);
+				res.json(dataRange);
+			} catch (error) {
+				log.error('Error getting meter data range:', error);
+				res.sendStatus(500);
+			}
+		}
+	});
+
+	// Route for getting data range for group
+	router.get('/dataRange/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
+		if (!validateSingleGroupID(req.params)) {
+			log.warn(`Invalid group ID for dataRange request: ${req.params.group_id}`);
+			res.sendStatus(400);
+		} else {
+			const groupID = Number(req.params.group_id);
+			const conn = getConnection();
+			try {
+				const dataRange = await Reading.getGroupDataRange(groupID, conn);
+				res.json(dataRange);
+			} catch (error) {
+				log.error('Error getting group data range:', error);
+				res.sendStatus(500);
 			}
 		}
 	});

@@ -35,7 +35,6 @@ export default function DateRangeComponent() {
 		dispatch(changeSliderRange(dateRangeToTimeInterval(value)));
 	};
 
-
 	return (
 		<div style={{ width: '100%' }}>
 			{datePickerVisible && (

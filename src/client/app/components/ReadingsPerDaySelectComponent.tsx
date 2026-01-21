@@ -23,7 +23,8 @@ export default function ReadingsPerDaySelect() {
 	const readingInterval = useAppSelector(selectThreeDReadingInterval);
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
 
-	const { currentValue, isDisabled, isFetching } = readingsApi.endpoints.threeD.useQuery(args, {
+	// When shouldSkipQuery is true, args is undefined but the query won't execute, so the non-null assertion is safe
+	const { currentValue, isDisabled, isFetching } = readingsApi.endpoints.threeD.useQuery(args!, {
 		skip: shouldSkipQuery,
 		selectFromResult: ({ currentData, ...result }) => ({
 			...result,

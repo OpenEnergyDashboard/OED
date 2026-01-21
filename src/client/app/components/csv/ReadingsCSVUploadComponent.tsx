@@ -284,8 +284,8 @@ export default function ReadingsCSVUploadComponent() {
 			|| readingsData.relaxedParsing !== ReadingsCSVUploadDefaults.relaxedParsing
 			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
 			|| readingsData.update !== ReadingsCSVUploadDefaults.update
-			|| readingsData.useMeterZone !== readingsData.useMeterZone
-			|| readingsData.warnOnCumulativeReset !== readingsData.warnOnCumulativeReset
+			|| readingsData.useMeterZone !== ReadingsCSVUploadDefaults.useMeterZone
+			|| readingsData.warnOnCumulativeReset !== ReadingsCSVUploadDefaults.warnOnCumulativeReset
 			// If any file is added, it will count as edit made.
 			|| selectedFile !== null
 			|| invalidFileEntry === true;

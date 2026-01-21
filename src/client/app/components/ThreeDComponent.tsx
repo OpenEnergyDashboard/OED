@@ -8,22 +8,35 @@ import { selectGroupDataById } from '../redux/api/groupsApi';
 import { selectMeterDataById } from '../redux/api/metersApi';
 import { readingsApi } from '../redux/api/readingsApi';
 import { selectUnitDataById } from '../redux/api/unitsApi';
-import { useAppSelector } from '../redux/reduxHooks';
+import { useAppSelector, useAppDispatch } from '../redux/reduxHooks';
 import { selectThreeDQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectThreeDComponentInfo } from '../redux/selectors/threeDSelectors';
 import { selectScalingFromEntity } from '../redux/selectors/entitySelectors';
-import { selectGraphState } from '../redux/slices/graphSlice';
+import {
+	selectGraphState,
+	updateThreeDInterval,
+	selectThreeDNumDays,
+	selectQueryTimeInterval,
+	selectThreeDMeterOrGroup
+} from '../redux/slices/graphSlice';
 import { ThreeDReading } from '../types/readings';
 import { GraphState, MeterOrGroup } from '../types/redux/graph';
 import { GroupDataByID } from '../types/redux/groups';
 import { MeterDataByID } from '../types/redux/meters';
 import { UnitDataById } from '../types/redux/units';
-import { isValidThreeDInterval, roundTimeIntervalForFetch } from '../utils/dateRangeCompatibility';
+import {
+	isValidThreeDInterval,
+	roundTimeIntervalForFetch,
+	calculateThreeDDateRange,
+	getEffectiveNumDays,
+	MAX_3D_DAYS
+} from '../utils/dateRangeCompatibility';
 import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { lineUnitLabel } from '../utils/graphics';
 // Both translates are used since some are in the function component where the React Hook is okay
 // and some are in other functions where the older method is needed.
 import { useTranslate } from '../redux/componentHooks';
+import { showWarnNotification } from '../utils/notifications';
 import SpinnerComponent from './SpinnerComponent';
 import ThreeDPillComponent from './ThreeDPillComponent';
 import Plot from 'react-plotly.js';
@@ -38,14 +51,79 @@ import { fullSizeContainer } from '../styles/modalStyle';
  */
 export default function ThreeDComponent() {
 	const translate = useTranslate();
+	const dispatch = useAppDispatch();
 	const { args, shouldSkipQuery } = useAppSelector(selectThreeDQueryArgs);
-	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args, { skip: shouldSkipQuery });
+	// When shouldSkipQuery is true, args is undefined but the query won't execute, so the non-null assertion is safe
+	const { data, isFetching } = readingsApi.endpoints.threeD.useQuery(args!, { skip: shouldSkipQuery });
 	const meterDataById = useAppSelector(selectMeterDataById);
 	const groupDataById = useAppSelector(selectGroupDataById);
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const graphState = useAppSelector(selectGraphState);
 	const locale = useAppSelector(selectSelectedLanguage);
 	const { meterOrGroupID, meterOrGroupName, isAreaCompatible } = useAppSelector(selectThreeDComponentInfo);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+	const threeDMeterOrGroup = useAppSelector(selectThreeDMeterOrGroup);
+
+	// Get data range for 3D date range calculation
+	const { data: dataRange } = readingsApi.endpoints.dataRange.useQuery(
+		{ id: meterOrGroupID!, meterOrGroup: threeDMeterOrGroup! },
+		{ skip: !meterOrGroupID || !threeDMeterOrGroup }
+	);
+
+	// Get numDays from Redux state
+	const numDaysRedux = useAppSelector(selectThreeDNumDays);
+	const numDays = getEffectiveNumDays(numDaysRedux);
+
+	// Track previous warning state and calculated interval to avoid duplicate notifications/dispatches
+	const prevWarningRef = React.useRef<boolean>(false);
+	const prevCalculatedIntervalRef = React.useRef<string | null>(null);
+
+	// Calculate 3D date range based on the 4-case logic
+	React.useEffect(() => {
+		if (!meterOrGroupID || !threeDMeterOrGroup) {
+			dispatch(updateThreeDInterval(undefined));
+			prevWarningRef.current = false;
+			prevCalculatedIntervalRef.current = null;
+			return;
+		}
+
+		const maxDataDate = dataRange?.maxDate ? moment(dataRange.maxDate) : undefined;
+		const minDataDate = dataRange?.minDate ? moment(dataRange.minDate) : undefined;
+
+		const result = calculateThreeDDateRange(
+			queryTimeInterval,
+			numDays,
+			MAX_3D_DAYS,
+			maxDataDate,
+			minDataDate
+		);
+
+		// Create a string representation of the interval to check if it changed
+		const intervalString = result.threeDInterval.getIsBounded()
+			? `${result.threeDInterval.getStartTimestamp()?.valueOf()}-${result.threeDInterval.getEndTimestamp()?.valueOf()}`
+			: 'unbounded';
+
+		// Only dispatch if the calculated interval actually changed
+		if (prevCalculatedIntervalRef.current !== intervalString) {
+			// Store the calculated 3D interval in Redux
+			if (result.shouldShowGraph && result.threeDInterval.getIsBounded()) {
+				dispatch(updateThreeDInterval(result.threeDInterval));
+			} else {
+				dispatch(updateThreeDInterval(undefined));
+			}
+			prevCalculatedIntervalRef.current = intervalString;
+		}
+
+		// Show warning to user if result.shouldWarn is true (only once per change)
+		if (result.shouldWarn && !prevWarningRef.current) {
+			showWarnNotification(translate('threeD.date.range.exceeds.max'));
+			prevWarningRef.current = true;
+		} else if (!result.shouldWarn) {
+			prevWarningRef.current = false;
+		}
+		// dispatch and translate are stable and don't need to be in dependencies
+	}, [meterOrGroupID, dataRange, queryTimeInterval, numDays, threeDMeterOrGroup]);
+
 	// Initialize Default values
 	const threeDData = data;
 	let layout = {};
@@ -64,9 +142,9 @@ export default function ThreeDComponent() {
 		layout = setHelpLayout(translate('select.meter.group'));
 	} else if (graphState.areaNormalization && !isAreaCompatible) {
 		layout = setHelpLayout(`${meterOrGroupName}${translate('threeD.area.incompatible')}`);
-	} else if (!isValidThreeDInterval(roundTimeIntervalForFetch(graphState.queryTimeInterval))) {
-		// Not a valid time interval. ThreeD can only support up to 1 year of readings
-		layout = setHelpLayout(translate('threeD.date.range.too.long'));
+	} else if (!graphState.threeDInterval || !isValidThreeDInterval(roundTimeIntervalForFetch(graphState.threeDInterval), MAX_3D_DAYS)) {
+		// 3D interval calculation is handled in useEffect above, but show loading while calculating
+		layout = setHelpLayout(translate('threeD.rendering'));
 	} else if (!threeDData) {
 		// Not actually 'rendering', but from the user perspective should make sense.
 		layout = setHelpLayout(translate('threeD.rendering'));

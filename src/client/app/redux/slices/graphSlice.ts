@@ -24,6 +24,7 @@ const defaultState: GraphState = {
 	lastAddedMeterOrGroup: undefined,
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
+	threeDInterval: undefined,
 	rangeSliderInterval: TimeInterval.unbounded(),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
@@ -37,7 +38,9 @@ const defaultState: GraphState = {
 	threeD: {
 		meterOrGroupID: undefined,
 		meterOrGroup: undefined,
-		readingInterval: ReadingInterval.Hourly
+		readingInterval: ReadingInterval.Hourly,
+		// Default to undefined, will use 1 year (365 days) if not set
+		numDays: undefined
 	},
 	hotlinked: false,
 	shiftAmount: ShiftAmount.none,
@@ -85,6 +88,9 @@ export const graphSlice = createSlice({
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.queryTimeInterval = action.payload;
+		},
+		updateThreeDInterval: (state, action: PayloadAction<TimeInterval | undefined>) => {
+			state.current.threeDInterval = action.payload;
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.shiftTimeInterval = action.payload;
@@ -149,6 +155,9 @@ export const graphSlice = createSlice({
 			if (state.current.threeD.meterOrGroup !== action.payload) {
 				state.current.threeD.meterOrGroup = action.payload;
 			}
+		},
+		updateThreeDNumDays: (state, action: PayloadAction<number | undefined>) => {
+			state.current.threeD.numDays = action.payload;
 		},
 		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup | undefined }>) => {
 			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
@@ -274,6 +283,9 @@ export const graphSlice = createSlice({
 							case 'readingInterval':
 								current.threeD.readingInterval = parseInt(value);
 								break;
+							case 'numDays':
+								current.threeD.numDays = value === 'undefined' ? undefined : parseInt(value);
+								break;
 							case 'serverRange':
 								current.queryTimeInterval = TimeInterval.fromString(value);
 								break;
@@ -320,12 +332,14 @@ export const graphSlice = createSlice({
 		selectSelectedGroups: state => state.current.selectedGroups,
 		selectSortingOrder: state => state.current.compareSortingOrder,
 		selectQueryTimeInterval: state => state.current.queryTimeInterval,
+		selectThreeDInterval: state => state.current.threeDInterval,
 		selectInitialXAxisRange: state => state.current.initialXAxisRange,
 		selectThreeDMeterOrGroup: state => state.current.threeD.meterOrGroup,
 		selectCompareTimeInterval: state => state.current.compareTimeInterval,
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
+		selectThreeDNumDays: state => state.current.threeD.numDays,
 		selectLastMeterOrGroup: state => state.current.lastAddedMeterOrGroup,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
@@ -347,9 +361,9 @@ export const {
 	selectComparePeriod, selectChartToRender,
 	selectForwardHistory, selectSelectedMeters,
 	selectSelectedGroups, selectQueryTimeInterval,
-	selectThreeDMeterOrGroup, selectCompareTimeInterval,
+	selectThreeDInterval, selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectThreeDNumDays, selectLastMeterOrGroup, selectGraphAreaNormalization,
 	selectSliderRangeInterval, selectDefaultGraphState,
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,
@@ -362,7 +376,7 @@ export const {
 	setBarStacking, toggleShowMinMax,
 	changeBarStacking, resetTimeInterval,
 	updateDuration, changeSliderRange,
-	updateTimeInterval, updateSelectedUnit,
+	updateTimeInterval, updateThreeDInterval, updateSelectedUnit,
 	changeChartToRender, updateComparePeriod,
 	updateSelectedMeters, updateLineGraphRate,
 	setAreaNormalization, updateSelectedGroups,
@@ -370,7 +384,7 @@ export const {
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
 	setLastAddedMeterOrGroup, changeCompareSortingOrder,
 	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
-	updateThreeDMeterOrGroupInfo, updateShiftAmount,
+	updateThreeDNumDays, updateThreeDMeterOrGroupInfo, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
 	updateShiftTimeInterval
 } = graphSlice.actions;

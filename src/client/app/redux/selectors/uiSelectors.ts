@@ -498,6 +498,9 @@ export const selectChartLink = createAppSelector(
 				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;
 				linkText += `&meterOrGroupID=${current.threeD.meterOrGroupID}`;
 				linkText += `&readingInterval=${current.threeD.readingInterval}`;
+				if (current.threeD.numDays !== undefined) {
+					linkText += `&numDays=${current.threeD.numDays}`;
+				}
 				break;
 			case ChartTypes.compareLine:
 				linkText += `&meterOrGroup=${current.threeD.meterOrGroup}`;

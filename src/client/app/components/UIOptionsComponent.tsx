@@ -14,6 +14,7 @@ import CompareControlsComponent from './CompareControlsComponent';
 import DateRangeComponent from './DateRangeComponent';
 import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
+import ThreeDIntervalControlsComponent from './ThreeDIntervalControlsComponent';
 import MoreOptionsComponent from './MoreOptionsComponent';
 import CompareLineControlsComponent from './CompareLineControlsComponent';
 
@@ -77,6 +78,7 @@ export default function UIOptionsComponent() {
 			{/* UI options for 3D graphic */}
 			{chartToRender == ChartTypes.threeD && <ReadingsPerDaySelectComponent />}
 			{chartToRender == ChartTypes.threeD && <DateRangeComponent />}
+			{chartToRender == ChartTypes.threeD && <ThreeDIntervalControlsComponent />}
 
 			{/* UI options for radar graphic */}
 			{chartToRender == ChartTypes.radar}

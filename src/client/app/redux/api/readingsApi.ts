@@ -12,6 +12,7 @@ import {
 } from '../selectors/chartQuerySelectors';
 import { RootState } from '../../store';
 import { BarReadings, CompareReadings, LineReadings, ThreeDReading } from '../../types/readings';
+import { MeterOrGroup } from '../../types/redux/graph';
 import { baseApi } from './baseApi';
 
 export const readingsApi = baseApi.injectEndpoints({
@@ -149,6 +150,10 @@ export const readingsApi = baseApi.injectEndpoints({
 				const { data, error } = await baseQuery({ url: `api/unitReadings/radar/${meterOrGroup}/${idsToFetch}`, params });
 				return error ? { error } : { data: data as LineReadings };
 			},
+			providesTags: ['Readings']
+		}),
+		dataRange: builder.query<{ minDate: string | null, maxDate: string | null }, { id: number, meterOrGroup: MeterOrGroup }>({
+			query: ({ id, meterOrGroup }) => `api/unitReadings/dataRange/${meterOrGroup}/${id}`,
 			providesTags: ['Readings']
 		})
 

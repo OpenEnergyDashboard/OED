@@ -475,6 +475,36 @@ class Reading {
 		return groupThreeDData;
 	}
 
+	/**
+	 * Gets the data range (min and max timestamps) for a single meter
+	 * Used for 3D auto-adjustment to determine available data range
+	 * @param meterID The meter ID to get data range for
+	 * @param conn the connection to use
+	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
+	 */
+	static async getMeterDataRange(meterID, conn) {
+		const result = await conn.oneOrNone(sqlFile('reading/get_meter_data_range.sql'), { meterID });
+		return {
+			minDate: result?.min_date || null,
+			maxDate: result?.max_date || null
+		};
+	}
+
+	/**
+	 * Gets the data range (min and max timestamps) for a group
+	 * Used for 3D auto-adjustment to determine available data range
+	 * @param groupID The group ID to get data range for
+	 * @param conn the connection to use
+	 * @returns {Promise<{minDate: Moment | null, maxDate: Moment | null}>}
+	 */
+	static async getGroupDataRange(groupID, conn) {
+		const result = await conn.oneOrNone(sqlFile('reading/get_group_data_range.sql'), { groupID });
+		return {
+			minDate: result?.min_date || null,
+			maxDate: result?.max_date || null
+		};
+	}
+
 	toString() {
 		return `Reading [id: ${this.meterID}, reading: ${this.reading}, startTimestamp: ${this.startTimestamp}, endTimestamp: ${this.endTimestamp}]`;
 	}
