@@ -27,7 +27,6 @@
 function failure(res, code = 500, comment = '') {
 	res.status(code)
 	.send(comment);
-
 }
 
 module.exports = { success, failure };

@@ -20,6 +20,7 @@ import { useTranslate } from '../redux/componentHooks';
 import LanguageSelectorComponent from './LanguageSelectorComponent';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
 import LoginComponent from './LoginComponent';
+import ChangePasswordModalComponent from './ChangePasswordModalComponent';
 
 /**
  * React Component that defines the header buttons at the top of a page
@@ -156,15 +157,21 @@ export default function HeaderButtonsComponent() {
 			logout();
 		}
 	};
-	// Handle modal visibility
-	const [showModal, setShowModal] = useState<boolean>(false);
+
+	// enum to handle modal visibility
+	enum ModalType {
+		LOGIN = 'login',
+		CHANGE_PASSWORD = 'changePassword',
+		NONE = 'none'
+	}
+	const [modalType, setModalType] = useState<ModalType>(ModalType.NONE);
 
 	const handleClose = () => {
-		setShowModal(false);
+		setModalType(ModalType.NONE);
 	};
 
-	const handleShow = () => {
-		setShowModal(true);
+	const handleShow = (type: ModalType) => {
+		setModalType(type);
 	};
 
 	return (
@@ -288,13 +295,18 @@ export default function HeaderButtonsComponent() {
 							<DropdownItem divider />
 							<DropdownItem
 								style={state.loginLinkStyle}
-								onClick={handleShow}>
+								onClick={() => handleShow(ModalType.LOGIN)}>
 								<FormattedMessage id='log.in' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.logoutLinkStyle}
 								onClick={handleLogOut}>
 								<FormattedMessage id='log.out' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.logoutLinkStyle}
+								onClick={() => handleShow(ModalType.CHANGE_PASSWORD)}>
+								<FormattedMessage id='password.change' />
 							</DropdownItem>
 							<DropdownItem divider />
 							<DropdownItem
@@ -310,16 +322,29 @@ export default function HeaderButtonsComponent() {
 				</Nav>
 			</Navbar>
 			<>
-				<Modal isOpen={showModal} toggle={handleClose}>
-					<ModalHeader>
-						{translate('log.in')}
-					</ModalHeader>
-					<ModalBody>
-						<LoginComponent handleClose={handleClose} />
-					</ModalBody>
-				</Modal>
+				{modalType === 'login' && (
+					<Modal isOpen toggle={handleClose}>
+						<ModalHeader>
+							{translate('log.in')}
+						</ModalHeader>
+						<ModalBody>
+							<LoginComponent handleClose={handleClose} />
+						</ModalBody>
+					</Modal>
+				)}
 			</>
-
+			<>
+				{modalType === 'changePassword' && (
+					<Modal isOpen toggle={handleClose}>
+						<ModalHeader>
+							{translate('password.change')}
+						</ModalHeader>
+						<ModalBody>
+							<ChangePasswordModalComponent handleClose={handleClose} />
+						</ModalBody>
+					</Modal>
+				)}
+			</>
 		</div>
 	);
 }
