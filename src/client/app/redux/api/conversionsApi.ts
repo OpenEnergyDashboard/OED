@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { createSelector } from '@reduxjs/toolkit';
-import { ConversionData } from '../../types/redux/conversions';
+import { ConversionData, SimulateDeleteResult } from '../../types/redux/conversions';
 import { baseApi } from './baseApi';
 import { CikData } from '../../types/redux/ciks';
 import { setRefresingReadings } from '../../redux/slices/appStateSlice';
@@ -37,14 +37,18 @@ export const conversionsApi = baseApi.injectEndpoints({
 			}
 
 		}),
-		deleteConversion: builder.mutation<void, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
-			query: conversion => ({
+		deleteConversion: builder.mutation<void, {
+			sourceId: number;
+			destinationId: number;
+			meterIds: number[];
+			groupIds: number[];
+		}>({
+			query: ({ sourceId, destinationId, meterIds, groupIds }) => ({
 				url: 'api/conversions/delete',
 				method: 'POST',
-				body: conversion
+				body: { sourceId, destinationId, meterIds, groupIds }
 			}),
 			onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
-				// TODO write more robust logic for error handling, and manually invalidate tags instead?
 				// TODO Verify Behavior w/ Maintainers
 				queryFulfilled
 					.then(() => {
@@ -54,8 +58,9 @@ export const conversionsApi = baseApi.injectEndpoints({
 								refreshReadingViews: false
 							}));
 					});
-
-			}
+			},
+			//These tags are invalidated because we want to rerender them in case default graphic unit is affected. Add more tags to invalidate if needed
+			invalidatesTags: ['MeterData', 'GroupData']
 		}),
 		editConversion: builder.mutation<void, { conversionData: ConversionData, shouldRedoCik: boolean }>({
 			query: ({ conversionData }) => ({
@@ -87,7 +92,7 @@ export const conversionsApi = baseApi.injectEndpoints({
 				body: { redoCik, refreshReadingViews }
 			}),
 			invalidatesTags: ['ConversionDetails', 'Cik', 'Readings', 'Units'],
-			onQueryStarted: async (_arg, { dispatch, queryFulfilled} ) => {
+			onQueryStarted: async (_arg, { dispatch, queryFulfilled }) => {
 				dispatch(setRefresingReadings(true));
 				try {
 					await queryFulfilled;
@@ -95,6 +100,13 @@ export const conversionsApi = baseApi.injectEndpoints({
 					dispatch(setRefresingReadings(false));
 				}
 			}
+		}),
+		simulateDeleteConversion: builder.query<SimulateDeleteResult, Pick<ConversionData, 'sourceId' | 'destinationId'>>({
+			query: conversion => ({
+				url: 'api/conversions/simulate-delete',
+				method: 'POST',
+				body: conversion
+			})
 		})
 	})
 });

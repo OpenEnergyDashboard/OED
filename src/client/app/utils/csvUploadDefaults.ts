@@ -24,7 +24,8 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferences = {
 	relaxedParsing: false,
 	timeSort: MeterTimeSortType.increasing,
 	update: false,
-	useMeterZone: false
+	useMeterZone: false,
+	warnOnCumulativeReset: false
 };
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferences = {

@@ -10,7 +10,7 @@ ALTER TABLE meters
 UPDATE meters
 SET disable_checks_temp = 
     CASE 
-        WHEN disable_checks = true THEN 'reject_none'::disable_checks_type
+        WHEN disable_checks = true THEN 'reject_disable'::disable_checks_type
         WHEN disable_checks = false THEN 'reject_all'::disable_checks_type
     END;
 

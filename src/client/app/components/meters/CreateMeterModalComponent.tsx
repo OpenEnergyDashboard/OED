@@ -55,7 +55,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleClose();
 		}
 	};
 

@@ -17,13 +17,15 @@ const Meter = require('../../models/Meter');
  * @returns 
  */
 async function uploadReadings(req, res, filepath, conn) {
-	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone } = req.body; // extract query parameters
+	// extract query parameters
+	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
 	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = normalizeBoolean(headerRow);
 	const shouldUpdate = normalizeBoolean(update);
 	let shouldHonorDst = normalizeBoolean(honorDst);
 	let shouldRelaxedParsing = normalizeBoolean(relaxedParsing);
 	let shouldUseMeterZone = normalizeBoolean(useMeterZone);
+	let shouldWarnOnCumulativeReset = normalizeBoolean(warnOnCumulativeReset);
 	// TODO:
 	// Allowing for backwards compatibility if any users are still using the 'meterName' parameter instead of
 	// the 'meterIdentifier' parameter to login. Developers need to decide in the future if we should deprecate
@@ -38,8 +40,8 @@ async function uploadReadings(req, res, filepath, conn) {
 	} catch (error) {
 		// If Meter does not exist, we do not know what to do with the readings so we error out.
 		let errorMessage = meterIdentifier
-		? `User Error: Meter with identifier '${meterIdentifier}' not found.`
-		: `User Error: Meter with name '${meterName}' not found.`;
+			? `User Error: Meter with identifier '${meterIdentifier}' not found.`
+			: `User Error: Meter with name '${meterName}' not found.`;
 
 		throw new CSVPipelineError(
 			errorMessage,
@@ -217,7 +219,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		conn,
 		shouldHonorDst,
 		shouldRelaxedParsing,
-		shouldUseMeterZone
+		shouldUseMeterZone,
+		shouldWarnOnCumulativeReset
 	); // load csv data
 }
 

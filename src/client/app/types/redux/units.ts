@@ -21,6 +21,7 @@ export enum UnitRepresentType {
 }
 
 export enum DisableChecksType {
+	reject_disabled = 'reject_disabled',
 	reject_bad = 'reject_bad',
 	reject_all = 'reject_all',
 	reject_none = 'reject_none'

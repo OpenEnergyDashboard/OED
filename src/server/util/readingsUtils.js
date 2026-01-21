@@ -87,10 +87,18 @@ function expectRangeToEqualExpected(res, expected, id = METER_ID) {
     expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
     // Loop over each reading
     for (let i = 0; i < expected.length; i++) {
-        // Check that the reading's min/max is within the expected tolerance (DELTA).
-       expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
-       expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
-       // Reading has correct start/end date and time.
+        // The parsing of the expected CSV file returns a string which will be null if no min/max
+        if (expected[i][0] === 'null' || expected[i][1] === 'null') {
+            // This is a case where raw/meter readings are being returned so min/max is null.
+            // Both expected values should always be null if one is so require one to be null to be safe.
+            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(null);
+            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(null);
+        } else {
+            // Check that the reading's min/max is within the expected tolerance (DELTA).
+            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
+            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
+        }
+        // Reading has correct start/end date and time.
         expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
         expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
     }

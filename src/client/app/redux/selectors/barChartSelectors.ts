@@ -12,13 +12,15 @@ import getGraphColor from '../../utils/getGraphColor';
 import { createAppSelector } from './selectors';
 import { selectAreaScalingFromEntity, selectNameFromEntity } from './entitySelectors';
 import { selectPlotlyMeterDeps, selectPlotlyGroupDeps } from './plotlyDataSelectors';
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 
 type PlotlyBarDeps = ReturnType<typeof selectPlotlyMeterDeps> & { barDuration: moment.Duration }
 export const selectPlotlyBarDeps = createAppSelector(
 	[
 		selectPlotlyMeterDeps,
 		selectPlotlyGroupDeps,
-		selectWidthDays
+		selectWidthDays,
+		selectSelectedLanguage
 	],
 	(meterDeps, groupDeps, barDuration) => {
 		const barMeterDeps = { ...meterDeps, barDuration };

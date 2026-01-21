@@ -24,7 +24,7 @@ import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
 import SpinnerComponent from '../SpinnerComponent';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
-import { useBlocker } from 'react-router-dom';
+import { useBlocker, useNavigate } from 'react-router-dom';
 
 /**
  * Defines the CSV Readings page
@@ -32,6 +32,24 @@ import { useBlocker } from 'react-router-dom';
  */
 export default function ReadingsCSVUploadComponent() {
 	const translate = useTranslate();
+
+	// boolean that updates if any change is made to any readings modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
+	// If there are unsaved changes, useBlocker() is true.
+	// If useBlocker() is true, the user is unable to navigate to other pages
+	// unless the blocker state is changed.
+	// This line of code is called on every time hasUnsavedChanges is updated.
+	const blocker = useBlocker(hasUnsavedChanges);
+
+	// Stores the URL of the page that the user tries to go to before
+	// being blocked by the unsaved warning.
+	const [attemptedDestinationURL, setAttemptedDestinationURL] = useState<string | null>(null);
+	// When blocker.state is unblocked, useNavigate() is used to navigate
+	// to the attempted destination URL.
+	const navigate = useNavigate();
+
 	const dispatch = useAppDispatch();
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
@@ -160,7 +178,8 @@ export default function ReadingsCSVUploadComponent() {
 			lengthVariation: selectedMeter.readingVariation,
 			endOnly: selectedMeter.endOnlyTime,
 			timeSort: MeterTimeSortType[selectedMeter.timeSort as keyof typeof MeterTimeSortType],
-			useMeterZone: false
+			useMeterZone: false,
+			warnOnCumulativeReset: false
 		}));
 	};
 
@@ -200,11 +219,27 @@ export default function ReadingsCSVUploadComponent() {
 		display: 'flex'
 	};
 
-	// boolean that updates if any change is made to any meter modal
-	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	const handleNavigationAttempt = (path: string) => {
+		// If there are unsaved changes, store the URL of the attempted destination
+		// and display the unsaved warning.
+		if (hasUnsavedChanges) {
+			setAttemptedDestinationURL(path);
+			setShowUnsavedWarning(true);
+		}
+		// Otherwise, navigate to the attempted destination.
+		else {
+			navigate(path);
+		}
+	};
 
-	const blocker = useBlocker(hasUnsavedChanges);
+	// Automatically calls handleNavigationAttempt()
+	// to update the attempted destination URL when blocked.
+	React.useEffect(() => {
+		if (blocker.state === 'blocked' && blocker.location) {
+			handleNavigationAttempt(blocker.location.pathname);
+		}
+
+	}, [blocker.state, blocker.location, hasUnsavedChanges]);
 
 	// displays the unsaved warning component whenever there's unsaved
 	// changes, otherwise closes out of the modal
@@ -213,7 +248,8 @@ export default function ReadingsCSVUploadComponent() {
 			setShowUnsavedWarning(true);
 		}
 		else {
-			handleClear(); // Proceed to close the modal
+			// Proceed to close the modal
+			handleClear();
 		}
 	};
 
@@ -249,6 +285,7 @@ export default function ReadingsCSVUploadComponent() {
 			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
 			|| readingsData.update !== ReadingsCSVUploadDefaults.update
 			|| readingsData.useMeterZone !== readingsData.useMeterZone
+			|| readingsData.warnOnCumulativeReset !== readingsData.warnOnCumulativeReset
 			// If any file is added, it will count as edit made.
 			|| selectedFile !== null
 			|| invalidFileEntry === true;
@@ -267,16 +304,31 @@ export default function ReadingsCSVUploadComponent() {
 					onDiscard={() => {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
-						// Note: This does not work cleanly, instead of immediately
-						// leaving after pressing "Leave", it instead clears the boolean
-						// values that display the warning, and the user just has to
-						// leave the page again.
 						handleClear();
-						blocker.state = 'unblocked';
+
+						// After pressing 'Leave,' the user will be redirected
+						// to the page that they have attempted to go to before being
+						// blocked.
+						if (attemptedDestinationURL) {
+							navigate(attemptedDestinationURL);
+							setAttemptedDestinationURL(null);
+						}
+						// blocker.proceed() is undefined unless it is inside of an
+						// if statement. This if statement will only call blocker.proceed()
+						// if blocker.proceed exists.
+						if (blocker.proceed) {
+							blocker.proceed();
+						}
 					}}
 					onCancel={() => {
 						setShowUnsavedWarning(false);
-						blocker.state = 'unblocked';
+						setAttemptedDestinationURL(null);
+						// blocker.state = 'unblocked' does not change the state,
+						// reset() is the proper way to reset the state to an
+						// unblocked state.
+						if (blocker.reset) {
+							blocker.reset();
+						}
 					}}
 				/>
 			)}
@@ -634,6 +686,19 @@ export default function ReadingsCSVUploadComponent() {
 											checked={useMeterZone}
 											type='checkbox'
 											name='useMeterZone'
+											onChange={handleCheckboxChange}
+										/>
+										<div className='ps-2'>
+											{translate('csv.readings.param.use.meter.zone' />
+										</div>
+									</Label>
+								*/}
+								{/*
+									<Label check>
+										<Input
+											checked={warnOnCumulativeReset}
+											type='checkbox'
+											name='warnOnCumulativeReset'
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>

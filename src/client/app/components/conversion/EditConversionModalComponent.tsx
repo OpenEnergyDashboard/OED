@@ -9,6 +9,7 @@ import { Button, Col, Container, FormGroup, FormFeedback, Input, Label, Modal, M
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi, selectConversionsDetails } from '../../redux/api/conversionsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
+import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import '../../styles/modal.css';
@@ -18,8 +19,10 @@ import { ConversionData } from '../../types/redux/conversions';
 import { UnitData, UnitType } from '../../types/redux/units';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -39,12 +42,14 @@ interface EditConversionModalComponentProps {
 export default function EditConversionModalComponent(props: EditConversionModalComponentProps) {
 	const translate = useTranslate();
 	const [editConversion] = conversionsApi.useEditConversionMutation();
+	const [triggerSimulate] = conversionsApi.useLazySimulateDeleteConversionQuery();
 	const [deleteConversion] = conversionsApi.useDeleteConversionMutation();
 	const unitDataById = useAppSelector(selectUnitDataById);
 	const meterDataById = useAppSelector(selectMeterDataById);
+	const groupDataById = useAppSelector(selectGroupDataById);
 	const conversionDetails = useAppSelector(selectConversionsDetails);
 
-	// boolean that updates if any change is made to any meter modal
+	// boolean that updates if any change is made to any conversion modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
 	// If there are no changes, then save is disabled
@@ -57,7 +62,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			setShowUnsavedWarning(true);
 		}
 		else {
-			props.handleClose(); // Proceed to close the modal
+			// Proceed to close the modal
+			props.handleClose();
 		}
 	};
 
@@ -67,13 +73,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
+	const [metersWithLostDefault, setMetersWithLostDefault] = useState<number[]>([]);
+	const [groupsWithLostDefault, setGroupsWithLostDefault] = useState<number[]>([]);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
 	};
 
 	const handleBooleanChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setState({...state, [e.target.name]: JSON.parse(e.target.value) });
+		setState({ ...state, [e.target.name]: JSON.parse(e.target.value) });
 	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,52 +128,84 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 		return count;
 	};
-
 	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
-	const checkState = () => {
+	const checkState = async () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
-		let msg = '';
+		const msgElements: React.ReactNode[] = [];
 		let cancel = false;
+
+		// Meter source orphan check
 		if (source.typeOfUnit === UnitType.meter) {
 			// How many conversions have this conversion's source so are conversions from a meter.
 			const srcCount = getConversionCount(source, conversionDetails);
 			// How many meters use this conversion, i.e., have the source as its unit.
 			const relatedMeters = Object.values(meterDataById).filter(meter => meter.unitId === source.id);
+
 			if (srcCount === 1 && relatedMeters.length !== 0) {
 				// This is the only conversion for this meter unit so if it is removed then
 				// you cannot graph any meters using this unit. Not allowed to delete if
 				// any meters use this unit as in this case.
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
-				});
+				msgElements.push(
+					<div key="meter-orphan">
+						<span className="bold">{translate('conversion.delete.meter.orphan')} </span>
+						&quot;{source.name}&quot;.
+						<br />
+						<span className="bold">{translate('conversion.delete.meter.related')} </span>
+						&quot;{source.name}&quot;:
+						<ul>
+							{relatedMeters.map(meter => (
+								<li key={meter.id}>&quot;{meter.name}&quot;</li>
+							))}
+						</ul>
+					</div>
+				);
 				cancel = true;
 			} else if (relatedMeters.length !== 0) {
-				// Some meters use this meter unit but there are other ways to graphic it
+				// Some meters use this meter unit but there are other ways to graph it,
 				// so warn the admin and tell each meter impacted.
-				msg += `${translate('conversion.delete.meter.related')} "${source.name}":\n`;
-				relatedMeters.forEach(meter => {
-					msg += `"${meter.name}"\n`;
-				});
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
+				msgElements.push(
+					<div key="meter-related">
+						<span className="bold">{translate('conversion.delete.meter.related')} </span>
+						&quot;{source.name}&quot;:
+						<ul>
+							{relatedMeters.map(meter => (
+								<li key={meter.id}>&quot;{meter.name}&quot;</li>
+							))}
+						</ul>
+						<span className="bold">{translate('conversion.delete.meter.reduce.graphable')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			} else if (srcCount === 1) {
 				// No meters use this meter unit so warn that will is ungraphable if used.
-				msg += `${translate('conversion.delete.meter.orphan')} "${source.name}".\n`;
+				msgElements.push(
+					<div key="meter-orphan-alone">
+						<span className="bold">{translate('conversion.delete.meter.orphan')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			} else {
 				// No meters use this meter unit so warn that reduced graphable units if used.
-				msg += `${translate('conversion.delete.meter.reduce.graphable')} "${source.name}".\n`;
+				msgElements.push(
+					<div key="meter-reduce-graphable">
+						<span className="bold">{translate('conversion.delete.meter.reduce.graphable')} </span>
+						&quot;{source.name}&quot;.
+					</div>
+				);
 			}
-			// TODO The following code did what was originally in issue #905 but there were issues
-			// with the design and usage of suffix units. It is commented out for now and needs
-			// to be revisited when the design for suffix is better.
-			// } else if (source.typeOfUnit === UnitType.suffix) {
-			// 	const srcCount = getConversionCount(source, conversionDetails);
-			// 	if (srcCount === 1) {
-			// 		msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
-			// 	}
-		} else if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
+			//	TODO The following code did what was originally in issue #905 but there were issues
+			//	with the design and usage of suffix units. It is commented out for now and needs
+			//	to be revisited when the design for suffix is better.
+			//	} else if (source.typeOfUnit === UnitType.suffix) {
+			//		const srcCount = getConversionCount(source, conversionDetails);
+			//		if (srcCount === 1) {
+			//			msg += `${translate('conversion.delete.suffix.disable')} "${source.name}".\n`;
+			//  }
+		}
+
+		// Unit-to-unit orphan check
+		if (source.typeOfUnit === UnitType.unit && dest.typeOfUnit === UnitType.unit) {
 			const destConversions = conversionDetails.filter(conversion =>
 				(conversion.destinationId === dest.id) ||
 				(conversion.bidirectional && conversion.sourceId === dest.id)
@@ -176,34 +216,170 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			);
 
 			if (remainingDestConversions.length === 0) {
-				msg += `${translate('conversion.delete.unit.orphan')} "${dest.name}".\n`;
-				cancel = true;
-			}
-
-			if (msg === '') {
-				msg += `${translate('conversion.delete.unit')}\n`;
-				// TODO: Check after deleting the conversion to see if a change happens.
-				// 		 Notify the admin of any consequences caused by deleting the conversion.
+				msgElements.push(
+					<div key="unit-orphan">
+						<span className="bold">{translate('conversion.delete.unit.orphan')} </span>
+						"{dest.name}".
+					</div>
+				);
 			}
 		}
 
-		if (msg === '') {
-			handleDeleteConfirmationModalOpen();
-		} else if (cancel) {
-			setDeleteConfirmationMessage(msg + `${translate('conversion.delete.restricted')}\n`);
+		// Only run simulation if the previous orphan check passed and it's unit-to-unit
+		if (source.typeOfUnit !== UnitType.suffix && dest.typeOfUnit === UnitType.unit && !cancel) {
+			try {
+				const result = await triggerSimulate({
+					sourceId: state.sourceId,
+					destinationId: state.destinationId
+				}).unwrap();
+
+				// Orphaned groups check
+				const orphanedGroups = result.affectedGroups?.filter(group => group.orphaned);
+				if (orphanedGroups.length > 0) {
+					msgElements.push(
+						<div key="orphaned-groups">
+							<span className="bold">{translate('conversion.delete.group.orphan')}:</span>
+							<ul>
+								{orphanedGroups.map(group => (
+									<li key={group.groupName}>"{group.groupName}"</li>
+								))}
+							</ul>
+						</div>
+					);
+					cancel = true;
+				} else {
+					// Group meters by lostUnits
+					const meterLossMap = new Map<string, string[]>();
+					result.affectedMeters.forEach(meter => {
+						const key = JSON.stringify([...meter.lostUnits].sort());
+						if (!meterLossMap.has(key)) {
+							meterLossMap.set(key, []);
+						}
+						meterLossMap.get(key)!.push(meter.meterName);
+					});
+					meterLossMap.forEach((meterNames, lostUnitsKey) => {
+						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+						msgElements.push(
+							<div key={`meters-${lostUnitsKey}`}>
+								<span className="bold">{translate('conversion.delete.meter.affected')}: </span>
+								<div style={{ marginLeft: 16 }}>
+									{meterNames.map(name => (
+										<div key={name}>"{name}"</div>
+									))}
+								</div>
+								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+								{lostUnits.map((id: number, i: number) => (
+									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
+								))}
+								<br /><br />
+							</div>
+						);
+					});
+
+					// Group non-orphaned groups by lostUnits
+					const groupLossMap = new Map<string, string[]>();
+					const nonOrphanedGroups = result.affectedGroups?.filter(group => !group.orphaned);
+					nonOrphanedGroups.forEach(group => {
+						const key = JSON.stringify([...group.lostUnits].sort());
+						if (!groupLossMap.has(key)) {
+							groupLossMap.set(key, []);
+						}
+						groupLossMap.get(key)!.push(group.groupName);
+					});
+					groupLossMap.forEach((groupNames, lostUnitsKey) => {
+						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+						msgElements.push(
+							<div key={`groups-${lostUnitsKey}`}>
+								<span className="bold">{translate('conversion.delete.group.affected')}: </span>
+								<div style={{ marginLeft: 16 }}>
+									{groupNames.map(name => (
+										<div key={name}>"{name}"</div>
+									))}
+								</div>
+								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+								{lostUnits.map((id: number, i: number) => (
+									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
+								))}
+								<br /><br />
+							</div>
+						);
+					});
+
+					// After you get result from simulateDeleteConversion check default graphic units
+					const metersLostDefault: number[] = [];
+					const groupsLostDefault: number[] = [];
+
+					result.affectedMeters.forEach(meter => {
+						const meterData = meterDataById[meter.meterId];
+						const lostDefault = meter.lostUnits.includes(meterData.defaultGraphicUnit);
+						if (lostDefault) {
+							metersLostDefault.push(meter.meterId);
+							msgElements.push(
+								<div key={`meter-default-${meter.meterId}`}>
+									<span className="bold">{translate('conversion.delete.meter.default.lost')}</span>
+									<br />
+									"{meterData.name}"
+									<br />
+									({translate('conversion.default.graphic.unit')}: "<span>{unitDataById[meterData.defaultGraphicUnit].name}</span>")
+								</div>
+							);
+						}
+					});
+
+					result.affectedGroups?.forEach(group => {
+						const groupData = groupDataById[group.groupId];
+						const lostDefault = group.lostUnits.includes(groupData.defaultGraphicUnit);
+						if (lostDefault) {
+							groupsLostDefault.push(group.groupId);
+							msgElements.push(
+								<div key={`group-default-${group.groupId}`}>
+									<span className="bold">{translate('conversion.delete.group.default.lost')}</span>
+									<br />
+									"{groupData.name}"
+									<br />
+									({translate('conversion.default.graphic.unit')}: <span>{unitDataById[groupData.defaultGraphicUnit].name}</span>)
+								</div>
+							);
+						}
+					});
+					setMetersWithLostDefault(metersLostDefault);
+					setGroupsWithLostDefault(groupsLostDefault);
+				}
+			} catch (e) {
+				msgElements.push(
+					<div key="simulation-error">
+						{translate('conversion.delete.simulation.error')}
+					</div>
+				);
+				cancel = true;
+			}
+		}
+
+		if (cancel) {
+			msgElements.push(
+				<div key="restricted">
+					<br />
+					{translate('conversion.delete.restricted')}
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
 			handleCancelModalOpen();
 		} else {
-			setDeleteConfirmationMessage(msg + translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?');
+			msgElements.push(
+				<div key="final-confirm">
+					{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
+				</div>
+			);
+			setDeleteConfirmationMessage(msgElements);
 			handleDeleteConfirmationModalOpen();
 		}
 	};
-
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 	const [showCancelModal, setShowCancelModal] = useState(false);
-	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState(
-		translate('conversion.delete.conversion') + ' [' + props.conversionIdentifier + '] ?');
+	const [deleteConfirmationMessage, setDeleteConfirmationMessage] = useState<React.ReactNode>(
+		<div>{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?</div>);
 	const deleteConfirmText = translate('conversion.delete.conversion');
 	const deleteRejectText = translate('cancel');
 	// The first two handle functions below are required because only one Modal can be open at a time (properly)
@@ -219,13 +395,24 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Show the warning modal
 		setShowDeleteConfirmationModal(true);
 	};
-	const handleDeleteConversion = () => {
+	const handleDeleteConversion = async () => {
 		// Closes the warning modal
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 
-		// Delete the conversion using the state object, it should only require the source and destination ids set
-		deleteConversion({ sourceId: state.sourceId, destinationId: state.destinationId });
+		const payload = {
+			sourceId: state.sourceId,
+			destinationId: state.destinationId,
+			meterIds: metersWithLostDefault,
+			groupIds: groupsWithLostDefault
+		};
+		deleteConversion(payload)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(translate('conversion.delete.success'));
+			}).catch(error => {
+				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
+			});
 	};
 
 	const handleCancelModalClose = () => {
@@ -288,7 +475,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			editConversion({
 				conversionData: {
 					...state,
-					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
+					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+				}, shouldRedoCik
+			});
 		}
 	};
 	const handleWarningCancel = () => {
@@ -322,7 +511,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				editConversion({
 					conversionData: {
 						...state,
-						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional }, shouldRedoCik });
+						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+					}, shouldRedoCik
+				});
 			}
 		}
 	};
@@ -445,7 +636,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								name='bidirectional'
 								type='select'
 								defaultValue={state.bidirectional.toString()}
-								onChange={e => {handleBooleanChange(e);}}
+								onChange={e => { handleBooleanChange(e); }}
 								invalid={(isMeterSource() || isSuffixUsed()) && state.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
@@ -453,12 +644,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							</Input>
 							{isMeterSource() && state.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
+									<FormattedMessage id="conversion.bidirectional.disabled.meter" />
 								</FormFeedback>
 							)}
 							{isSuffixUsed() && state.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
+									<FormattedMessage id="conversion.bidirectional.disabled.suffix" />
 								</FormFeedback>
 							)}
 						</FormGroup>
@@ -472,7 +663,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='slope'
 										type='number'
 										value={state.slope}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 									/>
 								</FormGroup>
 							</Col>
@@ -485,7 +676,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 										name='intercept'
 										type='number'
 										value={state.intercept}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 									/>
 								</FormGroup>
 							</Col>
@@ -499,7 +690,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								type='textarea'
 								defaultValue={state.note}
 								placeholder='Note'
-								onChange={e => {handleStringChange(e);}}
+								onChange={e => { handleStringChange(e); }}
 							/>
 						</FormGroup>
 					</Container>

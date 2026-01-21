@@ -12,6 +12,7 @@ const handleCumulativeReset = require('./handleCumulativeReset');
 const { validateReadings, validateSingleReading } = require('./validateReadings');
 const { MeterTimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
+const { disableChecksType } = require('../../models/Unit');
 
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
@@ -39,7 +40,7 @@ const E0 = moment(0).utc()
  * @param {string} resetStart a string representation in the format "HH:mm:ss.SSS" which represents the start time a cumulativeReset may occur after.
  *    The :ss.SSS can be left off. The default resetStart time is '00:00:00.000'
  * @param {string} resetEnd a string which represents the end time a cumulativeReset may occur before in same format as resetStart.
- *  The default resetEnd time is '23:59:99.999'
+ *   The default resetEnd time is '23:59:99.999'
  * @param {number} readingGap the allowed time variation in seconds that a gap may occur between two readings, default 0
  * @param {number} readingLengthVariation the allowed time variation in seconds that two readings may deviate in time
  *   length from each other, default 0
@@ -51,11 +52,20 @@ const E0 = moment(0).utc()
  * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
  *   Should only be true if honorDST is true and reading does not have proper time zone information. This feature is not great and should
  *   be avoided except in special circumstances.
+ * @param {boolean} warnOnCumulativeReset true if each cumulative reset generates a warning message and false if not. Default is false.
+ * @param {boolean} useMeterFrequency true if isEndTime is true then any reading found with a different reading length that is longer than the meter
+ * 	frequency will make the start time by the end time minus the meter reading frequency. The idea is that a change in the length represents
+ * 	missing reading(s) then it will have a longer time but that is not what is desired for this meter. This only happens if the length of the reading
+ * 	if longer than the meter frequency and the time length variation exceeds the allow amount. This can generate incorrect values if the longer length is
+ * 	also includes the usage so the longer time is actually correct. This is not currently used but was done because a system was thought to have this issue.
+ * 	The default if false.
+ * @param {number} useMeterFrequencyVariation the allowed time variation in seconds above the meter frequency that a reading can deviate when using useMeterFrequency.
+ * 	It effectively ignores differences in reading length for the number of seconds indicated. Default is 0.
  * @returns {object[]} {array of readings accepted, true if all readings accepted and false otherwise, all messages from processing}
  */
 async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false, useMeterFrequency = false, useMeterFrequencyVariation = 0) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -136,6 +146,14 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		// No readings yet so can return result
 		return { result, isAllReadingsOk, msgTotal };
 	}
+	// To avoid mistakes, processing does not happen if useMeterFrequency is true but isEndOny is false.
+	if (useMeterFrequency && !isEndTime) {
+		isAllReadingsOk = false;
+		msgTotal = '<h2>On meter ' + meterName + ' in pipeline: isEndTime was false but useMeterFrequency was true.' +
+			' To avoid mistakes all reading are rejected.</h2>';
+		// No readings yet so can return result
+		return { result, isAllReadingsOk, msgTotal };
+	}
 	/* The currentReading will represent the current reading being parsed in the csv file. i.e. if index == 1, currentReading = rows[1] where
 	*  rows[1] : {reading_value, startTimestamp, endTimestamp}
 	*  Note that rows[1] may not contain a startTimestamp and may contain only an endTimestamp which must be reflected by
@@ -194,20 +212,26 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			if (useMeterZone) {
 				// Treat the reading as if it came in the meter time zone.
 				// This keeps the time the same but applies the time zone.
-				endTimestampTz = moment.tz(rows[index][1], meterZone);
+				endTimestampTz = moment(rows[index][1]).tz(meterZone);
 			} else {
 				// Use whatever the reading has (UTC if none)
 				endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			}
-			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				endTimestampTz = moment.parseZone(rows[index][1], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][1], undefined).tz(meterZone);
+				} else {
+					endTimestampTz = moment.parseZone(rows[index][1], undefined);
+				}
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
-			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);
+			endTimestamp = endTimestampTz.clone().tz('UTC', true);
 		} else {
 			// If the start date/time from the reading's timezone. Next, we put it
 			// into a moment reading has a timezone offset associated with it then we want to honor it by using parseZone.
@@ -220,32 +244,44 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			if (useMeterZone) {
 				// Treat the reading as if it came in the meter time zone.
 				// This keeps the time the same but applies the time zone.
-				startTimestampTz = moment.tz(rows[index][1], meterZone);
+				startTimestampTz = moment(rows[index][1]).tz(meterZone);
 			} else {
 				// Use whatever the reading has (UTC if none)
 				startTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			}
-			if (!startTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!startTimestampTz.isValid() && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
 				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				startTimestampTz = moment.parseZone(rows[index][1], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][1], undefined).tz(meterZone);
+				} else {
+					startTimestampTz = moment.parseZone(rows[index][1], undefined);
+				}
 			}
 			if (useMeterZone) {
 				// Treat the reading as if it came in the meter time zone.
 				// This keeps the time the same but applies the time zone.
-				endTimestampTz = moment.tz(rows[index][2], meterZone);
+				endTimestampTz = moment(rows[index][2]).tz(meterZone);
 			} else {
 				// Use whatever the reading has (UTC if none)
 				endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
 			}
-			if (!endTimestampTz.isValid() && !useMeterZone && relaxedParsing) {
+			if (!endTimestampTz.isValid() && relaxedParsing) {
 				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
 					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
 				// If this fails it is caught below.
-				endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				if (useMeterZone) {
+					// Treat the reading as if it came in the meter time zone.
+					// This keeps the time the same but applies the time zone.
+					endTimestampTz = moment(rows[index][2], undefined).tz(meterZone);
+				} else {
+					endTimestampTz = moment.parseZone(rows[index][2], undefined);
+				}
 			}
 			// Get the reading into UTC where clone so don't change the Tz one in case use later if honorDst. The date/time is
 			// the same but in UTC.
@@ -270,8 +306,10 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		}
 		// Determine the meter reading value to use based on if the data is cumulative or not cumulative
 		if (isCumulative) {
-			meterReading1 = meter.reading; // In cumulative this is the canonical previous raw reading
-			meterReading2 = rows[index][0]; // In cumulative this is the canonical current raw reading
+			// In cumulative this is the canonical previous raw reading
+			meterReading1 = meter.reading;
+			// In cumulative this is the canonical current raw reading
+			meterReading2 = rows[index][0];
 			// Check the current reading is a number. The previous one should already be checked.
 			if (isNaN(meterReading2)) {
 				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
@@ -326,6 +364,19 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// Get the shift in timezone for the start and end of this reading to see if crossed DST.
 			// Must do in the meter timezone and the reading must have an offset for this to work.
 			shift = dstShift(startTimestampTz, endTimestampTz);
+			if (index === startLoop && startTimestamp.isSameOrAfter(endTimestamp) && shift !== 0) {
+				// This is an invalid reading that is detected below. However, that test cannot happen yet because
+				// if the start & end are the same then maybe that happened due to crossing out of DST where the
+				// shift is the same as the reading. Thus, this only checks the first item in the loop
+				// in case the new reading timestamp is before that stored one from the previous upload.
+				// If that is the case, the start is >= the end (not in the TZ) and a shift was
+				// detected then it treats the shift as zero to avoid it thinking it crossed DST.
+				// Without this, it may set inDst to true so future points are incorrectly processed.
+				// Note this could happen with other bad values but limiting to first one since it is
+				// the obvious case to happen. Since not checking in TZ then it might be safe to do this
+				// in more cases but it is subtle and uncertain.
+				shift = 0;
+			}
 			if (shift < 0) {
 				// These are the examples on the left in the example diagram in the developer docs.
 				// This reading crossed and entered DST so went forward in time.
@@ -352,29 +403,18 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				// for inclusion. Thus, we mark that a split is needed.
 				splitDst = true;
 			} else if (shift > 0) {
-				// This is a hack where when doing meter time zone you don't do the DST processing when crossing out
-				// of DST. This can give duplicate values and miss if the readings don't align with the DST shift range.
-				// TODO fix this up so better.
-				if (!useMeterZone) {
-					// These are the examples on the right in the example diagram in the developer docs.
-					// This reading crossed and left DST so went back in time.
-					// The next two lines are similar use to above.
-					const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
-					zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
-					// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
-					// This may take multiple readings so store the time now.
-					prevEndTimestamp = prevReading.endTimestamp;
-					// We note we are in this situation and may need to remove and split readings.
-					inDst = true;
-				}
-			} else {
-				// Note a shift of zero means did not cross DST so just use as usual unless inDst that is
-				// handled next.
-				if (useMeterZone) {
-					// TODO This is a big hack because we we don't do inDst for this case so reset. Similar to issue above.
-					splitDst = false;
-				}
+				// These are the examples on the right in the example diagram in the developer docs.
+				// This reading crossed and left DST so went back in time.
+				// The next two lines are similar use to above.
+				const endTimestampMeterZone = endTimestamp.clone().tz(meterZone, true);
+				zoneUntil = getZoneUntil(meterZone, endTimestampMeterZone);
+				// We must not accept any reading time until it is after the previous reading end time so there is no overlap.
+				// This may take multiple readings so store the time now.
+				prevEndTimestamp = prevReading.endTimestamp;
+				// We note we are in this situation and may need to remove and split readings.
+				inDst = true;
 			}
+			// If shift = 0 then no DST crossing so do nothing.
 			if (inDst) {
 				if (endTimestamp.isAfter(prevEndTimestamp)) {
 					// This reading has some part of its time past the previous one used so need to use it and stop this process.
@@ -493,6 +533,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				return { result, isAllReadingsOk, msgTotal };
 			}
 			// To handle net cumulative readings which are negative.
+			// TODO Need to figure out way to deal with meters with negative readings.
 			if (meterReading < 0) {
 				// if meterReading is negative then cumulative check that the times fall within an acceptable reset range.
 				// Note this will be false if not cumulative given check above that need cumulative with reset.
@@ -501,6 +542,11 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					// This means that we assume the reading value reset at the start of the reading or some value will be lost.
 					// We don't really have an alternative to doing this.
 					meterReading = meterReading2;
+					if (warnOnCumulativeReset) {
+						// Log that did this for information.
+						errMsg += 'While handling cumulative data, the current value is less than the previous value within the allowed reset times so' +
+							' the current reading is treated as the correct absolute value. This is normally fine so not considered an error.' + '<br>'
+					}
 				} else {
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
 					errMsg += ('<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
@@ -534,6 +580,23 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					errMsg += 'The previous reading has a different time length than the current reading and exceeds the tolerance of ' +
 						msReadingLengthVariation / 1000 +
 						' seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>';
+					if (isEndTime && useMeterFrequency && endTimestamp.diff(startTimestamp) >
+						(moment.duration(meter.readingFrequency).add(useMeterFrequencyVariation, 'seconds'))) {
+						// Force the reading to have the expected length since assuming the gap is due to missing reading(s).
+						// Done by making the startTimestamp be earlier than the endTimestamp by the meter frequency.
+						// Don't do if the reading is shorter than the meter frequency within allowed variation since then it might be correct.
+						// TODO Can the meter frequency be 0? That would be bad.
+						// TODO If the meter frequency is off then this can cause a whole sequence of readings to change as
+						// it will differ in length from the next reading.
+						// This is modifying the timestamp which is desired.
+						const origStartTimestamp = startTimestamp.clone();
+						startTimestamp = endTimestamp.clone().subtract(meter.readingFrequency);
+						errMsg +=
+							'The reading with the different time length has end only and useMeterFrequency is true where the length of the reading' +
+							' exceeds the meter reading frequency of ' + moment.duration(meter.readingFrequency).asSeconds() +
+							' plus the allowed variation of ' + useMeterFrequencyVariation + ' so the start time is being changed from '
+							+ origStartTimestamp.format() + ' to ' + startTimestamp.format() + '<br>';
+					}
 					// If this is true we still add the reading to the results
 				}
 			}
@@ -571,7 +634,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				// The second part starts at the end of the DST shift which is what moment returns. Notice this is shift time later than
 				// the end time of the first part.
 				let readingTwoStartTimestamp = zoneUntil;
-				// Check to make sure there is any time in this first part.
+				// Check to make sure there is any time in this second part.
 				if (origEndTimestamp.isAfter(readingTwoStartTimestamp)) {
 					// The reading has some time associated with the second split so use.
 					// We need to prorate the value for the fraction of time it uses compared to the full time. This uses the shifted end time.
@@ -659,20 +722,22 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		// Not used in many cases but just set since easier.
 		prevEndTimestampTz = endTimestampTz;
 	}
-	// Validate data if conditions are given and disableChecks is not set to 'reject_none'
-	if (conditionSet !== undefined && conditionSet['disableChecks'] !== 'reject_none') {
+	// Validate data if conditions are given and disableChecks is not set to 'reject_disabled'
+	if (conditionSet !== undefined && conditionSet['disableChecks'] !== disableChecksType.REJECT_DISABLED) {
 		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
 		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
 
 		if (!validReadings) {
 			errMsg = `<h2>For meter ${meterName}: Error when validating data where `;
 			// Handle 'reject_bad' specifically
-			if (conditionSet['disableChecks'] === 'reject_bad') {
+			if (conditionSet['disableChecks'] === disableChecksType.REJECT_BAD) {
 				errMsg += `only bad readings are rejected</h2>`;
 				// This removes invalid readings but keeps the valid ones.
 				result = result.filter(reading => validateSingleReading(reading, conditionSet));
+			} else if (conditionSet['disableChecks'] === disableChecksType.REJECT_NONE) {
+				errMsg += `all readings are accepted even though there were check errors</h2>`;
 			} else {
-				// Default behavior: reject all readings
+				// Make this the default to be careful in accepting readings.
 				errMsg += `all readings are rejected</h2>`;
 				// Empties the result array
 				result.splice(0, result.length);
