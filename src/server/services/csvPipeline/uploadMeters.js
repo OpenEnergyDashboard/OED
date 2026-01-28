@@ -349,22 +349,19 @@ function validateMinMaxValues(meter, rowIndex) {
 	const minValue = Number(meter[27]);
 	const maxValue = Number(meter[28]);
 
-	if (isNaN(minValue) && isNaN(maxValue)) {
-		// do nothing, pass it through
-	} else if (isNaN(minValue) || minValue < -9007199254740991 || minValue > maxValue) {
+	if (isNaN(minValue) || minValue < -9007199254740991 || (!isNaN(maxValue) && minValue > maxValue)) {
 		throw new CSVPipelineError(
-			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
+			`Invalid min/max values in row ${rowIndex + 1}: min="${minValue}", max="${maxValue}". ` +
 			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
 			undefined,
 			500
 		);
 	}
 
-	if (isNaN(maxValue)) {
 		// do nothing, pass it through
-	} else if (isNaN(maxValue) || maxValue > 9007199254740991 || minValue > maxValue) {
+	if (isNaN(maxValue) || maxValue > 9007199254740991) {
 		throw new CSVPipelineError(
-			`Invalid min/max values in row ${rowIndex + 1}: min="${meter[27]}", max="${meter[28]}". ` +
+			`Invalid min/max values in row ${rowIndex + 1}: min="${minValue}", max="${maxValue}". ` +
 			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
 			undefined,
 			500
