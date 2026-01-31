@@ -266,3 +266,10 @@ mocha.describe('meters API', () => {
 		expect(res).to.have.status(500);
 	});
 });
+
+mocha.describe('Meter model', () => {
+	mocha.it('returns -99 when convertUnitValue is passed with null', async () => {
+		const unit = Meter.convertUnitValue(null);
+		expect(unit).to.equal(-99);
+	});
+});
