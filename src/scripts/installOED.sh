@@ -242,18 +242,7 @@ if [ "$dostart" == "yes" ]; then
 		# If the user is in production and their postgres password has been left default, generating a random one
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
 			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
-			POSTGRES_PASSWORD=$(openssl rand -base64 12)
-			node ./src/scripts/changePostgresPass.js "$POSTGRES_PASSWORD"
-			printf "\n********************************************************************************\n"
-			printf "Generated a secure PostgreSQL password and set PostgreSQL to use it: %s\n" "$POSTGRES_PASSWORD"
-			printf "\n Make sure to save or change this value"
-			printf "\n********************************************************************************\n\n"
-			if grep -q "^POSTGRES_PASSWORD=" .env; then
-				# Don't want to store the password in plain text in the .env file, but need to let the code know the password has been changed
-    			sed -i.bak 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=autoSet/' .env 
-			else
-    			echo "POSTGRES_PASSWORD=autoSet" >> .env
-			fi
+			node ./src/scripts/changePostgresPass.js
 		fi
 		npm run start
 	else

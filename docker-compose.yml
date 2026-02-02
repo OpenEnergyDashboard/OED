@@ -37,7 +37,7 @@ services:
             - OED_DB_USER=oed
             - OED_DB_DATABASE=oed
             - OED_DB_TEST_DATABASE=oed_testing
-            - OED_DB_PASSWORD=opened # See comment regarding POSTGRES_PASSWORD above, same situation
+            - OED_DB_PASSWORD=${OED_DB_PASSWORD:-opened} # See comment regarding POSTGRES_PASSWORD above, same situation
             - OED_DB_HOST=database # Docker will set this hostname
             - OED_DB_PORT=5432
             - OED_TOKEN_SECRET=${OED_TOKEN_SECRET:-?} #Automatically generated when OED is run in production
@@ -57,6 +57,7 @@ services:
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
             # Set the correct build environment.
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pleaseChange}
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
