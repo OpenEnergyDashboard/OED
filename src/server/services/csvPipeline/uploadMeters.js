@@ -388,5 +388,21 @@ function validateMaxError(meter, rowIndex) {
 	}
 }
 
+function validateArea(meter, rowIndex) {
+	const areaValue = Number(meter[9]);
+	const areaUnit = meter[25];
+
+	if (areaUnit && areaUnit.toLowerCase() === 'none') {
+		if(!isNaN(areaValue) && areaValue !== 0) {
+			throw new CSVPipelineError(
+			`Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` +
+			`Area must be empty when area unit is 'none'.`,
+			undefined,
+			500
+			);
+		}
+	}
+}
+
 
 module.exports = uploadMeters;
