@@ -14,6 +14,7 @@ import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { useTranslate } from '../../redux/componentHooks';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 /**
  * Defines the create weather modal form
@@ -23,19 +24,37 @@ export default function CreateWeatherModalComponent() {
 	const [submitCreateWeatherLocation] = weatherLocationApi.useAddWeatherLocationMutation();
 	const translate = useTranslate();
 
+	// Boolean that updates if any change is made to the modal
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+
 	const defaultValues = {
 		identifier: '',
 		gps: '',
 		note: '',
-		// The client code makes the id for the selected unit and default graphic unit be -99
+		// The client code makes the id for the new weather location be -99
 		id: -99
 	};
 
 	const [showModal, setShowModal] = useState(false);
+
+	// Displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		}
+		else {
+			// Proceed to close the modal
+			handleClose();
+		}
+	};
+
 	const handleClose = () => {
 		setShowModal(false);
 		resetState();
 	};
+
 	const handleShow = () => setShowModal(true);
 
 	// Handlers for each type of input change
@@ -51,9 +70,19 @@ export default function CreateWeatherModalComponent() {
 		Gps cannot be blank
 	*/
 
-	const [validUnit, setValidUnit] = useState(false);
+	const [validWeather, setValidWeather] = useState(false);
 	useEffect(() => {
-		setValidUnit(state.identifier !== '' && state.gps !== '');
+		setValidWeather(state.identifier !== '' && state.gps !== '');
+
+		// Check if any changes were made compared to default values
+		const editMade =
+			state.identifier !== defaultValues.identifier
+			|| state.gps !== defaultValues.gps
+			|| state.note !== defaultValues.note;
+
+		// Automatically checks for unsaved changes
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
 	}, [state.identifier, state.gps]);
 
 	const resetState = () => {
@@ -120,13 +149,36 @@ export default function CreateWeatherModalComponent() {
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSubmit();
+						handleClose();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!validWeather}
+				/>
+			)}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.weather" />
 			</Button>
-			<Modal isOpen={showModal} toggle={handleClose} size='lg'>
+			<Modal isOpen={showModal} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="create.weather" />
 					<TooltipHelpComponent page='weather-create' />
+					<div style={tooltipStyle}>
+						<TooltipMarkerComponent page='weather-create' helpTextId={tooltipStyle.tooltipCreateWeatherView} />
+					</div>
 				</ModalHeader>
 				<ModalBody>
 					<Container>
@@ -173,11 +225,10 @@ export default function CreateWeatherModalComponent() {
 					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id="discard.changes" />
 					</Button>
-					<Button color='primary' onClick={handleSubmit} disabled={!validUnit}>
+					<Button color='primary' onClick={handleSubmit} disabled={!validWeather}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
-				<TooltipMarkerComponent page='weather-create' helpTextId={tooltipStyle.tooltipCreateWeatherView} />
 			</Modal>
 		</>
 	);
