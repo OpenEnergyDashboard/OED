@@ -11,6 +11,7 @@ import { WeatherLocationData } from '../../types/redux/weather';
 import { showErrorNotification, showSuccessNotification, showInfoNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
 interface EditWeatherModalComponentProps {
 	show: boolean;
@@ -40,7 +41,12 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 	/* State */
 	// Handlers for each type of input change
 	const [state, setState] = useState(values);
-	const [localValues] = useState(values);
+
+	// Unsaved changes tracking
+	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	// If there are no changes, then save is disabled
+	const [canSave, setCanSave] = useState(false);
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ ...state, [e.target.name]: e.target.value });
@@ -50,16 +56,18 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		// Open delete confirmation modal
 		setOpenDeleteConfirmation(true);
 	};
-
-	/* Edit WeatherLocation Validation:
-		Identifier cannot be blank
-		GPS cannot be blank
-	*/
-	const [validLocation, setValidLocation] = useState(false);
-	useEffect(() => {
-		setValidLocation(state.identifier !== '' && state.gps !== '');
-	}, [state.identifier, state.gps]);
 	/* End State */
+
+	// Displays the unsaved warning component whenever there's unsaved
+	// changes, otherwise closes out of the modal
+	const handleToggle = () => {
+		if (hasUnsavedChanges) {
+			setShowUnsavedWarning(true);
+		} else {
+			// Proceed to close the modal
+			props.handleClose();
+		}
+	};
 
 	const resetState = () => {
 		setState(values);
@@ -68,28 +76,6 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 	const handleClose = () => {
 		props.handleClose();
 		resetState();
-	};
-
-	const compareLocations = (loc1: { [x: string]: any; }, loc2: { [x: string]: any; }) => {
-		// Get the keys of each location
-		const keys1 = Object.keys(loc1);
-		const keys2 = Object.keys(loc2);
-
-		// Check if the number of keys is the same
-		if (keys1.length !== keys2.length) {
-			return false;
-		}
-
-		// Check if all keys and values are the same
-		for (const key of keys1) {
-			// If the key is not present in loc2 or values are different, objects are not equal
-			if (!(key in loc2) || loc1[key] !== loc2[key]) {
-				return false;
-			}
-		}
-
-		// Objects are equal
-		return true;
 	};
 
 	// Save changes
@@ -103,7 +89,8 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
-		if (!compareLocations(state, localValues)) {
+		// Only proceed if there are actual changes
+		if (hasUnsavedChanges) {
 			// Check GPS entered.
 			// Validate GPS is okay and take from string to GPSPoint to submit.
 			const gpsInput = state.gps;
@@ -171,6 +158,25 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		setOpenDeleteConfirmation(!openDeleteConfirmation);
 	};
 
+	// Checks if edit made.
+	useEffect(() => {
+		// Compare the local changes to the original values
+		const editMade =
+			props.location.identifier !== state.identifier
+			|| (props.location.gps === null ? '' : props.location.gps.latitude + ',' + props.location.gps.longitude) !== state.gps
+			|| props.location.note !== state.note;
+
+		// Check if the current state is valid (identifier and GPS cannot be blank)
+		const isValid = state.identifier !== '' && state.gps !== '';
+
+		// Automatically checks for unsaved changes and addresses the issue
+		// of having to manually set the setHasUnsavedChanges
+		// If editMade is true, then hasUnsavedChanges will be set to true.
+		setHasUnsavedChanges(editMade);
+		// If editsMade AND valid, then canSave is true (saving is enabled)
+		setCanSave(editMade && isValid);
+	}, [state, props.location]);
+
 	const tooltipStyle = {
 		...tooltipBaseStyle,
 		tooltipEditWeatherLocationView: 'help.admin.weatheredit'
@@ -179,8 +185,28 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 
 	return (
 		<>
+			{/* Unsaved Warning Component */}
+			{showUnsavedWarning && (
+				<SimpleUnsavedWarningComponent
+					isOpen={showUnsavedWarning}
+					onDiscard={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleClose();
+						resetState();
+					}}
+					onConfirm={() => {
+						setShowUnsavedWarning(false);
+						setHasUnsavedChanges(false);
+						handleSaveChanges();
+					}}
+					onCancel={() => setShowUnsavedWarning(false)}
+					disabled={!canSave}
+				/>
+			)}
+
 			{/* Main Edit Modal */}
-			<Modal isOpen={props.show} toggle={handleClose} size='lg'>
+			<Modal isOpen={props.show} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.weather.location" />
 					<TooltipHelpComponent page='weatherLocation-edit' />
@@ -201,7 +227,6 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.identifier}
-								placeholder='Identifier'
 								invalid={state.identifier === ''}
 							/>
 							<FormFeedback>
@@ -215,15 +240,10 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 								id='gps'
 								name='gps'
 								type='text'
-								autoComplete='on'
 								onChange={e => handleStringChange(e)}
 								value={state.gps}
-								placeholder='gps'
 								disabled={true}
 							/>
-							<FormFeedback>
-								<FormattedMessage id="error.required" />
-							</FormFeedback>
 						</FormGroup>
 						{/* Note input */}
 						<FormGroup>
@@ -233,7 +253,6 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 								name='note'
 								type='textarea'
 								value={state.note}
-								placeholder='Note'
 								onChange={e => handleStringChange(e)}
 							/>
 						</FormGroup>
@@ -248,7 +267,7 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					<Button color='primary' onClick={handleSaveChanges} disabled={!validLocation}>
+					<Button color='primary' onClick={handleSaveChanges} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
 				</ModalFooter>
@@ -257,14 +276,14 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 			{/* Delete Confirmation Modal */}
 			<Modal isOpen={openDeleteConfirmation} toggle={toggleDeleteConfirmation}>
 				<ModalHeader>
-					<FormattedMessage id="delete.weather-location" />
+					<FormattedMessage id="delete.weather.location" />
 					<TooltipHelpComponent page='weatherLocation-edit' />
 					<div style={tooltipStyle}>
 						<TooltipMarkerComponent page='weatherLocation-edit' helpTextId={tooltipStyle.tooltipEditWeatherLocationView} />
 					</div>
 				</ModalHeader>
 				<ModalBody>
-					<FormattedMessage id="confirm.delete.weather-location" />
+					<FormattedMessage id="confirm.delete.weather.location" />
 				</ModalBody>
 				<ModalFooter>
 					<Button color="danger" onClick={handleDeleteConfirmation}>
