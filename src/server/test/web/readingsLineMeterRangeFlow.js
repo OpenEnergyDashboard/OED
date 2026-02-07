@@ -150,6 +150,70 @@ mocha.describe('readings API', () => {
                 });
 
                 // Add LR26 here
+				mocha.it('LR26: range should have hourly points for middle readings for 15 minute for a 60 day period and flow units & kW as kW', async () => {
+                    const unitData = [
+                        {   
+                            // u4
+                            name: 'Electric',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.METER,
+                            suffix: '',
+                            displayable: Unit.displayableType.NONE,
+                            preferredDisplay: false,
+                            note: 'kilowatts'
+                        },
+                        {
+                            // u5
+                            name: 'kW',
+                            identifier: '',
+                            unitRepresent: Unit.unitRepresentType.FLOW,
+                            secInRate: 3600,
+                            typeOfUnit: Unit.unitType.UNIT,
+                            suffix: '',
+                            displayable: Unit.displayableType.ALL,
+                            preferredDisplay: false,
+                            note: 'special unit' // Not sure if this is correct!
+                        }
+                    ];
+
+                    const conversionData = [
+                        {
+                            // c4
+                            sourceName: 'Electric',
+                            destinationName: 'kW',
+                            bidirectional: false,
+                            slope: 1,
+                            intercept: 0,
+                            note: 'Electric → kW'
+                        }
+                    ];
+
+                    const meterData = [
+                        {
+                            name: 'Electric kW',
+                            unit: 'Electric',
+                            defaultGraphicUnit: 'kW',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
+                    await prepareTest(unitData, conversionData, meterData);
+
+                    const unitId = await getUnitId('kW');
+
+                    const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kW_gu_kW_st_2022-08-25%00#00#00_et_2022-10-24%00#00#00.csv');
+
+                    const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                        .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+                    expectRangeToEqualExpected(res, expected)
+                });
             	});
 			});
         });
