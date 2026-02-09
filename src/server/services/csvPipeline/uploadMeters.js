@@ -9,6 +9,7 @@ const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 const moment = require('moment-timezone');
+const { min } = require('lodash');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -72,11 +73,31 @@ async function uploadMeters(req, res, filepath, conn) {
 				}
 			}
 
+			// validate reading duplication
+			const duplicateValue = meter[16];
+			if (duplicateValue) {
+				if (!isDuplicate(duplicateValue)) {
+					let msg = `For meter ${meter[0]}, duplicate reading is outside of the range 1 to 9 inclusive.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
 			const timeSortValue = meter[17];
 			if (timeSortValue) {
 				if (!isValidTimeSort(timeSortValue)) {
 					let msg = `For meter ${meter[0]} the time sort ${timeSortValue} is invalid. Valid options are increasing or decreasing.`;
 					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// validate min & maxDates
+			// meter indicies based off of timeSortValue
+			const minDate = meter[29];
+			const maxDate = meter[30];
+			if (minDate && maxDate) {
+				if (!isValidDate(minDate, maxDate)) {
+					let msg = `For meter ${meter[0]} the dates are invalid.`;
+					throwError(msg, undefined, 500);
 				}
 			}
 
@@ -367,6 +388,119 @@ function validateMinMaxValues(meter, rowIndex) {
 			500
 		);
 	}
+}
+
+/**
+ * A function to validate whether or not the inputted minimum and maximum dates are valid.
+ * Also validates whether the minimum date comes before, or is equal to the maximum date.
+ * Includes the helper function validateYear to create a valid range of dates (currently from: 1900 to the current year).
+ * @param {String} minDate 
+ * @param {String} maxDate 
+ * @returns array[boolean, string]
+ */
+function isValidDate(minDate, maxDate) {
+    // final issue with this: I'm not sure the min date and max date will always be in the format `YYYY-MM-DD HH:MM:SS`. If they aren't, this function needs to be updated.
+    
+    // validate lengths of the dates first
+    if (minDate.length != maxDate.length) {
+		let msg = `Min date: ${minDate} and max date: ${maxDate} are not equivalent lengths.`;
+		return false;
+    }
+    
+	// create new dates with inputted dates
+    const minDateObj = new Date(minDate);
+    const maxDateObj = new Date(maxDate);
+    
+    // validate dates & times
+    const validMinDate = !isNaN(new Date(minDate));
+    const validMaxDate = !isNaN(new Date(maxDate));
+    
+    // validate that years are within range 1900 to 2100
+    // validate range min date
+	const currentYear = new Date().getFullYear();
+    if (!validateYear(minDateObj.getFullYear())) {
+		let msg = `Min year: ${minDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
+		throwError(msg, undefined, 500);
+		return false;
+    }
+    // validate range max date
+    if (!validateYear(maxDateObj.getFullYear())) {
+		let msg = `Max year: ${maxDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
+		throwError(msg, undefined, 500);
+		return false;
+    }
+    
+    // check if both dates are valid
+    let bothValid = false;
+    
+    if (validMinDate && validMaxDate) {
+		// can't return true until validate minDate < maxDate
+        bothValid = true;
+    } else if (validMinDate && !validMaxDate) {
+		let msg = `Min date is valid. Max date: ${maxDate} is invalid.`;
+		throwError(msg, undefined, 500);
+		return false;
+    } else if (!validMinDate && validMaxDate) {
+		let msg = `Min date: ${minDate} is invalid. Max date is valid.`;
+		throwError(msg, undefined, 500);
+		return false;
+    } else {
+		let msg = `Both dates invalid. Min date: ${minDate}, Max date: ${maxDate}.`;
+		throwError(msg, undefined, 500);
+		return false;
+    }
+    
+    // dates validated
+    if (minDate < maxDate && bothValid) {
+        // everything validated
+        return true;
+    } else if (minDate == maxDate) {
+		let msg = `Min date: ${minDate} is equal to the max date: ${maxDate}.`;
+		throwError(msg, undefined, 500);
+		return false;
+    }
+
+    // otherwise minDate > maxDate -> so just return false/throw error 
+	let msg = `Min date: ${minDate} is greater than max date: ${maxDate}.`;
+	throwError(msg, undefined, 500);
+	return false;
+}
+
+/**
+ * A subsidary function to help out isValidDate with processing a viable year range.
+ * @param {Date} year 
+ * @returns boolean 
+ */
+function validateYear(year) {
+	const minYear = new Date("1900-01-01").getFullYear();
+	const currentYear = new Date().getFullYear(); //todo: check if this should be const
+
+    if (year >= minYear && year <= currentYear) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * A function to outsource the throwing of errors and improve code maintainability and readability.
+ * @param {String} msg 
+ * @param {Any} type 
+ * @param {Number} code 
+ */
+function throwError(msg, type = undefined, code = 500) { //todo: implement error catching for this?
+	throw new CSVPipelineError(msg, type, code);
+}
+
+/**
+ * Checks if the number of times each reading is given lies within the range 1 to 9 inclusive.
+ * @param {Number} duplicateValue 
+ * @returns 
+ */
+function isDuplicate(duplicateValue) {
+    if (duplicateValue >= 1 && duplicateValue <= 9) {
+        return true;
+    }
+    return false;
 }
 
 module.exports = uploadMeters;
