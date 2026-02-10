@@ -9,7 +9,7 @@ const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 const moment = require('moment-timezone');
-const { min } = require('lodash');
+const { min, max } = require('lodash');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -95,9 +95,12 @@ async function uploadMeters(req, res, filepath, conn) {
 			const minDate = meter[29];
 			const maxDate = meter[30];
 			if (minDate && maxDate) {
-				if (!isValidDate(minDate, maxDate)) {
-					let msg = `For meter ${meter[0]} the dates are invalid.`;
-					throwError(msg, undefined, 500);
+				// returns boolean
+				const { msg, value } = isValidDate(minDate, maxDate);	
+
+				if (!value) {
+					// msg comes from function
+					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
 
@@ -399,12 +402,16 @@ function validateMinMaxValues(meter, rowIndex) {
  * @returns array[boolean, string]
  */
 function isValidDate(minDate, maxDate) {
-    // final issue with this: I'm not sure the min date and max date will always be in the format `YYYY-MM-DD HH:MM:SS`. If they aren't, this function needs to be updated.
+	let msg = '';
+	
+	// get correctly formatted dates
+	minDate = correctDateTimeFormat(minDate);
+	maxDate = correctDateTimeFormat(maxDate);
     
     // validate lengths of the dates first
     if (minDate.length != maxDate.length) {
-		let msg = `Min date: ${minDate} and max date: ${maxDate} are not equivalent lengths.`;
-		return false;
+		msg += `Min date: ${minDate} and max date: ${maxDate} are not equivalent lengths.`;
+		return { msg: msg, value: false };
     }
     
 	// create new dates with inputted dates
@@ -419,51 +426,43 @@ function isValidDate(minDate, maxDate) {
     // validate range min date
 	const currentYear = new Date().getFullYear();
     if (!validateYear(minDateObj.getFullYear())) {
-		let msg = `Min year: ${minDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
-		throwError(msg, undefined, 500);
-		return false;
+		msg += `\nMin year: ${minDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
     }
     // validate range max date
     if (!validateYear(maxDateObj.getFullYear())) {
-		let msg = `Max year: ${maxDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
-		throwError(msg, undefined, 500);
-		return false;
+		msg += `\nMax year: ${maxDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
     }
     
     // check if both dates are valid
     let bothValid = false;
     
+	// get correct error messages with this format
     if (validMinDate && validMaxDate) {
 		// can't return true until validate minDate < maxDate
         bothValid = true;
-    } else if (validMinDate && !validMaxDate) {
-		let msg = `Min date is valid. Max date: ${maxDate} is invalid.`;
-		throwError(msg, undefined, 500);
-		return false;
-    } else if (!validMinDate && validMaxDate) {
-		let msg = `Min date: ${minDate} is invalid. Max date is valid.`;
-		throwError(msg, undefined, 500);
-		return false;
     } else {
-		let msg = `Both dates invalid. Min date: ${minDate}, Max date: ${maxDate}.`;
-		throwError(msg, undefined, 500);
-		return false;
+		if (validMinDate && !validMaxDate) {
+			msg += `\nMin date is valid. Max date: ${maxDate} is invalid.`;
+		} else if (!validMinDate && validMaxDate) {
+			msg += `\nMin date: ${minDate} is invalid. Max date is valid.`;
+		} else {
+			msg += `\nBoth dates invalid. Min date: ${minDate}, Max date: ${maxDate}.`;
+		}
+
+		return { msg: msg, value: false };
     }
     
     // dates validated
     if (minDate < maxDate && bothValid) {
         // everything validated
-        return true;
+        return { msg: msg, value: true };
     } else if (minDate == maxDate) {
-		let msg = `Min date: ${minDate} is equal to the max date: ${maxDate}.`;
-		throwError(msg, undefined, 500);
-		return false;
+		msg += `\nMin date: ${minDate} is equal to the max date: ${maxDate}.`;
     }
 
     // otherwise minDate > maxDate -> so just return false/throw error 
-	let msg = `Min date: ${minDate} is greater than max date: ${maxDate}.`;
-	throwError(msg, undefined, 500);
-	return false;
+	msg += `\nMin date: ${minDate} is greater than max date: ${maxDate}.`;
+	return { msg: msg, value: false };
 }
 
 /**
@@ -482,13 +481,47 @@ function validateYear(year) {
 }
 
 /**
- * A function to outsource the throwing of errors and improve code maintainability and readability.
- * @param {String} msg 
- * @param {Any} type 
- * @param {Number} code 
+ * A function to convert an incorrect date string -> ex: "1970-1-1 1:1:1" to a correct date string
+ * "1970-01-01 01:01:01" for less of a chance of an error being thrown in the isValidDate() function.
+ * @param {String} date 
+ * @returns String - Format "YYYY-MM-DD HH:MM:SS"
  */
-function throwError(msg, type = undefined, code = 500) { //todo: implement error catching for this?
-	throw new CSVPipelineError(msg, type, code);
+function correctDateTimeFormat(date) {
+    // validate type is string
+    if (typeof date != 'string') {
+        return `Error: Inputted date not a string.`;
+    }
+    
+    // trim whitespace
+    date = date.trim();
+    
+    // if length < 10, it's not a full date (even if invalid)
+    if (date.length < 8) {
+        return `Error: Inputted date not complete.`; 
+    }
+    
+    // check if date is valid
+    if (isNaN(new Date(date))) {
+        return `Error: Inputted date not valid.`; // return empty string
+    }
+    
+    const dateObj = new Date(date);
+    
+    // create only date string
+    let dateString = `${String(dateObj.getFullYear())}-${String(dateObj.getMonth()+1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    
+    // convert time
+    // if parameter (date) length is <= the improved dateString
+    // then return, because there's no time -> return only dateSring
+    const DATE_LENGTH = dateString.length;
+    if (date.length <= dateString.length) {
+        return `${dateString}`;
+    }
+    
+    const timeString = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}:${String(dateObj.getSeconds()).padStart(2, '0')}`;
+    
+    // return full date string
+    return `${dateString} ${timeString}`;
 }
 
 /**
