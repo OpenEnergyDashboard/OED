@@ -50,18 +50,6 @@ class WeatherLocation {
 	}
 
 	/**
-	 * Returns a promise to retrieve the weather location with the given coordinates from the database.
-	 * @param longitude the longitude to look up
-	 * @param latitude the latitude to look up
-	 * @param conn the connection to use.
-	 * @returns {Promise.<WeatherLocation>} either the weather_location object with info or null if does not exist.
-	 */
-	static async getByCoordinates(longitude, latitude, conn) {
-		const row = await conn.oneOrNone(sqlFile('weather_location/get_weather_location_by_coordinates.sql'), { longitude: longitude, latitude: latitude });
-		return row === null ? null : new WeatherLocation(row.id, row.identifier, row.longitude, row.latitude, row.note);
-	}
-
-	/**
 	 * Returns a promise to get all of the weather locations from the database
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<WeatherLocation>>}
