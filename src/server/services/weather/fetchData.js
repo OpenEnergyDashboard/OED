@@ -28,13 +28,6 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 	return fetchWeatherApi(url, params).then(responses => {
 		const response = responses[0];
 		const utcOffsetSeconds = response.utcOffsetSeconds();
-		// console.log(utcOffsetSeconds);
-		const timezone = response.timezone();
-		// console.log(timezone);
-		const timezoneAbbreviation = response.timezoneAbbreviation();
-		// console.log(timezoneAbbreviation);
-		const latitude = response.latitude();
-		const longitude = response.longitude();
 
 		const hourly = response.hourly();
 
@@ -44,9 +37,11 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 
 		const weatherData = {
 			hourly: {
+				// Generates an array of timestamps from API's time range
 				time: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
 					(t) => new Date((t + utcOffsetSeconds) * 1000)
 				),
+				// Extracts temperature values array
 				temperature2m: hourly.variables(0).valuesArray(),
 			},
 		};

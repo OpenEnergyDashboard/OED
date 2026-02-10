@@ -8,7 +8,7 @@ import { useTranslate } from '../../redux/componentHooks';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { WeatherLocationData } from '../../types/redux/weather';
-import { showErrorNotification, showSuccessNotification, showInfoNotification } from '../../utils/notifications';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
@@ -89,53 +89,48 @@ export default function EditWeatherModalComponent(props: EditWeatherModalCompone
 		// true if inputted values are okay. Then can submit.
 		let inputOk = true;
 
-		// Only proceed if there are actual changes
-		if (hasUnsavedChanges) {
-			// Check GPS entered.
-			// Validate GPS is okay and take from string to GPSPoint to submit.
-			const gpsInput = state.gps;
-			let gps: GPSPoint | null = null;
-			const latitudeIndex = 0;
-			const longitudeIndex = 1;
-			// If the user input a value then gpsInput should be a string.
-			// null came from the DB and it is okay to just leave it - Not a string.
-			if (typeof gpsInput === 'string') {
-				const { validGps, message } = isValidGPSInput(gpsInput);
-				if (validGps) {
-					// Clearly gpsInput is a string but TS complains about the split so cast.
-					const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
-					// It is valid and needs to be in this format for routing.
-					gps = {
-						longitude: gpsValues[longitudeIndex],
-						latitude: gpsValues[latitudeIndex]
-					};
-					// gpsInput must be of type string but TS does not think so so cast.
-				} else if ((gpsInput as string).length !== 0) {
-					// GPS not okay.
-					showErrorNotification(message);
-					inputOk = false;
-				}
+		// Check GPS entered.
+		// Validate GPS is okay and take from string to GPSPoint to submit.
+		const gpsInput = state.gps;
+		let gps: GPSPoint | null = null;
+		const latitudeIndex = 0;
+		const longitudeIndex = 1;
+		// If the user input a value then gpsInput should be a string.
+		// null came from the DB and it is okay to just leave it - Not a string.
+		if (typeof gpsInput === 'string') {
+			const { validGps, message } = isValidGPSInput(gpsInput);
+			if (validGps) {
+				// Clearly gpsInput is a string but TS complains about the split so cast.
+				const gpsValues = (gpsInput as string).split(',').map((value: string) => parseFloat(value));
+				// It is valid and needs to be in this format for routing.
+				gps = {
+					longitude: gpsValues[longitudeIndex],
+					latitude: gpsValues[latitudeIndex]
+				};
+				// gpsInput must be of type string but TS does not think so so cast.
+			} else if ((gpsInput as string).length !== 0) {
+				// GPS not okay.
+				showErrorNotification(message);
+				inputOk = false;
 			}
+		}
 
-			if (inputOk) {
-				// The input passed validation.
-				// GPS may have been updated so create updated state to submit.
-				submitEditedLocation({
-					editedLocation: {
-						...state,
-						gps: gps
-					}
+		if (inputOk) {
+			// The input passed validation.
+			// GPS may have been updated so create updated state to submit.
+			submitEditedLocation({
+				editedLocation: {
+					...state,
+					gps: gps
+				}
+			})
+				.unwrap()
+				.then(() => {
+					showSuccessNotification(translate('weather.successfully.edit.location'));
 				})
-					.unwrap()
-					.then(() => {
-						showSuccessNotification(translate('weather.successfully.edit.location'));
-					})
-					.catch(() => {
-						showErrorNotification(translate('weather.failed.to.edit.location'));
-					});
-			}
-		} else {
-			showInfoNotification(translate('weather.location.no.changes'));
+				.catch(() => {
+					showErrorNotification(translate('weather.failed.to.edit.location'));
+				});
 		}
 	};
 

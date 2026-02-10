@@ -10,7 +10,7 @@ class WeatherLocation {
 	/**
 	 * @param id This weather location's ID.
 	 * @param identifier This weather location's identifier
-	 * @param gps location in format of GIS coordinates
+	 * @param gps location in format of GPS coordinates
 	 * @param note The weather location's note
 	 */
 	constructor(id, identifier, gps, note) {
@@ -30,14 +30,23 @@ class WeatherLocation {
 	}
 
 	/**
+	 * Creates a new weather location from the row's data.
+	 * @param {*} row The row from which the weather location will be created.
+	 * @returns {WeatherLocation} The new WeatherLocation object.
+	 */
+	static mapRow(row) {
+		return new WeatherLocation(row.id, row.identifier, row.longitude, row.latitude, row.note);
+	}
+
+	/**
 	 * Returns a promise to retrieve the weather location with the given id from the database.
 	 * @param conn is the connection to use.
-	 * @param id
+	 * @param id is this weather location's ID
 	 * @returns {Promise.<WeatherLocation>}
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('weather_location/get_weather_location_by_id.sql'), { id: id });
-		return new WeatherLocation(row.id, row.identifier, row.longitude, row.latitude, row.note);
+		return this.mapRow(row);
 	}
 
 	/**
@@ -63,7 +72,7 @@ class WeatherLocation {
 	}
 
 	/**
-	 * Returns a promise to insert this weather location into the database
+	 * Returns a promise to insert this weather location into the database and updates object with created id
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<>}
 	 */
