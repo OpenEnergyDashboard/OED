@@ -218,7 +218,7 @@ class Reading {
 	 */
 	static async getEarliestTimeStamp(conn) {
 		try {
-			return moment( await conn.one(sqlFile('reading/get_earliest_timestamp.sql')));
+			return moment(await conn.one(sqlFile('reading/get_earliest_timestamp.sql')));
 		} catch (err) {
 			log.error(`Error fetching the earliest start timestamp: ${err}`, err);
 			throw err;

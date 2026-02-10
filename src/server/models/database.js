@@ -92,13 +92,12 @@ async function createSchema(conn) {
 	const Cik = require('./Cik');
 
 	/* eslint-enable global-require */
-	await WeatherLocation.createTable(conn);
-	await WeatherData.createTable(conn);
 	await Unit.createUnitTypesEnum(conn);
 	await Unit.createAreaUnitTypesEnum(conn);
 	await Unit.createDisplayableTypesEnum(conn);
 	await Unit.createDisableChecksTypesEnum(conn);
 	await Unit.createUnitRepresentTypesEnum(conn);
+	await Unit.createTemperatureUnitTypesEnum(conn);
 	await Unit.createTable(conn);
 	await Conversion.createTable(conn);
 	await Cik.createTable(conn);
@@ -106,7 +105,8 @@ async function createSchema(conn) {
 	// This sql code creates a function to check meter's timezone.
 	// It needs to be called before meter table is created.
 	await conn.none(sqlFile('meter/check_timezone.sql'));
-	// await WeatherLocation.createTable(conn);
+	await WeatherLocation.createTable(conn);
+	await WeatherData.createTable(conn);
 	await Meter.createTable(conn);
 	await Reading.createReadingLineAccuracyEnum(conn);
 	await Reading.createTable(conn);

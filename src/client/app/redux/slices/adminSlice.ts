@@ -35,7 +35,7 @@ export const defaultAdminState: AdminState = {
 	defaultMeterReadingGap: 0,
 	defaultMeterMaximumErrors: 75,
 	defaultHelpUrl: '',
-	defaultWeatherLocation: '',
+	defaultWeatherLocation: ''
 };
 
 export const adminSlice = createSlice({

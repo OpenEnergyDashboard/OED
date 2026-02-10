@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS preferences (
     default_meter_maximum_date TIMESTAMP NOT NULL,
 	default_meter_reading_gap REAL NOT NULL,
     default_meter_maximum_errors INTEGER NOT NULL,
-	default_help_url TEXT DEFAULT NULL
+	default_help_url TEXT DEFAULT NULL,
+	default_temperature_unit temperature_unit_type NOT NULL
 );

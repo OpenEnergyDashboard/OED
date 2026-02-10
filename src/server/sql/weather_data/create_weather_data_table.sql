@@ -4,9 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS weather_data (
     weather_location_id INTEGER NOT NULL,
-    start_time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP,
-    temperature FLOAT,
-    PRIMARY KEY (weather_location_id, start_time),
+    start_timestamp TIMESTAMP NOT NULL,
+    end_timestamp TIMESTAMP NOT NULL,
+    temperature FLOAT NOT NULL,
+    CHECK (start_timestamp < end_timestamp),
+    PRIMARY KEY (weather_location_id, start_timestamp),
     FOREIGN KEY (weather_location_id) REFERENCES weather_location(id)
 );

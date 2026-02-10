@@ -139,7 +139,7 @@ mocha.describe('Enums JS to DB', () => {
 		const conn = DB.getConnection();
 		let serverEnum = [];
 		let jsObject = [];
-		//SQL query returning area_unit_type ENUM
+		//SQL query returning temperature_unit_type ENUM
 		await conn.result('SELECT unnest(enum_range(NULL::temperature_unit_type));')
 			.then(data => {
 				//get temperature_unit_type enum as nested enumerations

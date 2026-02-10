@@ -10,7 +10,7 @@ const sqlFile = database.sqlFile;
 
 class WeatherData {
 	/**
-	 * Constructor without the id sine it's not in the schema
+	 * Constructor without the id since it's not in the schema
 	 * @param weatherLocationId The weather location id
 	 * @param {Moment} startTime The weather data's startTime
 	 * @param {Moment} endTime The weather data's endTime
@@ -54,13 +54,13 @@ class WeatherData {
 
 	/**
 	 * Returns a promise to get the latest end timestamp for a given weather data location.
-	 * @param id
+	 * @param id is the weather loction's id
 	 * @param conn the database connection to use
 	 * @returns {Promise<Moment>} the latest end timestamp as a Moment object
 	 */
 	static async getLatestTimeStamp(id, conn) {
 		try {
-			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weatherLocationId: id }));
+			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weather_location_id: id }));
 		} catch (err) {
 			log.error(`Error fetching the latest end timestamp: ${err}`, err);
 			throw err;
