@@ -75,20 +75,6 @@ class WeatherLocation {
 	}
 
 	/**
-	 * Returns a promise to insert all of the given weather locations into the database (as a transaction)
-	 * @param {array<WeatherLocation>} weatherLocations the weather locations to insert
-	 * @param conn is the connection to use.
-	 * @returns {Promise.<>}
-	 */
-	static insertAll(weatherLocations, conn) {
-		// TODO decide how to dal with errors as done by Reading.js
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return weatherLocations[i] && weatherLocations[i].insert(seqT);
-		}));
-	}
-
-	/**
 	* Returns a promise to update an existing location in the database.
 	* @param {*} conn The connection to use.
 	* @returns {Promise.<>}
