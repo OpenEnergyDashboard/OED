@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 
 const { simulateDeleteConversion } = require('../services/conversionSimulation');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
+const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
 
 
 const router = express.Router();
@@ -40,30 +41,34 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
+		maxProperties: 6,
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+				type: 'integer',
+				minimum: 1,
+				maximum: Number.MAX_SAFE_INTEGER
 			},
 			destinationId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+				type: 'integer',
+				minimum: 1,
+				maximum: Number.MAX_SAFE_INTEGER
 			},
 			bidirectional: {
 				type: 'boolean'
 			},
 			slope: {
-				type: 'float'
+				type: 'number'
 			},
 			intercept: {
-				type: 'float'
+				type: 'number'
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{
+						type: 'string',
+						maxLength: STRING_GENERAL_MAX_LENGTH
+					},
 					{ type: 'null' }
 				]
 			}
@@ -74,6 +79,7 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		return;
 	} else {
 		const conn = getConnection();
 		try {
@@ -94,30 +100,34 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req, res) => {
 	const validConversion = {
 		type: 'object',
+		maxProperties: 6,
 		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
 		properties: {
 			sourceId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+				type: 'integer',
+				minimum: 1,
+				maximum: Number.MAX_SAFE_INTEGER
 			},
 			destinationId: {
-				type: 'number',
-				// Do not allow negatives for now
-				minimum: 0
+				type: 'integer',
+				minimum: 1,
+				maximum: Number.MAX_SAFE_INTEGER
 			},
 			bidirectional: {
 				type: 'boolean'
 			},
 			slope: {
-				type: 'float'
+				type: 'number'
 			},
 			intercept: {
-				type: 'float'
+				type: 'number'
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{
+						type: 'string',
+						maxLength: STRING_GENERAL_MAX_LENGTH
+					},
 					{ type: 'null' }
 				]
 			}

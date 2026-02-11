@@ -9,6 +9,7 @@ const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
+const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
 
@@ -21,9 +22,10 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 		maxProperties: 1,
 		required: ['meter_ids'],
 		properties: {
-			meter_ids: {
-				type: 'string'
-			}
+		meter_ids: {
+			type: 'string',
+			maxLength: GENERAL_STRING_MAX_LENGTH
+		}
 		}
 	};
 	const validQueries = {
@@ -32,7 +34,8 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 		required: ['timeInterval'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: GENERAL_STRING_MAX_LENGTH
 			}
 		}
 	};
@@ -41,7 +44,20 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 	} else {
 		const conn = getConnection();
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		let timeInterval;
+		try {
+			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		} catch (err) {
+			log.warn(`Invalid timeInterval supplied for readings count: ${req.query.timeInterval}`, err);
+			res.sendStatus(400);
+			return;
+		}
+		if ((timeInterval.startTimestamp && !timeInterval.startTimestamp.isValid())
+			|| (timeInterval.endTimestamp && !timeInterval.endTimestamp.isValid())) {
+			log.warn(`Invalid moment parsed for readings count: ${req.query.timeInterval}`);
+			res.sendStatus(400);
+			return;
+		}
 		try {
 			let count = 0;
 			for (var i = 0; i < meterIDs.length; i++) {
@@ -69,8 +85,10 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		maxProperties: 1,
 		required: ['meter_id'],
 		properties: {
-			meter_ids: {
-				type: 'integer'
+			meter_id: {
+				type: 'integer',
+				minimum: 1,
+				maximum: 2147483647
 			}
 		}
 	};
@@ -80,7 +98,8 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		required: ['timeInterval'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: GENERAL_STRING_MAX_LENGTH
 			}
 		}
 	};
@@ -90,7 +109,20 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		const conn = getConnection();
 		// Get the routed meter id and time for the desired readings.
 		const meterID = req.params.meter_id;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		let timeInterval;
+		try {
+			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		} catch (err) {
+			log.warn(`Invalid timeInterval supplied for raw readings: ${req.query.timeInterval}`, err);
+			res.sendStatus(400);
+			return;
+		}
+		if ((timeInterval.startTimestamp && !timeInterval.startTimestamp.isValid())
+			|| (timeInterval.endTimestamp && !timeInterval.endTimestamp.isValid())) {
+			log.warn(`Invalid moment parsed for raw readings: ${req.query.timeInterval}`);
+			res.sendStatus(400);
+			return;
+		}
 		try {
 			// Get the raw readings for this meter over time range desired.
 			// Note this returns unusual identifiers to save space and does not return the meter id.
@@ -106,4 +138,3 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 
 
 module.exports = router;
-
