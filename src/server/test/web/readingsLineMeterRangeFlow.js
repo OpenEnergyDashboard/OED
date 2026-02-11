@@ -149,7 +149,6 @@ mocha.describe('readings API', () => {
                     expectRangeToEqualExpected(res, expected)
                 });
 
-                // Add LR26 here
 				mocha.it('LR26: range should have hourly points for middle readings for 15 minute for a 60 day period and flow units & kW as kW', async () => {
                     const unitData = [
                         {   
