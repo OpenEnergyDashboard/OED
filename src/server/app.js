@@ -32,8 +32,7 @@ const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
-
-const crypto = require('node:crypto')
+const crypto = require('node:crypto');
 
 // Limit the rate of overall requests to OED
 // Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
@@ -149,8 +148,8 @@ router.get('*', (req, res) => {
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 
 		//assigns a value to the nonce in order to check for authenticity
-		const nonce = crypto.randomBytes(16).toString('base64url')
-		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce)
+		const nonce = crypto.randomBytes(16).toString('base64url');
+		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce);
 
 		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com ; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self' 'nonce-${nonce}' 'unsafe-inline';`)
 
