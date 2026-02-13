@@ -268,8 +268,47 @@ mocha.describe('meters API', () => {
 });
 
 mocha.describe('Meter model', () => {
+	let unitId;
+	mocha.beforeEach(async () => {
+		conn = testDB.getConnection();
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.UNIT,
+			'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		await unit.insert(conn);
+		unitId = unit.id;
+	});
+
 	mocha.it('returns -99 when convertUnitValue is passed with null', async () => {
 		const unit = Meter.convertUnitValue(null);
 		expect(unit).to.equal(-99);
+	});
+
+	mocha.it('returns -99 when unitID & defaultGraphicUnit is -99 and inserted into DB', async () => {
+		const conn = testDB.getConnection();
+		const meterPreInsert = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', -99, -99,
+			Unit.areaUnitType.METERS, '13:57:19');
+		await meterPreInsert.insert(conn);
+
+		const meterPostInsert = await Meter.getByID(meterPreInsert.id, conn);
+		expect(meterPostInsert.unitId).to.equal(-99);
+		expect(meterPostInsert.defaultGraphicUnit).to.equal(-99);
+	});
+
+	mocha.it('returns -99 when unitID & defaultGraphicUnit is updated to -99', async() => {
+		const conn = testDB.getConnection();
+		const meterPreInsert = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
+			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
+			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
+			Unit.areaUnitType.METERS, '13:57:19');
+		await meterPreInsert.insert(conn);
+
+		meterPreInsert.unitId = -99;
+		meterPreInsert.defaultGraphicUnit = -99;
+		await meterPreInsert.update(conn);
+
+		const meterPostUpdate = await Meter.getByID(meterPreInsert.id, conn);
+		expect(meterPostUpdate.unitId).to.equal(-99);
+		expect(meterPostUpdate.defaultGraphicUnit).to.equal(-99);
 	});
 });
