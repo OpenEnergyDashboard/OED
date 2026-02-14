@@ -393,6 +393,39 @@ function validateMinMaxValues(meter, rowIndex) {
 	}
 }
 
+function validateMaxError(meter, rowIndex) {
+	const maxErrorValue = Number(meter[31]);
+
+	//if its a number, validate its range
+	if (!isNaN(maxErrorValue)) {
+		if (maxErrorValue < 0 || maxErrorValue > 75) {	
+			throw new CSVPipelineError(
+				`Invalid maxError value in row ${rowIndex + 1}: maxError="${meter[31]}". ` +
+				`MaxError must be a number larger than 0, and less then 75.`,
+				undefined,
+				500
+			);
+		}
+	}
+}
+
+function validateArea(meter, rowIndex) {
+	const areaValue = Number(meter[9]);
+	const areaUnit = meter[25];
+
+	if (areaUnit && areaUnit.toLowerCase() === 'none') {
+		if(!isNaN(areaValue) && areaValue !== 0) {
+			throw new CSVPipelineError(
+			`Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` +
+			`Area must be empty when area unit is 'none'.`,
+			undefined,
+			500
+			);
+		}
+	}
+}
+
+
 /**
  * A function to validate whether or not the inputted minimum and maximum dates are valid.
  * Also validates whether the minimum date comes before, or is equal to the maximum date.
