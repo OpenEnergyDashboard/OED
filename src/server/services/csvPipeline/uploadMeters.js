@@ -396,7 +396,8 @@ function validateMinMaxValues(meter, rowIndex) {
 /**
  * A function to validate whether or not the inputted minimum and maximum dates are valid.
  * Also validates whether the minimum date comes before, or is equal to the maximum date.
- * Includes the helper function validateYear to create a valid range of dates (currently from: 1900 to the current year).
+ * Includes the helper function validateYear to create a valid range of dates (currently from: 0001 to the current year).
+ * Also includes helper function correctDateTimeFormat to validate and correct any variations between the inputted dates.
  * @param {String} minDate 
  * @param {String} maxDate 
  * @returns array[boolean, string]
@@ -404,77 +405,78 @@ function validateMinMaxValues(meter, rowIndex) {
 function isValidDate(minDate, maxDate) {
 	let msg = '';
 	
-	// get correctly formatted dates
-	minDate = correctDateTimeFormat(minDate);
-	maxDate = correctDateTimeFormat(maxDate);
-    
-    // validate lengths of the dates first
-    if (minDate.length != maxDate.length) {
-		msg += `Min date: ${minDate} and max date: ${maxDate} are not equivalent lengths.`;
+	// get correctly formatted dates and check if they're correctly formatted
+	const correctMinFormat = correctDateTimeFormat(minDate);
+	const correctMaxFormat = correctDateTimeFormat(maxDate);
+	
+	// validate that minDate was formatted correctly
+	let formattedMinDate, formattedMaxDate;
+	if (!correctMinFormat.value || !correctMaxFormat.value) {
+		// add error messages to the overall error message
+		msg += correctMinFormat.msg + '\n' + correctMaxFormat.msg;
+		return { msg: msg, value: false };
+	} else {
+		// set the formatted dates
+		formattedMinDate = correctMinFormat.msg;
+		formattedMaxDate = correctMaxFormat.msg;
+	}
+	
+    // validate that years are within range 0001 to the current date
+	if (!validateYear(formattedMinDate) || !validateYear(formattedMaxDate)) {
+		msg += `\nMin year ${moment(formattedMinDate, "YYYY-MM-DD", true).year()} and Max year ${moment(formattedMaxDate, "YYYY-MM-DD", true).year()} are out of range (0001 to current year).`;
+		return { msg: msg, value: false };
+	}
+	
+	let bothValid = false;
+	
+	// create moment objects
+	const minMoment = moment(formattedMinDate, ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD"], true); 
+	const maxMoment = moment(formattedMaxDate, ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD"], true); 
+	
+	// validate lengths of the dates 
+	// checking if one includes time and one doesn't
+    if (minMoment.length != maxMoment.length) {
+		msg += `Min date: ${minMoment} and max date: ${maxMoment} are not equivalent lengths.`;
 		return { msg: msg, value: false };
     }
-    
-	// create new dates with inputted dates
-    const minDateObj = new Date(minDate);
-    const maxDateObj = new Date(maxDate);
-    
-    // validate dates & times
-    const validMinDate = !isNaN(new Date(minDate));
-    const validMaxDate = !isNaN(new Date(maxDate));
-    
-    // validate that years are within range 1900 to 2100
-    // validate range min date
-	const currentYear = new Date().getFullYear();
-    if (!validateYear(minDateObj.getFullYear())) {
-		msg += `\nMin year: ${minDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
-    }
-    // validate range max date
-    if (!validateYear(maxDateObj.getFullYear())) {
-		msg += `\nMax year: ${maxDateObj.getFullYear()} is outside the range allowed (1900 to ${currentYear}).`;
-    }
-    
-    // check if both dates are valid
-    let bothValid = false;
-    
-	// get correct error messages with this format
-    if (validMinDate && validMaxDate) {
-		// can't return true until validate minDate < maxDate
-        bothValid = true;
-    } else {
-		if (validMinDate && !validMaxDate) {
-			msg += `\nMin date is valid. Max date: ${maxDate} is invalid.`;
-		} else if (!validMinDate && validMaxDate) {
-			msg += `\nMin date: ${minDate} is invalid. Max date is valid.`;
-		} else {
-			msg += `\nBoth dates invalid. Min date: ${minDate}, Max date: ${maxDate}.`;
-		}
 
+	if (!minMoment.isValid() || !maxMoment.isValid()) {
+		msg += `\nError: Either Min Date ${minDate} or Max Date ${maxDate} is invalid (or both!).`;
 		return { msg: msg, value: false };
+	} else if (minMoment.isValid() && maxMoment.isValid()) {
+		bothValid = true;
+	}
+	
+    // dates validated now check if minDate is == maxDate
+    if (minMoment.isBefore(maxMoment) && bothValid) {
+		// everything validated
+		return { msg: msg, value: true };
     }
-    
-    // dates validated
-    if (minDate < maxDate && bothValid) {
-        // everything validated
-        return { msg: msg, value: true };
-    } else if (minDate == maxDate) {
+	// check if equal
+	if (minMoment.isSame(maxMoment)) {
 		msg += `\nMin date: ${minDate} is equal to the max date: ${maxDate}.`;
     }
 
-    // otherwise minDate > maxDate -> so just return false/throw error 
 	msg += `\nMin date: ${minDate} is greater than max date: ${maxDate}.`;
 	return { msg: msg, value: false };
 }
 
 /**
  * A subsidary function to help out isValidDate with processing a viable year range.
- * @param {Date} year 
+ * @param {String} date 
  * @returns boolean 
  */
-function validateYear(year) {
-	const minYear = new Date("1900-01-01").getFullYear();
-	const currentYear = new Date().getFullYear(); //todo: check if this should be const
+function validateYear(date) {
+	// make sure year exists
+	if (date === null || date === undefined) {
+		return false;
+	}
 
-    if (year >= minYear && year <= currentYear) {
+	const minYear = 1;
+	const mYear = moment(date).year();
+	const mCurrentYear = moment().year();
+
+    if (mYear >= minYear && mYear <= mCurrentYear) {
         return true;
     }
     return false;
@@ -484,44 +486,57 @@ function validateYear(year) {
  * A function to convert an incorrect date string -> ex: "1970-1-1 1:1:1" to a correct date string
  * "1970-01-01 01:01:01" for less of a chance of an error being thrown in the isValidDate() function.
  * @param {String} date 
- * @returns String - Format "YYYY-MM-DD HH:MM:SS"
+ * @returns String - Targeted Format "YYYY-MM-DD HH:MM:SS"
  */
 function correctDateTimeFormat(date) {
     // validate type is string
-    if (typeof date != 'string') {
-        return `Error: Inputted date not a string.`;
-    }
-    
+	if (typeof date != 'string') {
+		return { msg: `\nError: Inputted date not a string.`, value: false };
+	}
+
     // trim whitespace
     date = date.trim();
-    
-    // if length < 10, it's not a full date (even if invalid)
+
+    // if length < 10, it's not a full date
     if (date.length < 8) {
-        return `Error: Inputted date not complete.`; 
+        return { msg: `\nError: Inputted date not complete.`, value: false }; 
     }
+
+	// accepted moment format options, more options = slower runtime
+	// can remove variations of options if necessary
+	// should keep: YYYY-MM-DD, YYYY-M-D, MM-DD-YYYY, M-D-YYYY
+	//				YYYY-MM-DD HH:mm:ss, YYYY-MM-DD H:m:s
+	//				MM-DD-YYYY HH:mm:ss, MM-DD-YYYY H:m:s 
+	const acceptedFormats = [
+		'YYYY-MM-DD', 'YYYY-M-D',
+		'MM-DD-YYYY', 'M-D-YYYY',
+		'M-DD-YYYY', 'MM-D-YYYY',
+		'YYYY-M-DD', 'YYYY-MM-D',
+		'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD H:m:s',
+		'MM-DD-YYYY HH:mm:ss', 'MM-DD-YYYY H:m:s',
+		'M-D-YYYY HH:mm:ss', 'M-D-YYYY H:m:s',
+		'M-DD-YYYY HH:mm:ss', 'M-DD-YYYY H:m:s', 
+		'MM-D-YYYY HH:mm:ss', 'MM-D-YYYY H:m:s',
+		'YYYY-M-DD HH:mm:ss', 'YYYY-M-DD H:m:s',
+		'YYYY-MM-D HH:mm:ss', 'YYYY-MM-D HH:mm:ss',
+	];	
+	
+	// parse date with moment 
+	const mDate = moment(date, acceptedFormats, true);
     
     // check if date is valid
-    if (isNaN(new Date(date))) {
-        return `Error: Inputted date not valid.`; // return empty string
+    if (!mDate.isValid()) {
+        return { msg: `\nError: Inputted date not valid.`, value: false };
     }
-    
-    const dateObj = new Date(date);
-    
-    // create only date string
-    let dateString = `${String(dateObj.getFullYear())}-${String(dateObj.getMonth()+1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
-    
-    // convert time
-    // if parameter (date) length is <= the improved dateString
-    // then return, because there's no time -> return only dateSring
-    const DATE_LENGTH = dateString.length;
-    if (date.length <= dateString.length) {
-        return `${dateString}`;
-    }
-    
-    const timeString = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}:${String(dateObj.getSeconds()).padStart(2, '0')}`;
-    
-    // return full date string
-    return `${dateString} ${timeString}`;
+	
+	// check if time was included in the input
+	const hasTime = date.includes(':') || date.split(/[\s-]/).length > 3;
+
+	if (hasTime) {
+		return { msg: mDate.format('YYYY-MM-DD HH:mm:ss'), value: true };
+	} else {
+		return { msg: mDate.format('YYYY-MM-DD'), value: true };
+	}
 }
 
 /**
@@ -529,7 +544,7 @@ function correctDateTimeFormat(date) {
  * @param {Number} duplicateValue 
  * @returns 
  */
-function isDuplicate(duplicateValue) {
+function isDuplicate(duplicateValue) {	
     if (duplicateValue >= 1 && duplicateValue <= 9) {
         return true;
     }
