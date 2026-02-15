@@ -9,6 +9,7 @@ const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 const moment = require('moment-timezone');
+const { validate } = require('jsonschema');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -96,19 +97,16 @@ async function uploadMeters(req, res, filepath, conn) {
 					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
-
-				const areaCheck = validateArea(areaInput, areaUnitString);
+			//DESTINY added this check to make sure if area unit is none then area value must be empty or 0, and if area unit is not none then area value must be a number greater than 0.
+				const areaCheck = validateArea(meter, i);
                 if (!areaCheck.value) {
                     throw new CSVPipelineError(areaCheck.areaMsg, undefined, 500);
                 }
 			}
-
-			const MaxError = meter[31];
-			if (MaxError) {
-				if (!validateMaxError(MaxError)) {
-					let msg = `For meter ${meter[0]} the max error of ${MaxError} is invalid. Max error must be a number greater than or equal to 0.`;
-					throw new CSVPipelineError(msg, undefined, 500);
-				}
+			//DESTINY added this check to make sure max error value is a number between 0 and 75 if it is provided.
+			const maxErrorCheck = validateMaxError(meter, i);
+			if (!maxErrorCheck.value) {
+				throw new CSVPipelineError(maxErrorCheck.maxErrorMsg, undefined, 500);
 			}
 
 			// Verify meter type
@@ -407,7 +405,7 @@ function validateArea(meter, rowIndex) {
 
 	if (areaUnit && areaUnit.toLowerCase() === 'none') {
 		if(!isNaN(areaValue) && areaValue !== 0) {
-      msg = `Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` + `Area must be empty when are unit is 'none'.`;
+      msg = `Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` + `Area must be empty when area unit is 'none'.`;
       return { areaMsg: msg, value: false };
     }
   }
