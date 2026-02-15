@@ -90,9 +90,19 @@ async function uploadMeters(req, res, filepath, conn) {
 
 			// Verify area unit provided
 			const areaUnitString = meter[25];
+			validateArea(meter, i);
 			if (areaUnitString) {
+				//for "feet/meters/none" check
 				if (!isValidAreaUnit(areaUnitString)) {
-					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid. Unit must be feet, meters, or none.`;
+					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			const MaxError = meter[31];
+			if (MaxError) {
+				if (!validateMaxError(MaxError)) {
+					let msg = `For meter ${meter[0]} the max error of ${MaxError} is invalid. Max error must be a number greater than or equal to 0.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
@@ -380,7 +390,7 @@ function validateMaxError(meter, rowIndex) {
 		if (maxErrorValue < 0 || maxErrorValue > 75) {	
 			throw new CSVPipelineError(
 				`Invalid maxError value in row ${rowIndex + 1}: maxError="${meter[31]}". ` +
-				`MaxError must be a number larger than 0, and less then 75.`,
+				`MaxError must be a number larger than 0, and less than 75.`,
 				undefined,
 				500
 			);
@@ -404,5 +414,7 @@ function validateArea(meter, rowIndex) {
 	}
 }
 
+//uploadMeters.validateMaxError = validateMaxError;
+//uploadMeters.validateArea = validateArea;
 
 module.exports = uploadMeters;
