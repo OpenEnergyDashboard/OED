@@ -90,13 +90,17 @@ async function uploadMeters(req, res, filepath, conn) {
 
 			// Verify area unit provided
 			const areaUnitString = meter[25];
-			validateArea(meter, i);
 			if (areaUnitString) {
 				//for "feet/meters/none" check
 				if (!isValidAreaUnit(areaUnitString)) {
 					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
+
+				const areaCheck = validateArea(areaInput, areaUnitString);
+                if (!areaCheck.value) {
+                    throw new CSVPipelineError(areaCheck.areaMsg, undefined, 500);
+                }
 			}
 
 			const MaxError = meter[31];
@@ -384,35 +388,33 @@ function validateMinMaxValues(meter, rowIndex) {
 
 function validateMaxError(meter, rowIndex) {
 	const maxErrorValue = Number(meter[31]);
+	let msg = '';
 
 	//if its a number, validate its range
 	if (!isNaN(maxErrorValue)) {
 		if (maxErrorValue < 0 || maxErrorValue > 75) {	
-			throw new CSVPipelineError(
-				`Invalid maxError value in row ${rowIndex + 1}: maxError="${meter[31]}". ` +
-				`MaxError must be a number larger than 0, and less than 75.`,
-				undefined,
-				500
-			);
+			msg = `Invalid max error value in row ${rowIndex + 1}: maxError="${meter[31]}". ` + `MaxError must be a number larger than 0, and less than 75.`;
+			return { maxErrorMsg: msg, value: false };
 		}
 	}
+	return { maxErrorMsg: '', value: true };
 }
 
 function validateArea(meter, rowIndex) {
 	const areaValue = Number(meter[9]);
 	const areaUnit = meter[25];
+	let msg = '';
 
 	if (areaUnit && areaUnit.toLowerCase() === 'none') {
 		if(!isNaN(areaValue) && areaValue !== 0) {
-			throw new CSVPipelineError(
-			`Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` +
-			`Area must be empty when area unit is 'none'.`,
-			undefined,
-			500
-			);
-		}
-	}
+      msg = `Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` + `Area must be empty when are unit is 'none'.`;
+      return { areaMsg: msg, value: false };
+    }
+  }
+  
+  return { areaMsg: '', value: true };
 }
+
 
 //uploadMeters.validateMaxError = validateMaxError;
 //uploadMeters.validateArea = validateArea;
