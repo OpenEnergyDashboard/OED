@@ -5,14 +5,12 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { cloneDeep } from 'lodash';
 import * as moment from 'moment';
-import { ActionMeta } from 'react-select';
 import { TimeInterval } from '../../../../common/TimeInterval';
 import {
 	clearGraphHistory, historyStepBack,
 	historyStepForward, processGraphLink,
 	updateHistory, updateSliderRange
 } from '../../redux/actions/extraActions';
-import { SelectOption } from '../../types/items';
 import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
@@ -23,6 +21,7 @@ const defaultState: GraphState = {
 	selectedGroups: [],
 	selectedUnit: -99,
 	selectedAreaUnit: AreaUnitType.none,
+	lastAddedMeterOrGroup: undefined,
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
@@ -142,12 +141,16 @@ export const graphSlice = createSlice({
 				state.current.threeD.meterOrGroupID = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup>) => {
+		// Added here because it is used to easily track if the last added was meter or group, which then used to select which is active in threeD
+		setLastAddedMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
+			state.current.lastAddedMeterOrGroup = action.payload;
+		},
+		updateThreeDMeterOrGroup: (state, action: PayloadAction<MeterOrGroup | undefined>) => {
 			if (state.current.threeD.meterOrGroup !== action.payload) {
 				state.current.threeD.meterOrGroup = action.payload;
 			}
 		},
-		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup }>) => {
+		updateThreeDMeterOrGroupInfo: (state, action: PayloadAction<{ meterOrGroupID: number | undefined, meterOrGroup: MeterOrGroup | undefined }>) => {
 			const { updateThreeDMeterOrGroupID, updateThreeDMeterOrGroup } = graphSlice.caseReducers;
 			updateThreeDMeterOrGroupID(state, graphSlice.actions.updateThreeDMeterOrGroupID(action.payload.meterOrGroupID));
 			updateThreeDMeterOrGroup(state, graphSlice.actions.updateThreeDMeterOrGroup(action.payload.meterOrGroup));
@@ -156,82 +159,6 @@ export const graphSlice = createSlice({
 			// 	// Set the query time interval to 6 moths back when not bounded for 3D
 			// 	state.current.queryTimeInterval = new TimeInterval(moment.utc().subtract(6, 'months'), moment.utc());
 			// }
-		},
-		updateSelectedMetersOrGroups: (state, action: PayloadAction<{ newMetersOrGroups: number[], meta: ActionMeta<SelectOption> }>) => {
-			const { current } = state;
-			// This reducer handles the addition and subtraction values for both the meter and group select components.
-			// The 'MeterOrGroup' type is heavily utilized in the reducer and other parts of the code.
-			// Note that this option is binary, if it's not a meter, then it's a group.
-
-			// Destructure payload
-			const { newMetersOrGroups, meta } = action.payload;
-			const cleared = meta.action === 'clear';
-			const valueRemoved = (meta.action === 'pop-value' || meta.action === 'remove-value') && meta.removedValue !== undefined;
-			const valueAdded = meta.action === 'select-option' && meta.option !== undefined;
-			let isAMeter = true;
-
-			if (cleared) {
-				const clearedMeterOrGroups = meta.removedValues;
-				// A Select has been cleared (all values removed with clear)
-				// use the first index of cleared items to check for meter or group
-				isAMeter = clearedMeterOrGroups[0].meterOrGroup === MeterOrGroup.meters;
-				// if a meter clear meters, else clear groups
-				isAMeter ? current.selectedMeters = [] : current.selectedGroups = [];
-
-			} else if (valueRemoved) {
-				isAMeter = meta.removedValue.meterOrGroup === MeterOrGroup.meters;
-				// An entry was deleted.
-				// Update either selected meters or groups
-
-				isAMeter
-					? current.selectedMeters = newMetersOrGroups
-					: current.selectedGroups = newMetersOrGroups;
-			} else if (valueAdded) {
-				isAMeter = meta.option?.meterOrGroup === MeterOrGroup.meters;
-				const addedMeterOrGroupUnit = meta.option?.defaultGraphicUnit;
-				// An entry was added,
-				// Update either selected meters or groups
-				isAMeter
-					? current.selectedMeters = newMetersOrGroups
-					: current.selectedGroups = newMetersOrGroups;
-
-				// If the current unit is -99, there is not yet a graphic unit
-				// Set the newly added meterOrGroup's default graphic unit as the current selected unit.
-				if (current.selectedUnit === -99 && addedMeterOrGroupUnit) {
-					current.selectedUnit = addedMeterOrGroupUnit;
-				}
-			}
-
-			// Blocks Pertaining to behaviors of specific pages below
-
-			// Additional 3d logic for each case.
-			// Reset Currently Selected 3D Meter Or Group if it has been removed from any page
-			if (cleared) {
-				const removedType = meta.removedValues[0].meterOrGroup;
-				const threeDSelectedType = current.threeD.meterOrGroup;
-				if (removedType === threeDSelectedType) {
-					current.threeD.meterOrGroupID = undefined;
-					current.threeD.meterOrGroup = undefined;
-
-				}
-			} else if (valueAdded && current.chartToRender === ChartTypes.threeD) {
-				// When a meter or group is selected/added, make it the currently active in 3D current.
-				// TODO Currently only tracks when on 3d, Verify that this is the desired behavior
-				// re-use existing reducers, action creators
-				graphSlice.caseReducers.updateThreeDMeterOrGroupInfo(state,
-					graphSlice.actions.updateThreeDMeterOrGroupInfo({
-						meterOrGroupID: meta.option!.value,
-						meterOrGroup: meta.option!.meterOrGroup!
-					})
-				);
-			} else if (valueRemoved) {
-				const idMatches = meta.removedValue.value === current.threeD.meterOrGroupID;
-				const typeMatches = meta.removedValue.meterOrGroup === current.threeD.meterOrGroup;
-				if (idMatches && typeMatches) {
-					current.threeD.meterOrGroupID = undefined;
-					current.threeD.meterOrGroup = undefined;
-				}
-			}
 		},
 		resetTimeInterval: state => {
 			if (!state.current.queryTimeInterval.equals(TimeInterval.unbounded())) {
@@ -399,6 +326,7 @@ export const graphSlice = createSlice({
 		selectGraphAreaNormalization: state => state.current.areaNormalization,
 		selectThreeDMeterOrGroupID: state => state.current.threeD.meterOrGroupID,
 		selectThreeDReadingInterval: state => state.current.threeD.readingInterval,
+		selectLastMeterOrGroup: state => state.current.lastAddedMeterOrGroup,
 		selectDefaultGraphState: () => defaultState,
 		selectHistoryIsDirty: state => state.prev.length > 0 || state.next.length > 0,
 		selectSliderRangeInterval: state => state.current.rangeSliderInterval,
@@ -421,11 +349,11 @@ export const {
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectGraphAreaNormalization, selectSliderRangeInterval,
-	selectDefaultGraphState, selectHistoryIsDirty,
-	selectPlotlySliderMax, selectPlotlySliderMin,
-	selectShiftAmount, selectShiftTimeInterval,
-	selectInitialXAxisRange
+	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectSliderRangeInterval, selectDefaultGraphState,
+	selectHistoryIsDirty, selectPlotlySliderMax,
+	selectPlotlySliderMin, selectShiftAmount,
+	selectShiftTimeInterval, selectInitialXAxisRange
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -440,9 +368,9 @@ export const {
 	setAreaNormalization, updateSelectedGroups,
 	resetRangeSliderStack, updateSelectedAreaUnit,
 	toggleAreaNormalization, updateThreeDMeterOrGroup,
-	changeCompareSortingOrder, updateThreeDMeterOrGroupID,
-	updateThreeDReadingInterval, updateThreeDMeterOrGroupInfo,
-	updateSelectedMetersOrGroups, updateShiftAmount,
+	setLastAddedMeterOrGroup, changeCompareSortingOrder,
+	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
+	updateThreeDMeterOrGroupInfo, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
 	updateShiftTimeInterval
 } = graphSlice.actions;

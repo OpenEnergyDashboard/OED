@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import {GPSPoint, isValidGPSInput} from '../../utils/calibration';
-import {ChangeEvent, FormEvent} from 'react';
-import {FormattedMessage} from 'react-intl';
+import { GPSPoint, isValidGPSInput } from '../../utils/calibration';
+import { ChangeEvent, FormEvent } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 interface InfoDisplayProps {
 	showGrid: boolean;
@@ -47,15 +47,15 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 				<div id='UserInput'>
 					<form onSubmit={this.handleSubmit}>
 						<label>
-							<FormattedMessage id='input.gps.coords.first'/> {this.props.currentCartesianDisplay}
-							<br/>
-							<FormattedMessage id='input.gps.coords.second'/>
-							<br/>
-							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput}/>
+							<FormattedMessage id='input.gps.coords.first' /> {this.props.currentCartesianDisplay}
+							<br />
+							<FormattedMessage id='input.gps.coords.second' />
+							<br />
+							<textarea id={'text'} cols={50} value={this.state.value} onChange={this.handleGPSInput} />
 						</label>
-						<br/>
+						<br />
 						<FormattedMessage id='calibration.submit.button'>
-							{intlSubmitText => <input type={'submit'} value={intlSubmitText.toString()}/>}
+							{intlSubmitText => <input type={'submit'} value={intlSubmitText.toString()} />}
 						</FormattedMessage>
 					</form>
 					<FormattedMessage id='calibration.reset.button'>
@@ -88,7 +88,8 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 		const longitudeIndex = 1;
 		if (this.props.currentCartesianDisplay === 'x: undefined, y: undefined') { return; }
 		const input = this.state.value;
-		if (isValidGPSInput(input)) {
+		const { validGps, message } = isValidGPSInput(input);
+		if (validGps) {
 			const array = input.split(',').map((value: string) => parseFloat(value));
 			const gps: GPSPoint = {
 				longitude: array[longitudeIndex],
@@ -97,7 +98,7 @@ export default class MapCalibrationInfoDisplayComponent extends React.Component<
 			this.props.updateGPSCoordinates(gps);
 			this.resetInputField();
 		} else {
-			this.props.log('info', `refused data point with invalid input: ${input}`);
+			this.props.log('info', `refused data point with invalid input: ${input} and error of "${message}"`);
 		}
 	};
 

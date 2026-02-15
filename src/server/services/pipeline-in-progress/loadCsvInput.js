@@ -31,6 +31,7 @@ const { log } = require('../../log');
  * @param {boolean} relaxedParsing true if the parsing of readings allows for non-standard formats, default if false since this can give bad dates/times.
  * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
  *   Should only be true if honorDST is true and reading does not have proper time zone information.
+ * @param {boolean} warnOnCumulativeReset true if a warning is shown for each reset with cumulative data. cumulative must be true. default is false.
  */
 async function loadCsvInput(
 	filePath,
@@ -49,16 +50,17 @@ async function loadCsvInput(
 	shouldUpdate,
 	conditionSet,
 	conn,
-	honorDst,
-	relaxedParsing,
-	useMeterZone
+	honorDst = false,
+	relaxedParsing = false,
+	useMeterZone = false,
+	warnOnCumulativeReset = false
 ) {
 	try {
 		const dataRows = await readCsv(filePath, headerRow);
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn,
-			honorDst, relaxedParsing, useMeterZone);
+			honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}

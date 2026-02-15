@@ -36,7 +36,7 @@ class Logger {
 	constructor(logFilePath) {
 		this.level = LogLevel.INFO;
 		this.emailLevel = LogLevel.ERROR;
-		this.logToFile = true;
+		this.logToDb = true;
 		this.logToConsole = true;
 		this.logFile = logFilePath;
 	}
@@ -71,27 +71,30 @@ class Logger {
 			}
 		}
 
-		// Always log to the logfile.
-		if (this.logToFile) {
-			fs.appendFile(logFile, messageToLog, async err => {
-				if (err) {
-					console.error(`Failed to write to log file: ${err} (${err.stack})`); // tslint:disable-line no-console
-				}
-			});
-
+		// The default is to always log to the DB but testing skips this.
+		if (this.logToDb) {
 			// Write the new log to the database
 			const logMsg = new LogMsg(level.name, message, logTime);
 			(async () => {
 				try {
 					await logMsg.insert(conn);
 				} catch (err) {
-					console.error(`Failed to write log to database: ${err} (${err.stack})`);
+					// Show error message since not in DB.
+					console.error(`Failed to write error message "${messageToLog}" to database which generated the error: "${err}" and stack: (${err.stack})`);
+					// Also try to put in the file so it has a permanent life.
+					fs.appendFile(logFile, messageToLog, async err => {
+						if (err) {
+							// Note file save failed so people know. It does duplicate a lot of the message above but this
+							// isn't likely to happen and it is significant.
+							console.error(`Failed to write error message "${messageToLog}" to file which generated the error: "${err}" and stack: (${err.stack})`);
+						}
+					});
 				}
 			})();
 		}
 
-		// Only log elsewhere if given a high enough priority level.
-		if (level.priority <= this.level.priority && !skipMail) {
+		// Only log to console if given a high enough priority level.
+		if (level.priority <= this.level.priority) {
 			if (this.logToConsole) {
 				if (level.priority >= LogLevel.WARN.priority) {
 					// tslint:disable-next-line no-console
@@ -172,7 +175,7 @@ process.on('unhandledRejection', (reason, p) => {
 	});
 });
 
-defaultLogger.logToFile = true;
+defaultLogger.logToDb = true;
 defaultLogger.logToConsole = true;
 defaultLogger.level = LogLevel.DEBUG;
 

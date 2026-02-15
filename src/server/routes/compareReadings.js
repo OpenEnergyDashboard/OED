@@ -8,8 +8,18 @@ const express = require('express');
 const validate = require('jsonschema').validate;
 const moment = require('moment');
 const { getConnection } = require('../db');
-
 const Reading = require('../models/Reading');
+const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
+
+const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
+
+function isValidIsoDateTime(value) {
+	return moment.parseZone(value, moment.ISO_8601, true).isValid();
+}
+
+function isValidIsoDuration(value) {
+	return ISO_DURATION_REGEX.test(value);
+}
 
 function validateMeterCompareReadingsParams(params) {
 	const validParams = {
@@ -19,7 +29,8 @@ function validateMeterCompareReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				maxLength: STRING_GENERAL_MAX_LENGTH,
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -35,7 +46,8 @@ function validateGroupCompareReadingsParams(params) {
 		properties: {
 			group_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				maxLength: STRING_GENERAL_MAX_LENGTH,
+				pattern: '^\\d+(?:,\\d+)*$'
 			}
 		}
 	};
@@ -50,16 +62,20 @@ function validateQueryParams(queryParams) {
 		required: ['curr_start', 'curr_end', 'shift', 'graphicUnitId'],
 		properties: {
 			curr_start: {
-				type: 'string' // iso 8601
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			curr_end: {
-				type: 'string' // iso 8601
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			shift: {
-				type: 'string' // iso 8601 duration
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
+				maxLength: NUMERIC_ID_MAX_LENGTH,
 				pattern: '^\\d+$'
 			}
 		}
@@ -77,7 +93,7 @@ function validateQueryParams(queryParams) {
  * @param shift how far to shift back in time from current period to previous period
  * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
- async function meterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift) {
+async function meterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();
 	return await Reading.getMeterCompareReadings(meterIDs, graphicUnitId, currStart, currEnd, shift, conn);
 }
@@ -91,7 +107,7 @@ function validateQueryParams(queryParams) {
  * @param shift how far to shift back in time from current period to previous period
  * @returns {Promise<object<int, array<{reading_rate: number, start_timestamp: }>>>}
  */
- async function groupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift) {
+async function groupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift) {
 	const conn = getConnection();
 	return await Reading.getGroupCompareReadings(groupIDs, graphicUnitId, currStart, currEnd, shift, conn);
 }
@@ -106,10 +122,19 @@ function createRouter() {
 		}
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
 		const graphicUnitID = req.query.graphicUnitId;
+		const currStartRaw = req.query.curr_start;
+		const currEndRaw = req.query.curr_end;
+		const shiftRaw = req.query.shift;
+
+		if (!isValidIsoDateTime(currStartRaw) || !isValidIsoDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
+			res.sendStatus(400);
+			return;
+		}
+
 		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
-		const currStart = moment.parseZone(req.query.curr_start, undefined, true);
-		const currEnd = moment.parseZone(req.query.curr_end, undefined, true);
-		const shift = moment.duration(req.query.shift);
+		const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
+		const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
+		const shift = moment.duration(shiftRaw);
 		res.json(await meterCompareReadings(meterIDs, graphicUnitID, currStart, currEnd, shift));
 	});
 
@@ -118,13 +143,21 @@ function createRouter() {
 			res.sendStatus(400);
 			return;
 		}
-		const conn = getConnection();
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
 		const graphicUnitID = req.query.graphicUnitId;
+		const currStartRaw = req.query.curr_start;
+		const currEndRaw = req.query.curr_end;
+		const shiftRaw = req.query.shift;
+
+		if (!isValidIsoDateTime(currStartRaw) || !isValidIsoDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
+			res.sendStatus(400);
+			return;
+		}
+
 		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
-		const currStart = moment.parseZone(req.query.curr_start, undefined, true);
-		const currEnd = moment.parseZone(req.query.curr_end, undefined, true);
-		const shift = moment.duration(req.query.shift);
+		const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
+		const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
+		const shift = moment.duration(shiftRaw);
 		res.json(await groupCompareReadings(groupIDs, graphicUnitID, currStart, currEnd, shift));
 	});
 

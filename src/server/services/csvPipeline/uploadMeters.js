@@ -7,13 +7,16 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
-const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
+const { normalizeBoolean, MeterTimeSortTypesJS, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 const moment = require('moment-timezone');
 const { min, max } = require('lodash');
 const { validate } = require('jsonschema');
+const moment = require('moment-timezone');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
+ * @param {express.Request} req
+ * @param {express.Response} res
  * @param {express.Request} req
  * @param {express.Response} res
  * @param {filepath} filepath Path to meters csv file.
@@ -139,6 +142,24 @@ async function uploadMeters(req, res, filepath, conn) {
 				if (!isValidMeterType(meterTypeString)) {
 					let msg = `For meter ${meter[0]} the meter type of ${meterTypeString} is invalid. Valid types include:
 								egauge, mamac, metasys, obvius, and other. `;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// verify the Gap input
+			const gapInput = meter[14];
+			if (gapInput) {
+				if (!validateGap(gapInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${gapInput} is invalid. Gap must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// verify the Variation input
+			const variationInput = meter[15];
+			if (variationInput) {
+				if (!validateVariation(variationInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${variationInput} is invalid. Gap must be a number greater than 0.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
@@ -434,10 +455,6 @@ function validateArea(meter, rowIndex) {
   return { areaMsg: '', value: true };
 }
 
-
-//uploadMeters.validateMaxError = validateMaxError;
-//uploadMeters.validateArea = validateArea;
-
 /**
  * A function to validate whether or not the inputted minimum and maximum dates are valid.
  * Also validates whether the minimum date comes before, or is equal to the maximum date.
@@ -594,6 +611,34 @@ function isDuplicate(duplicateValue) {
         return true;
     }
     return false;
+}
+
+function validateGap(meter, rowIndex){
+	const gapValue = Number(meter[14]);
+	if(!isNaN(gapValue)){
+		if(gapValue < 0){
+		throw new CSVPipelineError(
+			`Invalid gap value in row ${rowIndex + 1}: GapValue="${meter[14]}". ` +
+			`Gap must be a number larger than 0.`,
+			undefined, 
+			500
+		);
+		};
+	}
+}
+function validateVariation(meter, rowIndex){
+	const variationValue =Number(meter[15]);
+	if(!isNaN(variationValue)){
+		if(variationValue < 0)
+		{
+			throw new CSVPipelineError(
+			`Invalid variation value in row ${rowIndex + 1}: VariationValue="${meter[15]}". ` +
+			`Variation Value must be a number larger than 0.`,
+			undefined,
+			500
+			);
+		};
+	}
 }
 
 module.exports = uploadMeters;

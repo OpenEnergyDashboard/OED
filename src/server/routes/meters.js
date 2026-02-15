@@ -10,17 +10,16 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { isTokenAuthorized } = require('../util/userRoles');
-const requiredAdmin = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const merge = require('lodash/merge');
 const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
 
 /**
  * Defines the format in which we want to send meters and controls what information we send to the client, if logged in and an Admin or not.
@@ -103,7 +102,7 @@ function formatMeterForResponse(meter, hasFullAccess) {
 /**
  * GET information on displayable meters (or all meters, if logged in as an admin.)
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
 		const conn = getConnection();
 		let query;
@@ -125,15 +124,16 @@ router.get('/', async (req, res) => {
  * Prohibits access to meters that are not displayable if not logged in
  * @param {int} meter_id
  */
-router.get('/:meter_id', async (req, res) => {
+router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['meter_id'],
 		properties: {
 			meter_id: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -162,27 +162,28 @@ router.get('/:meter_id', async (req, res) => {
 function validateMeterParams(params) {
 	const validParams = {
 		type: 'object',
-		maxProperties: 34,
+		additionalProperties: false,
 		// We can get rid of some of these if we defaulted more values in the meter model.
 		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
 		properties: {
-			id: { type: 'integer' },
-			name: { type: 'string' },
+			id: { type: 'integer', minimum: 1 },
+			name: { type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
 			url: {
 				oneOf: [
 					{ type: 'string' },
 					{ type: 'null' }
 				]
 			},
-			enabled: { type: 'bool' },
-			displayable: { type: 'bool' },
+			enabled: { type: 'boolean' },
+			displayable: { type: 'boolean' },
 			meterType: {
 				type: 'string',
-				enum: Object.values(Meter.type)
+				enum: Object.values(Meter.type),
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
 			timeZone: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
@@ -201,35 +202,36 @@ function validateMeterParams(params) {
 			},
 			identifier: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			area: { type: 'number', minimum: 0 },
-			cumulative: { type: 'bool' },
-			cumulativeReset: { type: 'bool' },
-			cumulativeResetStart: { type: 'string' },
-			cumulativeResetEnd: { type: 'string' },
+			cumulative: { type: 'boolean' },
+			cumulativeReset: { type: 'boolean' },
+			cumulativeResetStart: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+			cumulativeResetEnd: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			readingGap: { type: 'number' },
 			readingVariation: { type: 'number' },
 			readingDuplication: { type: 'integer', minimum: '1', maximum: '9' },
 			timeSort: {
 				type: 'string',
-				enum: Object.values(MeterTimeSortTypesJS)
+				enum: Object.values(MeterTimeSortTypesJS),
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
-			endOnlyTime: { type: 'bool' },
+			endOnlyTime: { type: 'boolean' },
 			reading: { type: 'number' },
-			startTimestamp: { type: 'string' },
-			endTimestamp: { type: 'string' },
+			startTimestamp: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+			endTimestamp: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			previousEnd: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
@@ -238,17 +240,19 @@ function validateMeterParams(params) {
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: 50,
 				enum: Object.values(Unit.areaUnitType)
 			},
-			readingFrequency: { type: 'string' },
+			readingFrequency: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			minVal: { type: 'number' },
 			maxVal: { type: 'number' },
-			minDate: { type: 'string' },
-			maxDate: { type: 'string' },
+			minDate: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+			maxDate: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			maxError: { type: 'integer' },
 			disableChecks: {
 				type: 'string',
 				minLength: 1,
+				maxLength: 50,
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
@@ -257,7 +261,7 @@ function validateMeterParams(params) {
 	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
 }
 
-router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
@@ -321,7 +325,7 @@ router.post('/edit', requiredAdmin('edit meters'), async (req, res) => {
 /**
  * Route for POST add meter.
  */
-router.post('/addMeter', async (req, res) => {
+router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 	const response = validateMeterParams(req.body)
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
@@ -379,4 +383,3 @@ router.post('/addMeter', async (req, res) => {
 });
 
 module.exports = router;
-

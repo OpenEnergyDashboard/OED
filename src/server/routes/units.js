@@ -1,101 +1,113 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
-  * License, v. 2.0. If a copy of the MPL was not distributed with this
-  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
-
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../util/validationConstants');
 const router = express.Router();
 
-function formatUnitForResponse(item) {
+function formatUnitForResponse(unit) {
 	return {
-		id: item.id, name: item.name, identifier: item.identifier, unitRepresent: item.unitRepresent,
-		secInRate: item.secInRate, typeOfUnit: item.typeOfUnit, suffix: item.suffix,
-		displayable: item.displayable, preferredDisplay: item.preferredDisplay, note: item.note,
-		minVal: item.minVal, maxVal: item.maxVal, disableChecks: item.disableChecks
+		id: unit.id,
+		name: unit.name,
+		identifier: unit.identifier,
+		unitRepresent: unit.unitRepresent,
+		secInRate: unit.secInRate,
+		typeOfUnit: unit.typeOfUnit,
+		suffix: unit.suffix,
+		displayable: unit.displayable,
+		preferredDisplay: unit.preferredDisplay,
+		note: unit.note,
+		minVal: unit.minVal,
+		maxVal: unit.maxVal,
+		disableChecks: unit.disableChecks
 	};
 }
 
 /**
  * Route for getting all units.
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Unit.getAll(conn);
 		res.json(rows.map(formatUnitForResponse));
 	} catch (err) {
-		log.error(`Error while performing GET units details query: ${err}`, err);
+		log.error(`Error fetching units: ${err}`, err);
+		res.sendStatus(500);
 	}
 });
 
 /**
- * Route for POST, edit unit.
+ * Route for editing a unit by ID.
  */
-router.post('/edit', async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['id', 'identifier'],
+		// TODO Consider updating once decide exactly what want.
+		// required: ['id', 'name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
 		properties: {
-			id: {
-				type: 'integer'
-			},
+			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			identifier: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitRepresentType)
 			},
-			secInRate: {
-				type: 'number',
-			},
+			secInRate: { type: 'number', minimum: 0 },
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			displayable: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.displayableType)
 			},
-			preferredDisplay: {
-				type: 'bool'
-			},
+			preferredDisplay: { type: 'boolean' },
 			note: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
-			minVal: {
-				type: 'number',
-			},
-			maxVal: {
-				type: 'number',
-			},
+			minVal: { type: 'number' },
+			maxVal: { type: 'number' },
 			disableChecks: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
 	};
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
-        failure(res, 400, `Got request to edit units with invalid unit data, errors:${validatorResult.errors}`);
+		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
+		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -104,94 +116,89 @@ router.post('/edit', async (req, res) => {
 				// Suffix changes so some conversions and units need to be removed.
 				await removeAdditionalConversionsAndUnits(unit, conn);
 			}
-			unit.name = req.body.name;
-			unit.displayable = req.body.displayable;
-			unit.identifier = req.body.identifier;
-			unit.unitRepresent = req.body.unitRepresent;
-			unit.typeOfUnit = req.body.typeOfUnit;
-			unit.preferredDisplay = req.body.preferredDisplay;
-			unit.secInRate = req.body.secInRate;
-			unit.suffix = req.body.suffix;
-			unit.note = req.body.note;
-			unit.minVal = req.body.minVal;
-			unit.maxVal = req.body.maxVal;
-			unit.disableChecks = req.body.disableChecks;
+			for (const key of Object.keys(unit)) {
+				if (Object.hasOwn(req.body, key)) {
+					unit[key] = req.body[key]
+				}
+			}
+			// TODO Consider if this might be a better way.
+			// Object.assign(unit, req.body);
 			await unit.update(conn);
+			success(res, 'Successfully edited unit');
 		} catch (err) {
-			log.error('Failed to edit unit', err);
-            failure(res, 500, 'Unable to edit unit ' + err.toString());
+			log.error(`Failed to update unit: ${err}`, err);
+			failure(res, 500, 'Unable to update unit');
 		}
-		success(res, `Successfully edited unit`);
 	}
 });
 
 /**
- * Route for POST add unit.
+ * Route for creating a new unit.
  */
-router.post('/addUnit', async (req, res) => {
+router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
 		properties: {
-			// Removed id from properties list since it is set to undefined no matter what is passed.
+			// TODO Probably should not be passed
+			// id: { type: 'integer' },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			identifier: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitRepresentType)
 			},
-			secInRate: {
-				type: 'number'
-			},
+			secInRate: { type: 'number', minimum: 0 },
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_SHORT_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			displayable: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.displayableType)
 			},
-			preferredDisplay: {
-				type: 'bool'
-			},
+			preferredDisplay: { type: 'boolean' },
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
-			minVal: {
-				type: 'number'
-			},
-			maxVal: {
-				type: 'number'
-			},
+			minVal: { type: 'number' },
+			maxVal: { type: 'number' },
 			disableChecks: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
 	};
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
-        log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-        failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
+		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
+		failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -213,27 +220,25 @@ router.post('/addUnit', async (req, res) => {
 				);
 				await newUnit.insert(t);
 			});
-			success(res);
+			success(res, 'Unit created successfully');
 		} catch (err) {
-			log.error(`Error while inserting new unit ${err}`, err);
-            failure(res, 500, `Error while inserting new unit ${err}`);
+			log.error(`Error while inserting new unit: ${err}`, err);
+			failure(res, 500, `Error while inserting new unit: ${err}`);
 		}
 	}
 });
 
 /**
- * Route for POST, delete unit.
+ * Route for deleting a unit by ID.
  */
-router.post('/delete', async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => {
 	const validParams = {
 		type: 'object',
+		additionalProperties: false,
 		maxProperties: 1,
 		required: ['id'],
-		properties: {
-			id: { type: 'integer' }
-		}
+		properties: { id: { type: 'integer', minimum: 1 } }
 	};
-
 	// Ensure delete request is valid
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
@@ -242,16 +247,17 @@ router.post('/delete', async (req, res) => {
 		failure(res, 400, errorMsg);
 	} else {
 		const conn = getConnection();
+		const unitId = req.body.id;
 		try {
 			// Don't worry about checking if the unit already exists
 			// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
-			await Unit.delete(req.body.id, conn);
+			await Unit.delete(unitId, conn);
+			success(res, 'Successfully deleted unit');
 		} catch (err) {
-			const errorMsg = `Error while deleting conversion with error(s): ${err}`;
+			const errorMsg = `Error while deleting unit with error(s): ${err}`;
 			log.error(errorMsg);
 			failure(res, 500, errorMsg);
 		}
-		success(res, 'Successfully deleted conversion');
 	}
 });
 

@@ -22,27 +22,19 @@ function validateReadings(arrayToValidate, conditionSet, meterIdentifier = undef
 	/* tslint:enable:no-string-literal */
 	const errMsg = errMsgDate + errMsgValue;
 
-	let validReadings = validDates && validValues;
+	const validReadings = validDates && validValues;
 	// At the current time rejectedReadings does not seem to be used but leaving for now.
 	let rejectedReadings = [];
 
-	// Even when 'reject_none' is set, issues should still be logged
-	if (conditionSet['disableChecks'] === 'reject_none') {
-		// Note all readings considered valid. Might not be due to checks done above.
-		// Unclear why run checks if reject_none but leave it this way. Note error
-		// msgs still returned.
-		validReadings = true;
-	} else {
-		if (conditionSet['disableChecks'] === 'reject_bad') {
-			// Remove only invalid readings and return the rejected ones
-			rejectedReadings = [...rejectedDates, ...rejectedValues];
-			arrayToValidate = arrayToValidate.filter(reading => !rejectedReadings.includes(reading));
-		} else if (conditionSet['disableChecks'] === 'reject_all' && !validReadings) {
-			// Reject all readings if validation fails
-			rejectedReadings = [...arrayToValidate];
-			// Clear the array
-			arrayToValidate = arrayToValidate.slice(0, 0);
-		}
+	if (conditionSet['disableChecks'] === 'reject_bad') {
+		// Remove only invalid readings and return the rejected ones
+		rejectedReadings = [...rejectedDates, ...rejectedValues];
+		arrayToValidate = arrayToValidate.filter(reading => !rejectedReadings.includes(reading));
+	} else if (conditionSet['disableChecks'] === 'reject_all' && !validReadings) {
+		// Reject all readings if validation fails
+		rejectedReadings = [...arrayToValidate];
+		// Clear the array
+		arrayToValidate = arrayToValidate.slice(0, 0);
 	}
 
 	return {

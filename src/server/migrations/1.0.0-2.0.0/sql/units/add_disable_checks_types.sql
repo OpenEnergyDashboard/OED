@@ -4,7 +4,7 @@
 
 
 DO $$ BEGIN 
-	CREATE TYPE disable_checks_type AS ENUM('reject_bad', 'reject_all', 'reject_none');
+	CREATE TYPE disable_checks_type AS ENUM('reject_disable', 'reject_bad', 'reject_all', 'reject_none');
 EXCEPTION
 	WHEN duplicate_object THEN null;
 END $$;

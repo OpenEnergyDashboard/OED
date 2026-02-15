@@ -125,7 +125,8 @@ async function loadLogfileToReadings(serialNumber, ipAddress, logfile, conn) {
 				conn = conn,
 				honorDst = false,
 				relaxedParsing = false,
-				useMeterZone = false
+				useMeterZone = false,
+				warnOnCumulativeReset = false
 			);
 		} catch (err) {
 			log.error('Could not insert readings from Obvius logfile.', err);

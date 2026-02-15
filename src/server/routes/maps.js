@@ -7,15 +7,14 @@ const { Map } = require('../models/Map');
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const Point = require('../models/Point');
 const { isTokenAuthorized } = require('../util/userRoles');
 const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
 
 function formatMapForResponse(map) {
 	const formattedMap = {
@@ -34,7 +33,7 @@ function formatMapForResponse(map) {
 	return formattedMap;
 }
 
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
 		const conn = getConnection();
 		let query;
@@ -51,7 +50,7 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.get('/:map_id', async (req, res) => {
+router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -59,6 +58,7 @@ router.get('/:map_id', async (req, res) => {
 		properties: {
 			map_id: {
 				type: 'string',
+				maxLength: NUMERIC_ID_MAX_LENGTH,
 				pattern: '^\\d+$'
 			}
 		}
@@ -77,63 +77,77 @@ router.get('/:map_id', async (req, res) => {
 	}
 });
 
-router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
+router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
 		properties: {
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
 			filename: {
-				type: 'string'
+				type: 'string',
+				maxLength: 500
 			},
 			modifiedDate: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			mapSource: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
-			if: {
-				properties: {
-					origin: {
+			northAngle: {
+				type: 'number',
+				minimum: 0,
+				maximum: 360
+			},
+			circleSize: {
+				type: 'number',
+				minimum: 1,
+				maximum: 1000
+			},
+			origin: {
+				oneOf: [
+					{
 						type: 'object',
+						additionalProperties: false,
 						required: ['latitude', 'longitude'],
 						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+							latitude: { type: 'number', minimum: -90, maximum: 90 },
+							longitude: { type: 'number', minimum: -180, maximum: 180 }
 						}
-					}
-				}
+					},
+					{ type: 'null' }
+				]
 			},
-			then: {
-				properties: {
-					opposite: {
+			opposite: {
+				oneOf: [
+					{
 						type: 'object',
+						additionalProperties: false,
 						required: ['latitude', 'longitude'],
 						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+							latitude: { type: 'number', minimum: -90, maximum: 90 },
+							longitude: { type: 'number', minimum: -180, maximum: 180 }
 						}
-					}
-				}
-			},
-			else: {
-				properties: {
-					opposite: { type: 'null' }
-				}
+					},
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -176,67 +190,82 @@ router.post('/create', adminAuthenticator('create maps'), async (req, res) => {
 	}
 });
 
-router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
+router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 	const validMap = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
 		properties: {
 			id: {
 				type: 'integer',
-				minimum: 1
+				minimum: 1,
+				maximum: 2147483647
 			},
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
 			filename: {
-				type: 'string'
+				type: 'string',
+				maxLength: 500
 			},
 			modifiedDate: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			mapSource: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
-			if: {
-				properties: {
-					origin: {
+			northAngle: {
+				type: 'number',
+				minimum: 0,
+				maximum: 360
+			},
+			circleSize: {
+				type: 'number',
+				minimum: 1,
+				maximum: 1000
+			},
+			origin: {
+				oneOf: [
+					{
 						type: 'object',
+						additionalProperties: false,
 						required: ['latitude', 'longitude'],
 						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+							latitude: { type: 'number', minimum: -90, maximum: 90 },
+							longitude: { type: 'number', minimum: -180, maximum: 180 }
 						}
-					}
-				}
+					},
+					{ type: 'null' }
+				]
 			},
-			then: {
-				properties: {
-					opposite: {
+			opposite: {
+				oneOf: [
+					{
 						type: 'object',
+						additionalProperties: false,
 						required: ['latitude', 'longitude'],
 						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
+							latitude: { type: 'number', minimum: -90, maximum: 90 },
+							longitude: { type: 'number', minimum: -180, maximum: 180 }
 						}
-					}
-				}
-			},
-			else: {
-				properties: {
-					opposite: { type: 'null' }
-				}
+					},
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -279,13 +308,17 @@ router.post('/edit', adminAuthenticator('edit maps'), async (req, res) => {
 	}
 });
 
-router.post('/delete', adminAuthenticator('delete maps'), async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete maps'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
 		required: ['id'],
 		properties: {
-			id: { type: 'integer' }
+			id: {
+				type: 'integer',
+				minimum: 1,
+				maximum: 2147483647
+			}
 		}
 	};
 	if (!validate(req.body, validParams).valid) {

@@ -9,14 +9,13 @@ const validate = require('jsonschema').validate;
 const Unit = require('../models/Unit');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
-const adminAuthenticator = require('./authenticator').adminAuthMiddleware;
-const optionalAuthenticator = require('./authenticator').optionalAuthMiddleware;
+const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { log } = require('../log');
 const Point = require('../models/Point');
 const { failure, success } = require('./response');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
-router.use(optionalAuthenticator);
 
 /**
  * Given a meter or group, return id, name, displayable, gps, note, area.
@@ -49,7 +48,7 @@ function formatToOnlyNameID(item) {
 /**
  * GET info of all groups
  */
-router.get('/', async (req, res) => {
+router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
@@ -66,7 +65,10 @@ router.get('/', async (req, res) => {
 	}
 });
 
-router.get('/idname', async (req, res) => {
+// TODO It is unclear if all these routes can be used by non-admins.
+// This should be checked an updated as needed.
+
+router.get('/idname', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
@@ -83,7 +85,7 @@ router.get('/idname', async (req, res) => {
  * @param int group_id
  * @returns {[int], [int]}  child meter IDs and child group IDs
  */
-router.get('/children/:group_id', async (req, res) => {
+router.get('/children/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const [meters, groups, deepMeters] = await Promise.all([
@@ -103,7 +105,7 @@ router.get('/children/:group_id', async (req, res) => {
  * only the IDs of the children.
  * @return {[int, [int], [int]]}  array where each entry has the group id, array of child meter IDs and array of child group IDs
  */
-router.get('/allChildren/', async (req, res) => {
+router.get('/allChildren/', optionalAuthMiddleware, async (req, res) => {
 	// There are not parameters so nothing to verify.
 	const conn = getConnection();
 	try {
@@ -114,15 +116,16 @@ router.get('/allChildren/', async (req, res) => {
 	}
 });
 
-router.get('/deep/groups/:group_id', async (req, res) => {
+router.get('/deep/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['group_id'],
 		properties: {
 			group_id: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -142,15 +145,16 @@ router.get('/deep/groups/:group_id', async (req, res) => {
 	}
 });
 
-router.get('/deep/meters/:group_id', async (req, res) => {
+router.get('/deep/meters/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['group_id'],
 		properties: {
 			group_id: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -170,15 +174,16 @@ router.get('/deep/meters/:group_id', async (req, res) => {
 	}
 });
 
-router.get('/parents/:group_id', async (req, res) => {
+router.get('/parents/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['group_id'],
 		properties: {
 			group_id: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -198,19 +203,20 @@ router.get('/parents/:group_id', async (req, res) => {
 	}
 });
 
-router.post('/create', adminAuthenticator('create groups'), async (req, res) => {
+router.post('/create', adminAuthMiddleware('create groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 10,
+		additionalProperties: false,
 		required: ['name', 'childGroups', 'childMeters'],
 		properties: {
-			id: { type: 'integer' },
+			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			gps: {
 				oneOf: [
@@ -227,7 +233,7 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
@@ -235,21 +241,26 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
+				maxItems: 1000,
 				items: {
-					type: 'integer'
+					type: 'integer',
+					minimum: 1
 				}
 			},
 			childMeters: {
 				type: 'array',
 				uniqueItems: true,
+				maxItems: 1000,
 				items: {
-					type: 'integer'
+					type: 'integer',
+					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer' },
+			defaultGraphicUnit: { type: 'integer', minimum: 1 },
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: 50,
 				enum: Object.values(Unit.areaUnitType)
 			}
 		}
@@ -292,19 +303,20 @@ router.post('/create', adminAuthenticator('create groups'), async (req, res) => 
 	}
 });
 
-router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
+router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 	const validGroup = {
 		type: 'object',
-		maxProperties: 10,
+		additionalProperties: false,
 		required: ['id', 'name', 'childGroups', 'childMeters'],
 		properties: {
-			id: { type: 'integer' },
+			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: SHORT_STRING_MAX_LENGTH
 			},
 			displayable: {
-				type: 'bool'
+				type: 'boolean'
 			},
 			gps: {
 				oneOf: [
@@ -321,7 +333,7 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 			},
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
@@ -329,21 +341,26 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 			childGroups: {
 				type: 'array',
 				uniqueItems: true,
+				maxItems: 1000,
 				items: {
-					type: 'integer'
+					type: 'integer',
+					minimum: 1
 				}
 			},
 			childMeters: {
 				type: 'array',
 				uniqueItems: true,
+				maxItems: 1000,
 				items: {
-					type: 'integer'
+					type: 'integer',
+					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer' },
+			defaultGraphicUnit: { type: 'integer', minimum: 1 },
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: 50,
 				enum: Object.values(Unit.areaUnitType)
 			}
 		}
@@ -402,13 +419,13 @@ router.put('/edit', adminAuthenticator('edit groups'), async (req, res) => {
 	}
 });
 
-router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => {
+router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['id'],
 		properties: {
-			id: { type: 'integer' }
+			id: { type: 'integer', minimum: 1 }
 		}
 	};
 
@@ -429,4 +446,3 @@ router.post('/delete', adminAuthenticator('delete groups'), async (req, res) => 
 });
 
 module.exports = router;
-
