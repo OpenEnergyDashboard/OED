@@ -71,6 +71,24 @@ async function uploadMeters(req, res, filepath, conn) {
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 			}
+			
+			// verify the Gap input
+			const gapInput = meter[14];
+			if (gapInput) {
+				if (!validateGap(gapInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${gapInput} is invalid. Gap must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// verify the Variation input
+			const variationInput = meter[15];
+			if (variationInput) {
+				if (!validateVariation(variationInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${variationInput} is invalid. Gap must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
 
 			const timeSortValue = meter[17];
 			if (timeSortValue) {
