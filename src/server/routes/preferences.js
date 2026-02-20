@@ -63,6 +63,9 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 				defaultAreaNormalization: {
 					type: 'boolean'
 				},
+				defaultTemperatureUnit: {
+					type: 'string'
+				},
 				defaultMeterReadingFrequency: {
 					type: 'string'
 				},
@@ -82,7 +85,7 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 					type: 'string'
 				},
 				defaultWeatherLocation: {
-					type: 'string'
+					type: 'integer'
 				}
 			}
 		}

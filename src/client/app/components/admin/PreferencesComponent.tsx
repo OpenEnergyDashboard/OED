@@ -22,6 +22,9 @@ import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
 import { TemperatureUnitType } from '../../utils/getTemperatureUnitConversion';
+import { weatherLocationApi, selectAllWeatherLocations } from '../../redux/api/weatherLocationApi';
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
 
 /**
  * @returns Preferences Component for Administrative use
@@ -39,7 +42,7 @@ export default function PreferencesComponent() {
 	// Compare the API response against the localState to determine changes
 	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
-	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
+	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem] | null) => {
 		setLocalAdminPref({ ...localAdminPref, [key]: value });
 	};
 
@@ -81,6 +84,13 @@ export default function PreferencesComponent() {
 				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
 		}
 	};
+
+	weatherLocationApi.useGetWeatherLocationDetailsQuery();
+	const weatherLocations = useSelector(selectAllWeatherLocations);
+	const weatherLocationOptions = [
+		{ value: null, label: translate('weather.location.no') },
+		...weatherLocations.map(loc => ({ value: String(loc.id), label: loc.identifier }))
+	];
 
 	return (
 		<div className='d-flex flex-column '>
@@ -395,10 +405,12 @@ export default function PreferencesComponent() {
 				<p className='mt-2' style={titleStyle}>
 					<FormattedMessage id='default.weather.location' />:
 				</p>
-				<Input
-					type='text'
-					value={localAdminPref.defaultWeatherLocation}
-					onChange={e => makeLocalChanges('defaultWeatherLocation', e.target.value)}
+				<Select
+					menuPlacement='bottom'
+					menuShouldScrollIntoView={true}
+					value={weatherLocationOptions.find(opt => opt.value === String(localAdminPref.defaultWeatherLocation)) ?? weatherLocationOptions[0]}
+					onChange={selected => makeLocalChanges('defaultWeatherLocation', selected?.value ?? null)}
+					options={weatherLocationOptions}
 				/>
 			</div>
 			<div className='d-flex justify-content-end mt-3'>
