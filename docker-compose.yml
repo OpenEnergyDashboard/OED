@@ -14,8 +14,11 @@ services:
             # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
             # The postgres database will only pull from this value on the first
-            # startup of OED. If a change is desired after this, one must manually
-            # do so via SQL.
+            # startup of OED. If a change is desired after this, one must 
+            # run the following command in the docker web terminal:
+            # "npm run changePostgresPassword -- postgrespassword oedpassword"
+            # Replace "postgrespassword" with your desired postgres user password
+            # and "oedpassword" with your desired oed user password.
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-pleaseChange}
         volumes:
             - ./postgres-data:/var/lib/postgresql/data/pgdata
