@@ -33,13 +33,23 @@ const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
 
+// Detect test environment and use higher rate limits during tests.
+// Rate limiting is critical for security in production but interferes with automated testing.
+// Using a separate test rate limiter (100x production limits) ensures the middleware is still
+// exercised during tests while preventing test failures from rate limiting.
+// 100x is certainly big enough to avoid issues and the exact value should not be important as
+// the goal is to avoid hitting rate limiting in testing.
+// Note that NODE_ENV of test should only be set for the testing environment and is done in
+// package.json in the script section for the test ones.
+const isTestEnvironment = process.env.NODE_ENV === 'test';
+const testMultiplier = isTestEnvironment ? 100 : 1;
+
 // Limit the rate of overall requests to OED
-// Note that the rate limit may make the automatic test return the value of 429. In that case, the limiters below need to be increased.
 // TODO Verify that user see the message returned, see https://express-rate-limit.mintlify.app/reference/configuration#message
-// Create a limit of 200 requests/5 seconds
+// Create a limit of 200 requests/5 seconds (20000 in test environment)
 const generalLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
-	limit: 200, // 200 requests
+	limit: 200 * testMultiplier, // 200 requests in production, 20000 in test
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 	// If rate limit is 10, OED won't load and bad things will happen
@@ -49,27 +59,27 @@ const generalLimiter = rateLimit({
 				You have been rate limited by your OED site.
 			</h1>
 			<h2 style ='text-align:center'>
-				We suggest you try these in this order: 
+				We suggest you try these in this order:
 			</h2>
-			<h2 
+			<h2
 				style='text-align:center'>
 			</h2>
-			<div> 
-				<ol style = "text-align: center; list-style-position: inside;"> 
+			<div>
+				<ol style = "text-align: center; list-style-position: inside;">
 					<li>
 						Click the 'Refresh this page' button below to try again.
 					</li>
-					<li> 
+					<li>
 						If you keep returning to this page wait longer and click 'Refresh this page' button.
-					</li> 
+					</li>
 					<li>
 						Contact your site to find why the rate limit is denying access to the OED site.
-					</li> 
-				</ol>  
+					</li>
+				</ol>
 			</div>
 			<h3 style='text-align:center'>
-				<button onClick='window.location.reload();'> 
-					Refresh this page 
+				<button onClick='window.location.reload();'>
+					Refresh this page
 				</button>
 			</h3>
 		`
@@ -90,16 +100,16 @@ const threeDLimiter = rateLimit({
 	could be high. This is now resolved so it is around the same time as line graphics.
 	It is unclear a lower limit is actually needed but done to be safe. */
 	windowMs: 5 * 1000, // 5 seconds
-	limit: 33,
+	limit: 33 * testMultiplier, // 33 requests in production, 3300 in test
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
 app.use('/api/unitReadings/threeD/meters', threeDLimiter);
 
-// Limit the number of raw exports to 5 per 5 seconds
+// Limit the number of raw exports to 5 per 5 seconds (500 in test environment)
 const exportRawLimiter = rateLimit({
 	windowMs: 5 * 1000, // 5 seconds
-	limit: 5, // 5 requests
+	limit: 5 * testMultiplier, // 5 requests in production, 500 in test
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false // Disable the `X-RateLimit-*` headers
 });
