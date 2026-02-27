@@ -8,6 +8,7 @@ const { log } = require('../log');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
 
@@ -105,4 +106,3 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 });
 
 module.exports = router;
-

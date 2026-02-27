@@ -12,7 +12,6 @@ const bcrypt = require('bcryptjs');
 const { insertUnits } = require('../../util/insertData');
 const Unit = require('../../models/Unit');
 const Meter = require('../../models/Meter.js');
-const { Console } = require('console');
 
 //expected names and ids for obvius meters.
 const expMeterNames = [

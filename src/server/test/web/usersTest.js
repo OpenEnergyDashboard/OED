@@ -42,7 +42,7 @@ mocha.describe('Users API', () => {
 			// Note later testing found the issue was somewhere else but leaving this to be sure
 			// and to remind me about this since it took up too much of my life.
 			const conn = testDB.getConnection();
-			const user = { username: 'a@ex.com', password: 'abc', role: User.role.CSV, note: 'test note' };
+			const user = { username: 'a@ex.com', password: 'abcdefgh', role: User.role.CSV, note: 'test note' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(200);
 			const dbUser = await User.getByUsername(user.username, conn);
@@ -50,7 +50,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('rejects invalid user creation', async () => {
 			const conn = testDB.getConnection();
-			const user = { username: 'a@ex.com', password: 'abc' };
+			const user = { username: 'a@ex.com', password: 'abcdefg' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
 			expect(res).to.have.status(400);
 			const users = await User.getAll(conn);
