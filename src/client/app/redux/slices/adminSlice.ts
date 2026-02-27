@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import * as moment from 'moment';
 import { createAppSelector } from '../../redux/selectors/selectors';
 import { PreferenceRequestItem } from '../../types/items';
@@ -41,97 +41,7 @@ export const defaultAdminState: AdminState = {
 export const adminSlice = createSlice({
 	name: 'admin',
 	initialState: defaultAdminState,
-	reducers: {
-		updateDisplayTitle: (state, action: PayloadAction<string>) => {
-			state.displayTitle = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultChartToRender: (state, action: PayloadAction<ChartTypes>) => {
-			state.defaultChartToRender = action.payload;
-			state.submitted = false;
-		},
-		toggleDefaultBarStacking: state => {
-			state.defaultBarStacking = !state.defaultBarStacking;
-			state.submitted = false;
-		},
-		toggleDefaultAreaNormalization: state => {
-			state.defaultAreaNormalization = !state.defaultAreaNormalization;
-			state.submitted = false;
-		},
-		updateDefaultAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
-			state.defaultAreaUnit = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultTemperatureUnit: (state, action: PayloadAction<TemperatureUnitType>) => {
-			state.defaultTemperatureUnit = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultTimezone: (state, action: PayloadAction<string>) => {
-			state.defaultTimezone = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultLanguage: (state, action: PayloadAction<LanguageTypes>) => {
-			state.defaultLanguage = action.payload;
-			state.submitted = false;
-		},
-		requestPreferences: state => {
-			state.isFetching = true;
-		},
-		receivePreferences: (state, action: PayloadAction<PreferenceRequestItem>) => {
-			state = {
-				...state,
-				isFetching: false,
-				...action.payload,
-				defaultMeterReadingFrequency: durationFormat(action.payload.defaultMeterReadingFrequency)
-			};
-		},
-		markPreferencesNotSubmitted: state => {
-			state.submitted = false;
-		},
-		markPreferencesSubmitted: (state, action: PayloadAction<string>) => {
-			state.defaultMeterReadingFrequency = durationFormat(action.payload);
-			state.submitted = true;
-		},
-		updateDefaultWarningFileSize: (state, action: PayloadAction<number>) => {
-			state.defaultWarningFileSize = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultFileSizeLimit: (state, action: PayloadAction<number>) => {
-			state.defaultFileSizeLimit = action.payload;
-			state.submitted = false;
-		},
-		toggleWaitForCikAndDB: state => {
-			state.isUpdatingCikAndDBViews = !state.isUpdatingCikAndDBViews;
-		},
-		updateDefaultMeterReadingFrequency: (state, action: PayloadAction<string>) => {
-			state.defaultMeterReadingFrequency = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterMinimumDate: (state, action: PayloadAction<string>) => {
-			state.defaultMeterMinimumDate = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterMaximumDate: (state, action: PayloadAction<string>) => {
-			state.defaultMeterMaximumDate = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterReadingGap: (state, action: PayloadAction<number>) => {
-			state.defaultMeterReadingGap = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultMeterMaximumErrors: (state, action: PayloadAction<number>) => {
-			state.defaultMeterMaximumErrors = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultHelpUrl: (state, action: PayloadAction<string>) => {
-			state.defaultHelpUrl = action.payload;
-			state.submitted = false;
-		},
-		updateDefaultWeatherLocation: (state, action: PayloadAction<string>) => {
-			state.defaultWeatherLocation = action.payload;
-			state.submitted = false;
-		}
-	},
+	reducers: {},
 	extraReducers: builder => {
 		builder.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, (state, action) => ({
 			...state,
@@ -147,27 +57,10 @@ export const adminSlice = createSlice({
 });
 
 export const {
-	updateDisplayTitle,
-	updateDefaultChartToRender,
-	updateDefaultLanguage,
-	updateDefaultTimezone,
-	updateDefaultWarningFileSize,
-	updateDefaultFileSizeLimit,
-	updateDefaultAreaUnit,
-	updateDefaultTemperatureUnit,
-	updateDefaultMeterReadingFrequency,
-	updateDefaultMeterMinimumDate,
-	updateDefaultMeterMaximumDate,
-	updateDefaultMeterReadingGap,
-	updateDefaultMeterMaximumErrors
-} = adminSlice.actions;
-
-export const {
 	selectAdminState,
 	selectDisplayTitle,
 	selectBaseHelpUrl
 } = adminSlice.selectors;
-
 
 export const selectAdminPreferences = createAppSelector(
 	[selectAdminState],
