@@ -434,4 +434,43 @@ mocha.describe('Meters', () => {
 			expectMetersToBeEquivalent(expectedMeters[i], actualMeters[i]);
 		}
 	});
+
+	mocha.it('can get meter by identifier', async () => {
+			const conn = testDB.getConnection();
+			const meterA = new Meter(undefined, 'MeterA', null, true, true, Meter.type.MAMAC, null, gps, 
+				'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				Unit.areaUnitType.METERS, undefined);
+			await meterA.insert(conn);
+
+			const identifierMeter = await Meter.getByIdentifier('MeterA', conn);
+			expectMetersToBeEquivalent(meterA, identifierMeter);
+	});
+
+	mocha.it('can get all meters', async () => {
+			const conn = testDB.getConnection();
+			const meterA = new Meter(undefined, 'MeterA', null, true, true, Meter.type.MAMAC, null, gps, 
+				'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				Unit.areaUnitType.METERS, undefined);
+			const meterB = new Meter(undefined, 'MeterB', null, true, true, Meter.type.MAMAC, null, gps, 
+				'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				Unit.areaUnitType.METERS, undefined);
+			const meterC= new Meter(undefined, 'MeterC', null, true, true, Meter.type.MAMAC, null, gps, 
+				'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				Unit.areaUnitType.METERS, undefined);
+
+			await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+			const allExpectedMeters = await Meter.getAll(conn);
+			const allActualMeters = [meterA, meterB, meterC];
+			allExpectedMeters.sort((a,b) => a.id - b.id);
+			allActualMeters.sort((a,b) => a.id - b.id);
+
+			expect(allExpectedMeters.length).to.be.equal(allActualMeters.length);
+			for (let i = 0; i < allExpectedMeters.length; ++i) {
+				expectMetersToBeEquivalent(allExpectedMeters[i], allActualMeters[i]);
+			}
+	});
 });
