@@ -48,7 +48,7 @@ class WeatherData {
 	  */
 	// TODO: needs model and db get_weather_data
 	static async getWeatherData(conn) {
-		const rows = await conn.one(sqlFile('weather_data/get_weather_data_by_id_and_start_time.sql'));
+		const rows = await conn.one(sqlFile('weather_data/get_weather_data_by_id_and_date_range.sql'));
 		return rows.map(WeatherData.mapRow);
 	}
 

@@ -62,7 +62,6 @@ function validateWeatherLocationParams(params) {
 							longitude: { type: 'number', minimum: '-180', maximum: '180' }
 						}
 					},
-					{ type: 'null' }
 				]
 			},
 			note: {
@@ -98,8 +97,7 @@ async function addWeatherDataForLocation(location, conn) {
 
 	// this only gets the data for the current day(?)
 	// earliestDate = earliestDate.format('YYYY-MM-DD');
-	// const latestDate = moment().format('YYYY-MM-DD');
-	earliestDate = '2025-12-11'; // test date
+	earliestDate = '2026-03-09'; // test date
 	const latestDate = moment().format('YYYY-MM-DD');
 
 	// Fetch weather data for this location's coordinates

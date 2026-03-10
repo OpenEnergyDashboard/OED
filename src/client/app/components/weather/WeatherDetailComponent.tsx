@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { selectAllWeatherLocations } from '../../redux/api/weatherLocationApi';
+import { weatherLocationApi, selectAllWeatherLocations } from '../../redux/api/weatherLocationApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateWeatherModalComponent from './CreateWeatherModalComponent';
@@ -16,7 +16,8 @@ import WeatherViewComponent from './WeatherViewComponent';
  * @returns Weather page element
  */
 export default function WeatherDetailComponent() {
-	const weatherData = useAppSelector(selectAllWeatherLocations);
+	weatherLocationApi.useGetWeatherLocationDetailsQuery();
+	const weatherLocations = useAppSelector(selectAllWeatherLocations);
 	return (
 		<div className='flexGrowOne'>
 			<div>
@@ -36,10 +37,10 @@ export default function WeatherDetailComponent() {
 					<div className="card-container">
 						{/* Create a WeatherViewComponent for each WeatherLocationData in Weather State after sorting by identifier */}
 						{
-							weatherData.map(weatherData => (
+							weatherLocations.map(location => (
 								<WeatherViewComponent
-									key={weatherData.id}
-									weather={weatherData}
+									key={location.id}
+									weather={location}
 								/>
 							))}
 					</div>
