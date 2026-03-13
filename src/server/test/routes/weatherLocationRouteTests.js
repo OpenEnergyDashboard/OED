@@ -5,11 +5,21 @@
  */
 
 const { expect } = require('chai');
-const { chai, mocha, app } = require('../common');
+const { chai, mocha, app, testUser } = require('../common');
 
 mocha.describe('Weather Location Routes', () => {
+	let token;
+
+	mocha.before(async () => {
+		const res = await chai.request(app).post('/api/login')
+			.send({ username: testUser.username, password: testUser.password });
+		token = res.body.token;
+	});
+
 	mocha.it('GET all weather locations', async () => {
 		const res = await chai.request(app)
+			.get('/api/weatherLocation')
+			.set('token', token);
 		// Check for successful response
 		expect(res.status).to.equal(200);
 		expect(res.body).to.be.an('array');
@@ -18,13 +28,16 @@ mocha.describe('Weather Location Routes', () => {
 	mocha.it('POST for adding a weather location', async () => {
 		const newWeatherLocation = {
 			identifier: 'Test Location',
-			longitude: -121.798942,
-			latitude: 36.653562,
+			gps: {
+				longitude: -121.798942,
+				latitude: 36.653562
+			},
 			note: 'test note'
 		};
 		// Check for successful response
 		const res = await chai.request(app)
 			.post('/api/weatherLocation/addWeatherLocation')
+			.set('token', token)
 			.send(newWeatherLocation);
 		expect(res.status).to.equal(200);
 	});
@@ -36,6 +49,7 @@ mocha.describe('Weather Location Routes', () => {
 		// Check for successful response
 		const res = await chai.request(app)
 			.post('/api/weatherLocation/delete')
+			.set('token', token)
 			.send(locationId);
 		expect(res.status).to.equal(200);
 	});
