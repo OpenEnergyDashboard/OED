@@ -91,9 +91,94 @@ mocha.describe('readings API', () => {
                         // Check result matches expected csv file
                         expectRangeToEqualExpected(res, expected);
                     });
+                    mocha.it('LR14: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as F with intercept', async () => {
+                        const unitData = [
+                            {
+                                // u6, used for conversion instead of display
+                                name: 'C',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.NONE,
+                                preferredDisplay: false,
+                                note: 'Celsius'
+                            },
+                            {
+                                // u7, raw units stored in meter
+                                name: 'Degrees',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.METER,
+                                suffix: '',
+                                displayable: Unit.displayableType.NONE,
+                                preferredDisplay: false,
+                                note: 'special unit'
+                            },
+                            {
+                                // u8, display unit for graph
+                                name: 'F',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.ALL,
+                                preferredDisplay: false,
+                                note: 'OED created standard unit unit'
+                            }
 
-                    // Add LR14 here
+                        ];
+                        const conversionData = [
+                            {
+                                // c5
+                                sourceName: 'Degrees',
+                                destinationName: 'C',
+                                bidirectional: false,
+                                slope: 1,
+                                intercept: 0,
+                                note: 'Degrees → C'
+                            },
+                            {
+                                // c7
+                                sourceName: 'C',
+                                destinationName: 'F',
+                                bidirectional: true,
+                                slope: 1.8,
+                                intercept: 32,
+                                note: 'Celsius → Fahrenheit'
+                            }
+                        ];
 
+                        //const variable for meter metadata here
+                        const meterDataDegrees = [
+                            {
+                                name: 'Temp Fahrenheit Meter',
+                                unit: 'Degrees',
+                                defaultGraphicUnit: 'F',
+                                displayable: true,
+                                gps: undefined,
+                                note: 'special meter for raw temp data',
+                                file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                                deleteFile: false,
+                                readingFrequency: '15 minutes',
+                                id: METER_ID
+                            }
+                        ];
+                        //fill emptied database with test units/data defined above using prepareTest()
+                        await prepareTest(unitData, conversionData, meterDataDegrees);
+                        //Get the graphic unit ID for 'F'
+                        const graphicUnitIdF = await getUnitId('F');
+                        //load expected readings into variable using parseExpectedCsv()
+                        const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_C_gu_F_st_-inf_et_inf.csv');
+                        //api call to get line chart readings from meter using METER_ID, convert to graphic unit defined above, then store in variable
+                        const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                            .query({ timeInterval: ETERNITY.toString(), graphicUnitId: graphicUnitIdF });
+                        //check if response from api call matches values in expected readings csv using expectRangeToEqualExpected()
+                        expectRangeToEqualExpected(res, expected);
+                    });
                     // Add LR15 here
 
                     // Add LR16 here

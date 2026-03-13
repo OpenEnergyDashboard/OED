@@ -11,6 +11,8 @@ const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
+const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH }
+	= require('../util/validationConstants');
 
 /**
  * Middleware function to force a route to require authentication
@@ -20,7 +22,8 @@ const escapeHtml = require('escape-html');
 authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
-		type: 'string'
+		type: 'string',
+		maxLength: TOKEN_MAX_LENGTH
 	};
 	if (!validate(token, validParams).valid) {
 		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
@@ -31,7 +34,8 @@ authMiddleware = (req, res, next) => {
 			} else {
 				try {
 					const conn = getConnection();
-					await User.getByID(decoded.data, conn); // checks if user exists in the database in case it was deleted
+					// checks if user exists in the database in case it was deleted
+					await User.getByID(decoded.data, conn);
 					req.decoded = decoded;
 					next();
 				} catch (error) {
@@ -51,16 +55,20 @@ authMiddleware = (req, res, next) => {
 function credentialsRequestValidationMiddleware(req, res, next) {
 	const validParams = {
 		type: 'object',
+		// Don't use ``additionalProperties: false,`` since there are more parameters for some modes and this
+		// is used across all those routes.
+		// The route replaces historical email with username so don't need a oneOf to test for one as required.
 		required: ['username', 'password'],
 		properties: {
 			username: {
 				type: 'string',
-				minLength: 3,
-				maxLength: 254
+				minLength: USERNAME_MIN_LENGTH,
+				maxLength: USERNAME_MAX_LENGTH
 			},
 			password: {
 				type: 'string',
-				minLength: 8
+				minLength: PASSWORD_MIN_LENGTH,
+				maxLength: PASSWORD_MAX_LENGTH
 			}
 		}
 	};
@@ -184,7 +192,8 @@ optionalAuthMiddleware = (req, res, next) => {
 
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
-		type: 'string'
+		type: 'string',
+		maxLength: TOKEN_MAX_LENGTH
 	};
 
 	// If there is no token, there can be no valid token.

@@ -12,6 +12,7 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
+const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -22,7 +23,8 @@ function validateMeterLineReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -37,12 +39,14 @@ function validateLineReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -86,10 +90,11 @@ function validateGroupLineReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_ids'],
 		properties: {
-			meter_ids: {
+			group_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -119,7 +124,8 @@ function validateMeterBarReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -134,16 +140,19 @@ function validateBarReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'barWidthDays', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			barWidthDays: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -180,10 +189,11 @@ function validateGroupBarReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_ids'],
 		properties: {
-			meter_ids: {
+			group_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -214,7 +224,9 @@ function validateMeterRadarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				pattern: '^\\d+(?:,\\d+)*$'
+				,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -229,11 +241,13 @@ function validateRadarReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -270,7 +284,8 @@ function validateGroupRadarReadingsParams(params) {
 		properties: {
 			group_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -328,7 +343,8 @@ function validateMeterThreeDReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -342,10 +358,11 @@ function validateGroupThreeDReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_id'],
 		properties: {
-			meter_ids: {
+			group_id: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -361,14 +378,17 @@ function validateThreeDQueryParams(queryParams) {
 		properties: {
 			timeInterval: {
 				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
-			graphicUnitID: {
+			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			},
 			readingInterval: {
 				type: 'string',
+				maxLength: NUMERIC_ID_MAX_LENGTH,
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
 				// Matches divisors of 24: 1, 2, 3, 4, 6, 8 or 12 but not 24
 				pattern: '^([123468]|[1][2])$'

@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const { STRING_GENERAL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
 
@@ -31,7 +32,8 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 router.get('/token', optionalAuthMiddleware, async (req, res) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
-		type: 'string'
+		type: 'string',
+		maxLength: TOKEN_MAX_LENGTH
 	};
 	if (!validate(token, validParams).valid) {
 		res.status(403).json({ message: 'No token provided or JSON was invalid.' });
@@ -62,12 +64,13 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
-		maxProperties: 1,
+		additionalProperties: false,
 		required: ['user_id'],
 		properties: {
 			user_id: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -89,20 +92,26 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	const validParams = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['username', 'password', 'role', 'note'],
 		properties: {
 			username: {
-				type: 'string'
+				type: 'string',
+				minLength: USERNAME_MIN_LENGTH,
+				maxLength: USERNAME_MAX_LENGTH
 			},
 			password: {
-				type: 'string'
+				type: 'string',
+				minLength: PASSWORD_MIN_LENGTH,
+				maxLength: PASSWORD_MAX_LENGTH
 			},
 			role: {
 				type: 'string',
 				enum: Object.values(User.role)
 			},
 			note: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -131,35 +140,39 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 
 // Route for updating an existing user.
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
-	
+
 	const validParams = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['user'],
 		properties: {
 			user: {
 				type: 'object',
+				additionalProperties: false,
 				required: ['id', 'username', 'role', 'note'],
 				properties: {
 					id: {
-						type: 'integer'
+						type: 'integer',
+						minimum: 1
 					},
 					username: {
 						type: 'string',
-						minLength: 3,
-						maxLength: 254
-							},
+						minLength: USERNAME_MIN_LENGTH,
+						maxLength: USERNAME_MAX_LENGTH
+					},
 					role: {
 						type: 'string',
 						enum: Object.values(User.role)
 					},
 					password: {
 						type: 'string',
-						// TODO Do not have minLength: 8 because this is optional. Nice if could check if present.
-						maxLength: 128
-		
+						// TODO: Optional field - if present, should be 8-1000 chars
+						minLength: PASSWORD_MIN_LENGTH,
+						maxLength: PASSWORD_MAX_LENGTH
 					},
 					note: {
-						type: 'string'
+						type: 'string',
+						maxLength: STRING_GENERAL_MAX_LENGTH
 					}
 				}
 			}
@@ -172,8 +185,8 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 		try {
 			const conn = getConnection();
 			const { user } = req.body;
-			const userBeforeChanges = await User.getByID(user.id,conn);
-			
+			const userBeforeChanges = await User.getByID(user.id, conn);
+
 			// This protects the database so that there will always be at least one admin
 			if (userBeforeChanges.role === 'admin' && user.role !== 'admin') {
 				const numberOfAdmins = await User.getNumberOfAdmins(conn);
@@ -193,8 +206,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			userUpdates.push(
 				User.updateUser(user.id, user.username, user.role, user.note, conn)
 			);
-			
-			
+
 			// update the user's password if needed
 			if (user.password) {
 				const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -207,7 +219,6 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			return res.sendStatus(200);
 
 		} catch (error) {
-			
 			log.error('Error while performing edit user request.', error);
 			res.status(500).json({
 				message: 'Error while performing edit user request.',
@@ -221,10 +232,13 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
 	const validParams = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['username'],
 		properties: {
 			username: {
-				type: 'string'
+				type: 'string',
+				minLength: 5,
+				maxLength: 254
 			}
 		}
 	};

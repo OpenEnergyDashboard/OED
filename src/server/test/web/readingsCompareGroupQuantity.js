@@ -157,8 +157,47 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 
-				// Add CG9 here
-
+				mocha.it('CG9: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as MJ reverse conversion', async () => {
+					// Define unit u3 for MJ (megajoules)
+					const u3 = {
+						name: 'MJ',
+						identifier: 'megaJoules',
+						unitRepresent: Unit.unitRepresentType.QUANTITY,
+						secInRate: 3600,
+						typeOfUnit: Unit.unitType.UNIT, suffix: '',
+						displayable: Unit.displayableType.ALL,
+						preferredDisplay: false,
+						note: 'MJ'
+					}
+					// Define conversion c6 for kWh to MJ
+					const c6 = {
+						sourceName: 'MJ',
+						destinationName: 'kWh',
+						bidirectional: true,
+						slope: 1 / 3.6,
+						intercept: 0,
+						note: 'MJ → kWh'
+					}
+					await prepareTest(
+						unitDatakWh.concat(u3), // Use units [u1, u2] + u3
+						conversionDatakWh.concat(c6), // Use conversion [c1] + c6
+						meterDatakWhGroups,
+						groupDatakWh
+					);
+					// Get the unit ID since the DB could use any value.
+					const unitId = await getUnitId('MJ');
+					const expected = [20398.8705799196, 21140.7089140044];
+					// for comparison, need the unitID, currentStart, currentEnd, shift
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				});
+				
 				// Add CG10 here
 
 				// Add CG11 here

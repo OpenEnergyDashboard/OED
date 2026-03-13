@@ -28,8 +28,15 @@ const obvius = require('../util').obvius;
 const { obviusUsernameAndPasswordAuthMiddleware } = require('./authenticator');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
+const { PASSWORD_MAX_LENGTH } = require('../util/validationConstants');
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+	storage: multer.memoryStorage(),
+	limits: {
+		fileSize: 50 * 1024 * 1024, // 50MB limit
+		files: 10 // Max 10 files
+	}
+});
 const router = express.Router();
 
 // Here, the use of upload.array() allows the lowercaseParams middleware to
@@ -116,18 +123,31 @@ function verifyObviusUser(req, res, next) {
 	const password = req.param('password');
 	// TODO This is allowing for backwards compatibility if previous obvius meters are using the'email' parameter
 	// instead of the 'username' parameter to login. Developers need to decide in the future if we should deprecate
-	// email or continue to allow this backwards compatibility
-	const username = req.param('username') || req.param('email');
+	// email or continue to allow this backwards compatibility.
+	let username;
+	if (req.param('email')) {
+		username = req.param('email');
+		// Treat request as if it had username instead of email
+		req.body.username = username;
+		delete req.body['email'];
+	} else {
+		username = req.param('username');
+	}
 
+	// The test for password and username existence is redone later with JSONSchema but left since error
+	// message is different for historical reasons.
 	if (!password) {
 		failure(req, res, 'password parameter is required.');
-		return;
 	} else if (!username) {
 		failure(req, res, 'username parameter is required.');
-		return;
-	} else { // Authenticate Obvius user.
-		req.body.username = username;
-		req.body.password = password;
+	} else if (typeof password !== 'string' || password.length > PASSWORD_MAX_LENGTH) {
+		failure(req, res, 'Invalid password format.');
+		// TODO 254 should be checked as accurate and then a global const here and in tests.
+	} else if (typeof username !== 'string' || username.length > 254) {
+		failure(req, res, 'Invalid username format.');
+	} else {
+		// Authenticate Obvius user after all validation passes.
+		// See above for why only have username and not email.
 		obviusUsernameAndPasswordAuthMiddleware('Obvius pipeline')(req, res, next);
 	}
 }
@@ -152,8 +172,13 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 	}
 
 	if (mode === obvius.mode.logfile_upload) {
-		if (!req.param('serialnumber', false)) {
+		const serialNumber = req.param('serialnumber', false);
+		if (!serialNumber) {
 			failure(req, res, 'Logfile Upload Requires Serial Number');
+			return;
+		}
+		if (typeof serialNumber !== 'string' || serialNumber.length > 100) {
+			failure(req, res, 'Invalid serial number format');
 			return;
 		}
 		const conn = getConnection();
@@ -198,12 +223,25 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 
 	if (mode === obvius.mode.config_file_upload) {
 		// Check required parameters
-		if (!req.param('serialnumber', false)) {
+		const serialNumber = req.param('serialnumber', false);
+		const modbusDevice = req.param('modbusdevice', false);
+
+		if (!serialNumber) {
 			failure(req, res, 'Config Upload Requires Serial Number');
 			return;
 		}
-		if (!req.param('modbusdevice', false)) {
+		if (!modbusDevice) {
 			failure(req, res, 'Config Upload Requires Modbus Device ID');
+			return;
+		}
+
+		// Basic parameter validation
+		if (typeof serialNumber !== 'string' || serialNumber.length > 100) {
+			failure(req, res, 'Invalid serial number format');
+			return;
+		}
+		if (typeof modbusDevice !== 'string' || modbusDevice.length > 50) {
+			failure(req, res, 'Invalid modbus device format');
 			return;
 		}
 		const conn = getConnection();
