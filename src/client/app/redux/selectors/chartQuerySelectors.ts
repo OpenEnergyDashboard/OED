@@ -41,6 +41,7 @@ export interface CompareReadingApiArgs extends Omit<commonQueryArgs, 'timeInterv
 // Maps uses the Bar Endpoint so just use its args for simplicity, however barWidthDays should be durationDays
 export interface MapReadingApiArgs extends BarReadingApiArgs { }
 export interface RadarReadingApiArgs extends commonQueryArgs { }
+export interface TemperatureReadingApiArgs extends commonQueryArgs { }
 
 export const selectCommonQueryArgs = createSelector(
 	selectSelectedMeters,
@@ -209,6 +210,17 @@ export const selectThreeDQueryArgs = createSelector(
 	}
 );
 
+export const selectTemperatureChartQueryArgs = createSelector(
+	selectCommonQueryArgs,
+	common => {
+		const meterArgs: TemperatureReadingApiArgs = common.meterArgs;
+		const groupArgs: TemperatureReadingApiArgs = common.groupArgs;
+		const meterShouldSkip = common.meterSkip;
+		const groupShouldSkip = common.groupSkip;
+		return { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip };
+	}
+);
+
 export const selectAllChartQueryArgs = createSelector(
 	selectLineChartQueryArgs,
 	selectBarChartQueryArgs,
@@ -216,12 +228,14 @@ export const selectAllChartQueryArgs = createSelector(
 	selectMapChartQueryArgs,
 	selectThreeDQueryArgs,
 	selectCompareLineQueryArgs,
-	(line, bar, compare, map, threeD, compareLine) => ({
+	selectTemperatureChartQueryArgs,
+	(line, bar, compare, map, threeD, compareLine, temperature) => ({
 		line,
 		bar,
 		compare,
 		map,
 		threeD,
-		compareLine
+		compareLine,
+		temperature
 	})
 );

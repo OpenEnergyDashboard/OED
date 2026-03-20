@@ -12,7 +12,7 @@ import { TimeInterval } from '../../../common/TimeInterval';
 import { updateSliderRange } from '../redux/actions/extraActions';
 import { readingsApi, stableEmptyLineReadings } from '../redux/api/readingsApi';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
-import { selectLineChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
+import { selectTemperatureChartQueryArgs } from '../redux/selectors/chartQuerySelectors';
 import { selectLineChartDeps, selectPlotlyGroupData, selectPlotlyMeterData } from '../redux/selectors/lineChartSelectors';
 import { selectLineUnitLabel } from '../redux/selectors/plotlyDataSelectors';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
@@ -29,7 +29,7 @@ export default function TemperatureChartComponent() {
 	const translate = useTranslate();
 	const dispatch = useAppDispatch();
 	// get current data fetching arguments
-	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectLineChartQueryArgs);
+	const { meterArgs, groupArgs, meterShouldSkip, groupShouldSkip } = useAppSelector(selectTemperatureChartQueryArgs);
 	// get data needed to derive/ format data from query response
 	const { meterDeps, groupDeps } = useAppSelector(selectLineChartDeps);
 	const locale = useAppSelector(selectSelectedLanguage);

@@ -43,7 +43,8 @@ export default function GraphicRateMenuComponent() {
 		ChartTypes.line,
 		ChartTypes.threeD,
 		ChartTypes.radar,
-		ChartTypes.compareLine
+		ChartTypes.compareLine,
+		ChartTypes.temperature
 	];
 
 	if (!displayOnChartType.includes(graphState.chartToRender)) {

@@ -85,6 +85,14 @@ export default function MoreOptionsComponent() {
 							{chartToRender === ChartTypes.compareLine && <AreaUnitSelectComponent />}
 							{chartToRender === ChartTypes.compareLine && <ErrorBarComponent />}
 							{chartToRender === ChartTypes.compareLine && <ChartLinkComponent />}
+
+							{/* More UI options for temperature graphic */}
+							{chartToRender == ChartTypes.temperature && <GraphicRateMenuComponent />}
+							{chartToRender == ChartTypes.temperature && !isBoundedAnywhere && <DateRangeComponent />}
+							{chartToRender == ChartTypes.temperature && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.temperature && <ErrorBarComponent />}
+							{/* {chartToRender == ChartTypes.temperature && <ExportComponent />} */}
+							{chartToRender == ChartTypes.temperature && <ChartLinkComponent />}
 						</ModalBody>
 						<ModalFooter></ModalFooter>
 					</Modal>

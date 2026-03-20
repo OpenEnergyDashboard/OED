@@ -85,6 +85,9 @@ export default function UIOptionsComponent() {
 			{chartToRender === ChartTypes.compareLine && <DateRangeComponent />}
 			{chartToRender === ChartTypes.compareLine && <CompareLineControlsComponent />}
 
+			{/* UI options for temperature graphic */}
+			{chartToRender == ChartTypes.temperature}
+
 			<MoreOptionsComponent />
 
 		</div>

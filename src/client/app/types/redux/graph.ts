@@ -14,7 +14,8 @@ export enum ChartTypes {
 	map = 'map',
 	radar = 'radar',
 	threeD = '3D',
-	compareLine = 'compare.line'
+	compareLine = 'compare.line',
+	temperature = "temperature"
 }
 
 // Rates that can be graphed, only relevant to line graphs.
