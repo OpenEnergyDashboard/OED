@@ -8,18 +8,19 @@ vulnerabilities in HTML of user uploaded data.*/
 /* Run in OED Docker web container terminal/shell:
 npm run testsome src/server/test/crossSite/crossSite.js */
 const { chai, mocha, expect, app, testUser } = require('../common');
-const xssIndicators = [
-	'onerror',
-	'alert',
-	'document.domain',
-	'<script',
-	'javascript:',
-	'onload',
-	'onclick',
-	'<iframe'
-];
 
 mocha.describe('Cross site', () => {
+	
+	const xssIndicators = [
+		'onerror',
+		'alert',
+		'document.domain',
+		'<script',
+		'javascript:',
+		'onload',
+		'onclick',
+		'<iframe'
+	];
 	
 	mocha.it('Test for sanitization of HTML', async () => {
 		const filePath = 'src/server/test/crossSite/readings.csv';
