@@ -5,13 +5,15 @@
 const { logMailer } = require('../logMailer');
 const { log } = require('../log');
 const { getConnection } = require('../db');
+const { sanitizeForLog } = require('../utils/sanitizeForLog');
 
 (async function sendLoggingEmail() {
 	let conn = getConnection();
 	try {
 		await logMailer(conn);
 	} catch (err) {
-		log.error(`Error while sending email: ${err}`, err, true);
+		const safeErrorMessage = sanitizeForLog(err?.message || String(err));
+		log.error(`Error while sending email: ${safeErrorMessage}`, err, true);
 	}
 }());
 
