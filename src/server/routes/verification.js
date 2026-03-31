@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const User = require('../models/User');
+const { getConnection } = require('../db');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
@@ -30,13 +32,29 @@ router.post('/', (req, res) => {
 		res.sendStatus(400);
 	} else {
 		const token = req.body.token;
-		jwt.verify(token, secretToken, err => {
-			if (err) {
-				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-			} else {
-				res.status(200).json({ success: true });
-			}
-		});
+		jwt.verify(token, secretToken, async (err, decoded) => {
+        	if (err) {
+        		res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+        	} else {
+        		try {
+        			const conn = getConnection();
+        			const user = await User.getByID(decoded.data, conn);
+
+        			const tokenIssuedAt = decoded.iat;
+        			const invalidBefore = user.tokenInvalidBefore
+        				? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
+        				: 0;
+
+        			if (tokenIssuedAt < invalidBefore) {
+        				return res.status(401).json({ success: false, message: 'Token invalidated.' });
+        			}
+
+        			res.status(200).json({ success: true });
+        		} catch (error) {
+        			res.status(401).json({ success: false, message: 'User does not exist in database.' });
+        		}
+        	}
+        });
 	}
 });
 

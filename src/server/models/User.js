@@ -13,13 +13,15 @@ class User {
 	 * @param passwordHash The user's passwordHash
 	 * @param role The user's role
 	 * @param note The user note
+	 * @param tokenInvalidBefore Timestamp before which issued tokens are invalid
 	 */
-	constructor(id, username, passwordHash, role, note = '') {
+	constructor(id, username, passwordHash, role, note = '', tokenInvalidBefore = null) {
 		this.id = id;
 		this.username = username;
 		this.passwordHash = passwordHash;
 		this.role = role;
 		this.note = note;
+		this.tokenInvalidBefore = tokenInvalidBefore;
 	}
 
 	/**
@@ -41,7 +43,14 @@ class User {
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
-		return new User(row.id, row.username, row.password_hash, row.role, row.note);
+		return new User(
+			row.id,
+			row.username,
+			row.password_hash,
+			row.role,
+			row.note,
+			row.token_invalid_before
+		);
 	}
 
 	/**
@@ -54,7 +63,14 @@ class User {
 	 */
 	static async getByUsername(username, conn) {
 		const row = await conn.oneOrNone(sqlFile('user/get_user_by_username.sql'), { username: username });
-		return row === null ? null : new User(row.id, row.username, row.password_hash, row.role, row.note);
+		return row === null ? null : new User(
+			row.id,
+			row.username,
+			row.password_hash,
+			row.role,
+			row.note,
+			row.token_invalid_before
+		);
 	}
 
 	/**
@@ -81,7 +97,7 @@ class User {
 	 * @param id the id of the user whose password is to be updated
 	 * @param passwordHash the new password's hash
 	 * @param conn is the connection to use.
-	 * @returns {Promise.<array.<User>>}
+	 * @returns {Promise.<void>}
 	 */
 	static async updateUserPassword(id, passwordHash, conn) {
 		return conn.none(sqlFile('user/update_user_password.sql'), { id: id, password_hash: passwordHash });
@@ -133,6 +149,16 @@ class User {
 	}
 
 	/**
+	 * Returns a promise to invalidate all tokens issued before now for a user.
+	 * @param id the id of the user whose tokens are to be invalidated
+	 * @param conn is the connection to use.
+	 * @returns {Promise<void>}
+	 */
+	static async invalidateTokensBeforeNow(id, conn) {
+		return conn.none(sqlFile('user/update_token_invalid_before.sql'), { id: id });
+	}
+
+	/**
 	 * Returns a promise to delete a user
 	 * @param username the username of the user
 	 * @param conn is the connection to use.
@@ -168,7 +194,7 @@ class User {
 
 /**
  * Enum of roles.
- * This enum needs to be kept in sync with the src/server/sql/create_user_types_enum.sql and the UserRoles enum in src/client/types/items.ts 
+ * This enum needs to be kept in sync with the src/server/sql/create_user_types_enum.sql and the UserRoles enum in src/client/types/items.ts
  * @enum {string}
  */
 User.role = Object.freeze({

@@ -35,7 +35,17 @@ authMiddleware = (req, res, next) => {
 				try {
 					const conn = getConnection();
 					// checks if user exists in the database in case it was deleted
-					await User.getByID(decoded.data, conn);
+					const user = await User.getByID(decoded.data, conn);
+
+					const tokenIssuedAt = decoded.iat;
+					const invalidBefore = user.tokenInvalidBefore
+						? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
+						: 0;
+
+					if (tokenIssuedAt < invalidBefore) {
+						return res.status(401).json({ success: false, message: 'Token invalidated.' });
+					}
+
 					req.decoded = decoded;
 					next();
 				} catch (error) {
@@ -200,12 +210,26 @@ optionalAuthMiddleware = (req, res, next) => {
 	if (!validate(token, validParams).valid) {
 		next();
 	} else if (token) {
-		jwt.verify(token, secretToken, (err, decoded) => {
+		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
 				// do nothing. Could log here if need be
 			} else {
-				req.decoded = decoded;
-				req.hasValidAuthToken = true;
+				try {
+					const conn = getConnection();
+					const user = await User.getByID(decoded.data, conn);
+
+					const tokenIssuedAt = decoded.iat;
+					const invalidBefore = user.tokenInvalidBefore
+						? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
+						: 0;
+
+					if (tokenIssuedAt >= invalidBefore) {
+						req.decoded = decoded;
+						req.hasValidAuthToken = true;
+					}
+				} catch (error) {
+					// do nothing. Could log here if need be
+				}
 			}
 			next();
 		});
@@ -215,6 +239,7 @@ optionalAuthMiddleware = (req, res, next) => {
 };
 
 module.exports = {
+	authMiddleware,
 	adminAuthMiddleware,
 	csvAuthMiddleware,
 	exportAuthMiddleware,
