@@ -73,6 +73,7 @@ mocha.describe('Response Utility Functions', () => {
 			expect(mockRes.sentData).to.equal('');
 		});
 
+		//should also accept empty quotes
 		mocha.it('should handle null comment', () => {
 			const mockRes = createMockResponse();
 

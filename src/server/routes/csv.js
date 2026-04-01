@@ -207,6 +207,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			message += '<h3>However, note that the processing of the readings returned these warning(s):</h3>' + msgTotal;
 		}
 		success(req, res, message);
+		//see if theres a way to accept this specific message
 	} else {
 		message = '<h2>It looks like the insert of the readings had issues with some or all of the readings where' +
 			' the processing of the readings returned these warning(s)/error(s):</h2>' + msgTotal;
