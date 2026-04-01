@@ -515,24 +515,13 @@ function escapeForEgrepLiteral(str) {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/**
- * Convert a full API path from routes.json into the router-local path
- * we expect to find inside src/server/routes.
- *
- * Examples:
- *  '/api/users/'              -> '/'
- *  '/api/users/:user_id'      -> '/:user_id'
- *  '/api/groups/edit'         -> '/edit'
- *  '/api/logs/info'           -> '/info'
- *  '/api/readings/line/raw/meter/:meter_id' -> '/line/raw/meter/:meter_id'
- */
 function apiToRouterLocal(apiPath) {
 	const s = normalizePath(apiPath);
 	if (!s) return null;
 
-	const parts = s.split('/').filter(Boolean); // ['api','users',':user_id']
+	const parts = s.split('/').filter(Boolean); 
 	if (parts.length >= 2 && parts[0] === 'api') {
-		const rest = parts.slice(2); // drop 'api' + resource segment
+		const rest = parts.slice(2); 
 		return '/' + rest.join('/');
 	}
 
@@ -565,14 +554,6 @@ function loadExpectedLocalPaths() {
 	return expected;
 }
 
-/**
- * Grep src/server/routes for routes:
- *   something.get('/path'
- *   something.post('/path'
- *   something.route('/path').get(...)
- *
- * Returns a Set of routes found in code.
- */
 function findActualLocalPathsViaGrep() {
 	if (!fs.existsSync(ROUTES_DIR)) {
 		throw new Error(`routes directory not found at: ${ROUTES_DIR}`);
