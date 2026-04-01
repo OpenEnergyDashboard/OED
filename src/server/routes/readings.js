@@ -68,7 +68,7 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			res.send(JSON.stringify(count));
 		} catch (err) {
 			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(408);
 		}
 	}
 })
@@ -133,7 +133,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			res.send(rawReadings);
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(408);
 		}
 	}
 });

@@ -174,7 +174,7 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 					res.status(400).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. Please make a request with a valid username.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
-					res.status(500).send('Internal OED Server Error for Obvius request.');
+					res.status(400).send('Internal OED Server Error for Obvius request.');
 				}
 			}
 		});

@@ -88,7 +88,7 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 			await updatedConversion.update(conn);
 		} catch (err) {
 			log.error(`Error while editing conversion with error(s): ${err}`);
-			failure(res, 500, `Error while editing conversion with error(s): ${err}`);
+			failure(res, 400, `Error while editing conversion with error(s): ${err}`);
 		}
 		success(res);
 	}
@@ -154,7 +154,7 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 			res.sendStatus(200);
 		} catch (err) {
 			log.error(`Error while inserting new conversion with error(s): ${err}`);
-			failure(res, 500, `Error while inserting new conversion with errors(s): ${err}`);
+			failure(res, 400, `Error while inserting new conversion with errors(s): ${err}`);
 		}
 	}
 });
@@ -215,7 +215,7 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			success(res, 'Successfully deleted conversion and updated meters/groups');
 		} catch (err) {
 			log.error(`Error while deleting conversion and updating meters/groups: ${err}`);
-			failure(res, 500, `Error while deleting conversion and updating meters/groups: ${err}`);
+			failure(res, 400, `Error while deleting conversion and updating meters/groups: ${err}`);
 		}
 	}
 });

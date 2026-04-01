@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
 		const rawBaselines = await Baseline.getAllBaselines(conn);
 		res.json(rawBaselines);
 	} catch (err) {
+		res.sendStatus(400);
 		log(`Error while getting all baselines: ${err}`, 'error');
 	}
 });
@@ -73,7 +74,7 @@ router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) =>
 		await baseline.insert(conn);
 		res.sendStatus(200);
 	} catch (err) {
-		res.sendStatus(500);
+		res.sendStatus(400);
 		log(`Error while adding baseline: ${err}`, 'error');
 	}
 });
