@@ -1,0 +1,90 @@
+{
+  "admin": {
+    "GET": [
+      "/api/users/",
+      "/api/users/:user_id",
+      "/api/logs/logsmsg/getLogsByDateRangeAndType"
+    ],
+    "POST": [
+      "/api/logs/info",
+      "/api/logs/warn",
+      "/api/logs/error",
+      "/api/conversion-array/refresh",
+      "/api/conversions/edit",
+      "/api/conversions/addConversion",
+      "/api/conversions/delete",
+      "/api/conversions/simulate-delete",
+      "/api/groups/create",
+      "/api/groups/delete",
+      "/api/maps/create",
+      "/api/maps/delete",
+      "/api/meters/edit",
+      "/api/meters/addMeter",
+      "/api/units/edit",
+      "/api/units/addUnit",
+      "/api/units/delete",
+      "/api/users/create",
+      "/api/users/edit",
+      "/api/users/delete",
+			"/api/preferences/"
+    ],
+    "PUT": [
+      "/api/groups/edit"
+    ]
+  },
+
+  "Optional":{
+    "GET": [
+      "/api/maps/",
+      "/api/maps/:map_id",
+      "/api/meters/",
+      "/api/meters/:meter_id",
+      "/line/meters/:meter_ids",
+      "/api/preferences/",
+      "/api/readings/line/count/meters/:meter_ids",
+      "/api/readings/line/raw/meter/:meter_id",
+      "/api/unitReadings/line/groups/:group_ids",
+      "/api/unitReadings/bar/meters/:meter_ids",
+      "/api/unitReadings/bar/groups/:group_ids",
+      "/api/unitReadings/radar/meters/:meter_ids",
+      "/api/unitReadings/radar/groups/:group_ids",
+      "/api/unitReadings/threeD/meters/:meter_ids",
+      "/api/unitReadings/threeD/groups/:group_id",
+      "/api/units/",
+      "/api/users/token",
+      "/api/conversions/",
+      "/api/groups/",
+      "/api/groups/idname",
+      "/api/groups/children/:group_id",
+      "/api/groups/allChildren/",
+      "/api/groups/deep/groups/:group_id",
+      "/api/groups/deep/meters/:group_id",
+      "/api/groups/parents/:group_id"
+    ]
+  },
+
+  "User":{
+    "POST": [
+    "/api/login/"
+    ]
+  },
+
+  "Obvius":{
+    "ALL": [
+      "/api/obvius/"
+    ]
+  },
+
+  "UnauthenticatedUser":{
+    "GET": [
+      "/api/ciks",
+      "/api/compareReadings/meters/:meter_ids",
+      "/api/compareReadings/groups/:group_ids",
+      "/api/csv/meters",
+      "/api/csv/readings",
+      "/api/version/",
+			"/api/baseline/new",
+      "/api/verification/"
+    ]
+  }
+}
