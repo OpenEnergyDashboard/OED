@@ -155,6 +155,13 @@ router.get('*', (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
+
+		// Clickjacking protection: restrict framing to same-origin by default,
+		// with optional admin-configurable trusted origins via environment variable.
+		// This preserves OED's chart embedding functionality while mitigating UI redress attacks.
+		const frameAncestors = ["'self'", ...config.trustedFrameAncestors].join(' ');
+		res.setHeader('Content-Security-Policy', `frame-ancestors ${frameAncestors};`);
+
 		res.send(htmlPlusData);
 	});
 });

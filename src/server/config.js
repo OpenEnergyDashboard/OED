@@ -49,4 +49,13 @@ config.serverPort = process.env.OED_SERVER_PORT;
 config.logFile = process.env.OED_LOG_FILE || 'log.txt';
 config.subdir = process.env.OED_SUBDIR || '';
 
+// Parse trusted frame ancestors for clickjacking protection.
+// Comma-separated list of allowed origins (e.g., https://example.com)
+
+const trustedFrameAncestors = process.env.OED_TRUSTED_FRAME_ANCESTORS || '';
+config.trustedFrameAncestors = trustedFrameAncestors
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(origin => origin.length > 0);
+
 module.exports = config;
