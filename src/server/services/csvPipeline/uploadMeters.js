@@ -7,18 +7,21 @@ const { CSVPipelineError } = require('./CustomErrors');
 const Meter = require('../../models/Meter');
 const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
-const { normalizeBoolean } = require('./validateCsvUploadParams');
+const { normalizeBoolean, MeterTimeSortTypesJS, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
+const moment = require('moment-timezone');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {express.Request} req
+ * @param {express.Response} res
+ * @param {express.Request} req
+ * @param {express.Response} res
  * @param {filepath} filepath Path to meters csv file.
  * @param conn Connection to the database.
  */
 async function uploadMeters(req, res, filepath, conn) {
 	const temp = (await readCsv(filepath)).map(row => {
-		// The Canonical structure of each row in the Meters CSV file is the order of the fields 
+		// The Canonical structure of each row in the Meters CSV file is the order of the fields
 		// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
 		// then we assume that the uploaded CSV file follows this Canonical structure.
 
@@ -41,20 +44,122 @@ async function uploadMeters(req, res, filepath, conn) {
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
+			//validation for boolean values
+			validateBooleanFields(meter, i);
+
+			// Validate min and max values
+			validateMinMaxValues(meter, i);
+
 			// First verify GPS is okay
 			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
 			const gpsInput = meter[6];
 			// Skip if undefined.
 			if (gpsInput) {
 				// Verify GPS is okay values
-				const { validGps, message } = isValidGPSInput(gpsInput);
-				if (!validGps) {
-					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid with error of "${message}"`;
+				if (!isValidGPSInput(gpsInput)) {
+					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid.`;
 					throw new CSVPipelineError(msg, undefined, 500);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
 				// DB is longitude, latitude.
 				meter[6] = switchGPS(gpsInput);
+			}
+
+			// verify the area input
+			const areaInput = meter[9];
+			if (areaInput) {
+				if (!isValidArea(areaInput)) {
+					let msg = `For meter ${meter[0]} the area entry of ${areaInput} is invalid. Area must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// validate reading duplication
+			const duplicateValue = meter[16];
+			if (duplicateValue) {
+				if (!isDuplicate(duplicateValue)) {
+					let msg = `For meter ${meter[0]}, duplicate reading is outside of the range 1 to 9 inclusive.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			const timeSortValue = meter[17];
+			if (timeSortValue) {
+				if (!isValidTimeSort(timeSortValue)) {
+					let msg = `For meter ${meter[0]} the time sort ${timeSortValue} is invalid. Valid options are increasing or decreasing.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// validate min & maxDates
+			// meter indicies based off of timeSortValue
+			const minDate = meter[29];
+			const maxDate = meter[30];
+			if (minDate && maxDate) {
+				// returns boolean
+				const { msg, value } = isValidDate(minDate, maxDate);	
+
+				if (!value) {
+					// msg comes from function
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			const timezone = meter[5];
+			if (timezone) {
+				if (!isValidTimeZone(timezone)) {
+					let msg = `For meter ${meter[0]}, ${timezone} is not a valid time zone.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// Verify area unit provided
+			const areaUnitString = meter[25];
+			if (areaUnitString) {
+				if (!isValidAreaUnit(areaUnitString)) {
+					let msg = `For meter ${meter[0]} the area unit of ${areaUnitString} is invalid.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+				
+				//checks to make sure if area unit is none then area value must be empty or 0, and if area unit is not none then area value must be a number greater than 0.
+				const areaCheck = validateArea(meter, i);
+                if (!areaCheck.value) {
+                    throw new CSVPipelineError(areaCheck.areaMsg, undefined, 500);
+                }
+			}
+
+			//checks to make sure max error value is a number between 0 and 75 if it is provided.
+			const maxErrorCheck = validateMaxError(meter, i);
+			if (!maxErrorCheck.value) {
+				throw new CSVPipelineError(maxErrorCheck.maxErrorMsg, undefined, 500);
+			}
+
+			// Verify meter type
+			const meterTypeString = meter[4];
+			if (meterTypeString) {
+				if (!isValidMeterType(meterTypeString)) {
+					let msg = `For meter ${meter[0]} the meter type of ${meterTypeString} is invalid. Valid types include:
+								egauge, mamac, metasys, obvius, and other. `;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// verify the Gap input
+			const gapInput = meter[14];
+			if (gapInput) {
+				if (!validateGap(gapInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${gapInput} is invalid. Gap must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
+			}
+
+			// verify the Variation input
+			const variationInput = meter[15];
+			if (variationInput) {
+				if (!validateVariation(variationInput)) {
+					let msg = `For meter ${meter[0]} the Gap entry of ${variationInput} is invalid. Gap must be a number greater than 0.`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				}
 			}
 
 			// Process unit.
@@ -118,8 +223,6 @@ async function uploadMeters(req, res, filepath, conn) {
 	}
 }
 
-// TODO This is almost the same as the client function in src/client/app/utils/calibration.ts. When the server side
-// is in TS then a single version should exist and be used.
 /**
  * Checks if the string is a valid GPS representation. This requires it to be two numbers
  * separated by a comma and the GPS values to be within allowed values. The should be a latitude, longitude pair.
@@ -128,29 +231,19 @@ async function uploadMeters(req, res, filepath, conn) {
  * @returns true if string is GPS and false otherwise.
  */
 function isValidGPSInput(input) {
-	let message = '';
-	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
-		message = 'GPS Input is missing a comma';
-		validGps = false;
+		return false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		message = 'GPS Input has too many commas';
-		validGps = false;
+		return false;
 	}
-	if (validGps) {
-		// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-		const array = input.split(',').map((value) => parseFloat(value));
-		const latitudeIndex = 0;
-		const longitudeIndex = 1;
-		const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
-		const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
-		const result = latitudeConstraint && longitudeConstraint;
-		if (!result) {
-			validGps = false;
-			message = 'Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: ' + input;
-		}
-	}
-	return { validGps, message };
+	// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
+	const array = input.split(',').map(value => parseFloat(value));
+	const latitudeIndex = 0;
+	const longitudeIndex = 1;
+	const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+	const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+	const result = latitudeConstraint && longitudeConstraint;
+	return result;
 }
 
 /**
@@ -163,6 +256,83 @@ function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
 	return (array[1] + ',' + array[0]);
+}
+
+/**
+ * Checks if the area provided is a number and if it is larger than zero.
+ * @param areaInput the provided area for the meter
+ * @returns true or false
+ */
+function isValidArea(areaInput) {
+	// check for non-number input, which is not allowed
+	if (Number.isNaN(areaInput)){
+		return false;
+	}
+
+	// must be a number and must be non-negative
+	if (areaInput > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks if the area unit provided is an option
+ * @param areaUnit the provided area for the meter
+ * @returns true or false
+ */
+function isValidAreaUnit(areaUnit) { 
+    const validTypes = Object.values(Unit.areaUnitType); 
+    // must be one of the three values 
+    if (validTypes.includes(areaUnit)) { 
+        return true; 
+    } else { 
+        return false; 
+    } 
+}
+
+/**
+ * Checks if the time sort value provided is accurate (should be increasing or decreasing)
+ * @param timeSortValue the provided time sort
+ * @returns true or false
+ */
+function isValidTimeSort(timeSortValue) {
+	const validTimes = Object.values(MeterTimeSortTypesJS);
+	// must be one of the three values
+	if (validTimes.includes(timeSortValue)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks if the meter type provided is one of the 5 options allowed when creating a meter.
+ * @param meterTypeString the string for the meter type
+ * @returns true or false
+ */
+function isValidMeterType(meterTypeString) {
+	const validTypes = Object.values(Meter.type);
+	if (validTypes.includes(meterTypeString)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+/**
+ * Checks the provided time zone and if it is a real time zone.
+ * @param zone the provided time zone from the csv
+ * @returns true or false
+ */
+function isValidTimeZone(zone) {
+	const validZones = moment.tz.names();
+	if (validZones.includes(zone)) {
+		return true;
+	} else {
+		return false;
+	}
 }
 
 /**
@@ -181,6 +351,317 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+
+/**
+ * Validates all boolean-like fields for a given meter row.
+ * @param {Array} meter - A single row from the CSV file.
+ * @param {number} rowIndex - The current row index for error reporting.
+ */
+function validateBooleanFields(meter, rowIndex) {
+	// all inputs that involve a true or false all being validated together.
+	const booleanFields = {
+		2: 'enabled',
+		3: 'displayable',
+		10: 'cumulative',
+		11: 'reset',
+		18: 'end only',
+		32: 'disableChecks'
+	};
+
+	// this array has values which may be left empty
+	const booleanUndefinedAcceptable = [
+		'cumulative', 'reset', 'end only', 'disableChecks'
+	];
+
+	for (const [index, name] of Object.entries(booleanFields)) {
+		let value = meter[index];
+
+		// allows upper/lower case.
+		if ((value === '' || value === undefined) && booleanUndefinedAcceptable.includes(name)) {
+			// skip if the value is undefined
+			continue;
+		} else {
+			if (typeof value === 'string') {
+				value = value.toLowerCase();
+			}
+		}
+
+		// Validates read values to either false or true
+		if (value !== 'true' && value !== 'false' && value !== true && value !== false
+			&& value !== 'yes' && value !== 'no') {
+			throw new CSVPipelineError(
+				`Invalid input for '${name}' in row ${rowIndex + 1}: "${meter[index]}". Expected 'true' or 'false'.`,
+				undefined,
+				500
+			);
+		}
+	}
+}
+
+function validateMinMaxValues(meter, rowIndex) {
+	const minValue = Number(meter[27]);
+	const maxValue = Number(meter[28]);
+
+	if (isNaN(minValue) || minValue < -9007199254740991 || (!isNaN(maxValue) && minValue > maxValue)) {
+		throw new CSVPipelineError(
+			`Invalid min/max values in row ${rowIndex + 1}: min="${minValue}", max="${maxValue}". ` +
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			undefined,
+			500
+		);
+	}
+
+		// do nothing, pass it through
+	if (isNaN(maxValue) || maxValue > 9007199254740991) {
+		throw new CSVPipelineError(
+			`Invalid min/max values in row ${rowIndex + 1}: min="${minValue}", max="${maxValue}". ` +
+			`Min or/and max must be a number larger than -9007199254740991, and less then 9007199254740991, and min must be less than max.`,
+			undefined,
+			500
+		);
+	}
+}
+
+/**
+ * Validates the max error value for a given meter row.
+ * @param {Number} meter 
+ * @param {Number} rowIndex 
+ * @returns 
+ */
+function validateMaxError(meter, rowIndex) {
+	const maxErrorValue = Number(meter[31]);
+	let msg = '';
+
+	//if its a number, validate its range
+	if (!isNaN(maxErrorValue)) {
+		if (maxErrorValue < 0 || maxErrorValue > 75) {	
+			msg = `Invalid max error value in row ${rowIndex + 1}: maxError="${meter[31]}". ` + `MaxError must be a number larger than 0, and less than 75.`;
+			return { maxErrorMsg: msg, value: false };
+		}
+	}
+	return { maxErrorMsg: '', value: true };
+}
+
+/**
+ * Validates the area value for a given meter row.
+ * @param {Number} meter 
+ * @param {Number} rowIndex 
+ * @returns 
+ */
+function validateArea(meter, rowIndex) {
+	const areaValue = Number(meter[9]);
+	const areaUnit = meter[25];
+	let msg = '';
+
+	if (areaUnit && areaUnit.toLowerCase() === 'none') {
+		if(!isNaN(areaValue) && areaValue !== 0) {
+      msg = `Invalid area value in row ${rowIndex + 1}: area="${meter[9]}". ` + `Area must be empty when area unit is 'none'.`;
+      return { areaMsg: msg, value: false };
+    }
+  }
+  
+  return { areaMsg: '', value: true };
+}
+
+/**
+ * A function to validate whether or not the inputted minimum and maximum dates are valid.
+ * Also validates whether the minimum date comes before, or is equal to the maximum date.
+ * Includes the helper function validateYear to create a valid range of dates (currently from: 0001 to the current year).
+ * Also includes helper function correctDateTimeFormat to validate and correct any variations between the inputted dates.
+ * @param {String} minDate 
+ * @param {String} maxDate 
+ * @returns pair { msg, value } 
+ */
+function isValidDate(minDate, maxDate) {
+	let msg = '';
+	
+	// get correctly formatted dates and check if they're correctly formatted
+	const correctMinFormat = correctDateTimeFormat(minDate);
+	const correctMaxFormat = correctDateTimeFormat(maxDate);
+	
+	// validate that minDate was formatted correctly
+	let formattedMinDate, formattedMaxDate;
+	if (!correctMinFormat.value || !correctMaxFormat.value) {
+		// add error messages to the overall error message
+		msg += correctMinFormat.msg + '\n' + correctMaxFormat.msg;
+		return { msg: msg, value: false };
+	} else {
+		// set the formatted dates
+		formattedMinDate = correctMinFormat.msg;
+		formattedMaxDate = correctMaxFormat.msg;
+	}
+	
+    // validate that years are within range 0001 to the current date
+	if (!validateYear(formattedMinDate) || !validateYear(formattedMaxDate)) {
+		msg += `\nMin year ${moment(formattedMinDate, "YYYY-MM-DD", true).year()} and Max year ${moment(formattedMaxDate, "YYYY-MM-DD", true).year()} are out of range (0001 to current year).`;
+		return { msg: msg, value: false };
+	}
+	
+	let bothValid = false;
+	
+	// create moment objects
+	const minMoment = moment(formattedMinDate, ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD"], true); 
+	const maxMoment = moment(formattedMaxDate, ["YYYY-MM-DD HH:mm:ss", "YYYY-MM-DD"], true); 
+	
+	// validate lengths of the dates 
+	// checking if one includes time and one doesn't
+    if (minMoment.length != maxMoment.length) {
+		msg += `Min date: ${minMoment} and max date: ${maxMoment} are not equivalent lengths.`;
+		return { msg: msg, value: false };
+    }
+
+	if (!minMoment.isValid() || !maxMoment.isValid()) {
+		msg += `\nError: Either Min Date ${minDate} or Max Date ${maxDate} is invalid (or both!).`;
+		return { msg: msg, value: false };
+	} else if (minMoment.isValid() && maxMoment.isValid()) {
+		bothValid = true;
+	}
+	
+    // dates validated now check if minDate is == maxDate
+    if (minMoment.isBefore(maxMoment) && bothValid) {
+		// everything validated
+		return { msg: msg, value: true };
+    }
+	// check if equal
+	if (minMoment.isSame(maxMoment)) {
+		msg += `\nMin date: ${minDate} is equal to the max date: ${maxDate}.`;
+    }
+
+	msg += `\nMin date: ${minDate} is greater than max date: ${maxDate}.`;
+	return { msg: msg, value: false };
+}
+
+/**
+ * A subsidary function to help out isValidDate with processing a viable year range.
+ * @param {String} date 
+ * @returns boolean 
+ */
+function validateYear(date) {
+	// make sure year exists
+	if (date === null || date === undefined) {
+		return false;
+	}
+
+	const minYear = 1;
+	const mYear = moment(date).year();
+	const mCurrentYear = moment().year();
+
+    if (mYear >= minYear && mYear <= mCurrentYear) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * A function to convert an incorrect date string -> ex: "1970-1-1 1:1:1" to a correct date string
+ * "1970-01-01 01:01:01" for less of a chance of an error being thrown in the isValidDate() function.
+ * @param {String} date 
+ * @returns String - Targeted Format "YYYY-MM-DD HH:MM:SS"
+ */
+function correctDateTimeFormat(date) {
+    // validate type is string
+	if (typeof date != 'string') {
+		return { msg: `\nError: Inputted date not a string.`, value: false };
+	}
+
+    // trim whitespace
+    date = date.trim();
+
+    // if length < 10, it's not a full date
+    if (date.length < 8) {
+        return { msg: `\nError: Inputted date not complete.`, value: false }; 
+    }
+
+	// accepted moment format options, more options = slower runtime
+	// can remove variations of options if necessary
+	// should keep: YYYY-MM-DD, YYYY-M-D, MM-DD-YYYY, M-D-YYYY
+	//				YYYY-MM-DD HH:mm:ss, YYYY-MM-DD H:m:s
+	//				MM-DD-YYYY HH:mm:ss, MM-DD-YYYY H:m:s 
+	const acceptedFormats = [
+		'YYYY-MM-DD', 'YYYY-M-D',
+		'MM-DD-YYYY', 'M-D-YYYY',
+		'M-DD-YYYY', 'MM-D-YYYY',
+		'YYYY-M-DD', 'YYYY-MM-D',
+		'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD H:m:s',
+		'MM-DD-YYYY HH:mm:ss', 'MM-DD-YYYY H:m:s',
+		'M-D-YYYY HH:mm:ss', 'M-D-YYYY H:m:s',
+		'M-DD-YYYY HH:mm:ss', 'M-DD-YYYY H:m:s', 
+		'MM-D-YYYY HH:mm:ss', 'MM-D-YYYY H:m:s',
+		'YYYY-M-DD HH:mm:ss', 'YYYY-M-DD H:m:s',
+		'YYYY-MM-D HH:mm:ss', 'YYYY-MM-D HH:mm:ss',
+	];	
+	
+	// parse date with moment 
+	const mDate = moment(date, acceptedFormats, true);
+    
+    // check if date is valid
+    if (!mDate.isValid()) {
+        return { msg: `\nError: Inputted date not valid.`, value: false };
+    }
+	
+	// check if time was included in the input
+	const hasTime = date.includes(':') || date.split(/[\s-]/).length > 3;
+
+	if (hasTime) {
+		return { msg: mDate.format('YYYY-MM-DD HH:mm:ss'), value: true };
+	} else {
+		return { msg: mDate.format('YYYY-MM-DD'), value: true };
+	}
+}
+
+/**
+ * Checks if the number of times each reading is given lies within the range 1 to 9 inclusive.
+ * @param {Number} duplicateValue 
+ * @returns 
+ */
+function isDuplicate(duplicateValue) {	
+    if (duplicateValue >= 1 && duplicateValue <= 9) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * In the validateGap function we take in the readings for the Gap and
+ * verify that it’s greater than or equal to 0.
+ * @param {Number} meter 
+ * @param {Number} rowIndex 
+ */
+function validateGap(meter, rowIndex){
+	const gapValue = Number(meter[14]);
+	if(!isNaN(gapValue)){
+		if(gapValue < 0){
+		throw new CSVPipelineError(
+			`Invalid gap value in row ${rowIndex + 1}: GapValue="${meter[14]}". ` +
+			`Gap must be a number larger than 0.`,
+			undefined, 
+			500
+		);
+		};
+	}
+}
+
+/**
+ * In the validateVariation function we take in the readings for the variation and
+ * verify that it’s greater than or equal to 0.
+ * @param {Number} meter 
+ * @param {Number} rowIndex 
+ */
+function validateVariation(meter, rowIndex){
+	const variationValue = Number(meter[15]);
+	if(!isNaN(variationValue)){
+		if(variationValue < 0)
+		{
+			throw new CSVPipelineError(
+			`Invalid variation value in row ${rowIndex + 1}: VariationValue="${meter[15]}". ` +
+			`Variation Value must be a number larger than 0.`,
+			undefined,
+			500
+			);
+		};
+	}
 }
 
 module.exports = uploadMeters;
