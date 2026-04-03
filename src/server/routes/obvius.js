@@ -28,6 +28,7 @@ const obvius = require('../util').obvius;
 const { obviusUsernameAndPasswordAuthMiddleware } = require('./authenticator');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
+const { sanitizeForLog } = require('../util/sanitizeForLog');
 const { PASSWORD_MAX_LENGTH } = require('../util/validationConstants');
 
 const upload = multer({
@@ -45,6 +46,11 @@ const router = express.Router();
 router.use(upload.any(), middleware.lowercaseAllParamNames);
 router.use(middleware.paramsLookupMixin);
 
+function getClientIp(req) {
+	const rawIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown';
+	return sanitizeForLog(rawIp);
+}
+
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
  *
@@ -54,12 +60,15 @@ router.use(middleware.paramsLookupMixin);
  *
  */
 function failure(req, res, reason = '') {
-	reason = escapeHtml(reason); // escape html to sanitize html
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
+	const ip = getClientIp(req);
 
-	res.status(406) // 406 Not Acceptable error, as required by Obvius
-		.send(`<pre>\n${reason}\n</pre>\n`);
+	log.error('Obvius protocol request failed', {
+		ip,
+		reason: sanitizeForLog(reason)
+	});
+
+	res.status(406)
+		.send(`<pre>\n${escapeHtml(reason)}\n</pre>\n`);
 }
 
 /**
@@ -83,24 +92,27 @@ function success(req, res, comment = '') {
  */
 function handleStatus(req, res) {
 	// Grab the IP of the requester.
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	const ip = getClientIp(req);
 	// These are all the params OED cares about. They just get logged.
 	// Note that this route does NOT log the password, for security reasons.
-	const paramNames = ['MODE', 'SENDDATATRACE', 'SERIALNUMBER', 'GSMSIGNAL',
+	const paramNames = [
+		'MODE', 'SENDDATATRACE', 'SERIALNUMBER', 'GSMSIGNAL',
 		'LOOPNAME', 'UPTIME', 'PERCENTBLOCKSINUSE', 'PERCENTINODESINUSE',
 		'UPLOADATTEMPT', 'ACQUISUITEVERSION', 'USRVERSION', 'ROOTVERSION',
-		'KERNELVERSION', 'FIRMWAREVERSION', 'BOOTCOUNT', 'BATTERYGOOD'];
+		'KERNELVERSION', 'FIRMWAREVERSION', 'BOOTCOUNT', 'BATTERYGOOD'
+	];
 	// Build a log entry for this request
-	let s = `Handling request from ${ip}\n`;
+	const loggedParams = {};
 	for (const paramName of paramNames) {
-		if (req.param(paramName) !== false && req.param(paramName) !== undefined) {
-			s += `\tGot ${paramName}: ${req.param(paramName)}\n`;
-		} else {
-			s += `\tNo ${paramName} submitted\n`;
+		const value = req.param(paramName);
+		if (value !== false && value !== undefined) {
+			loggedParams[paramName] = sanitizeForLog(value);
 		}
 	}
-	log.info(s);
-
+	log.info('Handling Obvius STATUS request', {
+		ip,
+		params: loggedParams
+	});
 	success(req, res);
 }
 
@@ -109,9 +121,9 @@ function handleStatus(req, res) {
  */
 function obviusLog(req, res, next) {
 	// Log the IP of the requester
-	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	const ip = getClientIp(req);
 	req.IP = ip;
-	log.info(`Received Obvious protocol request from ${ip}`);
+	log.info('Received Obvius protocol request', { ip });
 	next();
 }
 
@@ -184,15 +196,15 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 		const conn = getConnection();
 		const loadLogfilePromises = [];
 		for (const fx of req.files) {
-			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
+			log.info(`Received ${sanitizeForLog(fx.fieldname)}: ${sanitizeForLog(fx.originalname)}`);
 			// Logfiles are always gzipped.
 			let data;
 			try {
 				data = zlib.gunzipSync(fx.buffer);
 			} catch (err) {
-				log.error(err);
-				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
-				return;
+				const safeErrorMessage = sanitizeForLog(err?.message || String(err));
+				log.error(`Gunzip failed: ${safeErrorMessage}`, err);
+				return failure(req, res, 'Unable to gunzip incoming buffer');
 			}
 			// The original code did not await for the Promise to finish. The new version
 			// allows the files to run in parallel (as before) but then wait for them all
@@ -203,7 +215,8 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 		Promise.all(loadLogfilePromises).then(() => {
 			success(req, res, 'Logfile Upload IS PROVISIONAL');
 		}).catch((err) => {
-			log.warn(`Logfile Upload had issues from ip: ${ip}`, err)
+			const safeErrorMessage = sanitizeForLog(err?.message || String(err));
+			log.warn(`Logfile Upload had issues from ip: ${ip} - ${safeErrorMessage}`, err);
 			failure(req, res, 'Logfile Upload had issues');
 		});
 		// This return may not be needed.
@@ -246,7 +259,7 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 		}
 		const conn = getConnection();
 		for (const fx of req.files) {
-			log.info(`Received ${fx.fieldname}: ${fx.originalname}`);
+			log.info(`Received ${sanitizeForLog(fx.fieldname)}: ${sanitizeForLog(fx.originalname)}`);
 
 			let data;
 			try {
