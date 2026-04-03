@@ -41,6 +41,8 @@ FILES=$(echo "$FILES" | grep -v "src\/server\/test\/web\/readingsData\/.*")
 FILES=$(echo "$FILES" | grep -v ".github\/**")
 # Filter out unit test files
 FILES=$(echo "$FILES" | grep -v "src\/server\/data\/unit\/.*")
+# Filter out crossSite test files
+FILES=$(echo "$FILES" | grep -v "src/server/test/crossSite/something.csv")
 
 # Counts the files listed in FILES
 NFILES=$(echo $FILES | wc -w)
