@@ -94,8 +94,8 @@ async function changePasswords() {
 
 	// If arguments are included, treat them as the new passwords
 	const currentPostgresPassword = fileEnv.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD || 'pleaseChange';
-	const newPostgresPassword = process.argv[2] || fileEnv.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD || generatePassword();
-	const newOedPassword = process.argv[3] || fileEnv.OED_DB_PASSWORD || process.env.OED_DB_PASSWORD || generatePassword();
+	const newPostgresPassword = process.argv[2] || generatePassword();
+	const newOedPassword = process.argv[3] || generatePassword();
 
 	const clientConfig = {
 		host: process.env.OED_DB_HOST || 'database',

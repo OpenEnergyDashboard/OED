@@ -243,9 +243,6 @@ if [ "$dostart" == "yes" ]; then
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
 			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
 			node ./src/server/util/changePostgresPass.js
-			# Wait for PostgreSQL to fully register the password change and for any lingering connections to close
-			printf "%s\n" "Waiting for database to stabilize with new credentials..."
-			sleep 5
 		fi
 		npm run start
 	else
