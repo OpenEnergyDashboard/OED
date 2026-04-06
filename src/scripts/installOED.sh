@@ -225,7 +225,7 @@ if [ "$dostart" == "yes" ]; then
 			
 			printf "\n********************************************************************************\n"
 			printf "Generated OED_TOKEN_SECRET: %s\n" "$OED_TOKEN_SECRET"
-			printf "\n Make sure to save or change this value"
+			printf "\nMake sure to save or change this value"
 			printf "********************************************************************************\n\n"
 
 			# Save to .env for future runs
@@ -242,7 +242,10 @@ if [ "$dostart" == "yes" ]; then
 		# If the user is in production and their postgres password has been left default, generating a random one
 		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
 			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
-			node ./src/scripts/changePostgresPass.js
+			node ./src/server/util/changePostgresPass.js
+			# Wait for PostgreSQL to fully register the password change and for any lingering connections to close
+			printf "%s\n" "Waiting for database to stabilize with new credentials..."
+			sleep 5
 		fi
 		npm run start
 	else
