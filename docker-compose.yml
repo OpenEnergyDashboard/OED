@@ -35,7 +35,7 @@ services:
     web:
         # Configuration variables for the app.
         environment:
-            - OED_PRODUCTION=yes # Set this value to yes or no, other values will result in a configuration error
+            - OED_PRODUCTION=no # Set this value to yes or no, other values will result in a configuration error
             - OED_SERVER_PORT=3000
             - OED_DB_USER=oed
             - OED_DB_DATABASE=oed
