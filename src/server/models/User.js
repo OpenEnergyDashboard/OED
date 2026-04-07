@@ -25,6 +25,22 @@ class User {
 	}
 
 	/**
+	 * Maps a database row to a User model.
+	 * @param row
+	 * @returns {User}
+	 */
+	static mapRow(row) {
+		return new User(
+			row.id,
+			row.username,
+			row.password_hash,
+			row.role,
+			row.note,
+			row.token_invalid_before
+		);
+	}
+
+	/**
 	 * Returns a promise to create the users table
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<>}
@@ -43,14 +59,7 @@ class User {
 	 */
 	static async getByID(id, conn) {
 		const row = await conn.one(sqlFile('user/get_user_by_id.sql'), { id: id });
-		return new User(
-			row.id,
-			row.username,
-			row.password_hash,
-			row.role,
-			row.note,
-			row.token_invalid_before
-		);
+		return User.mapRow(row);
 	}
 
 	/**
@@ -63,14 +72,7 @@ class User {
 	 */
 	static async getByUsername(username, conn) {
 		const row = await conn.oneOrNone(sqlFile('user/get_user_by_username.sql'), { username: username });
-		return row === null ? null : new User(
-			row.id,
-			row.username,
-			row.password_hash,
-			row.role,
-			row.note,
-			row.token_invalid_before
-		);
+		return row === null ? null : User.mapRow(row);
 	}
 
 	/**

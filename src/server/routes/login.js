@@ -10,8 +10,8 @@ const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const { credentialsRequestValidationMiddleware } = require('./authenticator');
-const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
+const { credentialsRequestValidationMiddleware, verifyActiveTokenAndGetUser } = require('./authenticator');
+const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
 
@@ -65,6 +65,44 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 				log.error(`Unable to check user password for ${req.body.username}`, err);
 				res.status(500).send({ text: 'Internal Server Error' });
 			}
+		}
+	}
+});
+
+/**
+ * Logs out the authenticated user by invalidating previously issued tokens.
+ */
+router.post('/logout', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['token'],
+		properties: {
+			token: {
+				type: 'string',
+				maxLength: TOKEN_MAX_LENGTH
+			}
+		}
+	};
+
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(400);
+		return;
+	}
+
+	try {
+		const { user } = await verifyActiveTokenAndGetUser(req.body.token);
+		const conn = getConnection();
+		await User.invalidateTokensBeforeNow(user.id, conn);
+		res.json({ success: true, message: 'Logout successful.' });
+	} catch (error) {
+		if (error.code === 'TOKEN_INVALIDATED') {
+			res.json({ success: true, message: 'Logout successful.' });
+		} else if (error.message === 'No data returned from the query.') {
+			res.status(401).json({ success: false, message: 'Logout failed.' });
+		} else {
+			log.error('Logout failed while invalidating user tokens.', error);
+			res.status(500).json({ success: false, message: 'Logout failed.' });
 		}
 	}
 });

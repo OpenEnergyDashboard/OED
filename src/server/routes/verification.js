@@ -2,18 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const User = require('../models/User');
-const { getConnection } = require('../db');
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
 const { TOKEN_MAX_LENGTH } = require('../util/validationConstants');
+const { log } = require('../log');
+const { verifyActiveTokenAndGetUser } = require('./authenticator');
 
 const router = express.Router();
 
 /**
  * Route for verifying a JWT.
+ * Verifies that the token is cryptographically valid, belongs to an
+ * existing user, and has not been invalidated by server-side session
+ * invalidation logic.
  * @param token
  */
 router.post('/', (req, res) => {
@@ -28,33 +29,26 @@ router.post('/', (req, res) => {
 			}
 		}
 	};
+
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(400);
 	} else {
 		const token = req.body.token;
-		jwt.verify(token, secretToken, async (err, decoded) => {
-        	if (err) {
-        		res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-        	} else {
-        		try {
-        			const conn = getConnection();
-        			const user = await User.getByID(decoded.data, conn);
 
-        			const tokenIssuedAt = decoded.iat;
-        			const invalidBefore = user.tokenInvalidBefore
-        				? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
-        				: 0;
-
-        			if (tokenIssuedAt < invalidBefore) {
-        				return res.status(401).json({ success: false, message: 'Token invalidated.' });
-        			}
-
-        			res.status(200).json({ success: true });
-        		} catch (error) {
-        			res.status(401).json({ success: false, message: 'User does not exist in database.' });
-        		}
-        	}
-        });
+		verifyActiveTokenAndGetUser(token)
+			.then(() => {
+				res.json({ success: true });
+			})
+			.catch(error => {
+				if (error.code === 'TOKEN_INVALIDATED') {
+					res.status(401).json({ success: false, message: 'Token invalidated.' });
+				} else if (error.message === 'No data returned from the query.') {
+					res.status(401).json({ success: false, message: 'User does not exist in database.' });
+				} else {
+					log.error('Token verification failed.', error);
+					res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+				}
+			});
 	}
 });
 

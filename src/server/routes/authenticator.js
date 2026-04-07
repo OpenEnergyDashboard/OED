@@ -16,8 +16,7 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN
 
 /**
  * Middleware function to force a route to require authentication
- * Verifies the request's token against the server's secret token
- * It is used within this file but not by other parts of OED.
+ * Verifies the request's token against the server's secret token.
  */
 authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
@@ -25,41 +24,31 @@ authMiddleware = (req, res, next) => {
 		type: 'string',
 		maxLength: TOKEN_MAX_LENGTH
 	};
+
 	if (!validate(token, validParams).valid) {
 		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
-		jwt.verify(token, secretToken, async (err, decoded) => {
-			if (err) {
-				res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-			} else {
-				try {
-					const conn = getConnection();
-					// checks if user exists in the database in case it was deleted
-					const user = await User.getByID(decoded.data, conn);
-
-					const tokenIssuedAt = decoded.iat;
-					const invalidBefore = user.tokenInvalidBefore
-						? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
-						: 0;
-
-					if (tokenIssuedAt < invalidBefore) {
-						return res.status(401).json({ success: false, message: 'Token invalidated.' });
-					}
-
-					req.decoded = decoded;
-					next();
-				} catch (error) {
+		verifyActiveTokenAndGetUser(token)
+			.then(({ decoded }) => {
+				req.decoded = decoded;
+				next();
+			})
+			.catch(error => {
+				if (error.code === 'TOKEN_INVALIDATED') {
+					res.status(401).json({ success: false, message: 'Token invalidated.' });
+				} else if (error.message === 'No data returned from the query.') {
 					res.status(401).json({ success: false, message: 'User does not exist in database.' });
+				} else {
+					res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
 				}
-			}
-		});
+			});
 	} else {
 		res.status(403).send({ success: false, message: 'No token provided.' });
 	}
 };
 
 /**
- * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next 
+ * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next
  * is executed. Otherwise, the server responds with a 400 error.
  */
 function credentialsRequestValidationMiddleware(req, res, next) {
@@ -91,9 +80,9 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 
 /**
  * Verifies the username and password of a user.
- * @param {string} username 
- * @param {string} password 
- * @param {boolean} returnUser 
+ * @param {string} username
+ * @param {string} password
+ * @param {boolean} returnUser
  * @returns true if the user exists in the database. False otherwise. Returns the user itself if returnUser is set to true and user is verified.
  */
 async function verifyCredentials(username, password, returnUser = false) {
@@ -114,9 +103,49 @@ async function verifyCredentials(username, password, returnUser = false) {
 }
 
 /**
+ * Verifies a JWT, ensures the user exists, and rejects tokens that were invalidated.
+ * Returns the decoded token and matching user when successful.
+ * @param {string} token
+ * @returns {Promise<{decoded: object, user: User}>}
+ */
+async function verifyActiveTokenAndGetUser(token) {
+	const decoded = await new Promise((resolve, reject) => {
+		jwt.verify(token, secretToken, (err, payload) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(payload);
+			}
+		});
+	});
+
+	const conn = getConnection();
+	const user = await User.getByID(decoded.data, conn);
+
+	let invalidBefore = 0;
+	if (user.tokenInvalidBefore) {
+		const parsedDate = new Date(user.tokenInvalidBefore);
+		if (!isNaN(parsedDate.getTime())) {
+			invalidBefore = Math.floor(parsedDate.getTime() / 1000);
+		} else {
+			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
+		}
+	}
+
+	const tokenIssuedAt = decoded.iat;
+	if (tokenIssuedAt <= invalidBefore) {
+		const error = new Error('Token invalidated');
+		error.code = 'TOKEN_INVALIDATED';
+		throw error;
+	}
+
+	return { decoded, user };
+}
+
+/**
  * Returns middleware that verifies the requested token and only proceeds if the requestor is a particular user role or is Admin.
- * @param {string} role 
- * @param action 
+ * @param {string} role
+ * @param action
  */
 function roleTokenAuthMiddleware(role, action) {
 	return function (req, res, next) {
@@ -210,29 +239,15 @@ optionalAuthMiddleware = (req, res, next) => {
 	if (!validate(token, validParams).valid) {
 		next();
 	} else if (token) {
-		jwt.verify(token, secretToken, async (err, decoded) => {
-			if (err) {
-				// do nothing. Could log here if need be
-			} else {
-				try {
-					const conn = getConnection();
-					const user = await User.getByID(decoded.data, conn);
-
-					const tokenIssuedAt = decoded.iat;
-					const invalidBefore = user.tokenInvalidBefore
-						? Math.floor(new Date(user.tokenInvalidBefore).getTime() / 1000)
-						: 0;
-
-					if (tokenIssuedAt >= invalidBefore) {
-						req.decoded = decoded;
-						req.hasValidAuthToken = true;
-					}
-				} catch (error) {
-					// do nothing. Could log here if need be
-				}
-			}
-			next();
-		});
+		verifyActiveTokenAndGetUser(token)
+			.then(({ decoded }) => {
+				req.decoded = decoded;
+				req.hasValidAuthToken = true;
+				next();
+			})
+			.catch(() => {
+				next();
+			});
 	} else {
 		next();
 	}
@@ -246,5 +261,6 @@ module.exports = {
 	obviusUsernameAndPasswordAuthMiddleware,
 	optionalAuthMiddleware,
 	verifyCredentials,
+	verifyActiveTokenAndGetUser,
 	credentialsRequestValidationMiddleware
 };
