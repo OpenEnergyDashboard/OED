@@ -11,7 +11,7 @@ import {
 	historyStepForward, processGraphLink,
 	updateHistory, updateSliderRange
 } from '../../redux/actions/extraActions';
-import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount } from '../../types/redux/graph';
+import { ChartTypes, GraphState, LineGraphRate, MeterOrGroup, ReadingInterval, ShiftAmount, TemperatureUnitType } from '../../types/redux/graph';
 import { ComparePeriod, SortingOrder, calculateCompareTimeInterval, validateComparePeriod, validateSortingOrder } from '../../utils/calculateCompare';
 import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { preferencesApi } from '../api/preferencesApi';
@@ -41,7 +41,8 @@ const defaultState: GraphState = {
 	},
 	hotlinked: false,
 	shiftAmount: ShiftAmount.none,
-	shiftTimeInterval: TimeInterval.unbounded()
+	shiftTimeInterval: TimeInterval.unbounded(),
+	selectedTemperatureUnit: TemperatureUnitType.celsius
 };
 
 interface History<T> {
@@ -170,6 +171,9 @@ export const graphSlice = createSlice({
 		},
 		setInitialXAxisRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.initialXAxisRange = action.payload;
+		},
+		setTemperatureUnit: (state, action: PayloadAction<TemperatureUnitType>) => {
+			state.current.selectedTemperatureUnit = action.payload;
 		}
 
 	},
@@ -295,11 +299,12 @@ export const graphSlice = createSlice({
 			)
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
 				if (!current.hotlinked) {
-					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization } = action.payload;
+					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization, defaultTemperatureUnit } = action.payload;
 					current.selectedAreaUnit = defaultAreaUnit;
 					current.chartToRender = defaultChartToRender;
 					current.barStacking = defaultBarStacking;
 					current.areaNormalization = defaultAreaNormalization;
+					current.selectedTemperatureUnit = defaultTemperatureUnit;
 				}
 			});
 	},
@@ -333,7 +338,8 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMin: state => state.current.rangeSliderInterval.getStartTimestamp()?.utc().toDate().toISOString(),
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
-		selectShiftTimeInterval: state => state.current.shiftTimeInterval
+		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
+		selectTemperatureUnit: state => state.current.selectedTemperatureUnit
 	}
 });
 
@@ -353,7 +359,8 @@ export const {
 	selectSliderRangeInterval, selectDefaultGraphState,
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,
-	selectShiftTimeInterval, selectInitialXAxisRange
+	selectShiftTimeInterval, selectInitialXAxisRange,
+	selectTemperatureUnit
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -372,6 +379,6 @@ export const {
 	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
 	updateThreeDMeterOrGroupInfo, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
-	updateShiftTimeInterval
+	updateShiftTimeInterval, setTemperatureUnit
 } = graphSlice.actions;
 

@@ -88,4 +88,10 @@ export interface GraphState {
 	hotlinked: boolean;
 	shiftAmount: ShiftAmount;
 	shiftTimeInterval: TimeInterval;
+	selectedTemperatureUnit: TemperatureUnitType;
+}
+
+export enum TemperatureUnitType {
+	celsius = 'celsius',
+	fahrenheit = 'fahrenheit'
 }

@@ -70,6 +70,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.home.select.rates': { link: `${helpUrl}/graphingRates/` },
 		'help.home.select.units': { link: `${helpUrl}/graphingUnits/` },
 		'help.home.readings.per.day': { link: `${helpUrl}/readingsPerDay/` },
+		"help.home.temperature.unit": { link: `${helpUrl}/temperatureUnit/` },
 		'help.home.toggle.chart.link': { link: `${helpUrl}/chartLink/` },
 		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing/#groupDetails` },
 		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },

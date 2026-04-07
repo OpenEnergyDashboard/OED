@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this
+* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+import * as React from 'react';
+import { FormattedMessage } from 'react-intl';
+import Select from 'react-select';
+import TooltipMarkerComponent from './TooltipMarkerComponent';
+import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
+import { selectTemperatureUnit, graphSlice } from '../redux/slices/graphSlice';
+import { TemperatureUnitType } from '../types/redux/graph';
+import { useTranslate } from '../redux/componentHooks';
+
+interface TemperatureUnitOptions {
+	label: string;
+	value: TemperatureUnitType;
+}
+
+export default function TemperatureUnitSelectComponent() {
+	const dispatch = useAppDispatch();
+	const translate = useTranslate();
+	const temperatureUnit = useAppSelector(selectTemperatureUnit);
+
+	const options: TemperatureUnitOptions[] = [
+		{ label: translate('TemperatureUnitType.celsius'), value: TemperatureUnitType.celsius },
+		{ label: translate('TemperatureUnitType.fahrenheit'), value: TemperatureUnitType.fahrenheit }
+	];
+
+	const currentValue = options.find(o => o.value === temperatureUnit) ?? options[0];
+
+	const divBottomPadding: React.CSSProperties = {
+		paddingBottom: '15px'
+	};
+
+	return (
+		<div>
+			<p style={{ fontWeight: 'bold', margin: 0 }}>
+				<FormattedMessage id='temperature.unit' />
+				<TooltipMarkerComponent page='home' helpTextId='help.home.temperature.unit' />
+			</p>
+			<div style={divBottomPadding}>
+				<Select
+					value={currentValue}
+					options={options}
+					onChange={e => dispatch(graphSlice.actions.setTemperatureUnit(e!.value))}
+				/>
+			</div>
+		</div>
+	);
+}

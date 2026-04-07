@@ -16,6 +16,7 @@ import MapControlsComponent from './MapControlsComponent';
 import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 import MoreOptionsComponent from './MoreOptionsComponent';
 import CompareLineControlsComponent from './CompareLineControlsComponent';
+import TemperatureUnitSelectComponent from './TemperatureUnitSelectComponent';
 
 /**
  * @returns the UI Control panel
@@ -86,7 +87,7 @@ export default function UIOptionsComponent() {
 			{chartToRender === ChartTypes.compareLine && <CompareLineControlsComponent />}
 
 			{/* UI options for temperature graphic */}
-			{chartToRender == ChartTypes.temperature}
+			{chartToRender == ChartTypes.temperature && <TemperatureUnitSelectComponent/>}
 
 			<MoreOptionsComponent />
 
