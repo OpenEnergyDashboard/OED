@@ -9,107 +9,91 @@ const { chai, mocha, app } = require('../common');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const {
 	testInvalidField,
-	validateNoExtraFields
+	validateNoExtraFields,
+	validateNumericIdInPath,
+	expectValidNumericIdInPath
 } = require('../util/validationHelpers');
 const {
 	STRING_GENERAL_MAX_LENGTH,
 	STRING_SHORT_MAX_LENGTH
 } = require('../../util/validationConstants');
 
+/** Non-numeric path values reused across group_id route tests. */
+const INVALID_GROUP_ID_PATH_VALUES = ['abc', '12abc', 'group123', 'null', ''];
+/** Some group routes still return HTTP_CODE.OK for malformed group_id until path validation is strict; test encodes current behavior. */
+const GROUP_ID_MALFORMED_EXPECTED_STATUSES = [HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST];
+
+async function expectMalformedGroupIdRejectedOrOk(baseEndpoint) {
+	await validateNumericIdInPath({
+		baseEndpoint,
+		invalidValues: INVALID_GROUP_ID_PATH_VALUES,
+		expectedStatus: GROUP_ID_MALFORMED_EXPECTED_STATUSES
+	});
+}
+
 mocha.describe('Groups Parameter Validation', () => {
 
 	mocha.describe('GET /api/groups/deep/groups/:group_id - Deep Groups Validation', () => {
-		const DEEP_GROUPS_ENDPOINT = '/api/groups/deep/groups/123';
+		const BASE_ENDPOINT = '/api/groups/deep/groups';
 
 		mocha.it('should validate group_id parameter', async () => {
-			// Test invalid group ID patterns (non-numeric)
-			const invalidIds = ['abc', '12abc', 'group123', 'null', ''];
-
-			for (const invalidId of invalidIds) {
-				const res = await chai.request(app)
-					.get(`/api/groups/deep/groups/${invalidId}`);
-
-				// TODO: Some invalid IDs like 'abc' return 200 instead of expected 400
-				// This suggests path parameter validation may not be working as intended
-				// or Express is interpreting these as valid somehow. Needs investigation.
-				expect([HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST]).to.include(res.status);
-			}
+			await expectMalformedGroupIdRejectedOrOk(BASE_ENDPOINT);
 		});
 
 		mocha.it('should handle extremely long group IDs', async () => {
-			const longId = '1'.repeat(25);
-			const res = await chai.request(app)
-				.get(`/api/groups/deep/groups/${longId}`);
-
-			expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['1'.repeat(25)],
+				expectedStatus: HTTP_CODE.BAD_REQUEST
+			});
 		});
 
 		mocha.it('should handle SQL injection in group ID', async () => {
-			const sqlInjection = encodeURIComponent("1' OR '1'='1");
-			const res = await chai.request(app)
-				.get(`/api/groups/deep/groups/${sqlInjection}`);
-
-			expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: [encodeURIComponent("1' OR '1'='1")],
+				expectedStatus: HTTP_CODE.BAD_REQUEST
+			});
 		});
 
 		mocha.it('should accept valid numeric group IDs', async () => {
-			const validIds = ['1', '123', '999999'];
-
-			for (const validId of validIds) {
-				const res = await chai.request(app)
-					.get(`/api/groups/deep/groups/${validId}`);
-
-				// Valid numeric IDs should pass validation - may return 200 (success), 
-				// 404 (not found) or 500 (DB error) depending on data existence
-				expect([HTTP_CODE.OK, HTTP_CODE.NOT_FOUND, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
-			}
+			await expectValidNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				validValues: ['1', '123', '999999']
+			});
 		});
 	});
 
 	mocha.describe('GET /api/groups/deep/meters/:group_id - Deep Meters Validation', () => {
+		const BASE_ENDPOINT = '/api/groups/deep/meters';
+
 		mocha.it('should validate group_id parameter', async () => {
-			const invalidIds = ['abc', '12abc', 'group123', 'null', ''];
-
-			for (const invalidId of invalidIds) {
-				const res = await chai.request(app)
-					.get(`/api/groups/deep/meters/${invalidId}`);
-
-				// Should return 400 for validation error or HTTP_CODE.OK if somehow valid
-				expect([HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST]).to.include(res.status);
-			}
+			await expectMalformedGroupIdRejectedOrOk(BASE_ENDPOINT);
 		});
 
 		mocha.it('should handle path traversal attempts', async () => {
-			const pathTraversalAttempts = ['../123', '../../admin', '../../../etc/passwd'];
-
-			for (const maliciousPath of pathTraversalAttempts) {
-				const res = await chai.request(app)
-					.get(`/api/groups/deep/meters/${encodeURIComponent(maliciousPath)}`);
-
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
-			}
+			const pathTraversalAttempts = ['../123', '../../admin', '../../../etc/passwd'].map(p => encodeURIComponent(p));
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: pathTraversalAttempts,
+				expectedStatus: HTTP_CODE.BAD_REQUEST
+			});
 		});
 	});
 
 	mocha.describe('GET /api/groups/parents/:group_id - Parents Validation', () => {
+		const BASE_ENDPOINT = '/api/groups/parents';
+
 		mocha.it('should validate group_id parameter', async () => {
-			const invalidIds = ['abc', '12abc', 'group123', 'null', ''];
-
-			for (const invalidId of invalidIds) {
-				const res = await chai.request(app)
-					.get(`/api/groups/parents/${invalidId}`);
-
-				// Should return 400 for validation error or 200 if somehow valid
-				expect([HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST]).to.include(res.status);
-			}
+			await expectMalformedGroupIdRejectedOrOk(BASE_ENDPOINT);
 		});
 
 		mocha.it('should handle oversized group IDs', async () => {
-			const oversizedId = '9'.repeat(50);
-			const res = await chai.request(app)
-				.get(`/api/groups/parents/${oversizedId}`);
-
-			expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['9'.repeat(50)],
+				expectedStatus: HTTP_CODE.BAD_REQUEST
+			});
 		});
 	});
 

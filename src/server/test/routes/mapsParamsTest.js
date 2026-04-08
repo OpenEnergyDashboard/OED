@@ -6,7 +6,12 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { testInvalidField } = require('../util/validationHelpers');
+const {
+	testInvalidField,
+	validateNumericIdInPath,
+	expectValidNumericIdInPath,
+	validateNoExtraFields
+} = require('../util/validationHelpers');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const {
 	NUMERIC_ID_MAX_LENGTH,
@@ -30,38 +35,27 @@ mocha.describe('Maps Parameter Validation', () => {
 		const BASE_ENDPOINT = '/api/maps';
 
 		mocha.it('should accept valid map ID', async () => {
-			const res = await chai.request(app)
-				.get(`${BASE_ENDPOINT}/1`);
-
-			// Should return 200 or 500 (DB error) - no auth required for reading
-			expect([HTTP_CODE.OK, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			await expectValidNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				validValues: ['1'],
+				expectedStatuses: [HTTP_CODE.OK, HTTP_CODE.INTERNAL_SERVER_ERROR]
+			});
 		});
 
 		mocha.it('should reject invalid map ID patterns', async () => {
-			const invalidPatterns = [
-				'abc',           // Non-numeric
-				'1.5',           // Decimal
-				'-1',            // Negative
-				'1a',            // Mixed alphanumeric
-				'0',             // Zero
-			];
-
-			for (const invalidPattern of invalidPatterns) {
-				const res = await chai.request(app)
-					.get(`${BASE_ENDPOINT}/${invalidPattern}`);
-
-				//TODO
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
-			}
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['abc', '1.5', '-1', '1a', '0'],
+				expectedStatus: [HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]
+			});
 		});
 
 		mocha.it('should reject extremely long map ID strings (DoS prevention)', async () => {
-			const longMapId = 'x'.repeat(NUMERIC_ID_MAX_LENGTH + 1);
-
-			const res = await chai.request(app)
-				.get(`${BASE_ENDPOINT}/${longMapId}`);
-
-			expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['x'.repeat(NUMERIC_ID_MAX_LENGTH + 1)],
+				expectedStatus: HTTP_CODE.BAD_REQUEST
+			});
 		});
 	});
 
@@ -100,17 +94,12 @@ mocha.describe('Maps Parameter Validation', () => {
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseMapData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(CREATE_ENDPOINT)
-				.send(payloadWithExtra);
-
-			// Will fail auth before validation
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: CREATE_ENDPOINT,
+				basePayload: baseMapData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODE.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate string field lengths (DoS prevention)', async () => {
@@ -261,16 +250,12 @@ mocha.describe('Maps Parameter Validation', () => {
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseEditData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(EDIT_ENDPOINT)
-				.send(payloadWithExtra);
-
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: EDIT_ENDPOINT,
+				basePayload: baseEditData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODE.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate ID bounds', async () => {
@@ -329,16 +314,12 @@ mocha.describe('Maps Parameter Validation', () => {
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseDeleteData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(DELETE_ENDPOINT)
-				.send(payloadWithExtra);
-
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: DELETE_ENDPOINT,
+				basePayload: baseDeleteData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODE.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate ID bounds', async () => {

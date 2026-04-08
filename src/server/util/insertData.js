@@ -11,6 +11,7 @@ const { loadGeneratedInput } = require('../services/pipeline-in-progress/loadGen
 const moment = require('moment');
 const fs = require('fs').promises;
 const cloneDeep = require('lodash/cloneDeep');
+const util = require('util');
 
 /**
  * Inserts specified units into the database.
@@ -27,7 +28,7 @@ async function insertUnits(unitsToInsert, update = false, conn) {
 			let ok = true;
 			requiredKeys.forEach(key => {
 				if (!unitData.hasOwnProperty(key)) {
-					console.log(`********key "${key}" is required but missing so unit number ${index} not processed with values:`, unitData);
+					console.log(util.format('********key "%s" is required but missing so unit number %s not processed with values:', key, index), unitData);
 					// Don't insert
 					ok = false;
 				}
@@ -194,7 +195,7 @@ async function insertConversions(conversionsToInsert, conn) {
 			let ok = true;
 			requiredKeys.forEach(key => {
 				if (!conversionData.hasOwnProperty(key)) {
-					console.log(`********key "${key}" is required but missing so conversion number ${index} not processed with values:`, conversionData);
+					console.log(util.format('********key "%s" is required but missing so conversion number %s not processed with values:', key, index), conversionData);
 					// Don't insert
 					ok = false;
 				}
@@ -522,7 +523,7 @@ async function insertGroups(groupsToInsert, conn) {
 		let ok = true;
 		requiredKeys.forEach(key => {
 			if (!groupData.hasOwnProperty(key)) {
-				console.log(`********key "${key}" is required but missing so group number ${i} not processed with values:`, groupData);
+				console.log(util.format('********key "%s" is required but missing so group number %s not processed with values:', key, i), groupData);
 				// Don't insert
 				ok = false;
 			}
