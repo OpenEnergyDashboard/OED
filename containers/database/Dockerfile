@@ -6,7 +6,7 @@
 
 # Dockerfile for OED Postgres server.
 # Use a pinned version
-FROM postgres:15.3
+FROM timescale/timescaledb:latest-pg15
 
 # All SQL files in the build context
 # get copied into the container and
