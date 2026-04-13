@@ -30,6 +30,10 @@ class User {
 	 * @returns {User}
 	 */
 	static mapRow(row) {
+		if (row === null) {
+			return null;
+		}
+
 		return new User(
 			row.id,
 			row.username,
@@ -72,7 +76,7 @@ class User {
 	 */
 	static async getByUsername(username, conn) {
 		const row = await conn.oneOrNone(sqlFile('user/get_user_by_username.sql'), { username: username });
-		return row === null ? null : User.mapRow(row);
+		return User.mapRow(row);
 	}
 
 	/**
@@ -91,7 +95,7 @@ class User {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('user/get_all_users.sql'));
-		return rows.map(row => new User(row.id, row.username, undefined, row.role, row.note));
+		return rows.map(User.mapRow);
 	}
 
 	/**

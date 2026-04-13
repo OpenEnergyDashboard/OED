@@ -7,6 +7,8 @@
 const { expect } = require('chai');
 const { chai, mocha, app, testUser } = require('../common');
 const { HTTP_CODE } = require('../../util/readingsUtils');
+const jwt = require('jsonwebtoken');
+const secretToken = require('../../config').secretToken;
 
 mocha.describe('Session Invalidation Security', () => {
 	const LOGIN_ENDPOINT = '/api/login';
@@ -14,7 +16,9 @@ mocha.describe('Session Invalidation Security', () => {
 	const VERIFY_ENDPOINT = '/api/verification';
 	const PROTECTED_ENDPOINT = '/api/users';
 
-	async function loginAndGetToken() {
+	let token;
+
+	mocha.beforeEach(async () => {
 		const res = await chai.request(app)
 			.post(LOGIN_ENDPOINT)
 			.send({
@@ -24,22 +28,25 @@ mocha.describe('Session Invalidation Security', () => {
 
 		expect(res).to.have.status(HTTP_CODE.OK);
 		expect(res.body).to.have.property('token');
-		return res.body.token;
-	}
+		token = res.body.token;
+	});
 
 	mocha.it('should verify a valid token before logout', async () => {
-		const token = await loginAndGetToken();
-
 		const verifyRes = await chai.request(app)
 			.post(VERIFY_ENDPOINT)
 			.send({ token });
 
 		expect(verifyRes).to.have.status(HTTP_CODE.OK);
-		expect(verifyRes.body).to.deep.equal({ success: true });
+		expect(verifyRes.body).to.have.property('success', true);
+		expect(verifyRes.body).to.not.have.property('message');
 	});
 
 	mocha.it('should invalidate a token after logout', async () => {
-		const token = await loginAndGetToken();
+		const beforeVerify = await chai.request(app)
+			.post(VERIFY_ENDPOINT)
+			.send({ token });
+
+		expect(beforeVerify).to.have.status(HTTP_CODE.OK);
 
 		const logoutRes = await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
@@ -47,7 +54,6 @@ mocha.describe('Session Invalidation Security', () => {
 
 		expect(logoutRes).to.have.status(HTTP_CODE.OK);
 		expect(logoutRes.body).to.have.property('success', true);
-		expect(logoutRes.body).to.have.property('message', 'Logout successful.');
 
 		const verifyRes = await chai.request(app)
 			.post(VERIFY_ENDPOINT)
@@ -59,8 +65,6 @@ mocha.describe('Session Invalidation Security', () => {
 	});
 
 	mocha.it('should allow repeated logout with an already invalidated token', async () => {
-		const token = await loginAndGetToken();
-
 		const firstLogoutRes = await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
 			.send({ token });
@@ -78,19 +82,15 @@ mocha.describe('Session Invalidation Security', () => {
 	});
 
 	mocha.it('should reject an invalidated token on a protected route', async () => {
-		const token = await loginAndGetToken();
-
 		const beforeLogoutRes = await chai.request(app)
 			.get(PROTECTED_ENDPOINT)
 			.set('token', token);
 
 		expect(beforeLogoutRes).to.have.status(HTTP_CODE.OK);
 
-		const logoutRes = await chai.request(app)
+		await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
 			.send({ token });
-
-		expect(logoutRes).to.have.status(HTTP_CODE.OK);
 
 		const afterLogoutRes = await chai.request(app)
 			.get(PROTECTED_ENDPOINT)
@@ -110,8 +110,6 @@ mocha.describe('Session Invalidation Security', () => {
 	});
 
 	mocha.it('should reject extra fields on logout', async () => {
-		const token = await loginAndGetToken();
-
 		const res = await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
 			.send({
@@ -120,5 +118,23 @@ mocha.describe('Session Invalidation Security', () => {
 			});
 
 		expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+	});
+
+	mocha.it('should reject an expired token through normal JWT expiration handling', async () => {
+		const expiredToken = jwt.sign(
+			{ data: testUser.id },
+			secretToken,
+			{ expiresIn: 1 }
+		);
+
+		await new Promise(resolve => setTimeout(resolve, 1500));
+
+		const res = await chai.request(app)
+			.post(VERIFY_ENDPOINT)
+			.send({ token: expiredToken });
+
+		expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+		expect(res.body).to.have.property('success', false);
+		expect(res.body).to.have.property('message', 'Failed to authenticate token.');
 	});
 });

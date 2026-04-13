@@ -42,12 +42,13 @@ router.post('/', (req, res) => {
 			.catch(error => {
 				if (error.code === 'TOKEN_INVALIDATED') {
 					res.status(401).json({ success: false, message: 'Token invalidated.' });
-				} else if (error.message === 'No data returned from the query.') {
-					res.status(401).json({ success: false, message: 'User does not exist in database.' });
-				} else {
-					log.error('Token verification failed.', error);
-					res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-				}
+		        } else if (error.message === 'No data returned from the query.') {
+                    log.error('Token verification failed because the referenced user does not exist.', error);
+                	res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+                } else {
+                    log.error('Token verification failed.', error);
+                	res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
+                }
 			});
 	}
 });

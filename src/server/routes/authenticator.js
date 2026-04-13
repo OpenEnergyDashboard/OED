@@ -15,9 +15,14 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN
 	= require('../util/validationConstants');
 
 /**
- * Middleware function to force a route to require authentication
- * Verifies the request's token against the server's secret token.
+ * Middleware function to require authentication on protected routes.
+ * Verifies the request's token, ensures the user exists, and checks that
+ * the token has not been invalidated.
+ *
+ * This middleware is primarily used within this file and applied to
+ * routes that require authentication.
  */
+
 authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
@@ -119,6 +124,9 @@ async function verifyActiveTokenAndGetUser(token) {
 		});
 	});
 
+	// jwt.verify confirms the token signature is valid, but it does not guarantee
+	// the referenced user still exists in the database. The user may have been
+	// deleted after the token was issued, so OED must still verify the user record.
 	const conn = getConnection();
 	const user = await User.getByID(decoded.data, conn);
 
