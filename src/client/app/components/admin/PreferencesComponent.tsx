@@ -329,7 +329,20 @@ export default function PreferencesComponent() {
 					invalid={invalidFuncs.warningFileSize()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: 0, max: Number(localAdminPref.defaultFileSizeLimit) }} />
+					{Number(localAdminPref.defaultWarningFileSize) < 0 ? (
+						<FormattedMessage
+							id="error.greater"
+							values={{ min: 0 }}
+						/>
+					) : (
+						<FormattedMessage
+						id="error.bounds"
+						values={{
+							min: 0,
+							max: Number(localAdminPref.defaultFileSizeLimit)
+						}}
+						/>
+					)}
 				</FormFeedback>
 			</div>
 			<div>
@@ -345,7 +358,17 @@ export default function PreferencesComponent() {
 					invalid={invalidFuncs.fileSizeLimit()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: Number(localAdminPref.defaultWarningFileSize), max: Infinity }} />
+					{Number(localAdminPref.defaultFileSizeLimit) < 0 ? (
+						<FormattedMessage
+							id="error.greater"
+      						values={{ min: 0 }}
+						/>
+					) : (
+						<FormattedMessage
+							id="error.greater"
+      						values={{ min: Number(localAdminPref.defaultWarningFileSize) }}
+						/>
+					)}
 				</FormFeedback>
 			</div>
 			<div>
