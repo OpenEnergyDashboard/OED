@@ -30,7 +30,7 @@ function parseEnvFile(envPath) {
 
 // Generate a secure random password
 function generatePassword() {
-	return crypto.randomBytes(18).toString('base64');
+	return crypto.randomBytes(32).toString('base64');
 }
 
 // Escape single quotes in password for SQL
@@ -61,7 +61,7 @@ function updateEnvFile(postgresPassword, oedPassword) {
 		env = env.trimEnd() + `\nOED_DB_PASSWORD=${oedPassword}\n`;
 	}
 
-	// Writing new passwords to .env or creating it if it doesn't exist yet
+	// Writing new passwords to .env or creating it if it doesn't exist yet, only allowing the current user to read and write
 	fs.writeFileSync(ENV_PATH, env, { mode: 0o600 });
 	console.log('.env updated with new PostgreSQL and OED passwords');
 }
@@ -71,7 +71,10 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Detect retryable Postgres errors
+// Detect retryable Postgres errors:
+// 'tuple concurrently updated': row was modified by another transaction
+// 40001 (serialization_failure): concurrent transaction conflict
+// 55P03 (lock_not_available): couldn't acquire lock, may be freed soon
 function shouldRetryError(error) {
 	return (
 		error.message.includes('tuple concurrently updated') ||
@@ -83,6 +86,18 @@ function shouldRetryError(error) {
 // if this is done after the initial setup, OED must be restarted to get a connection with the server
 async function changePasswords() {
 	const fileEnv = parseEnvFile(ENV_PATH);
+
+	// Determine context: 'install' (automatic, no restart needed) or 'manual' (script, restart needed)
+	const isManual = process.argv[4] !== 'install';
+
+	// Warn if manual invocation that all OED users will lose access until restart
+	if (isManual) {
+		console.error('');
+		console.error('WARNING: This will change database passwords immediately.');
+		console.error('All currently logged-in users will experience disconnections.');
+		console.error('OED will not work for anyone until the server is restarted.');
+		console.error('');
+	}
 
 	// Prefer the most recent passwords from the .env file over process.env which may be outdated
 	if (fileEnv.POSTGRES_PASSWORD) {
@@ -126,7 +141,14 @@ async function changePasswords() {
 			console.log('********************************************************************************');
 			console.log('Generated a secure PostgreSQL and OED password and applied them successfully.');
 			console.log('The passwords have been stored in ".env" for reference.');
-			console.log('If this was run manually, you will need to restart OED for the changes to take effect.');
+			if (isManual) {
+				console.log('');
+				console.log('CRITICAL: OED is now disconnected for all users.');
+				console.log('You must restart OED immediately for it to function.');
+				console.log('All active user sessions will be terminated.');
+			} else {
+				console.log('(Installation mode: restart not required)');
+			}
 			console.log('********************************************************************************\n');
 
 			process.exit(0);
@@ -143,7 +165,7 @@ async function changePasswords() {
 			console.error('Error changing PostgreSQL or OED password:', error.message);
 
 			if (error.message.includes('password authentication')) {
-				console.error('Authentication failed: default password may already be changed.');
+				console.error('Authentication failed: default password may already be changed or password used is incorrect.');
 			}
 
 			process.exit(1);
