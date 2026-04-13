@@ -8,7 +8,8 @@ const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const {
 	validateCommaSeparatedIdPatterns,
-	expectValidCommaSeparatedIds
+	expectValidCommaSeparatedIds,
+	validateRequiredQueryParams
 } = require('../util/validationHelpers');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const {	STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
@@ -75,18 +76,11 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 
 		mocha.describe('Query Parameter Validation', () => {
 			mocha.it('should require all query parameters', async () => {
-				const requiredParams = ['curr_start', 'curr_end', 'shift', 'graphicUnitId'];
-
-				for (const param of requiredParams) {
-					const incompleteQuery = { ...validQuery };
-					delete incompleteQuery[param];
-
-					const res = await chai.request(app)
-						.get(`${BASE_METER_ENDPOINT}/1`)
-						.query(incompleteQuery);
-
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				}
+				await validateRequiredQueryParams({
+					endpoint: `${BASE_METER_ENDPOINT}/1`,
+					baseQuery: validQuery,
+					requiredParams: ['curr_start', 'curr_end', 'shift', 'graphicUnitId']
+				});
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection prevention)', async () => {
@@ -230,18 +224,11 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 
 		mocha.describe('Query Parameter Validation', () => {
 			mocha.it('should require all query parameters', async () => {
-				const requiredParams = ['curr_start', 'curr_end', 'shift', 'graphicUnitId'];
-
-				for (const param of requiredParams) {
-					const incompleteQuery = { ...validQuery };
-					delete incompleteQuery[param];
-
-					const res = await chai.request(app)
-						.get(`${BASE_GROUP_ENDPOINT}/1`)
-						.query(incompleteQuery);
-
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				}
+				await validateRequiredQueryParams({
+					endpoint: `${BASE_GROUP_ENDPOINT}/1`,
+					baseQuery: validQuery,
+					requiredParams: ['curr_start', 'curr_end', 'shift', 'graphicUnitId']
+				});
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection prevention)', async () => {

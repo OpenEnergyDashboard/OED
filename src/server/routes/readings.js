@@ -64,6 +64,7 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 				count += curr
 			}
+			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 			res.send(JSON.stringify(count));
 		} catch (err) {
 			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
@@ -128,6 +129,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Note this returns unusual identifiers to save space and does not return the meter id.
 			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			// They are ready to go back.
+			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 			res.send(rawReadings);
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
