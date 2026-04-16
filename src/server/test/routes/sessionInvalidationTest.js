@@ -5,10 +5,12 @@
  */
 
 const { expect } = require('chai');
-const { chai, mocha, app, testUser } = require('../common');
+const common = require('../common');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
+
+const { chai, mocha, app, testUser, testUser2 } = common;
 
 mocha.describe('Session Invalidation Security', () => {
 	const LOGIN_ENDPOINT = '/api/login';
@@ -18,17 +20,21 @@ mocha.describe('Session Invalidation Security', () => {
 
 	let token;
 
-	mocha.beforeEach(async () => {
+	async function loginAndGetToken(user) {
 		const res = await chai.request(app)
 			.post(LOGIN_ENDPOINT)
 			.send({
-				username: testUser.username,
-				password: testUser.password
+				username: user.username,
+				password: user.password
 			});
 
 		expect(res).to.have.status(HTTP_CODE.OK);
 		expect(res.body).to.have.property('token');
-		token = res.body.token;
+		return res.body.token;
+	}
+
+	mocha.beforeEach(async () => {
+		token = await loginAndGetToken(testUser);
 	});
 
 	mocha.it('should verify a valid token before logout', async () => {
@@ -47,6 +53,7 @@ mocha.describe('Session Invalidation Security', () => {
 			.send({ token });
 
 		expect(beforeVerify).to.have.status(HTTP_CODE.OK);
+		expect(beforeVerify.body).to.have.property('success', true);
 
 		const logoutRes = await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
@@ -136,5 +143,31 @@ mocha.describe('Session Invalidation Security', () => {
 		expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
 		expect(res.body).to.have.property('success', false);
 		expect(res.body).to.have.property('message', 'Failed to authenticate token.');
+	});
+
+	mocha.it('should invalidate token for a non-admin user', async () => {
+		const otherToken = await loginAndGetToken(testUser2);
+
+		const beforeVerify = await chai.request(app)
+			.post(VERIFY_ENDPOINT)
+			.send({ token: otherToken });
+
+		expect(beforeVerify).to.have.status(HTTP_CODE.OK);
+		expect(beforeVerify.body).to.have.property('success', true);
+
+		const logoutRes = await chai.request(app)
+			.post(LOGOUT_ENDPOINT)
+			.send({ token: otherToken });
+
+		expect(logoutRes).to.have.status(HTTP_CODE.OK);
+		expect(logoutRes.body).to.have.property('success', true);
+
+		const verifyRes = await chai.request(app)
+			.post(VERIFY_ENDPOINT)
+			.send({ token: otherToken });
+
+		expect(verifyRes).to.have.status(HTTP_CODE.UNAUTHORIZED);
+		expect(verifyRes.body).to.have.property('success', false);
+		expect(verifyRes.body).to.have.property('message', 'Token invalidated.');
 	});
 });

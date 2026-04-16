@@ -91,6 +91,10 @@ router.post('/logout', async (req, res) => {
 	}
 
 	try {
+		// This route does not trust a user id from the request body.
+		// It authenticates the provided token, ensures the referenced user
+		// still exists, and then uses that verified user record to determine
+		// which user's tokens should be invalidated.
 		const { user } = await verifyActiveTokenAndGetUser(req.body.token);
 		const conn = getConnection();
 		await User.invalidateTokensBeforeNow(user.id, conn);

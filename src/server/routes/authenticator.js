@@ -18,12 +18,9 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN
  * Middleware function to require authentication on protected routes.
  * Verifies the request's token, ensures the user exists, and checks that
  * the token has not been invalidated.
- *
- * This middleware is primarily used within this file and applied to
- * routes that require authentication.
+ * This middleware is currently used within this file.
  */
-
-authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
 		type: 'string',
@@ -129,7 +126,8 @@ async function verifyActiveTokenAndGetUser(token) {
 	// deleted after the token was issued, so OED must still verify the user record.
 	const conn = getConnection();
 	const user = await User.getByID(decoded.data, conn);
-
+    // Default to 0 (Unix epoch start) to align with the database default.
+    // If tokenInvalidBefore is missing or invalid, tokens issued after epoch remain valid.
 	let invalidBefore = 0;
 	if (user.tokenInvalidBefore) {
 		const parsedDate = new Date(user.tokenInvalidBefore);
@@ -141,6 +139,8 @@ async function verifyActiveTokenAndGetUser(token) {
 	}
 
 	const tokenIssuedAt = decoded.iat;
+	// Reject tokens issued at or before tokenInvalidBefore so tokens created in
+    // the same second as invalidation are not incorrectly treated as valid.
 	if (tokenIssuedAt <= invalidBefore) {
 		const error = new Error('Token invalidated');
 		error.code = 'TOKEN_INVALIDATED';
@@ -157,7 +157,7 @@ async function verifyActiveTokenAndGetUser(token) {
  */
 function roleTokenAuthMiddleware(role, action) {
 	return function (req, res, next) {
-		this.authMiddleware(req, res, async () => {
+		authMiddleware(req, res, async () => {
 			const token = req.headers.token || req.body.token || req.query.token;
 			if (await isTokenAuthorized(token, role)) {
 				next();
@@ -233,7 +233,7 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
  * Verifies the request's token against the server's secret token
  * Sets the req field hasValidAuthToken to true or false
  */
-optionalAuthMiddleware = (req, res, next) => {
+const optionalAuthMiddleware = (req, res, next) => {
 	// Set auth token to false initially.
 	req.hasValidAuthToken = false;
 

@@ -70,6 +70,15 @@ function connectTestDB() {
 const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('password', 10), User.role.ADMIN);
 testUser.password = 'password';
 
+// Non-admin user (for role testing)
+const testUser2 = new User(
+	undefined,
+	'test2@example.invalid',
+	bcrypt.hashSync('password', 10),
+	User.role.CSV
+);
+testUser2.password = 'password';
+
 async function recreateDB() {
 	conn = testDB.getConnection();
 	// This should drop all database objects, as long as they were all created by the current database user
@@ -77,6 +86,7 @@ async function recreateDB() {
 	await conn.none('DROP OWNED BY current_user;');
 	await createSchema(conn);
 	await testUser.insert(conn);
+    await testUser2.insert(conn);
 }
 
 mocha.before(() => {
@@ -97,6 +107,7 @@ module.exports = {
 	expect,
 	app,
 	testUser,
+	testUser2,
 	recreateDB,
 	testDB
 };
