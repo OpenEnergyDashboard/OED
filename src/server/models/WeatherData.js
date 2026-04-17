@@ -47,8 +47,12 @@ class WeatherData {
 	  * @returns {Promise.<WeatherData>}
 	  */
 	// TODO: needs model and db get_weather_data
-	static async getWeatherData(conn) {
-		const rows = await conn.one(sqlFile('weather_data/get_weather_data_by_id_and_date_range.sql'));
+	static async getWeatherData(id, startTime, endTime, conn) {
+		const rows = await conn.many(sqlFile('weather_data/get_weather_data_by_id_and_date_range.sql'), {
+			weatherLocationId: id,
+			startTime: startTime,
+			endTime: endTime
+		});
 		return rows.map(WeatherData.mapRow);
 	}
 
@@ -60,7 +64,7 @@ class WeatherData {
 	 */
 	static async getLatestTimeStamp(id, conn) {
 		try {
-			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weather_location_id: id }));
+			return moment(await conn.one(sqlFile('weather_data/get_latest_timestamp.sql'), { weatherLocationId: id }));
 		} catch (err) {
 			log.error(`Error fetching the latest end timestamp: ${err}`, err);
 			throw err;

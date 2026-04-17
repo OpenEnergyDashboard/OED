@@ -81,6 +81,9 @@ export const graphSlice = createSlice({
 		updateSelectedAreaUnit: (state, action: PayloadAction<AreaUnitType>) => {
 			state.current.selectedAreaUnit = action.payload;
 		},
+		updateSelectedTemperatureUnit: (state, action: PayloadAction<TemperatureUnitType>) => {
+			state.current.selectedTemperatureUnit = action.payload;
+		},
 		updateDuration: (state, action: PayloadAction<moment.Duration>) => {
 			state.current.duration = action.payload;
 		},

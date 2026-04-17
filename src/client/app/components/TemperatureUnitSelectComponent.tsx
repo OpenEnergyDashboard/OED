@@ -10,23 +10,26 @@ import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectTemperatureUnit, graphSlice } from '../redux/slices/graphSlice';
 import { TemperatureUnitType } from '../types/redux/graph';
 import { useTranslate } from '../redux/componentHooks';
+import { StringSelectOption } from '../types/items';
 
-interface TemperatureUnitOptions {
-	label: string;
-	value: TemperatureUnitType;
-}
-
+/**
+ * React Component that creates the temperature unit selector dropdown
+ * @returns temperature unit select element
+ */
 export default function TemperatureUnitSelectComponent() {
 	const dispatch = useAppDispatch();
 	const translate = useTranslate();
 	const temperatureUnit = useAppSelector(selectTemperatureUnit);
 
-	const options: TemperatureUnitOptions[] = [
-		{ label: translate('TemperatureUnitType.celsius'), value: TemperatureUnitType.celsius },
-		{ label: translate('TemperatureUnitType.fahrenheit'), value: TemperatureUnitType.fahrenheit }
-	];
+	// Array of select options created from the temperatureUnitType enum
+	const temperatureUnitOptions: StringSelectOption[] = [];
 
-	const currentValue = options.find(o => o.value === temperatureUnit) ?? options[0];
+	Object.keys(TemperatureUnitType).forEach(unitKey => {
+		temperatureUnitOptions.push({
+			label: translate(`TemperatureUnitType.${unitKey}`),
+			value: unitKey
+		} as StringSelectOption);
+	});
 
 	const divBottomPadding: React.CSSProperties = {
 		paddingBottom: '15px'
@@ -40,9 +43,13 @@ export default function TemperatureUnitSelectComponent() {
 			</p>
 			<div style={divBottomPadding}>
 				<Select
-					value={currentValue}
-					options={options}
-					onChange={e => dispatch(graphSlice.actions.setTemperatureUnit(e!.value))}
+					value={{ label: translate(`TemperatureUnitType.${temperatureUnit}`), value: temperatureUnit } as StringSelectOption}
+					options={temperatureUnitOptions}
+					onChange={newSelectedUnit => {
+						if (newSelectedUnit) {
+							dispatch(graphSlice.actions.updateSelectedTemperatureUnit(newSelectedUnit.value as TemperatureUnitType));
+						}
+					}}
 				/>
 			</div>
 		</div>

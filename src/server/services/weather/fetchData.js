@@ -21,7 +21,7 @@ function fetchWeatherData(latitude, longitude, startDate, endDate) {
 		"start_date": startDate,
 		"end_date": endDate,
 		"hourly": "temperature_2m",
-		"temperature_unit": "fahrenheit",
+		"temperature_unit": "celsius",
 	};
 	const url = "https://archive-api.open-meteo.com/v1/archive";
 

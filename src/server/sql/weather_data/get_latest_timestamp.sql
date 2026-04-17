@@ -4,5 +4,5 @@
 
 SELECT MAX(end_timestamp) AS max_end_timestamp
 FROM weather_data
-WHERE weather_location_id = ${weather_location_id};
+WHERE weather_location_id = ${weatherLocationId};
 select max(end_timestamp) as max_end_timestamp from weather_data where weather_location_id=7;
