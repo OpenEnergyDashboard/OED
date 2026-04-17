@@ -120,12 +120,19 @@ const exportRawLimiter = rateLimit({
 // Apply the raw export limit
 app.use('/api/readings/line/raw/meters', exportRawLimiter);
 
-// Limit the number of login attempts to 1 per 4 seconds
+// Limit the number of login attempts
 const loginLimiter = rateLimit({
-	windowMs: 4 * 1000, // 4 seconds
-	limit: isRateTest ? 1 : 1 * testMultiplier, // 1 requests
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	// Window of 4 seconds
+	windowMs: 4 * 1000, 
+	/* Rationale: The login route requires a more specifc and strict rate limit that must be tested seperately. 
+	This is to validate that the rate limit in place is functioning correctly. 
+	If running in the rate test enviromnet, limit to 1 request (1 per 4 seconds)
+	Otherwise, use the standard limit based on the configured multiplier*/
+	limit: isRateTest ? 1 : 1 * testMultiplier,
+	// Return rate limit info in the `RateLimit-*` headers
+	standardHeaders: true, 
+	// Disable the `X-RateLimit-*` headers
+	legacyHeaders: false, 
 });
 //Apply the login limit
 app.use('/api/login', loginLimiter);
@@ -145,7 +152,7 @@ app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/readings', readings);
 app.use('/api/preferences', preferences);
-app.use('api/login')
+app.use('api/login', login);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/version', version);
