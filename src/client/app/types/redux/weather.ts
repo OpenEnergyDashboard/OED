@@ -26,3 +26,11 @@ export interface WeatherState {
 	submitting: number[];
 	weatherLocationData: WeatherLocationById;
 }
+
+export interface WeatherDataReading {
+	id: number;
+	weatherLocationId: number;
+	startTimestamp: string;
+	endTimestamp: string;
+	temperature: number;
+}
