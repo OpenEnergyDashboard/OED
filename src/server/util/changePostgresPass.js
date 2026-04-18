@@ -6,6 +6,7 @@ const { Client } = require('pg');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
+const readline = require('readline');
 const dotenv = require('dotenv');
 
 const ROOT_ENV_PATH = path.resolve(__dirname, '..', '..', '..', '.env');
@@ -36,6 +37,21 @@ function generatePassword() {
 // Escape single quotes in password for SQL
 function escapePassword(password) {
 	return password.replace(/'/g, "''");
+}
+
+// Prompt the user for an explicit yes/no confirmation
+function promptConfirmation(promptText) {
+	const rl = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+
+	return new Promise((resolve) => {
+		rl.question(`${promptText} `, (answer) => {
+			rl.close();
+			resolve(answer.trim().toLowerCase() === 'yes');
+		});
+	});
 }
 
 // Update .env with PostgreSQL and OED user passwords
@@ -97,6 +113,12 @@ async function changePasswords() {
 		console.error('All currently logged-in users will experience disconnections.');
 		console.error('OED will not work for anyone until the server is restarted.');
 		console.error('');
+
+		const confirmed = await promptConfirmation('Do you want to continue? Type yes to proceed:');
+		if (!confirmed) {
+			console.error('Aborting password change. No changes were made.');
+			process.exit(0);
+		}
 	}
 
 	// Prefer the most recent passwords from the .env file over process.env which may be outdated
