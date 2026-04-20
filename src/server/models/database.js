@@ -15,7 +15,6 @@ const pgp = require('pg-promise')({
 const path = require('path');
 const patchMomentType = require('./patch-moment-type');
 const patchPointType = require('./patch-point-type');
-const { log } = require('../log');
 
 patchMomentType(pgp);
 patchPointType(pgp);
@@ -57,16 +56,9 @@ const loadedSqlFiles = {};
  * @returns {pgPromise.QueryFile}
  */
 function sqlFile(filePath) {
-	const sanitizedPath = filePath.replace(/\.\./g, ''); 
-    const resolvedPath = path.resolve(sqlFilesDir, sanitizedPath);
-	if (!resolvedPath.startsWith(path.resolve(sqlFilesDir))) {
-		log.error(`Path traversal detected - resolved path: ${resolvedPath}, expected base: ${path.resolve(sqlFilesDir)}`);
-		throw new Error('Invalid file path: path traversal detected');
-	}
-
-	const sqlFilePath = resolvedPath
+	const sqlFilePath = path.join(sqlFilesDir, filePath);
 	if (loadedSqlFiles[sqlFilePath] === undefined) {
-		loadedSqlFiles[sqlFilePath] = new pgp.QueryFile(sqlFilePath, {minify: true});
+		loadedSqlFiles[sqlFilePath] = new pgp.QueryFile(path.join(sqlFilesDir, filePath), { minify: true });
 	}
 	return loadedSqlFiles[sqlFilePath];
 }

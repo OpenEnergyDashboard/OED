@@ -12,29 +12,17 @@
  * A middleware to lowercase all params, including those passed by form/multipart
  */
 function lowercaseAllParamNames(req, res, next) {
-
-	// Use null-prototype objects to prevent prototype pollution from user-controlled keys
-    const newQuery = Object.create(null);
-
-	for (const [key, value] of Object.entries(req.query)) {
-		newQuery[key.toLowerCase()] = value;
+	for (const key of Object.entries(req.query)) {
+		req.query[key[0].toLowerCase()] = key[1];
 	}
-	req.query = newQuery;
-
-	const newParams = Object.create(null);
-	for (const [key, value] of Object.entries(req.params)) {
-		newParams[key.toLowerCase()] = value;
+	for (const key of Object.entries(req.params)) {
+		req.params[key[0].toLowerCase()] = key[1];
 	}
-	req.params = newParams;
-
 	if (req.body) {
-		const newBody = Object.create(null);
-		for (const [key, value] of Object.entries(req.body)) {
-			newBody[key.toLowerCase()] = value;
+		for (const key of Object.entries(req.body)) {
+			req.body[key[0].toLowerCase()] = key[1];
 		}
-		req.body = newBody;
 	}
-
 	next();
 }
 
