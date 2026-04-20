@@ -53,6 +53,7 @@ services:
             - OED_MAIL_FROM=mydomain@example.com # The email address that the email will come from
             - OED_MAIL_TO=someone@example.com # Set the destination address here for where to send emails
             - OED_MAIL_ORG=My Organization Name # Org name for mail that is included in the subject
+            - PASSWORD_VAULT=no # Set to yes to load DB passwords from Infisical
             # Changing this value does not impact what OED displays.
             # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
             # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
