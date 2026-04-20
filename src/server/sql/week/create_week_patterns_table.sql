@@ -12,5 +12,6 @@ CREATE TABLE IF NOT EXISTS week_patterns (
 	wednesday INTEGER NOT NULL REFERENCES day_patterns(id),
 	thursday INTEGER NOT NULL REFERENCES day_patterns(id),
 	friday INTEGER NOT NULL REFERENCES day_patterns(id),
-	saturday INTEGER NOT NULL REFERENCES day_patterns(id)
+	saturday INTEGER NOT NULL REFERENCES day_patterns(id),
+	holiday_instance_group_id INTEGER REFERENCES holiday_instance_group(id)
 );
