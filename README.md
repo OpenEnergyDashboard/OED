@@ -10,22 +10,6 @@ Open Energy Dashboard is available under the Mozilla Public License v2, and cont
 
 See [USAGE.md](USAGE.md).
 
-## Optional Infisical password vault support ##
-
-OED can optionally load `POSTGRES_PASSWORD` and `OED_DB_PASSWORD` from Infisical when the following environment variable is enabled:
-
-- `PASSWORD_VAULT=yes`
-- `INFISICAL_CLIENT_ID` - Machine Identity client ID
-- `INFISICAL_CLIENT_SECRET` - Machine Identity client secret
-- `INFISICAL_PROJECT_ID` - The Infisical project ID
-- `INFISICAL_SITE_URL` (optional, default: `https://app.infisical.com`)
-- `INFISICAL_ENVIRONMENT` (optional, default: `dev`)
-- `INFISICAL_PATH` (optional, default: `/`)
-
-The secrets `POSTGRES_PASSWORD` and `OED_DB_PASSWORD` must exist in your Infisical project. When `PASSWORD_VAULT=yes`, OED will override those two values from Infisical while continuing to load all other variables from `.env`.
-
-Install the SDK before starting OED with vault support: `npm install @infisical/sdk`
-
 ## Built With ##
 
 Plotly.js - JavaScript library used to generate data charts ([plotly.com](https://plotly.com/javascript/))
