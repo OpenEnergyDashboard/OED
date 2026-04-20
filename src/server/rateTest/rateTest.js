@@ -31,8 +31,8 @@ mocha.describe('Login Rate Limit', () => {
 					password: 'invalidPassword'
 				});
 
-			//Second request that triggers the rate limit of 1 request per 4 seconds
-			expect(first).to.have.status(HTTP_CODE.TOO_MANY_REQUESTS);
+			//Second request that triggers the rate limit of 1 request per hour
+			expect(second).to.have.status(HTTP_CODE.TOO_MANY_REQUESTS);
 			expect(second.text).to.include('Too many requests');
 	});
 });

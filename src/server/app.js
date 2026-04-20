@@ -122,13 +122,13 @@ app.use('/api/readings/line/raw/meters', exportRawLimiter);
 
 // Limit the number of login attempts
 const loginLimiter = rateLimit({
-	// Window of 4 seconds
-	windowMs: 4 * 1000, 
+	// Window of 1 hour 
+	windowMs: 60 * 60 * 1000, 
 	/* Rationale: The login route requires a more specifc and strict rate limit that must be tested seperately. 
 	This is to validate that the rate limit in place is functioning correctly. 
-	If running in the rate test enviromnet, limit to 1 request (1 per 4 seconds)
-	Otherwise, use the standard limit based on the configured multiplier*/
-	limit: isRateTest ? 1 : 1 * testMultiplier,
+	If running in the rate test enviroment, limit to 1 request (1 per hour)
+	Otherwise, use the standard limit based on the configured multiplier. */
+	limit: isRateTest ? 1 : 900 * testMultiplier,
 	// Return rate limit info in the `RateLimit-*` headers
 	standardHeaders: true, 
 	// Disable the `X-RateLimit-*` headers
