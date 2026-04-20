@@ -9,7 +9,9 @@ const { chai, mocha, app } = require('../common');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const {
 	testInvalidField,
-	validateNoExtraFields
+	validateNoExtraFields,
+	validateString,
+	validateBool
 } = require('../util/validationHelpers');
 const {
 	STRING_GENERAL_MAX_LENGTH,
@@ -62,106 +64,60 @@ mocha.describe('Units Add Parameter Validation', () => {
 		});
 
 		mocha.it('should validate string field lengths', async () => {
-			// Test name field length (minLength: 1)
-			await testInvalidField({
-				field: 'name',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
+			const lengthOnlyFields = [
+				{ field: 'name', maxLength: STRING_SHORT_MAX_LENGTH },
+				{ field: 'identifier', maxLength: STRING_GENERAL_MAX_LENGTH }
+			];
 
-			// Test identifier field length (minLength: 1)
-			await testInvalidField({
-				field: 'identifier',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test unitRepresent field length (minLength: 1)
-			await testInvalidField({
-				field: 'unitRepresent',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test typeOfUnit field length (minLength: 1)
-			await testInvalidField({
-				field: 'typeOfUnit',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test displayable field length (minLength: 1)
-			await testInvalidField({
-				field: 'displayable',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test disableChecks field length (minLength: 1)
-			await testInvalidField({
-				field: 'disableChecks',
-				invalidValue: '',
-				endpoint: ADD_ENDPOINT,
-				basePayload: baseUnitData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
+			for (const { field, maxLength } of lengthOnlyFields) {
+				await validateString({
+					field,
+					endpoint: ADD_ENDPOINT,
+					basePayload: baseUnitData,
+					minLength: 1,
+					maxLength,
+					expectedStatus: HTTP_CODE.FORBIDDEN
+				});
+			}
 		});
 
-		mocha.it('should validate enum fields', async () => {
-			// Test invalid unitRepresent (valid: quantity, flow, raw)
-			const invalidUnitRepresents = ['INVALID', 'invalid', 'volume', 'rate', ''];
-			for (const invalidValue of invalidUnitRepresents) {
-				await testInvalidField({
+		mocha.it('should validate enum-like string fields', async () => {
+			const enumLikeFields = [
+				{
 					field: 'unitRepresent',
-					invalidValue: invalidValue,
-					endpoint: ADD_ENDPOINT,
-					basePayload: baseUnitData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
-				});
-			}
-
-			// Test invalid typeOfUnit (valid: unit, meter, suffix)
-			const invalidTypeOfUnits = ['INVALID', 'invalid', 'group', 'reading', ''];
-			for (const invalidValue of invalidTypeOfUnits) {
-				await testInvalidField({
+					maxLength: STRING_GENERAL_MAX_LENGTH,
+					enumValues: ['quantity', 'flow', 'raw'],
+					additionalInvalidEnumValues: ['INVALID', 'invalid', 'volume', 'rate', '']
+				},
+				{
 					field: 'typeOfUnit',
-					invalidValue: invalidValue,
-					endpoint: ADD_ENDPOINT,
-					basePayload: baseUnitData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
-				});
-			}
-
-			// Test invalid displayable (valid: none, all, admin)
-			const invalidDisplayables = ['INVALID', 'invalid', 'public', 'private', ''];
-			for (const invalidValue of invalidDisplayables) {
-				await testInvalidField({
+					maxLength: STRING_GENERAL_MAX_LENGTH,
+					enumValues: ['unit', 'meter', 'suffix'],
+					additionalInvalidEnumValues: ['INVALID', 'invalid', 'group', 'reading', '']
+				},
+				{
 					field: 'displayable',
-					invalidValue: invalidValue,
-					endpoint: ADD_ENDPOINT,
-					basePayload: baseUnitData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
-				});
-			}
-
-			// Test invalid disableChecks (valid: reject_disabled, reject_bad, reject_all, reject_none)
-			const invalidDisableChecks = ['INVALID', 'invalid', 'reject', 'disable', ''];
-			for (const invalidValue of invalidDisableChecks) {
-				await testInvalidField({
+					maxLength: STRING_GENERAL_MAX_LENGTH,
+					enumValues: ['none', 'all', 'admin'],
+					additionalInvalidEnumValues: ['INVALID', 'invalid', 'public', 'private', '']
+				},
+				{
 					field: 'disableChecks',
-					invalidValue: invalidValue,
+					maxLength: STRING_GENERAL_MAX_LENGTH,
+					enumValues: ['reject_disabled', 'reject_bad', 'reject_all', 'reject_none'],
+					additionalInvalidEnumValues: ['INVALID', 'invalid', 'reject', 'disable', '']
+				}
+			];
+
+			for (const { field, maxLength, enumValues, additionalInvalidEnumValues } of enumLikeFields) {
+				await validateString({
+					field,
 					endpoint: ADD_ENDPOINT,
 					basePayload: baseUnitData,
+					minLength: 1,
+					maxLength,
+					enumValues,
+					additionalInvalidEnumValues,
 					expectedStatus: HTTP_CODE.FORBIDDEN
 				});
 			}
@@ -197,17 +153,12 @@ mocha.describe('Units Add Parameter Validation', () => {
 		});
 
 		mocha.it('should validate boolean field types', async () => {
-			const invalidBooleanValues = ['yes', 'no', '1', '0', 'on', 'off', 'true', 'false'];
-
-			for (const invalidValue of invalidBooleanValues) {
-				await testInvalidField({
-					field: 'preferredDisplay',
-					invalidValue: invalidValue,
-					endpoint: ADD_ENDPOINT,
-					basePayload: baseUnitData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
-				});
-			}
+			await validateBool({
+				field: 'preferredDisplay',
+				endpoint: ADD_ENDPOINT,
+				basePayload: baseUnitData,
+				expectedStatus: HTTP_CODE.FORBIDDEN
+			});
 		});
 
 		mocha.it('should handle oneOf nullable fields correctly', async () => {
