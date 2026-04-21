@@ -48,8 +48,8 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 			const user = await User.getByUsername(req.body.username, conn);
 			let isValid;
 			if (user === null) {
-				// User did not exist so return false.
-				isValid = await bcrypt.compare(req.body.password, user.passwordHash);
+				// call the bcrypt.compare() without assigning it valid user to eliminate time differation
+				await bcrypt.compare(req.body.password, user.passwordHash);
 				isValid = false;
 			} else {
 				isValid = await bcrypt.compare(req.body.password, user.passwordHash);
