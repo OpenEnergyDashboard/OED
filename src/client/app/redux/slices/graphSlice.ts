@@ -42,7 +42,8 @@ const defaultState: GraphState = {
 	hotlinked: false,
 	shiftAmount: ShiftAmount.none,
 	shiftTimeInterval: TimeInterval.unbounded(),
-	selectedTemperatureUnit: TemperatureUnitType.celsius
+	selectedTemperatureUnit: TemperatureUnitType.celsius,
+	selectedWeatherLocationId: null
 };
 
 interface History<T> {
@@ -177,6 +178,9 @@ export const graphSlice = createSlice({
 		},
 		setTemperatureUnit: (state, action: PayloadAction<TemperatureUnitType>) => {
 			state.current.selectedTemperatureUnit = action.payload;
+		},
+		updateSelectedWeatherLocationId: (state, action: PayloadAction<number | null>) => {
+			state.current.selectedWeatherLocationId = action.payload;
 		}
 
 	},
@@ -302,12 +306,14 @@ export const graphSlice = createSlice({
 			)
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
 				if (!current.hotlinked) {
-					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization, defaultTemperatureUnit } = action.payload;
+					const { defaultAreaUnit, defaultChartToRender, defaultBarStacking, defaultAreaNormalization,
+							defaultTemperatureUnit, defaultWeatherLocation } = action.payload;
 					current.selectedAreaUnit = defaultAreaUnit;
 					current.chartToRender = defaultChartToRender;
 					current.barStacking = defaultBarStacking;
 					current.areaNormalization = defaultAreaNormalization;
 					current.selectedTemperatureUnit = defaultTemperatureUnit;
+					current.selectedWeatherLocationId = defaultWeatherLocation ? Number(defaultWeatherLocation) : null;
 				}
 			});
 	},
@@ -342,7 +348,8 @@ export const graphSlice = createSlice({
 		selectPlotlySliderMax: state => state.current.rangeSliderInterval.getEndTimestamp()?.utc().toDate().toISOString(),
 		selectShiftAmount: state => state.current.shiftAmount,
 		selectShiftTimeInterval: state => state.current.shiftTimeInterval,
-		selectTemperatureUnit: state => state.current.selectedTemperatureUnit
+		selectTemperatureUnit: state => state.current.selectedTemperatureUnit,
+		selectSelectedWeatherLocationId: state => state.current.selectedWeatherLocationId
 	}
 });
 
@@ -363,7 +370,7 @@ export const {
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,
 	selectShiftTimeInterval, selectInitialXAxisRange,
-	selectTemperatureUnit
+	selectTemperatureUnit, selectSelectedWeatherLocationId
 } = graphSlice.selectors;
 
 // actionCreators exports
@@ -382,6 +389,7 @@ export const {
 	updateThreeDMeterOrGroupID, updateThreeDReadingInterval,
 	updateThreeDMeterOrGroupInfo, updateShiftAmount,
 	setInitialXAxisRange, updateTimeIntervalAndSliderRange,
-	updateShiftTimeInterval, setTemperatureUnit
+	updateShiftTimeInterval, setTemperatureUnit,
+	updateSelectedWeatherLocationId
 } = graphSlice.actions;
 

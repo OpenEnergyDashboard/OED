@@ -17,6 +17,7 @@ import ReadingsPerDaySelectComponent from './ReadingsPerDaySelectComponent';
 import MoreOptionsComponent from './MoreOptionsComponent';
 import CompareLineControlsComponent from './CompareLineControlsComponent';
 import TemperatureUnitSelectComponent from './TemperatureUnitSelectComponent';
+import WeatherLocationSelectComponent from './WeatherLocationSelectComponent';
 
 /**
  * @returns the UI Control panel
@@ -88,6 +89,7 @@ export default function UIOptionsComponent() {
 
 			{/* UI options for temperature graphic */}
 			{chartToRender == ChartTypes.temperature && <TemperatureUnitSelectComponent/>}
+			{chartToRender == ChartTypes.temperature && <WeatherLocationSelectComponent />}
 
 			<MoreOptionsComponent />
 

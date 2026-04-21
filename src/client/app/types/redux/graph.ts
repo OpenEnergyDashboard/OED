@@ -89,6 +89,7 @@ export interface GraphState {
 	shiftAmount: ShiftAmount;
 	shiftTimeInterval: TimeInterval;
 	selectedTemperatureUnit: TemperatureUnitType;
+	selectedWeatherLocationId: number | null;
 }
 
 export enum TemperatureUnitType {
