@@ -3,12 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { MeterTimeSortType } from '../types/redux/meters';
+import { DisableChecksType } from './redux/units';
 
 export interface CSVUploadPreferences {
 	meterIdentifier: string;
 	gzip: boolean;
 	headerRow: boolean;
 	update: boolean;
+	timeZone?: string;
+	minVal?: string;
+	maxVal?: string;
+	minDate?: string;
+	maxDate?: string;
+	maxError?: string;
+	disableChecks?: DisableChecksType;
 }
 
 export interface ReadingsCSVUploadPreferences extends CSVUploadPreferences {
