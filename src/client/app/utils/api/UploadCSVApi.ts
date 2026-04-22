@@ -35,7 +35,9 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 		warnOnCumulativeReset: uploadPreferences.warnOnCumulativeReset
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
-		formData.append(preference, value.toString());
+		if (value !== undefined && value !== null) {
+			formData.append(preference, value.toString());
+		}
 	}
 	formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
 
@@ -61,7 +63,9 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 		update: uploadPreferences.update
 	};
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
-		formData.append(preference, value.toString());
+		if (value !== undefined && value !== null) {
+			formData.append(preference, value.toString());
+		}
 	}
 	formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
 

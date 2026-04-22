@@ -19,6 +19,13 @@ MeterTimeSortTypesJS = Object.freeze({
 	decreasing: 'decreasing',
 });
 
+DisableChecksTypesJS = Object.freeze({
+	reject_disabled: 'reject_disabled',
+	reject_bad: 'reject_bad',
+	reject_all: 'reject_all',
+	reject_none: 'reject_none'
+});
+
 // This function allows for curl users to continue to use 'yes' or 'no' and also allows string
 // values of true or false if the change is made.
 const normalizeBoolean = (input) => {
@@ -64,6 +71,13 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
+		timeZone: undefined,
+		minVal: undefined,
+		maxVal: undefined,
+		minDate: undefined,
+		maxDate: undefined,
+		maxError: undefined,
+		disableChecks: undefined,
 		cumulative: undefined,
 		cumulativeReset: undefined,
 		cumulativeResetStart: undefined,
@@ -115,6 +129,13 @@ const VALIDATION = {
 		type: 'object',
 		properties: {
 			...COMMON_PROPERTIES,
+			timeZone: new StringParam('timeZone', undefined, undefined),
+			minVal: new StringParam('minVal', undefined, undefined),
+			maxVal: new StringParam('maxVal', undefined, undefined),
+			minDate: new StringParam('minDate', undefined, undefined),
+			maxDate: new StringParam('maxDate', undefined, undefined),
+			maxError: new StringParam('maxError', undefined, undefined),
+			disableChecks: new EnumParam('disableChecks', Object.values(DisableChecksTypesJS)),
 			cumulative: new EnumParam('cumulative', BooleanCheckArray),
 			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
@@ -182,10 +203,32 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 
 	// extract query parameters
-	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
+	const { timeZone, minVal, maxVal, minDate, maxDate, maxError, disableChecks,
+		cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
 		refreshReadings, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
 
 	// Set default values of not supplied parameters.
+	if (timeZone === undefined) {
+		req.body.timeZone = DEFAULTS.readings.timeZone;
+	}
+	if (minVal === undefined) {
+		req.body.minVal = DEFAULTS.readings.minVal;
+	}
+	if (maxVal === undefined) {
+		req.body.maxVal = DEFAULTS.readings.maxVal;
+	}
+	if (minDate === undefined) {
+		req.body.minDate = DEFAULTS.readings.minDate;
+	}
+	if (maxDate === undefined) {
+		req.body.maxDate = DEFAULTS.readings.maxDate;
+	}
+	if (maxError === undefined) {
+		req.body.maxError = DEFAULTS.readings.maxError;
+	}
+	if (disableChecks === undefined) {
+		req.body.disableChecks = DEFAULTS.readings.disableChecks;
+	}
 	if (cumulative === undefined) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
 	}

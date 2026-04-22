@@ -18,7 +18,8 @@ const Meter = require('../../models/Meter');
  */
 async function uploadReadings(req, res, filepath, conn) {
 	// extract query parameters
-	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
+	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset,
+		timeZone, minVal, maxVal, minDate, maxDate, maxError, disableChecks } = req.body;
 	// The next few have no value in the DB for a meter so always use the value passed.
 	const hasHeaderRow = normalizeBoolean(headerRow);
 	const shouldUpdate = normalizeBoolean(update);
@@ -188,16 +189,25 @@ async function uploadReadings(req, res, filepath, conn) {
 	}
 	const areReadingsEndOnly = readingEndOnly;
 
+	const isMissingParam = param => param === undefined || param === '';
+	const resolvedTimeZone = isMissingParam(timeZone) ? meter.meterTimezone : timeZone;
+	const resolvedMinVal = isMissingParam(minVal) ? meter.minVal : parseFloat(minVal);
+	const resolvedMaxVal = isMissingParam(maxVal) ? meter.maxVal : parseFloat(maxVal);
+	const resolvedMinDate = isMissingParam(minDate) ? meter.minDate : new Date(minDate);
+	const resolvedMaxDate = isMissingParam(maxDate) ? meter.maxDate : new Date(maxDate);
+	const resolvedMaxError = isMissingParam(maxError) ? meter.maxError : parseInt(maxError, 10);
+	const resolvedDisableChecks = isMissingParam(disableChecks) ? meter.disableChecks : disableChecks;
+
 	const mapRowToModel = row => { return row; }; // STUB function to satisfy the parameter of loadCsvInput.
 
 	const conditionSet = {
-		minVal: meter.minVal,
-		maxVal: meter.maxVal,
-		minDate: meter.minDate,
-		maxDate: meter.maxDate,
-		threshold: meter.readingGap,
-		maxError: meter.maxError,
-		disableChecks: meter.disableChecks
+		minVal: resolvedMinVal,
+		maxVal: resolvedMaxVal,
+		minDate: resolvedMinDate,
+		maxDate: resolvedMaxDate,
+		threshold: readingGap,
+		maxError: resolvedMaxError,
+		disableChecks: resolvedDisableChecks
 	}
 
 	return await loadCsvInput(
@@ -220,7 +230,8 @@ async function uploadReadings(req, res, filepath, conn) {
 		shouldHonorDst,
 		shouldRelaxedParsing,
 		shouldUseMeterZone,
-		shouldWarnOnCumulativeReset
+		shouldWarnOnCumulativeReset,
+		resolvedTimeZone
 	); // load csv data
 }
 
