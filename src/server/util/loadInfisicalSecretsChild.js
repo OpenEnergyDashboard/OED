@@ -15,51 +15,51 @@ const environment = env.INFISICAL_ENVIRONMENT || 'dev';
 const secretPath = env.INFISICAL_PATH || '/';
 
 if (!clientId || !clientSecret) {
-    console.error('PASSWORD_VAULT is enabled but INFISICAL_CLIENT_ID or INFISICAL_CLIENT_SECRET is not set.');
-    process.exit(1);
+	console.error('PASSWORD_VAULT is enabled but INFISICAL_CLIENT_ID or INFISICAL_CLIENT_SECRET is not set in the .env file.');
+	process.exit(1);
 }
 
 if (!projectId) {
-    console.error('PASSWORD_VAULT is enabled but INFISICAL_PROJECT_ID is not set.');
-    process.exit(1);
+	console.error('PASSWORD_VAULT is enabled but INFISICAL_PROJECT_ID is not set in the .env file.');
+	process.exit(1);
 }
 
 (async () => {
-    try {
-        const client = new InfisicalSDK({ siteUrl });
+	try {
+		const client = new InfisicalSDK({ siteUrl });
 
-        // Authenticate using machine identity credentials to get secrets from vault
-        await client.auth().universalAuth.login({ clientId, clientSecret });
+		// Authenticate using machine identity credentials to get secrets from vault
+		await client.auth().universalAuth.login({ clientId, clientSecret });
 
-        async function loadSecret(name) {
-            try {
-                const result = await client.secrets().getSecret({
-                    environment,
-                    projectId,
-                    secretName: name,
-                    secretPath,
-                    type: 'shared'
-                });
-                return result?.secretValue;
-            } catch (err) {
-                // Missing secrets are treated as optional overrides
-                return undefined;
-            }
-        }
+		async function loadSecret(name) {
+			try {
+				const result = await client.secrets().getSecret({
+					environment,
+					projectId,
+					secretName: name,
+					secretPath,
+					type: 'shared'
+				});
+				return result?.secretValue;
+			} catch (err) {
+				// Missing secrets are treated as optional overrides
+				return undefined;
+			}
+		}
 
-        const [postgresPassword, oedDbPassword] = await Promise.all([
-            loadSecret('POSTGRES_PASSWORD'),
-            loadSecret('OED_DB_PASSWORD')
-        ]);
+		const [postgresPassword, oedDbPassword] = await Promise.all([
+			loadSecret('POSTGRES_PASSWORD'),
+			loadSecret('OED_DB_PASSWORD')
+		]);
 
-        const payload = {
-            POSTGRES_PASSWORD: postgresPassword,
-            OED_DB_PASSWORD: oedDbPassword
-        };
-        process.stdout.write(JSON.stringify(payload));
-        process.exit(0);
-    } catch (err) {
-        console.error('Infisical vault loading error:', err.message);
-        process.exit(1);
-    }
+		const payload = {
+			POSTGRES_PASSWORD: postgresPassword,
+			OED_DB_PASSWORD: oedDbPassword
+		};
+		process.stdout.write(JSON.stringify(payload));
+		process.exit(0);
+	} catch (err) {
+		console.error('Infisical vault loading error:', err.message);
+		process.exit(1);
+	}
 })();
