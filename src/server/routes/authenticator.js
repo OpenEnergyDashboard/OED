@@ -121,31 +121,31 @@ async function verifyActiveTokenAndGetUser(token) {
 		});
 	});
 
-	// jwt.verify confirms the token signature is valid, but it does not guarantee
-	// the referenced user still exists in the database. The user may have been
-	// deleted after the token was issued, so OED must still verify the user record.
-	const conn = getConnection();
-	const user = await User.getByID(decoded.data, conn);
-    // Default to 0 (Unix epoch start) to align with the database default.
-    // If tokenInvalidBefore is missing or invalid, tokens issued after epoch remain valid.
-	let invalidBefore = 0;
-	if (user.tokenInvalidBefore) {
-		const parsedDate = new Date(user.tokenInvalidBefore);
-		if (!isNaN(parsedDate.getTime())) {
-			invalidBefore = Math.floor(parsedDate.getTime() / 1000);
-		} else {
-			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
-		}
-	}
+		// jwt.verify confirms the token signature is valid, but it does not guarantee
+    	// the referenced user still exists in the database. The user may have been
+    	// deleted after the token was issued, so OED must still verify the user record.
+    	const conn = getConnection();
+    	const user = await User.getByID(decoded.data, conn);
 
-	const tokenIssuedAt = decoded.iat;
-	// Reject tokens issued at or before tokenInvalidBefore so tokens created in
-    // the same second as invalidation are not incorrectly treated as valid.
-	if (tokenIssuedAt <= invalidBefore) {
-		const error = new Error('Token invalidated');
-		error.code = 'TOKEN_INVALIDATED';
-		throw error;
-	}
+    	// Compare timestamps at millisecond precision to avoid edge cases caused by
+    	// JWT iat being stored in seconds while the database timestamp is more precise.
+    	const tokenIssuedAtMs = decoded.iat * 1000;
+    	let invalidBeforeMs = 0;
+
+    	if (user.tokenInvalidBefore) {
+    		const parsedDate = new Date(user.tokenInvalidBefore);
+    		if (!isNaN(parsedDate.getTime())) {
+    			invalidBeforeMs = parsedDate.getTime();
+    		} else {
+    			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
+    		}
+    	}
+
+    	if (tokenIssuedAtMs <= invalidBeforeMs) {
+    		const error = new Error('Token invalidated');
+    		error.code = 'TOKEN_INVALIDATED';
+    		throw error;
+    	}
 
 	return { decoded, user };
 }
