@@ -71,6 +71,13 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 
 /**
  * Logs out the authenticated user by invalidating previously issued tokens.
+ *
+ * Note: This route intentionally does not use auth middleware.
+ * Authentication is handled by verifyActiveTokenAndGetUser, which verifies
+ * the JWT, ensures the user exists, and checks token validity.
+ *
+ * The user ID is derived from the verified token (not request input),
+ * preventing a user from logging out another user.
  */
 router.post('/logout', async (req, res) => {
 	const validParams = {
