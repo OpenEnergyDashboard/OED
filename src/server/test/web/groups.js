@@ -98,7 +98,7 @@ mocha.describe('groups API', () => {
 		// Since this .before is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
 		mocha.before(async () => {
-			let res = await chai.request(app).post('/api/login')
+			let res = await chai.request(app).post('/api/login/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -129,7 +129,7 @@ mocha.describe('groups API', () => {
 						unauthorizedUser.password = password;
 
 						// login
-						res = await chai.request(app).post('/api/login')
+						res = await chai.request(app).post('/api/login/login')
 							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						currentToken = res.body.token;
 						// create
@@ -189,7 +189,7 @@ mocha.describe('groups API', () => {
 						unauthorizedUser.password = password;
 
 						// login
-						res = await chai.request(app).post('/api/login')
+						res = await chai.request(app).post('/api/login/login')
 							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						currentToken = res.body.token;
 						// edit

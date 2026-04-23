@@ -15,7 +15,7 @@ const secretToken = require('../../config').secretToken;
 const { chai, mocha, app, testUser } = common;
 
 mocha.describe('Session Invalidation Security', () => {
-	const LOGIN_ENDPOINT = '/api/login';
+	const LOGIN_ENDPOINT = '/api/login/login';
 	const LOGOUT_ENDPOINT = '/api/login/logout';
 	const VERIFY_ENDPOINT = '/api/verification';
 	const PROTECTED_ENDPOINT = '/api/users';

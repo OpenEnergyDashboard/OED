@@ -25,7 +25,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 	mocha.describe('Credentials Validation (username/password)', () => {
 		// Since authenticator.js doesn't export direct endpoints, we test through routes that use it
 		// The login route uses credentialsRequestValidationMiddleware
-		const LOGIN_ENDPOINT = '/api/login';
+		const LOGIN_ENDPOINT = '/api/login/login';
 
 		const baseCredentials = {
 			username: 'validuser',
@@ -213,7 +213,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 
 	mocha.describe('Security Edge Cases', () => {
 		mocha.it('should handle concurrent authentication attempts', async () => {
-			const LOGIN_ENDPOINT = '/api/login';
+			const LOGIN_ENDPOINT = '/api/login/login';
 			const invalidCredentials = {
 				username: 'nonexistent',
 				password: 'wrongpass'
@@ -235,7 +235,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 		});
 
 		mocha.it('should prevent username enumeration attacks', async () => {
-			const LOGIN_ENDPOINT = '/api/login';
+			const LOGIN_ENDPOINT = '/api/login/login';
 
 			// Test with non-existent user vs invalid password for existing user
 			// Both should return similar error responses (timing-safe)

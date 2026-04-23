@@ -20,7 +20,7 @@ mocha.describe('Users API', () => {
 			// To fix this, manually call  DB creation. This will also happen right after this
 			// .before finishes.
 			await recreateDB();
-			let res = await chai.request(app).post('/api/login')
+			let res = await chai.request(app).post('/api/login/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -71,7 +71,7 @@ mocha.describe('Users API', () => {
 				user: { id: retrievedTestUser.id, username: retrievedTestUser.username, role: retrievedTestUser.role, note: 'test note' }
 			});
 			expect(res1).to.have.status(200);
-			
+
 			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				user: { id: csvUser.id, username: csv.username, role: User.role.OBVIUS, note: 'test note' }
 			});
@@ -114,7 +114,7 @@ mocha.describe('Users API', () => {
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/login')
+					let res = await chai.request(app).post('/api/login/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});

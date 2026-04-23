@@ -20,7 +20,7 @@ const router = express.Router();
  * @param {String} username
  * @param {String} Password
  */
-router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
+router.post('/login', credentialsRequestValidationMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,

@@ -10,7 +10,7 @@ mocha.describe('Units Route', () => {
 	let token;
 
 	mocha.before(async () => {
-		const res = await chai.request(app).post('/api/login')
+		const res = await chai.request(app).post('/api/login/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
 	});

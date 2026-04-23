@@ -13,7 +13,7 @@ mocha.describe('preferences API', () => {
 	mocha.describe('modification api', () => {
 		mocha.describe('edit endpoint', () => {
 			mocha.it('should accept requests from Admin role', async () => {
-				let res = await chai.request(app).post('/api/login')
+				let res = await chai.request(app).post('/api/login/login')
 					.send({ username: testUser.username, password: testUser.password });
 				expect(res).to.have.status(200);
 				const token = res.body.token;
@@ -46,7 +46,7 @@ mocha.describe('preferences API', () => {
 							unauthorizedUser.password = password;
 
 							// login
-							let res = await chai.request(app).post('/api/login')
+							let res = await chai.request(app).post('/api/login/login')
 								.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 							token = res.body.token;
 						});

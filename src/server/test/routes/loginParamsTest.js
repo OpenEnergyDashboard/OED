@@ -17,7 +17,7 @@ const {
 
 mocha.describe('Login Parameter Validation', () => {
 
-	const LOGIN_ENDPOINT = '/api/login';
+	const LOGIN_ENDPOINT = '/api/login/login';
 
 	const baseCredentials = {
 		username: 'validuser@example.com',
