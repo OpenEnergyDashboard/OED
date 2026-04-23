@@ -4,13 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+const bcrypt = require('bcrypt');
+const User = require('../../models/User');
 const { expect } = require('chai');
 const common = require('../common');
 const { HTTP_CODE } = require('../../util/readingsUtils');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
 
-const { chai, mocha, app, testUser, testUser2 } = common;
+const { chai, mocha, app, testUser } = common;
 
 mocha.describe('Session Invalidation Security', () => {
 	const LOGIN_ENDPOINT = '/api/login';
@@ -19,7 +21,13 @@ mocha.describe('Session Invalidation Security', () => {
 	const PROTECTED_ENDPOINT = '/api/users';
 
 	let token;
+	let csvUser;
 
+	/**
+	 * Logs in the provided user and returns the issued token.
+	 * @param {User & {password: string}} user
+	 * @returns {Promise<string>}
+	 */
 	async function loginAndGetToken(user) {
 		const res = await chai.request(app)
 			.post(LOGIN_ENDPOINT)
@@ -34,6 +42,18 @@ mocha.describe('Session Invalidation Security', () => {
 	}
 
 	mocha.beforeEach(async () => {
+		const conn = common.testDB.getConnection();
+
+		csvUser = new User(
+			undefined,
+			'test-csv@example.invalid',
+			bcrypt.hashSync('csv-password-2', 10),
+			User.role.CSV
+		);
+		csvUser.password = 'csv-password-2';
+
+		await csvUser.insert(conn);
+
 		token = await loginAndGetToken(testUser);
 	});
 
@@ -145,26 +165,26 @@ mocha.describe('Session Invalidation Security', () => {
 		expect(res.body).to.have.property('message', 'Failed to authenticate token.');
 	});
 
-	mocha.it('should invalidate token for a non-admin user', async () => {
-		const otherToken = await loginAndGetToken(testUser2);
+	mocha.it('should invalidate token for a CSV user', async () => {
+		const csvToken = await loginAndGetToken(csvUser);
 
 		const beforeVerify = await chai.request(app)
 			.post(VERIFY_ENDPOINT)
-			.send({ token: otherToken });
+			.send({ token: csvToken });
 
 		expect(beforeVerify).to.have.status(HTTP_CODE.OK);
 		expect(beforeVerify.body).to.have.property('success', true);
 
 		const logoutRes = await chai.request(app)
 			.post(LOGOUT_ENDPOINT)
-			.send({ token: otherToken });
+			.send({ token: csvToken });
 
 		expect(logoutRes).to.have.status(HTTP_CODE.OK);
 		expect(logoutRes.body).to.have.property('success', true);
 
 		const verifyRes = await chai.request(app)
 			.post(VERIFY_ENDPOINT)
-			.send({ token: otherToken });
+			.send({ token: csvToken });
 
 		expect(verifyRes).to.have.status(HTTP_CODE.UNAUTHORIZED);
 		expect(verifyRes.body).to.have.property('success', false);
