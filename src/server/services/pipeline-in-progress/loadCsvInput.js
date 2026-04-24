@@ -32,7 +32,7 @@ const { log } = require('../../log');
  * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
  *   Should only be true if honorDST is true and reading does not have proper time zone information.
  * @param {boolean} warnOnCumulativeReset true if a warning is shown for each reset with cumulative data. cumulative must be true. default is false.
- * @param {string} timeZone optional timezone override provided by the upload request.
+ * @param {string} timeZone timezone to use while processing data, default is undefined.
  */
 async function loadCsvInput(
 	filePath,

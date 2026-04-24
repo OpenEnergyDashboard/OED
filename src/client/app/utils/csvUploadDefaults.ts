@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { DisableChecksType } from 'types/redux/units';
+import { DisableChecksType } from '../types/redux/units';
 import { ReadingsCSVUploadPreferences, MetersCSVUploadPreferences } from '../types/csvUploadForm';
 import { MeterTimeSortType } from '../types/redux/meters';
 
@@ -27,13 +27,13 @@ export const ReadingsCSVUploadDefaults: ReadingsCSVUploadPreferences = {
 	update: false,
 	useMeterZone: false,
 	warnOnCumulativeReset: false,
-	timeZone: "",
-	minVal: "",
-	maxVal: "",
-	minDate: "",
-	maxDate: "",
-	maxError: "",
-	disableChecks: DisableChecksType.reject_all,
+	timeZone: '',
+	minVal: '',
+	maxVal: '',
+	minDate: '',
+	maxDate: '',
+	maxError: '',
+	disableChecks: DisableChecksType.reject_all
 };
 
 export const MetersCSVUploadDefaults: MetersCSVUploadPreferences = {

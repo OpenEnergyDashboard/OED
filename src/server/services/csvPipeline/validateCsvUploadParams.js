@@ -7,6 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSchemas');
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
+const Unit = require('../../models/Unit');
 
 // This is only used for meter page inputs but put here so next one above that related to.
 /**
@@ -17,13 +18,6 @@ const validate = require('jsonschema').validate;
 MeterTimeSortTypesJS = Object.freeze({
 	increasing: 'increasing',
 	decreasing: 'decreasing',
-});
-
-DisableChecksTypesJS = Object.freeze({
-	reject_disabled: 'reject_disabled',
-	reject_bad: 'reject_bad',
-	reject_all: 'reject_all',
-	reject_none: 'reject_none'
 });
 
 // This function allows for curl users to continue to use 'yes' or 'no' and also allows string
@@ -135,7 +129,7 @@ const VALIDATION = {
 			minDate: new StringParam('minDate', undefined, undefined),
 			maxDate: new StringParam('maxDate', undefined, undefined),
 			maxError: new StringParam('maxError', undefined, undefined),
-			disableChecks: new EnumParam('disableChecks', Object.values(DisableChecksTypesJS)),
+			disableChecks: new EnumParam('disableChecks', Object.values(Unit.disableChecksType)),
 			cumulative: new EnumParam('cumulative', BooleanCheckArray),
 			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),

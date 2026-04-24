@@ -53,6 +53,7 @@ const E0 = moment(0).utc()
  *   Should only be true if honorDST is true and reading does not have proper time zone information. This feature is not great and should
  *   be avoided except in special circumstances.
  * @param {boolean} warnOnCumulativeReset true if each cumulative reset generates a warning message and false if not. Default is false.
+ * @param {string} timeZone timezone to use while processing data, default is undefined.
  * @param {boolean} useMeterFrequency true if isEndTime is true then any reading found with a different reading length that is longer than the meter
  * 	frequency will make the start time by the end time minus the meter reading frequency. The idea is that a change in the length represents
  * 	missing reading(s) then it will have a longer time but that is not what is desired for this meter. This only happens if the length of the reading
