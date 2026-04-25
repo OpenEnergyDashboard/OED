@@ -161,7 +161,9 @@ async function changePasswords() {
 			updateEnvFile(newPostgresPassword, newOedPassword);
 
 			console.log('********************************************************************************');
-			console.log('Generated a secure PostgreSQL and OED password and applied them successfully.');
+			console.log('PostgreSQL and OED passwords applied successfully.');
+			console.log(`PostgreSQL (postgres) password: ${newPostgresPassword}`);
+			console.log(`OED user password: ${newOedPassword}`);
 			console.log('The passwords have been stored in ".env" for reference.');
 			if (isManual) {
 				console.log('');
