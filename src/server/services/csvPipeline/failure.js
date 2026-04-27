@@ -6,6 +6,7 @@ const express = require('express') /* needed to resolve types in JSDoc comments 
 const { CSVPipelineError } = require('./CustomErrors');
 const escapeHtml = require('escape-html');
 const { log } = require('../../log');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 /**
  * Inform the client of a failure (406 Not Acceptable), and log it.
@@ -25,7 +26,7 @@ function failure(req, res, error) {
 	} else { // we do not actually expect to reach this case however just in case we receive an error we still want to respond.
 		const { message } = error;
 		log.error(`Csv protocol request from ${ip} failed due to ${message}`, error);
-		res.status(500) // since it is an unexpected case we do 500 for internal server error
+		res.status(HTTP_CODES.INTERNAL_SERVER_ERROR) // since it is an unexpected case we do 500 for internal server error
 			.send(escapeHtml(message));
 	}
 }

@@ -8,6 +8,8 @@ const { log } = require('../log');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -36,56 +38,79 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 		required: ['preferences'],
 		properties: {
 			preferences: {
-				displayTitle: {
-					type: 'string'
-				},
-				defaultChartToRender: {
-					type: 'string'
-				},
-				defaultBarStacking: {
-					type: 'boolean'
-				},
-				defaultLanguage: {
-					type: 'string'
-				},
-				defaultTimezone: {
-					oneOf: [
-						{ type: 'string' },
-						{ type: 'null' }
-					]
-				},
-				defaultWarningFileSize: {
-					type: 'number'
-				},
-				defaultFileSizeLimit: {
-					type: 'number'
-				},
-				defaultAreaNormalization: {
-					type: 'boolean'
-				},
-				defaultMeterReadingFrequency: {
-					type: 'string'
-				},
-				defaultMeterMinimumDate: {
-					type: 'string'
-				},
-				defaultMeterMaximumDate: {
-					type: 'string'
-				},
-				defaultMeterReadingGap: {
-					type: 'number'
-				},
-				defaultMeterMaximumErrors: {
-					type: 'number'
-				},
-				defaultHelpUrl: {
-					type: 'string'
+				type: 'object',
+				additionalProperties: false,
+				properties: {
+					displayTitle: {
+						type: 'string',
+						maxLength: SHORT_STRING_MAX_LENGTH
+					},
+					defaultChartToRender: {
+						type: 'string',
+						maxLength: SHORT_STRING_MAX_LENGTH
+					},
+					defaultBarStacking: {
+						type: 'boolean'
+					},
+					defaultLanguage: {
+						type: 'string',
+						maxLength: 10
+					},
+					defaultTimezone: {
+						oneOf: [
+							{ type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
+							{ type: 'null' }
+						]
+					},
+					defaultWarningFileSize: {
+						type: 'number',
+						minimum: 0,
+						maximum: 1000000000
+					},
+					defaultFileSizeLimit: {
+						type: 'number',
+						minimum: 0,
+						maximum: 1000000000
+					},
+					defaultAreaNormalization: {
+						type: 'boolean'
+					},
+					defaultAreaUnit: {
+						type: 'string',
+						maxLength: SHORT_STRING_MAX_LENGTH
+					},
+					defaultMeterReadingFrequency: {
+						type: 'string',
+						maxLength: SHORT_STRING_MAX_LENGTH
+					},
+					defaultMeterMinimumDate: {
+						type: 'string',
+						maxLength: STRING_GENERAL_MAX_LENGTH
+					},
+					defaultMeterMaximumDate: {
+						type: 'string',
+						maxLength: STRING_GENERAL_MAX_LENGTH
+					},
+					defaultMeterReadingGap: {
+						type: 'number',
+						minimum: 0,
+						maximum: 86400
+					},
+					defaultMeterMaximumErrors: {
+						type: 'number',
+						minimum: 0,
+						maximum: 10000
+					},
+					defaultHelpUrl: {
+						type: 'string',
+						maxLength: 500
+					}
 				}
 			}
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -93,10 +118,9 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing POST update preferences: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
 
 module.exports = router;
-

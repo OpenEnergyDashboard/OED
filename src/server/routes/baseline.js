@@ -7,6 +7,10 @@ const { getConnection } = require('../db');
 const express = require('express');
 const Baseline = require('../models/Baseline');
 const log = require('../log');
+const validate = require('jsonschema').validate;
+const { adminAuthMiddleware } = require('./authenticator');
+const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 const router = express.Router();
 router.get('/', async (req, res) => {
 	const conn = getConnection();
@@ -17,7 +21,47 @@ router.get('/', async (req, res) => {
 		log(`Error while getting all baselines: ${err}`, 'error');
 	}
 });
-router.post('/new', async (req, res) => {
+router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) => {
+	const validParams = {
+		type: 'object',
+		additionalProperties: false,
+		maxProperties: 6,
+		required: ['meterID', 'applyStart', 'applyEnd', 'calcStart', 'calcEnd'],
+		properties: {
+			meterID: {
+				type: 'integer',
+				minimum: 1
+			},
+			applyStart: {
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
+			},
+			applyEnd: {
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
+			},
+			calcStart: {
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
+			},
+			calcEnd: {
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
+			},
+			note: {
+				oneOf: [
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+					{ type: 'null' }
+				]
+			}
+		}
+	};
+
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		return;
+	}
+
 	const conn = getConnection();
 	try {
 		const baseline = new Baseline(
@@ -28,9 +72,9 @@ router.post('/new', async (req, res) => {
 			req.body.calcEnd,
 			req.body.note);
 		await baseline.insert(conn);
-		res.sendStatus(200);
+		res.sendStatus(HTTP_CODES.OK);
 	} catch (err) {
-		res.sendStatus(500);
+		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		log(`Error while adding baseline: ${err}`, 'error');
 	}
 });

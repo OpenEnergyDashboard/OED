@@ -8,11 +8,12 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const Unit = require('../../models/Unit');
 const { expectUnitToBeEquivalent, expectArrayOfUnitsToBeEquivalent } = require('../../util/compareUnits');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe("Units routes", () => {
     mocha.it('returns nothing with no units present', async () => {
         const res = await chai.request(app).get('/api/units');
-        expect(res).to.have.status(200);
+        expect(res).to.have.status(HTTP_CODES.OK);
         expect(res).to.be.json;
         expect(res.body).to.have.lengthOf(0);
     });
@@ -22,7 +23,7 @@ mocha.describe("Units routes", () => {
         const expected = new Unit(undefined, 'kwh', 'kWh', Unit.unitRepresentType.QUANTITY, undefined, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, "standard unit");
         await expected.insert(conn);
         const res = await chai.request(app).get('/api/units');
-        expect(res).to.have.status(200);
+        expect(res).to.have.status(HTTP_CODES.OK);
         expect(res).to.be.json;
         expect(res.body).to.have.lengthOf(1);
         expectUnitToBeEquivalent(expected, res.body[0]);
@@ -54,7 +55,7 @@ mocha.describe("Units routes", () => {
         }
 
         const res = await chai.request(app).get('/api/units');
-        expect(res).to.have.status(200);
+        expect(res).to.have.status(HTTP_CODES.OK);
         expect(res).to.be.json;
         expect(res.body).to.have.lengthOf(8);
         expectArrayOfUnitsToBeEquivalent(expectedUnits, res.body);

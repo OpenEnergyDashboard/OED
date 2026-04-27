@@ -12,10 +12,10 @@ const { prepareTest,
     getUnitId,
     ETERNITY,
     METER_ID,
-    HTTP_CODE,
     unitDatakWh,
     conversionDatakWh,
     meterDatakWh } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -32,7 +32,7 @@ mocha.describe('readings API', () => {
                             graphicUnitId: unitId
                         });
                     expect(res).to.be.json;
-                    expect(res).to.have.status(HTTP_CODE.OK);
+                    expect(res).to.have.status(HTTP_CODES.OK);
                     expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('reading');
                     expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('startTimestamp');
                     expect(res.body).to.have.property(`${METER_ID}`).to.have.property('0').to.have.property('endTimestamp');

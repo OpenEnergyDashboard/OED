@@ -13,9 +13,9 @@ const { prepareTest,
     ETERNITY,
     METER_ID,
     GROUP_ID,
-    HTTP_CODE,
     unitDatakWh,
     conversionDatakWh } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -72,7 +72,7 @@ mocha.describe('readings API', () => {
                     // unitReadings should be returning json
                     expect(res).to.be.json;
                     // the route should not return a bad request
-                    expect(res).to.have.status(HTTP_CODE.OK);
+                    expect(res).to.have.status(HTTP_CODES.OK);
                     expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('reading');
                     expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('startTimestamp');
                     expect(res.body).to.have.property(`${GROUP_ID}`).to.have.property('0').to.have.property('endTimestamp');

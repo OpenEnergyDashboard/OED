@@ -12,6 +12,8 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { TimeInterval } = require('../../common/TimeInterval');
 const moment = require('moment');
+const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -22,7 +24,8 @@ function validateMeterLineReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -37,12 +40,14 @@ function validateLineReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -86,10 +91,11 @@ function validateGroupLineReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_ids'],
 		properties: {
-			meter_ids: {
+			group_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -119,7 +125,8 @@ function validateMeterBarReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -134,16 +141,19 @@ function validateBarReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'barWidthDays', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			barWidthDays: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -180,10 +190,11 @@ function validateGroupBarReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_ids'],
 		properties: {
-			meter_ids: {
+			group_ids: {
 				type: 'string',
 				// Matches 1 or more integers separated by commas
-				pattern: '^\\d+(?:,\\d+)*$'
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -214,7 +225,9 @@ function validateMeterRadarReadingsParams(params) {
 		properties: {
 			meter_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				pattern: '^\\d+(?:,\\d+)*$'
+				,
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -229,11 +242,13 @@ function validateRadarReadingsQueryParams(queryParams) {
 		required: ['timeInterval', 'graphicUnitId'],
 		properties: {
 			timeInterval: {
-				type: 'string'
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
 			graphicUnitId: {
 				type: 'string',
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -270,7 +285,8 @@ function validateGroupRadarReadingsParams(params) {
 		properties: {
 			group_ids: {
 				type: 'string',
-				pattern: '^\\d+(?:,\\d+)*$' // Matches 1 or 1,2 or 1,2,34 (for example)
+				pattern: '^\\d+(?:,\\d+)*$',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			}
 		}
 	};
@@ -328,7 +344,8 @@ function validateMeterThreeDReadingsParams(params) {
 			meter_ids: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -342,10 +359,11 @@ function validateGroupThreeDReadingsParams(params) {
 		maxProperties: 1,
 		required: ['group_id'],
 		properties: {
-			meter_ids: {
+			group_id: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -361,14 +379,17 @@ function validateThreeDQueryParams(queryParams) {
 		properties: {
 			timeInterval: {
 				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
 			},
-			graphicUnitID: {
+			graphicUnitId: {
 				type: 'string',
 				// Matches a single integer value
-				pattern: '^\\d+$'
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			},
 			readingInterval: {
 				type: 'string',
+				maxLength: NUMERIC_ID_MAX_LENGTH,
 				// for reference regarding this pattern: https://json-schema.org/understanding-json-schema/reference/regular_expressions.html
 				// Matches divisors of 24: 1, 2, 3, 4, 6, 8 or 12 but not 24
 				pattern: '^([123468]|[1][2])$'
@@ -384,7 +405,7 @@ function createRouter() {
 	// Route for fetching line readings by meter IDs
 	router.get('/line/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
@@ -397,7 +418,7 @@ function createRouter() {
 	// Route for fetching line readings by group IDs
 	router.get('/line/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
@@ -410,7 +431,7 @@ function createRouter() {
 	// Route for fetching bar readings by meter IDs
 	router.get('/bar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -424,7 +445,7 @@ function createRouter() {
 	// Route for fetching bar readings by group IDs
 	router.get('/bar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -438,7 +459,7 @@ function createRouter() {
 	// Route for fetching radar readings by meter IDs
 	router.get('/radar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
@@ -451,7 +472,7 @@ function createRouter() {
 	// Route for fetching radar readings by group IDs
 	router.get('/radar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
 			const graphicUnitID = req.query.graphicUnitId;
@@ -464,20 +485,20 @@ function createRouter() {
 	// Route for fetching 3D readings by meter IDs
 	router.get('/threeD/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			// Get time range to validate 1 year or less.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
-				res.sendStatus(400);
+				res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			} else {
 				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
 				const durationInYears = duration.years();
 				if (durationInYears >= 1) {
 					// Limit 3D to one year of data.
-					res.sendStatus(400);
+					res.sendStatus(HTTP_CODES.BAD_REQUEST);
 				} else {
 					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
 					const graphicUnitID = req.query.graphicUnitId;
@@ -492,20 +513,20 @@ function createRouter() {
 	// Route for fetching 3D readings by group ID
 	router.get('/threeD/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			// Get time range to validate 1 year or less.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
-				res.sendStatus(400);
+				res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			} else {
 				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
 				const durationInYears = duration.years();
 				if (durationInYears >= 1) {
 					// Limit 3D to one year of data.
-					res.sendStatus(400);
+					res.sendStatus(HTTP_CODES.BAD_REQUEST);
 				} else {
 					const groupID = req.params.group_id;
 					const graphicUnitID = req.query.graphicUnitId;

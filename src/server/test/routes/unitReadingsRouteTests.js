@@ -4,15 +4,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const chai = require('chai');
-
-const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
 const sinon = require('sinon');
-
 const moment = require('moment');
-
 const Reading = require('../../models/Reading');
-
 const { meterLineReadings,
 	validateLineReadingsParams,
 	validateLineReadingsQueryParams,
@@ -208,8 +203,8 @@ mocha.describe('unit readings routes', () => {
 				const validationResult = validateGroupThreeDReadingsParams({ meter_ids: '1,2' });
 				expect(validationResult).to.equal(false);
 			});
-			mocha.it('validates when the group_id param is valid', () => {
-				const validationResult = validateGroupThreeDReadingsParams({ group_id: { meter_ids: '1' } });
+		mocha.it('validates when the group_id param is valid', () => {
+			const validationResult = validateGroupThreeDReadingsParams({ group_id: '1' });
 				expect(validationResult).to.equal(true);
 			});
 			mocha.it('validates when the time interval is valid', () => {
