@@ -187,13 +187,6 @@ export default function ReadingsCSVUploadComponent() {
 			lengthVariation: selectedMeter.readingVariation,
 			endOnly: selectedMeter.endOnlyTime,
 			timeSort: MeterTimeSortType[selectedMeter.timeSort as keyof typeof MeterTimeSortType],
-			timeZone: selectedMeter.timeZone ?? '',
-			minVal: selectedMeter.minVal.toString(),
-			maxVal: selectedMeter.maxVal.toString(),
-			minDate: selectedMeter.minDate,
-			maxDate: selectedMeter.maxDate,
-			maxError: selectedMeter.maxError.toString(),
-			disableChecks: selectedMeter.disableChecks,
 			useMeterZone: false,
 			warnOnCumulativeReset: false
 		}));
@@ -299,16 +292,9 @@ export default function ReadingsCSVUploadComponent() {
 			|| readingsData.refreshReadings !== ReadingsCSVUploadDefaults.refreshReadings
 			|| readingsData.relaxedParsing !== ReadingsCSVUploadDefaults.relaxedParsing
 			|| readingsData.timeSort !== ReadingsCSVUploadDefaults.timeSort
-			|| readingsData.timeZone !== ReadingsCSVUploadDefaults.timeZone
-			|| readingsData.minVal !== ReadingsCSVUploadDefaults.minVal
-			|| readingsData.maxVal !== ReadingsCSVUploadDefaults.maxVal
-			|| readingsData.minDate !== ReadingsCSVUploadDefaults.minDate
-			|| readingsData.maxDate !== ReadingsCSVUploadDefaults.maxDate
-			|| readingsData.maxError !== ReadingsCSVUploadDefaults.maxError
-			|| readingsData.disableChecks !== ReadingsCSVUploadDefaults.disableChecks
 			|| readingsData.update !== ReadingsCSVUploadDefaults.update
-			|| readingsData.useMeterZone !== ReadingsCSVUploadDefaults.useMeterZone
-			|| readingsData.warnOnCumulativeReset !== ReadingsCSVUploadDefaults.warnOnCumulativeReset
+			|| readingsData.useMeterZone !== readingsData.useMeterZone
+			|| readingsData.warnOnCumulativeReset !== readingsData.warnOnCumulativeReset
 			// If any file is added, it will count as edit made.
 			|| selectedFile !== null
 			|| invalidFileEntry === true;
@@ -695,8 +681,6 @@ export default function ReadingsCSVUploadComponent() {
 											</Input>
 										</FormGroup>
 									</Col>
-								</Row>
-								<Row xs='1' lg='2'>
 									<Col>
 										<FormGroup>
 											<Label>
@@ -705,28 +689,6 @@ export default function ReadingsCSVUploadComponent() {
 												</div>
 											</Label>
 											<TimeZoneSelect current={readingsData.timeZone ?? null} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
-										</FormGroup>
-									</Col>
-									<Col>
-										<FormGroup>
-											<Label for='disableChecks'>
-												<div className='pb-1'>
-													{translate('meter.disableChecks')}
-												</div>
-											</Label>
-											<Input
-												type='select'
-												id='disableChecks'
-												name='disableChecks'
-												value={readingsData.disableChecks || DisableChecksType.reject_all}
-												onChange={e => {handleChange(e);}}
-											>
-												{Object.values(DisableChecksType).map(disableChecks => {
-													return (
-														<option value={disableChecks} key={disableChecks}>{translate(`DisableChecksType.${disableChecks}`)}</option>
-													);
-												})}
-											</Input>
 										</FormGroup>
 									</Col>
 								</Row>
@@ -815,6 +777,28 @@ export default function ReadingsCSVUploadComponent() {
 											/>
 										</FormGroup>
 									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='disableChecks'>
+												<div className='pb-1'>
+													{translate('meter.disableChecks')}
+												</div>
+											</Label>
+											<Input
+												type='select'
+												id='disableChecks'
+												name='disableChecks'
+												value={readingsData.disableChecks || DisableChecksType.reject_all}
+												onChange={e => {handleChange(e);}}
+											>
+												{Object.values(DisableChecksType).map(disableChecks => {
+													return (
+														<option value={disableChecks} key={disableChecks}>{translate(`DisableChecksType.${disableChecks}`)}</option>
+													);
+												})}
+											</Input>
+										</FormGroup>
+									</Col>
 								</Row>
 								{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl.
 									Rest of changes left so easy to add back in.
@@ -823,7 +807,7 @@ export default function ReadingsCSVUploadComponent() {
 									originally added to the web page input of import but decided to not allow
 									it at this time. Thus, the code was commented out. As of now
 									there is no plan to make this generally available due to its limitations.*/}
-								{/*
+								{/**
 									<Label check>
 										<Input
 											checked={useMeterZone}
@@ -832,11 +816,11 @@ export default function ReadingsCSVUploadComponent() {
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>
-											{translate('csv.readings.param.use.meter.zone' />
+											{translate('csv.readings.param.use.meter.zone')}
 										</div>
 									</Label>
 								*/}
-								{/*
+								{/**
 									<Label check>
 										<Input
 											checked={warnOnCumulativeReset}
@@ -845,7 +829,7 @@ export default function ReadingsCSVUploadComponent() {
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>
-											{translate('csv.readings.param.use.meter.zone' />
+											{translate('csv.readings.param.use.meter.zone')}
 										</div>
 									</Label>
 								*/}
@@ -863,11 +847,11 @@ export default function ReadingsCSVUploadComponent() {
 								</div>
 								<div className='pb-5'>
 								</div>
-							</Col>
-						</Row>
-					</Form>
-				</>)}
-			</Container>
-		</>
-	);
-}
+								</Col>
+							</Row>
+						</Form>
+					</>)}
+				</Container>
+			</>
+		);
+	}

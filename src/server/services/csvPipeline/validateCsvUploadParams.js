@@ -65,13 +65,6 @@ const DEFAULTS = {
 	meters: {
 	},
 	readings: {
-		timeZone: undefined,
-		minVal: undefined,
-		maxVal: undefined,
-		minDate: undefined,
-		maxDate: undefined,
-		maxError: undefined,
-		disableChecks: undefined,
 		cumulative: undefined,
 		cumulativeReset: undefined,
 		cumulativeResetStart: undefined,
@@ -85,7 +78,14 @@ const DEFAULTS = {
 		relaxedParsing: false,
 		timeSort: undefined,
 		useMeterZone: false,
-		warnOnCumulativeReset: false
+		warnOnCumulativeReset: false,
+		timeZone: undefined,
+		minVal: undefined,
+		maxVal: undefined,
+		minDate: undefined,
+		maxDate: undefined,
+		maxError: undefined,
+		disableChecks: undefined
 	}
 }
 
@@ -123,13 +123,6 @@ const VALIDATION = {
 		type: 'object',
 		properties: {
 			...COMMON_PROPERTIES,
-			timeZone: new StringParam('timeZone', undefined, undefined),
-			minVal: new StringParam('minVal', undefined, undefined),
-			maxVal: new StringParam('maxVal', undefined, undefined),
-			minDate: new StringParam('minDate', undefined, undefined),
-			maxDate: new StringParam('maxDate', undefined, undefined),
-			maxError: new StringParam('maxError', undefined, undefined),
-			disableChecks: new EnumParam('disableChecks', Object.values(Unit.disableChecksType)),
 			cumulative: new EnumParam('cumulative', BooleanCheckArray),
 			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
 			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
@@ -144,6 +137,13 @@ const VALIDATION = {
 			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
 			useMeterZone: new EnumParam('useMeterZone', BooleanCheckArray),
 			warnOnCumulativeReset: new EnumParam('warnOnCumulativeReset', BooleanCheckArray),
+			timeZone: new StringParam('timeZone', undefined, undefined),
+			minVal: new StringParam('minVal', undefined, undefined),
+			maxVal: new StringParam('maxVal', undefined, undefined),
+			minDate: new StringParam('minDate', undefined, undefined),
+			maxDate: new StringParam('maxDate', undefined, undefined),
+			maxError: new StringParam('maxError', undefined, undefined),
+			disableChecks: new EnumParam('disableChecks', Object.values(Unit.disableChecksType))
 		},
 		anyOf: [
 			{ required: ['meterIdentifier'] },
@@ -197,32 +197,11 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 
 	// extract query parameters
-	const { timeZone, minVal, maxVal, minDate, maxDate, maxError, disableChecks,
-		cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
-		refreshReadings, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
+	const { cumulative, cumulativeReset, duplications, gzip, headerRow, timeSort, update, honorDst,
+		refreshReadings, relaxedParsing, useMeterZone, warnOnCumulativeReset, timeZone, minVal,
+		maxVal, minDate, maxDate, maxError, disableChecks } = req.body;
 
 	// Set default values of not supplied parameters.
-	if (timeZone === undefined) {
-		req.body.timeZone = DEFAULTS.readings.timeZone;
-	}
-	if (minVal === undefined) {
-		req.body.minVal = DEFAULTS.readings.minVal;
-	}
-	if (maxVal === undefined) {
-		req.body.maxVal = DEFAULTS.readings.maxVal;
-	}
-	if (minDate === undefined) {
-		req.body.minDate = DEFAULTS.readings.minDate;
-	}
-	if (maxDate === undefined) {
-		req.body.maxDate = DEFAULTS.readings.maxDate;
-	}
-	if (maxError === undefined) {
-		req.body.maxError = DEFAULTS.readings.maxError;
-	}
-	if (disableChecks === undefined) {
-		req.body.disableChecks = DEFAULTS.readings.disableChecks;
-	}
 	if (cumulative === undefined) {
 		req.body.cumulative = DEFAULTS.readings.cumulative;
 	}
@@ -258,6 +237,27 @@ function validateReadingsCsvUploadParams(req, res, next) {
 	}
 	if (warnOnCumulativeReset === undefined) {
 		req.body.warnOnCumulativeReset = DEFAULTS.readings.warnOnCumulativeReset;
+	}
+	if (timeZone === undefined) {
+		req.body.timeZone = DEFAULTS.readings.timeZone;
+	}
+	if (minVal === undefined) {
+		req.body.minVal = DEFAULTS.readings.minVal;
+	}
+	if (maxVal === undefined) {
+		req.body.maxVal = DEFAULTS.readings.maxVal;
+	}
+	if (minDate === undefined) {
+		req.body.minDate = DEFAULTS.readings.minDate;
+	}
+	if (maxDate === undefined) {
+		req.body.maxDate = DEFAULTS.readings.maxDate;
+	}
+	if (maxError === undefined) {
+		req.body.maxError = DEFAULTS.readings.maxError;
+	}
+	if (disableChecks === undefined) {
+		req.body.disableChecks = DEFAULTS.readings.disableChecks;
 	}
 	next();
 }

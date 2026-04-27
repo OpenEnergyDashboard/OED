@@ -33,10 +33,19 @@ const processData = require('./processData');
  * @param {string} timeZone timezone to use while processing data, default is undefined.
  * @returns {object[]} {whether readings were all process (true) or false, all the messages from processing the readings as a string}
  */
+// NOTE (follow-up): Callers of this function sometimes omit optional trailing
+// parameters (for example `timeZone`). This works because JS allows omitted
+// trailing args, but it makes call sites inconsistent and harder to maintain.
+// Suggested follow-up: migrate to a single `options` object (e.g.
+// `loadArrayInput(dataRows, meterID, mapRowToModel, opts)`) or mandate
+// explicitly passing all arguments. Do NOT remove `timeZone` or other
+// parameters here in this PR — perform a backward-compatible refactor in a
+// separate change to avoid regressions.
+
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = 
-	false, warnOnCumulativeReset = false, timeZone = undefined) {
+	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false,
+	warnOnCumulativeReset = false, timeZone = undefined) {
 	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
 	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
