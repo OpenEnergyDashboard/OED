@@ -17,7 +17,7 @@ class HolidayInstance {
 		this.id = id;
 		this.name = name;
 		this.holidayId = holidayId;
-		this.dayPatternId = daPatternId;
+		this.dayPatternId = dayPatternId;
 		this.note = note;
 	}
 
@@ -37,7 +37,7 @@ class HolidayInstance {
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('holidayInstance/get_all.sql'));
-		return rows.map(row => new HolidayInstance(row.id, row.name, row.holidayId, row.dayPatternId, row.note));
+		return rows.map(row => new HolidayInstance(row.id, row.name, row.holiday_id, row.day_pattern_id, row.note));
 	}
 
     /**
@@ -48,7 +48,7 @@ class HolidayInstance {
 	 */
 	static async getByHolidayId(holidayId, conn) {
 		const rows = await conn.any(sqlFile('holidayInstance/get_by_holiday_id.sql'), { holidayId: holidayId });
-		return rows.map(row => new HolidayInstance(row.id, row.name, row.holidayId, row.dayPatternId, row.note));
+		return rows.map(row => new HolidayInstance(row.id, row.name, row.holiday_id, row.day_pattern_id, row.note));
 	}
 
     /**
@@ -59,7 +59,7 @@ class HolidayInstance {
 	 */
 	static async getById(id, conn) {
 		const rows = await conn.any(sqlFile('holidayInstance/get_by_id.sql'), { id: id });
-		return rows.map(row => new HolidayInstance(row.id, row.name, row.holidayId, row.dayPatternId, row.note));
+		return rows.map(row => new HolidayInstance(row.id, row.name, row.holiday_id, row.day_pattern_id, row.note));
 	}
 
     /**
